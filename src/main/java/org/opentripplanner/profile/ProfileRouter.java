@@ -151,7 +151,9 @@ public class ProfileRouter {
                 if (pattern.getStops().get(i) == sd.stop) {
                     /* Pseudo-transfer from null indicates first leg. */
                     ProfileTransfer xfer = new ProfileTransfer(null, pattern, null, sd.stop, sd.distance);
-                    queue.add(new PatternRide(pattern, i, null, xfer));
+                    if (req.modes.contains(pattern.mode)) {
+                        queue.add(new PatternRide(pattern, i, null, xfer));
+                    }
                     /* Do not break in case stop appears more than once in the same pattern. */
                 }
             }
@@ -160,9 +162,7 @@ public class ProfileRouter {
         for (int round = 0; round < ROUNDS; ++round) {
             LOG.info("ROUND {}", round);
             for (PatternRide pr : queue) {
-                if (req.modes.contains(pr.pattern.mode)) {
-                    makeRides(pr, rides);
-                }
+                makeRides(pr, rides);
             }
             LOG.info("number of rides: {}", rides.size());
             /* Check rides reaching the targets */
@@ -190,7 +190,9 @@ public class ProfileRouter {
                             // enqueue transfer result state
                             for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
                                 if (tr.tp2.getStops().get(i) == tr.s2) {
-                                    queue.add(new PatternRide(tr.tp2, i, ride, tr));
+                                    if (req.modes.contains(tr.tp2.mode)) {
+                                        queue.add(new PatternRide(tr.tp2, i, ride, tr));
+                                    }
                                     /* Do not break, stop can appear in pattern more than once. */
                                 }
                             }
