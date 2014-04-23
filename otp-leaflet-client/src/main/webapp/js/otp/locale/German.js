@@ -126,7 +126,7 @@ otp.locale.German = {
     buttons: {
         reverse: "umkehren",
         reverseTip: "<b>Umgekehrte Richtung</b><br/>Startpunkt und Zielort vertauschen und Route mit aktualisierter Abfahrtszeit berechnen.",
-        reverseMiniTip: "Inverser l'itinéraire",
+        reverseMiniTip: "Umgekehrte Richtung",
 
         edit: "anpassen",
         editTip: "<b>Route anpassen</b><br/>Zurück zu den Routeneinstellungen.",
@@ -247,7 +247,7 @@ otp.locale.German = {
         student_fare: "Ausbildungstarif",
         senior_fare: "Seniorentarif",
 
-        travel: "Départ le",
+        travel: "Reise",
         valid: "Gültig bis",
         trip_length: "Dauer",
         with_a_walk: "Fußweg",
