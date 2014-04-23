@@ -68,7 +68,6 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
-import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -194,7 +193,7 @@ class Context {
     }
 
     private void initBikeRental() {
-        BikeRentalStationService service = new BikeRentalStationService();
+        BikeRentalStationService service = graph.getService(BikeRentalStationService.class, true);
         BikeRentalStation station = new BikeRentalStation();
         station.x = -122.637634;
         station.y = 45.513084;
@@ -202,9 +201,7 @@ class Context {
         station.spacesAvailable = 4;
         station.id = "1";
         station.name = "bike rental station";
-
-        service.addStation(station);
-        graph.putService(BikeRentalStationService.class, service);
+        service.addBikeRentalStation(station);
     }
 
     private Graph makeSimpleGraph() {
