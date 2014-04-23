@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.opentripplanner.api.common.Message;
-import org.opentripplanner.api.resource.LocationNotAccessible;
+import org.opentripplanner.api.common.LocationNotAccessible;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
