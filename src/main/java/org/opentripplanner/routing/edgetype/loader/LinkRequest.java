@@ -89,7 +89,9 @@ public class LinkRequest {
      * Used by both the network linker and for adding temporary "extra" edges at the origin 
      * and destination of a search.
      */
-    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v, Collection<Edge> nearbyRouteEdges, RoutingRequest options) {
+    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v,
+            Collection<Edge> nearbyRouteEdges, RoutingRequest options,
+            boolean possibleTransitLinksOnly) {
         Collection<StreetVertex> existing = linker.splitVertices.get(v);
         if (existing != null)
             return existing;
@@ -104,7 +106,8 @@ public class LinkRequest {
         /* is there a bundle of edges nearby to use or split? */
         GenericLocation location = new GenericLocation(coordinate);
         TraversalRequirements reqs = new TraversalRequirements(options);
-        CandidateEdgeBundle edges = linker.index.getClosestEdges(location, reqs, null, nearbyRouteEdges, true);
+        CandidateEdgeBundle edges = linker.index.getClosestEdges(location, reqs, null,
+                nearbyRouteEdges, possibleTransitLinksOnly);
         if (edges == null || edges.size() < 1) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
             LOG.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
@@ -340,7 +343,8 @@ public class LinkRequest {
         TraverseModeSet modes = v.getModes().clone();
         modes.setMode(TraverseMode.WALK, true);
         RoutingRequest request = new RoutingRequest(modes);
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges, request);
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges,
+                request, true);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {
@@ -366,7 +370,8 @@ public class LinkRequest {
         if (modes != null) {
             request = new RoutingRequest(modes);
         }
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, request);
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, request,
+                false);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {
