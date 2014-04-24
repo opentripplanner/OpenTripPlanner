@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -22,6 +23,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -53,8 +55,10 @@ public class StreetBikeParkLink extends Edge {
     }
 
     public LineString getGeometry() {
-        // TODO Return straight line geometry between the two end-points ?
-        return null;
+        // Return straight line beetween the bike park and the street
+        Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(),
+                getToVertex().getCoordinate() };
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
     public String getName() {
