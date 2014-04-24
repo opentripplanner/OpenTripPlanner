@@ -17,8 +17,6 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class BikePark implements Serializable {
@@ -57,7 +55,7 @@ public class BikePark implements Serializable {
         if (!(o instanceof BikePark)) {
             return false;
         }
-        BikeRentalStation other = (BikeRentalStation) o;
+        BikePark other = (BikePark) o;
         return other.id.equals(id);
     }
 
