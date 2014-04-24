@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.model.JSONObjectMapperProvider;
 import org.opentripplanner.api.resource.AlertPatcher;
 import org.opentripplanner.api.resource.BikeRental;
@@ -107,6 +108,8 @@ public class OTPApplication extends Application {
     @Override
     public Set getSingletons() {
         return Sets.newHashSet (
+            // Show exception messages in responses
+            new OTPExceptionMapper(),
             // Serialize POJOs (unannotated) JSON using Jackson
             new JSONObjectMapperProvider(),
             // Allow injecting the OTP server object into Jersey resource classes
