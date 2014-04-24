@@ -264,10 +264,10 @@ public class ProfileRouter {
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
         rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
-        rr.setRoutingContext(graph);
-        // Set batch afterward, so both origin and dest will be found.
-        rr.setBatch(true);
         rr.setArriveBy(back);
+        rr.setRoutingContext(graph);
+        // Set batch after context, so both origin and dest vertices will be found.
+        rr.setBatch(true);
         // If this is not set, searches are very slow.
         int worstElapsedTime = 60 * 90;
         if (back) worstElapsedTime *= -1;
@@ -297,7 +297,7 @@ public class ProfileRouter {
             public boolean shouldSearchContinue(Vertex origin, Vertex target, State current, ShortestPathTree spt, RoutingRequest req) {
                 if (current.getVertex() != target) return true;
                 // current.dumpPath();
-                return false;
+                return true;
             }
         };
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000, terminator);
