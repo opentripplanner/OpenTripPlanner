@@ -138,39 +138,6 @@ public class GraphIndex {
 
     private static DistanceLibrary distlib = new SphericalDistanceLibrary();
 
-
-    /**
-     * For profile routing.
-     */
-    public List<StopAtDistance> findTransitStops(double lon, double lat, double radius) {
-        List<StopAtDistance> ret = Lists.newArrayList();
-        for (TransitStop tstop : stopSpatialIndex.query(lon, lat, radius)) {
-            Stop stop = tstop.getStop();
-            int distance = (int) distlib.distance(lat, lon, stop.getLat(), stop.getLon());
-            if (distance < radius)
-                ret.add(new StopAtDistance(stop, distance));
-        }
-        return ret;
-    }
-
-    /**
-     * For profile routing.
-     * Find all patterns that stop close to a given lat,lon coordinate.
-     * Return a map from each pattern to the closest stop on that pattern.
-     * We want a single stop object rather than an index within the pattern because we want to consider
-     * stops that appear more than once in a pattern at every index where they occur (in profile routing).
-     * Therefore this is not the right place to convert to stop indexes from stop objects.
-     */
-    public Map<TripPattern, StopAtDistance> closestPatterns(double lon, double lat, double radius) {
-        SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closest = new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
-        for (StopAtDistance stopDist : findTransitStops(lon, lat, radius)) {
-            for (TripPattern pattern : patternsForStop.get(stopDist.stop)) {
-                closest.putMin(pattern, stopDist);
-            }
-        }
-        return closest;
-    }
-
     /**
      * Lazy-initialize additional transfer data for profile routing.
      * Find best transfers between each pair of routes that pass near one another.
@@ -205,6 +172,21 @@ public class GraphIndex {
          * transfer.toString()); } }
          */
         LOG.info("Done finding transfers.");
+    }
+
+    /**
+     * For profile routing. Actually, now only used for finding transfers.
+     * TODO replace with an on-street search.
+     */
+    public List<StopAtDistance> findTransitStops(double lon, double lat, double radius) {
+        List<StopAtDistance> ret = Lists.newArrayList();
+        for (TransitStop tstop : stopSpatialIndex.query(lon, lat, radius)) {
+            Stop stop = tstop.getStop();
+            int distance = (int) distlib.distance(lat, lon, stop.getLat(), stop.getLon());
+            if (distance < radius)
+                ret.add(new StopAtDistance(stop, distance));
+        }
+        return ret;
     }
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */

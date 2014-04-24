@@ -34,11 +34,10 @@ import org.opentripplanner.standalone.OTPServer;
 @Path("routers/{routerId}/profile")
 public class ProfileResource {
 
-    private ProfileRouter router;
+    private Graph graph;
 
     public ProfileResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        Graph graph = otpServer.graphService.getGraph(routerId);
-        router = new ProfileRouter(graph.index);
+        graph = otpServer.graphService.getGraph(routerId);
     }
 
     @GET
@@ -46,26 +45,35 @@ public class ProfileResource {
     public Response profileRoute (
             @QueryParam("from")  LatLon from,
             @QueryParam("to")    LatLon to,
-            @QueryParam("date")      @DefaultValue("today") YearMonthDay date,
-            @QueryParam("startTime") @DefaultValue("07:00") HourMinuteSecond fromTime,
-            @QueryParam("endTime")   @DefaultValue("09:00") HourMinuteSecond toTime,
-            @QueryParam("orderBy")   @DefaultValue("MIN")   Option.SortOrder orderBy,
-            @QueryParam("limit")     @DefaultValue("10")    Integer limit,
-            @QueryParam("modes")     @DefaultValue("WALK,TRANSIT") TraverseModeSet modes)
+            @QueryParam("date")       @DefaultValue("today") YearMonthDay date,
+            @QueryParam("startTime")  @DefaultValue("07:00") HourMinuteSecond fromTime,
+            @QueryParam("endTime")    @DefaultValue("09:00") HourMinuteSecond toTime,
+            @QueryParam("walkSpeed")  @DefaultValue("1.4")   float walkSpeed,  // m/sec
+            @QueryParam("bikeSpeed")  @DefaultValue("4.1")   float bikeSpeed,  // m/sec
+            @QueryParam("streetDist") @DefaultValue("800")   float streetDist, // meters
+            @QueryParam("orderBy")    @DefaultValue("MIN")   Option.SortOrder orderBy,
+            @QueryParam("limit")      @DefaultValue("10")    int limit,
+            @QueryParam("modes")      @DefaultValue("WALK,TRANSIT") TraverseModeSet modes)
             throws Exception {
 
         QueryParameter.checkRangeInclusive(limit, 0, Integer.MAX_VALUE);
+        QueryParameter.checkRangeInclusive(walkSpeed, 0, 7);
+        QueryParameter.checkRangeInclusive(bikeSpeed, 0, 21);
         ProfileRequest req = new ProfileRequest();
-        req.from     = from;
-        req.to       = to;
-        req.fromTime = fromTime.toSeconds();
-        req.toTime   = toTime.toSeconds();
-        req.date     = date.toJoda();
-        req.orderBy  = orderBy;
-        req.limit    = limit;
-        req.modes    = modes;
+        req.from       = from;
+        req.to         = to;
+        req.fromTime   = fromTime.toSeconds();
+        req.toTime     = toTime.toSeconds();
+        req.walkSpeed  = walkSpeed;
+        req.bikeSpeed  = bikeSpeed;
+        req.streetDist = streetDist;
+        req.date       = date.toJoda();
+        req.orderBy    = orderBy;
+        req.limit      = limit;
+        req.modes      = modes;
 
-        ProfileResponse response = router.route(req);
+        ProfileRouter router = new ProfileRouter(graph, req);
+        ProfileResponse response = router.route();
         return Response.status(Status.OK).entity(response).build();
     
     }

@@ -13,6 +13,9 @@ public class ProfileRequest {
     public LatLon to;
     public int fromTime;
     public int toTime;
+    public float walkSpeed;
+    public float bikeSpeed;
+    public float streetDist;
     public LocalDate date;
     public Option.SortOrder orderBy;
     public int limit;
