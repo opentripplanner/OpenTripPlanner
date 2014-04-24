@@ -14,10 +14,10 @@ public class Option {
     @Getter int finalWalkTime;
     @Getter Stats stats;
     
-    public Option (Ride ride, int finalWalkTime, TimeWindow window) {
+    public Option (Ride ride, int finalWalkTime, TimeWindow window, double walkSpeed) {
         stats = new Stats();
         while (ride != null) {
-            Segment segment = new Segment (ride, window); 
+            Segment segment = new Segment (ride, window, walkSpeed);
             segments.add(0, segment);
             stats.add(segment.walkTime);
             stats.add(segment.waitStats);

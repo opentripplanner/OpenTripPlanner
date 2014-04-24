@@ -42,7 +42,6 @@ public class ProfileRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
     static final int SLACK = 60; // sec
-    static final double WALK_SPEED = 1.4; // m/sec FIXME hard coded speed constant
     static final Stop fakeTargetStop = new Stop();
     
     static {
@@ -226,7 +225,7 @@ public class ProfileRouter {
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
             int dist = toStops.get(ride.patternRides.get(0).pattern).distance; 
-            Option option = new Option (ride, dist, window); // TODO Convert distance to time.
+            Option option = new Option (ride, dist, window, request.walkSpeed); // TODO Convert distance to time.
             if ( ! option.hasEmptyRides()) options.add(option); 
         }
         return new ProfileResponse(options, request.orderBy, request.limit);
@@ -259,6 +258,10 @@ public class ProfileRouter {
         return closest;
     }
 
+    /**
+     * Perform an on-street search to find nearby stops,
+     * and a path to the destination if possible.
+     */
     private List<StopAtDistance> findClosestStops(boolean back) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
@@ -304,9 +307,5 @@ public class ProfileRouter {
         rr.rctx.destroy();
         return ret;
     }
-
-    // genericAStar is stalling and I'm tired of trying to figure out why.
-    // so I'm re-implementing a non-generic Dijkstra.
-
 
 }

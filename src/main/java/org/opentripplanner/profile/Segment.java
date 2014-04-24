@@ -44,7 +44,7 @@ public class Segment {
     @Getter Stats rideStats;
     @Getter List<SegmentPattern> segmentPatterns = Lists.newArrayList();
 
-    public Segment (Ride ride, TimeWindow window) {
+    public Segment (Ride ride, TimeWindow window, double walkSpeed) {
         route = ride.route.getId().getId();
         mode = GtfsLibrary.getTraverseMode(ride.route).toString();
         routeShortName = ride.route.getShortName();
@@ -59,9 +59,9 @@ public class Segment {
         }
         Collections.sort(segmentPatterns);
         walkDistance = (int) ride.getTransferDistance();
-        walkTime = (int) (ride.getTransferDistance() / ProfileRouter.WALK_SPEED);
+        walkTime = (int) (ride.getTransferDistance() / walkSpeed);
         /* At this point we know all patterns on rides. Calculate transfer time information. */
-        waitStats = ride.statsForTransfer (window);
+        waitStats = ride.statsForTransfer (window, walkSpeed);
     }
 
 }

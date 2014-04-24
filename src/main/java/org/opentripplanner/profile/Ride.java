@@ -148,12 +148,12 @@ public class Ride {
      * Distances can be stored in rides, including the first and last distance. But waits must be
      * calculated from full sets of patterns, which are not known until a round is over.
      */
-    public Stats statsForTransfer (TimeWindow window) {
+    public Stats statsForTransfer (TimeWindow window, double walkSpeed) {
         /* If there is no previous ride, assume uniformly distributed arrival times. */
         if (previous == null) return this.statsForBoarding (window); 
         List<Integer> departures = getSortedStoptimes(window, false);
         List<Integer> arrivals   = getSortedStoptimes(window, true);
-        int walkTime = (int) (getTransferDistance() / ProfileRouter.WALK_SPEED);
+        int walkTime = (int) (getTransferDistance() / walkSpeed);
         List<Integer> waits = Lists.newArrayList();        
         Iterator<Integer> departureIterator = departures.iterator(); 
         int departure = departureIterator.next();
