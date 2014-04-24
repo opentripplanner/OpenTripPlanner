@@ -35,6 +35,9 @@ public class BikeParkGraphBuilder implements GraphBuilder {
     private static Logger LOG = LoggerFactory.getLogger(BikeParkGraphBuilder.class);
 
     private BikeParkDataSource dataSource;
+    
+    @Setter
+    private String namePrefix;
 
     public void setDataSource(BikeParkDataSource dataSource) {
         this.dataSource = dataSource;
@@ -53,6 +56,8 @@ public class BikeParkGraphBuilder implements GraphBuilder {
         Collection<BikePark> bikeParks = dataSource.getBikeParks();
 
         for (BikePark bikePark : bikeParks) {
+            if (namePrefix != null)
+                bikePark.name = namePrefix + bikePark.name;
             service.addBikePark(bikePark);
             BikeParkVertex bikeParkVertex = new BikeParkVertex(graph, bikePark);
             new BikeParkEdge(bikeParkVertex);
