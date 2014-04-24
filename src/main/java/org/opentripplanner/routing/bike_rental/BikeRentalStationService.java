@@ -32,6 +32,7 @@ public class BikeRentalStationService implements Serializable {
     }
 
     public void addBikeRentalStation(BikeRentalStation bikeRentalStation) {
+        // Remove old reference first, as adding will be a no-op if already present
         bikeRentalStations.remove(bikeRentalStation);
         bikeRentalStations.add(bikeRentalStation);
     }
@@ -45,6 +46,7 @@ public class BikeRentalStationService implements Serializable {
     }
 
     public void addBikePark(BikePark bikePark) {
+        // Remove old reference first, as adding will be a no-op if already present
         bikeParks.remove(bikePark);
         bikeParks.add(bikePark);
     }
