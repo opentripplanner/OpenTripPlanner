@@ -60,6 +60,8 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
                     return null;
                 }
                 bikePark.name = attributes.get("name").trim();
+                if (namePrefix != null)
+                    bikePark.name = namePrefix + bikePark.name;
                 String[] coords = attributes.get("Point").trim().split(",");
                 bikePark.x = Double.parseDouble(coords[0]);
                 bikePark.y = Double.parseDouble(coords[1]);
