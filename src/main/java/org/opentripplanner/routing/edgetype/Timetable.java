@@ -52,7 +52,8 @@ public class Timetable implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(Timetable.class);
 
     /**
-     * This creates a circular reference between trippatterns and timetables. Be careful during serialization.
+     * This creates a circular reference between trippatterns and their scheduled
+     * (non-updated) timetables. Be careful during serialization.
      */
     @Getter
     private final TripPattern pattern;
@@ -133,6 +134,7 @@ public class Timetable implements Serializable {
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
+                if (depTime < 0) continue;
                 if (depTime >= time && depTime < bestTime && tt.tripAcceptable(s0,
                         currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
                     bestTrip = tt;
@@ -140,6 +142,7 @@ public class Timetable implements Serializable {
                 }
             } else {
                 int arvTime = tt.getArrivalTime(stopIndex - 1);
+                if (arvTime < 0) continue;
                 if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(s0,
                         currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
                     bestTrip = tt;

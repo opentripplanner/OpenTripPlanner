@@ -20,7 +20,7 @@ public class Segment {
             this.patternId = patternRide.pattern.getCode();
             this.fromIndex = patternRide.fromIndex;
             this.toIndex   = patternRide.toIndex;
-            this.nTrips    = patternRide.pattern.getNumScheduledTrips();
+            this.nTrips    = patternRide.pattern.getNumScheduledTrips(); // TODO time window not applied?
             //this.stats     = patternRide.stats;
         }
         @Override

@@ -532,29 +532,30 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         }
     }
 
-    /* NESTED STATIC CLASSES */
-
-    /** Used for sorting an array of StopTimes based on arrivals for a specific hop. */
-    @AllArgsConstructor
-    public static class ArrivalsComparator implements Comparator<TripTimes> {
-        final int hop;
-        @Override public int compare(TripTimes tt1, TripTimes tt2) {
-            return tt1.getArrivalTime(hop) - tt2.getArrivalTime(hop);
-        }
-    }
-
-    /** Used for sorting an array of StopTimes based on departures for a specific hop. */
-    @AllArgsConstructor
-    public static class DeparturesComparator implements Comparator<TripTimes> {
-        final int hop;
-        @Override public int compare(TripTimes tt1, TripTimes tt2) {
-            return tt1.getDepartureTime(hop) - tt2.getDepartureTime(hop);
-        }
-    }
-
-    /* Allow sorting TripTimes based on first departure time. */
+    /** Sort TripTimes based on first departure time. */
     @Override
     public int compareTo(TripTimes other) {
         return this.getDepartureTime(0) - other.getDepartureTime(0);
     }
+
+    /**
+     * This is the method actually called when searching for departures across a timetable.
+     * The base class ignores the time parameter t.
+     * The frequency-based subclass uses it.
+     * @return the time at which the next departure will happen or -1 if none.
+     */
+    public int nextDepartureTime (int hop, int t) {
+        return getDepartureTime(hop);
+    }
+
+    /**
+     * This is the method actually called when searching for arrivals across a timetable.
+     * The base class ignores the time parameter t.
+     * The frequency-based subclass uses it.
+     * @return the time at which the previous arrival will happen or -1 if none.
+     */
+    public int prevArrivalTime (int hop, int t) {
+        return getArrivalTime(hop);
+    }
+
 }
