@@ -15,6 +15,7 @@ public class FrequencyTripTimes extends TripTimes {
     final int endTime;
     final int headwaySecs;
     final boolean exactTimes;
+    int timeOffset; // how many seconds to subtract. or maybe just shift the scheduled arrv/dep times.
 
     public FrequencyTripTimes(Trip trip, List<StopTime> stopTimes, Frequency freq) {
         super(trip, stopTimes);

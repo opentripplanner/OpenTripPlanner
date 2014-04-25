@@ -52,16 +52,7 @@ public class Timetable implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(Timetable.class);
 
     /**
-     * The Timetable size (number of TripTimes) at which indexes will be built for all stops.
-     * Below this size, departure and arrival times will be found by linear search. Above this
-     * size, it will be possible to use binary search.
-     * Break even list size for linear and binary searches was determined to be around 16.
-     */
-    private static final int INDEX_THRESHOLD = 16;
-
-    /** 
-     * This creates a circular reference between trippatterns and timetables. 
-     * Be careful during serialization. 
+     * This creates a circular reference between trippatterns and timetables. Be careful during serialization.
      */
     @Getter
     private final TripPattern pattern;
@@ -74,20 +65,10 @@ public class Timetable implements Serializable {
     private final ArrayList<TripTimes> tripTimes;
 
     /**
-     * The ServiceDate for which this (updated) timetables is valid.
-     * If null, then it is valid for all dates.
+     * The ServiceDate for which this (updated) timetables is valid. If null, then it is valid for all dates.
      */
     @Getter
     private final ServiceDate serviceDate;
-
-    /**
-     * If the departures index is null, this timetable has not been indexed: use a linear search.
-     * Unfortunately you really do need 2 indexes, because dwell times for different trips at
-     * the same stop may overlap. The indexes always contain the same elements as the main
-     * tripTimes List, but are re-sorted at each stop to allow binary searches.
-     */
-    private transient TripTimes[][] arrivalsIndex = null;
-    private transient TripTimes[][] departuresIndex = null;
 
     /**
      * For each hop, the best running time. This serves to provide lower bounds on traversal time.
@@ -112,8 +93,7 @@ public class Timetable implements Serializable {
     }
 
     /**
-     * Copy constructor: create an un-indexed Timetable with the same TripTimes as the
-     * specified timetable.
+     * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified timetable.
      */
     Timetable (Timetable tt, ServiceDate serviceDate) {
         tripTimes = new ArrayList<TripTimes>(tt.tripTimes);
@@ -126,53 +106,8 @@ public class Timetable implements Serializable {
     }
 
     /**
-     * Produces 2D index arrays that are stop-major and sorted, allowing binary search at any
-     * given stop. It is of course inefficient to call this after updating only one or two
-     * trips in a pattern since we can usually get by with swapping only the new trip into the
-     * existing already-sorted lists. But let's see realistically how resource-intensive this
-     * is before optimizing it.
-     */
-    private void index() {
-        int nHops = pattern.getHopCount();
-        arrivalsIndex = new TripTimes[nHops][];
-        departuresIndex = new TripTimes[nHops][];
-        boolean departuresFifo = true;
-        boolean arrivalsMatchDepartures = true;
-        for (int hop = 0; hop < nHops; hop++) {
-            // copy canonical TripTimes List into new arrays
-            arrivalsIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
-            departuresIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
-            // TODO: STOP VS HOP
-            Arrays.sort(arrivalsIndex[hop], new TripTimes.ArrivalsComparator(hop));
-            Arrays.sort(departuresIndex[hop], new TripTimes.DeparturesComparator(hop));
-            if (hop > 0) {
-                if (Arrays.equals(departuresIndex[hop], departuresIndex[hop - 1])) {
-                    departuresIndex[hop] = departuresIndex[hop - 1];
-                } else {
-                    departuresFifo = false;
-                }
-            }
-            if (Arrays.equals(departuresIndex[hop], arrivalsIndex[hop])) {
-                arrivalsIndex[hop] = departuresIndex[hop];
-            } else {
-                arrivalsMatchDepartures = false;
-            }
-        }
-        if (departuresFifo) {
-            //LOG.debug("Compressing FIFO Timetable index.");
-            departuresIndex = Arrays.copyOf(departuresIndex, 1);
-        }
-        if (arrivalsMatchDepartures) {
-            //LOG.debug("Reusing departures index where arrivals index is identical.");
-            arrivalsIndex = departuresIndex;
-        }
-    }
-
-    /**
      * Get the next (previous) trip that departs (arrives) from the specified stop at or after
-     * (before) the specified time. The haveBicycle parameter must be passed in because we cannot
-     * determine whether the user is in possession of a rented bicycle from the options alone.
-     *
+     * (before) the specified time.
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
      * trip matches both the time and other criteria.
      */
@@ -183,62 +118,32 @@ public class Timetable implements Serializable {
         boolean haveBicycle = s0.getNonTransitMode() == TraverseMode.BICYCLE; 
         TripTimes bestTrip = null;
         int index;
-        TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex;
         Stop currentStop = pattern.getStop(stopIndex);
-        if (tableIndex != null) {
-            TripTimes[] sorted;
-            // this timetable has been indexed, use binary search
-            if (tableIndex.length == 1) { // for optimized FIFO patterns
-                sorted = tableIndex[0];
-            } else {
-                sorted = tableIndex[boarding ? stopIndex : stopIndex - 1];
-            }
-            // an alternative to conditional increment/decrement would be to sort the arrivals
-            // index in decreasing order, but that would require changing the search algorithm
+        // Linear search through the timetable looking for the best departure.
+        // We no longer use a binary search on Timetables because:
+        // 1. we allow combining trips from different service IDs on the same tripPattern.
+        // 2. We mix frequency-based and one-off TripTimes together on tripPatterns.
+        // 3. Stoptimes may change with realtime updates, and we cannot count on them being sorted.
+        //    The complexity of keeping sorted indexes up to date does not appear to be worth the
+        //    apparently minor speed improvement.
+        int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        // Hoping JVM JIT will distribute the loop over the if clauses as needed.
+        // We could invert this and skip some service days based on schedule overlap as in RRRR.
+        for (TripTimes tt : tripTimes) {
+            if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
             if (boarding) {
-                index = TripTimes.binarySearchDepartures(sorted, stopIndex, time);
-                while (index < sorted.length) {
-                    TripTimes tt = sorted[index++];
-                    if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
-                    if (tt.tripAcceptable(s0,
-                            currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
-                        bestTrip = tt;
-                        break;
-                    }
+                int depTime = tt.getDepartureTime(stopIndex);
+                if (depTime >= time && depTime < bestTime && tt.tripAcceptable(s0,
+                        currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
+                    bestTrip = tt;
+                    bestTime = depTime;
                 }
             } else {
-                index = TripTimes.binarySearchArrivals(sorted, stopIndex - 1, time);
-                while (index >= 0) {
-                    TripTimes tt = sorted[index--];
-                    if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
-                    if (tt.tripAcceptable(s0,
-                            currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
-                        bestTrip = tt;
-                        break;
-                    }
-                }
-            }
-        } else {
-            // no index present on this timetable. use a linear search:
-            // because trips may change with stoptime updates, we cannot count on them being sorted
-            int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-            for (TripTimes tt : tripTimes) {
-                if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
-                // hoping JVM JIT will distribute the loop over the if clauses as needed
-                if (boarding) {
-                    int depTime = tt.getDepartureTime(stopIndex);
-                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(s0,
-                            currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
-                        bestTrip = tt;
-                        bestTime = depTime;
-                    }
-                } else {
-                    int arvTime = tt.getArrivalTime(stopIndex - 1);
-                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(s0,
-                            currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
-                        bestTrip = tt;
-                        bestTime = arvTime;
-                    }
+                int arvTime = tt.getArrivalTime(stopIndex - 1);
+                if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(s0,
+                        currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
+                    bestTrip = tt;
+                    bestTime = arvTime;
                 }
             }
         }
@@ -300,15 +205,6 @@ public class Timetable implements Serializable {
                 }
             }
         }
-        /* In large timetables, index stoptimes to allow binary searches over trips. */
-// disabled since we are now mixing serviceids
-        if (nTrips > INDEX_THRESHOLD) {
-            LOG.trace("indexing pattern with {} trips", nTrips);
-            index(); 
-        } else {
-            arrivalsIndex = null;
-            departuresIndex = null;
-        }
         /* Detect trip overlap modulo 24 hours. Allows departure search optimizations. */
         minDepart = Integer.MAX_VALUE;
         maxArrive = Integer.MIN_VALUE;
@@ -322,38 +218,6 @@ public class Timetable implements Serializable {
                 maxArrive = arrive;
             }
         }
-    }
-
-    public class DeparturesIterator implements Iterator<Integer> {
-
-        int nextPosition = 0;
-
-        private int stopIndex;
-
-        public DeparturesIterator(int stopIndex) {
-            this.stopIndex = stopIndex;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return nextPosition < tripTimes.size();
-        }
-
-        @Override
-        public Integer next() {
-            return tripTimes.get(nextPosition++).getDepartureTime(stopIndex);
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-    }
-
-    /** Gets all the departure times at a given stop (not used in routing) */
-    public Iterator<Integer> getDepartureTimes(int stopIndex) {
-        return new DeparturesIterator(stopIndex);
     }
 
     public class ArrivalsIterator implements Iterator<Integer> {
