@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
  * indexes everywhere for simplicity.
  */
 public class TripTimes implements Serializable, Comparable<TripTimes> {
+
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
 

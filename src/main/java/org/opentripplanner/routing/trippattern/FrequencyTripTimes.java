@@ -8,15 +8,20 @@ import java.util.List;
 
 /**
  * Like a tripTimes, but can represent multiple trips following the same template at regular intervals.
- * Created by abyrd on 2014-03-31.
  */
 public class FrequencyTripTimes extends TripTimes {
 
-    Frequency freq;
+    final int startTime;
+    final int endTime;
+    final int headwaySecs;
+    final boolean exactTimes;
 
     public FrequencyTripTimes(Trip trip, List<StopTime> stopTimes, Frequency freq) {
         super(trip, stopTimes);
-        this.freq = freq;
+        this.startTime   = freq.getStartTime();
+        this.endTime     = freq.getEndTime();
+        this.headwaySecs = freq.getHeadwaySecs();
+        this.exactTimes  = freq.getExactTimes() != 0;
     }
 
     // funcs for: trip is running, trip is acceptable according to params.
