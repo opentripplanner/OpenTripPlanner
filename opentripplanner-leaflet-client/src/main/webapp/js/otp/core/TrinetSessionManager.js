@@ -17,30 +17,25 @@ otp.namespace("otp.core");
 
 otp.core.TrinetSessionManager = otp.Class({
 
-    module : null,
-    
     sessionId : null,
     username : null,
     
     checkSessionSuccessCallback : null,
     
-    initialize : function(module, checkSessionSuccessCallback) {
+    initialize : function(webapp, verifyLoginUrl, redirectUrl, checkSessionSuccessCallback) {
     
-        this.module = module;
-        this.checkSessionSuccessCallback = checkSessionSuccessCallback; 
-        
         // initialize the session
-        if(_.has(this.module.webapp.urlParams, 'sessionId')) {
-            console.log("received session id: " + this.module.webapp.urlParams['sessionId']);
-            this.checkSession(this.module.webapp.urlParams['sessionId']);
+        if(_.has(webapp.urlParams, 'sessionId')) {
+            console.log("received session id: " + webapp.urlParams['sessionId']);
+            this.checkSession(webapp.urlParams['sessionId'], checkSessionSuccessCallback);
         }
         else { // no sessionId passed in; must request one from server
             console.log("creating new session..");
-            this.newSession();
+            this.newSession(verifyLoginUrl, redirectUrl);
         }
     },
         
-    newSession : function() {
+    newSession : function(verifyLoginUrl, redirectUrl) {
         var this_ = this;
         var url = otp.config.datastoreUrl+'/auth/newSession';
         $.ajax(url, {
@@ -49,9 +44,9 @@ otp.core.TrinetSessionManager = otp.Class({
             
             success: function(data) {
                 console.log("newSession success: "+data.sessionId);
-                var redirectUrl = this_.module.options.trinet_verify_login_url + "?session=" + data.sessionId + "&redirect=" + this_.module.options.module_redirect_url;
-                console.log("redirect url: "+redirectUrl);
-                window.location = redirectUrl;
+                var windowUrl = verifyLoginUrl + "?session=" + data.sessionId + "&redirect=" + redirectUrl;
+                console.log("redirecting to: "+windowUrl);
+                window.location = windowUrl;
             },
             
             error: function(data) {
@@ -61,7 +56,7 @@ otp.core.TrinetSessionManager = otp.Class({
         });
     },
     
-    checkSession : function(sessionId) {
+    checkSession : function(sessionId, checkSessionSuccessCallback) {
         var this_ = this;
         var url = otp.config.datastoreUrl+'/auth/checkSession';
         $.ajax(url, {
@@ -75,7 +70,10 @@ otp.core.TrinetSessionManager = otp.Class({
                 if(data.username) {
                     this_.sessionId = sessionId;
                     this_.username = data.username;
-                    this_.checkSessionSuccessCallback.call(this);
+                    this_.role = data.role;
+                    checkSessionSuccessCallback.call(this);
+                    //console.log('logged in as '+data.username);
+                    //console.log(data);
                 }
                 else {
                     console.log("bad session id: " + sessionId);
