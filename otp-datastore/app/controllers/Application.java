@@ -60,7 +60,8 @@ public class Application extends Controller {
         Map<String, String> resp = new HashMap<String, String>();
         resp.put("sessionId", sessionId);
         if(userSession != null) {
-            resp.put("username", userSession.user.username);            
+            resp.put("username", userSession.user.username);
+            resp.put("role", userSession.user.role);
         }
         renderJSON(resp);
     }

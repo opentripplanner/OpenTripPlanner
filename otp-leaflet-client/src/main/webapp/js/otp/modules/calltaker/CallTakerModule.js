@@ -21,14 +21,7 @@ otp.modules.calltaker.CallTakerModule =
     moduleName  : "Call Taker Interface",
     
     activeCall : null,
-    
-    /*sessionId : null,
-    username: null,*/
-    
-    sessionManager : null,
-    
-    //templateFile : 'otp/modules/calltaker/calltaker-templates.html',
-    
+        
     tripOptionsWidgetCssClass : 'otp-calltaker-tripOptionsWidget',
     itinerariesWidgetCssClass : 'otp-calltaker-itinerariesWidget',
     
@@ -36,8 +29,10 @@ otp.modules.calltaker.CallTakerModule =
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
         this.templateFiles.push('otp/modules/calltaker/calltaker-templates.html');
 
+        this.requiresAuth = true;
+        this.authUserRoles = ['calltaker', 'all'];
+
         this.showIntermediateStops = true;
-        
     },
     
     activate : function() {    
@@ -45,10 +40,10 @@ otp.modules.calltaker.CallTakerModule =
         console.log("activate ctm: " + this.tripOptionsWidgetCssClass);
         otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
         
-        this.sessionManager = new otp.core.TrinetSessionManager(this, $.proxy(function() {
-            this.showHistoryWidget();
-        }, this));
-        
+        // use app-wide session manager
+        this.sessionManager = this.webapp.sessionManager;
+
+        this.showHistoryWidget();
         this.mailablesWidget = new otp.modules.calltaker.MailablesWidget(this.id+'-mailablesWidget', this);
     },
     
