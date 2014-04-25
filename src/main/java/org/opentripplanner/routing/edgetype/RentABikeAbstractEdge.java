@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -41,6 +42,10 @@ public abstract class RentABikeAbstractEdge extends Edge {
     public RentABikeAbstractEdge(Vertex from, Vertex to, Set<String> networks) {
         super(from, to);
         this.networks = networks;
+        if (this.networks == null) {
+            this.networks = new HashSet<String>();
+            this.networks.add("*");
+        }
     }
 
     protected State traverseRent(State s0) {
@@ -124,7 +129,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
     private boolean hasCompatibleNetworks(Set<String> stationNetworks, Set<String> rentedNetworks) {
         /*
          * Two stations are compatible if they share at least one network.
-         * Special case for "*" networks (no network defined in OSM).
+         * Special case for "*" networks (no network defined).
          */
         if (stationNetworks.contains("*") || rentedNetworks.contains("*"))
             return true;

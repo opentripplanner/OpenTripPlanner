@@ -49,6 +49,11 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public boolean realTimeData = true;
+
+    /**
+     * List of compatible network names. Null (default) to be compatible with all.
+     */
+    public Set<String> networks;
     
     public boolean equals(Object o) {
         if (!(o instanceof BikeRentalStation)) {
