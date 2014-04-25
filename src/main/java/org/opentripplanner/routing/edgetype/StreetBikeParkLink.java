@@ -77,10 +77,10 @@ public class StreetBikeParkLink extends Edge {
             return null;
 
         StateEditor s1 = s0.edit(this);
-        // Assume bike rental stations are more-or-less on-street
+        // Assume bike park are more-or-less on-street
         s1.incrementTimeInSeconds(1);
         s1.incrementWeight(1);
-        s1.setBackMode(s0.getNonTransitMode());
+        // Do not force any mode, will use the latest one (walking bike or bike)
         return s1.makeState();
     }
 

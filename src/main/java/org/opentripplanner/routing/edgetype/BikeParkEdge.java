@@ -62,7 +62,7 @@ public class BikeParkEdge extends Edge {
         StateEditor s0e = s0.edit(this);
         s0e.incrementWeight(options.bikeParkCost);
         s0e.incrementTimeInSeconds(options.bikeParkTime);
-        s0e.setBackMode(TraverseMode.BICYCLE);
+        s0e.setBackMode(TraverseMode.LEG_SWITCH);
         s0e.setBikeParked(false);
         State s1 = s0e.makeState();
         return s1;
@@ -75,7 +75,7 @@ public class BikeParkEdge extends Edge {
          * it.
          */
         if (s0.getNonTransitMode() != TraverseMode.BICYCLE || !options.modes.getWalk()
-                || s0.isBikeRenting())
+                || s0.isBikeRenting() || s0.isBikeParked())
             return null;
         BikeParkVertex bikeParkVertex = (BikeParkVertex) tov;
         if (bikeParkVertex.getSpacesAvailable() == 0) {
@@ -85,7 +85,7 @@ public class BikeParkEdge extends Edge {
         StateEditor s0e = s0.edit(this);
         s0e.incrementWeight(options.bikeParkCost);
         s0e.incrementTimeInSeconds(options.bikeParkTime);
-        s0e.setBackMode(TraverseMode.WALK);
+        s0e.setBackMode(TraverseMode.LEG_SWITCH);
         s0e.setBikeParked(true);
         State s1 = s0e.makeState();
         return s1;
