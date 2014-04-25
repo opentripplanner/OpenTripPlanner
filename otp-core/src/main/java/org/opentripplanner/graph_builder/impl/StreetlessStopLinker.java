@@ -21,6 +21,7 @@ import lombok.Setter;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -32,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * {@link GraphBuilder} plugin that links up the stops of a transit network among themselves,
@@ -57,6 +60,7 @@ public class StreetlessStopLinker implements GraphBuilder {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         StreetVertexIndexService index = new StreetVertexIndexServiceImpl(graph);
+        GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
         
         for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
             Coordinate c = ts.getCoordinate();
@@ -65,10 +69,12 @@ public class StreetlessStopLinker implements GraphBuilder {
             for (TransitStop other : index.getNearbyTransitStops(c, radius)) {
                 if(!other.isStreetLinkable())
                     continue;
-                
-                double distance = distanceLibrary.distance(c, other.getCoordinate());
+
+                Coordinate coordinates[] = new Coordinate[] {c, other.getCoordinate()};
+                double distance = distanceLibrary.distance(coordinates[0], coordinates[1]);
+                LineString geometry = geometryFactory.createLineString(coordinates);
                 LOG.trace("  to stop: {} ({}m)", other, distance);
-                new SimpleTransfer(ts, other, distance);
+                new SimpleTransfer(ts, other, distance, geometry);
                 n += 1;
             }
             LOG.trace("linked to {} others.", n);

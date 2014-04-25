@@ -108,7 +108,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class PlanGeneratorTest {
-    private static final double[] F_DISTANCE = {3, 9996806.8, 3539050.5, 11, 2478638.8, 4, 2, 1, 0};
+    private static final double F_DISTANCE[] = {3, 9996806.8, 3539050.5, 7, 2478638.8, 4, 2, 1, 0};
     private static final double O_DISTANCE = 7286193.2;
     private static final double OCTANT = Math.PI / 4;
     private static final double NORTH = OCTANT * 0;
@@ -496,6 +496,8 @@ public class PlanGeneratorTest {
         // Coordinate sequences and line strings for those same edges
         PackedCoordinateSequence coordinates3 = new PackedCoordinateSequence.Double(
                 new double[]{0, 0, 1, 1}, 2);
+        PackedCoordinateSequence coordinates25 = new PackedCoordinateSequence.Double(
+                new double[]{133, 67, 135, 67}, 2);
         PackedCoordinateSequence coordinates39 = new PackedCoordinateSequence.Double(
                 new double[]{179, 89, 180, 89}, 2);
         PackedCoordinateSequence coordinates41 = new PackedCoordinateSequence.Double(
@@ -508,6 +510,7 @@ public class PlanGeneratorTest {
         GeometryFactory geometryFactory = new GeometryFactory();
 
         LineString l3 = new LineString(coordinates3, geometryFactory);
+        LineString l25 = new LineString(coordinates25, geometryFactory);
         LineString l39 = new LineString(coordinates39, geometryFactory);
         LineString l41 = new LineString(coordinates41, geometryFactory);
         LineString l49 = new LineString(coordinates49, geometryFactory);
@@ -543,7 +546,7 @@ public class PlanGeneratorTest {
 
         // Edges for legs 3 and 4
         SimpleTransfer e25 = new SimpleTransfer(
-                v24, v26, 11);
+                v24, v26, 7, l25);
         PreBoardEdge e27 = new PreBoardEdge(
                 v26, v28);
         TransitBoardAlight e29 = new TransitBoardAlight(
@@ -934,9 +937,9 @@ public class PlanGeneratorTest {
         }
 
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals(21.0, itinerary.walkDistance, 0.0);
+            assertEquals(17.0, itinerary.walkDistance, 0.0);
         } else if (type == Type.ONBOARD) {
-            assertEquals(18.0, itinerary.walkDistance, 0.0);
+            assertEquals(14.0, itinerary.walkDistance, 0.0);
         }
 
         assertFalse(itinerary.walkLimitExceeded);
@@ -1342,8 +1345,8 @@ public class PlanGeneratorTest {
         assertEquals(AbsoluteDirection.EAST, steps[3][0].absoluteDirection);
         assertEquals(RelativeDirection.DEPART, steps[3][0].relativeDirection);
         assertEquals(EAST, steps[3][0].angle, EPSILON);
-        assertEquals("Simple Transfer", steps[3][0].streetName);
-        assertEquals(11.0, steps[3][0].distance, 0.0);
+        assertEquals("Train stop arrive => Ferry stop depart", steps[3][0].streetName);
+        assertEquals(7.0, steps[3][0].distance, 0.0);
         assertFalse(steps[3][0].bogusName);
         assertFalse(steps[3][0].stayOn);
         assertEquals(133, steps[3][0].lon, 0.0);

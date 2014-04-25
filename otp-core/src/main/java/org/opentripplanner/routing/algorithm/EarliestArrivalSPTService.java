@@ -15,6 +15,8 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
 
+import lombok.Setter;
+
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
@@ -37,6 +39,9 @@ import org.slf4j.LoggerFactory;
 public class EarliestArrivalSPTService implements SPTService { 
 
     private static final Logger LOG = LoggerFactory.getLogger(EarliestArrivalSPTService.class);
+
+    @Setter
+    private int maxDuration = 60 * 60 * 2;
 
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
@@ -62,7 +67,7 @@ public class EarliestArrivalSPTService implements SPTService {
             options.setClampInitialWait(60 * 30);
         
         // impose search cutoff
-        final long maxt = (60 * 60 * 2) + options.getClampInitialWait();
+        final long maxt = maxDuration + options.getClampInitialWait();
         options.worstTime = options.dateTime + (options.arriveBy ? -maxt : maxt);
             
         // SPT cache does not look at routing request in SPT to perform lookup, 
