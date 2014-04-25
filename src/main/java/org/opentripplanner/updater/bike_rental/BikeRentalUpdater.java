@@ -179,7 +179,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     }
                     verticesByStation.put(station, vertex);
                     new RentABikeOnEdge(vertex, vertex, station.networks);
-                    new RentABikeOffEdge(vertex, vertex, station.networks);
+                    if (station.allowDropoff)
+                        new RentABikeOffEdge(vertex, vertex, station.networks);
                 } else {
                     vertex.setBikesAvailable(station.bikesAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);

@@ -71,7 +71,8 @@ public class BikeRentalGraphBuilder implements GraphBuilder {
                 graph.addTemporaryEdge(e);
             }
             new RentABikeOnEdge(vertex, vertex, station.networks);
-            new RentABikeOffEdge(vertex, vertex, station.networks);
+            if (station.allowDropoff)
+                new RentABikeOffEdge(vertex, vertex, station.networks);
         }
         LOG.info("Created " + stations.size() + " bike rental stations.");
     }

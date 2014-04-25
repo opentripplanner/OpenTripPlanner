@@ -38,6 +38,9 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public int spacesAvailable = Integer.MAX_VALUE;
+    @XmlAttribute
+    @JsonSerialize
+    public boolean allowDropoff = true;
 
     /**
      * List of compatible network names. Null (default) to be compatible with all.

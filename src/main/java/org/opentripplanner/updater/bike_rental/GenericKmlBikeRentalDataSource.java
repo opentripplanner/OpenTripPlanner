@@ -36,6 +36,9 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
     private String namePrefix = null;
 
     private Set<String> networks = null;
+    
+    @Setter
+    private boolean allowDropoff = true;
 
     /**
      * @param namePrefix A string to prefix all station names coming from this source (for example:
@@ -81,6 +84,7 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
         brStation.bikesAvailable = 1; // Unknown, always 1
         brStation.spacesAvailable = 1; // Unknown, always 1
         brStation.networks = networks;
+        brStation.allowDropoff = allowDropoff;
         return brStation;
     }
 
