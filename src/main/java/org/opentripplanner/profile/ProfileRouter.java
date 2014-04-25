@@ -50,6 +50,7 @@ public class ProfileRouter {
 
     private final Graph graph;
     private final ProfileRequest request;
+    private Option directOption; // an option not using transit
 
     public ProfileRouter(Graph graph, ProfileRequest request) {
         this.graph = graph;
@@ -118,7 +119,8 @@ public class ProfileRouter {
     }
     
     /* Maybe don't even try to accumulate stats and weights on the fly, just enumerate options. */
-    
+    /* TODO Or actually use a priority queue based on the min time. */
+
     /**
      * Complete a partial PatternRide (with only pattern and beginning stop) which was enqueued in the last round.
      * This is done by scanning through the Pattern, creating rides to all downstream stops that are near the
@@ -228,6 +230,8 @@ public class ProfileRouter {
             Option option = new Option (ride, dist, window, request.walkSpeed); // TODO Convert distance to time.
             if ( ! option.hasEmptyRides()) options.add(option); 
         }
+        /* Include the direct (no-transit) biking or walking option if we have one. */
+        if (directOption != null) options.add(directOption);
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
@@ -259,8 +263,8 @@ public class ProfileRouter {
     }
 
     /**
-     * Perform an on-street search to find nearby stops,
-     * and a path to the destination if possible.
+     * Perform an on-street search at the origin and destination points
+     * to find nearby stops, as well as a path to the destination if possible.
      */
     private List<StopAtDistance> findClosestStops(boolean back) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
@@ -299,7 +303,7 @@ public class ProfileRouter {
             @Override
             public boolean shouldSearchContinue(Vertex origin, Vertex target, State current, ShortestPathTree spt, RoutingRequest req) {
                 if (current.getVertex() != target) return true;
-                // current.dumpPath();
+                directOption = new Option(current);
                 return true;
             }
         };

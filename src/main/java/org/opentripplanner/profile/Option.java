@@ -7,13 +7,16 @@ import lombok.Getter;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 
 public class Option {
 
     @Getter List<Segment> segments = Lists.newLinkedList();
     @Getter int finalWalkTime;
     @Getter Stats stats;
-    
+    @Getter String summary;
+
     public Option (Ride ride, int finalWalkTime, TimeWindow window, double walkSpeed) {
         stats = new Stats();
         while (ride != null) {
@@ -26,9 +29,18 @@ public class Option {
         }
         this.finalWalkTime = finalWalkTime;
         stats.add(finalWalkTime);
+        summary = generateSegmentSummary();
     }
 
-    public String getSummary() {
+    public Option (State state) {
+        stats = new Stats();
+        int time = (int) state.getElapsedTimeSeconds();
+        stats.add(time);
+        this.finalWalkTime = time;
+        summary = state.getNonTransitMode().toString();
+    }
+
+    public String generateSegmentSummary() {
         StringBuilder sb = new StringBuilder();
         sb.append("routes ");
         List<String> routeShortNames = Lists.newArrayList();
