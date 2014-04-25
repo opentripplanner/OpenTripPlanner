@@ -72,7 +72,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
             }
         }
         
-    	int runningTime = getPattern().getBestRunningTime(stopIndex);
+    	int runningTime = getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
     	StateEditor s1 = state0.edit(this);
     	s1.incrementTimeInSeconds(runningTime);
     	s1.setBackMode(getMode());
@@ -82,7 +82,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return getPattern().getBestRunningTime(stopIndex);
+        return getPattern().scheduledTimetable.getBestRunningTime(stopIndex);
     }
     
     @Override

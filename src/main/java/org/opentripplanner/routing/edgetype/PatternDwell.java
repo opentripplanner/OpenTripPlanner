@@ -69,7 +69,7 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
 
     @Override
     public State optimisticTraverse(State s0) {
-        int dwellTime = getPattern().getBestDwellTime(stopIndex);
+        int dwellTime = getPattern().scheduledTimetable.getBestDwellTime(stopIndex);
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(dwellTime);
         s1.setBackMode(getMode());
@@ -79,7 +79,7 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
     
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return getPattern().getBestDwellTime(stopIndex);
+        return getPattern().scheduledTimetable.getBestDwellTime(stopIndex);
     }
 
     @Override

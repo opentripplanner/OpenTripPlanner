@@ -133,7 +133,9 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             for (ServiceDay serviceDay : ctx.serviceDays) {
                 ServiceDate serviceDate = serviceDay.getServiceDate();
                 TripPattern pattern = nextStop.getTripPattern();
-                TripTimes tripTimes = pattern.getTripTimes(pattern.getTripIndex(tripId));
+                Timetable timetable = pattern.getScheduledTimetable();
+                int tripIndex = timetable.getTripIndex(tripId);
+                TripTimes tripTimes = timetable.getTripTimes(tripIndex);
                 // Get the tripTimes including real-time updates for the serviceDay
                 if (ctx.timetableSnapshot != null) {
                     Timetable timeTable = ctx.timetableSnapshot.resolve(pattern, serviceDate);
@@ -172,7 +174,9 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
 
             for (ServiceDay serviceDay : ctx.serviceDays) {
                 ServiceDate serviceDate = serviceDay.getServiceDate();
-                TripTimes tripTimes = tripPattern.getTripTimes(tripPattern.getTripIndex(tripId));
+                Timetable timetable = tripPattern.getScheduledTimetable();
+                int tripIndex = timetable.getTripIndex(tripId);
+                TripTimes tripTimes = timetable.getTripTimes(tripIndex);
                 // Get the tripTimes including real-time updates for the serviceDay
                 if (ctx.timetableSnapshot != null) {
                     Timetable timeTable = ctx.timetableSnapshot.resolve(tripPattern, serviceDate);
