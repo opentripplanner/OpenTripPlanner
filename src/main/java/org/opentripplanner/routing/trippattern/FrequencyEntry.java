@@ -3,20 +3,26 @@ package org.opentripplanner.routing.trippattern;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.MavenVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 /**
  * Like a tripTimes, but can represent multiple trips following the same template at regular intervals.
  */
-public class FrequencyTripTimes extends TripTimes {
+public class FrequencyEntry extends TripTimes {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FrequencyEntry.class);
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     final int startTime;
     final int endTime;
     final int headwaySecs;
     final boolean exactTimes;
 
-    public FrequencyTripTimes(Trip trip, List<StopTime> stopTimes, Frequency freq) {
+    public FrequencyEntry(Trip trip, List<StopTime> stopTimes, Frequency freq) {
         super(trip, stopTimes);
         // TODO Shift the scheduled times to be relative to zero here.
         this.startTime   = freq.getStartTime();
@@ -39,6 +45,7 @@ public class FrequencyTripTimes extends TripTimes {
      */
     @Override
     public int nextDepartureTime (int hop, int t) {
+        LOG.info("FreqTripTimes {} {} {}", getTrip().getRoute().toString(), startTime, endTime);
         if (t > endTime) return -1;
         // Start time and end time are for the first stop in the trip. Find the time offset for this stop.
         int stopOffset = getDepartureTime(hop) - getDepartureTime(0);

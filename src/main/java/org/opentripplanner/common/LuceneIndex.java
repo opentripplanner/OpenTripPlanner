@@ -91,9 +91,11 @@ public class LuceneIndex {
     private void addStop(IndexWriter iwriter, Stop stop) throws IOException {
         Document doc = new Document();
         doc.add(new TextField("name", stop.getName(), Field.Store.YES));
+        if (stop.getCode() != null) {
+            doc.add(new StringField("code", stop.getCode(), Field.Store.YES));
+        }
         doc.add(new DoubleField("lat", stop.getLat(), Field.Store.YES));
         doc.add(new DoubleField("lon", stop.getLon(), Field.Store.YES));
-        doc.add(new StringField("code", stop.getCode(), Field.Store.YES));
         doc.add(new StringField("id", stop.getId().toString(), Field.Store.YES));
         doc.add(new StringField("category", Category.STOP.name(), Field.Store.YES));
         iwriter.addDocument(doc);
