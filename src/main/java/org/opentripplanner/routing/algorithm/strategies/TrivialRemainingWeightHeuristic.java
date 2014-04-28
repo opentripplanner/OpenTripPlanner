@@ -29,7 +29,7 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void initialize(State s, Vertex target, long abortTime) {}
+    public void initialize(RoutingRequest options, Vertex origin, Vertex target, long abortTime) {}
 
     @Override
     public double computeForwardWeight(State s, Vertex target) {
