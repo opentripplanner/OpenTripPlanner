@@ -240,7 +240,7 @@ otp.core.Webapp = otp.Class({
                 this.addModule(module);
             }
             if(!defaultModule) defaultModule = this.modules[0];
-            this_.setActiveModule(defaultModule);
+            if(defaultModule) this_.setActiveModule(defaultModule);
         }                
 
 
@@ -259,16 +259,18 @@ otp.core.Webapp = otp.Class({
                 }
 
             }
-            console.log("#" + verifyLoginUrl + ' | ' + redirectUrl);
 
             this.sessionManager = new otp.core.TrinetSessionManager(this, verifyLoginUrl, redirectUrl, $.proxy(function() {
+                var setActive = false;
                 for(var i = 0; i < authModules.length; i++) {
                     var authModule = authModules[i];
-                    console.log(authModule);
                     var roleIndex = authModule.authUserRoles.indexOf(this.sessionManager.role);
                     if(roleIndex !== -1) {
                         this.addModule(authModule);
-                        if(roleIndex === 0 || authModule.config.isDefault) this_.setActiveModule(authModule);
+                        if((roleIndex === 0 || authModule.config.isDefault) && !setActive) {
+                            this_.setActiveModule(authModule);
+                            setActive = true;
+                        }
                     }
                 } 
             }, this));            
