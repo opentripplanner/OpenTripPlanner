@@ -37,7 +37,7 @@ otp.modules.calltaker.CallHistoryWidget =
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-callHistoryWidget',
-            title : "Call History for user " + module.sessionManager.username,
+            title : "Call History for user " + module.webapp.sessionManager.username,
             closeable : true,
             persistOnClose : true,
         });

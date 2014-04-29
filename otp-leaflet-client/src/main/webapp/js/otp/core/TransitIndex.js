@@ -181,6 +181,12 @@ otp.core.TransitIndex = otp.Class({
 
 
     runStopTimesQuery : function(agencyId, stopId, startTime, endTime, callbackTarget, callback) {
+
+        if(otp.config.useLegacyMillisecondsApi) {
+            startTime *= 1000;
+            endTime *= 1000;
+        }
+
         var params = {
             agency: agencyId,
             id: stopId,

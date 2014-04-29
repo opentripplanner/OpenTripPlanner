@@ -99,8 +99,8 @@ otp.widgets.tripoptions.TripOptionsWidget =
     restoreDefaults : function(useCurrentTime) {
         var params = _.clone(this.module.defaultQueryParams);
         if(useCurrentTime) {
-            params['date'] = moment().format("MM-DD-YYYY");
-            params['time'] = moment().format("h:mma");
+            params['date'] = moment().format(otp.config.locale.time.date_format);
+            params['time'] = moment().format(otp.config.locale.time.time_format);
         }
         this.applyQueryParams(params);
     },
@@ -321,7 +321,7 @@ otp.widgets.tripoptions.TimeSelector =
         });
 
         $('#'+this.id+'-date').datepicker({
-            timeFormat: "hh:mmtt", 
+            timeFormat: otp.config.locale.time.time_format_picker,
             onSelect: function(date) {
                 this_.tripWidget.inputChanged({
                     date : date,
@@ -330,9 +330,9 @@ otp.widgets.tripoptions.TimeSelector =
         });
         $('#'+this.id+'-date').datepicker("setDate", new Date());
         
-        $('#'+this.id+'-time').val(moment().format(otp.config.timeFormat))
+        $('#'+this.id+'-time').val(moment().format(otp.config.locale.time.time_format))
         .keyup(function() {
-            if(otp.config.timeFormat.toLowerCase().charAt(otp.config.timeFormat.length-1) === 'a') {
+            if(otp.config.locale.time.time_format.toLowerCase().charAt(otp.config.locale.time.time_format.length-1) === 'a') {
                 var val = $(this).val().toLowerCase();
                 if(val.charAt(val.length-1) === 'm') {
                     val = val.substring(0, val.length-1);
@@ -358,7 +358,7 @@ otp.widgets.tripoptions.TimeSelector =
         
         $("#"+this.id+'-nowButton').click(function() {
             $('#'+this_.id+'-date').datepicker("setDate", new Date());        
-            $('#'+this_.id+'-time').val(moment().format(otp.config.timeFormat))
+            $('#'+this_.id+'-time').val(moment().format(otp.config.locale.time.time_format))
             this_.tripWidget.inputChanged({
                 time : $('#'+this_.id+'-time').val(),
                 date : $('#'+this_.id+'-date').val()
@@ -383,7 +383,7 @@ otp.widgets.tripoptions.TimeSelector =
             this.tripWidget.module.date = data.queryParams.date;
         }
         if(data.queryParams.time) {
-            $('#'+this.id+'-time').val(data.queryParams.time);
+            $('#'+this.id+'-time').val(moment(data.queryParams.time, "h:mma").format(otp.config.locale.time.time_format));
             this.tripWidget.module.time = data.queryParams.time;
         }
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
