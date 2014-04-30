@@ -20,11 +20,12 @@ import java.util.TimeZone;
 import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.TransitIndexService;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,21 +64,17 @@ public class TimetableSnapshotSource {
     /** Should expired realtime data be purged from the graph. */
     @Setter private boolean purgeExpiredData = true;
 
-    /** The TransitIndexService */
-    private TransitIndexService transitIndexService;
-
     protected ServiceDate lastPurgeDate = null;
 
     protected long lastSnapshotTime = -1;
 
     private final TimeZone timeZone;
 
+    private GraphIndex graphIndex;
+
     public TimetableSnapshotSource(Graph graph) {
         timeZone = graph.getTimeZone();
-        transitIndexService = graph.getService(TransitIndexService.class);
-        if (transitIndexService == null)
-            throw new RuntimeException("Real-time updates need a TransitIndexService. " +
-                    "Please setup one during graph building.");
+        graphIndex = graph.index;
     }
 
     /**
@@ -190,7 +187,7 @@ public class TimetableSnapshotSource {
             ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
         AgencyAndId tripId = new AgencyAndId(agencyId, tripDescriptor.getTripId());
-        TripPattern pattern = getPatternForTrip(tripId);
+        TripPattern pattern = getPatternForTripId(tripId);
 
         if (pattern == null) {
             LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
@@ -224,7 +221,7 @@ public class TimetableSnapshotSource {
             ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
         AgencyAndId tripId = new AgencyAndId(agencyId, tripDescriptor.getTripId());
-        TripPattern pattern = getPatternForTrip(tripId);
+        TripPattern pattern = getPatternForTripId(tripId);
 
         if (pattern == null) {
             LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
@@ -257,8 +254,9 @@ public class TimetableSnapshotSource {
         return buffer.purgeExpiredData(previously);
     }
 
-    protected TripPattern getPatternForTrip(AgencyAndId tripId) {
-        TripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
+    protected TripPattern getPatternForTripId(AgencyAndId tripId) {
+        Trip trip = graphIndex.tripForId.get(tripId);
+        TripPattern pattern = graphIndex.patternForTrip.get(trip);
         return pattern;
     }
 }
