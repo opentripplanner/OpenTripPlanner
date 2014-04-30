@@ -47,6 +47,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
@@ -66,6 +67,9 @@ import com.google.common.collect.Multimap;
  * is a list of departure times, running times, arrival times, dwell times, and wheelchair
  * accessibility information (one of each of these per trip per stop).
  * Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a later trip.
+ *
+ * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
+ * thus TripPattern.
  */
 public class TripPattern implements Serializable {
 
@@ -137,9 +141,9 @@ public class TripPattern implements Serializable {
     // TODO: this field can be removed, and interlining can be done differently?
     /**
      * This pattern may have multiple Timetable objects, but they should all contain TripTimes
-     * for the same trips, in the same order (that of the scheduled Timetable). An exception to 
-     * this rule may arise if unscheduled trips are added to a Timetable. For that case we need 
-     * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.  
+     * for the same trips, in the same order (that of the scheduled Timetable). An exception to
+     * this rule may arise if unscheduled trips are added to a Timetable. For that case we need
+     * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
      */
     final ArrayList<Trip> trips = new ArrayList<Trip>();
 
@@ -228,10 +232,6 @@ public class TripPattern implements Serializable {
         patternHops[stopIndex] = patternHop;
     }
 
-    public int getHopCount() {
-        return patternHops.length;
-    }
-
     public Trip getTrip(int tripIndex) {
         return trips.get(tripIndex);
     }
@@ -305,17 +305,29 @@ public class TripPattern implements Serializable {
      */
     public void add(TripTimes tt) {
         // Only scheduled trips (added at graph build time, rather than directly to the timetable via updates) are in this list.
-        trips.add(tt.getTrip());
+        trips.add(tt.trip);
         scheduledTimetable.addTripTimes(tt);
         // Check that all trips added to this pattern are on the initially declared route.
         // Identity equality is valid on GTFS entity objects.
-        if (this.route != tt.getTrip().getRoute()) {
-            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", tt.getTrip(), route);
+        if (this.route != tt.trip.getRoute()) {
+            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", tt.trip, route);
         }
     }
 
-    /* OTHER METHODS */
-    
+    /**
+     * Add the given FrequencyEntry to this pattern's scheduled timetable, recording the corresponding
+     * trip as one of the scheduled trips on this pattern.
+     * TODO possible improvements: combine freq entries and TripTimes. Do not keep trips list in TripPattern
+     * since it is redundant.
+     */
+    public void add(FrequencyEntry freq) {
+        trips.add(freq.tripTimes.trip);
+        scheduledTimetable.addFrequencyEntry(freq);
+        if (this.route != freq.tripTimes.trip.getRoute()) {
+            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", freq.tripTimes.trip, route);
+        }
+    }
+
     /**
      * Rather than the scheduled timetable, get the one that has been updated with real-time updates.
      * The view is consistent across a single request, and depends on the routing context in the request.
@@ -327,7 +339,6 @@ public class TripPattern implements Serializable {
     private static String stopNameAndId (Stop stop) {
         return stop.getName() + " (" + stop.getId() + ")";
     }
-
 
     /**
      * Static method that creates unique human-readable names for a collection of TableTripPatterns.
@@ -516,18 +527,19 @@ public class TripPattern implements Serializable {
         /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */ 
         PatternArriveVertex pav0, pav1 = null;
         PatternDepartVertex pdv0;
-        for (int hop = 0; hop < this.getHopCount(); hop++) {
-            Stop s0 = stopPattern.stops[hop];
-            Stop s1 = stopPattern.stops[hop + 1];
-            pdv0 = new PatternDepartVertex(graph, this, hop);
-            departVertices[hop] = pdv0;
-            if (hop > 0) {
+        int nStops = stopPattern.size;
+        for (int stop = 0; stop < nStops - 1; stop++) {
+            Stop s0 = stopPattern.stops[stop];
+            Stop s1 = stopPattern.stops[stop + 1];
+            pdv0 = new PatternDepartVertex(graph, this, stop);
+            departVertices[stop] = pdv0;
+            if (stop > 0) {
                 pav0 = pav1;
-                dwellEdges[hop] = new PatternDwell(pav0, pdv0, hop, this);
+                dwellEdges[stop] = new PatternDwell(pav0, pdv0, stop, this);
             }
-            pav1 = new PatternArriveVertex(graph, this, hop + 1);
-            arriveVertices[hop + 1] = pav1;
-            hopEdges[hop] = new PatternHop(pdv0, pav1, s0, s1, hop);
+            pav1 = new PatternArriveVertex(graph, this, stop + 1);
+            arriveVertices[stop + 1] = pav1;
+            hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
 
             /* Get the arrive and depart vertices for the current stop (not pattern stop). */
             TransitStopDepart stopDepart = getStopOrParent(context.stopDepartNodes, s0, graph);
@@ -542,11 +554,11 @@ public class TripPattern implements Serializable {
             stopArrive.getStopVertex().addMode(mode); 
 
             /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
-            if (this.canBoard(hop)) {
-                boardEdges[hop] = new TransitBoardAlight(stopDepart, pdv0, hop, mode);
+            if (this.canBoard(stop)) {
+                boardEdges[stop] = new TransitBoardAlight(stopDepart, pdv0, stop, mode);
             }
-            if (this.canAlight(hop + 1)) {
-                alightEdges[hop +1] = new TransitBoardAlight(pav1, stopArrive, hop + 1, mode);
+            if (this.canAlight(stop + 1)) {
+                alightEdges[stop + 1] = new TransitBoardAlight(pav1, stopArrive, stop + 1, mode);
             }
         }        
     }
@@ -604,4 +616,5 @@ public class TripPattern implements Serializable {
     public String toString () {
         return String.format("<TripPattern %s>", this.code);
     }
+
 }

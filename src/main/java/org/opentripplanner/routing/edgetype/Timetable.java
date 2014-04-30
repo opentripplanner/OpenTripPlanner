@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import static org.opentripplanner.routing.trippattern.TripTimes.formatSeconds;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.beust.jcommander.internal.Lists;
 import lombok.Getter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -28,9 +30,11 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +44,8 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 
+import javax.ws.rs.GET;
+
 
 /**
  * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more than
@@ -48,25 +54,31 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
  */
 public class Timetable implements Serializable {
 
-    private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(Timetable.class);
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     /**
-     * This creates a circular reference between trippatterns and their scheduled
-     * (non-updated) timetables. Be careful during serialization.
+     * A circular reference between TripPatterns and their scheduled (non-updated) timetables.
      */
     @Getter
     private final TripPattern pattern;
 
     /**
      * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
-     * additional TripTimes objects for unscheduled trips.
+     * additional TripTimes objects for unscheduled trips. Frequency entries are stored separately.
      */
     @Getter
-    private final ArrayList<TripTimes> tripTimes;
+    private final List<TripTimes> tripTimes = Lists.newArrayList();
 
     /**
-     * The ServiceDate for which this (updated) timetables is valid. If null, then it is valid for all dates.
+     * Contains one FrequencyEntry object for each block of frequency-based trips.
+     */
+    @Getter
+    private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+
+    /**
+     * The ServiceDate for which this (updated) timetable is valid.
+     * If null, then it is valid for all dates.
      */
     @Getter
     private final ServiceDate serviceDate;
@@ -88,7 +100,6 @@ public class Timetable implements Serializable {
     
     /** Construct an empty Timetable. */
     public Timetable(TripPattern pattern) {
-        tripTimes = new ArrayList<TripTimes>();
         this.pattern = pattern;
         this.serviceDate = null;
     }
@@ -97,13 +108,9 @@ public class Timetable implements Serializable {
      * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified timetable.
      */
     Timetable (Timetable tt, ServiceDate serviceDate) {
-        tripTimes = new ArrayList<TripTimes>(tt.tripTimes);
+        tripTimes.addAll(tt.tripTimes);
         this.serviceDate = serviceDate;
         this.pattern = tt.pattern;
-    }
-
-    public int getStopSequence(int stopIndex, int tripIndex) {
-        return tripTimes.get(tripIndex).getStopSequence(stopIndex);
     }
 
     /**
@@ -115,6 +122,7 @@ public class Timetable implements Serializable {
     protected TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding) {
         /* Search at the state's time, but relative to midnight on the given service day. */
         int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
+        // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
         /* Establish whether we have a rented _or_ owned bicycle. */
         boolean haveBicycle = s0.getNonTransitMode() == TraverseMode.BICYCLE; 
         TripTimes bestTrip = null;
@@ -141,7 +149,7 @@ public class Timetable implements Serializable {
                     bestTime = depTime;
                 }
             } else {
-                int arvTime = tt.getArrivalTime(stopIndex - 1);
+                int arvTime = tt.getArrivalTime(stopIndex);
                 if (arvTime < 0) continue;
                 if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(s0,
                         currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
@@ -149,6 +157,36 @@ public class Timetable implements Serializable {
                     bestTime = arvTime;
                 }
             }
+        }
+        // ACK all logic is identical to above.
+        // A sign that FrequencyEntries and TripTimes need a common interface.
+        FrequencyEntry bestFreq = null;
+        for (FrequencyEntry freq : frequencyEntries) {
+            TripTimes tt = freq.tripTimes;
+            if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
+            LOG.debug("  running freq {}", freq);
+            if (boarding) {
+                int depTime = freq.nextDepartureTime(stopIndex, time);
+                if (depTime < 0) continue;
+                if (depTime >= time && depTime < bestTime && tt.tripAcceptable(s0,
+                        currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
+                    bestFreq = freq;
+                    bestTime = depTime;
+                }
+            } else {
+                int arvTime = freq.prevArrivalTime(stopIndex, time);
+                if (arvTime < 0) continue;
+                if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(s0,
+                        currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
+                    bestFreq = freq;
+                    bestTime = arvTime;
+                }
+            }
+        }
+        if (bestFreq != null) {
+            // A FrequencyEntry beat all the TripTimes.
+            // Materialize that FrequencyEntry entry at the given time.
+            bestTrip = bestFreq.tripTimes.timeShift(stopIndex, bestTime, boarding);
         }
         return bestTrip;
     }
@@ -180,25 +218,23 @@ public class Timetable implements Serializable {
      * actions to compact the data structure such as trimming and deduplicating arrays.
      */
     public void finish() {
-        int nHops = pattern.getHopCount();
+        int nStops = pattern.stopPattern.size;
+        int nHops = nStops - 1;
         int nTrips = tripTimes.size();
         bestRunningTimes = new int[nHops];
         boolean nullArrivals = false; // TODO: should scan through triptimes?
         if ( ! nullArrivals) {
-            bestDwellTimes = new int[nHops];
+            bestDwellTimes = new int[nStops];
             for (int h = 1; h < nHops; ++h) { // dwell time is undefined on first hop
                 bestDwellTimes[h] = Integer.MAX_VALUE;
                 for (int t = 0; t < nTrips; ++t) {
-                    int dt = this.getDwellTime(h, t);
+                    int dt = this.getDwellTime(h, t); // TODO why aren't we just calling this directly on the triptimes rather than delegating?
                     if (bestDwellTimes[h] > dt) {
                         bestDwellTimes[h] = dt;
                     }
                 }
             }
         }
-        // Q: Why is incoming running times 1 shorter than departures?
-        // A: Because when there is no arrivals array, the last departure is actually used for an
-        // arrival.
         for (int h = 0; h < nHops; ++h) {
             bestRunningTimes[h] = Integer.MAX_VALUE;
             for (int t = 0; t < nTrips; ++t) {
@@ -261,7 +297,7 @@ public class Timetable implements Serializable {
         for (TripTimes tt : tripTimes) {
             // could replace linear search with indexing in stoptime updater, but not necessary
             // at this point since the updater thread is far from pegged.
-            if (tt.getTrip().getId().equals(tripId)) return ret;
+            if (tt.trip.getId().equals(tripId)) return ret;
             ret += 1;
         }
         return -1;
@@ -287,6 +323,7 @@ public class Timetable implements Serializable {
      */
     public boolean update(TripUpdate tripUpdate, String agencyId, TimeZone timeZone,
             ServiceDate updateServiceDate) {
+        // FIXME this method is totally wrong, it uses hops not stops
         if (tripUpdate == null) {
             LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
             return false;
@@ -329,10 +366,10 @@ public class Timetable implements Serializable {
                 }
                 StopTimeUpdate update = updates.next();
 
-                int numHops = newTimes.getNumHops();
+                int numStops = newTimes.getNumStops();
                 Integer delay = null;
 
-                for (int i = 0; i <= numHops; i++) {
+                for (int i = 0; i < numStops; i++) {
                     boolean match = false;
                     if (update != null) {
                         if (update.hasStopSequence()) {
@@ -354,7 +391,7 @@ public class Timetable implements Serializable {
                         } else if (scheduleRelationship ==
                                 StopTimeUpdate.ScheduleRelationship.NO_DATA) {
                             if (i > 0) newTimes.updateArrivalDelay(i - 1, 0);
-                            if (i < numHops) newTimes.updateDepartureDelay(i, 0);
+                            if (i < numStops - 1) newTimes.updateDepartureDelay(i, 0);
                             delay = 0;
                         } else {
                             long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
@@ -394,7 +431,7 @@ public class Timetable implements Serializable {
                                 }
                             }
 
-                            if (i < numHops) {
+                            if (i < numStops - 1) {
                                 if (update.hasDeparture()) {
                                     StopTimeEvent departure = update.getDeparture();
                                     if (departure.hasDelay()) {
@@ -431,15 +468,13 @@ public class Timetable implements Serializable {
                     } else {
                         if (delay == null) {
                             if (i > 0) newTimes.updateArrivalTime(i - 1, TripTimes.UNAVAILABLE);
-                            if (i < numHops) newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                            if (i < numStops - 1) newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
                         } else {
                             if (i > 0) newTimes.updateArrivalDelay(i - 1, delay);
-                            if (i < numHops) newTimes.updateDepartureDelay(i, delay);
+                            if (i < numStops - 1) newTimes.updateDepartureDelay(i, delay);
                         }
                     }
                 }
-
-                newTimes.compactArrivalsAndDepartures();
                 if (update != null) {
                     LOG.error("Part of a TripUpdate object could not be applied successfully.");
                     return false;
@@ -469,11 +504,15 @@ public class Timetable implements Serializable {
      * Here we don't know if it's a scheduled trip or a realtime-added trip.
      */
     public void addTripTimes(TripTimes tt) {
-        if ( ! tripTimes.isEmpty()) {
-            // TODO: maybe this should be done with all the other compacting and analysing mentioned above.
-            tt.compactStopSequence(tripTimes.get(0));
-        }
         tripTimes.add(tt);
+    }
+
+    /**
+     * Add a frequency entry to this Timetable. See addTripTimes method. Maybe Frequency Entries should
+     * just be TripTimes for simplicity.
+     */
+    public void addFrequencyEntry(FrequencyEntry freq) {
+        frequencyEntries.add(freq);
     }
 
     /**
@@ -522,7 +561,12 @@ public class Timetable implements Serializable {
     // TODO maybe put this is a more appropriate place
     public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
         for (TripTimes tt : this.tripTimes) {
-            tt.serviceCode = serviceCodes.get(tt.getTrip().getServiceId());
+            tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
+        }
+        // Repeated code... bad sign...
+        for (FrequencyEntry freq : this.frequencyEntries) {
+            TripTimes tt = freq.tripTimes;
+            tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
         }
     }
 

@@ -145,7 +145,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         boolean leavingTransit = 
                 ( boarding &&  options.isArriveBy()) || 
                 (!boarding && !options.isArriveBy()); 
-                
+
         /* TODO pull on/off transit out into two functions. */
         if (leavingTransit) { 
             /* We are leaving transit, not as much to do. */
@@ -244,7 +244,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
              * if (!sd.anyServiceRunning(this.getPattern().services)) continue;
              */
             for (ServiceDay sd : rctx.serviceDays) {
-//            ServiceDay sd = rctx.serviceDays.get(1);
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
                 Timetable timetable = tripPattern.scheduledTimetable;
                 if (rctx.timetableSnapshot != null) {
@@ -256,7 +255,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                     /* Wait is relative to departures on board and arrivals on alight. */
                     int wait = boarding ? 
                         (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
-                        (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex - 1)));
+                        (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex)));
                     /* A trip was found. The wait should be non-negative. */
                     if (wait < 0) LOG.error("Negative wait time when boarding.");
                     /* Track the soonest departure over all relevant schedules. */
@@ -268,7 +267,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 }
             }
             if (bestWait < 0) return null; // no appropriate trip was found
-            Trip trip = bestTripTimes.getTrip();
+            Trip trip = bestTripTimes.trip;
             
             /* check if route and/or Agency are banned for this plan */
             // FIXME this should be done WHILE searching for a trip.

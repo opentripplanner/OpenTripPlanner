@@ -136,6 +136,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         if (options.getModes().contains(TraverseMode.TRANSIT)) {
             // assume that the max average transit speed over a hop is 10 m/s, which is roughly
             // true in Portland and NYC, but *not* true on highways
+            // FIXME this is extremely wrong if you include rail
             return 10;
         } else {
             if (options.optimize == OptimizeType.QUICK) {
@@ -143,6 +144,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
             } else {
                 // assume that the best route is no more than 10 times better than
                 // the as-the-crow-flies flat base route.
+                // FIXME random magic constants
                 return options.getStreetSpeedUpperBound() * 10;
             }
         }

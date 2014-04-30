@@ -281,6 +281,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             // if they are the reverse of the other. Also, because it doesn't matter which direction
             // we are searching in - these traversals are always disallowed (they are U-turns in one direction
             // or the other).
+            // TODO profiling indicates that this is a hot spot.
             if (this.isReverseOf(backEdge) || backEdge.isReverseOf(this)) {
                 return null;
             }

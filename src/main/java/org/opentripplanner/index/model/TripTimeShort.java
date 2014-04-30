@@ -26,11 +26,9 @@ public class TripTimeShort {
     public TripTimeShort(TripTimes tt, int i, Stop stop) {
         stopId = stop.getId().getId();
         if (i > 0) {
-            scheduledArrival = tt.getScheduledArrivalTime(i - 1);
-            realtimeArrival  = tt.getArrivalTime(i - 1);
-            arrivalDelay     = tt.getArrivalDelay(i - 1);
-        }
-        if (i < tt.getNumHops()) {
+            scheduledArrival   = tt.getScheduledArrivalTime(i);
+            realtimeArrival    = tt.getArrivalTime(i);
+            arrivalDelay       = tt.getArrivalDelay(i);
             scheduledDeparture = tt.getScheduledDepartureTime(i);
             realtimeDeparture  = tt.getDepartureTime(i);
             departureDelay     = tt.getDepartureDelay(i);
@@ -44,7 +42,7 @@ public class TripTimeShort {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
         List<TripTimeShort> out = Lists.newArrayList();
         // one per stop, not one per hop, thus the <= operator
-        for (int i = 0; i <= times.getNumHops(); ++i) {
+        for (int i = 0; i < times.getNumStops(); ++i) {
             out.add(new TripTimeShort(times, i, table.getPattern().getStop(i)));
         }
         return out;

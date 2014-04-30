@@ -117,7 +117,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
 
             pattern = ((OnboardVertex) fromv).getTripPattern();
             newTripTimes = pattern.getResolvedTripTimes(dwellData.patternIndex, state0);
-            arrivalTime = newTripTimes.getArrivalTime(newTripTimes.getNumHops() - 1);
+            arrivalTime = newTripTimes.getArrivalTime(newTripTimes.getNumStops());
             departureTime = oldTripTimes.getDepartureTime(0);
         } else {
             // traversing forward
@@ -126,7 +126,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
 
             pattern = ((OnboardVertex) tov).getTripPattern();
             newTripTimes = pattern.getResolvedTripTimes(dwellData.patternIndex, state0);
-            arrivalTime = oldTripTimes.getArrivalTime(oldTripTimes.getNumHops() - 1);
+            arrivalTime = oldTripTimes.getArrivalTime(oldTripTimes.getNumStops());
             departureTime = newTripTimes.getDepartureTime(0);
         }
 

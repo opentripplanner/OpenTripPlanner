@@ -75,7 +75,7 @@ import org.opentripplanner.routing.impl.OnBoardDepartServiceImpl;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.services.OnBoardDepartService;
-import org.opentripplanner.routing.trippattern.FrequencyTripTimes;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
@@ -428,7 +428,7 @@ public class GTFSPatternHopFactory {
             List<Frequency> frequencies = frequenciesForTrip.get(trip);
             if (frequencies != null && !(frequencies.isEmpty())) {
                 for (Frequency freq : frequencies) {
-                    tripPattern.add(new FrequencyTripTimes(trip, stopTimes, freq));
+                    tripPattern.add(new FrequencyEntry(freq, new TripTimes(trip, stopTimes)));
                 }
                 // TODO replace: createGeometry(graph, trip, stopTimes, hops);
             }
