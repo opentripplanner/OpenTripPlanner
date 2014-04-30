@@ -97,59 +97,6 @@ public class NetworkLinkerLibrary {
         return request;
     }
 
-//    /**
-//     * Add edges from street locations to the target vertex.
-//     * 
-//     * @param v
-//     * @param wheelchairAccessible
-//     * @return true if the links were successfully added, otherwise false
-//     */
-//    public boolean determineIncomingEdgesForVertex(Vertex v, boolean wheelchairAccessible) {
-//        Vertex location = getLocation(v);
-//        if (location == null) {
-//            getLocation(v);
-//            return false;
-//        } else {
-//            graph.addEdge(new StreetTransitLink(location, v, wheelchairAccessible));
-//            return true;
-//        }
-//    }
-//
-//    /**
-//     * Add edges from the target vertex to street locations.
-//     * 
-//     * @param v
-//     * @param wheelchairAccessible
-//     * @return true if the links were successfully added, otherwise false
-//     */
-//    public boolean determineOutgoingEdgesForVertex(Vertex v, boolean wheelchairAccessible) {
-//        Vertex location = getLocation(v);
-//        if (location == null) {
-//            getLocation(v);
-//            return false;
-//        } else {
-//            graph.addEdge(new StreetTransitLink(v, location, wheelchairAccessible));
-//            return true;
-//        }
-//    }
-
-//    public void addAllReplacementEdgesToGraph() {
-//
-//        for (Entry<HashSet<StreetEdge>, LinkedList<P2<PlainStreetEdge>>> 
-//             entry : replacements.entrySet()) {
-//            /* insert newly created edges into the graph */
-//            for (P2<PlainStreetEdge> edge : entry.getValue()) {
-//                graph.addVerticesFromEdge(edge.getFirst() );
-//                graph.addVerticesFromEdge(edge.getSecond());
-//            }
-//            /* remove original (replaced) edges from the graph */
-//            for (Edge edge : entry.getKey()) {
-//                // uncomment to remove replaced edges
-//                // graph.removeEdge((Edge)edge);
-//            }
-//        }
-//    }
-
     public DistanceLibrary getDistanceLibrary() {
         return distanceLibrary ;
     }
