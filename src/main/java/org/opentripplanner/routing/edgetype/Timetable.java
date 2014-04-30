@@ -220,25 +220,18 @@ public class Timetable implements Serializable {
     public void finish() {
         int nStops = pattern.stopPattern.size;
         int nHops = nStops - 1;
-        int nTrips = tripTimes.size();
+        /* Find lower bounds on dwell and running times at each stop. */
+        bestDwellTimes = new int[nHops];
         bestRunningTimes = new int[nHops];
-        boolean nullArrivals = false; // TODO: should scan through triptimes?
-        if ( ! nullArrivals) {
-            bestDwellTimes = new int[nStops];
-            for (int h = 1; h < nHops; ++h) { // dwell time is undefined on first hop
-                bestDwellTimes[h] = Integer.MAX_VALUE;
-                for (int t = 0; t < nTrips; ++t) {
-                    int dt = this.getDwellTime(h, t); // TODO why aren't we just calling this directly on the triptimes rather than delegating?
-                    if (bestDwellTimes[h] > dt) {
-                        bestDwellTimes[h] = dt;
-                    }
+        Arrays.fill(bestDwellTimes, Integer.MAX_VALUE);
+        Arrays.fill(bestRunningTimes, Integer.MAX_VALUE);
+        for (TripTimes tt : tripTimes) {
+            for (int h = 0; h < nHops; ++h) {
+                int dt = tt.getDwellTime(h);
+                if (bestDwellTimes[h] > dt) {
+                    bestDwellTimes[h] = dt;
                 }
-            }
-        }
-        for (int h = 0; h < nHops; ++h) {
-            bestRunningTimes[h] = Integer.MAX_VALUE;
-            for (int t = 0; t < nTrips; ++t) {
-                int rt = this.getRunningTime(h, t);
+                int rt = tt.getRunningTime(h);
                 if (bestRunningTimes[h] > rt) {
                     bestRunningTimes[h] = rt;
                 }
@@ -247,12 +240,12 @@ public class Timetable implements Serializable {
         /* Detect trip overlap modulo 24 hours. Allows departure search optimizations. */
         minDepart = Integer.MAX_VALUE;
         maxArrive = Integer.MIN_VALUE;
-        for (int t = 0; t < nTrips; ++t) { 
-            int depart = getDepartureTime(0, t);
-            int arrive = getArrivalTime(nHops - 1, t);
+        for (TripTimes tt : tripTimes) {
+            int depart = tt.getDepartureTime(0);
             if (minDepart > depart) {
                 minDepart = depart;
             }
+            int arrive = tt.getArrivalTime(nStops - 1);
             if (maxArrive < arrive) {
                 maxArrive = arrive;
             }
