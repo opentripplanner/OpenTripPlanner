@@ -122,6 +122,8 @@ public class Timetable implements Serializable {
     protected TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding) {
         /* Search at the state's time, but relative to midnight on the given service day. */
         int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
+        // Skip this search if it's impossible to use any trip.
+        if (boarding ? (time > this.maxArrive) : (time < this.minDepart)) return null;
         // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
         /* Establish whether we have a rented _or_ owned bicycle. */
         boolean haveBicycle = s0.getNonTransitMode() == TraverseMode.BICYCLE; 
@@ -489,6 +491,7 @@ public class Timetable implements Serializable {
 
     /**
      * Check that all dwell times at the given stop are zero, which allows removing the dwell edge.
+     * TODO we should probably just eliminate dwell-deletion. It won't be important if we get rid of transit edges.
      */
     boolean allDwellsZero(int hopIndex) {
         for (TripTimes tt : tripTimes) {
