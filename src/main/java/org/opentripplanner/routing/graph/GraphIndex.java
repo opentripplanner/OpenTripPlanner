@@ -73,6 +73,9 @@ public class GraphIndex {
     /* Separate transfers for profile routing */
     public Multimap<Stop, ProfileTransfer> transfersForStop = HashMultimap.create();
 
+    /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
+    public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
+
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
         for (Agency a : graph.getAgencies()) {

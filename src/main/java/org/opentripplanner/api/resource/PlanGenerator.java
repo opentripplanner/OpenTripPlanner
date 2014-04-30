@@ -60,7 +60,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
@@ -1081,9 +1080,6 @@ public class PlanGenerator {
     public TripPlan generateFirstTrip(RoutingRequest request) {
         Graph graph = graphService.getGraph(request.getRouterId());
 
-        TransitIndexService transitIndex = graph.getService(TransitIndexService.class);
-        transitIndexWithBreakRequired(transitIndex);
-
         request.setArriveBy(false);
 
         TimeZone tz = graph.getTimeZone();
@@ -1093,7 +1089,7 @@ public class PlanGenerator {
         calendar.set(Calendar.HOUR, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.SECOND, transitIndex.getOvernightBreak());
+        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
 
         request.dateTime = calendar.getTimeInMillis() / 1000;
         return generate(request);
@@ -1104,9 +1100,6 @@ public class PlanGenerator {
     public TripPlan generateLastTrip(RoutingRequest request) {
         Graph graph = graphService.getGraph(request.getRouterId());
 
-        TransitIndexService transitIndex = graph.getService(TransitIndexService.class);
-        transitIndexWithBreakRequired(transitIndex);
-
         request.setArriveBy(true);
 
         TimeZone tz = graph.getTimeZone();
@@ -1116,27 +1109,12 @@ public class PlanGenerator {
         calendar.set(Calendar.HOUR, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.SECOND, transitIndex.getOvernightBreak());
+        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
         calendar.add(Calendar.DAY_OF_YEAR, 1);
 
         request.dateTime = calendar.getTimeInMillis() / 1000;
 
         return generate(request);
-    }
-
-    private void transitIndexWithBreakRequired(TransitIndexService transitIndex) {
-        transitIndexRequired(transitIndex);
-        if (transitIndex.getOvernightBreak() == -1) {
-            throw new RuntimeException("TransitIndexBuilder could not find an overnight break "
-                    + "in the transit schedule; first/last trips are undefined");
-        }
-    }
-
-    private void transitIndexRequired(TransitIndexService transitIndex) {
-        if (transitIndex == null) {
-            throw new RuntimeException(
-                    "TransitIndexBuilder is required for first/last/next/previous trip");
-        }
     }
 
 }
