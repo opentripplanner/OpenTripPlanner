@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.codehaus.jettison.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -34,7 +33,6 @@ import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.TransitIndexService;
 
 public class GtfsGraphBuilderImplTest {
 
@@ -42,14 +40,8 @@ public class GtfsGraphBuilderImplTest {
 
     private GtfsGraphBuilderImpl _builder = new GtfsGraphBuilderImpl();
 
-    @Before
-    public void setup() {
-        GraphBuilderWithGtfsDao indexBuilder = new TransitIndexBuilder();
-        _builder.setGtfsGraphBuilders(Arrays.asList(indexBuilder));
-    }
-
     @Test
-    public void testNoBikesByDefault() throws IOException, JSONException {
+    public void testNoBikesByDefault() throws IOException {
         // We configure two trip: one with unknown bikes_allowed and the second with bikes
         // allowed.
         MockGtfs gtfs = getSimpleGtfs();
@@ -63,8 +55,8 @@ public class GtfsGraphBuilderImplTest {
         Graph graph = new Graph();
         _builder.buildGraph(graph, _extra);
 
-        TransitIndexService index = graph.getService(TransitIndexService.class);
-        TripPattern pattern = index.getTripPatternForTrip(new AgencyAndId("a0", "t0"));
+        Trip trip = graph.index.tripForId.get(new AgencyAndId("a0", "t0"));
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.UNKNOWN,
                 BikeAccess.fromTrip(withId(trips, new AgencyAndId("a0", "t0"))));
@@ -73,7 +65,7 @@ public class GtfsGraphBuilderImplTest {
     }
 
     @Test
-    public void testBikesByDefault() throws IOException, JSONException {
+    public void testBikesByDefault() throws IOException {
         // We configure two trip: one with unknown bikes_allowed and the second with no bikes
         // allowed.
         MockGtfs gtfs = getSimpleGtfs();
@@ -87,8 +79,8 @@ public class GtfsGraphBuilderImplTest {
         Graph graph = new Graph();
         _builder.buildGraph(graph, _extra);
 
-        TransitIndexService index = graph.getService(TransitIndexService.class);
-        TripPattern pattern = index.getTripPatternForTrip(new AgencyAndId("a0", "t0"));
+        Trip trip = graph.index.tripForId.get(new AgencyAndId("a0", "t0"));
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.ALLOWED,
                 BikeAccess.fromTrip(withId(trips, new AgencyAndId("a0", "t0"))));
