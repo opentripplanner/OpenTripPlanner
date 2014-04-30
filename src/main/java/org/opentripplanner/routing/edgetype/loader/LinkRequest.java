@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.GenericLocation;
@@ -345,9 +346,9 @@ public class LinkRequest {
 
     public void connectVertexToStreets(TransitStop v, boolean wheelchairAccessible) {
         List<Edge> nearbyEdges = null;
-        if (linker.edgesForRoute != null && linker.transitIndex != null) {
+        if (linker.edgesForRoute != null) {
             nearbyEdges = new ArrayList<Edge>();
-            for (AgencyAndId route : linker.transitIndex.getRoutesForStop(v.getStopId())) {
+            for (Route route : linker.graph.index.routesForStop(v.getStop())) {
                 Collection<Edge> edges = linker.edgesForRoute.get(route);
                 if (edges != null) {
                     nearbyEdges.addAll(edges);

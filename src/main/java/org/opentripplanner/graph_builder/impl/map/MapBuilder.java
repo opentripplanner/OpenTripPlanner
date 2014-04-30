@@ -72,7 +72,7 @@ public class MapBuilder implements GraphBuilder {
                     List<Coordinate> coordinates = new ArrayList<Coordinate>();
                     for (Edge e : edges) {
                         coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
-                        edgesForRoute.edgesForRoute.put(route.getId(), e);
+                        edgesForRoute.edgesForRoute.put(route, e);
                     }
                     Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
                     LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));

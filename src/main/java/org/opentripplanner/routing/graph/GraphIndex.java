@@ -216,5 +216,12 @@ public class GraphIndex {
         return servicesRunning(new ServiceDate(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth()));
     }
 
-
+    /** Dynamically generate the set of Routes passing though a Stop on demand. */
+    public Set<Route> routesForStop(Stop stop) {
+        Set<Route> routes = Sets.newHashSet();
+        for (TripPattern p : patternsForStop.get(stop)) {
+            routes.add(p.route);
+        }
+        return routes;
+    }
 }
