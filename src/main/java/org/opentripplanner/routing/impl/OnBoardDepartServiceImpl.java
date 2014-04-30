@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -30,7 +31,6 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.OnBoardDepartService;
-import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
@@ -68,8 +68,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
 
         /* 1. Get the list of PatternHop for the given trip ID. */
         AgencyAndId tripId = opt.getStartingTransitTripId();
-        TransitIndexService transitIndexService = ctx.graph.getService(TransitIndexService.class);
-        TripPattern tripPattern = transitIndexService.getTripPatternForTrip(tripId);
+        Trip trip = ctx.graph.index.tripForId.get(tripId);
+        TripPattern tripPattern = ctx.graph.index.patternForTrip.get(trip);
         if (tripPattern == null) {
             // TODO Shouldn't we bailout on a normal trip plan here, returning null ?
             throw new IllegalArgumentException("Unknown/invalid trip ID: " + tripId);
