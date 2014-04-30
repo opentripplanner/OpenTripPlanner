@@ -38,6 +38,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -328,7 +329,7 @@ public class TestTransfers extends TestCase {
         // Find state with FrequencyBoard back edge and save time of that state
         long time = -1;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof FrequencyBoard) {
+            if (s.getBackEdge() instanceof TransitBoardAlight) {
                 time = s.getTimeSeconds();
                 break;
             }
@@ -352,7 +353,7 @@ public class TestTransfers extends TestCase {
         // Find state with FrequencyBoard back edge and save time of that state
         long newTime = -1;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof FrequencyBoard) {
+            if (s.getBackEdge() instanceof TransitBoardAlight) {
                 newTime = s.getTimeSeconds();
                 break;
             }
@@ -393,7 +394,7 @@ public class TestTransfers extends TestCase {
         // Find state with FrequencyBoard back edge and save time of that state
         long time = -1;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof FrequencyAlight
+            if (s.getBackEdge() instanceof TransitBoardAlight
                     && s.getBackState() != null) {
                 time = s.getBackState().getTimeSeconds();
                 break;
@@ -418,7 +419,7 @@ public class TestTransfers extends TestCase {
         // Find state with FrequencyBoard back edge and save time of that state
         long newTime = -1;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof FrequencyAlight
+            if (s.getBackEdge() instanceof TransitBoardAlight
                     && s.getBackState() != null) {
                 newTime = s.getBackState().getTimeSeconds();
                 break;
