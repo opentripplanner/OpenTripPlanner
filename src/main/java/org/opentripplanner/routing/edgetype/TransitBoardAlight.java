@@ -191,7 +191,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
                 for (int tripIndex = 0; tripIndex < numTrips; tripIndex++) {
                     // TODO: BUG this is using only scheduled times, not updated times.
-                    nextDeparture = getPattern().scheduledTimetable.getDepartureTime(stopIndex, tripIndex);
+                    nextDeparture = getPattern().scheduledTimetable.getTripTimes(tripIndex).getDepartureTime(stopIndex);
         
                     if (nextDeparture > thisDeparture) {
                         s1.setLastNextArrivalDelta(nextDeparture - thisDeparture);

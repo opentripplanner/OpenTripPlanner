@@ -191,27 +191,6 @@ public class Timetable implements Serializable {
         return bestTrip;
     }
 
-    /** Gets the departure time for a given hop on a given trip */
-    public int getDepartureTime(int hop, int trip) {
-        return tripTimes.get(trip).getDepartureTime(hop);
-    }
-
-    /** Gets the arrival time for a given hop on a given trip */
-    public int getArrivalTime(int hop, int trip) {
-        return tripTimes.get(trip).getArrivalTime(hop);
-    }
-
-    /** Gets the running time after a given stop (i.e. for the given hop) on a given trip */
-    public int getRunningTime(int stopIndex, int trip) {
-        return tripTimes.get(trip).getRunningTime(stopIndex);
-    }
-
-    /** Gets the dwell time at a given stop (i.e. before then given hop) on a given trip */
-    public int getDwellTime(int hop, int trip) {
-        // the dwell time of a hop is the dwell time *before* that hop.
-        return tripTimes.get(trip).getDwellTime(hop);
-    }
-    
     /**
      * Finish off a Timetable once all TripTimes have been added to it. This involves caching
      * lower bounds on the running times and dwell times at each stop, and may perform other
@@ -512,8 +491,8 @@ public class Timetable implements Serializable {
      * Check that all dwell times at the given stop are zero, which allows removing the dwell edge.
      */
     boolean allDwellsZero(int hopIndex) {
-        for (int t = 0; t < tripTimes.size(); ++t) {
-            if (getDwellTime(hopIndex, t) != 0) {
+        for (TripTimes tt : tripTimes) {
+            if (tt.getDwellTime(hopIndex) != 0) {
                 return false;
             }
         }
