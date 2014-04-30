@@ -32,7 +32,7 @@ public class Itinerary {
     /**
      * Duration of the trip on this itinerary, in seconds.
      */
-    public Double duration = 0.0;
+    public Long duration = 0L;
 
     /**
      * Time that the trip departs.

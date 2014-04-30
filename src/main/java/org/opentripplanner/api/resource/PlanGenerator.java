@@ -244,7 +244,7 @@ public class PlanGenerator {
 
         fixupLegs(itinerary.legs, legsStates);
 
-        itinerary.duration = (double) lastState.getElapsedTimeSeconds();
+        itinerary.duration = lastState.getElapsedTimeSeconds();
         itinerary.startTime = makeCalendar(states[0]);
         itinerary.endTime = makeCalendar(lastState);
 
