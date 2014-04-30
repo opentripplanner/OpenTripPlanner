@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.collect.HashMultimap;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -146,6 +148,9 @@ public class TripPattern implements Serializable {
      * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.
      */
     final ArrayList<Trip> trips = new ArrayList<Trip>();
+
+    /** Would be used by the MapBuilder, not currently implemented. */
+    public LineString geometry = null;
 
     /**
      * An ordered list of PatternHop edges associated with this pattern. All trips in a pattern have
