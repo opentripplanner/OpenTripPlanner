@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import lombok.Getter;
 import lombok.Setter;
@@ -159,6 +160,9 @@ public class Graph implements Serializable {
     private transient GraphMetadata graphMetadata = null;
 
     private transient Geometry hull = null;
+
+    /** The density center of the graph for determining the initial geographic extent in the client. */
+    private Coordinate center = null;
 
     /**
      * Makes it possible to embed a default configuration inside a graph.

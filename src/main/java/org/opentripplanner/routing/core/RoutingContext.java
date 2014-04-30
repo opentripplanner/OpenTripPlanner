@@ -17,6 +17,7 @@ import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
@@ -40,7 +41,6 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
-import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -293,14 +293,9 @@ public class RoutingContext implements Cloneable {
         }
         
         if (opt.getStartingTransitStopId() != null) {
-            TransitIndexService tis = graph.getService(TransitIndexService.class);
-            if (tis == null) {
-                throw new RuntimeException("Next/Previous/First/Last trip "
-                        + "functionality depends on the transit index. Rebuild "
-                        + "the graph with TransitIndexBuilder");
-            }
-            AgencyAndId stopId = opt.getStartingTransitStopId();
-            startingStop = tis.getPreBoardEdge(stopId).getToVertex();
+            Stop stop = graph.index.stopForId.get(opt.getStartingTransitStopId());
+            TransitStop tstop = graph.index.stopVertexForStop.get(stop);
+            startingStop = tstop.departVertex;
         }
         origin = opt.arriveBy ? toVertex : fromVertex;
         originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;

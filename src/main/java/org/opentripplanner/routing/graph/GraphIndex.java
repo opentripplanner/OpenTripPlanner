@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -25,9 +26,12 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopAtDistance;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,10 +94,11 @@ public class GraphIndex {
         for (Vertex vertex : vertices) {
             vertexForId.put(vertex.getLabel(), vertex);
             if (vertex instanceof TransitStop) {
-                TransitStop transitStop = (TransitStop) vertex; 
-                stopForId.put(transitStop.getStop().getId(), transitStop.getStop());
-                stopVertexForStop.put(transitStop.getStop(), transitStop);
-                stopsForParentStation.put(transitStop.getStop().getParentStation(), transitStop.getStop());
+                TransitStop transitStop = (TransitStop) vertex;
+                Stop stop = transitStop.getStop();
+                stopForId.put(stop.getId(), stop);
+                stopVertexForStop.put(stop, transitStop);
+                stopsForParentStation.put(stop.getParentStation(), stop);
             }
         }
         stopSpatialIndex.setProjectionMeridian(vertices.iterator().next().getCoordinate().x);

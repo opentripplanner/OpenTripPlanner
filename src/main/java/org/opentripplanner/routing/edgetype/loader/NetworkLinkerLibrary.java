@@ -29,7 +29,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -59,13 +58,10 @@ public class NetworkLinkerLibrary {
 
     EdgesForRoute edgesForRoute;
 
-    TransitIndexService transitIndex;
-
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public NetworkLinkerLibrary(Graph graph, Map<Class<?>, Object> extra) {
         this.graph = graph;
-        this.transitIndex = graph.getService(TransitIndexService.class);
         EdgesForRoute edgesForRoute = (EdgesForRoute) extra.get(EdgesForRoute.class);
         this.edgesForRoute = edgesForRoute;
         LOG.debug("constructing index...");

@@ -23,7 +23,6 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.TransitIndexService;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -93,18 +92,10 @@ public class GraphMetadata {
             setUpperRightLatitude(Math.max(rightEnv.getMaxY(), leftEnv.getMaxY()));
             setLowerLeftLatitude(Math.min(rightEnv.getMinY(), leftEnv.getMinY()));
         }
-
-        TransitIndexService tis = graph.getService(TransitIndexService.class);
-        if (tis == null) {
-            // default center
-            //fixme does not work around 180th parallel
-            setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
-            setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
-        } else {
-            Coordinate center = tis.getCenter();
-            setCenterLatitude(center.y);
-            setCenterLongitude(center.x);
-        }
+        // Does not work around 180th parallel.
+        // Should be replaced by using k-means center code from TransitIndex, and storing the center directly in the graph.
+        setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
+        setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
     }
 
     public void setLowerLeftLatitude(double lowerLeftLatitude) {

@@ -828,6 +828,7 @@ public class GTFSPatternHopFactory {
     private void loadStops(Graph graph) {
         for (Stop stop : _dao.getAllStops()) {
             if (context.stops.contains(stop.getId())) {
+                LOG.error("Skipping stop {} because we already loaded an identical ID.", stop.getId());
                 continue;
             }
             context.stops.add(stop.getId());
@@ -843,15 +844,19 @@ public class GTFSPatternHopFactory {
                 context.stationStopNodes.put(stop, stopVertex);
 
                 if (locationType != 2) {
-                    //add a vertex representing arriving at the stop
+                    // Add a vertex representing arriving at the stop
                     TransitStopArrive arrive = new TransitStopArrive(graph, stop, stopVertex);
+                    // FIXME no need for this context anymore, we just put references to these nodes in the stop vertices themselves.
                     context.stopArriveNodes.put(stop, arrive);
+                    stopVertex.arriveVertex = arrive;
 
-                    //add a vertex representing departing from the stop
+                    // Add a vertex representing departing from the stop
                     TransitStopDepart depart = new TransitStopDepart(graph, stop, stopVertex);
+                    // FIXME no need for this context anymore, we just put references to these nodes in the stop vertices themselves.
                     context.stopDepartNodes.put(stop, depart);
+                    stopVertex.departVertex = depart;
 
-                    //add edges from arrive to stop and stop to depart
+                    // Add edges from arrive to stop and stop to depart
                     new PreAlightEdge(arrive, stopVertex);
                     new PreBoardEdge(stopVertex, depart);
                 }
