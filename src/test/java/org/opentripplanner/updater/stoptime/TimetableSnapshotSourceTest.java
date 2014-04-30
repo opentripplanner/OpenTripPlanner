@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
@@ -33,7 +34,6 @@ import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -43,10 +43,10 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 
 public class TimetableSnapshotSourceTest {
+
     private static byte cancellation[];
     private static Graph graph = new Graph();
     private static GtfsContext context;
-    private static TransitIndexService transitIndexService;
     private static ServiceDate serviceDate = new ServiceDate();
 
     private TimetableSnapshotSource updater;
@@ -57,12 +57,6 @@ public class TimetableSnapshotSourceTest {
 
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
-
-        TransitIndexBuilder builder = new TransitIndexBuilder();
-        builder.setDao(context.getDao());
-        builder.buildGraph(graph);
-
-        transitIndexService = graph.getService(TransitIndexService.class);
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -104,9 +98,10 @@ public class TimetableSnapshotSourceTest {
     public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
         AgencyAndId tripId2 = new AgencyAndId("agency", "1.2");
-        TripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
-        int tripIndex = pattern.getTripIndex(tripId);
-        int tripIndex2 = pattern.getTripIndex(tripId2);
+        Trip trip = graph.index.tripForId.get(tripId);
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
+        int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
+        int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
         updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
 
@@ -118,7 +113,7 @@ public class TimetableSnapshotSourceTest {
         assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
 
         TripTimes tripTimes = forToday.getTripTimes(tripIndex);
-        for (int i = 0; i < tripTimes.getNumHops(); i++) {
+        for (int i = 0; i < tripTimes.getNumStops(); i++) {
             assertEquals(TripTimes.UNAVAILABLE, tripTimes.getDepartureTime(i));
             assertEquals(TripTimes.UNAVAILABLE, tripTimes.getArrivalTime(i));
         }
@@ -128,9 +123,10 @@ public class TimetableSnapshotSourceTest {
     public void testHandleModifiedTrip() {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
         AgencyAndId tripId2 = new AgencyAndId("agency", "1.2");
-        TripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
-        int tripIndex = pattern.getTripIndex(tripId);
-        int tripIndex2 = pattern.getTripIndex(tripId2);
+        Trip trip = graph.index.tripForId.get(tripId);
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
+        int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
+        int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -172,7 +168,8 @@ public class TimetableSnapshotSourceTest {
     public void testPurgeExpiredData() throws InvalidProtocolBufferException {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
         ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
-        TripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
+        Trip trip = graph.index.tripForId.get(tripId);
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
 
         updater.setMaxSnapshotFrequency(0);
         updater.setPurgeExpiredData(false);
