@@ -84,7 +84,7 @@ public class AlertPatch implements Serializable {
     }
 
     public void apply(Graph graph) {
-
+/*
         if (route != null || trip != null || agency != null) {
             List<RouteVariant> variants;
 
@@ -118,11 +118,11 @@ public class AlertPatch implements Serializable {
             edge = index.getPreAlightEdge(stop);
             graph.addAlertPatch(edge, this);
         }
+*/
     }
 
     public void remove(Graph graph) {
-            TransitIndexService index = graph.getService(TransitIndexService.class);
-
+/*
         if (route != null || trip != null || agency != null) {
             List<RouteVariant> variants;
 
@@ -156,6 +156,7 @@ public class AlertPatch implements Serializable {
             edge = index.getPreAlightEdge(stop);
             graph.removeAlertPatch(edge, this);
         }
+*/
     }
 
     public void setAlert(Alert alert) {
