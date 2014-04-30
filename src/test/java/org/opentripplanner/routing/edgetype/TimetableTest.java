@@ -201,7 +201,7 @@ public class TimetableTest {
         assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
 
         TripTimes tripTimes = timetable.getTripTimes(trip_1_1_index);
-        for (int i = 0; i < tripTimes.getNumHops(); i++) {
+        for (int i = 0; i < tripTimes.getNumStops(); i++) {
             assertEquals(TripTimes.UNAVAILABLE, tripTimes.getDepartureTime(i));
             assertEquals(TripTimes.UNAVAILABLE, tripTimes.getArrivalTime(i));
         }

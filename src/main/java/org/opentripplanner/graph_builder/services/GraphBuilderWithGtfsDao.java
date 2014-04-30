@@ -24,6 +24,9 @@ import org.opentripplanner.routing.graph.Graph;
  * @author novalis
  *
  */
+
+// TODO: remove this entirely
+
 public interface GraphBuilderWithGtfsDao {
 	public void setDao(GtfsRelationalDao dao);
 	public void buildGraph(Graph graph);
