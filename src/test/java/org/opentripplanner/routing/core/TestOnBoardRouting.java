@@ -161,7 +161,7 @@ public class TestOnBoardRouting extends TestCase {
                     nhop++;
                 }
             }
-            System.out.println("Boarded depart: trip=" + tripTimes.getTrip() + ", nextStop="
+            System.out.println("Boarded depart: trip=" + tripTimes.trip + ", nextStop="
                     + nextV.getStop() + " stopIndex=" + stopIndex + " startTime="
                     + new Date(newStart * 1000L));
 
