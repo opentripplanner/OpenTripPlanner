@@ -389,6 +389,8 @@ public class GTFSPatternHopFactory {
         }
         
         /* Then loop over all trips, handling each one as a frequency-based or scheduled trip. */
+        int freqCount = 0;
+        int nonFreqCount = 0;
         TRIP : for (Trip trip : trips) {
 
             if (++tripCount % 100000 == 0) {
@@ -429,6 +431,7 @@ public class GTFSPatternHopFactory {
             if (frequencies != null && !(frequencies.isEmpty())) {
                 for (Frequency freq : frequencies) {
                     tripPattern.add(new FrequencyEntry(freq, new TripTimes(trip, stopTimes)));
+                    freqCount++;
                 }
                 // TODO replace: createGeometry(graph, trip, stopTimes, hops);
             }
@@ -437,6 +440,7 @@ public class GTFSPatternHopFactory {
             else {
                 TripTimes tripTimes = new TripTimes(trip, stopTimes);
                 tripPattern.add(tripTimes);
+                nonFreqCount++;
                 // For interlining, group TripTimes with all others sharing the same block ID.
                 // Block semantics seem undefined for frequency trips.
                 if (trip.getBlockId() != null && ! trip.getBlockId().equals("")) {
@@ -445,6 +449,7 @@ public class GTFSPatternHopFactory {
             }
 
         } // end foreach TRIP
+        LOG.info("Added {} frequency-based timetable entries and {} single-trip entries.", freqCount, nonFreqCount);
 
         /* Generate unique names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns.values());
