@@ -114,6 +114,31 @@ public class Timetable implements Serializable {
     }
 
     /**
+     * Before performing the relatively expensive iteration over all the trips in this pattern, check whether it's even
+     * possible to board any of them given the time at which we are searching, and whether it's possible that any of
+     * them could improve on the best known time. This is only an optimization, but a significant one. When we search
+     * for departures, we look at three separate days: yesterday, today, and tomorrow. Many patterns do not have
+     * service at all hours of the day or past midnight. This optimization can cut the search time for each pattern
+     * by 66 to 100 percent.
+     *
+     * @param bestWait -1 means there is not yet any best known time.
+     */
+    public boolean temporallyViable(ServiceDay sd, long searchTime, int bestWait, boolean boarding) {
+        // Check whether any services are running at all on this pattern.
+        if ( ! sd.anyServiceRunning(this.pattern.services)) return false;
+        // Make the search time relative to the given service day.
+        searchTime = sd.secondsSinceMidnight(searchTime);
+        // Check whether any trip can be boarded at all, given the search time
+        if (boarding ? (searchTime > this.maxArrive) : (searchTime < this.minDepart)) return false;
+        // Check whether any trip can improve on the best time yet found
+        if (bestWait >= 0) {
+            long bestTime = searchTime + bestWait;
+            if (boarding ? (bestTime < this.minDepart) : (bestTime > this.maxArrive)) return false;
+        }
+        return true;
+    }
+
+    /**
      * Get the next (previous) trip that departs (arrives) from the specified stop at or after
      * (before) the specified time.
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
@@ -122,8 +147,6 @@ public class Timetable implements Serializable {
     protected TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding) {
         /* Search at the state's time, but relative to midnight on the given service day. */
         int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
-        // Skip this search if it's impossible to use any trip.
-        if (boarding ? (time > this.maxArrive) : (time < this.minDepart)) return null;
         // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
         /* Establish whether we have a rented _or_ owned bicycle. */
         boolean haveBicycle = s0.getNonTransitMode() == TraverseMode.BICYCLE; 

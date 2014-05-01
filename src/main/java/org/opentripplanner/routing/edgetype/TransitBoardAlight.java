@@ -237,18 +237,15 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             int bestWait = -1;
             TripTimes  bestTripTimes  = null;
             ServiceDay bestServiceDay = null;
-            /* 
-             * testing seems to indicate that skipping some service days based on whether
-             * patterns are running, or whether we are past the end of the day makes very little 
-             * difference in speed. Is cache locality helping? 
-             * if (!sd.anyServiceRunning(this.getPattern().services)) continue;
-             */
             for (ServiceDay sd : rctx.serviceDays) {
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
                 Timetable timetable = tripPattern.scheduledTimetable;
                 if (rctx.timetableSnapshot != null) {
                     timetable = rctx.timetableSnapshot.resolve(tripPattern, sd.getServiceDate());
-                } 
+                }
+                /* Skip this day/timetable if no trip in it could possibly be useful. */
+                // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
+                // if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) continue;
                 /* Find the next or prev departure depending on final boolean parameter. */
                 TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);
                 if (tripTimes != null) {
