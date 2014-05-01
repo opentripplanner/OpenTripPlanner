@@ -34,7 +34,6 @@ import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
@@ -197,9 +196,7 @@ public class OTPConfigurator {
                     graphBuilder.addGraphBuilder(new StreetfulStopLinker());
                 }
             }
-            List<GraphBuilderWithGtfsDao> gtfsBuilders = new ArrayList<GraphBuilderWithGtfsDao>();
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
-            gtfsBuilder.setGtfsGraphBuilders(gtfsBuilders);
             gtfsBuilder.setDeleteUselessDwells(params.deleteUselessDwells);
         }
         if (configFile != null) {

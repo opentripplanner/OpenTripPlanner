@@ -49,7 +49,6 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -81,8 +80,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     private GtfsBundles _gtfsBundles;
 
     private EntityReplacementStrategy _entityReplacementStrategy = new EntityReplacementStrategyImpl();
-
-    private List<GraphBuilderWithGtfsDao> gtfsGraphBuilders;
 
     EntityHandler counter = new EntityCounter();
 
@@ -120,11 +117,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     public List<String> provides() {
         List<String> result = new ArrayList<String>();
         result.add("transit");
-        if (gtfsGraphBuilders != null) {
-            for (GraphBuilderWithGtfsDao builder : gtfsGraphBuilders) {
-                result.addAll(builder.provides());
-            }
-        }
         return result;
     }
 
@@ -198,14 +190,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 } 
                 if (gtfsBundle.isParentStationTransfers()) {
                     hf.createParentStationTransfers();
-                }
-                // run any additional graph builders that require the DAO
-                if (gtfsGraphBuilders != null) {
-                    for (GraphBuilderWithGtfsDao builder : gtfsGraphBuilders) {
-                        builder.setDao(dao);
-                        builder.buildGraph(graph);
-                        builder.setDao(null); // clean up
-                    }
                 }
             }
         } catch (IOException e) {
@@ -294,14 +278,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         store.close();
 
-    }
-
-    public void setGtfsGraphBuilders(List<GraphBuilderWithGtfsDao> gtfsGraphBuilders) {
-        this.gtfsGraphBuilders = gtfsGraphBuilders;
-    }
-
-    public List<GraphBuilderWithGtfsDao> getGtfsGraphBuilders() {
-        return gtfsGraphBuilders;
     }
 
     private class StoreImpl implements GenericMutableDao {
