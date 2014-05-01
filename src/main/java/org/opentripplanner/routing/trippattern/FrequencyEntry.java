@@ -102,4 +102,14 @@ public class FrequencyEntry implements Serializable {
         return (endTime - startTime) / headway;
     }
 
+    /** @return the minimum time in seconds since midnight at which a trip may depart on this frequency definition. */
+    public int getMinDeparture() {
+        return tripTimes.getDepartureTime(0) + startTime;
+    }
+
+    /** @return the maximum time in seconds since midnight at which a trip may arrive on this frequency definition. */
+    public int getMaxArrival() {
+        return tripTimes.getArrivalTime(tripTimes.getNumStops() - 1) + endTime;
+    }
+
 }

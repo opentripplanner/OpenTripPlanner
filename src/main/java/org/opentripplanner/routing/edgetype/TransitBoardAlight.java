@@ -245,6 +245,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 }
                 /* Skip this day/timetable if no trip in it could possibly be useful. */
                 // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
+                // However, experiments seem to show very little measurable improvement here (due to cache locality?)
                 // if ( ! timetable.temporallyViable(sd, s0.getTimeSeconds(), bestWait, boarding)) continue;
                 /* Find the next or prev departure depending on final boolean parameter. */
                 TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);

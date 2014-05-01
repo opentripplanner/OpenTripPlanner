@@ -13,9 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import static org.opentripplanner.routing.trippattern.TripTimes.formatSeconds;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -27,8 +25,6 @@ import lombok.Getter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -43,8 +39,6 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-
-import javax.ws.rs.GET;
 
 
 /**
@@ -77,8 +71,7 @@ public class Timetable implements Serializable {
     private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
 
     /**
-     * The ServiceDate for which this (updated) timetable is valid.
-     * If null, then it is valid for all dates.
+     * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.
      */
     @Getter
     private final ServiceDate serviceDate;
@@ -86,17 +79,17 @@ public class Timetable implements Serializable {
     /**
      * For each hop, the best running time. This serves to provide lower bounds on traversal time.
      */
-    private transient int bestRunningTimes[];
+    private transient int minRunningTimes[];
 
     /**
      * For each stop, the best dwell time. This serves to provide lower bounds on traversal time.
      */
-    private transient int bestDwellTimes[];
+    private transient int minDwellTimes[];
 
     /** 
      * Helps determine whether a particular pattern is worth searching for departures at a given time. 
      */
-    private transient int minDepart, maxArrive;
+    private transient int minTime, maxTime;
     
     /** Construct an empty Timetable. */
     public Timetable(TripPattern pattern) {
@@ -129,11 +122,11 @@ public class Timetable implements Serializable {
         // Make the search time relative to the given service day.
         searchTime = sd.secondsSinceMidnight(searchTime);
         // Check whether any trip can be boarded at all, given the search time
-        if (boarding ? (searchTime > this.maxArrive) : (searchTime < this.minDepart)) return false;
+        if (boarding ? (searchTime > this.maxTime) : (searchTime < this.minTime)) return false;
         // Check whether any trip can improve on the best time yet found
         if (bestWait >= 0) {
-            long bestTime = searchTime + bestWait;
-            if (boarding ? (bestTime < this.minDepart) : (bestTime > this.maxArrive)) return false;
+            long bestTime = boarding ? (searchTime + bestWait) : (searchTime - bestWait);
+            if (boarding ? (bestTime < this.minTime) : (bestTime > this.maxTime)) return false;
         }
         return true;
     }
@@ -225,70 +218,41 @@ public class Timetable implements Serializable {
         int nStops = pattern.stopPattern.size;
         int nHops = nStops - 1;
         /* Find lower bounds on dwell and running times at each stop. */
-        bestDwellTimes = new int[nHops];
-        bestRunningTimes = new int[nHops];
-        Arrays.fill(bestDwellTimes, Integer.MAX_VALUE);
-        Arrays.fill(bestRunningTimes, Integer.MAX_VALUE);
-        for (TripTimes tt : tripTimes) {
+        minDwellTimes = new int[nHops];
+        minRunningTimes = new int[nHops];
+        Arrays.fill(minDwellTimes, Integer.MAX_VALUE);
+        Arrays.fill(minRunningTimes, Integer.MAX_VALUE);
+        // Concatenate raw TripTimes and those referenced from FrequencyEntries
+        List<TripTimes> allTripTimes = Lists.newArrayList(tripTimes);
+        for (FrequencyEntry freq : frequencyEntries) allTripTimes.add(freq.tripTimes);
+        for (TripTimes tt : allTripTimes) {
             for (int h = 0; h < nHops; ++h) {
                 int dt = tt.getDwellTime(h);
-                if (bestDwellTimes[h] > dt) {
-                    bestDwellTimes[h] = dt;
+                if (minDwellTimes[h] > dt) {
+                    minDwellTimes[h] = dt;
                 }
                 int rt = tt.getRunningTime(h);
-                if (bestRunningTimes[h] > rt) {
-                    bestRunningTimes[h] = rt;
+                if (minRunningTimes[h] > rt) {
+                    minRunningTimes[h] = rt;
                 }
             }
         }
-        /* Detect trip overlap modulo 24 hours. Allows departure search optimizations. */
-        minDepart = Integer.MAX_VALUE;
-        maxArrive = Integer.MIN_VALUE;
+        /* Find the time range over which this timetable is active. Allows departure search optimizations. */
+        minTime = Integer.MAX_VALUE;
+        maxTime = Integer.MIN_VALUE;
         for (TripTimes tt : tripTimes) {
-            int depart = tt.getDepartureTime(0);
-            if (minDepart > depart) {
-                minDepart = depart;
-            }
-            int arrive = tt.getArrivalTime(nStops - 1);
-            if (maxArrive < arrive) {
-                maxArrive = arrive;
-            }
+            minTime = Math.min(minTime, tt.getDepartureTime(0));
+            maxTime = Math.max(maxTime, tt.getArrivalTime(nStops - 1));
+        }
+        // Slightly repetitive code.
+        // Again it seems reasonable to have a shared interface between FrequencyEntries and normal TripTimes.
+        for (FrequencyEntry freq : frequencyEntries) {
+            minTime = Math.min(minTime, freq.getMinDeparture());
+            maxTime = Math.max(maxTime, freq.getMaxArrival());
         }
     }
 
-    public class ArrivalsIterator implements Iterator<Integer> {
-
-        int nextPosition = 0;
-
-        private int stopIndex;
-
-        public ArrivalsIterator(int stopIndex) {
-            this.stopIndex = stopIndex;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return nextPosition < tripTimes.size();
-        }
-
-        @Override
-        public Integer next() {
-            return tripTimes.get(nextPosition++).getArrivalTime(stopIndex - 1);
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-    }
-
-    /** Gets all the arrival times at a given stop (not used in routing) */
-    public Iterator<Integer> getArrivalTimes(int stopIndex) {
-        return new ArrivalsIterator(stopIndex);
-    }
-
-    /** @return the index of TripTimes for this Trip(Id) in this particular Timetable */
+    /** @return the index of TripTimes for this trip ID in this particular Timetable */
     public int getTripIndex(AgencyAndId tripId) {
         int ret = 0;
         for (TripTimes tt : tripTimes) {
@@ -527,34 +491,21 @@ public class Timetable implements Serializable {
 
     /** Returns the shortest possible running time for this stop */
     public int getBestRunningTime(int stopIndex) {
-        return bestRunningTimes[stopIndex];
+        return minRunningTimes[stopIndex];
     }
 
     /** Returns the shortest possible dwell time at this stop */
     public int getBestDwellTime(int stopIndex) {
-        if (bestDwellTimes == null) {
+        if (minDwellTimes == null) {
             return 0;
         }
-        return bestDwellTimes[stopIndex];
+        return minDwellTimes[stopIndex];
     }
 
     public boolean isValidFor(ServiceDate serviceDate) {
         return this.serviceDate == null || this.serviceDate.equals(serviceDate);
     }
     
-    /** 
-     * @return true if any two trips in this timetable overlap, modulo 24 hours. Helps determine
-     * whether we need to look at more than one day when performing departure/arrival searches.
-     */
-    private boolean tripsOverlap() {
-        return maxArrive - minDepart > (24 * 60 * 60);
-    }
-    
-    /** @return true if any trip in this timetable contains a stoptime greater than 24 hours. */
-    private boolean crossesMidnight() {
-        return maxArrive > (24 * 60 * 60);
-    }
-
     /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
     // TODO maybe put this is a more appropriate place
     public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
