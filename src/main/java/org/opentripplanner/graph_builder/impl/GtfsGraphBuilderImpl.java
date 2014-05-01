@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.common.collect.Sets;
 import lombok.Setter;
 
 import org.onebusaway.csv_entities.EntityHandler;
@@ -59,20 +61,6 @@ import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * {@link GraphBuilder} plugin that supports adding transit network data from a GTFS feed to the
- * routing {@link Graph}.
- * 
- * Supports reading from multiple {@link GtfsReader} instances sequentially with respect to GTFS
- * entity classes. That is to say, given three feeds A, B, and C, all {@link Agency} entities will
- * be read from A, B, and C in turn, and then all {@link ShapePoint} entities will be read from A,
- * B, and C in turn, and so forth. This sequential reading scheme allows for cases where two
- * separate feeds may have cross-feed references (ex. StopTime => Stop) as facilitated by the use of
- * an {@link EntityReplacementStrategy}.
- * 
- * @author bdferris
- * 
- */
 public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsGraphBuilderImpl.class);
@@ -91,9 +79,9 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     /** will be applied to all bundles which do not have the useCached property set */
     @Setter private Boolean useCached; 
 
-    Map<Agency, GtfsBundle> agenciesSeen = new HashMap<Agency, GtfsBundle>();
+    Set<String> agencyIdsSeen = Sets.newHashSet();
 
-    private boolean generateFeedIds = false;
+    int nAgencies = 0;
 
     /**
      * Delete dwell edges for trip patterns that have all-zero dwell times.
@@ -168,10 +156,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
                 hf.setDeleteUselessDwells(deleteUselessDwells);
 
-                if (generateFeedIds && gtfsBundle.getDefaultAgencyId() == null) {
-                    gtfsBundle.setDefaultAgencyId("FEED#" + bundleIndex);
-                }
-
                 loadBundle(gtfsBundle, graph, dao);
 
                 CalendarServiceDataFactoryImpl csfactory = new CalendarServiceDataFactoryImpl();
@@ -217,14 +201,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         GtfsReader reader = new GtfsReader();
         reader.setInputSource(gtfsBundle.getCsvInputSource());
         reader.setEntityStore(store);
-
         reader.setInternStrings(true);
-
-        if (gtfsBundle.getDefaultAgencyId() != null)
-            reader.setDefaultAgencyId(gtfsBundle.getDefaultAgencyId());
-
-        for (Map.Entry<String, String> entry : gtfsBundle.getAgencyIdMappings().entrySet())
-            reader.addAgencyIdMapping(entry.getKey(), entry.getValue());
 
         if (LOG.isDebugEnabled())
             reader.addEntityHandler(counter);
@@ -236,18 +213,28 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             LOG.info("reading entities: " + entityClass.getName());
             reader.readEntities(entityClass);
             store.flush();
+            // NOTE that agencies are first in the list and read before all other entity types, so it is effective to
+            // set the agencyId here. Each feed ("bundle") is loaded by a separate reader, so there is no risk of
+            // agency mappings accumulating.
             if (entityClass == Agency.class) {
-                if (reader.getDefaultAgencyId() == null) {
-                    reader.setDefaultAgencyId(reader.getAgencies().get(0).getId());
-                }
+                nAgencies++;
+                String defaultAgencyId = null;
                 for (Agency agency : reader.getAgencies()) {
-                    GtfsBundle existing = agenciesSeen.get(agency);
-                    if (existing != null) {
-                        LOG.warn(graph.addBuilderAnnotation(new AgencyNameCollision(agency, existing.toString())));
-                    } else {
-                        agenciesSeen.put(agency, gtfsBundle);
+                    String agencyId = agency.getId();
+                    LOG.info("This Agency has the ID {}", agencyId);
+                    // TODO Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
+                    // Figure out how and why this is happening.
+                    if (agencyId == null || agencyIdsSeen.contains(agencyId) || agencyId.length() == 1) {
+                        String generatedAgencyId = "AGENCY#" + nAgencies;
+                        LOG.warn("The agency ID '{}' was already seen, or I think it's bad. Replacing with '{}'.", agencyId, generatedAgencyId);
+                        reader.addAgencyIdMapping(agencyId, generatedAgencyId); // NULL key should work
+                        agency.setId(generatedAgencyId);
+                        agencyId = generatedAgencyId;
                     }
+                    if (agencyId != null) agencyIdsSeen.add(agencyId);
+                    if (defaultAgencyId == null) defaultAgencyId = agencyId;
                 }
+                reader.setDefaultAgencyId(defaultAgencyId); // not sure this is a good idea, setting it to the first-of-many IDs.
             }
         }
 
@@ -408,7 +395,4 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         }
     }
 
-    public void setGenerateFeedIds(boolean generateFeedIds) {
-        this.generateFeedIds = generateFeedIds;
-    }
 }
