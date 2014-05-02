@@ -31,10 +31,13 @@ class Stats implements Cloneable {
     public void add(Stats s) {
         min += s.min;
         max += s.max;
-        avg += (avg + s.avg) / 2; // TODO rethink
-        num = 1; // it's poorly defined here
+        avg += s.avg; // This only makes sense when adding successive legs TODO think through in depth
+        num = 1;      // Num is poorly defined once addition has occurred
     }
-    
+
+    /**
+     * We define adding an int I into a Stats to mean adding a Stats where min, max, and avg are all equal to I.
+     */
     public void add(int x) {
         min += x;
         avg += x;
