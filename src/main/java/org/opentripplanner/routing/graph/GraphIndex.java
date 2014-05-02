@@ -71,7 +71,7 @@ public class GraphIndex {
     public LuceneIndex luceneIndex;
 
     /* Separate transfers for profile routing */
-    public Multimap<Stop, ProfileTransfer> transfersForStop = HashMultimap.create();
+    public Multimap<Stop, ProfileTransfer> transfersForStop;
 
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
@@ -128,14 +128,6 @@ public class GraphIndex {
         LOG.info("Done indexing graph.");
     }
 
-    public Collection<ProfileTransfer> getTransfersForStop(Stop stop) {
-        if (transfersForStop == null) {
-            LOG.info("Lazy-initializing profile router transfers.");
-            findProfileTransfers();
-        }
-        return transfersForStop.get(stop);
-    }
-
     private void analyzeServices() {
         // This is a mess because CalendarService, CalendarServiceData, etc. are all in OBA.
         // TODO catalog days of the week and exceptions for each service day.
@@ -147,10 +139,11 @@ public class GraphIndex {
     private static DistanceLibrary distlib = new SphericalDistanceLibrary();
 
     /**
-     * Lazy-initialize additional transfer data for profile routing.
-     * Find best transfers between each pair of routes that pass near one another.
+     * Initialize transfer data needed for profile routing.
+     * Find the best transfers between each pair of routes that pass near one another.
      */
-    private void findProfileTransfers() {
+    public void initializeProfileTransfers() {
+        transfersForStop = HashMultimap.create();
         final double TRANSFER_RADIUS = 500.0; // meters
         SimpleIsochrone.MinMap<P2<TripPattern>, ProfileTransfer> bestTransfers = new SimpleIsochrone.MinMap<P2<TripPattern>, ProfileTransfer>();
         LOG.info("Finding transfers...");
