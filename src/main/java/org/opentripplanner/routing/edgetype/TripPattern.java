@@ -315,7 +315,7 @@ public class TripPattern implements Serializable {
         // Check that all trips added to this pattern are on the initially declared route.
         // Identity equality is valid on GTFS entity objects.
         if (this.route != tt.trip.getRoute()) {
-            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute());
+            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(), this.getRoute());
         }
     }
 
@@ -347,7 +347,7 @@ public class TripPattern implements Serializable {
 
     /**
      * Static method that creates unique human-readable names for a collection of TableTripPatterns.
-     * Perhaps this should be in TripPattern, and apply to Frequency patterns as well. TODO: resove
+     * Perhaps this should be in TripPattern, and apply to Frequency patterns as well. TODO: resolve
      * this question: can a frequency and table pattern have the same stoppattern? If so should they
      * have the same "unique" name?
      * 
