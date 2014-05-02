@@ -19,7 +19,8 @@ class Stats implements Cloneable {
     @Getter int num = 0;
     
     public Stats () { }
-    
+
+    /** Copy constructor. */
     public Stats (Stats other) {
         if (other != null) {
             this.min = other.min;
@@ -27,7 +28,12 @@ class Stats implements Cloneable {
             this.max = other.max;
         }
     }
-    
+
+    /**
+     * Adds another Stats into this one in place. This is intended to combine them in series, as for legs of a journey.
+     * It is not really correct for the average, but min and max values hold and avg is still a useful indicator.
+     * @return void to avoid thinking that a new object is created.
+     */
     public void add(Stats s) {
         min += s.min;
         max += s.max;
@@ -35,23 +41,26 @@ class Stats implements Cloneable {
         num = 1;      // Num is poorly defined once addition has occurred
     }
 
-    /**
-     * We define adding an int I into a Stats to mean adding a Stats where min, max, and avg are all equal to I.
-     */
+    /** Like add(Stats) but min, max, and avg are all equal. */
     public void add(int x) {
         min += x;
         avg += x;
         max += x;
         num = 1; // it's poorly defined here
     }
-    
+
+    /**
+     * Combines another Stats into this one in place. This considers the two Stats to be parallel, as for various trips
+     * or patterns making up a single leg of a journey. In this case, the weighted average is correctly computed.
+     * @return void to avoid thinking that a new object is created.
+     */
     public void merge (Stats other) {
         if (other.min < min) min = other.min;
         if (other.max > max) max = other.max;
         avg = (avg * num + other.avg * other.num) / (num + other.num); // TODO should be float math
     }
     
-    /** Build a composite Stats out of a bunch of other Stats. */
+    /** Build a composite Stats out of a bunch of other Stats. They are combined in parallel, as in merge(Stats). */
     public Stats (Iterable<Stats> stats) {
         min = Integer.MAX_VALUE;
         num = 0;
@@ -64,6 +73,7 @@ class Stats implements Cloneable {
         avg /= num; // TODO should perhaps be float math
     }
 
+    /** Construct a Stats containing the min, max, average, and count of the given ints. */
     public Stats (Collection<Integer> ints) {
         if (ints == null || ints.isEmpty()) return; // all zeros
         min = Integer.MAX_VALUE;
