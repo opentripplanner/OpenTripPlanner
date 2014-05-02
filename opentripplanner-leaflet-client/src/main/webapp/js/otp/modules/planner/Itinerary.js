@@ -251,7 +251,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 html += '<ul>';
                 html += '<li><b>Board</b>: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' + 
                         leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '</li>';
-                html += '<li><i>Time in transit: '+otp.util.Time.secsToHrMin(leg.duration)+'</i></li>';
+                html += '<li><i>Time in transit: '+otp.util.Time.secsToHrMin(leg.duration/1000)+'</i></li>';
                 html += '<li><b>Alight</b>: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' Stop ID #' + 
                         leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '</li>';
                 
@@ -327,7 +327,7 @@ otp.modules.planner.Itinerary = otp.Class({
             if(otp.util.Itin.isTransit(leg.mode)) {
                 text += ' - Board: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' + 
                         leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '\n';
-                text += ' - Time in transit: '+otp.util.Time.secsToHrMin(leg.duration) + '\n';
+                text += ' - Time in transit: '+otp.util.Time.secsToHrMin(leg.duration/1000) + '\n';
                 text += ' - Alight: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' Stop ID #' + 
                         leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '\n';
             }
