@@ -149,11 +149,14 @@ public class ProfileRouter {
     
     // TimeWindow could actually be resolved and created in the caller, which does have access to the profiledata.
     public ProfileResponse route () {
-
         /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
         final int ROUNDS = 3;
         int finalRound = ROUNDS - 1;
         int penultimateRound = ROUNDS - 2;
+        // Lazy-initialize profile transfers
+        if (graph.index.transfersForStop == null) {
+            graph.index.initializeProfileTransfers();
+        }
         findClosestPatterns();
         LOG.info("from stops: {}", fromStops);
         LOG.info("to stops: {}", toStops);
@@ -178,13 +181,13 @@ public class ProfileRouter {
         }
         /* One round per ride, as in RAPTOR. */
         for (int round = 0; round < ROUNDS; ++round) {
-            LOG.info("ROUND {}", round);
-            LOG.info("Queue size at beginning of round: {}", queue.size());
+            // LOG.info("ROUND {}", round);
+            // LOG.info("Queue size at beginning of round: {}", queue.size());
             for (PatternRide pr : queue) {
-                LOG.info("  PatternRide: {}", pr);
+                // LOG.info("  PatternRide: {}", pr);
                 makeRides(pr);
             }
-            LOG.info("Number of new rides created: {}", rides.size());
+            // LOG.info("Number of new rides created: {}", rides.size());
             /* Check rides reaching the targets */
 //            Set<Stop> uniqueStops = Sets.newHashSet();
 //            for (StopAtDistance sad : toStops.values()) {
@@ -200,7 +203,7 @@ public class ProfileRouter {
                 queue.clear();
                 /* Rides is cleared at the end of each round. */
                 for (Ride ride : rides.values()) {
-                    LOG.info("RIDE {}", ride);
+                    // LOG.info("RIDE {}", ride);
                     for (ProfileTransfer tr : graph.index.transfersForStop.get(ride.to)) {
                         // LOG.info("  TRANSFER {}", tr);
                         if (round == penultimateRound && !toStops.containsKey(tr.tp2)) continue;
@@ -219,7 +222,7 @@ public class ProfileRouter {
                         }
                     }
                 }
-                LOG.info("number of new queue states: {}", queue.size());
+                // LOG.info("number of new queue states: {}", queue.size());
                 rides.clear();
             }
         }
