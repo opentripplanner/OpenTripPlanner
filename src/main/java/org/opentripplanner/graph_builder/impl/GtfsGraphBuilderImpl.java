@@ -67,8 +67,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private GtfsBundles _gtfsBundles;
 
-    private EntityReplacementStrategy _entityReplacementStrategy = new EntityReplacementStrategyImpl();
-
     EntityHandler counter = new EntityCounter();
 
     private FareServiceFactory _fareServiceFactory;
@@ -123,10 +121,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             }
             bundles.add(key);
         }
-    }
-
-    public void setEntityReplacementStrategy(EntityReplacementStrategy strategy) {
-        _entityReplacementStrategy = strategy;
     }
 
     public void setFareServiceFactory(FareServiceFactory factory) {
@@ -282,24 +276,11 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         @Override
         public <T> T getEntityForId(Class<T> type, Serializable id) {
-            Serializable replacement = _entityReplacementStrategy.getReplacementEntityId(type, id);
-            if (replacement != null)
-                id = replacement;
             return dao.getEntityForId(type, id);
         }
 
         @Override
         public void saveEntity(Object entity) {
-
-            Class<? extends Object> entityType = entity.getClass();
-            if (entity instanceof IdentityBean<?>
-                    && _entityReplacementStrategy.hasReplacementEntities(entityType)) {
-                IdentityBean<?> bean = (IdentityBean<?>) entity;
-                Serializable id = bean.getId();
-                if (_entityReplacementStrategy.hasReplacementEntity(entityType, id))
-                    return;
-            }
-
             dao.saveEntity(entity);
         }
 
