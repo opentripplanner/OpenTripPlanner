@@ -42,7 +42,7 @@ otp.util.Time = {
     },
         
     formatItinTime : function(timestamp, formatStr) {
-        formatStr = formatStr || otp.config.timeFormat+", "+otp.config.dateFormat;
+        formatStr = formatStr || otp.config.locale.time.time_format+", "+otp.config.locale.time.date_format;
         return moment(timestamp).add("hours", otp.config.timeOffset).format(formatStr);
     },
 

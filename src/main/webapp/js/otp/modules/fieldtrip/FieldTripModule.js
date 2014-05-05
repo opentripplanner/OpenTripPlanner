@@ -38,13 +38,14 @@ otp.modules.fieldtrip.FieldTripModule =
     sessionManager : null,
     
     showIntermediateStops : true,
-    
-    //templateFile : 'otp/modules/fieldtrip/fieldtrip-templates.html',
 
     
     initialize : function(webapp, id, options) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
         this.templateFiles.push('otp/modules/fieldtrip/fieldtrip-templates.html');
+
+        this.requiresAuth = true;
+        this.authUserRoles = ['fieldtrip', 'all'];
 
         this.planTripFunction = this.ftPlanTrip;
         this.requestWidgets = {};
@@ -62,10 +63,10 @@ otp.modules.fieldtrip.FieldTripModule =
         modeSelector.addModeControl(new otp.widgets.tripoptions.GroupTripOptions(this.optionsWidget, "Group Size: "));
         modeSelector.refreshModeControls();
         
-        this.sessionManager = new otp.core.TrinetSessionManager(this, $.proxy(function() {
-            this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
-        }, this));
+        // use app-wide session manager
+        this.sessionManager = this.webapp.sessionManager;
 
+        this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
         this.searchWidget = new otp.modules.fieldtrip.SearchWidget(this.id+'-searchWidget', this);
 
     },

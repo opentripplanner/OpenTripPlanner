@@ -34,7 +34,6 @@ public class CommandLineParameters {
 
     private static final int DEFAULT_PORT = 8080;
     private static final int DEFAULT_SECURE_PORT = 8081;
-    private static final String DEFAULT_STATIC_DIRECTORY = "/var/otp/static";
     private static final String DEFAULT_GRAPH_DIRECTORY  = "/var/otp/graphs";
     private static final String DEFAULT_CACHE_DIRECTORY  = "/var/otp/cache";
     private static final String DEFAULT_ROUTER_ID = "";
@@ -122,10 +121,6 @@ public class CommandLineParameters {
             description = "path to graph directory")
     String graphDirectory;
 
-    @Parameter( names = { "--raptor"},
-            description = "use the RAPTOR algorithm for routing")
-    boolean raptor = false;
-
     @Parameter( names = { "-l", "--longDistance"}, 
             description = "use an algorithm tailored for long-distance routing")
     boolean longDistance = false;
@@ -142,10 +137,6 @@ public class CommandLineParameters {
             description = "run a server")
     boolean server = false;
     
-    @Parameter( names = { "-t", "--static"}, validateWith = ReadableDirectory.class,
-    description = "path to static content")
-    String staticDirectory;
-
     @Parameter( names = { "-z", "--visualize"}, 
     description = "open a debugging graph visualizer")
     boolean visualize;
@@ -159,7 +150,7 @@ public class CommandLineParameters {
         server |= ( inMemory || port != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
         if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
-        if (cacheDirectory == null)  cacheDirectory  = DEFAULT_CACHE_DIRECTORY;
+        if (cacheDirectory == null) cacheDirectory = DEFAULT_CACHE_DIRECTORY;
         if (server && port == null) {
             port = DEFAULT_PORT;
             new AvailablePort().validate(port);

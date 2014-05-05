@@ -197,57 +197,85 @@ otp.core.Webapp = otp.Class({
 
 
 
+        // create the module selector
+        
+        if(otp.config.showModuleSelector && otp.config.modules.length > 1) {
+
+            var selector = $('<select id="otp_moduleSelector"></select>').appendTo('#branding');
+            selector.change(function() {
+                this_.setActiveModule(this_.modules[this.selectedIndex]);
+            });
+                       
+        }
+
         // initialize the modules 
         
+        var authModules = [];
         if(this.urlParams['module'])
             console.log("startup module: "+this.urlParams['module'])
         if(otp.config.modules) {
-            var setDefault = false, defaultModule = null;
+            var defaultModule = null;
             for(var i=0; i<otp.config.modules.length; i++) {
                 var modConfig = otp.config.modules[i];
                 var modClass = this.stringToFunction(modConfig.className);
                 var id =  modConfig.id || 'module'+i;
                 var options = modConfig.options || {}; 
                 var module = new modClass(this, id, options);
+                module.config = modConfig;
                 if(modConfig.defaultBaseLayer) module.defaultBaseLayer = modConfig.defaultBaseLayer;
                 
-                var isDefault = false;
-                if(_.has(this.urlParams, 'module') && this.urlParams['module'] === module.id) {
-                    isDefault = setDefault = true;
+                if(module.requiresAuth) {
+                    authModules.push(module);
+                    continue;
                 }
-                if(modConfig.isDefault) {
-                    if(!_.has(this.urlParams, 'module')) isDefault = true;
+
+                if(_.has(this.urlParams, 'module') && this.urlParams['module'] === module.id) {
                     defaultModule = module;
                 }
-                    
-                this.addModule(module, isDefault);//modConfig.isDefault || false);
-            }
-            if(_.has(this.urlParams, 'module') && !setDefault) {
-                console.log("OTP module with id="+this.urlParams['module']+" not found");
-                if(defaultModule) {
-                    //this_.activeModule = defaultModule;
-                    //console.log("init active module: "+ defaultModule);
-                    this.setActiveModule(defaultModule);
+                if(!defaultModule && modConfig.isDefault) {
+                    defaultModule = module;
                 }
+
+                this.addModule(module);
             }
+            if(!defaultModule) defaultModule = this.modules[0];
+            if(defaultModule) this_.setActiveModule(defaultModule);
         }                
 
-        // create the module selector
-        
-        if(otp.config.showModuleSelector && this.modules.length > 1) {
 
-            var selector = $('<select id="otp_moduleSelector"></select>').appendTo('#branding');
-            for(i in this.modules) {
-                var module = this.modules[i];
-                var option = $('<option'+(module == this_.activeModule ? ' selected' : '')+'>'+module.moduleName+'</option>').appendTo(selector);
-            }        
-            selector.change(function() {
-                this_.setActiveModule(this_.modules[this.selectedIndex]);
-            });
-                       
+
+        // create the session manager, if needed
+        if(authModules.length > 0) {
+            
+            var verifyLoginUrl, redirectUrl;
+            for(var i = 0; i < authModules.length; i++) {
+                var authModule = authModules[i];
+                if(authModule.options.trinet_verify_login_url) {
+                    if(authModule.config.isDefault || !verifyLoginUrl) verifyLoginUrl = authModules[i].options.trinet_verify_login_url;
+                }
+                if(authModule.options.module_redirect_url) {
+                    if(authModule.config.isDefault || !redirectUrl) redirectUrl = authModules[i].options.module_redirect_url;
+                }
+
+            }
+
+            this.sessionManager = new otp.core.TrinetSessionManager(this, verifyLoginUrl, redirectUrl, $.proxy(function() {
+                var setActive = false;
+                for(var i = 0; i < authModules.length; i++) {
+                    var authModule = authModules[i];
+                    var roleIndex = authModule.authUserRoles.indexOf(this.sessionManager.role);
+                    if(roleIndex !== -1) {
+                        this.addModule(authModule);
+                        if((roleIndex === 0 || authModule.config.isDefault) && !setActive) {
+                            this_.setActiveModule(authModule);
+                            setActive = true;
+                        }
+                    }
+                } 
+            }, this));            
         }
-        
-        
+
+
         // add the spinner
         
         $(Mustache.render(otp.templates.img, {
@@ -263,12 +291,13 @@ otp.core.Webapp = otp.Class({
 		
     },
     
-    addModule : function(module, makeActive) {
+    addModule : function(module) {
         makeActive = typeof makeActive !== 'undefined' ? makeActive : false;
         this.modules.push(module);
-        if(makeActive) {
-            this.setActiveModule(module);
-        }
+
+        // add to selector dropdown
+        var selector = $('#otp_moduleSelector');
+        $('<option>'+module.moduleName+'</option>').appendTo(selector);
     },
     
     loadedTemplates: {}, 

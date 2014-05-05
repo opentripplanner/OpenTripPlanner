@@ -37,7 +37,7 @@ otp.modules.calltaker.CallHistoryWidget =
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-callHistoryWidget',
-            title : "Call History for user " + module.sessionManager.username,
+            title : "Call History for user " + module.webapp.sessionManager.username,
             closeable : true,
             persistOnClose : true,
         });
@@ -123,7 +123,7 @@ otp.widgets.CallView = Backbone.View.extend({
         $(this.el).addClass('otp-callHistory-callListItem')
         .html('<span>'+moment(this.model.get('startTime')).format("h:mma")
             + ', ' + moment(this.model.get('startTime')).format("MMM D") + '<br>'
-            + '(Length: '+otp.util.Time.secsToHrMinSec(duration)+')</span>');
+            + '(Length: '+otp.util.Time.secsToHrMinSec(duration/1000)+')</span>');
         return this; // for chainable calls, like .render().el
     }, 
     

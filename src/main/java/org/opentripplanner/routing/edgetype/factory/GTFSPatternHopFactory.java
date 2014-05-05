@@ -353,7 +353,7 @@ public class GTFSPatternHopFactory {
         this._calendarService = null;
     }
 
-    /** Generate the edges. */
+    /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
     public void run(Graph graph) {
         if (fareServiceFactory == null) {
             fareServiceFactory = new DefaultFareServiceFactory();

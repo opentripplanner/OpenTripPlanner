@@ -163,39 +163,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return results;
     }
 
-    @Override
-    /** radius is meters */
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
-        Envelope envelope = new Envelope(coordinate);
-
-        envelope.expandBy(SphericalDistanceLibrary.metersToDegrees(radius));
-        List<?> stops = transitStopTree.query(envelope);
-        ArrayList<TransitStop> out = new ArrayList<TransitStop>();
-        for (Object o : stops) {
-            TransitStop stop = (TransitStop) o;
-            if (distanceLibrary.distance(stop.getCoordinate(), coordinate) < radius) {
-                out.add(stop);
-            }
-        }
-        return out;
-    }
-
-    @Override
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne,
-            Coordinate coordinateTwo) {
-        Envelope envelope = new Envelope(coordinateOne, coordinateTwo);
-
-        List<?> stops = transitStopTree.query(envelope);
-        ArrayList<TransitStop> out = new ArrayList<TransitStop>();
-        for (Object o : stops) {
-            TransitStop stop = (TransitStop) o;
-            if(envelope.contains(stop.getCoordinate())) {
-                out.add(stop);
-            }
-        }
-        return out;
-    }
-
     /**
      * Convenience helper for when extraEdges is empty/null.
      */
@@ -279,9 +246,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // here we skip examining stops, as they are really only relevant when transit is being used
         if (options != null && options.getModes().isTransit()) {
             for (TransitStop v : getLocalTransitStops(coord, 1000)) {
-                if(!v.isStreetLinkable())
-                    continue;
-                
+                if (!v.isStreetLinkable()) continue;
+
                 double d = distanceLibrary.distance(v.getCoordinate(), coord);
                 if (d < closestStopDistance) {
                     closestStopDistance = d;
@@ -474,6 +440,39 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             }
         }
         return nearest;
+    }
+
+    @Override
+    /** radius is meters */
+    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
+        Envelope envelope = new Envelope(coordinate);
+
+        envelope.expandBy(SphericalDistanceLibrary.metersToDegrees(radius));
+        List<?> stops = transitStopTree.query(envelope);
+        ArrayList<TransitStop> out = new ArrayList<TransitStop>();
+        for (Object o : stops) {
+            TransitStop stop = (TransitStop) o;
+            if (distanceLibrary.distance(stop.getCoordinate(), coordinate) < radius) {
+                out.add(stop);
+            }
+        }
+        return out;
+    }
+
+    @Override
+    public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne,
+            Coordinate coordinateTwo) {
+        Envelope envelope = new Envelope(coordinateOne, coordinateTwo);
+
+        List<?> stops = transitStopTree.query(envelope);
+        ArrayList<TransitStop> out = new ArrayList<TransitStop>();
+        for (Object o : stops) {
+            TransitStop stop = (TransitStop) o;
+            if(envelope.contains(stop.getCoordinate())) {
+                out.add(stop);
+            }
+        }
+        return out;
     }
 
     @Override
