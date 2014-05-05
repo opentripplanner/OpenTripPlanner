@@ -92,13 +92,13 @@ class Stats implements Cloneable {
     }
     
     /** Scan through all trips on this pattern and summarize those that are running. */
-    public static Stats create (TripPattern pattern, int hop0, int hop1, TimeWindow window) {
+    public static Stats create (TripPattern pattern, int stop0, int stop1, TimeWindow window) {
         Stats s = new Stats ();
         s.min = Integer.MAX_VALUE;
         s.num = 0;
         for (TripTimes tripTimes : pattern.getScheduledTimetable().getTripTimes()) {
-            int depart = tripTimes.getDepartureTime(hop0);
-            int arrive = tripTimes.getArrivalTime(hop1);
+            int depart = tripTimes.getDepartureTime(stop0);
+            int arrive = tripTimes.getArrivalTime(stop1);
             if (window.includes (depart) && 
                 window.includes (arrive) && 
                 window.servicesRunning.get(tripTimes.serviceCode)) {

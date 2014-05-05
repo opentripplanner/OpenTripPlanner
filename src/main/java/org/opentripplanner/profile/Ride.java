@@ -105,7 +105,7 @@ public class Ride {
         for (PatternRide patternRide : patternRides) {
             for (TripTimes tt : patternRide.pattern.getScheduledTimetable().getTripTimes()) {
                 if (window.servicesRunning.get(tt.serviceCode)) {
-                    int t = arrivals ? tt.getArrivalTime(patternRide.toIndex - 1)
+                    int t = arrivals ? tt.getArrivalTime(patternRide.toIndex)
                                      : tt.getDepartureTime(patternRide.fromIndex);
                     if (window.includes(t)) times.add(t);
                 }

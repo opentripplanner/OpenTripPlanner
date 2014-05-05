@@ -62,7 +62,7 @@ class PatternRide {
     // depending on the fromIndex and toIndex. Some indexes can be reached within the window, others
     // not. But that's an optimization.
     public PatternRide extendToIndex(int toIndex, TimeWindow window) {
-        Stats stats = Stats.create (pattern, fromIndex, toIndex - 1, window);
+        Stats stats = Stats.create (pattern, fromIndex, toIndex, window);
         /* There might not be any trips within the time window. */ 
         if (stats == null) return null;
         /* Copy most fields from this unfinished ride. */
