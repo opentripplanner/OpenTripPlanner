@@ -406,8 +406,13 @@ public class PlanGenerator {
 
             FrequencyBoard fb = (FrequencyBoard) states[0].getBackEdge();
             FrequencyBasedTripPattern pt = fb.getPattern();
-            int boardTime = preBoardState.getServiceDay().secondsSinceMidnight(
-                    preBoardState.getTimeSeconds());
+            int boardTime;
+            if (preBoardState.getServiceDay() == null) {
+                boardTime = 0; //TODO why is this happening?
+            } else {
+                boardTime = preBoardState.getServiceDay().secondsSinceMidnight(
+                        preBoardState.getTimeSeconds());
+            }
             int period = pt.getPeriod(fb.getStopIndex(), boardTime); //TODO fix
 
             leg.isNonExactFrequency = !pt.isExact();
