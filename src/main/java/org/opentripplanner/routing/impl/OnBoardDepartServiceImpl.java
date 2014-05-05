@@ -169,9 +169,6 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                     actDelta);
         } else {
             /* 2. Compute service day */
-            PatternHop firstHop = hops.get(0);
-            PatternHop lastHop = hops.get(hops.size() - 1);
-
             for (ServiceDay serviceDay : ctx.serviceDays) {
                 ServiceDate serviceDate = serviceDay.getServiceDate();
                 Timetable timetable = tripPattern.getScheduledTimetable();
@@ -183,8 +180,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                     tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
                 }
 
-                int depTime = tripTimes.getDepartureTime(firstHop.getStopIndex());
-                int arrTime = tripTimes.getArrivalTime(lastHop.getStopIndex());
+                int depTime = tripTimes.getDepartureTime(0);
+                int arrTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
 
                 int time = serviceDay.secondsSinceMidnight(opt.dateTime);
 
@@ -210,7 +207,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             for (PatternHop hop : hops) {
                 int stopIndex = hop.getStopIndex();
                 int depTime = bestTripTimes.getDepartureTime(stopIndex);
-                int arrTime = bestTripTimes.getArrivalTime(stopIndex);
+                int arrTime = bestTripTimes.getArrivalTime(stopIndex + 1);
 
                 if (time == arrTime) {
                     return ctx.graph.getVertex(hop.getEndStop().getId().toString());
@@ -234,7 +231,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
              * not 100% accurate. On the flip side, they are easy to compute and very well testable.
              */
             int depTime = bestTripTimes.getDepartureTime(bestStopIndex);
-            int arrTime = bestTripTimes.getArrivalTime(bestStopIndex);
+            int arrTime = bestTripTimes.getArrivalTime(bestStopIndex + 1);
             fractionCovered =  ((double) (time - depTime)) / ((double) (arrTime - depTime));
 
             P2<LineString> geomPair =

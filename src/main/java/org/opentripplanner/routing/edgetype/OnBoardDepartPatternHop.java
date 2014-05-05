@@ -59,7 +59,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
      * @param to Destination vertex: a PatternStopVertex for the next stop of the current hop.
      * @param tripTimes Resolved trip times for the trip with updated real-time info if available.
      * @param serviceDay Service day on which trip is running.
-     * @param stopIndex Index of the *next* stop.
+     * @param stopIndex Index of the current stop.
      * @param positionInHop Between 0 to 1, an estimation of the covered distance in this hop so
      *        far.
      */
