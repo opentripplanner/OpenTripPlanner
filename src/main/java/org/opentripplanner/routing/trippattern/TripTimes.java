@@ -348,12 +348,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return true;
     }
 
-    /** FIXME Cancel this entire trip */
+    /** Cancel this entire trip */
     public void cancel() {
         cancelled = true;
-        departureTimes = new int[departureTimes.length];
-        Arrays.fill(departureTimes, UNAVAILABLE);
-        arrivalTimes = departureTimes;
+        arrivalTimes = new int[getNumStops()];
+        Arrays.fill(arrivalTimes, UNAVAILABLE);
+        departureTimes = arrivalTimes;
     }
 
     public void updateDepartureTime(int stop, int time) {
