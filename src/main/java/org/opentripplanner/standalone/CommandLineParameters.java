@@ -39,7 +39,7 @@ public class CommandLineParameters {
     private static final String DEFAULT_ROUTER_ID = "";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
-    
+
     @Parameter(names = { "-h", "--help"}, help = true,
     description = "Print this help message and exit")
     boolean help;
@@ -97,6 +97,11 @@ public class CommandLineParameters {
     @Parameter(names = {"--noEmbedConfig"},
     description = "Skip embedding config in graph (Embed.properties)")
     boolean noEmbedConfig = false;
+
+    @Parameter(names = { "--skipVisibility"},
+            description = "skip area visibility calculations, which are often time consuming.")
+    boolean skipVisibility;
+
 
     /* Options for the server sub-task. */
 

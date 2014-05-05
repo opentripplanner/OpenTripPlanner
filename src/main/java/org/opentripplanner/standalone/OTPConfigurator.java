@@ -163,6 +163,7 @@ public class OTPConfigurator {
             OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders); 
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
             osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
+            osmBuilder.skipVisibility = params.skipVisibility;
             graphBuilder.addGraphBuilder(osmBuilder);
             graphBuilder.addGraphBuilder(new PruneFloatingIslands());            
         }

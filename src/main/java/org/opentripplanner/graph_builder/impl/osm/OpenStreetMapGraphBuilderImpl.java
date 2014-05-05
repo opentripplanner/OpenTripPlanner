@@ -162,6 +162,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
 
+    public boolean skipVisibility = false;
+
     // Members that can be set by clients.
 
     /**
@@ -775,7 +777,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             initIntersectionNodes();
 
             buildBasicGraph();
-            buildWalkableAreas();
+            if (skipVisibility) {
+                LOG.info("Skipping visibility graph construction for walkable areas.");
+            } else {
+                buildWalkableAreas();
+            }
             if (staticParkAndRide) {
                 buildParkAndRideAreas();
             }
@@ -898,12 +904,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         final int MAX_AREA_NODES = 500;
 
         private void buildWalkableAreas() {
-            LOG.info("Building visibility graphs for walkable areas");
-
+            LOG.info("Building visibility graphs for walkable areas.");
             List<AreaGroup> areaGroups = groupAreas(_walkableAreas);
             for (AreaGroup group : areaGroups) {
                 buildWalkableAreasForGroup(group);
             }
+            LOG.info("Done building visibility graphs for walkable areas.");
         }
 
         /**
@@ -985,7 +991,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
 
                 Environment areaEnv = new Environment(polygons);
-
                 // FIXME: temporary hard limit on size of
                 // areas to prevent way explosion
                 if (visibilityPoints.size() > MAX_AREA_NODES) {
@@ -2715,8 +2720,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * Record the level of the way for this node, e.g. if the way is at level 5, mark that this node is active at level 5.
          *
-         * @param the way that has the level
-         * @param the node to record for
+         * @param way the way that has the level
+         * @param node the node to record for
          * @author mattwigway
          */
         private IntersectionVertex recordLevel(OSMNode node, OSMWithTags way) {
