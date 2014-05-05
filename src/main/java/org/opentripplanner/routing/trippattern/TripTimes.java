@@ -145,7 +145,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     // However, we then lose the "final" modifiers on the fields, and the immutability.
     public TripTimes(TripTimes object) {
         this.trip = object.trip;
-        // TODO service code is missing.
+        this.serviceCode = object.serviceCode;
         this.timeShift = object.timeShift;
         this.headsigns = object.headsigns;
         this.scheduledDepartureTimes = object.scheduledDepartureTimes;
