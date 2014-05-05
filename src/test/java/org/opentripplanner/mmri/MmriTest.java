@@ -29,9 +29,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -82,12 +80,10 @@ abstract class MmriTest extends TestCase {
         GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
         List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
         GtfsGraphBuilderImpl gtfsGraphBuilderImpl = new GtfsGraphBuilderImpl(gtfsBundleList);
-        GraphBuilderWithGtfsDao transitIndexBuilder = new TransitIndexBuilder();
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();
         gtfsBundle.setTransfersTxtDefinesStationPaths(true);
-        gtfsGraphBuilderImpl.setGtfsGraphBuilders(Collections.singletonList(transitIndexBuilder));
         gtfsGraphBuilderImpl.buildGraph(graph, null);
         graph.index(new DefaultStreetVertexIndexFactory());
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
@@ -109,13 +105,11 @@ abstract class MmriTest extends TestCase {
             alertsUpdateHandler.update(feedMessage);
         } catch (Exception exception) {}
 
-        planGenerator = new PlanGenerator();
-        longDistancePathService = new LongDistancePathService();
         genericAStar = new GenericAStar();
+        longDistancePathService = new LongDistancePathService(null, genericAStar);
+        planGenerator = new PlanGenerator(null, longDistancePathService);
         serviceDayList = new ArrayList<ServiceDay>(3);
 
-        planGenerator.pathService = longDistancePathService;
-        longDistancePathService.setSptService(genericAStar);
         serviceDayList.add(new ServiceDay(graph, 1388534400L, graph.getCalendarService(), "MMRI"));
         serviceDayList.add(new ServiceDay(graph, 1388620800L, graph.getCalendarService(), "MMRI"));
         serviceDayList.add(new ServiceDay(graph, 1388707200L, graph.getCalendarService(), "MMRI"));
