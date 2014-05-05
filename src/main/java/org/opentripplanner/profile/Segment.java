@@ -15,13 +15,13 @@ public class Segment {
         public int fromIndex;
         public int toIndex;
         public int nTrips;
-        //public Stats stats;
+        // public Stats stats;
         public SegmentPattern (PatternRide patternRide) {
             this.patternId = patternRide.pattern.getCode();
             this.fromIndex = patternRide.fromIndex;
             this.toIndex   = patternRide.toIndex;
-            this.nTrips    = patternRide.pattern.getNumScheduledTrips(); // TODO time window not applied?
-            //this.stats     = patternRide.stats;
+            this.nTrips    = patternRide.stats.num; // this stats has time window applied
+            // this.stats     = patternRide.stats;
         }
         @Override
         public int compareTo (SegmentPattern other) {
