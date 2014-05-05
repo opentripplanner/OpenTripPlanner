@@ -284,7 +284,6 @@ public class Timetable implements Serializable {
      */
     public boolean update(TripUpdate tripUpdate, String agencyId, TimeZone timeZone,
             ServiceDate updateServiceDate) {
-        // FIXME this method is totally wrong, it uses hops not stops
         if (tripUpdate == null) {
             LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
             return false;
@@ -351,72 +350,61 @@ public class Timetable implements Serializable {
                             return false;
                         } else if (scheduleRelationship ==
                                 StopTimeUpdate.ScheduleRelationship.NO_DATA) {
-                            if (i > 0) newTimes.updateArrivalDelay(i - 1, 0);
-                            if (i < numStops - 1) newTimes.updateDepartureDelay(i, 0);
+                            newTimes.updateArrivalDelay(i, 0);
+                            newTimes.updateDepartureDelay(i, 0);
                             delay = 0;
                         } else {
                             long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
 
-                            if (i == 0) {
-                                if (update.hasArrival()) {
-                                    StopTimeEvent arrival = update.getArrival();
-                                    if (arrival.hasDelay()) {
-                                        delay = arrival.getDelay();
-                                    }   // Arrival times aren't stored for the first stop - no else.
+                            if (update.hasArrival()) {
+                                StopTimeEvent arrival = update.getArrival();
+                                if (arrival.hasDelay()) {
+                                    delay = arrival.getDelay();
+                                    if (arrival.hasTime()) {
+                                        newTimes.updateArrivalTime(i,
+                                                (int) (arrival.getTime() - today));
+                                    } else {
+                                        newTimes.updateArrivalDelay(i, delay);
+                                    }
+                                } else if (arrival.hasTime()) {
+                                    newTimes.updateArrivalTime(i,
+                                            (int) (arrival.getTime() - today));
+                                    delay = newTimes.getArrivalDelay(i);
+                                } else {
+                                    LOG.error("Arrival time at index {} is erroneous.", i);
+                                    return false;
                                 }
                             } else {
-                                if (update.hasArrival()) {
-                                    StopTimeEvent arrival = update.getArrival();
-                                    if (arrival.hasDelay()) {
-                                        delay = arrival.getDelay();
-                                        if (arrival.hasTime()) {
-                                            newTimes.updateArrivalTime(i - 1,
-                                                    (int) (arrival.getTime() - today));
-                                        } else {
-                                            newTimes.updateArrivalDelay(i - 1, delay);
-                                        }
-                                    } else if (arrival.hasTime()) {
-                                        newTimes.updateArrivalTime(i - 1,
-                                                (int) (arrival.getTime() - today));
-                                        delay = newTimes.getArrivalDelay(i - 1);
-                                    } else {
-                                        LOG.error("Arrival time at index {} is erroneous.", i);
-                                        return false;
-                                    }
+                                if (delay == null) {
+                                    newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
                                 } else {
-                                    if (delay == null) {
-                                        newTimes.updateArrivalTime(i - 1, TripTimes.UNAVAILABLE);
-                                    } else {
-                                        newTimes.updateArrivalDelay(i - 1, delay);
-                                    }
+                                    newTimes.updateArrivalDelay(i, delay);
                                 }
                             }
 
-                            if (i < numStops - 1) {
-                                if (update.hasDeparture()) {
-                                    StopTimeEvent departure = update.getDeparture();
-                                    if (departure.hasDelay()) {
-                                        delay = departure.getDelay();
-                                        if (departure.hasTime()) {
-                                            newTimes.updateDepartureTime(i,
-                                                    (int) (departure.getTime() - today));
-                                        } else {
-                                            newTimes.updateDepartureDelay(i, delay);
-                                        }
-                                    } else if (departure.hasTime()) {
+                            if (update.hasDeparture()) {
+                                StopTimeEvent departure = update.getDeparture();
+                                if (departure.hasDelay()) {
+                                    delay = departure.getDelay();
+                                    if (departure.hasTime()) {
                                         newTimes.updateDepartureTime(i,
                                                 (int) (departure.getTime() - today));
-                                        delay = newTimes.getDepartureDelay(i);
-                                    } else {
-                                        LOG.error("Departure time at index {} is erroneous.", i);
-                                        return false;
-                                    }
-                                } else {
-                                    if (delay == null) {
-                                        newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
                                     } else {
                                         newTimes.updateDepartureDelay(i, delay);
                                     }
+                                } else if (departure.hasTime()) {
+                                    newTimes.updateDepartureTime(i,
+                                            (int) (departure.getTime() - today));
+                                    delay = newTimes.getDepartureDelay(i);
+                                } else {
+                                    LOG.error("Departure time at index {} is erroneous.", i);
+                                    return false;
+                                }
+                            } else {
+                                if (delay == null) {
+                                    newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                                } else {
+                                    newTimes.updateDepartureDelay(i, delay);
                                 }
                             }
                         }
@@ -428,11 +416,11 @@ public class Timetable implements Serializable {
                         }
                     } else {
                         if (delay == null) {
-                            if (i > 0) newTimes.updateArrivalTime(i - 1, TripTimes.UNAVAILABLE);
-                            if (i < numStops - 1) newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
+                            newTimes.updateArrivalTime(i, TripTimes.UNAVAILABLE);
+                            newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
                         } else {
-                            if (i > 0) newTimes.updateArrivalDelay(i - 1, delay);
-                            if (i < numStops - 1) newTimes.updateDepartureDelay(i, delay);
+                            newTimes.updateArrivalDelay(i, delay);
+                            newTimes.updateDepartureDelay(i, delay);
                         }
                     }
                 }
