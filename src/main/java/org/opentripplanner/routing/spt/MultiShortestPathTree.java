@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -34,8 +33,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
-
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiShortestPathTree.class);
 
