@@ -35,7 +35,6 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -50,18 +49,7 @@ import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
-import org.opentripplanner.api.model.internals.EdgeSet;
-import org.opentripplanner.api.model.internals.FeatureCount;
-import org.opentripplanner.api.model.internals.VertexSet;
-import org.opentripplanner.api.model.transit.AgencyList;
-import org.opentripplanner.api.model.transit.ModeList;
-import org.opentripplanner.api.model.transit.RouteData;
-import org.opentripplanner.api.model.transit.RouteDataList;
-import org.opentripplanner.api.model.transit.RouteList;
-import org.opentripplanner.api.model.transit.StopList;
-import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
-import org.opentripplanner.api.resource.services.MetadataService;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
@@ -73,9 +61,7 @@ import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuil
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
-import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
-import org.opentripplanner.model.json_serialization.WithGraph;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -90,25 +76,24 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
+import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-import org.opentripplanner.util.TestUtils;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
@@ -116,6 +101,13 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import com.vividsolutions.jts.geom.LineString;
+
+/*
+ * FIXME: This entire file is one ugly POS that ought to be killed with infinite amounts of fire and
+ * then some more. But before we throw the baby out with the bath water, we should ensure that these
+ * tests are replaced by something that covers at least this functionality with at least this degree
+ * of thoroughness. The tests themselves may be imperfect, but they are useful. The framework sucks.
+ */
 
 class SimpleGraphServiceImpl implements GraphService {
     private HashMap<String, Graph> graphs = new HashMap<String, Graph>();
@@ -186,9 +178,9 @@ class Context {
 
     public SimpleGraphServiceImpl graphService = new SimpleGraphServiceImpl();
 
-    public PlanGenerator planGenerator = new PlanGenerator();
+    public CommandLineParameters commandLineParameters = new CommandLineParameters();
 
-    public RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
+    public OTPServer otpServer = new OTPServer(commandLineParameters, graphService);
 
     private static Context instance = null;
 
@@ -229,7 +221,7 @@ class Context {
         initTransit();
 
         initBikeRental();
-        graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
+        graph.index(new DefaultStreetVertexIndexFactory());
 
         if (DEBUG_OUTPUT) {
             try {
@@ -238,11 +230,8 @@ class Context {
                 throw new RuntimeException(e);
             }
         }
-        GenericAStar star = new GenericAStar();
-        star.setNPaths(1); // to make test results more deterministic, only find the single best path
-        pathService.setSptService(star);
-        pathService.setGraphService(graphService);
-        planGenerator.pathService = pathService;
+        // to make test results more deterministic, only find the single best path
+        ((GenericAStar) otpServer.sptService).setNPaths(1);
 
         // Create dummy TimetableResolver
         TimetableResolver resolver = new TimetableResolver();
@@ -265,9 +254,6 @@ class Context {
         GtfsBundles bundles = new GtfsBundles();
         bundles.setBundles(bundleList);
         gtfsBuilder.setGtfsBundles(bundles);
-
-        gtfsBuilder.setGtfsGraphBuilders(Arrays
-                .asList((GraphBuilderWithGtfsDao) new TransitIndexBuilder()));
 
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         gtfsBuilder.buildGraph(graph, extra);
@@ -353,7 +339,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testPlanner() throws Exception {
-        Planner planner = new TestPlanner(
+        TestPlanner planner = new TestPlanner(
                 "portland", "From::NE 43RD AVE at NE GLISAN ST", "To::NE 43RD AVE at NE ROYAL CT");
 
         Response response = planner.getItineraries();
@@ -376,7 +362,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testFirstTrip() throws Exception {
-        Planner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
+        TestPlanner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
 
         Response response = planner.getFirstTrip();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -386,7 +372,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testFirstAndLastLeg() throws Exception {
-        Planner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
+        TestPlanner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
 
         Response response = planner.getFirstTrip();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -403,7 +389,7 @@ public class TestRequest extends TestCase {
 
     public void testAlerts() throws Exception {
         // SE 47th and Ash, NE 47th and Davis (note that we cross Burnside, this goes from SE to NE)
-        Planner planner = new TestPlanner(
+        TestPlanner planner = new TestPlanner(
                 "portland", "SE 47TH AVE at SE ASH ST", "NE 47TH AVE at NE COUCH ST");
         Response response = planner.getItineraries();
 
@@ -476,9 +462,7 @@ public class TestRequest extends TestCase {
 
     public void testMetadata() {
         Metadata metadata = new Metadata();
-        MetadataService metadataService = new MetadataService();
-        metadata.setMetadataService(metadataService);
-        metadataService.setGraphService(Context.getInstance().graphService);
+        metadata.otpServer = Context.getInstance().otpServer;
         GraphMetadata data1 = metadata.getMetadata(null);
         assertTrue("centerLatitude is not 40.005; got " + data1.getCenterLatitude(),
                 Math.abs(40.005 - data1.getCenterLatitude()) < 0.000001);
@@ -496,7 +480,7 @@ public class TestRequest extends TestCase {
         when(service.getStopPatches(any(AgencyAndId.class))).thenReturn(new ArrayList<AlertPatch>());
         when(service.getRoutePatches(any(AgencyAndId.class))).thenReturn(new ArrayList<AlertPatch>());
 
-        p.setAlertPatchService(service);
+        p.alertPatchService = service;
         AlertPatchResponse stopPatches = p.getStopPatches("TriMet", "5678");
         assertNull(stopPatches.alertPatches);
         AlertPatchResponse routePatches = p.getRoutePatches("TriMet", "100");
@@ -505,7 +489,7 @@ public class TestRequest extends TestCase {
 
     public void testRouters() {
         Routers routerApi = new Routers();
-        routerApi.graphService = Context.getInstance().graphService;
+        routerApi.server = Context.getInstance().otpServer;
         RouterList routers = routerApi.getRouterIds();
         assertEquals(2, routers.routerInfo.size());
         RouterInfo router0 = routers.routerInfo.get(0);
@@ -525,68 +509,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testTransitIndex() {
-        TransitIndex index = new TransitIndex();
-        index.setGraphService(Context.getInstance().graphService);
-        String routerId = "portland";
-        AgencyList agencyIds = index.getAgencyIds(routerId);
-        assertEquals(agencyIds.agencies.toArray(new Agency[0])[0].getId(), ("TriMet"));
-        assertEquals(1, agencyIds.agencies.size());
-
-        RouteDataList routeDataList = (RouteDataList) index.getRouteData(
-                "TriMet", "100", false, false, routerId);
-        assertEquals(new AgencyAndId("TriMet", "100"),
-                routeDataList.routeData.toArray(new RouteData[0])[0].id);
-        assertTrue(routeDataList.routeData.toArray(new RouteData[0])[0].variants.size() >= 2);
-
-        RouteList routes = (RouteList) index.getRoutes("TriMet", false, routerId);
-        assertTrue(routes.routes.size() > 50);
-
-        //without agencyId
-        routes = (RouteList) index.getRoutes(null, true, routerId);
-        assertTrue(routes.routes.size() > 50);
-
-        //without agencyId
-        routes = (RouteList) index.getRoutes(null, true, routerId);
-        assertTrue(routes.routes.size() > 50);
-
-        ModeList modes = (ModeList) index.getModes(routerId);
-        assertTrue(modes.modes.contains(TraverseMode.TRAM));
-        assertFalse(modes.modes.contains(TraverseMode.FUNICULAR));
-
-        RouteList routesForStop = (RouteList) index.getRoutesForStop("TriMet", "10579", false,
-                routerId);
-        assertEquals(1, routesForStop.routes.size());
-
-        routesForStop = (RouteList) index.getRoutesForStop(null, "10579", false,
-                routerId);
-        assertEquals(1, routesForStop.routes.size());
-        // assertEquals("MAX Red Line", routesForStop.routes.get(0).routeLongName);
-
-        StopList stopsNearPoint = (StopList) index.getStopsNearPoint("TriMet", 45.464783,
-                -122.578918, false, routerId, null);
-        assertTrue(stopsNearPoint.stops.size() > 0);
-
-        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0);
-        long endTime = startTime + 60 * 60;
-        StopTimeList stopTimesForStop = (StopTimeList) index.getStopTimesForStop("TriMet", "10579",
-                startTime, endTime, false, false, null, routerId);
-        assertTrue(stopTimesForStop.stopTimes.size() > 0);
-
-        stopTimesForStop = (StopTimeList) index.getStopTimesForStop(null, "10579",
-                startTime, endTime, false, false, null, routerId);
-        assertTrue(stopTimesForStop.stopTimes.size() > 0);
-
-        stopTimesForStop = (StopTimeList) index.getStopTimesForStop(null, "10579",
-                startTime, endTime, false, false, null, routerId);
-        assertTrue(stopTimesForStop.stopTimes.size() > 0);
-
-        stopTimesForStop = (StopTimeList) index.getStopTimesForStop(null, "10579",
-                startTime, endTime, false, false, null, routerId);
-        assertTrue(stopTimesForStop.stopTimes.size() > 0);
-
-        // StopTimeList stopTimesForTrip = (StopTimeList) index.getStopTimesForTrip(
-        // "TriMet", "1254", "TriMet", "10W1040", startTime, routerId);
-        // assertTrue(stopTimesForTrip.stopTimes.size() > 0);
+        fail("The old transit index doesn't exist anymore, but the new one needs to have tests.");
     }
 
     public void testBannedTrips() {
@@ -623,7 +546,6 @@ public class TestRequest extends TestCase {
         assertTrue(leg.to.stopId.getId().equals("2109"));
     }
 
-    @SuppressWarnings("deprecation")
     public void testBannedStopGroup() throws ParameterException {
         // Create StopMatcher instance
         StopMatcher stopMatcher = StopMatcher.parse("TriMet_2106,TriMet_65-tc");
@@ -707,27 +629,7 @@ public class TestRequest extends TestCase {
      * Test the influence of increasing the walk reluctance.
      */
     public void testWalkReluctance() {
-        // Test planning a trip with a walk reluctance of 1
-        TestPlanner planner = new TestPlanner("portland", "45.440947,-122.837645", "45.463966,-122.755822");
-        planner.setMaxWalkDistance(Arrays.asList(Double.POSITIVE_INFINITY));
-        planner.setWalkReluctance(Arrays.asList(1.0));
-
-        Response response = planner.getItineraries();
-        Itinerary itinerary = response.getPlan().itinerary.get(0);
-        Double duration = itinerary.duration;
-
-        // Some walking is expected here, because it's slightly faster than staying onboard the bus.
-        assertTrue(itinerary.walkDistance > 0);
-
-        // Replan with a walk reluctance of 16
-        planner.setWalkReluctance(Arrays.asList(16.0));
-
-        response = planner.getItineraries();
-        itinerary = response.getPlan().itinerary.get(0);
-
-        // Now the walking should be eliminated, but this alternative itinerary does take more time.
-        assertTrue(itinerary.walkDistance == 0);
-        assertTrue(duration < itinerary.duration);
+        fail("This test may not be appropriate due to its reliance on the specifics of the graph.");
     }
 
     public void testTransferPenalty() {
@@ -807,9 +709,8 @@ public class TestRequest extends TestCase {
         assertFalse("751W1330".equals(itinerary.legs.get(3).tripId));
 
         // Now apply a real-time update: let the to-trip have a delay of 3 seconds
-        @SuppressWarnings("deprecation")
-        TripPattern pattern = ((PatternStopVertex) graph
-                .getVertex("TriMet_7452_TriMet_751W1090_79_A")).getTripPattern();
+        Trip trip = graph.index.tripForId.get(new AgencyAndId("TriMet", "751W1330"));
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
         applyUpdateToTripPattern(pattern, "751W1330", "7452", 79, 41228, 41228,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
 
@@ -914,9 +815,7 @@ public class TestRequest extends TestCase {
         addTripToTripTransferTimeToTable(table, "7528", "9756", "75", "12", "750W1300", "120W1320"
                 , StopTransfer.TIMED_TRANSFER);
         // Don't forget to also add a TimedTransferEdge
-        @SuppressWarnings("deprecation")
         Vertex fromVertex = graph.getVertex("TriMet_7528_arrive");
-        @SuppressWarnings("deprecation")
         Vertex toVertex = graph.getVertex("TriMet_9756_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
 
@@ -929,9 +828,8 @@ public class TestRequest extends TestCase {
 
         // Now apply a real-time update: let the to-trip be early by 240 seconds,
         // resulting in a transfer time of 0 seconds
-        @SuppressWarnings("deprecation")
-        TripPattern pattern = ((PatternStopVertex) graph
-                .getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
+        Trip trip = graph.index.tripForId.get(new AgencyAndId("TriMet", "120W1320"));
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41580, 41580,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
 
@@ -973,9 +871,7 @@ public class TestRequest extends TestCase {
         // Now add a timed transfer between two other busses
         addStopToStopTransferTimeToTable(table, "7528", "9756", StopTransfer.TIMED_TRANSFER);
         // Don't forget to also add a TimedTransferEdge
-        @SuppressWarnings("deprecation")
         Vertex fromVertex = graph.getVertex("TriMet_7528_arrive");
-        @SuppressWarnings("deprecation")
         Vertex toVertex = graph.getVertex("TriMet_9756_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
 
@@ -988,9 +884,8 @@ public class TestRequest extends TestCase {
 
         // Now apply a real-time update: let the to-trip be early by 240 seconds,
         // resulting in a transfer time of 0 seconds
-        @SuppressWarnings("deprecation")
-        TripPattern pattern = ((PatternStopVertex) graph
-                .getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
+        Trip trip = graph.index.tripForId.get(new AgencyAndId("TriMet", "120W1320"));
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41580, 41580,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
 
@@ -1026,34 +921,7 @@ public class TestRequest extends TestCase {
      * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
      */
     public void testBikeSwitch() {
-        // Test planning a trip with bike and transit without any added penalties
-        TestPlanner planner = new TestPlanner("portland", "45.440947,-122.837645", "45.463966,-122.755822");
-        planner.setMaxWalkDistance(Arrays.asList(Double.POSITIVE_INFINITY));
-        planner.setWalkReluctance(Arrays.asList(1.0));
-        planner.setModes(Arrays.asList(new TraverseModeSet("BICYCLE,TRANSIT")));
-
-        Response response = planner.getItineraries();
-        Itinerary itinerary = response.getPlan().itinerary.get(0);
-        Double duration = itinerary.duration;
-
-        // Add a time penalty without changing the cost
-        planner.setBikeSwitchTime(Arrays.asList(30));
-
-        response = planner.getItineraries();
-        itinerary = response.getPlan().itinerary.get(0);
-
-        // Now the itinerary should be 30 seconds longer
-        assertTrue(duration + 30.0 == itinerary.duration);
-
-        // Change the cost as well, so the routing result changes
-        planner.setBikeSwitchCost(Arrays.asList(99));
-
-        response = planner.getItineraries();
-        itinerary = response.getPlan().itinerary.get(0);
-
-        // Now the length of the itinerary should be in between the lengths of the other itineraries
-        assertTrue(duration < itinerary.duration);
-        assertTrue(duration + 30.0 > itinerary.duration);
+        fail("This feature is known to be broken.");
     }
 
     /**
@@ -1146,6 +1014,8 @@ public class TestRequest extends TestCase {
      * from HTTP Query string.
      */
     private static class TestPlanner extends Planner {
+        private TravelingSalesmanPathService tsp;
+
         public TestPlanner(String routerId, String v1, String v2) {
             super();
             this.fromPlace = Arrays.asList(v1);
@@ -1164,21 +1034,15 @@ public class TestRequest extends TestCase {
             this.bikeSwitchTime = Arrays.asList(0);
             this.bikeSwitchCost = Arrays.asList(0);
             this.routerId = routerId; // not a list because this is a path parameter not a query parameter
-            this.planGenerator = Context.getInstance().planGenerator;
-            this.graphService = Context.getInstance().graphService;
-            this.planGenerator.graphService = Context.getInstance().graphService;
-            this.prototypeRoutingRequest = new RoutingRequest();
             this.numItineraries = Arrays.asList(1); // make results more deterministic by returning only one path
+            this.otpServer = Context.getInstance().otpServer;
         }
 
         public TestPlanner(String routerId, String v1, String v2, List<String> intermediates) {
             this(routerId, v1, v2);
             this.modes = Arrays.asList(new QualifiedModeSetSequence("WALK"));
             this.intermediatePlaces = intermediates;
-            TravelingSalesmanPathService tsp = new TravelingSalesmanPathService();
-            tsp.setChainedPathService(Context.getInstance().pathService);
-            tsp.graphService = Context.getInstance().graphService;
-            this.planGenerator.pathService = tsp;
+            tsp = new TravelingSalesmanPathService(otpServer.graphService, otpServer.pathService);
         }
 
         public void setBannedTrips(List<String> bannedTrips) {
@@ -1205,26 +1069,6 @@ public class TestRequest extends TestCase {
             return this.maxWalkDistance;
         }
 
-        public void setMaxWalkDistance(List<Double> maxWalkDistance) {
-            this.maxWalkDistance = maxWalkDistance;
-        }
-
-        public void setWalkReluctance(List<Double> walkReluctance) {
-            this.walkReluctance = walkReluctance;
-        }
-
-        public void setModes(List<TraverseModeSet> modes) {
-            this.modes = modes;
-        }
-
-        public void setBikeSwitchTime(List<Integer> bikeSwitchTime) {
-            this.bikeSwitchTime = bikeSwitchTime;
-        }
-
-        public void setBikeSwitchCost(List<Integer> bikeSwitchCost) {
-            this.bikeSwitchCost = bikeSwitchCost;
-        }
-
         public RoutingRequest buildRequest() throws ParameterException {
             return super.buildRequest();
         }
@@ -1233,11 +1077,20 @@ public class TestRequest extends TestCase {
             try {
                 RoutingRequest options = this.buildRequest();
                 options.intermediatePlacesOrdered = false;
-                return this.planGenerator.pathService.getPaths(options);
+                return tsp.getPaths(options);
             } catch (ParameterException e) {
                 e.printStackTrace();
                 return null;
             }
+        }
+
+        public Response getItineraries() {
+            return getItineraries(otpServer, null);
+        }
+
+        public Response getFirstTrip() {
+            time = Arrays.asList("00:00:00");
+            return getItineraries();
         }
     }
 }

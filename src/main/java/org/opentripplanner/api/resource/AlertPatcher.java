@@ -37,8 +37,7 @@ import org.opentripplanner.routing.services.AlertPatchService;
 @XmlRootElement
 public class AlertPatcher {
 
-    @Context // FIXME inject Application
-    private AlertPatchService alertPatchService;
+    @Context AlertPatchService alertPatchService; // FIXME inject Application
 
     /**
      * Return a list of all patches that apply to a given stop
