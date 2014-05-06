@@ -133,6 +133,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 featureList.add(feature);
             }
             it2.close();
+            it2 = null;
 
             HashMap<Coordinate, TreeSet<String>> coordinateToStreetNames = getCoordinatesToStreetNames(featureList);
             
@@ -226,8 +227,6 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
-
-            it2.close();
         } catch (Exception ex) {
             throw new IllegalStateException("error loading shapefile street data", ex);
         } finally {
