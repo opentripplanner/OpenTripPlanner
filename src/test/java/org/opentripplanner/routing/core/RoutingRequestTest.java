@@ -57,7 +57,7 @@ public class RoutingRequestTest {
     }
 
     @Test
-    public void testPreferencesPenaltyForTrip() {
+    public void testPreferencesPenaltyForRoute() {
         AgencyAndId agencyAndId = new AgencyAndId();
         Route route = new Route();
         Trip trip = new Trip();
@@ -65,6 +65,6 @@ public class RoutingRequestTest {
 
         trip.setRoute(route);
         route.setId(agencyAndId);
-        assertEquals(0, routingRequest.preferencesPenaltyForTrip(trip));
+        assertEquals(0, routingRequest.preferencesPenaltyForRoute(trip.getRoute()));
     }
 }
