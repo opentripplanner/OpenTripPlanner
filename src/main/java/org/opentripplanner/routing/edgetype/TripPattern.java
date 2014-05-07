@@ -284,7 +284,14 @@ public class TripPattern implements Serializable {
     public int getNumScheduledTrips () {
         return trips.size();
     }
-        
+
+
+    public TripTimes getResolvedTripTimes(Trip trip, State state0) {
+        // This is horrible but it works for now.
+        int tripIndex = this.trips.indexOf(trip);
+        return getResolvedTripTimes(tripIndex, state0);
+    }
+
     public TripTimes getResolvedTripTimes(int tripIndex, State state0) {
         ServiceDate serviceDate = state0.getServiceDay().getServiceDate();
         RoutingRequest options = state0.getOptions();

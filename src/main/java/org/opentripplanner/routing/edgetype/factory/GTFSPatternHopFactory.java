@@ -24,6 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Multimap;
 import org.apache.commons.math3.util.FastMath;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -41,6 +43,8 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
@@ -59,11 +63,13 @@ import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.StationStopEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
@@ -155,35 +161,6 @@ class BlockIdAndServiceId {
     @Override
     public int hashCode() {
         return blockId.hashCode() * 31 + serviceId.hashCode();
-    }
-}
-
-class InterlineSwitchoverKey {
-
-    public Stop s0, s1;
-    public TripPattern pattern1, pattern2;
-
-    public InterlineSwitchoverKey(Stop s0, Stop s1, 
-        TripPattern pattern1, TripPattern pattern2) {
-        this.s0 = s0;
-        this.s1 = s1;
-        this.pattern1 = pattern1;
-        this.pattern2 = pattern2;
-    }
-    
-    public boolean equals(Object o) {
-        if (o instanceof InterlineSwitchoverKey) {
-            InterlineSwitchoverKey other = (InterlineSwitchoverKey) o;
-            return other.s0.equals(s0) && 
-                other.s1.equals(s1) &&
-                other.pattern1 == pattern1 &&
-                other.pattern2 == pattern2;
-        }
-        return false;
-    }
-    
-    public int hashCode() {
-        return (((s0.hashCode() * 31) + s1.hashCode()) * 31 + pattern1.hashCode()) * 31 + pattern2.hashCode();
     }
 }
 
@@ -326,14 +303,7 @@ public class GTFSPatternHopFactory {
 
     private FareServiceFactory fareServiceFactory;
 
-    /* Need TripTimes rather than Trips, to allow sorting within blocks and linking up patterns. */
-    private ListMultimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
-
-//    private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
-
     private Map<StopPattern, TripPattern> tripPatterns = Maps.newHashMap();
-
-//    private Map<StopPattern, TripPattern> frequencyTripPatterns = Maps.newHashMap(); NOT USED, all patterns are mixed for the moment
 
     private GtfsStopContext context = new GtfsStopContext();
 
@@ -381,7 +351,7 @@ public class GTFSPatternHopFactory {
         /* First, record which trips are used by one or more frequency entries.
          * These trips will be ignored for the purposes of non-frequency routing, and
          * all the frequency entries referencing the same trip can be added at once to the same
-         * timetable.
+         * Timetable/TripPattern.
          */
         ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();        
         for(Frequency freq : _dao.getAllFrequencies()) {
@@ -426,80 +396,47 @@ public class GTFSPatternHopFactory {
                 tripPatterns.put(stopPattern, tripPattern);
             }
 
-            /* Check whether this trip is referenced by one or more frequency entries. */
+            /* Create a TripTimes object for this list of stoptimes, which form one trip. */
+            TripTimes tripTimes = new TripTimes(trip, stopTimes);
+
+            /* If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry. */
             List<Frequency> frequencies = frequenciesForTrip.get(trip);
             if (frequencies != null && !(frequencies.isEmpty())) {
                 for (Frequency freq : frequencies) {
-                    tripPattern.add(new FrequencyEntry(freq, new TripTimes(trip, stopTimes)));
+                    tripPattern.add(new FrequencyEntry(freq, tripTimes));
                     freqCount++;
                 }
                 // TODO replace: createGeometry(graph, trip, stopTimes, hops);
             }
 
-            /* This trip was not frequency-based, so it must be table-based. */
+            /* This trip was not frequency-based. Add the TripTimes directly to the TripPattern's scheduled timetable. */
             else {
-                TripTimes tripTimes = new TripTimes(trip, stopTimes);
                 tripPattern.add(tripTimes);
                 nonFreqCount++;
-                // For interlining, group TripTimes with all others sharing the same block ID.
-                // Block semantics seem undefined for frequency trips.
-                if (trip.getBlockId() != null && ! trip.getBlockId().equals("")) {
-                    tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);
-                }
             }
 
         } // end foreach TRIP
-        LOG.info("Added {} frequency-based timetable entries and {} single-trip entries.", freqCount, nonFreqCount);
+        LOG.info("Added {} frequency-based and {} single-trip timetable entries.", freqCount, nonFreqCount);
 
-        /* Generate unique names for all the TableTripPatterns. */
+        /* Generate unique human-readable names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns.values());
 
-        /* Generate unique IDs for all the TableTripPatterns. */
+        /* Generate unique short IDs for all the TableTripPatterns. */
         TripPattern.generateUniqueIds(tripPatterns.values());
 
-        /* Loop over all new TableTripPatterns, creating the vertices and edges for each pattern. */
-        for (TripPattern tableTripPattern : tripPatterns.values()) {
-            tableTripPattern.makePatternVerticesAndEdges(graph, context);
-            tableTripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
+        /* Loop over all new TripPatterns, creating the vertices and edges for each pattern. */
+        for (TripPattern tripPattern : tripPatterns.values()) {
+            tripPattern.makePatternVerticesAndEdges(graph, context);
+            tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
         }
 
-        /* Link up interlined trips (where a physical vehicle continues on to another logical trip). */
-        Map<TripTimes, TripTimes> interlinedTrips = Maps.newHashMap();
-        for (BlockIdAndServiceId block : tripTimesForBlock.keySet()) {
-            List<TripTimes> blockTripTimes = tripTimesForBlock.get(block);
-            /* Sort trips within the block by first departure time, then iterate over trips in this 
-             * block and schedule, linking them. Has no effect on single-trip blocks. 
-             * Storing TripTimes rather than trip, so we have both Pattern and Trip, 
-             * and can perform real time lookup. */
-            Collections.sort(blockTripTimes); 
-            TripTimes last = null;
-            for (TripTimes tripTimes : blockTripTimes) {
-                if (last != null) {
-                    interlinedTrips.put(last, tripTimes);
-                }
-                // TODO: Check for incoherence / trip times overlap.
-                last = tripTimes;
-            }
-        }
+        /* Identify interlined trips and create the necessary edges. */
+        interline(tripPatterns.values());
 
-     // FIXME MAKE PATTERN INTERLINE DWELL edges for patterns
-     // FIXME store next linked TripTimes in each TripTimes
-     // do we already have a PatternInterlineDwell edge for this dwell?
-//                 PatternInterlineDwell dwell = getInterlineDwell(dwellKey);
-//                 if (dwell == null) { 
-//                     // create the dwell because it does not exist yet
-//                     Vertex startJourney = context.patternArriveNodes.get(new T2<Stop, Trip>(s0, fromExemplar));
-//                     Vertex endJourney = context.patternDepartNodes.get(new T2<Stop, Trip>(s1, toExemplar));
-//                     // toTrip is just an exemplar; dwell edges can contain many trip connections
-//                     dwell = new PatternInterlineDwell(startJourney, endJourney, toTrip);
-//                     interlineDwells.put(dwellKey, dwell);
-//                 }
-//                 int dwellTime = st1.getDepartureTime() - st0.getArrivalTime();
-//                 dwell.addTrip(fromTrip, toTrip, dwellTime,
-//                         fromInterlineTrip.getPatternIndex(), toInterlineTrip.getPatternIndex());
-
+        /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
-        // TODO just remove dwell deletion entirely
+
+        /* TODO just remove dwell deletion entirely */
         if (_deleteUselessDwells) deleteUselessDwells(graph);
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
@@ -512,7 +449,77 @@ public class GTFSPatternHopFactory {
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
     }
-    
+
+    /**
+     * Identify interlined trips (where a physical vehicle continues on to another logical trip)
+     * and update the TripPatterns accordingly. This must be called after all the pattern edges and vertices
+     * are already created, because it creates interline dwell edges between existing pattern arrive/depart vertices.
+     */
+    private void interline (Collection<TripPattern> tripPatterns) {
+
+        /* Record which Pattern each interlined TripTimes belongs to. */
+        Map<TripTimes, TripPattern> patternForTripTimes = Maps.newHashMap();
+
+        /* TripTimes grouped by the block ID and service ID of their trips. Must be a ListMultimap to allow sorting. */
+        ListMultimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
+
+        LOG.info("Finding interlining trips based on block IDs.");
+        for (TripPattern pattern : tripPatterns) {
+            Timetable timetable = pattern.getScheduledTimetable();
+            /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
+            for (TripTimes tripTimes : timetable.getTripTimes()) {
+                Trip trip = tripTimes.trip;
+                if ( ! Strings.isNullOrEmpty(trip.getBlockId())) {
+                    tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);
+                    // For space efficiency, only record times that are part of a block.
+                    patternForTripTimes.put(tripTimes, pattern);
+                }
+            }
+        }
+
+        /* Associate pairs of TripPatterns with lists of trips that continue from one pattern to the other. */
+        Multimap<P2<TripPattern>, P2<Trip>> interlines = ArrayListMultimap.create();
+
+        /*
+          Sort trips within each block by first departure time, then iterate over trips in this block and service,
+          linking them. Has no effect on single-trip blocks.
+         */
+        SERVICE_BLOCK :
+        for (BlockIdAndServiceId block : tripTimesForBlock.keySet()) {
+            List<TripTimes> blockTripTimes = tripTimesForBlock.get(block);
+            Collections.sort(blockTripTimes);
+            TripTimes prev = null;
+            for (TripTimes curr : blockTripTimes) {
+                if (prev != null) {
+                    if (prev.getDepartureTime(prev.getNumStops() - 1) > curr.getArrivalTime(0)) {
+                        LOG.error("Trip times within block {} on service {} are not increasing on service {} after trip {}.",
+                                block.blockId, block.serviceId, prev.trip.getId());
+                        continue SERVICE_BLOCK;
+                    }
+                    TripPattern prevPattern = patternForTripTimes.get(prev);
+                    TripPattern currPattern = patternForTripTimes.get(curr);
+                    interlines.put(new P2<TripPattern>(prevPattern, currPattern), new P2<Trip>(prev.trip, curr.trip));
+                }
+                prev = curr;
+            }
+        }
+
+        /*
+          Create the PatternInterlineDwell edges linking together TripPatterns.
+          All the pattern vertices and edges must already have been created.
+         */
+        for (P2<TripPattern> patterns : interlines.keySet()) {
+            TripPattern prevPattern = patterns.getFirst();
+            TripPattern nextPattern = patterns.getSecond();
+            // This is a single (uni-directional) edge which may be traversed forward and backward.
+            PatternInterlineDwell edge = new PatternInterlineDwell(prevPattern, nextPattern);
+            for (P2<Trip> trips : interlines.get(patterns)) {
+                edge.add(trips.getFirst(), trips.getSecond());
+            }
+        }
+        LOG.info("Done finding interlining trips and creating the corresponding edges.");
+    }
+
     private <T extends Edge & HopEdge> void createGeometry(Graph graph, Trip trip,
             List<StopTime> stopTimes, List<T> hops) {
 
@@ -701,10 +708,6 @@ public class GTFSPatternHopFactory {
 
         return null;
     }
-
-
-// TODO makeFrequencyPattern(Graph graph, Trip trip, List<StopTime> stopTimes) {
-
 
     /**
      * Scan through the given list, looking for clearly incorrect series of stoptimes and unsetting

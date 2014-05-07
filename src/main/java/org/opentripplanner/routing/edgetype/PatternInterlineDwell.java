@@ -13,11 +13,17 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -69,61 +75,45 @@ import com.vividsolutions.jts.geom.LineString;
  * independent of one another. An update to one TripTimes will "infect" the entire block it belongs to because the
  * prev/next links are bidirectional.
  *
+ * Interlining info (Patterns, Trips) can either be stored locally (in the TripPatterns/Timetables) or nonlocally (at the Graph level).
  */
 public class PatternInterlineDwell extends Edge implements OnboardEdge {
 
     private static final Logger LOG = LoggerFactory.getLogger(PatternInterlineDwell.class);
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    private Map<AgencyAndId, InterlineDwellData> tripIdToInterlineDwellData;
+    /* The TripPattern this edge is coming from. */
+    final TripPattern pattern;
 
-    private Map<AgencyAndId, InterlineDwellData> reverseTripIdToInterlineDwellData;
+    /* Interlining relationships between trips. This could actually be a single Graph-wide BiMap. */
+    final BiMap<Trip,Trip> trips = HashBiMap.create();
 
-    private int bestDwellTime = Integer.MAX_VALUE;
-    
-    private Trip targetTrip;
-
-    public PatternInterlineDwell(Vertex startJourney, Vertex endJourney, Trip targetTrip) {
-        super(startJourney, endJourney);
-        this.tripIdToInterlineDwellData = new HashMap<AgencyAndId, InterlineDwellData>();
-        this.reverseTripIdToInterlineDwellData = new HashMap<AgencyAndId, InterlineDwellData>();
-        this.targetTrip = targetTrip;
+    public PatternInterlineDwell(TripPattern p0, TripPattern p1) {
+        // The dwell actually connects the _arrival_ at the last stop of the first pattern
+        // to the _departure_ of the first stop of the second pattern.
+        // The last stop of the first pattern does not even have a _depart_ vertex, and
+        // The first stop of the second pattern does not even have an _arrive_ vertex.
+        super(p0.arriveVertices[p0.stopPattern.size - 1],
+              p1.departVertices[0]);
+        pattern = p0;
     }
 
-    public void addTrip(Trip trip, Trip reverseTrip, int dwellTime,
-            int oldPatternIndex, int newPatternIndex) {
-        if (dwellTime < 0) {
-            dwellTime = 0;
-            LOG.warn ("Negative dwell time for trip " + trip.getId().getAgencyId() + " " + trip.getId().getId() + "(forcing to zero)");
-        }
-        tripIdToInterlineDwellData.put(trip.getId(), new InterlineDwellData(dwellTime, newPatternIndex, reverseTrip));
-        reverseTripIdToInterlineDwellData.put(reverseTrip.getId(), new InterlineDwellData(dwellTime,
-                oldPatternIndex, trip));
-        if (dwellTime < bestDwellTime) {
-            bestDwellTime = dwellTime;
-        }
-    }
-
-    public String getDirection() {
-        return targetTrip.getTripHeadsign();
-    }
-
-    public double getDistance() {
-        return 0;
+    public void add(Trip t1, Trip t2) {
+        trips.put(t1, t2);
     }
 
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(targetTrip.getRoute());
+        return pattern.getMode();
     }
 
     public String getName() {
-        return GtfsLibrary.getRouteName(targetTrip.getRoute());
+        return GtfsLibrary.getRouteName(pattern.getRoute());
     }
 
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(bestDwellTime);
+        s1.incrementTimeInSeconds(0); // FIXME too optimistic
         return s1.makeState();
     }
     
@@ -134,60 +124,51 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
     
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return bestDwellTime;
+        return 0; // FIXME overly optimistic
     }
 
     public State traverse(State state0) {
-        int arrivalTime;
-        int departureTime;
-        TripPattern pattern;
+
+        RoutingRequest options = state0.getOptions();
+        Trip oldTrip = state0.getBackTrip();
+        Trip newTrip = options.arriveBy ? trips.inverse().get(oldTrip) : trips.get(oldTrip);
+        if (newTrip == null) return null;
+
+        TripPattern newPattern;
         TripTimes newTripTimes;
         TripTimes oldTripTimes = state0.getTripTimes();
-        RoutingRequest options = state0.getOptions();
-
+        int arrivalTime;
+        int departureTime;
         AgencyAndId tripId = state0.getTripId();
-        InterlineDwellData dwellData;
 
         if (options.isArriveBy()) {
             // traversing backward
-            dwellData = reverseTripIdToInterlineDwellData.get(tripId);
-            if (dwellData == null) return null;
-
-            pattern = ((OnboardVertex) fromv).getTripPattern();
-            newTripTimes = pattern.getResolvedTripTimes(dwellData.patternIndex, state0);
-            arrivalTime = newTripTimes.getArrivalTime(newTripTimes.getNumStops());
+            newPattern = ((OnboardVertex) fromv).getTripPattern();
+            newTripTimes = newPattern.getResolvedTripTimes(newTrip, state0);
+            arrivalTime = newTripTimes.getArrivalTime(newTripTimes.getNumStops() - 1); // FIXME with getLastTime method
             departureTime = oldTripTimes.getDepartureTime(0);
         } else {
             // traversing forward
-            dwellData = tripIdToInterlineDwellData.get(tripId);
-            if (dwellData == null) return null;
-
-            pattern = ((OnboardVertex) tov).getTripPattern();
-            newTripTimes = pattern.getResolvedTripTimes(dwellData.patternIndex, state0);
-            arrivalTime = oldTripTimes.getArrivalTime(oldTripTimes.getNumStops());
+            newPattern = ((OnboardVertex) tov).getTripPattern();
+            newTripTimes = newPattern.getResolvedTripTimes(newTrip, state0);
+            arrivalTime = oldTripTimes.getArrivalTime(oldTripTimes.getNumStops() - 1); // FIXME with getLastTime method
             departureTime = newTripTimes.getDepartureTime(0);
         }
 
-        BannedStopSet banned = options.bannedTrips.get(dwellData.trip.getId());
-        if (banned != null) {
-            if (banned.contains(0)) 
-                return null;
-        }
+//        BannedStopSet banned = options.bannedTrips.get(newTrip.getId());
+//        if (banned != null && banned.contains(0)) // i.e. if the first stop is banned.
+//            return null;
 
         int dwellTime = departureTime - arrivalTime;
         if (dwellTime < 0) return null;
 
         StateEditor s1 = state0.edit(this);
-
         s1.incrementTimeInSeconds(dwellTime);
-        s1.setTripId(dwellData.trip.getId());
-        s1.setPreviousTrip(dwellData.trip);
-
+        s1.setTripId(newTrip.getId()); // TODO check meaning
+        s1.setPreviousTrip(oldTrip);   // TODO check meaning
         s1.setTripTimes(newTripTimes);
         s1.incrementWeight(dwellTime);
-        
-        // This shouldn't be changing - MWC
-        s1.setBackMode(getMode());
+        s1.setBackMode(getMode()); // Mode should not change, but just in case...
         return s1.makeState();
     }
 
@@ -198,21 +179,10 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
     public String toString() {
         return "PatternInterlineDwell(" + super.toString() + ")";
     }
-    
-    public Trip getTrip() {
-        return targetTrip;
-    }
-
-    public Map<AgencyAndId, InterlineDwellData> getReverseTripIdToInterlineDwellData() {
-        return reverseTripIdToInterlineDwellData;
-    }
-    public Map<AgencyAndId, InterlineDwellData> getTripIdToInterlineDwellData() {
-        return tripIdToInterlineDwellData;
-    }
 
     @Override
     public int getStopIndex() {
-        return -1; //special case.
+        return -1; // special case: this edge is at a different stop on two different patterns.
     }
 
 }

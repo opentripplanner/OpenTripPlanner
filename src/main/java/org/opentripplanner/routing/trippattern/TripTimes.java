@@ -60,7 +60,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public final Trip trip;
 
     /** The code for the service on which this trip runs. For departure search optimizations. */
-    // not final because these are set after the fact.
+    // not final because these are set later, after TripTimes construction.
     public int serviceCode = -1;
     
     /**
@@ -426,7 +426,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return shifted;
     }
 
-    /** Just to create uniform getter-syntax across all public parts of TripTimes. */
+    /** Just to create uniform getter-syntax across the whole public interface of TripTimes. */
     public int getStopSequence(int stop) {
         return stopSequences[stop];
     }

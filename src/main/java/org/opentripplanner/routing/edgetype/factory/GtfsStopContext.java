@@ -34,9 +34,9 @@ public class GtfsStopContext {
 
     public Map<Stop, TransitStationStop> stationStopNodes = new HashMap<Stop, TransitStationStop>();
 
-    public Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>();
+    public Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>(); // FIXME these are stored in the stop vertices now, can remove
 
-    public Map<Stop, TransitStopDepart> stopDepartNodes = new HashMap<Stop, TransitStopDepart>();
+    public Map<Stop, TransitStopDepart> stopDepartNodes = new HashMap<Stop, TransitStopDepart>(); // FIXME these are stored in the stop vertices now, can remove
 
     public Map<T2<Stop, Trip>, Vertex> patternArriveNodes = new HashMap<T2<Stop, Trip>, Vertex>();
 
