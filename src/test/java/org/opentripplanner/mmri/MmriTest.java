@@ -68,7 +68,6 @@ abstract class MmriTest extends TestCase {
     LongDistancePathService longDistancePathService;
     GenericAStar genericAStar;
     Graph graph;
-    ArrayList<ServiceDay> serviceDayList;
     TimetableSnapshotSource timetableSnapshotSource;
     AlertPatchServiceImpl alertPatchServiceImpl;
 
@@ -108,11 +107,6 @@ abstract class MmriTest extends TestCase {
         genericAStar = new GenericAStar();
         longDistancePathService = new LongDistancePathService(null, genericAStar);
         planGenerator = new PlanGenerator(null, longDistancePathService);
-        serviceDayList = new ArrayList<ServiceDay>(3);
-
-        serviceDayList.add(new ServiceDay(graph, 1388534400L, graph.getCalendarService(), "MMRI"));
-        serviceDayList.add(new ServiceDay(graph, 1388620800L, graph.getCalendarService(), "MMRI"));
-        serviceDayList.add(new ServiceDay(graph, 1388707200L, graph.getCalendarService(), "MMRI"));
     }
 
     Leg plan(long dateTime, String fromVertex, String toVertex, String onTripId,
@@ -151,7 +145,6 @@ abstract class MmriTest extends TestCase {
         }
         routingRequest.setOtherThanPreferredRoutesPenalty(0);
         routingRequest.setWalkBoardCost(0);
-        routingRequest.rctx.serviceDays = serviceDayList;
 
         TripPlan tripPlan = planGenerator.generate(routingRequest);
         Itinerary itinerary = tripPlan.itinerary.get(0);
