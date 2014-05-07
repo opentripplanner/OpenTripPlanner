@@ -33,7 +33,45 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
 
+/**
+ * A PatternInterlineDwell refers to "interlining", where a single physical vehicle carries out several logical trips
+ * and a passenger is optionally allowed to remain on the vehicle as it passes from one trip to the other. Interlining
+ * is inferred from block IDs in GTFS input. We do not represent cases where the user is not allowed to remain on the
+ * vehicle, as these are only interesting from an operations perspective and not for passenger information.
+ *
+ * Interline dwell info could be stored in various places, with various advantages and disadvantages:
+ *
+ * A. In the dwell edge itself (where it is now located). This will get in the way of realtime updates and the
+ *    eventual elimination of transit edges.
+ * B. In TripTimes. This has the disadvantage of leaving null fields in every TripTimes where interlining does not
+ *    happen, but the null field could be a pointer to a compound type so it doesn't waste too much space.
+ * C. In Timetables. Like TripTimes, this option also allows for real-time updates to interlining information.
+ * D. TripPatterns. This does not allow full real-time updates to block and interlining behavior.
+ *
+ * Another option is to store the Trip->Trip mapping at the Graph level, and use the source and target vertices of the
+ * interline dwell edges to know which pattern should be used for resolving TripTimes. However, this will get in the
+ * way of eventually eliminating transit edges. This could be a Guava BiMap<Trip, Trip>.
+ *
+ * Links to previous and next trips could be stored directly as fields in TripTimes, or in a map.
+ * Previous/next TripTimes in fields will not work because real-time updates to any one TripTimes will
+ * "infect" all other TripTimes in its block.
+ * Previous/next (Pattern, Trip) tuples in fields will work because the realtime lookup can be performed on the fly.
+ * In maps, the trips do not need to be grouped by service ID because each trip exists on only a single service ID.
+ *
+ * The "previous" and "next" targets in interline dwell information could be:
+ * A. TripTimes. This requires refreshing the TripTimes pointers when committing realtime updates to ensure that they
+ *    do not point to scheduled or outdated TripTimes. However, TripTimes do not currently store which TripPattern
+ *    they belong to, which could interfere with realtime lookup.
+ * B. Tuples of (TripPattern, Trip). This requires resolving the actual TripTimes object at runtime in case there are
+ *    real-time updates.
+ *
+ * Storing pointers directly to other TripTimes in prev/next fields in TripTimes prevents those TripTimes from being
+ * independent of one another. An update to one TripTimes will "infect" the entire block it belongs to because the
+ * prev/next links are bidirectional.
+ *
+ */
 public class PatternInterlineDwell extends Edge implements OnboardEdge {
+
     private static final Logger LOG = LoggerFactory.getLogger(PatternInterlineDwell.class);
 
     private static final long serialVersionUID = 1L;
