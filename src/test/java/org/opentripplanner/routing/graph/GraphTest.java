@@ -13,10 +13,10 @@
 
 package org.opentripplanner.routing.graph;
 
-import static org.apache.commons.lang.ArrayUtils.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.util.ArrayUtils.contains;
 
 import org.junit.Test;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
