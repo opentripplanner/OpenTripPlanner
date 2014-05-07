@@ -264,10 +264,6 @@ public class Timetable implements Serializable {
         return -1;
     }
 
-    /**
-     * Not private because it's used when traversing interline dwells, which refer to order
-     * in the scheduled trip pattern.
-     */
     public TripTimes getTripTimes(int tripIndex) {
         return tripTimes.get(tripIndex);
     }

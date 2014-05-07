@@ -98,9 +98,7 @@ public class TimetableTest {
 
         int trip_1_1_index = timetable.getTripIndex(new AgencyAndId("agency", "1.1"));
 
-        @SuppressWarnings("deprecation")
         Vertex stop_a = graph.getVertex("agency_A");
-        @SuppressWarnings("deprecation")
         Vertex stop_c = graph.getVertex("agency_C");
         RoutingRequest options = new RoutingRequest();
 
@@ -179,9 +177,9 @@ public class TimetableTest {
         stopTimeEventBuilder.setTime(TestUtils.dateInSeconds(
                 "America/New_York", 2009, AUGUST, 7, 0, 2, 0));
         tripUpdate = tripUpdateBuilder.build();
-        assertEquals(20*60, timetable.getArrivalTime(1, trip_1_1_index));
+        assertEquals(20*60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
         assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
-        assertEquals(20*60 + 120, timetable.getArrivalTime(1, trip_1_1_index));
+        assertEquals(20*60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
 
         //---
         options.setRoutingContext(graph, stop_a, stop_c);
