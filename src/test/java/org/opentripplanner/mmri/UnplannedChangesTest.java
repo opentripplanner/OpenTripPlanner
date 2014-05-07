@@ -17,8 +17,8 @@ import org.opentripplanner.api.model.Leg;
 
 public class UnplannedChangesTest extends MmriTest {
     @Override
-    final String getFeedName() {
-        return "3b";
+    public final String getFeedName() {
+        return "mmri/3b";
     }
 
     public void test3b1() {

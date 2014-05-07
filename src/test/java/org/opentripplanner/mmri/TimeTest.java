@@ -17,8 +17,8 @@ import org.opentripplanner.api.model.Leg;
 
 public class TimeTest extends MmriTest {
     @Override
-    final String getFeedName() {
-        return "1g";
+    public final String getFeedName() {
+        return "mmri/1g";
     }
 
     public void test1g1() {

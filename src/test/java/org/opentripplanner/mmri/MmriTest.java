@@ -23,6 +23,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.GtfsTest;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
@@ -47,116 +48,8 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 /** Common base class for all the MMRI tests (see package-info). */
-abstract class MmriTest extends TestCase {
-    AlertsUpdateHandler alertsUpdateHandler;
-    PlanGenerator planGenerator;
-    LongDistancePathService longDistancePathService;
-    GenericAStar genericAStar;
-    Graph graph;
-    TimetableSnapshotSource timetableSnapshotSource;
-    AlertPatchServiceImpl alertPatchServiceImpl;
+abstract class MmriTest extends GtfsTest {
 
-    abstract String getFeedName();
+    public boolean isLongDistance() { return true; }
 
-    protected void setUp() {
-        File gtfs = new File("src/test/resources/mmri/" + getFeedName() + ".zip");
-        File gtfsRealTime = new File("src/test/resources/mmri/" + getFeedName() + ".pb");
-        GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
-        List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
-        GtfsGraphBuilderImpl gtfsGraphBuilderImpl = new GtfsGraphBuilderImpl(gtfsBundleList);
-
-        alertsUpdateHandler = new AlertsUpdateHandler();
-        graph = new Graph();
-        gtfsBundle.setTransfersTxtDefinesStationPaths(true);
-        gtfsGraphBuilderImpl.buildGraph(graph, null);
-        graph.index(new DefaultStreetVertexIndexFactory());
-        timetableSnapshotSource = new TimetableSnapshotSource(graph);
-        timetableSnapshotSource.setPurgeExpiredData(false);
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
-        alertPatchServiceImpl = new AlertPatchServiceImpl(graph);
-        alertsUpdateHandler.setAlertPatchService(alertPatchServiceImpl);
-        alertsUpdateHandler.setDefaultAgencyId("MMRI");
-
-        try {
-            InputStream inputStream = new FileInputStream(gtfsRealTime);
-            FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
-            List<FeedEntity> feedEntityList = feedMessage.getEntityList();
-            List<TripUpdate> updates = new ArrayList<TripUpdate>(feedEntityList.size());
-            for (FeedEntity feedEntity : feedEntityList) {
-                updates.add(feedEntity.getTripUpdate());
-            }
-            timetableSnapshotSource.applyTripUpdates(updates, "MMRI");
-            alertsUpdateHandler.update(feedMessage);
-        } catch (Exception exception) {}
-
-        genericAStar = new GenericAStar();
-        longDistancePathService = new LongDistancePathService(null, genericAStar);
-        planGenerator = new PlanGenerator(null, longDistancePathService);
-    }
-
-    Leg plan(long dateTime, String fromVertex, String toVertex, String onTripId,
-            boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
-            String excludedRoute, String excludedStop) {
-        return plan(dateTime, fromVertex, toVertex, onTripId, wheelchairAccessible,
-                preferLeastTransfers, preferredMode, excludedRoute, excludedStop, 1)[0];
-    }
-
-    Leg[] plan(long dateTime, String fromVertex, String toVertex, String onTripId,
-            boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
-            String excludedRoute, String excludedStop, int legCount) {
-        final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
-        RoutingRequest routingRequest = new RoutingRequest();
-
-        routingRequest.setArriveBy(dateTime < 0);
-        routingRequest.dateTime = Math.abs(dateTime);
-        if (fromVertex != null && !fromVertex.isEmpty()) {
-            routingRequest.setFrom(new GenericLocation(null, "MMRI_" + fromVertex));
-        }
-        if (toVertex != null && !toVertex.isEmpty()) {
-            routingRequest.setTo(new GenericLocation(null, "MMRI_" + toVertex));
-        }
-        if (onTripId != null && !onTripId.isEmpty()) {
-            routingRequest.setStartingTransitTripId(new AgencyAndId("MMRI", onTripId));
-        }
-        routingRequest.setRoutingContext(graph);
-        routingRequest.setWheelchairAccessible(wheelchairAccessible);
-        routingRequest.setTransferPenalty(preferLeastTransfers ? 300 : 0);
-        routingRequest.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
-        if (excludedRoute != null && !excludedRoute.isEmpty()) {
-            routingRequest.setBannedRoutes("MMRI__" + excludedRoute);
-        }
-        if (excludedStop != null && !excludedStop.isEmpty()) {
-            routingRequest.setBannedStopsHard("MMRI_" + excludedStop);
-        }
-        routingRequest.setOtherThanPreferredRoutesPenalty(0);
-        routingRequest.setWalkBoardCost(0);
-
-        TripPlan tripPlan = planGenerator.generate(routingRequest);
-        Itinerary itinerary = tripPlan.itinerary.get(0);
-
-        assertEquals(legCount, itinerary.legs.size());
-
-        return itinerary.legs.toArray(new Leg[legCount]);
-    }
-
-    void validateLeg(Leg leg, long startTime, long endTime, String toStopId, String fromStopId,
-            String alert) {
-        assertEquals(startTime, leg.startTime.getTimeInMillis());
-        assertEquals(endTime, leg.endTime.getTimeInMillis());
-        assertEquals(toStopId, leg.to.stopId.getId());
-        assertEquals("MMRI", leg.to.stopId.getAgencyId());
-        if (fromStopId != null) {
-            assertEquals("MMRI", leg.from.stopId.getAgencyId());
-            assertEquals(fromStopId, leg.from.stopId.getId());
-        } else {
-            assertNull(leg.from.stopId);
-        }
-        if (alert != null) {
-            assertNotNull(leg.alerts);
-            assertEquals(1, leg.alerts.size());
-            assertEquals(alert, leg.alerts.get(0).alertHeaderText.getSomeTranslation());
-        } else {
-            assertNull(leg.alerts);
-        }
-    }
 }

@@ -17,8 +17,8 @@ import org.opentripplanner.api.model.Leg;
 
 public class ExcludedRoutesTest extends MmriTest {
     @Override
-    final String getFeedName() {
-        return "3d";
+    public final String getFeedName() {
+        return "mmri/3d";
     }
 
     public void test3d1() {

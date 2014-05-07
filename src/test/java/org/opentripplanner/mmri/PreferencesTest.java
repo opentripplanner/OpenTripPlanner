@@ -19,8 +19,8 @@ import org.opentripplanner.api.model.Leg;
 
 public class PreferencesTest extends MmriTest {
     @Override
-    final String getFeedName() {
-        return "2c";
+    public final String getFeedName() {
+        return "mmri/2c";
     }
 
     public void test2c1() {

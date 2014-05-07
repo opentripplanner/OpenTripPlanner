@@ -17,8 +17,8 @@ import org.opentripplanner.api.model.Leg;
 
 public class FirstForbiddenTripToTripTransferTest extends MmriTest {
     @Override
-    final String getFeedName() {
-        return "2e3";
+    public final String getFeedName() {
+        return "mmri/2e3";
     }
 
     public void test2e3() {

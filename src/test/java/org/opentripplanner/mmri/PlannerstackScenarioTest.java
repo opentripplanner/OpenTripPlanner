@@ -17,8 +17,8 @@ import org.opentripplanner.api.model.Leg;
 
 public class PlannerstackScenarioTest extends MmriTest {
     @Override
-    final String getFeedName() {
-        return "plannerstack_scenario";
+    public final String getFeedName() {
+        return "mmri/plannerstack_scenario";
     }
 
     public void testPlannerstackScenario() {

@@ -17,8 +17,8 @@ import org.opentripplanner.api.model.Leg;
 
 public class StopToStopTransfersTest extends MmriTest {
     @Override
-    final String getFeedName() {
-        return "2d";
+    public final String getFeedName() {
+        return "mmri/2d";
     }
 
     public void test2d1() {
