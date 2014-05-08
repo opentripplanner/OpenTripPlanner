@@ -17,11 +17,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.IdentityBean;
@@ -32,6 +30,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 public class GtfsGraphBuilderImplTest {
 
@@ -53,6 +52,7 @@ public class GtfsGraphBuilderImplTest {
 
         Graph graph = new Graph();
         _builder.buildGraph(graph, _extra);
+        graph.index(new DefaultStreetVertexIndexFactory());
 
         Trip trip = graph.index.tripForId.get(new AgencyAndId("a0", "t0"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
@@ -77,6 +77,7 @@ public class GtfsGraphBuilderImplTest {
 
         Graph graph = new Graph();
         _builder.buildGraph(graph, _extra);
+        graph.index(new DefaultStreetVertexIndexFactory());
 
         Trip trip = graph.index.tripForId.get(new AgencyAndId("a0", "t0"));
         TripPattern pattern = graph.index.patternForTrip.get(trip);
