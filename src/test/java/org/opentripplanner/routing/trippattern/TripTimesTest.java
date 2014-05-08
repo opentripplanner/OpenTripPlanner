@@ -99,14 +99,14 @@ public class TripTimesTest {
     public void testStopUpdate() {
         TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
-        updatedTripTimesA.updateArrivalTime(2, 190);
+        updatedTripTimesA.updateArrivalTime(3, 190);
         updatedTripTimesA.updateDepartureTime(3, 190);
-        updatedTripTimesA.updateArrivalTime(4, 311);
+        updatedTripTimesA.updateArrivalTime(5, 311);
         updatedTripTimesA.updateDepartureTime(5, 312);
 
-        assertEquals(3 * 60 + 10, updatedTripTimesA.getArrivalTime(2));
+        assertEquals(3 * 60 + 10, updatedTripTimesA.getArrivalTime(3));
         assertEquals(3 * 60 + 10, updatedTripTimesA.getDepartureTime(3));
-        assertEquals(5 * 60 + 11, updatedTripTimesA.getArrivalTime(4));
+        assertEquals(5 * 60 + 11, updatedTripTimesA.getArrivalTime(5));
         assertEquals(5 * 60 + 12, updatedTripTimesA.getDepartureTime(5));
     }
 
@@ -117,14 +117,14 @@ public class TripTimesTest {
         updatedTripTimesA.updateDepartureTime(0, TripTimes.UNAVAILABLE);
 
         assertEquals(TripTimes.UNAVAILABLE, updatedTripTimesA.getDepartureTime(0));
-        assertEquals(60, updatedTripTimesA.getArrivalTime(0));
+        assertEquals(60, updatedTripTimesA.getArrivalTime(1));
     }
 
     @Test
     public void testNonIncreasingUpdate() {
         TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
-        updatedTripTimesA.updateArrivalTime(0, 60);
+        updatedTripTimesA.updateArrivalTime(1, 60);
         updatedTripTimesA.updateDepartureTime(1, 59);
 
         assertFalse(updatedTripTimesA.timesIncreasing());
@@ -132,7 +132,7 @@ public class TripTimesTest {
         TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
 
         updatedTripTimesB.updateDepartureTime(6, 421);
-        updatedTripTimesB.updateArrivalTime(6, 420);
+        updatedTripTimesB.updateArrivalTime(7, 420);
 
         assertFalse(updatedTripTimesB.timesIncreasing());
     }
@@ -141,10 +141,10 @@ public class TripTimesTest {
     public void testDelay() {
         TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
         updatedTripTimesA.updateDepartureDelay(0, 10);
-        updatedTripTimesA.updateArrivalDelay(5, 13);
+        updatedTripTimesA.updateArrivalDelay(6, 13);
 
         assertEquals(0 * 60 + 10, updatedTripTimesA.getDepartureTime(0));
-        assertEquals(6 * 60 + 13, updatedTripTimesA.getArrivalTime(5));
+        assertEquals(6 * 60 + 13, updatedTripTimesA.getArrivalTime(6));
     }
 
     @Test
@@ -202,7 +202,7 @@ public class TripTimesTest {
 
         TripTimes updatedTripTimesA = new TripTimes(differingTripTimes);
 
-        updatedTripTimesA.updateArrivalTime(0, 89);
+        updatedTripTimesA.updateArrivalTime(1, 89);
         updatedTripTimesA.updateDepartureTime(1, 98);
 
         assertFalse(updatedTripTimesA.timesIncreasing());
@@ -210,22 +210,35 @@ public class TripTimesTest {
 
     @Test
     public void testGetRunningTime() {
-        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+        for (int i = 0; i < stops.length - 1; i++) {
+            assertEquals(60, originalTripTimes.getRunningTime(i));
+        }
 
-        updatedTripTimesA.updateDepartureTime(0, TripTimes.UNAVAILABLE);
+        TripTimes updatedTripTimes = new TripTimes(originalTripTimes);
 
-        assertEquals(-1, updatedTripTimesA.getRunningTime(0));
+        for (int i = 0; i < stops.length - 1; i++) {
+            updatedTripTimes.updateDepartureDelay(i, i);
+        }
+
+        for (int i = 0; i < stops.length - 1; i++) {
+            assertEquals(60 - i, updatedTripTimes.getRunningTime(i));
+        }
     }
 
     @Test
     public void testGetDwellTime() {
-        assertEquals(-1, originalTripTimes.getDwellTime(Integer.MIN_VALUE));
-        assertEquals(-1, originalTripTimes.getDwellTime(-1));
-        assertEquals(-1, originalTripTimes.getDwellTime(0));
-        assertEquals(0, originalTripTimes.getDwellTime(1));
-        assertEquals(0, originalTripTimes.getDwellTime(stops.length - 2));
-        assertEquals(-1, originalTripTimes.getDwellTime(stops.length - 1));
-        assertEquals(-1, originalTripTimes.getDwellTime(stops.length));
-        assertEquals(-1, originalTripTimes.getDwellTime(Integer.MAX_VALUE));
+        for (int i = 0; i < stops.length; i++) {
+            assertEquals(0, originalTripTimes.getDwellTime(i));
+        }
+
+        TripTimes updatedTripTimes = new TripTimes(originalTripTimes);
+
+        for (int i = 0; i < stops.length; i++) {
+            updatedTripTimes.updateArrivalDelay(i, -i);
+        }
+
+        for (int i = 0; i < stops.length; i++) {
+            assertEquals(i, updatedTripTimes.getDwellTime(i));
+        }
     }
 }
