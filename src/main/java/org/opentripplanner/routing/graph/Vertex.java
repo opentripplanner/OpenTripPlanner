@@ -276,33 +276,6 @@ public abstract class Vertex implements Serializable, Cloneable {
     }
 
     /**
-     * Merge another vertex into this one.  Useful during graph construction for handling
-     * sequential non-branching streets, and empty dwells.
-     */
-    public void mergeFrom(Graph graph, Vertex other) {
-        // copy edgelists to avoid concurrent modification
-        List<Edge> edges = new ArrayList<Edge>();
-        edges.addAll(this.getIncoming());
-        edges.addAll(this.getOutgoing());
-        edges.addAll(other.getIncoming());
-        edges.addAll(other.getOutgoing());
-
-        for (Edge e : edges) {
-            // We only support Vertices that are direct edges when merging
-            Vertex from = e.getFromVertex();
-            Vertex to = e.getToVertex();
-            if ((from==this && to==other) || (from==other && to==this)) {
-                e.detach();
-            } else if (from == other) {
-                e.attach(this, to);
-            } else if (to == other) {
-                e.attach(from, this);
-            }
-        }
-        graph.removeVertex(other);
-    }
-
-    /**
      * Clear this vertex's outgoing and incoming edge lists, and remove all the edges
      * they contained from this vertex's neighbors.
      */

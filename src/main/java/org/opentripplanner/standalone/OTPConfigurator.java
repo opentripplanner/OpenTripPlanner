@@ -198,7 +198,6 @@ public class OTPConfigurator {
                 }
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
-            gtfsBuilder.setDeleteUselessDwells(params.deleteUselessDwells);
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();

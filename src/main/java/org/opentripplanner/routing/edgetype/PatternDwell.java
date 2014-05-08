@@ -103,9 +103,4 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
     public int getStopIndex() {
         return stopIndex;
     }
-
-    public boolean allDwellsZero() {
-        return this.getPattern().scheduledTimetable.allDwellsZero(this.stopIndex);
-    }
-
 }

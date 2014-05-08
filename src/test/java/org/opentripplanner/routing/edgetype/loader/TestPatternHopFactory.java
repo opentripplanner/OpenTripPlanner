@@ -206,23 +206,6 @@ public class TestPatternHopFactory extends TestCase {
         assertEquals(endTime, path.getEndTime());
     }
 
-    /**
-     * Test that useless dwell edges are in fact removed.
-     */
-    public void testDwellSimplification() {
-        Vertex stop_f = graph.getVertex("agency_F_depart");
-        Vertex stop_h = graph.getVertex("agency_H_arrive");
-
-        RoutingRequest options = new RoutingRequest();
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 5, 0, 0);
-        options.setRoutingContext(graph, stop_f, stop_h);
-
-        ShortestPathTree spt = aStar.getShortestPathTree(options);
-        GraphPath path = spt.getPath(stop_h, false);
-        assertNotNull(path);
-        assertEquals(5, path.states.size());
-    }
-
     public void testRoutingOverMidnight() throws Exception {
         // this route only runs on weekdays
         Vertex stop_g = graph.getVertex("agency_G_depart");

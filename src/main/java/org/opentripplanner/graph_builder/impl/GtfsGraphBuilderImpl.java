@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
 import lombok.Setter;
 
 import org.onebusaway.csv_entities.EntityHandler;
@@ -46,10 +45,8 @@ import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
-import org.opentripplanner.graph_builder.annotation.AgencyNameCollision;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
-import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -60,6 +57,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 public class GtfsGraphBuilderImpl implements GraphBuilder {
 
@@ -80,12 +79,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     Set<String> agencyIdsSeen = Sets.newHashSet();
 
     int nAgencies = 0;
-
-    /**
-     * Delete dwell edges for trip patterns that have all-zero dwell times.
-     * Do not use with real-time updates.
-     */
-    @Setter private boolean deleteUselessDwells;
 
     /** 
      * Construct and set bundles all at once. 
@@ -134,9 +127,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         GtfsStopContext stopContext = new GtfsStopContext();
         
         try {
-            int bundleIndex = 0;
             for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
-                bundleIndex += 1;
                 // apply global defaults to individual GTFSBundles (if globals have been set) 
                 if (cacheDirectory != null && gtfsBundle.getCacheDirectory() == null)
                     gtfsBundle.setCacheDirectory(cacheDirectory);
@@ -148,7 +139,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 hf.setStopContext(stopContext);
                 hf.setFareServiceFactory(_fareServiceFactory);
                 hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
-                hf.setDeleteUselessDwells(deleteUselessDwells);
 
                 loadBundle(gtfsBundle, graph, dao);
 

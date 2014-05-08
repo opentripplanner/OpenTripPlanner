@@ -297,10 +297,6 @@ public class GTFSPatternHopFactory {
 
     private Map<AgencyAndId, double[]> _distancesByShapeId = new HashMap<AgencyAndId, double[]>();
     
-    private boolean _deleteUselessDwells = true;
-
-    private ArrayList<PatternDwell> potentiallyUselessDwells = new ArrayList<PatternDwell> ();
-
     private FareServiceFactory fareServiceFactory;
 
     private Map<StopPattern, TripPattern> tripPatterns = Maps.newHashMap();
@@ -435,9 +431,6 @@ public class GTFSPatternHopFactory {
 
         /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
-
-        /* TODO just remove dwell deletion entirely */
-        if (_deleteUselessDwells) deleteUselessDwells(graph);
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
@@ -871,22 +864,6 @@ public class GTFSPatternHopFactory {
             }
         }
     }
-    
-    /** Delete dwell edges that take no time, and merge their start and end vertices. */
-    private void deleteUselessDwells(Graph graph) {
-        int nDwells = potentiallyUselessDwells.size();
-        int nDeleted = 0;
-        for (PatternDwell dwell : potentiallyUselessDwells) {
-            // useless arrival time arrays are now eliminated in TripTimes constructor (AMB) 
-            if (dwell.allDwellsZero()) {
-                dwell.getFromVertex().mergeFrom(graph, dwell.getToVertex());
-                nDeleted += 1;
-            }                
-        }
-        LOG.debug("deleted {} dwell edges / {} candidates, merging arrival and departure vertices.", 
-           nDeleted, nDwells);
-        if (nDeleted > 0) graph.setDwellsDeleted(true);
-    }
 
     /**
      * Scan through the given list of stoptimes, interpolating the missing (unset) ones.
@@ -963,7 +940,6 @@ public class GTFSPatternHopFactory {
         _geometriesByShapeId.clear();
         _distancesByShapeId.clear();
         _geometriesByShapeSegmentKey.clear();
-        potentiallyUselessDwells.clear();
     }
 
     private void loadTransfers(Graph graph) {
@@ -1373,14 +1349,6 @@ public class GTFSPatternHopFactory {
 
     public void setDefaultStreetToStopTime(int defaultStreetToStopTime) {
         this.defaultStreetToStopTime = defaultStreetToStopTime;
-    }
-
-    /**
-     * You might not want to delete dwell edges when using realtime updates, because new dwells 
-     * might be introduced via trip updates.
-     */
-    public void setDeleteUselessDwells(boolean delete) {
-        this._deleteUselessDwells = delete;
     }
 
     public void setStopContext(GtfsStopContext context) {
