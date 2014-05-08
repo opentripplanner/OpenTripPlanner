@@ -34,6 +34,7 @@ import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -53,10 +54,11 @@ public class TimetableSnapshotSourceTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        context = GtfsLibrary.readGtfs(new File("../otp-core/" + ConstantsForTests.FAKE_GTFS));
+        context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
 
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
+        graph.index(new DefaultStreetVertexIndexFactory());
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -160,7 +162,7 @@ public class TimetableSnapshotSourceTest {
         assertNotSame(forToday, schedule);
         assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
         assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
-        assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(0));
+        assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
         assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
     }
 
