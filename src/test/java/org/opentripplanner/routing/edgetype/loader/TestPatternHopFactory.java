@@ -237,16 +237,18 @@ public class TestPatternHopFactory extends TestCase {
         assertTrue(endTime < startTime + 60 * 60);
     }
 
+    // FIXME: Return *which* hop, exactly? The current implementation depends on magic.
     public PatternHop getHopOut(Vertex v) {
+        PatternHop patternHop = null;
         for (TransitBoardAlight e : filter(v.getOutgoing(), TransitBoardAlight.class)) {
             if (!e.isBoarding())
                 continue;
             
             for (PatternHop f : filter(e.getToVertex().getOutgoing(), PatternHop.class)) {
-                return f;
+                patternHop = f;
             }
         }
-        return null;
+        return patternHop;
     }
 
     public void testShapeByLocation() throws Exception {
@@ -274,11 +276,7 @@ public class TestPatternHopFactory extends TestCase {
     public void testPickupDropoff() throws Exception {
         Vertex stop_o = graph.getVertex("agency_O_depart");
         Vertex stop_p = graph.getVertex("agency_P");
-        int i = 0;
-        for (@SuppressWarnings("unused") Edge e: stop_o.getOutgoing()) {
-            ++i;
-        }
-        assertTrue(i == 3);
+        assertEquals(2, stop_o.getOutgoing().size());
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 0);
         RoutingRequest options = new RoutingRequest();

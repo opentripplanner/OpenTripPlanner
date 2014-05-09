@@ -24,8 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Multimap;
 import org.apache.commons.math3.util.FastMath;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -44,7 +42,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
@@ -62,17 +59,16 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.HopEdge;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.StationStopEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.StationStopEdge;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
+import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -92,8 +88,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.internal.Maps;
+import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -424,6 +422,14 @@ public class GTFSPatternHopFactory {
         for (TripPattern tripPattern : tripPatterns.values()) {
             tripPattern.makePatternVerticesAndEdges(graph, context);
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
+            for (Trip trip : tripPattern.getTrips()) {
+                // FIXME: Compute geometry sanely, preferably for each trip individually.
+                if (trip.getShapeId() != null && trip.getShapeId().getId() != null &&
+                        !trip.getShapeId().getId().equals("")) {
+                    createGeometry(graph, trip, tripPattern.hopEdges);
+                    break;  // We can only store one geometry per pattern, so this one has to be it.
+                }
+            }
         }
 
         /* Identify interlined trips and create the necessary edges. */
@@ -513,24 +519,21 @@ public class GTFSPatternHopFactory {
         LOG.info("Done finding interlining trips and creating the corresponding edges.");
     }
 
-    private <T extends Edge & HopEdge> void createGeometry(Graph graph, Trip trip,
-            List<StopTime> stopTimes, List<T> hops) {
-
+    private void createGeometry(Graph graph, Trip trip, PatternHop hops[]) {
         AgencyAndId shapeId = trip.getShapeId();
-        if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
-            return; // this trip has no associated shape_id, bail out
-        // TODO: is this right? don't we want to use the straight-line logic below?
+        List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
         
         /* Detect presence or absence of shape_dist_traveled on a per-trip basis */
         StopTime st0 = stopTimes.get(0);
         boolean hasShapeDist = st0.isShapeDistTraveledSet();
         if (hasShapeDist) { 
             // this trip has shape_dist in stop_times
-            for (int i = 0; i < hops.size(); ++i) {
-                Edge hop = hops.get(i);
+            for (int i = 0; i < hops.length; ++i) {
+                if (hops[i] == null) continue;
                 st0 = stopTimes.get(i);
                 StopTime st1 = stopTimes.get(i + 1);
-                ((HopEdge)hop).setGeometry(getHopGeometryViaShapeDistTraveled(graph, shapeId, st0, st1, hop.getFromVertex(), hop.getToVertex()));
+                hops[i].setGeometry(getHopGeometryViaShapeDistTraveled(graph, shapeId, st0, st1,
+                        hops[i].getFromVertex(), hops[i].getToVertex()));
             }
             return;
         }
@@ -542,7 +545,7 @@ public class GTFSPatternHopFactory {
                 st0 = stopTimes.get(i);
                 StopTime st1 = stopTimes.get(i + 1);
                 LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
-                hops.get(i).setGeometry(geometry);
+                hops[i].setGeometry(geometry);
             }
             return;
         }
@@ -614,7 +617,7 @@ public class GTFSPatternHopFactory {
                 st0 = stopTimes.get(i);
                 StopTime st1 = stopTimes.get(i + 1);
                 LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
-                hops.get(i).setGeometry(geometry);
+                hops[i].setGeometry(geometry);
                 //this warning is not strictly correct, but will do
                 LOG.warn(graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1)));
             }
@@ -625,8 +628,8 @@ public class GTFSPatternHopFactory {
         LinearLocation endLocation = locationIt.next();
         double distanceSoFar = 0;
         int last = 0;
-        for (int i = 0; i < hops.size(); ++i) {
-            Edge hop = hops.get(i);
+        for (int i = 0; i < hops.length; ++i) {
+            if (hops[i] == null) continue;
             LinearLocation startLocation = endLocation;
             endLocation = locationIt.next();
 
@@ -666,7 +669,7 @@ public class GTFSPatternHopFactory {
                         .getCoordinates(), 2);
                 geometry = _geometryFactory.createLineString(sequence);
             }
-            ((HopEdge)hop).setGeometry(geometry);
+            hops[i].setGeometry(geometry);
         }
     }
 
