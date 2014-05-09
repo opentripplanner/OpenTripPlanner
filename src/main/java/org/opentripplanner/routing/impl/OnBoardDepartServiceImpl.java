@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -27,8 +26,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -62,9 +61,9 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
 
     @Override
     public Vertex setupDepartOnBoard(RoutingContext ctx) {
-
         DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
         RoutingRequest opt = ctx.opt;
+        opt.rctx = ctx;
 
         /* 1. Get the list of PatternHop for the given trip ID. */
         AgencyAndId tripId = opt.getStartingTransitTripId();
@@ -131,16 +130,10 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             int minDelta = Integer.MAX_VALUE;
             int actDelta = 0;
             for (ServiceDay serviceDay : ctx.serviceDays) {
-                ServiceDate serviceDate = serviceDay.getServiceDate();
                 TripPattern pattern = nextStop.getTripPattern();
-                Timetable timetable = pattern.getScheduledTimetable();
-                int tripIndex = timetable.getTripIndex(tripId);
-                TripTimes tripTimes = timetable.getTripTimes(tripIndex);
+                Timetable timetable = pattern.getUpdatedTimetable(opt, serviceDay);
                 // Get the tripTimes including real-time updates for the serviceDay
-                if (ctx.timetableSnapshot != null) {
-                    Timetable timeTable = ctx.timetableSnapshot.resolve(pattern, serviceDate);
-                    tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
-                }
+                TripTimes tripTimes = timetable.getTripTimes(timetable.getTripIndex(tripId));
 
                 int depTime = tripTimes.getDepartureTime(bestStopIndex);
                 int arrTime = tripTimes.getArrivalTime(bestStopIndex);
@@ -170,15 +163,9 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         } else {
             /* 2. Compute service day */
             for (ServiceDay serviceDay : ctx.serviceDays) {
-                ServiceDate serviceDate = serviceDay.getServiceDate();
-                Timetable timetable = tripPattern.getScheduledTimetable();
-                int tripIndex = timetable.getTripIndex(tripId);
-                TripTimes tripTimes = timetable.getTripTimes(tripIndex);
+                Timetable timetable = tripPattern.getUpdatedTimetable(opt, serviceDay);
                 // Get the tripTimes including real-time updates for the serviceDay
-                if (ctx.timetableSnapshot != null) {
-                    Timetable timeTable = ctx.timetableSnapshot.resolve(tripPattern, serviceDate);
-                    tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
-                }
+                TripTimes tripTimes = timetable.getTripTimes(timetable.getTripIndex(tripId));
 
                 int depTime = tripTimes.getDepartureTime(0);
                 int arrTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);

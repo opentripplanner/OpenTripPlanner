@@ -27,8 +27,6 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.google.common.collect.HashMultimap;
-import com.vividsolutions.jts.geom.LineString;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,11 +34,11 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
@@ -59,7 +57,9 @@ import org.slf4j.LoggerFactory;
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Represents a group of trips that all call at the same sequence of stops. For each stop, there
@@ -293,13 +293,9 @@ public class TripPattern implements Serializable {
     }
 
     public TripTimes getResolvedTripTimes(int tripIndex, State state0) {
-        ServiceDate serviceDate = state0.getServiceDay().getServiceDate();
+        ServiceDay serviceDay = state0.getServiceDay();
         RoutingRequest options = state0.getOptions();
-        Timetable timetable = scheduledTimetable;
-        TimetableResolver snapshot = options.rctx.timetableSnapshot;
-        if (snapshot != null) {
-            timetable = snapshot.resolve(this, serviceDate);
-        }
+        Timetable timetable = getUpdatedTimetable(options, serviceDay);
         return timetable.getTripTimes(tripIndex);
     }
 
@@ -341,8 +337,11 @@ public class TripPattern implements Serializable {
      * Rather than the scheduled timetable, get the one that has been updated with real-time updates.
      * The view is consistent across a single request, and depends on the routing context in the request.
      */
-    public Timetable getUpdatedTimetable (RoutingRequest req) {
-        return null;
+    public Timetable getUpdatedTimetable (RoutingRequest req, ServiceDay sd) {
+        if (req != null && req.rctx != null && req.rctx.timetableSnapshot != null && sd != null) {
+            return req.rctx.timetableSnapshot.resolve(this, sd.getServiceDate());
+        }
+        return scheduledTimetable;
     }
     
     private static String stopNameAndId (Stop stop) {

@@ -183,6 +183,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 s1.incrementWeight(options.getBoardCost(s0.getNonTransitMode()));
 
             if (options.isReverseOptimizeOnTheFly()) {
+                TripPattern pattern = getPattern();
                 int thisDeparture = s0.getTripTimes().getDepartureTime(stopIndex);
                 int numTrips = getPattern().getNumScheduledTrips(); 
                 int nextDeparture;
@@ -190,8 +191,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 s1.setLastNextArrivalDelta(Integer.MAX_VALUE);
 
                 for (int tripIndex = 0; tripIndex < numTrips; tripIndex++) {
-                    // TODO: BUG this is using only scheduled times, not updated times.
-                    nextDeparture = getPattern().scheduledTimetable.getTripTimes(tripIndex).getDepartureTime(stopIndex);
+                    Timetable timetable = pattern.getUpdatedTimetable(options, s0.getServiceDay());
+                    nextDeparture = timetable.getTripTimes(tripIndex).getDepartureTime(stopIndex);
         
                     if (nextDeparture > thisDeparture) {
                         s1.setLastNextArrivalDelta(nextDeparture - thisDeparture);
@@ -239,10 +240,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             ServiceDay bestServiceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
-                Timetable timetable = tripPattern.scheduledTimetable;
-                if (rctx.timetableSnapshot != null) {
-                    timetable = rctx.timetableSnapshot.resolve(tripPattern, sd.getServiceDate());
-                }
+                Timetable timetable = tripPattern.getUpdatedTimetable(options, sd);
                 /* Skip this day/timetable if no trip in it could possibly be useful. */
                 // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
                 // However, experiments seem to show very little measurable improvement here (due to cache locality?)
