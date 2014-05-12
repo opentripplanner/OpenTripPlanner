@@ -312,6 +312,7 @@ public class ProfileRouter {
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
         rr.setBatch(true);
+        rr.setWalkSpeed(request.walkSpeed);
         // If this is not set, searches are very slow.
         int worstElapsedTime = request.accessTime * 60; // from minutes to seconds
         if (back) worstElapsedTime *= -1;
@@ -351,6 +352,8 @@ public class ProfileRouter {
         // Impose a max time to protect against very slow searches.
         int worstElapsedTime = request.streetTime * 60;
         rr.setWorstTime(rr.dateTime + worstElapsedTime);
+        rr.setWalkSpeed(request.walkSpeed);
+        rr.setBikeSpeed(request.bikeSpeed);
         GenericAStar astar = new GenericAStar();
         astar.setNPaths(1);
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
