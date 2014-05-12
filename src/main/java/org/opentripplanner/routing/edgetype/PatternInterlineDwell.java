@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -34,6 +35,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
+import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,9 +86,6 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    /* The TripPattern this edge is coming from. */
-    final TripPattern pattern;
-
     /* Interlining relationships between trips. This could actually be a single Graph-wide BiMap. */
     final BiMap<Trip,Trip> trips = HashBiMap.create();
 
@@ -96,21 +96,29 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
         // The first stop of the second pattern does not even have an _arrive_ vertex.
         super(p0.arriveVertices[p0.stopPattern.size - 1],
               p1.departVertices[0]);
-        pattern = p0;
     }
 
+    @VisibleForTesting
+    public PatternInterlineDwell(PatternArriveVertex fromv, PatternDepartVertex tov) {
+        super(fromv, tov);
+    }
+
+    /**
+     * Register the fact that a passenger may pass from Trip t1 to Trip t2
+     * by staying on the same vehicle. Trip t1 must be on the TripPattern this
+     * edge comes from, and trip t2 must be on the TripPattern this edge leads
+     * to.
+     */
     public void add(Trip t1, Trip t2) {
         trips.put(t1, t2);
     }
 
-    public TraverseMode getMode() {
-        return pattern.getMode();
-    }
-
+    @Override
     public String getName() {
-        return GtfsLibrary.getRouteName(pattern.getRoute());
+        return "INTERLINE"; //GtfsLibrary.getRouteName(pattern.getRoute());
     }
 
+    @Override
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(0); // FIXME too optimistic
@@ -127,6 +135,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
         return 0; // FIXME overly optimistic
     }
 
+    @Override
     public State traverse(State state0) {
 
         RoutingRequest options = state0.getOptions();
@@ -168,14 +177,16 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
         s1.setPreviousTrip(oldTrip);   // TODO check meaning
         s1.setTripTimes(newTripTimes);
         s1.incrementWeight(dwellTime);
-        s1.setBackMode(getMode()); // Mode should not change, but just in case...
+        // Mode should not change.
         return s1.makeState();
     }
 
+    @Override
     public LineString getGeometry() {
         return null;
     }
 
+    @Override
     public String toString() {
         return "PatternInterlineDwell(" + super.toString() + ")";
     }

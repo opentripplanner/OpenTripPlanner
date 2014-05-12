@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import lombok.Getter;
@@ -214,6 +215,7 @@ public class Graph implements Serializable {
     }
 
     /* Fetching vertices by label is convenient in tests and such, but avoid using in general. */
+    @VisibleForTesting
     public Vertex getVertex(String label) {
         return vertices.get(label);
     }
