@@ -516,7 +516,7 @@ public class PlanGeneratorTest {
         PatternHop e15 = new PatternHop(
                 v14, v16, trainStopDwell, trainStopInterline, 1);
         PatternInterlineDwell e17 = new PatternInterlineDwell(
-                v16, v18, secondTrip);
+                v16, v18);
         PatternHop e19 = new PatternHop(
                 v18, v20, trainStopInterline, trainStopArrive, 0);
         TransitBoardAlight e21 = new TransitBoardAlight(
@@ -576,7 +576,7 @@ public class PlanGeneratorTest {
 
         // Edge initialization that can't be done using the constructor
         e3.setElevationProfile(elevation3, false);
-        e17.addTrip(firstTrip, secondTrip, 4, 0, 0);
+        e17.add(firstTrip, secondTrip);
         e39.setElevationProfile(elevation39, false);
         e41.setElevationProfile(elevation41, false);
         e41.setHasBogusName(true);
