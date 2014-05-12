@@ -15,7 +15,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
 
     @Override
     public int compareTo(StopAtDistance that) {
-        return that.distance - this.distance;
+        return this.distance - that.distance;
     }
 
     public String toString() {
