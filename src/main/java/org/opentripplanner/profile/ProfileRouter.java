@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.impl.StopTimeArray;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -50,7 +51,7 @@ public class ProfileRouter {
 
     private final Graph graph;
     private final ProfileRequest request;
-    private Option directOption; // an option not using transit
+    private List<Option> directOptions = Lists.newArrayList();
 
     public ProfileRouter(Graph graph, ProfileRequest request) {
         this.graph = graph;
@@ -157,6 +158,7 @@ public class ProfileRouter {
         if (graph.index.transfersForStop == null) {
             graph.index.initializeProfileTransfers();
         }
+        findStreetOptions();
         findClosestPatterns();
         LOG.info("from stops: {}", fromStops);
         LOG.info("to stops: {}", toStops);
@@ -234,8 +236,16 @@ public class ProfileRouter {
             if ( ! option.hasEmptyRides()) options.add(option); 
         }
         /* Include the direct (no-transit) biking or walking option if we have one. */
-        if (directOption != null) options.add(directOption);
+        for (Option option : directOptions) {
+            options.add(option);
+        }
         return new ProfileResponse(options, request.orderBy, request.limit);
+    }
+
+    public void findStreetOptions() {
+        for (TraverseMode mode : Lists.newArrayList(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR)) {
+            findStreetOption(mode);
+        }
     }
 
     // We don't need to retain a routing context or any temp vertices.
@@ -279,7 +289,7 @@ public class ProfileRouter {
         // Set batch after context, so both origin and dest vertices will be found.
         rr.setBatch(true);
         // If this is not set, searches are very slow.
-        int worstElapsedTime = 60 * 90;
+        int worstElapsedTime = 60 * 60 * 3;
         if (back) worstElapsedTime *= -1;
         rr.setWorstTime(rr.dateTime + worstElapsedTime);
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
@@ -301,18 +311,31 @@ public class ProfileRouter {
                 }
             }
         });
-        /* 2. If this on-street search reaches the destination, record the path. */
-        SearchTerminationStrategy terminator = new SearchTerminationStrategy() {
-            @Override
-            public boolean shouldSearchContinue(Vertex origin, Vertex target, State current, ShortestPathTree spt, RoutingRequest req) {
-                if (current.getVertex() != target) return true;
-                directOption = new Option(current);
-                return true;
-            }
-        };
-        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000, terminator);
+        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
         rr.rctx.destroy();
         return ret;
+    }
+
+    private void findStreetOption(TraverseMode mode) {
+        // Make a normal OTP routing request so we can traverse edges and use GenericAStar
+        RoutingRequest rr = new RoutingRequest(mode);
+        rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
+        rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
+        rr.setArriveBy(false);
+        rr.setRoutingContext(graph);
+        // This is not a batch search, it is a point-to-point search with goal direction.
+        // Impose a max time to protect against very slow searches.
+        int worstElapsedTime = 60 * 60 * 2;
+        rr.setWorstTime(rr.dateTime + worstElapsedTime);
+        GenericAStar astar = new GenericAStar();
+        astar.setNPaths(1);
+        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
+        State state = spt.getState(rr.rctx.target);
+        if (state != null) {
+            LOG.info("Found non-transit option for mode {}", mode);
+            directOptions.add(new Option(state));
+        }
+        rr.rctx.destroy();
     }
 
 }
