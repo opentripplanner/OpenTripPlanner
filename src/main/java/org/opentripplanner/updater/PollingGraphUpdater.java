@@ -63,7 +63,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     @Override
     final public void run() {
         try {
-            LOG.error("Polling updater {}@{} started.", this.getClass().getName(), this.hashCode());
+            LOG.info("Polling updater {}@{} started.", this.getClass().getName(), this.hashCode());
             // Run "forever"
             while (true) {
                 try {
