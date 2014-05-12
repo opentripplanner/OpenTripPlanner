@@ -36,8 +36,10 @@ public class Option {
         stats = new Stats();
         int time = (int) state.getElapsedTimeSeconds();
         stats.add(time);
-        this.finalWalkTime = time;
-        summary = state.getNonTransitMode().toString(); // this might not work if there is a transition to another mode
+        // this might not work if there is a transition to another mode
+        TraverseMode mode = state.getNonTransitMode();
+        if (mode == TraverseMode.WALK) this.finalWalkTime = time;
+        summary = mode.toString();
     }
 
     public String generateSegmentSummary() {
