@@ -115,8 +115,8 @@ public class AlertPatch implements Serializable {
                 if (direction != null && ! direction.equals(tripPattern.getDirection())) {
                     continue;
                 }
-                for (int i = 0; i < tripPattern.stopVertices.length; i++) {
-                    if (stop == null || tripPattern.stopVertices[i].getStop().equals(stop)) {
+                for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+                    if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
                         graph.addAlertPatch(tripPattern.boardEdges[i], this);
                         graph.addAlertPatch(tripPattern.alightEdges[i], this);
                     }
@@ -166,8 +166,8 @@ public class AlertPatch implements Serializable {
                 if (direction != null && ! direction.equals(tripPattern.getDirection())) {
                     continue;
                 }
-                for (int i = 0; i < tripPattern.stopVertices.length; i++) {
-                    if (stop == null || tripPattern.stopVertices[i].getStop().equals(stop)) {
+                for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
+                    if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
                         graph.removeAlertPatch(tripPattern.boardEdges[i], this);
                         graph.removeAlertPatch(tripPattern.alightEdges[i], this);
                     }

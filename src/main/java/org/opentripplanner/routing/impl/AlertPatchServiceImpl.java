@@ -13,18 +13,25 @@
 
 package org.opentripplanner.routing.impl;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.ws.rs.core.Context;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.services.GraphService;
 
-import javax.ws.rs.core.Context;
-import java.util.*;
-import java.util.Map.Entry;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
 
 public class AlertPatchServiceImpl implements AlertPatchService {
 
