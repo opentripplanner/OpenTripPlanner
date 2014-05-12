@@ -26,18 +26,17 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import lombok.Getter;
-
 import org.opentripplanner.common.MavenVersion;
 
 @Path("/")
 @XmlRootElement 
 public class ServerInfo {
+    static final String Q = ";qs=0.5";
     
     private static final ServerInfo SERVER_INFO = new ServerInfo();
-    
+
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public static ServerInfo getServerInfo() {
         return SERVER_INFO;
     }    
@@ -80,5 +79,4 @@ public class ServerInfo {
             nCores = 0;
         }
     }
-
 }

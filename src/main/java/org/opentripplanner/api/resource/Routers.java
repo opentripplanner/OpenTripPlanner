@@ -13,13 +13,9 @@
 
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.api.model.RouterInfo;
-import org.opentripplanner.api.model.RouterList;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.standalone.OTPServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.opentripplanner.api.resource.ServerInfo.Q;
+
+import java.io.InputStream;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -38,7 +34,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.io.InputStream;
+
+import org.opentripplanner.api.model.RouterInfo;
+import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Graph.LoadLevel;
+import org.opentripplanner.standalone.OTPServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This REST API endpoint allows remotely loading, reloading, and evicting graphs on a running server.
@@ -92,7 +95,8 @@ public class Routers {
      * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
      * on the Accept header in the HTTP request.
      */
-    @GET @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public RouterList getRouterIds() {
         RouterList routerList = new RouterList();
         for (String id : server.graphService.getRouterIds()) {
@@ -105,7 +109,8 @@ public class Routers {
      * Returns the bounds for a specific routerId, or verifies whether it is registered. 
      * @returns status code 200 if the routerId is registered, otherwise a 404.
      */
-    @GET @Path("{routerId}") @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @GET @Path("{routerId}")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public RouterInfo getGraphId(@PathParam("routerId") String routerId) {
         // factor out build one entry
         RouterInfo routerInfo = getRouterInfo(routerId);
@@ -200,12 +205,12 @@ public class Routers {
             InputStream is) {
         LOG.debug("save graph from POST data stream...");
         try {
-        	boolean success = server.graphService.save(routerId, is);
-        	if (success) {
-        		return Response.status(201).entity("graph saved.\n").build();
-        	} else {
-        		return Response.status(404).entity("graph not saved or other error.\n").build();
-        	}
+            boolean success = server.graphService.save(routerId, is);
+            if (success) {
+                return Response.status(201).entity("graph saved.\n").build();
+            } else {
+                return Response.status(404).entity("graph not saved or other error.\n").build();
+            }
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
         }

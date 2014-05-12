@@ -13,6 +13,8 @@
 
 package org.opentripplanner.api.resource;
 
+import static org.opentripplanner.api.resource.ServerInfo.Q;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +32,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
+
 import com.vividsolutions.jts.geom.Envelope;
 
 @Path("/routers/{routerId}/bike_rental")
@@ -43,7 +46,7 @@ public class BikeRental {
     }
     
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public BikeRentalStationList getBikeRentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,

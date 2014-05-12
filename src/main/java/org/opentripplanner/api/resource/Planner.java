@@ -12,22 +12,19 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.resource;
 
+import static org.opentripplanner.api.resource.ServerInfo.Q;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import lombok.Setter;
 
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +51,7 @@ public class Planner extends RoutingResource {
     // parameters in the outgoing response. This is a TriMet requirement.
     // Jersey uses @Context to inject internal types and @InjectParam or @Resource for DI objects.
     @GET
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public Response getItineraries(@Context OTPServer otpServer, @Context UriInfo uriInfo) {
 
         /*

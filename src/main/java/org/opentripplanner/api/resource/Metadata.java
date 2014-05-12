@@ -13,6 +13,8 @@
 
 package org.opentripplanner.api.resource;
 
+import static org.opentripplanner.api.resource.ServerInfo.Q;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -31,7 +33,7 @@ public class Metadata {
 
     /** Returns metadata about the graph -- presently, this is just the extent of the graph. */
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public GraphMetadata getMetadata(@PathParam("routerId") String routerId) {
         return otpServer.graphService.getGraph(routerId).getMetadata();
     }

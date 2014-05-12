@@ -13,6 +13,8 @@
 
 package org.opentripplanner.api.resource;
 
+import static org.opentripplanner.api.resource.ServerInfo.Q;
+
 import java.util.Collection;
 
 import javax.annotation.security.RolesAllowed;
@@ -47,7 +49,7 @@ public class AlertPatcher {
      */
     @GET
     @Path("/stopPatches")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public AlertPatchResponse getStopPatches(@QueryParam("agency") String agency,
             @QueryParam("id") String id) {
 
@@ -67,7 +69,7 @@ public class AlertPatcher {
      */
     @GET
     @Path("/routePatches")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public AlertPatchResponse getRoutePatches(@QueryParam("agency") String agency,
             @QueryParam("id") String id) {
 
@@ -83,7 +85,7 @@ public class AlertPatcher {
     @RolesAllowed("user")
     @POST
     @Path("/patch")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public AlertPatchCreationResponse createPatches(AlertPatchSet alertPatches) {
         AlertPatchCreationResponse response = new AlertPatchCreationResponse();
