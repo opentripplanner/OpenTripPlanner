@@ -48,9 +48,10 @@ public class ProfileResource {
             @QueryParam("date")       @DefaultValue("today") YearMonthDay date,
             @QueryParam("startTime")  @DefaultValue("07:00") HourMinuteSecond fromTime,
             @QueryParam("endTime")    @DefaultValue("09:00") HourMinuteSecond toTime,
-            @QueryParam("walkSpeed")  @DefaultValue("1.4")   float walkSpeed,  // m/sec
-            @QueryParam("bikeSpeed")  @DefaultValue("4.1")   float bikeSpeed,  // m/sec
-            @QueryParam("streetDist") @DefaultValue("800")   float streetDist, // meters
+            @QueryParam("walkSpeed")  @DefaultValue("1.4")   float walkSpeed, // m/sec
+            @QueryParam("bikeSpeed")  @DefaultValue("4.1")   float bikeSpeed, // m/sec
+            @QueryParam("streetTime") @DefaultValue("200")   int streetTime,  // max minutes to reach destination with no transit
+            @QueryParam("accessTime") @DefaultValue("15")    int accessTime,  // max minutes to reach transit
             @QueryParam("orderBy")    @DefaultValue("MIN")   Option.SortOrder orderBy,
             @QueryParam("limit")      @DefaultValue("10")    int limit,
             @QueryParam("modes")      @DefaultValue("WALK,TRANSIT") TraverseModeSet modes)
@@ -59,6 +60,8 @@ public class ProfileResource {
         QueryParameter.checkRangeInclusive(limit, 0, Integer.MAX_VALUE);
         QueryParameter.checkRangeInclusive(walkSpeed, 0, 7);
         QueryParameter.checkRangeInclusive(bikeSpeed, 0, 21);
+        QueryParameter.checkRangeInclusive(streetTime, 1, 480);
+        QueryParameter.checkRangeInclusive(accessTime, 1, 480);
         ProfileRequest req = new ProfileRequest();
         req.from       = from;
         req.to         = to;
@@ -66,7 +69,8 @@ public class ProfileResource {
         req.toTime     = toTime.toSeconds();
         req.walkSpeed  = walkSpeed;
         req.bikeSpeed  = bikeSpeed;
-        req.streetDist = streetDist;
+        req.streetTime = streetTime;
+        req.accessTime = accessTime;
         req.date       = date.toJoda();
         req.orderBy    = orderBy;
         req.limit      = limit;

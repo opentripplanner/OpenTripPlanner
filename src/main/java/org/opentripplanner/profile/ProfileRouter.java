@@ -1,9 +1,12 @@
 package org.opentripplanner.profile;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import com.google.common.collect.Maps;
 import org.joda.time.LocalDate;
@@ -43,6 +46,7 @@ public class ProfileRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
     static final int SLACK = 60; // sec
+    static final int TIMEOUT = 10; // sec
     static final Stop fakeTargetStop = new Stop();
     
     static {
@@ -150,6 +154,8 @@ public class ProfileRouter {
     
     // TimeWindow could actually be resolved and created in the caller, which does have access to the profiledata.
     public ProfileResponse route () {
+        long searchBeginTime = System.currentTimeMillis();
+        long abortTime = searchBeginTime + TIMEOUT * 1000;
         /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
         final int ROUNDS = 3;
         int finalRound = ROUNDS - 1;
@@ -223,6 +229,7 @@ public class ProfileRouter {
                             }
                         }
                     }
+                    if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
                 }
                 // LOG.info("number of new queue states: {}", queue.size());
                 rides.clear();
@@ -235,16 +242,19 @@ public class ProfileRouter {
             Option option = new Option (ride, dist, window, request.walkSpeed); // TODO Convert distance to time.
             if ( ! option.hasEmptyRides()) options.add(option); 
         }
-        /* Include the direct (no-transit) biking or walking option if we have one. */
+        /* Include the direct (no-transit) biking, driving, and walking options. */
         for (Option option : directOptions) {
             options.add(option);
         }
+        LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
     public void findStreetOptions() {
         for (TraverseMode mode : Lists.newArrayList(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR)) {
-            findStreetOption(mode);
+            if (request.modes.contains(mode)) {
+                findStreetOption(mode);
+            }
         }
     }
 
@@ -272,6 +282,19 @@ public class ProfileRouter {
                 closest.putMin(pattern, stopDist);
             }
         }
+
+        if (closest.size() > 50) {
+            LOG.info("Truncating the list to include only the closest patterns.");
+            List<Integer> distances = Lists.newArrayList();
+            for (StopAtDistance sd : closest.values()) distances.add(sd.distance);
+            Collections.sort(distances);
+            int maxDist = distances.get(50);
+            Iterator<Entry<TripPattern, StopAtDistance>> iter = closest.entrySet().iterator();
+            while (iter.hasNext()) {
+                Entry<TripPattern, StopAtDistance> entry = iter.next();
+                if (entry.getValue().distance > maxDist) iter.remove();
+            }
+        }
         return closest;
     }
 
@@ -282,6 +305,7 @@ public class ProfileRouter {
     private List<StopAtDistance> findClosestStops(boolean back) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        // TODO set walk speed!
         rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
         rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
         rr.setArriveBy(back);
@@ -289,7 +313,7 @@ public class ProfileRouter {
         // Set batch after context, so both origin and dest vertices will be found.
         rr.setBatch(true);
         // If this is not set, searches are very slow.
-        int worstElapsedTime = 60 * 60 * 3;
+        int worstElapsedTime = request.accessTime * 60; // from minutes to seconds
         if (back) worstElapsedTime *= -1;
         rr.setWorstTime(rr.dateTime + worstElapsedTime);
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
@@ -302,12 +326,12 @@ public class ProfileRouter {
             @Override public void visitEnqueue(State state) { }
             /* 1. Accumulate stops into ret as the search runs. */
             @Override public void visitVertex(State state) {
-                if (state.getWalkDistance() < request.streetDist) {
-                    Vertex vertex = state.getVertex();
-                    if (vertex instanceof TransitStop) {
-                        TransitStop tstop = (TransitStop) vertex;
-                        ret.add(new StopAtDistance(tstop.getStop(), (int) state.getWalkDistance()));
-                    }
+                Vertex vertex = state.getVertex();
+                if (vertex instanceof TransitStop) {
+                    TransitStop tstop = (TransitStop) vertex;
+                    LOG.debug("found stop: {} ({}m)", tstop.getStopId(), state.getWalkDistance());
+                    LOG.debug("  elapsed time {}", state.getElapsedTimeSeconds());
+                    ret.add(new StopAtDistance(tstop.getStop(), (int) state.getWalkDistance()));
                 }
             }
         });
@@ -325,7 +349,7 @@ public class ProfileRouter {
         rr.setRoutingContext(graph);
         // This is not a batch search, it is a point-to-point search with goal direction.
         // Impose a max time to protect against very slow searches.
-        int worstElapsedTime = 60 * 60 * 2;
+        int worstElapsedTime = request.streetTime * 60;
         rr.setWorstTime(rr.dateTime + worstElapsedTime);
         GenericAStar astar = new GenericAStar();
         astar.setNPaths(1);

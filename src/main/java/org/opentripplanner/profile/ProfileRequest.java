@@ -15,7 +15,8 @@ public class ProfileRequest {
     public int toTime;
     public float walkSpeed;
     public float bikeSpeed;
-    public float streetDist;
+    public int streetTime;
+    public int accessTime;
     public LocalDate date;
     public Option.SortOrder orderBy;
     public int limit;
