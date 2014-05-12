@@ -306,14 +306,18 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /** @return the shortest path, or null if none is found */
     public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
             SearchTerminationStrategy terminationStrategy) {
+        ShortestPathTree spt = null;
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
 
         RunState runState = startSearch (options, terminationStrategy, abortTime);
 
-        runSearch (runState, abortTime);
+        if (runState != null) {
+            runSearch(runState, abortTime);
+            spt = runState.spt;
+        }
         
         storeMemory();
-        return runState.spt;
+        return spt;
     }
 
     private void storeMemory() {
