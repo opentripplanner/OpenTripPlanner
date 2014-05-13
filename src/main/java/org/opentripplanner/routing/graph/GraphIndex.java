@@ -153,8 +153,6 @@ public class GraphIndex {
             Collection<TripPattern> ps0 = patternsForStop.get(s0);
             for (StopAtDistance sd : findTransitStops(s0.getLon(), s0.getLat(), TRANSFER_RADIUS)) {
                 Stop s1 = sd.stop;
-                if (s0 == s1)
-                    continue;
                 Collection<TripPattern> ps1 = patternsForStop.get(s1);
                 for (TripPattern p0 : ps0) {
                     for (TripPattern p1 : ps1) {
