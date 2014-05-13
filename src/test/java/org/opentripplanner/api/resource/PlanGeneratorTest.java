@@ -592,12 +592,13 @@ public class PlanGeneratorTest {
                 "Extra edge", 1.9, StreetTraversalPermission.NONE, true, 0);
 
         // Various bookkeeping operations
-        // FIXME this is not correctly setting the codes map.
-        /*
-        graph.serviceCodes.put(firstTrip.getServiceId(), firstTripPattern);
-        graph.serviceCodes.put(secondTrip.getServiceId(), secondTripPattern.getServiceId());
-        graph.serviceCodes.put(thirdTrip.getId(), thirdTripPattern.getServiceId());
-        */
+        graph.serviceCodes.put(firstTrip.getId(), 0);
+        graph.serviceCodes.put(secondTrip.getId(), 1);
+        graph.serviceCodes.put(thirdTrip.getId(), 2);
+
+        firstTripTimes.serviceCode = graph.serviceCodes.get(firstTrip.getId());
+        secondTripTimes.serviceCode = graph.serviceCodes.get(secondTrip.getId());
+        thirdTripTimes.serviceCode = graph.serviceCodes.get(thirdTrip.getId());
 
         CalendarServiceData calendarServiceData = new CalendarServiceDataStub(graph.serviceCodes.keySet());
         CalendarServiceImpl calendarServiceImpl = new CalendarServiceImpl(calendarServiceData);

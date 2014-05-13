@@ -747,7 +747,7 @@ public class PlanGenerator {
             if (leg.from.stopIndex != null) {
                 leg.departureDelay = tripTimes.getDepartureDelay(leg.from.stopIndex);
             }
-            leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex - 1);
+            leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
         }
     }
 
