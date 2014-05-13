@@ -306,6 +306,9 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
                 continue;
             }
         }
+        if (freqs.isEmpty()) {
+            throw new RuntimeException("Invalid frequencies caused a pattern with no frequency entries.");
+        }
     }
 
     public void createRanges(List<Frequency> frequencies) {
