@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -23,8 +24,12 @@ import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.T2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FrequencyBasedTripPattern implements Serializable, TripPattern {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FrequencyBasedTripPattern.class);
 
     private static final long serialVersionUID = -5392197874345648815L;
 
@@ -280,7 +285,31 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
         return (perStopFlags[stopIndex] & TableTripPattern.MASK_PICKUP) >> TableTripPattern.SHIFT_PICKUP;
     }
 
+    /** Remove invalid frequency entries. */
+    public void filterFrequencies (List<Frequency> freqs) {
+        Iterator<Frequency> iter = freqs.iterator();
+        while (iter.hasNext()) {
+            Frequency freq = iter.next();
+            if (freq.getStartTime() < 0) {
+                LOG.error("INVALID INPUT: Frequency {} start time was negative, removing it.", freq);
+                iter.remove();
+                continue;
+            }
+            if (freq.getEndTime() <= freq.getStartTime()) {
+                LOG.error("INVALID INPUT: Frequency {} end time is before start time, removing it.", freq);
+                iter.remove();
+                continue;
+            }
+            if (freq.getHeadwaySecs() < 5) {
+                LOG.error("INVALID INPUT: Frequency {} headway is {} sec, removing it.", freq, freq.getHeadwaySecs());
+                iter.remove();
+                continue;
+            }
+        }
+    }
+
     public void createRanges(List<Frequency> frequencies) {
+        filterFrequencies(frequencies);
         timeRangeStart = new int[frequencies.size()];
         timeRangeEnd = new int[frequencies.size()];
         timeRangeFrequency = new int[frequencies.size()];
@@ -289,8 +318,7 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
             timeRangeStart[i] = frequency.getStartTime();
             timeRangeEnd[i] = frequency.getEndTime();
             timeRangeFrequency[i] = frequency.getHeadwaySecs();
-            setExact(frequency.getExactTimes() == 1); // FIXME: assumes all frequencies work the same
-                                                    // way
+            setExact(frequency.getExactTimes() == 1);
         }
     }
 
