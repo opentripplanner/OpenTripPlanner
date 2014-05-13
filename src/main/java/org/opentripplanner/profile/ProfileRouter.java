@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.TimeoutException;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.TreeMultimap;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.impl.StopTimeArray;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -284,15 +287,28 @@ public class ProfileRouter {
         }
 
         if (closest.size() > 50) {
-            LOG.info("Truncating the list to include only the closest patterns.");
-            List<Integer> distances = Lists.newArrayList();
-            for (StopAtDistance sd : closest.values()) distances.add(sd.distance);
-            Collections.sort(distances);
-            int maxDist = distances.get(50);
-            Iterator<Entry<TripPattern, StopAtDistance>> iter = closest.entrySet().iterator();
-            while (iter.hasNext()) {
-                Entry<TripPattern, StopAtDistance> entry = iter.next();
-                if (entry.getValue().distance > maxDist) iter.remove();
+            // Truncate the list to include a mix of nearby bus and train patterns
+            Multimap<StopAtDistance, TripPattern> busPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
+            Multimap<StopAtDistance, TripPattern> otherPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
+            Multimap<StopAtDistance, TripPattern> patterns;
+            for (TripPattern pattern : closest.keySet()) {
+                patterns = (pattern.mode == TraverseMode.BUS) ? busPatterns : otherPatterns;
+                patterns.put(closest.get(pattern), pattern);
+            }
+            closest.clear();
+            Iterator<StopAtDistance> iterBus = busPatterns.keySet().iterator();
+            Iterator<StopAtDistance> iterOther = otherPatterns.keySet().iterator();
+            // Alternately add one of each kind of pattern until we reach the max
+            while (closest.size() < 50) {
+                StopAtDistance sd;
+                if (iterBus.hasNext()) {
+                    sd = iterBus.next();
+                    for (TripPattern tp : busPatterns.get(sd)) closest.put(tp, sd);
+                }
+                if (iterOther.hasNext()) {
+                    sd = iterOther.next();
+                    for (TripPattern tp: otherPatterns.get(sd)) closest.put(tp, sd);
+                }
             }
         }
         return closest;
