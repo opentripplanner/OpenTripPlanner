@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-04-16 22:10+0200\n"
-"PO-Revision-Date: 2014-04-16 22:11+0200\n"
-"Last-Translator: Marko Burjek <email4marko@gmail.com>\n"
+"POT-Creation-Date: 2014-05-14 23:27+0200\n"
+"PO-Revision-Date: 2014-05-14 23:35+0200\n"
+"Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3);\n"
-"X-Generator: Virtaal 0.7.1\n"
+"X-Generator: Lokalize 1.5\n"
 "Generated-By: Babel 1.3\n"
 
 #: core/WidgetManagerMenu.js:34
@@ -65,8 +65,9 @@ msgstr "Večmodalni načrtovalnik potovanj"
 #. Widget title
 #: modules/multimodal/MultimodalPlannerModule.js:131
 #: modules/planner/ItinerariesWidget.js:42
+#, fuzzy
 msgid "Itineraries"
-msgstr ""
+msgstr "Poti"
 
 #. widget title
 #: modules/planner/ItinerariesWidget.js:98
@@ -128,12 +129,21 @@ msgstr[3] "%d min. prehitro"
 msgid "on time"
 msgstr "pravočasno"
 
+#. [distance] to [name of destination]
+#: modules/planner/ItinerariesWidget.js:363 modules/planner/Itinerary.js:248
+#: modules/planner/Itinerary.js:334
+msgctxt "direction"
+msgid " to "
+msgstr " do "
+
 #. used in sentence like: <Long name of public transport route> "to" <Public
 #. transport
 #. headsign>. Used in showing itinerary
-#: modules/planner/ItinerariesWidget.js:382
-msgid "to"
-msgstr "smer"
+#: modules/planner/ItinerariesWidget.js:382 modules/planner/Itinerary.js:244
+#: modules/planner/Itinerary.js:331
+msgctxt "bus_direction"
+msgid " to "
+msgstr " smer "
 
 #. Shown as alert text before showing itinerary.
 #: modules/planner/ItinerariesWidget.js:431
@@ -141,62 +151,62 @@ msgstr "smer"
 msgid "Total walk distance for this trip exceeds specified maximum"
 msgstr "Skupna dolžina hoje za to pot je več kot nastavljen maksimum."
 
-#: modules/planner/ItinerariesWidget.js:446
+#: modules/planner/ItinerariesWidget.js:446 modules/planner/Itinerary.js:297
 msgid "Trip Summary"
 msgstr "Povzetek potovanja"
 
 #. Travel: hour date on which this trip is made
-#: modules/planner/ItinerariesWidget.js:448
+#: modules/planner/ItinerariesWidget.js:448 modules/planner/Itinerary.js:298
 msgid "Travel"
 msgstr "Potuj na"
 
 #. Time: minutes How long is this trip
-#: modules/planner/ItinerariesWidget.js:450
+#: modules/planner/ItinerariesWidget.js:450 modules/planner/Itinerary.js:299
 msgid "Time"
 msgstr "Trajanje"
 
 #. Total foot distance for trip
-#: modules/planner/ItinerariesWidget.js:455
+#: modules/planner/ItinerariesWidget.js:458 modules/planner/Itinerary.js:303
 msgid "Total Walk"
 msgstr "Skupno hoje"
 
 #. Total distance on a bike for this trip
-#: modules/planner/ItinerariesWidget.js:462
+#: modules/planner/ItinerariesWidget.js:465
 msgid "Total Bike"
 msgstr "Skupno kolesa"
 
 #. how many public transit transfers in a trip
-#: modules/planner/ItinerariesWidget.js:468
+#: modules/planner/ItinerariesWidget.js:471 modules/planner/Itinerary.js:301
 msgid "Transfers"
-msgstr ""
+msgstr "Prestopov"
 
 #. cost of trip
-#: modules/planner/ItinerariesWidget.js:474
+#: modules/planner/ItinerariesWidget.js:477 modules/planner/Itinerary.js:306
 msgid "Fare"
 msgstr "Cena"
 
 #. Valid date time; When is this trip correct
-#: modules/planner/ItinerariesWidget.js:482
+#: modules/planner/ItinerariesWidget.js:485
 msgid "Valid"
 msgstr "Veljavno"
 
 #. Links to this itinerary
-#: modules/planner/ItinerariesWidget.js:487
+#: modules/planner/ItinerariesWidget.js:490
 msgid "Link to Itinerary"
 msgstr "Povezava na potovanje"
 
 #. Default subject when sending trip to email
-#: modules/planner/ItinerariesWidget.js:502
+#: modules/planner/ItinerariesWidget.js:505
 msgid "Your Trip"
 msgstr "Vaše potovanje"
 
 #. Link to send trip by email
-#: modules/planner/ItinerariesWidget.js:505
+#: modules/planner/ItinerariesWidget.js:508
 msgid "Email"
 msgstr "E-pošta"
 
 #. public transport drives every N minutes
-#: modules/planner/ItinerariesWidget.js:525
+#: modules/planner/ItinerariesWidget.js:528
 #, python-format
 msgid "every %d min"
 msgid_plural "every %d mins"
@@ -206,49 +216,244 @@ msgstr[2] ""
 msgstr[3] ""
 
 #. Depart on to street / Board at station in itinerary
-#: modules/planner/ItinerariesWidget.js:531
+#: modules/planner/ItinerariesWidget.js:534 util/Itin.js:87
 #, fuzzy
 msgctxt "itinerary"
 msgid "Depart"
-msgstr "Odidi"
+msgstr "Odhod"
 
-#: modules/planner/ItinerariesWidget.js:531
+#: modules/planner/ItinerariesWidget.js:534
 msgid "<b>Board</b> at "
-msgstr "<b>Vstopi</b> na "
+msgstr "<b>Vstop</b> na "
 
 #. Public transport <Stop> (stop name)
-#: modules/planner/ItinerariesWidget.js:550
+#: modules/planner/ItinerariesWidget.js:553
 #: widgets/transit/StopViewerWidget.js:83
 msgid "Stop"
 msgstr "Postaja"
 
 #. widget title
-#: modules/planner/ItinerariesWidget.js:550
+#: modules/planner/ItinerariesWidget.js:553
 #: widgets/transit/StopViewerWidget.js:31
 msgid "Stop Viewer"
 msgstr "Pregledovalnik postaj"
 
-#: modules/planner/ItinerariesWidget.js:571
+#: modules/planner/ItinerariesWidget.js:574 modules/planner/Itinerary.js:259
+#: modules/planner/Itinerary.js:344
 msgid "Time in transit"
 msgstr "Časa na vožnji"
 
-#: modules/planner/ItinerariesWidget.js:573
+#: modules/planner/ItinerariesWidget.js:576
 #, fuzzy
 msgid "Trip Viewer"
 msgstr "Pregledovalnik poti"
 
-#: modules/planner/ItinerariesWidget.js:631
+#: modules/planner/ItinerariesWidget.js:634
 msgid "late as"
 msgstr ""
 
-#: modules/planner/ItinerariesWidget.js:636
+#: modules/planner/ItinerariesWidget.js:639
 #, fuzzy
 msgid "Stay on board"
 msgstr "Ostanite na vozilu"
 
-#: modules/planner/ItinerariesWidget.js:636
+#. Alight Public transit route name (agency name
+#. Stop ID ) end time
+#: modules/planner/ItinerariesWidget.js:639 modules/planner/Itinerary.js:262
+#: modules/planner/Itinerary.js:347
+#, fuzzy
 msgid "Alight"
+msgstr "Izstop"
+
+#. Start: location at [time date] (Used in print itinerary
+#. when do you start your trip)
+#: modules/planner/Itinerary.js:233 modules/planner/Itinerary.js:320
+#, python-format
+#, fuzzy, python-format
+msgid "Start: %s at %s"
+msgstr "Začetek: %s ob %s"
+
+#. Board Public transit route name (agency name
+#. Stop ID ) start time
+#: modules/planner/Itinerary.js:257 modules/planner/Itinerary.js:342
+msgid "Board"
+msgstr "Vstop"
+
+#. End: location at [time date] (Used in print itinerary
+#. when do you come at a destination)
+#: modules/planner/Itinerary.js:293 modules/planner/Itinerary.js:366
+#, python-format
+msgid "End: %s at %s"
+msgstr "Konec: %s ob %s"
+
+#. text at end of email %s is link to this itinerary
+#: modules/planner/Itinerary.js:370
+#, python-format
+msgid ""
+"\n"
+"View itinerary online:\n"
+"%s\n"
 msgstr ""
+"\n"
+"Oglejte si pot na spletu:\n"
+"%s"
+
+#. [Relative direction (Hard/Slightly Left/Right...)] to continue
+#. on /on to [streetname]
+#: util/Itin.js:90
+msgid "Hard Left"
+msgstr "Ostro levo"
+
+#: util/Itin.js:91
+msgid "Left"
+msgstr "Levo"
+
+#: util/Itin.js:92
+msgid "Slight left"
+msgstr "Rahlo levo"
+
+#: util/Itin.js:93
+msgid "Continue"
+msgstr "Nadaljujte"
+
+#: util/Itin.js:94
+msgid "Slight right"
+msgstr "Rahlo desno"
+
+#: util/Itin.js:95
+msgid "Right"
+msgstr "Desno"
+
+#: util/Itin.js:96
+msgid "Hard right"
+msgstr "Ostro desno"
+
+#: util/Itin.js:97
+#, fuzzy
+msgid "Elevator"
+msgstr "Pojdite z dvigalom"
+
+#: util/Itin.js:98
+msgid "U-turn left"
+msgstr "Polkrožno obrnite v levo"
+
+#: util/Itin.js:99
+msgid "U-turn right"
+msgstr "Polkrožno obrnite v desno"
+
+#. Walk distance to place
+#: util/Itin.js:113
+msgid "Walk"
+msgstr "Pešačite"
+
+#. Cycle distance to place
+#: util/Itin.js:115
+msgid "Cycle"
+msgstr "Kolesarite"
+
+#. Bus: (route number) Start station to end station
+#: util/Itin.js:117
+msgid "Bus"
+msgstr "Avtobus"
+
+#: util/Itin.js:118
+msgid "Subway"
+msgstr "Podzemna železnica"
+
+#: util/Itin.js:119
+msgid "Light Rail"
+msgstr "Tramvaj"
+
+#: util/Itin.js:120
+msgid "Aerial Tram"
+msgstr "Gondola"
+
+#: util/Itin.js:145
+#, python-format
+msgid "Take roundabout <b>counterclockwise</b> to <b>%s</b> exit on <b>%s</b>"
+msgstr ""
+"V krožišču vozite v <b>nasprotni smeri urinega kazalca</b> in pri <b>%s</b> "
+"izvozu zavijte na <b>%s</b>"
+
+#: util/Itin.js:147
+#, python-format
+msgid "Take roundabout counterclockwise to %s exit on %s"
+msgstr ""
+"V krožišču vozite v nasprotni smeri urinega kazalca in pri %s izvozu zavijte "
+"na %s"
+
+#: util/Itin.js:151
+#, python-format
+msgid "Take roundabout <b>clockwise</b> to <b>%s</b> exit on <b>%s</b>"
+msgstr ""
+"V krožišču vozite v <b>smeri urinega kazalca</b> in pri <b>%s</b> izvozu "
+"zavijte na <b>%s</b>"
+
+#: util/Itin.js:153
+#, python-format
+msgid "Take roundabout clockwise to %s exit on %s"
+msgstr ""
+"V krožišču vozite v smeri urinega kazalca in pri %s izvozu zavijte na %s"
+
+#. Start on [stret name] heading [compas direction]
+#: util/Itin.js:161
+msgid "Start on"
+msgstr "Začnite na"
+
+#: util/Itin.js:161
+msgid " heading "
+msgstr " v smeri "
+
+#. [Relative direction (Left/Right...)] to continue
+#. on /on to [streetname]
+#: util/Itin.js:167
+msgid "to continue on"
+msgstr "nadaljujte na"
+
+#: util/Itin.js:167
+msgid "on to"
+msgstr "na"
+
+#. Take roundabout to [nth] exit on [streetname]
+#: util/Text.js:30
+msgid "first"
+msgstr "prvem"
+
+#: util/Text.js:31
+msgid "second"
+msgstr "drugem"
+
+#: util/Text.js:32
+msgid "third"
+msgstr "tretjem"
+
+#: util/Text.js:33
+msgid "fourth"
+msgstr "četrtem"
+
+#: util/Text.js:34
+msgid "fifth"
+msgstr "petem"
+
+#: util/Text.js:35
+msgid "sixth"
+msgstr "šestem"
+
+#: util/Text.js:36
+msgid "seventh"
+msgstr "sedmem"
+
+#: util/Text.js:37
+msgid "eight"
+msgstr "osmem"
+
+#: util/Text.js:38
+msgid "ninth"
+msgstr "devetem"
+
+#: util/Text.js:39
+msgid "tenth"
+msgstr "desetem"
 
 #. Minimize widget in context menu
 #: widgets/Widget.js:107
@@ -444,8 +649,3 @@ msgstr "Sposojeno kolo"
 msgid "Plan Your Trip"
 msgstr "Načrtujte pot"
 
-#~ msgid "Time in transit:"
-#~ msgstr "Časa na vožnji:"
-
-#~ msgid "Depart"
-#~ msgstr "Odhod ob"

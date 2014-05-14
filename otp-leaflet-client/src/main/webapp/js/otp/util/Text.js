@@ -25,13 +25,24 @@ otp.util.Text = {
     },
     
     ordinal : function(n) {
-        if(n > 10 && n < 14) return n+"th";
-        switch(n % 10) {
-            case 1: return n+"st";
-            case 2: return n+"nd";
-            case 3: return n+"rd";
+        var ordinals = {
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname]
+            1: _tr('first'),
+            2: _tr('second'),
+            3: _tr('third'),
+            4: _tr('fourth'),
+            5: _tr('fifth'),
+            6: _tr('sixth'),
+            7: _tr('seventh'),
+            8: _tr('eight'),
+            9: _tr('ninth'),
+            10: _tr('tenth')
+        };
+        if (n in ordinals) {
+            return ordinals[n];
+        } else {
+            return n;
         }
-        return n+"th";
     },
     
     isNumber : function(str) {

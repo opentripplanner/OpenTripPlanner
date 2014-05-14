@@ -74,7 +74,33 @@ otp.util.Itin = {
         return false;
     },
 
-    directionString : function(dir) { // placeholder until localization is addressed
+
+    /** 
+     * Returns localized relative direction string
+     *
+     * @param {string} dir a relative direction string from a server
+     * @return {string} localized direction string
+     */
+
+    directionString : function(dir) { 
+        var directionStrings= {
+            'DEPART': pgettext("itinerary", "Depart"),
+            //TRANSLATORS: [Relative direction (Hard/Slightly Left/Right...)] to continue
+            //on /on to [streetname]
+            'HARD_LEFT': _tr("Hard Left"),
+            'LEFT': _tr("Left"),
+            'SLIGHTLY_LEFT': _tr("Slight left"), 
+            'CONTINUE': _tr("Continue"),
+            'SLIGHTLY_RIGHT': _tr("Slight right"),
+            'RIGHT': _tr("Right"),
+            'HARD_RIGHT': _tr("Hard right"),
+            'ELEVATOR': _tr("Elevator"),
+            'UTURN_LEFT': _tr("U-turn left"),
+            'UTURN_RIGHT': _tr("U-turn right")
+        };
+        if (dir in directionStrings) return directionStrings[dir];
+        // This is used if dir isn't found in directionStrings
+        // This shouldn't happen
         return dir.toLowerCase().replace('_',' ').replace('ly','');
     },
     
@@ -83,10 +109,15 @@ otp.util.Itin = {
     },
     
     modeStrings : {
-        'BUS' : 'Bus',
-        'SUBWAY' : 'Subway',
-        'TRAM' : 'Light Rail',
-        'GONDOLA' : 'Aerial Tram',
+        //TRANSLATORS: Walk distance to place
+        'WALK': _tr('Walk'),
+        //TRANSLATORS: Cycle distance to place
+        'BICYCLE': _tr('Cycle'),
+        //TRANSLATORS: Bus: (route number) Start station to end station
+        'BUS' : _tr('Bus'),
+        'SUBWAY' : _tr('Subway'),
+        'TRAM' : _tr('Light Rail'),
+        'GONDOLA' : _tr('Aerial Tram'),
     },
     
     modeString : function(mode) {
@@ -98,15 +129,31 @@ otp.util.Itin = {
         asHtml = (typeof asHtml === "undefined") ? true : asHtml;
         var text = '';
         if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
-            text += 'Take roundabout ' +
-                (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" ? 'counter' : '')+'clockwise to ' +
-                otp.util.Text.ordinal(step.exit)+' exit on '+step.streetName;
+            if (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE") {
+                if (asHtml) {
+                    text +=  _tr('Take roundabout <b>counterclockwise</b> to <b>%s</b> exit on <b>%s</b>', otp.util.Text.ordinal(step.exit), step.streetName);
+                } else {
+                    text +=  _tr('Take roundabout counterclockwise to %s exit on %s', otp.util.Text.ordinal(step.exit), step.streetName);
+                }
+            } else {
+                if (asHtml) {
+                    text +=  _tr('Take roundabout <b>clockwise</b> to <b>%s</b> exit on <b>%s</b>', otp.util.Text.ordinal(step.exit), step.streetName);
+                } else {
+                    text +=  _tr('Take roundabout clockwise to %s exit on %s', otp.util.Text.ordinal(step.exit), step.streetName);
+                }
+            }
+
         }
         else {
-            if(!step.relativeDirection) text += "Start on" + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + " heading " + step.absoluteDirection.toLowerCase();
+            //TODO: Absolute direction translation
+            //TRANSLATORS: Start on [stret name] heading [compas direction]
+            if(!step.relativeDirection) text += _tr("Start on") + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + _tr(" heading ") + step.absoluteDirection.toLowerCase();
             else {
                 text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection)) +
-                            (asHtml ? "</b>" : "") + ' ' + (step.stayOn ? "to continue on" : "on to")  + (asHtml ? " <b>" : " ") +
+                            (asHtml ? "</b>" : "") + ' ' +
+                            //TRANSLATORS: [Relative direction (Left/Right...)] to continue
+                            //on /on to [streetname]
+                            (step.stayOn ? _tr("to continue on") : _tr("on to"))  + (asHtml ? " <b>" : " ") +
                             step.streetName + (asHtml ? "</b>" : "");
             }
         }

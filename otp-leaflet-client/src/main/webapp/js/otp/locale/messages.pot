@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-04-16 22:10+0200\n"
+"POT-Creation-Date: 2014-05-14 23:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,11 +116,20 @@ msgstr[1] ""
 msgid "on time"
 msgstr ""
 
+#. [distance] to [name of destination]
+#: modules/planner/ItinerariesWidget.js:363 modules/planner/Itinerary.js:248
+#: modules/planner/Itinerary.js:334
+msgctxt "direction"
+msgid " to "
+msgstr ""
+
 #. used in sentence like: <Long name of public transport route> "to" <Public
 #. transport
 #. headsign>. Used in showing itinerary
-#: modules/planner/ItinerariesWidget.js:382
-msgid "to"
+#: modules/planner/ItinerariesWidget.js:382 modules/planner/Itinerary.js:244
+#: modules/planner/Itinerary.js:331
+msgctxt "bus_direction"
+msgid " to "
 msgstr ""
 
 #. Shown as alert text before showing itinerary.
@@ -128,62 +137,62 @@ msgstr ""
 msgid "Total walk distance for this trip exceeds specified maximum"
 msgstr ""
 
-#: modules/planner/ItinerariesWidget.js:446
+#: modules/planner/ItinerariesWidget.js:446 modules/planner/Itinerary.js:297
 msgid "Trip Summary"
 msgstr ""
 
 #. Travel: hour date on which this trip is made
-#: modules/planner/ItinerariesWidget.js:448
+#: modules/planner/ItinerariesWidget.js:448 modules/planner/Itinerary.js:298
 msgid "Travel"
 msgstr ""
 
 #. Time: minutes How long is this trip
-#: modules/planner/ItinerariesWidget.js:450
+#: modules/planner/ItinerariesWidget.js:450 modules/planner/Itinerary.js:299
 msgid "Time"
 msgstr ""
 
 #. Total foot distance for trip
-#: modules/planner/ItinerariesWidget.js:455
+#: modules/planner/ItinerariesWidget.js:458 modules/planner/Itinerary.js:303
 msgid "Total Walk"
 msgstr ""
 
 #. Total distance on a bike for this trip
-#: modules/planner/ItinerariesWidget.js:462
+#: modules/planner/ItinerariesWidget.js:465
 msgid "Total Bike"
 msgstr ""
 
 #. how many public transit transfers in a trip
-#: modules/planner/ItinerariesWidget.js:468
+#: modules/planner/ItinerariesWidget.js:471 modules/planner/Itinerary.js:301
 msgid "Transfers"
 msgstr ""
 
 #. cost of trip
-#: modules/planner/ItinerariesWidget.js:474
+#: modules/planner/ItinerariesWidget.js:477 modules/planner/Itinerary.js:306
 msgid "Fare"
 msgstr ""
 
 #. Valid date time; When is this trip correct
-#: modules/planner/ItinerariesWidget.js:482
+#: modules/planner/ItinerariesWidget.js:485
 msgid "Valid"
 msgstr ""
 
 #. Links to this itinerary
-#: modules/planner/ItinerariesWidget.js:487
+#: modules/planner/ItinerariesWidget.js:490
 msgid "Link to Itinerary"
 msgstr ""
 
 #. Default subject when sending trip to email
-#: modules/planner/ItinerariesWidget.js:502
+#: modules/planner/ItinerariesWidget.js:505
 msgid "Your Trip"
 msgstr ""
 
 #. Link to send trip by email
-#: modules/planner/ItinerariesWidget.js:505
+#: modules/planner/ItinerariesWidget.js:508
 msgid "Email"
 msgstr ""
 
 #. public transport drives every N minutes
-#: modules/planner/ItinerariesWidget.js:525
+#: modules/planner/ItinerariesWidget.js:528
 #, python-format
 msgid "every %d min"
 msgid_plural "every %d mins"
@@ -191,45 +200,227 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Depart on to street / Board at station in itinerary
-#: modules/planner/ItinerariesWidget.js:531
+#: modules/planner/ItinerariesWidget.js:534 util/Itin.js:87
 msgctxt "itinerary"
 msgid "Depart"
 msgstr ""
 
-#: modules/planner/ItinerariesWidget.js:531
+#: modules/planner/ItinerariesWidget.js:534
 msgid "<b>Board</b> at "
 msgstr ""
 
 #. Public transport <Stop> (stop name)
-#: modules/planner/ItinerariesWidget.js:550
+#: modules/planner/ItinerariesWidget.js:553
 #: widgets/transit/StopViewerWidget.js:83
 msgid "Stop"
 msgstr ""
 
 #. widget title
-#: modules/planner/ItinerariesWidget.js:550
+#: modules/planner/ItinerariesWidget.js:553
 #: widgets/transit/StopViewerWidget.js:31
 msgid "Stop Viewer"
 msgstr ""
 
-#: modules/planner/ItinerariesWidget.js:571
+#: modules/planner/ItinerariesWidget.js:574 modules/planner/Itinerary.js:259
+#: modules/planner/Itinerary.js:344
 msgid "Time in transit"
 msgstr ""
 
-#: modules/planner/ItinerariesWidget.js:573
+#: modules/planner/ItinerariesWidget.js:576
 msgid "Trip Viewer"
 msgstr ""
 
-#: modules/planner/ItinerariesWidget.js:631
+#: modules/planner/ItinerariesWidget.js:634
 msgid "late as"
 msgstr ""
 
-#: modules/planner/ItinerariesWidget.js:636
+#: modules/planner/ItinerariesWidget.js:639
 msgid "Stay on board"
 msgstr ""
 
-#: modules/planner/ItinerariesWidget.js:636
+#. Alight Public transit route name (agency name
+#. Stop ID ) end time
+#: modules/planner/ItinerariesWidget.js:639 modules/planner/Itinerary.js:262
+#: modules/planner/Itinerary.js:347
 msgid "Alight"
+msgstr ""
+
+#. Start: location at [time date] (Used in print itinerary
+#. when do you start your trip)
+#: modules/planner/Itinerary.js:233 modules/planner/Itinerary.js:320
+#, python-format
+msgid "Start: %s at %s"
+msgstr ""
+
+#. Board Public transit route name (agency name
+#. Stop ID ) start time
+#: modules/planner/Itinerary.js:257 modules/planner/Itinerary.js:342
+msgid "Board"
+msgstr ""
+
+#. End: location at [time date] (Used in print itinerary
+#. when do you come at a destination)
+#: modules/planner/Itinerary.js:293 modules/planner/Itinerary.js:366
+#, python-format
+msgid "End: %s at %s"
+msgstr ""
+
+#. text at end of email %s is link to this itinerary
+#: modules/planner/Itinerary.js:370
+#, python-format
+msgid ""
+"\n"
+"View itinerary online:\n"
+"%s\n"
+msgstr ""
+
+#. [Relative direction (Hard/Slightly Left/Right...)] to continue
+#. on /on to [streetname]
+#: util/Itin.js:90
+msgid "Hard Left"
+msgstr ""
+
+#: util/Itin.js:91
+msgid "Left"
+msgstr ""
+
+#: util/Itin.js:92
+msgid "Slight left"
+msgstr ""
+
+#: util/Itin.js:93
+msgid "Continue"
+msgstr ""
+
+#: util/Itin.js:94
+msgid "Slight right"
+msgstr ""
+
+#: util/Itin.js:95
+msgid "Right"
+msgstr ""
+
+#: util/Itin.js:96
+msgid "Hard right"
+msgstr ""
+
+#: util/Itin.js:97
+msgid "Elevator"
+msgstr ""
+
+#: util/Itin.js:98
+msgid "U-turn left"
+msgstr ""
+
+#: util/Itin.js:99
+msgid "U-turn right"
+msgstr ""
+
+#. Walk distance to place
+#: util/Itin.js:113
+msgid "Walk"
+msgstr ""
+
+#. Cycle distance to place
+#: util/Itin.js:115
+msgid "Cycle"
+msgstr ""
+
+#. Bus: (route number) Start station to end station
+#: util/Itin.js:117
+msgid "Bus"
+msgstr ""
+
+#: util/Itin.js:118
+msgid "Subway"
+msgstr ""
+
+#: util/Itin.js:119
+msgid "Light Rail"
+msgstr ""
+
+#: util/Itin.js:120
+msgid "Aerial Tram"
+msgstr ""
+
+#: util/Itin.js:145
+#, python-format
+msgid "Take roundabout <b>counterclockwise</b> to <b>%s</b> exit on <b>%s</b>"
+msgstr ""
+
+#: util/Itin.js:147
+#, python-format
+msgid "Take roundabout counterclockwise to %s exit on %s"
+msgstr ""
+
+#: util/Itin.js:151
+#, python-format
+msgid "Take roundabout <b>clockwise</b> to <b>%s</b> exit on <b>%s</b>"
+msgstr ""
+
+#: util/Itin.js:153
+#, python-format
+msgid "Take roundabout clockwise to %s exit on %s"
+msgstr ""
+
+#. Start on [stret name] heading [compas direction]
+#: util/Itin.js:161
+msgid "Start on"
+msgstr ""
+
+#: util/Itin.js:161
+msgid " heading "
+msgstr ""
+
+#. [Relative direction (Left/Right...)] to continue
+#. on /on to [streetname]
+#: util/Itin.js:167
+msgid "to continue on"
+msgstr ""
+
+#: util/Itin.js:167
+msgid "on to"
+msgstr ""
+
+#. Take roundabout to [nth] exit on [streetname]
+#: util/Text.js:30
+msgid "first"
+msgstr ""
+
+#: util/Text.js:31
+msgid "second"
+msgstr ""
+
+#: util/Text.js:32
+msgid "third"
+msgstr ""
+
+#: util/Text.js:33
+msgid "fourth"
+msgstr ""
+
+#: util/Text.js:34
+msgid "fifth"
+msgstr ""
+
+#: util/Text.js:35
+msgid "sixth"
+msgstr ""
+
+#: util/Text.js:36
+msgid "seventh"
+msgstr ""
+
+#: util/Text.js:37
+msgid "eight"
+msgstr ""
+
+#: util/Text.js:38
+msgid "ninth"
+msgstr ""
+
+#: util/Text.js:39
+msgid "tenth"
 msgstr ""
 
 #. Minimize widget in context menu

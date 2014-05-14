@@ -360,7 +360,7 @@ otp.widgets.ItinerariesWidget =
             }
 
             if(leg.mode === "WALK" || leg.mode === "BICYCLE") {
-                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
+                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+leg.to.name;
                 
                 if(otp.config.municoderHostname) {
                     var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
@@ -379,7 +379,7 @@ otp.widgets.ItinerariesWidget =
                 if(leg.headsign) {
                     /*TRANSLATORS: used in sentence like: <Long name of public transport route> "to" <Public transport
                     headsign>. Used in showing itinerary*/
-                    headerHtml +=  " " + _tr("to") + " " + leg.headsign;
+                    headerHtml +=  pgettext("bus_direction", " to ") + leg.headsign;
                 }
                 
                 if(leg.alerts) {
@@ -470,7 +470,7 @@ otp.widgets.ItinerariesWidget =
             //TRANSLATORS: how many public transit transfers in a trip
             tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Transfers") + '</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>')
             /*if(itin.itinData.walkDistance > 0) {
-                tripSummary.append('<div class="otp-itinTripSummaryLabel">Total Walk</div><div class="otp-itinTripSummaryText">' + 
+                tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Total Walk") + '</div><div class="otp-itinTripSummaryText">' + 
                     otp.util.Itin.distanceString(itin.itinData.walkDistance) + '</div>')
             }*/
            //TRANSLATORS: cost of trip
