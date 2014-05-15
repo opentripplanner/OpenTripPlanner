@@ -28,6 +28,7 @@ import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
@@ -125,7 +126,8 @@ public class StreetfulStopLinker implements GraphBuilder {
                             coordinates = new CoordinateArrayListSequence(coordinateList);
                         }
 
-                        LineString geometry = geometryFactory.createLineString(coordinates);
+                        LineString geometry = geometryFactory.createLineString(new
+                                PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
                         LOG.trace("  to stop: {} ({}m) [{}]", other, distance, geometry);
                         new SimpleTransfer(ts, other, distance, geometry);
                         n++;
