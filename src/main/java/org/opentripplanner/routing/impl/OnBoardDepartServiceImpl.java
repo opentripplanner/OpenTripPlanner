@@ -136,7 +136,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                 TripTimes tripTimes = timetable.getTripTimes(timetable.getTripIndex(tripId));
 
                 int depTime = tripTimes.getDepartureTime(bestStopIndex);
-                int arrTime = tripTimes.getArrivalTime(bestStopIndex);
+                int arrTime = tripTimes.getArrivalTime(bestStopIndex + 1);
                 int estTime = (int) Math.round(
                         depTime * fractionCovered + arrTime * (1 - fractionCovered));
 
@@ -201,7 +201,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                 } else if (depTime < time) {
                     bestHop = hop;
                     bestStopIndex = stopIndex;
-                } else if (time == depTime || bestTripTimes.getArrivalTime(bestStopIndex) < time) {
+                } else if (time == depTime || bestTripTimes.getArrivalTime(bestStopIndex + 1) < time) {
                     return ctx.graph.getVertex(hop.getBeginStop().getId().toString());
                 } else {
                     break;
