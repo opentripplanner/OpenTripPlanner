@@ -56,6 +56,7 @@ import com.vividsolutions.jts.geom.LineString;
  * like a good idea at the time, became more of a liability when it turned out lots of mocks were no
  * longer valid. The idea of a decoupled unit test has certainly not worked out the way it should've
  * worked out in theory. It would be very wise to rewrite this test to be simpler and not use mocks.
+ * FIXME too: Even worse, it didn't even fail when OnBoardDepartServiceImpl turned out to be broken.
  */
 public class OnBoardDepartServiceImplTest {
     OnBoardDepartServiceImpl onBoardDepartServiceImpl = new OnBoardDepartServiceImpl();
@@ -70,6 +71,7 @@ public class OnBoardDepartServiceImplTest {
         coordinates[4] = new Coordinate(5.0, 5.0);
 
         PatternDepartVertex depart = mock(PatternDepartVertex.class);
+        PatternArriveVertex dwell = mock(PatternArriveVertex.class);
         PatternArriveVertex arrive = mock(PatternArriveVertex.class);
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);
@@ -82,13 +84,16 @@ public class OnBoardDepartServiceImplTest {
                 geometryFactory.getCoordinateSequenceFactory();
         CoordinateSequence coordinateSequence = coordinateSequenceFactory.create(coordinates);
         LineString geometry = new LineString(coordinateSequence, geometryFactory);
+        ArrayList<Edge> hops = new ArrayList<Edge>(2);
         RoutingContext routingContext = new RoutingContext(routingRequest, graph, null, arrive);
         AgencyAndId agencyAndId = new AgencyAndId("Agency", "ID");
         Route route = new Route();
-        ArrayList<StopTime> stopTimes = new ArrayList<StopTime>(2);
+        ArrayList<StopTime> stopTimes = new ArrayList<StopTime>(3);
         StopTime stopDepartTime = new StopTime();
+        StopTime stopDwellTime = new StopTime();
         StopTime stopArriveTime = new StopTime();
         Stop stopDepart = new Stop();
+        Stop stopDwell = new Stop();
         Stop stopArrive = new Stop();
         Trip trip = new Trip();
 
@@ -96,12 +101,17 @@ public class OnBoardDepartServiceImplTest {
                 new ArrayList<ServiceDay>(Collections.singletonList(serviceDay));
         route.setId(agencyAndId);
         stopDepart.setId(agencyAndId);
+        stopDwell.setId(agencyAndId);
         stopArrive.setId(agencyAndId);
         stopDepartTime.setStop(stopDepart);
         stopDepartTime.setDepartureTime(0);
-        stopArriveTime.setArrivalTime(20);
+        stopDwellTime.setArrivalTime(20);
+        stopDwellTime.setStop(stopDwell);
+        stopDwellTime.setDepartureTime(40);
+        stopArriveTime.setArrivalTime(60);
         stopArriveTime.setStop(stopArrive);
         stopTimes.add(stopDepartTime);
+        stopTimes.add(stopDwellTime);
         stopTimes.add(stopArriveTime);
         trip.setId(agencyAndId);
         trip.setTripHeadsign("The right");
@@ -111,17 +121,23 @@ public class OnBoardDepartServiceImplTest {
         TripPattern tripPattern = new TripPattern(route, stopPattern);
 
         when(depart.getTripPattern()).thenReturn(tripPattern);
+        when(dwell.getTripPattern()).thenReturn(tripPattern);
 
-        PatternHop patternHop = new PatternHop(depart, arrive, stopDepart, stopDepart, 0);
+        PatternHop patternHop0 = new PatternHop(depart, dwell, stopDepart, stopDwell, 0);
+        PatternHop patternHop1 = new PatternHop(dwell, arrive, stopDwell, stopArrive, 1);
 
-        when(graph.getEdges()).thenReturn(Collections.<Edge>singletonList(patternHop));
+        hops.add(patternHop0);
+        hops.add(patternHop1);
+
+        when(graph.getEdges()).thenReturn(hops);
         when(depart.getCoordinate()).thenReturn(new Coordinate(0, 0));
+        when(dwell.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(routingRequest.getFrom()).thenReturn(new GenericLocation());
         when(routingRequest.getStartingTransitTripId()).thenReturn(agencyAndId);
         when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(9);
 
-        patternHop.setGeometry(geometry);
+        patternHop0.setGeometry(geometry);
         tripPattern.add(tripTimes);
         graph.index = new GraphIndex(graph);
 
@@ -137,7 +153,7 @@ public class OnBoardDepartServiceImplTest {
         Edge edge = vertex.getOutgoing().toArray(new Edge[1])[0];
 
         assertEquals(vertex, edge.getFromVertex());
-        assertEquals(arrive, edge.getToVertex());
+        assertEquals(dwell, edge.getToVertex());
         assertEquals("The right", edge.getDirection());
         assertEquals(geometry, edge.getGeometry());
 
@@ -249,8 +265,8 @@ public class OnBoardDepartServiceImplTest {
         stopArrive.setId(new AgencyAndId("Station", "2"));
         stopDepartTime.setStop(stopDepart);
         stopDepartTime.setDepartureTime(0);
-        stopDwellTime.setStop(stopDwell);
         stopDwellTime.setArrivalTime(20);
+        stopDwellTime.setStop(stopDwell);
         stopDwellTime.setDepartureTime(40);
         stopArriveTime.setArrivalTime(60);
         stopArriveTime.setStop(stopArrive);
