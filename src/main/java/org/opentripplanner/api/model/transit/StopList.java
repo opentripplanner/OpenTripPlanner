@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.routing.transit_index.adapters.StopType;
+import org.opentripplanner.api.adapters.StopType;
 
 @XmlRootElement(name="StopList")
 public class StopList {

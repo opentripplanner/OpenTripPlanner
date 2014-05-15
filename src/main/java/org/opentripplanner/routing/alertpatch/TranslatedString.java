@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.opentripplanner.routing.transit_index.adapters.MapAdapter;
+import org.opentripplanner.api.adapters.MapAdapter;
 
 @XmlType
 public class TranslatedString implements Serializable {

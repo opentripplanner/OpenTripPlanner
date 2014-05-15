@@ -11,32 +11,35 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.transit_index.adapters;
+package org.opentripplanner.api.adapters;
 
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@XmlRootElement(name = "Headsign")
-public class HeadsignsInfo implements Serializable {
+@XmlRootElement(name = "trip")
+public class TripsModelInfo implements Serializable {
 
     private static final long serialVersionUID = -4853941297409355512L;
 
-    public HeadsignsInfo(String headsign, Integer number, String calendarId) {
+    public TripsModelInfo(String headsign, Integer number, String calendarId, AgencyAndId tripId) {
         this.headsign = headsign;
         this.numberOfTrips = number;
         this.calendarId = calendarId;
+        this.id = tripId.getId();
+        this.agency = tripId.getAgencyId();
     }
 
-    public HeadsignsInfo(String headsign) {
-        this.headsign = headsign;
-        this.numberOfTrips = 0;
+    public TripsModelInfo() {
     }
 
-    public HeadsignsInfo() {
+    public String getId() {
+        return id;
     }
 
     @XmlAttribute
@@ -50,4 +53,12 @@ public class HeadsignsInfo implements Serializable {
     @XmlAttribute
     @JsonSerialize
     String calendarId;
+
+    @XmlAttribute
+    @JsonSerialize
+    String id;
+
+    @XmlAttribute
+    @JsonSerialize
+    String agency;
 }

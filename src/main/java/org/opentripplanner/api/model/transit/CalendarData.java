@@ -20,8 +20,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarDateType;
-import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarType;
+import org.opentripplanner.api.adapters.ServiceCalendarDateType;
+import org.opentripplanner.api.adapters.ServiceCalendarType;
 
 @XmlRootElement(name = "CalendarData")
 public class CalendarData {

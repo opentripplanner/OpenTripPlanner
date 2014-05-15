@@ -11,54 +11,29 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.transit_index.adapters;
-
-import java.io.Serializable;
+package org.opentripplanner.api.adapters;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@XmlRootElement(name = "trip")
-public class TripsModelInfo implements Serializable {
-
-    private static final long serialVersionUID = -4853941297409355512L;
-
-    public TripsModelInfo(String headsign, Integer number, String calendarId, AgencyAndId tripId) {
-        this.headsign = headsign;
-        this.numberOfTrips = number;
-        this.calendarId = calendarId;
-        this.id = tripId.getId();
-        this.agency = tripId.getAgencyId();
+@XmlRootElement(name = "AgencyAndId")
+public class AgencyAndIdType {
+    public AgencyAndIdType(String agency, String id) {
+        this.agency = agency;
+        this.id = id;
     }
 
-    public TripsModelInfo() {
-    }
-
-    public String getId() {
-        return id;
+    public AgencyAndIdType() {
     }
 
     @XmlAttribute
     @JsonSerialize
-    String headsign;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer numberOfTrips;
-
-    @XmlAttribute
-    @JsonSerialize
-    String calendarId;
+    String agency;
 
     @XmlAttribute
     @JsonSerialize
     String id;
 
-    @XmlAttribute
-    @JsonSerialize
-    String agency;
 }

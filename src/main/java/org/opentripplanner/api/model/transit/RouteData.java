@@ -21,10 +21,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.adapters.AgencyAndIdAdapter;
+import org.opentripplanner.api.adapters.RouteType;
+import org.opentripplanner.api.adapters.StopType;
 import org.opentripplanner.routing.transit_index.RouteVariant;
-import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
-import org.opentripplanner.routing.transit_index.adapters.RouteType;
-import org.opentripplanner.routing.transit_index.adapters.StopType;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

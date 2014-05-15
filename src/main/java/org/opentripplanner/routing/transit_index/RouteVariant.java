@@ -27,15 +27,15 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.api.adapters.LineStringAdapter;
+import org.opentripplanner.api.adapters.StopAgencyAndIdAdapter;
+import org.opentripplanner.api.adapters.TripsModelInfo;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.json_serialization.EncodedPolylineJSONSerializer;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.transit_index.adapters.LineStringAdapter;
-import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdAdapter;
-import org.opentripplanner.routing.transit_index.adapters.TripsModelInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -11,26 +11,28 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.transit_index.adapters;
+package org.opentripplanner.api.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.AgencyAndId;
 
-public class RouteAdapter extends XmlAdapter<RouteType, Route> {
-
-    @Override
-    public Route unmarshal(RouteType arg) throws Exception {
-        throw new UnsupportedOperationException(
-                "We presently serialize Route as RouteType, and thus cannot deserialize them");
-    }
+public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, AgencyAndId> {
 
     @Override
-    public RouteType marshal(Route arg) throws Exception {
+    public AgencyAndId unmarshal(AgencyAndIdType arg) throws Exception {
         if (arg == null) {
             return null;
         }
-        return new RouteType(arg);
+        return new AgencyAndId(arg.agency, arg.id);
+    }
+
+    @Override
+    public AgencyAndIdType marshal(AgencyAndId arg) throws Exception {
+        if (arg == null) {
+            return null;
+        }
+        return new AgencyAndIdType(arg.getAgencyId(), arg.getId());
     }
 
 }

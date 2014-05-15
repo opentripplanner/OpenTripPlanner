@@ -15,7 +15,7 @@ package org.opentripplanner.api.model.transit;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.routing.transit_index.adapters.TripType;
+import org.opentripplanner.api.adapters.TripType;
 
 @XmlRootElement(name = "tripMatch")
 public class TripMatch {

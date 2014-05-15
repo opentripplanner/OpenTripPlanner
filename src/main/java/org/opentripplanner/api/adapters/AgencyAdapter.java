@@ -11,32 +11,36 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.transit_index.adapters;
-
-import java.util.ArrayList;
+package org.opentripplanner.api.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Agency;
 
-public class StopAgencyAndIdArrayListAdapter extends
-        XmlAdapter<ArrayList<AgencyAndIdType>, ArrayList<Stop>> {
-
-    @Override
-    public ArrayList<Stop> unmarshal(ArrayList<AgencyAndIdType> arg) throws Exception {
-        throw new UnsupportedOperationException(
-                "We presently serialize stops as AgencyAndId, and thus cannot deserialize them");
-    }
+public class AgencyAdapter extends XmlAdapter<AgencyType, Agency> {
 
     @Override
-    public ArrayList<AgencyAndIdType> marshal(ArrayList<Stop> arg) throws Exception {
+    public Agency unmarshal(AgencyType arg) throws Exception {
         if (arg == null) {
             return null;
         }
-        ArrayList<AgencyAndIdType> result = new ArrayList<AgencyAndIdType>();
-        for (Stop a : arg)
-            result.add(new AgencyAndIdType(a.getId().getAgencyId(), a.getId().getId()));
-        return result;
+        Agency a = new Agency();
+        a.setId(arg.id);
+        a.setName(arg.name);
+        a.setUrl(arg.url);
+        a.setTimezone(arg.timezone);
+        a.setLang(arg.lang);
+        a.setPhone(arg.phone);
+        a.setFareUrl(arg.fareUrl);
+        return new Agency(a);
+    }
+
+    @Override
+    public AgencyType marshal(Agency arg) throws Exception {
+        if (arg == null) {
+            return null;
+        }
+        return new AgencyType(arg);
     }
 
 }

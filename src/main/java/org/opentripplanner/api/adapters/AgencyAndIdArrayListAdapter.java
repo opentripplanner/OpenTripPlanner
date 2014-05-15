@@ -11,36 +11,35 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.transit_index.adapters;
+package org.opentripplanner.api.adapters;
+
+import java.util.ArrayList;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.AgencyAndId;
 
-public class AgencyAdapter extends XmlAdapter<AgencyType, Agency> {
+public class AgencyAndIdArrayListAdapter extends XmlAdapter<ArrayList<AgencyAndIdType>, ArrayList<AgencyAndId>> {
 
     @Override
-    public Agency unmarshal(AgencyType arg) throws Exception {
+    public ArrayList<AgencyAndId> unmarshal(ArrayList<AgencyAndIdType> arg) throws Exception {
         if (arg == null) {
             return null;
         }
-        Agency a = new Agency();
-        a.setId(arg.id);
-        a.setName(arg.name);
-        a.setUrl(arg.url);
-        a.setTimezone(arg.timezone);
-        a.setLang(arg.lang);
-        a.setPhone(arg.phone);
-        a.setFareUrl(arg.fareUrl);
-        return new Agency(a);
+        ArrayList<AgencyAndId> result = new ArrayList<AgencyAndId>();
+        for (AgencyAndIdType a : arg)
+            result.add(new AgencyAndId(a.agency, a.id));
+        return result;
     }
 
     @Override
-    public AgencyType marshal(Agency arg) throws Exception {
+    public ArrayList<AgencyAndIdType> marshal(ArrayList<AgencyAndId> arg) throws Exception {
         if (arg == null) {
             return null;
         }
-        return new AgencyType(arg);
+        ArrayList<AgencyAndIdType> result = new ArrayList<AgencyAndIdType>();
+        for(AgencyAndId a:arg) result.add(new AgencyAndIdType(a.getAgencyId(), a.getId()));
+        return result;
     }
 
 }
