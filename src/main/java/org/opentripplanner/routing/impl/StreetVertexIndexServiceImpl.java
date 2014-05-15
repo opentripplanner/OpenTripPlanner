@@ -300,6 +300,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return intersectionTree.query(envelope);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Collection<StreetEdge> getEdgesForEnvelope(Envelope envelope) {
         return edgeTree.query(envelope);

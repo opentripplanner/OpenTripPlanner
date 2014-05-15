@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @XmlRootElement(name = "trip")
 public class TripType {
 
+    @SuppressWarnings("deprecation")
     public TripType(Trip obj) {
         this.id = obj.getId();
         this.serviceId = obj.getServiceId();
@@ -41,6 +42,7 @@ public class TripType {
         this.route = obj.getRoute();
     }
 
+    @SuppressWarnings("deprecation")
     public TripType(Trip obj, Boolean extended) {
         this.id = obj.getId();
         this.tripShortName = obj.getTripShortName();
