@@ -144,7 +144,7 @@ public class FrequencyAlight extends Edge {
                 //as banned)
                 return null;
             }
-
+            ServiceDay serviceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(currentTime);
                 // only check for service on days that are not in the future
@@ -163,6 +163,7 @@ public class FrequencyAlight extends Edge {
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
+                            serviceDay = sd;
                         }
                     }
 
@@ -185,6 +186,7 @@ public class FrequencyAlight extends Edge {
                 return null;
             }
             //s1.setTrip(bestPatternIndex); is this necessary? (AMB)
+            s1.setServiceDay(serviceDay);
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
