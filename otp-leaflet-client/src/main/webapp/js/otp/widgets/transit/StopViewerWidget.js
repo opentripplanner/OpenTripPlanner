@@ -43,8 +43,18 @@ otp.widgets.transit.StopViewerWidget =
         this.activeTime = moment().unix() * 1000;
         
         this.stopFinder = new otp.widgets.transit.StopFinderWidget(this.module.id + "-stopFinder", this.module, this);
+        
+        var translated_template = {
+            //TRANSLATORS: Date: date chooser (In stop viewer)
+            date: _tr('Date'),
+            //TRANSLATORS: Button
+            find_stops: _tr('Find Stops'),
+            //TRANSLATORS: When no public transit stops were selected in stop viewer
+            no_stops_selected: _tr('(No Stop Selected)'),
 
-        ich['otp-stopViewer']({}).appendTo(this.mainDiv);
+        }
+
+        ich['otp-stopViewer'](translated_template).appendTo(this.mainDiv);
         
         this.timeList = this.mainDiv.find(".otp-stopViewer-timeList");
         this.stopInfo = this.mainDiv.find(".otp-stopViewer-stopInfo");
@@ -102,9 +112,20 @@ otp.widgets.transit.StopViewerWidget =
     updateTimes : function() {
         var minDiff = 1000000000;
         var bestIndex = 0;
+        var to_trans = pgettext('bus_direction', " to ");
+        //TRANSLATORS: Trip block (A block consists of two or more
+        //sequential trips made using the same vehicle, where a passenger
+        //can transfer from one trip to the next just by staying in the
+        //vehicle.)
+        var block_trans = _tr('Block');
+
         for(var i = 0; i < this.times.length; i++) {
             var time = this.times[i];
             time.formattedTime = otp.util.Time.formatItinTime(time.time*1000, "h:mma");
+            //FIXME: There is probably a better way to translate to and block
+            //then in each call separately
+            time.to = to_trans;
+            time.block = block_trans;
             ich['otp-stopViewer-timeListItem'](time).appendTo(this.timeList);
             var diff = Math.abs(this.activeTime - time.time*1000);
             if(diff < minDiff) {

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-16 17:15+0200\n"
-"PO-Revision-Date: 2014-05-16 17:09+0200\n"
+"POT-Creation-Date: 2014-05-16 17:45+0200\n"
+"PO-Revision-Date: 2014-05-16 17:26+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
@@ -195,6 +195,7 @@ msgstr " do "
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:382
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:244
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:331
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:115
 msgctxt "bus_direction"
 msgid " to "
 msgstr " smer "
@@ -301,7 +302,7 @@ msgstr "<b>Vstop</b> na "
 
 #. Public transport <Stop> (stop name)
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:555
-#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:83
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:93
 msgid "Stop"
 msgstr "Postaja"
 
@@ -609,6 +610,29 @@ msgstr "Poišči"
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopFinderWidget.js:95
 msgid "No Stops Found"
 msgstr "Ni najdenih postaj"
+
+#. Date: date chooser (In stop viewer)
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:49
+msgid "Date"
+msgstr "Datum"
+
+#. Button
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:51
+msgid "Find Stops"
+msgstr "Poišči postaje"
+
+#. When no public transit stops were selected in stop viewer
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:53
+msgid "(No Stop Selected)"
+msgstr "(Nobena postaja ni bila izbrana)"
+
+#. Trip block (A block consists of two or more
+#. sequential trips made using the same vehicle, where a passenger
+#. can transfer from one trip to the next just by staying in the
+#. vehicle.)
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:120
+msgid "Block"
+msgstr ""
 
 #. Recenter map on this stop (Shown at each stop in
 #. Trip viewer

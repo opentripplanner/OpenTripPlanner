@@ -2,15 +2,15 @@
 
     <div class="otp-stopViewer-container notDraggable">
         <div class="otp-stopViewer-stopInfo"> 
-            (No Stop Selected)
+			{{no_stops_selected}}
         </div>
 
         <div style="margin-top: 4px; text-align: center;">
-            <b>Date</b>: <input type='text' class="otp-stopViewer-dateInput" />
+			<b>{{date}}</b>: <input type='text' class="otp-stopViewer-dateInput" />
         </div>
         <div class="otp-stopViewer-timeList"></div>
         <div class="otp-stopViewer-findButtonRow">
-            <button class="otp-stopViewer-findButton">Find Stops</button>
+			<button class="otp-stopViewer-findButton">{{find_stops}}</button>
         </div>
 
     </div>
@@ -31,13 +31,13 @@
 
         {{#direction}}
             <div class="otp-stopViewer-headsignRow">
-                to {{direction}}
+				{{to}}{{direction}}
             </div>
         {{/direction}}
         
         {{#trip.blockId}}
             <div class="otp-stopViewer-blockRow">
-                Block {{trip.blockId}}
+				{{block}} {{trip.blockId}}
             </div>
         {{/trip.blockId}}            
     </div>
