@@ -160,10 +160,12 @@ otp.modules.planner.PlannerModule =
     
     addMapContextMenuItems : function() {
         var this_ = this;
-        this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
+        //TRANSLATORS: Context menu
+        this.webapp.map.addContextMenuItem(_tr("Set as Start Location"), function(latlng) {
             this_.setStartPoint(latlng, true);
         });
-        this.webapp.map.addContextMenuItem("Set as End Location", function(latlng) {
+        //TRANSLATORS: Context menu
+        this.webapp.map.addContextMenuItem(_tr("Set as End Location"), function(latlng) {
             this_.setEndPoint(latlng, true);
         });
     },
