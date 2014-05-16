@@ -13,6 +13,9 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import com.google.common.base.Objects;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
@@ -30,6 +33,8 @@ import lombok.Setter;
 public class PartialPlainStreetEdge extends PlainStreetEdge {
 
     private static final long serialVersionUID = 1L;
+
+    public RoutingContext visibleTo = null;
 
     /**
      * The edge on which this lies.
@@ -124,6 +129,16 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
         return "PartialPlainStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getLength() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
+    }
+
+    @Override
+    public State traverse(State s0) {
+        // Split edges should only be usable by the routing context that created them.
+        // This should alleviate the concurrency problem in issue 1025.
+        if (this.visibleTo != null && ! (this.visibleTo == s0.getOptions().rctx)) {
+            return null;
+        }
+        return super.traverse(s0);
     }
 
 }

@@ -305,6 +305,17 @@ public class RoutingContext implements Cloneable {
         else
             remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
 
+        // If any temporary half-street-edges were created, record the fact that they should
+        // only be visible to the routing context we are currently constructing.
+        for (Vertex vertex : new Vertex[] {fromVertex, toVertex}) {
+            if (vertex instanceof StreetLocation) {
+                for (PartialPlainStreetEdge ppse : Iterables.filter(((StreetLocation) vertex).getExtra(),
+                        PartialPlainStreetEdge.class)) {
+                    ppse.visibleTo = this;
+                }
+            }
+        }
+
         if (this.origin != null) {
             LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());
             LOG.debug("Origin vertex outbound edges {}", this.origin.getOutgoing());
