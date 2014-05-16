@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-16 10:15+0200\n"
-"PO-Revision-Date: 2014-05-16 10:15+0200\n"
+"POT-Creation-Date: 2014-05-16 11:01+0200\n"
+"PO-Revision-Date: 2014-05-16 11:02+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
@@ -21,6 +21,60 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 "Language: sl\n"
 "X-Generator: Lokalize 1.5\n"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:205
+msgid "Transit"
+msgstr "Javni prevoz"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:208
+msgid "Bus Only"
+msgstr "Avtobus"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:211
+msgid "Rail Only"
+msgstr "Vlak"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:214
+msgid "Bicycle Only"
+msgstr "Kolo"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:217
+msgid "Bicycle &amp; Transit"
+msgstr "Kolo &amp; Javni prevoz"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:220
+msgid "Walk Only"
+msgstr "Pešačenje"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:223
+msgid "Drive Only"
+msgstr "Avto"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:230
+msgid "Rented Bicycle"
+msgstr "Sposojeno kolo"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:233
+msgid "Transit & Rented Bicycle"
+msgstr "Sposojeno kolo &amp; Javni prevoz"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/core/WidgetManagerMenu.js:34
 msgid "Minimize all"
@@ -584,7 +638,7 @@ msgstr "Zdaj"
 #. Label for dropdown Travel by: [mode of transport]
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:428
 msgid "Travel by"
-msgstr "Potuj z"
+msgstr "Način potovanja "
 
 #. default value for preset values of maximum walk
 #. distances in Trip Options

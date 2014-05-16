@@ -63,47 +63,6 @@
 <script src="js/otp/locale/French.js?v=1"></script>
 
 <script src="js/otp/config.js?v=1"></script>
-<script type="text/javascript" language="javascript">
-	//TODO: get current localization from config
-var options = {
-	resGetPath: 'js/otp/locale/__lng__.json',
-	fallbackLng: 'en',
-	preload: ['sl'],
-	lng: "sl",
-	//postProcess: 'add_nekaj', //Adds | around every string that is translated
-	shortcutFunction: 'sprintf',
-	//postProcess: 'sprintf',
-	debug: true,
-	getAsync: false, //TODO: make async
-	fallbackOnEmpty: true,
-};
-var _tr = null; //key
-var ngettext = null; // singular, plural, value
-var pgettext = null; // context, key
-var npgettext = null; // context, singular, plural, value
-
-i18n.addPostProcessor('add_nekaj', function(val, key, opts) {
-		return "|"+val+"|";
-		});
-
-i18n.init(options, function(t) {
-		console.log("loaded");
-		_tr = t;
-		ngettext = function(singular, plural, value) {
-			return t(singular, {count: value, postProcess: 'sprintf', sprintf: [value]});
-		};
-		pgettext = function(context, key) {
-			return t(key, {context: context});
-		};
-		npgettext = function(context, singular, plural, value) {
-		return t(singular, {context: context,
-			count: value,
-			postProcess: 'sprintf',
-		   	sprintf: [value]});
-		};
-
-		});
-</script>
 
 <script src="js/otp/debug.js?v=1"></script>
 <script src="js/otp/templates.js?v=1"></script>

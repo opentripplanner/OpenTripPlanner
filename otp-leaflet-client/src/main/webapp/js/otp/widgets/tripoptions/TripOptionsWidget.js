@@ -413,7 +413,7 @@ otp.widgets.tripoptions.ModeSelector =
     
     id           :  null,
 
-    modes        : otp.config.locale.tripPlanner.modes,
+    modes        : otp.config.modes,
     
     optionLookup : null,
     modeControls : null,

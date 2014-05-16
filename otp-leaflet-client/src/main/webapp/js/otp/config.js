@@ -2,6 +2,7 @@ otp.config = {
     debug: false,
 
     locale: otp.locale.English,
+    locale_short: 'en',
 
     /**
      * The OTP web service locations
@@ -152,3 +153,75 @@ otp.config = {
     dateFormat  : "MMM Do YYYY"
 
 };
+var options = {
+	resGetPath: 'js/otp/locale/__lng__.json',
+	fallbackLng: 'en',
+	preload: [otp.config.locale_short],
+	lng: otp.config.locale_short,
+	postProcess: 'add_nekaj', //Adds | around every string that is translated
+	shortcutFunction: 'sprintf',
+	//postProcess: 'sprintf',
+	debug: true,
+	getAsync: false, //TODO: make async
+	fallbackOnEmpty: true,
+};
+var _tr = null; //key
+var ngettext = null; // singular, plural, value
+var pgettext = null; // context, key
+var npgettext = null; // context, singular, plural, value
+
+i18n.addPostProcessor('add_nekaj', function(val, key, opts) {
+    return "|"+val+"|";
+});
+
+i18n.init(options, function(t) {
+    console.log("loaded");
+    _tr = t;
+    ngettext = function(singular, plural, value) {
+        return t(singular, {count: value, postProcess: 'sprintf', sprintf: [value]});
+    };
+    pgettext = function(context, key) {
+        return t(key, {context: context});
+    };
+    npgettext = function(context, singular, plural, value) {
+        return t(singular, {context: context,
+                 count: value,
+                 postProcess: 'sprintf',
+                 sprintf: [value]});
+    };
+
+});
+
+otp.config.modes = {
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        "TRANSIT,WALK"        : _tr("Transit"), 
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        "BUSISH,WALK"         : _tr("Bus Only"), 
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        "TRAINISH,WALK"       : _tr("Rail Only"), 
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        "BICYCLE"             : _tr('Bicycle Only'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        "TRANSIT,BICYCLE"     : _tr("Bicycle &amp; Transit"),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        "WALK"                : _tr('Walk Only'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        "CAR"                 : _tr('Drive Only'),
+        //uncomment only if bike rental exists in a map
+        // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
+        //       (note that we've been broken for awhile here, since many agencies don't have a 'Train' mode either...this needs attention)
+        // IDEA: maybe we start with a big array (like below), and the pull out modes from this array when turning off various modes...
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        'WALK,BICYCLE'        :_tr('Rented Bicycle'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+        'TRANSIT,WALK,BICYCLE': _tr('Transit & Rented Bicycle')
+    };
