@@ -135,7 +135,8 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     public State traverse(State s0) {
         // Split edges should only be usable by the routing context that created them.
         // This should alleviate the concurrency problem in issue 1025.
-        if (this.visibleTo != null && ! (this.visibleTo == s0.getOptions().rctx)) {
+        // In the tiny window of time before the visibleTo field is set, traversal will also fail (which is what we want).
+        if ( ! (this.visibleTo == s0.getOptions().rctx)) {
             return null;
         }
         return super.traverse(s0);
