@@ -180,7 +180,7 @@ otp.widgets.tripoptions.LocationsSelector =
             widgetId : this.id,
             showGeocoders : (this.geocoders && this.geocoders.length > 1),
             geocoders : this.geocoders,
-            //TODO: What does this labels mean?
+            //TODO: Where is this shown. Template seems not to be used
             start: _tr("Start"),
             end: _tr("End"),
             geocoder: _tr("Geocoder")

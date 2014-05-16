@@ -436,9 +436,11 @@ otp.widgets.ItinerariesWidget =
         }
         
         // add start and end time rows and the main leg accordion display 
-        itinDiv.append("<div class='otp-itinStartRow'><b>Start</b>: "+itin.getStartTimeStr()+"</div>");
+        //TRANSLATORS: Start: Time and date (Shown before path itinerary)
+        itinDiv.append("<div class='otp-itinStartRow'><b>" + _tr("Start") + "</b>: "+itin.getStartTimeStr()+"</div>");
         itinDiv.append(itinAccord);
-        itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+itin.getEndTimeStr()+"</div>");
+        //TRANSLATORS: End: Time and date (Shown after path itinerary)
+        itinDiv.append("<div class='otp-itinEndRow'><b>" + _tr("End") + "</b>: "+itin.getEndTimeStr()+"</div>");
 
         // add trip summary
 
