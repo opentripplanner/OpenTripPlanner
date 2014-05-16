@@ -42,8 +42,19 @@ otp.widgets.transit.StopFinderWidget =
         var this_ = this;
 
         this.activeTime = moment();
+
+        var translated_template = {
+            //TRANSLATORS: [Public transport] Agency: Selector for Public transport agencies
+            agency: _tr('Agency'),
+            //TRANSLATORS: Search for Stops by ID
+            by_id: _tr('By ID'),
+            //TRANSLATORS: Search for Stops by Name
+            by_name: _tr('By Name'),
+            //TRANSLATORS: Search for Stops by ID/by Name
+            search: _tr('Search')
+        }
           
-        ich['otp-stopFinder']({}).appendTo(this.mainDiv);
+        ich['otp-stopFinder'](translated_template).appendTo(this.mainDiv);
 
         this.agencySelect = this.mainDiv.find('.otp-stopFinder-agencySelect');
         this.module.webapp.transitIndex.loadAgencies(this, function() {
