@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-16 11:30+0200\n"
+"POT-Creation-Date: 2014-05-16 16:07+0200\n"
 "PO-Revision-Date: 2014-05-15 19:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -21,55 +21,55 @@ msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:205
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:206
 msgid "Transit"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:208
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:209
 msgid "Bus Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:211
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:212
 msgid "Rail Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:214
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:215
 msgid "Bicycle Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:217
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:218
 msgid "Bicycle &amp; Transit"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:220
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:221
 msgid "Walk Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:223
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:224
 msgid "Drive Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:230
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:231
 msgid "Rented Bicycle"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:233
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:234
 msgid "Transit & Rented Bicycle"
 msgstr ""
 
@@ -304,6 +304,7 @@ msgid "Time in transit"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:578
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/TripViewerWidget.js:35
 msgid "Trip Viewer"
 msgstr ""
 
@@ -540,6 +541,17 @@ msgstr ""
 msgid "Send to back"
 msgstr ""
 
+#. Public transit Route: routename (Used in Trip viewer)
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/RouteBasedWidget.js:42
+msgid "Route:"
+msgstr ""
+
+#. Public Transit Route variant: Start - end stop (Used in
+#. trip viewer)
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/RouteBasedWidget.js:62
+msgid "Variant:"
+msgstr ""
+
 #. Widget title
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopFinderWidget.js:31
 msgid "Stop Finder"
@@ -547,6 +559,18 @@ msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopFinderWidget.js:84
 msgid "No Stops Found"
+msgstr ""
+
+#. Recenter map on this stop (Shown at each stop in
+#. Trip viewer
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/TripViewerWidget.js:115
+msgid "Recenter"
+msgstr ""
+
+#. Link to Stop viewer (Shown at each stop in Trip
+#. viewer)
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/TripViewerWidget.js:123
+msgid "Viewer"
 msgstr ""
 
 #. Optimization for bicycle shown in bike triangle. Optimized
