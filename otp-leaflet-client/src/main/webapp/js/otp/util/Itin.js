@@ -109,14 +109,20 @@ otp.util.Itin = {
     },
     
     modeStrings : {
-        //TRANSLATORS: Walk distance to place
+        //TRANSLATORS: Walk distance to place (itinerary header)
         'WALK': _tr('Walk'),
-        //TRANSLATORS: Cycle distance to place
+        //TRANSLATORS: Cycle distance to place (itinerary header)
         'BICYCLE': _tr('Cycle'),
-        //TRANSLATORS: Bus: (route number) Start station to end station
+        //TRANSLATORS: Car distance to place (itinerary header)
+        'CAR': _tr('Car'),
+        //TRANSLATORS: Bus: (route number) Start station to end station (itinerary header)
         'BUS' : _tr('Bus'),
         'SUBWAY' : _tr('Subway'),
+        'RAIL' : _tr('Train'),
+        'FERRY' : _tr('Ferry'),
         'TRAM' : _tr('Light Rail'),
+        'CABLE_CAR': _tr('Cable Car'),
+        'FUNICULAR': _tr('Funicular'),
         'GONDOLA' : _tr('Aerial Tram'),
     },
     
