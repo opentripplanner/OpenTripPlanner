@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-16 17:45+0200\n"
+"POT-Creation-Date: 2014-05-16 19:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,6 +78,32 @@ msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/core/WidgetManagerMenu.js:42
 msgid "Unminimize all"
+msgstr ""
+
+#. widget title
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:62
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:555
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:31
+msgid "Stop Viewer"
+msgstr ""
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:64
+msgid "Plan Trip"
+msgstr ""
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:66
+msgid "From Stop"
+msgstr ""
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:68
+msgid "To Stop"
+msgstr ""
+
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:69
+msgid "Routes Serving Stop"
 msgstr ""
 
 #. Legend title in Analyst
@@ -289,12 +315,6 @@ msgstr ""
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:555
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:93
 msgid "Stop"
-msgstr ""
-
-#. widget title
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:555
-#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:31
-msgid "Stop Viewer"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:576

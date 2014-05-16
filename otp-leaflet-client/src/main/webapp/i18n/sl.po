@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-16 17:45+0200\n"
-"PO-Revision-Date: 2014-05-16 17:26+0200\n"
+"POT-Creation-Date: 2014-05-16 19:32+0200\n"
+"PO-Revision-Date: 2014-05-16 19:29+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
@@ -81,6 +81,36 @@ msgstr "Skrči vse"
 #: otp-leaflet-client/src/main/webapp/js/otp/core/WidgetManagerMenu.js:42
 msgid "Unminimize all"
 msgstr "Razširi vse"
+
+#. widget title
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:62
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:555
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:31
+msgid "Stop Viewer"
+msgstr "Pregledovalnik postaj"
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:64
+#, fuzzy
+msgid "Plan Trip"
+msgstr "Načrtujte pot"
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:66
+#, fuzzy
+msgid "From Stop"
+msgstr "Iz postaje"
+
+#. Plan Trip [From Stop| To Stop] Used in stoplayer popup
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:68
+#, fuzzy
+msgid "To Stop"
+msgstr "Do postaje"
+
+#: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:69
+#, fuzzy
+msgid "Routes Serving Stop"
+msgstr "Linije, ki ustavljajo na postaji"
 
 #. Legend title in Analyst
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/analyst/AnalystLegendWidget.js:26
@@ -305,12 +335,6 @@ msgstr "<b>Vstop</b> na "
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:93
 msgid "Stop"
 msgstr "Postaja"
-
-#. widget title
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:555
-#: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:31
-msgid "Stop Viewer"
-msgstr "Pregledovalnik postaj"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:576
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:259
