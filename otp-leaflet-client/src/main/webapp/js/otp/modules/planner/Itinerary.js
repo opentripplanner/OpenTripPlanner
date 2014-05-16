@@ -314,8 +314,6 @@ otp.modules.planner.Itinerary = otp.Class({
     
     getTextNarrative : function(itinLink) {
         var text = ''
-        //FIXME: This doesn't translate correct maybe : is a problem same with
-        //End:
 
         //TRANSLATORS: Start: location at [time date] (Used in print itinerary
         //when do you start your trip)
