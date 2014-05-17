@@ -471,28 +471,39 @@ otp.modules.planner.PlannerModule =
             }
             else if(leg.mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
-                	polyline.bindPopup('Your '+otp.config.bikeshareName+' route');
+                        //TRANSLATORS: %s is bikeshare company name (shown
+                        //when clicked on route on map
+                	polyline.bindPopup(_tr('Your %s route', otp.config.bikeshareName));
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
                 }
                 else { // regular bike trip
-                	polyline.bindPopup('Your bike route');
+                        //TRANSLATORS: Text which is shown when clicking bike route
+                        //in a map
+                	polyline.bindPopup(_tr('Your bike route'));
                 	//this.resetStationMarkers();
                 }	
             }
             else if(leg.mode === 'WALK') {
                 if(queryParams.mode === 'WALK,BICYCLE') { 
                     if(i == 0) {
-                    	polyline.bindPopup('Walk to the '+otp.config.bikeshareName+' dock.');
+                        //TRANSLATORS:%s is bikeshare company name. Shown in map when
+                        //clicking on a route 
+                    	polyline.bindPopup(_tr('Walk to the %s dock.', otp.config.bikeshareName));
                     }
                     if(i == 2) {
-                    	polyline.bindPopup('Walk from the '+otp.config.bikeshareName+' dock to your destination.');
+                        //TRANSLATORS:%s is bikeshare company name. Shown in map when
+                        //clicking on a route 
+                    	polyline.bindPopup(_tr('Walk from the %s dock to your destination.', otp.config.bikeshareName));
                     }
                 }
                 else { // regular walking trip
-                	polyline.bindPopup('Your walk route');
+                    //TRANSLATORS: Text which is shown when clicking walking
+                    //route in a map
+                	polyline.bindPopup(_tr('Your walk route'));
                 	//this.resetStationMarkers();
                 }
             }
+            //FIXME: CAR is missing
         }
         if (otp.config.zoomToFitResults) this.webapp.map.lmap.fitBounds(itin.getBoundsArray());
     },

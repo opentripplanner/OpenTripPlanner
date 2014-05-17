@@ -157,6 +157,7 @@ var options = {
 	resGetPath: 'js/otp/locale/__lng__.json',
 	fallbackLng: 'en',
         nsseparator: ';;', //Fixes problem when : is in translation text
+        keyseparator: '_|_',
 	preload: [otp.config.locale_short],
 	lng: otp.config.locale_short,
 	postProcess: 'add_nekaj', //Adds | around every string that is translated
