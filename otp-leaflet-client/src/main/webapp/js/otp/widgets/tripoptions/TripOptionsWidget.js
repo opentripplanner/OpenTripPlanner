@@ -181,7 +181,7 @@ otp.widgets.tripoptions.LocationsSelector =
             showGeocoders : (this.geocoders && this.geocoders.length > 1),
             geocoders : this.geocoders,
             //TODO: Where is this shown. Template seems not to be used
-            start: _tr("Start"),
+            start: pgettext('template', "Start"),
             end: _tr("End"),
             geocoder: _tr("Geocoder")
         }).appendTo(this.$());

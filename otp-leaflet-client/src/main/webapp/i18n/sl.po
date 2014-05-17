@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-17 10:30+0200\n"
-"PO-Revision-Date: 2014-05-17 10:16+0200\n"
+"POT-Creation-Date: 2014-05-17 10:44+0200\n"
+"PO-Revision-Date: 2014-05-17 10:42+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
@@ -256,6 +256,8 @@ msgstr "Skupna dolžina hoje za to pot je več kot nastavljen maksimum."
 #. Start: Time and date (Shown before path itinerary)
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:440
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:184
+#, fuzzy
+msgctxt "template"
 msgid "Start"
 msgstr "Začetek"
 
@@ -430,37 +432,49 @@ msgstr "Začetek poti"
 msgid "Set as End Location"
 msgstr "Konec poti"
 
+#. Shown in a popup on first point of a path in a map
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:189
+#, fuzzy
+msgctxt "popup"
+msgid "Start"
+msgstr "Začetek"
+
+#. shown in a popup on last point of a path in a map
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:220
+msgid "Destination"
+msgstr "Cilj"
+
 #. %s is bikeshare company name (shown
 #. when clicked on route on map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:476
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:478
 #, fuzzy, python-format
 msgid "Your %s route"
 msgstr "Kolesarjenje s kolesom sposojenim pri %s"
 
 #. Text which is shown when clicking bike route
 #. in a map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:482
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:484
 #, fuzzy
 msgid "Your bike route"
 msgstr "Kolesarska pot"
 
 #. %s is bikeshare company name. Shown in map when
 #. clicking on a route
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:491
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:493
 #, fuzzy, python-format
 msgid "Walk to the %s dock."
 msgstr "Hodite do postaje podjetja %s."
 
 #. %s is bikeshare company name. Shown in map when
 #. clicking on a route
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:496
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:498
 #, fuzzy, python-format
 msgid "Walk from the %s dock to your destination."
 msgstr "Hodite od postaje podjetja %s do vašega cilja."
 
 #. Text which is shown when clicking walking
 #. route in a map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:502
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:504
 #, fuzzy
 msgid "Your walk route"
 msgstr "Vaša pot"
@@ -896,4 +910,7 @@ msgstr "Sposojeno kolo"
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:1046
 msgid "Plan Your Trip"
 msgstr "Načrtujte pot"
+
+#~ msgid "Start"
+#~ msgstr "Začetek"
 

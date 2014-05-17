@@ -44,7 +44,6 @@
     "%d min early_plural_3": "%d min. prehitro",
     "on time": "pravočasno",
     "Total walk distance for this trip exceeds specified maximum": "Skupna dolžina hoje za to pot je več kot nastavljen maksimum.",
-    "Start": "Začetek",
     "End": "Konec",
     "Trip Summary": "Povzetek potovanja",
     "Travel": "Potuj na",
@@ -78,6 +77,7 @@
     ],
     "Set as Start Location": "Začetek poti",
     "Set as End Location": "Konec poti",
+    "Destination": "Cilj",
     "Your %s route": "Kolesarjenje s kolesom sposojenim pri %s",
     "Your bike route": "Kolesarska pot",
     "Walk to the %s dock.": "Hodite do postaje podjetja %s.",
@@ -167,6 +167,8 @@
     "Plan Your Trip": "Načrtujte pot",
     " to _direction": " do ",
     " to _bus_direction": " smer ",
+    "Start_template": "Začetek",
     "Depart_itinerary": "Odhod",
+    "Start_popup": "Začetek",
     "Depart_tripoptions": "Odhod ob"
 }

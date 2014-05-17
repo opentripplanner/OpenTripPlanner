@@ -185,7 +185,8 @@ otp.modules.planner.PlannerModule =
         this.startLatLng = latlng;
         if(this.startMarker == null) {
             this.startMarker = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true});
-            this.startMarker.bindPopup('<strong>Start</strong>');
+            //TRANSLATORS: Shown in a popup on first point of a path in a map
+            this.startMarker.bindPopup('<strong>' + pgettext('popup', 'Start') + '</strong>');
             this.startMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.startLatLng = this.startMarker.getLatLng();
@@ -215,7 +216,8 @@ otp.modules.planner.PlannerModule =
         this.endLatLng = latlng;    	 
         if(this.endMarker == null) {
             this.endMarker = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
-            this.endMarker.bindPopup('<strong>Destination</strong>');
+            //TRANSLATORS: shown in a popup on last point of a path in a map
+            this.endMarker.bindPopup('<strong>' + _tr('Destination') + '</strong>');
             this.endMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.endLatLng = this.endMarker.getLatLng();

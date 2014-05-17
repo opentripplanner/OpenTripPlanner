@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-17 10:30+0200\n"
+"POT-Creation-Date: 2014-05-17 10:44+0200\n"
 "PO-Revision-Date: 2014-05-15 19:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -239,6 +239,7 @@ msgstr ""
 #. Start: Time and date (Shown before path itinerary)
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:440
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:184
+msgctxt "template"
 msgid "Start"
 msgstr ""
 
@@ -402,36 +403,47 @@ msgstr ""
 msgid "Set as End Location"
 msgstr ""
 
+#. Shown in a popup on first point of a path in a map
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:189
+msgctxt "popup"
+msgid "Start"
+msgstr ""
+
+#. shown in a popup on last point of a path in a map
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:220
+msgid "Destination"
+msgstr ""
+
 #. %s is bikeshare company name (shown
 #. when clicked on route on map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:476
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:478
 #, python-format
 msgid "Your %s route"
 msgstr ""
 
 #. Text which is shown when clicking bike route
 #. in a map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:482
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:484
 msgid "Your bike route"
 msgstr ""
 
 #. %s is bikeshare company name. Shown in map when
 #. clicking on a route
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:491
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:493
 #, python-format
 msgid "Walk to the %s dock."
 msgstr ""
 
 #. %s is bikeshare company name. Shown in map when
 #. clicking on a route
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:496
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:498
 #, python-format
 msgid "Walk from the %s dock to your destination."
 msgstr ""
 
 #. Text which is shown when clicking walking
 #. route in a map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:502
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:504
 msgid "Your walk route"
 msgstr ""
 
@@ -848,4 +860,7 @@ msgstr ""
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:1046
 msgid "Plan Your Trip"
 msgstr ""
+
+#~ msgid "Start"
+#~ msgstr ""
 
