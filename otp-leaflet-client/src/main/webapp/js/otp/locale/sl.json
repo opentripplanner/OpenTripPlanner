@@ -67,6 +67,7 @@
     "late as": "",
     "Stay on board": "Ostanite na vozilu",
     "Alight": "Izstop",
+    "%1$s %2$s": "%2$s %1$s",
     "Start: %s at %s": "Začetek: %s ob %s",
     "Board": "Vstop",
     "End: %s at %s": "Konec: %s ob %s",

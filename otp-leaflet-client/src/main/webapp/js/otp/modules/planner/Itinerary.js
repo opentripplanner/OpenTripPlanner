@@ -94,8 +94,12 @@ otp.modules.planner.Itinerary = otp.Class({
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
         if(this.itinData.fare && this.itinData.fare.fare.regular) {
             var decimalPlaces = this.itinData.fare.fare.regular.currency.defaultFractionDigits;
-            return this.itinData.fare.fare.regular.currency.symbol +
-                (this.itinData.fare.fare.regular.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces);
+            var fare_info = {
+                'currency': this.itinData.fare.fare.regular.currency.symbol,
+                'price': (this.itinData.fare.fare.regular.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces),
+            }
+            //TRANSLATORS: Fare Currency Fare price
+            return _tr('%1$s %2$s', fare_info.currency, fare_info.price);
         }
         return "N/A";
     },
