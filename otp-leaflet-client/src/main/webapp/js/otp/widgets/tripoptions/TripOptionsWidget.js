@@ -875,9 +875,9 @@ otp.widgets.tripoptions.BikeType =
         this.$().addClass('notDraggable');
 
         var content = '';        
-        content += 'Use: ';
-        content += '<input id="'+this.id+'-myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked> My Own Bike&nbsp;&nbsp;';
-        content += '<input id="'+this.id+'-sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"> A Shared Bike';
+        content += otp.config.locale.widgets.TripOptionsWidget.use;
+        content += '<input id="'+this.id+'-myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked><label for="'+this.id+'-myOwnBikeRBtn"> ' +otp.config.locale.widgets.TripOptionsWidget.ownBike + '&nbsp;&nbsp;</label>';
+        content += '<input id="'+this.id+'-sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"><label for="'+this.id+'-sharedBikeRBtn">  ' +otp.config.locale.widgets.TripOptionsWidget.sharedBike + '</label>';
         
         this.setContent(content);
     },

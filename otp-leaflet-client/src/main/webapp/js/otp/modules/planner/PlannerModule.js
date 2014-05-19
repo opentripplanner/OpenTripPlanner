@@ -160,10 +160,10 @@ otp.modules.planner.PlannerModule =
     
     addMapContextMenuItems : function() {
         var this_ = this;
-        this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
+        this.webapp.map.addContextMenuItem(otp.config.locale.contextMenu.fromHere, function(latlng) {
             this_.setStartPoint(latlng, true);
         });
-        this.webapp.map.addContextMenuItem("Set as End Location", function(latlng) {
+        this.webapp.map.addContextMenuItem(otp.config.locale.contextMenu.toHere, function(latlng) {
             this_.setEndPoint(latlng, true);
         });
     },
@@ -183,7 +183,7 @@ otp.modules.planner.PlannerModule =
         this.startLatLng = latlng;
         if(this.startMarker == null) {
             this.startMarker = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true});
-            this.startMarker.bindPopup('<strong>Start</strong>');
+            this.startMarker.bindPopup('<strong>'+otp.config.locale.contextMenu.fromHere+'</strong>');
             this.startMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.startLatLng = this.startMarker.getLatLng();
@@ -210,10 +210,10 @@ otp.modules.planner.PlannerModule =
     
     setEndPoint : function(latlng, update, name) {
         this.endName = (typeof name !== 'undefined') ? name : null;
-        this.endLatLng = latlng;    	 
+        this.endLatLng = latlng;         
         if(this.endMarker == null) {
             this.endMarker = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
-            this.endMarker.bindPopup('<strong>Destination</strong>');
+            this.endMarker.bindPopup('<strong>'+otp.config.locale.contextMenu.toHere+'</strong>');
             this.endMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.endLatLng = this.endMarker.getLatLng();
@@ -469,26 +469,28 @@ otp.modules.planner.PlannerModule =
             }
             else if(leg.mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
-                	polyline.bindPopup('Your '+otp.config.bikeshareName+' route');
+                        polyline.bindPopup(
+                                otp.config.locale.tripPlanner.labels.your_bikeshare_route + ( otp.config.bikeshareName ?  ' '+otp.config.locale.tripPlanner.labels.with_ + ' '+otp.config.bikeshareName  : "") 
+                                );
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
                 }
                 else { // regular bike trip
-                	polyline.bindPopup('Your bike route');
-                	//this.resetStationMarkers();
-                }	
+                        polyline.bindPopup(otp.config.locale.tripPlanner.labels.your_bike_route);
+                        //this.resetStationMarkers();
+                }       
             }
             else if(leg.mode === 'WALK') {
                 if(queryParams.mode === 'WALK,BICYCLE') { 
                     if(i == 0) {
-                    	polyline.bindPopup('Walk to the '+otp.config.bikeshareName+' dock.');
+                        polyline.bindPopup(otp.config.locale.tripPlanner.labels.walk_to_the  + otp.config.locale.tripPlanner.labels.dock + otp.config.bikeshareName);
                     }
                     if(i == 2) {
-                    	polyline.bindPopup('Walk from the '+otp.config.bikeshareName+' dock to your destination.');
+                        polyline.bindPopup(otp.config.locale.tripPlanner.labels.walk_from_the + otp.config.locale.tripPlanner.labels.dock+ otp.config.bikeshareName + otp.config.locale.tripPlanner.labels.to_your_dest);
                     }
                 }
                 else { // regular walking trip
-                	polyline.bindPopup('Your walk route');
-                	//this.resetStationMarkers();
+                        polyline.bindPopup(otp.config.locale.tripPlanner.labels.your_walk_route);
+                        //this.resetStationMarkers();
                 }
             }
         }

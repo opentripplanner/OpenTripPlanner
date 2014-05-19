@@ -81,13 +81,14 @@ otp.util.Itin = {
     distanceString : function(m) {
         return otp.util.Geo.distanceString(m);
     },
-    
+    /*
     modeStrings : {
         'BUS' : 'Bus',
         'SUBWAY' : 'Subway',
         'TRAM' : 'Light Rail',
         'GONDOLA' : 'Aerial Tram',
-    },
+    },*/
+    modeStrings : otp.config.locale.modes,
     
     modeString : function(mode) {
         if(mode in this.modeStrings) return this.modeStrings[mode];
@@ -98,16 +99,16 @@ otp.util.Itin = {
         asHtml = (typeof asHtml === "undefined") ? true : asHtml;
         var text = '';
         if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
-            text += 'Take roundabout ' +
-                (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" ? 'counter' : '')+'clockwise to ' +
-                otp.util.Text.ordinal(step.exit)+' exit on '+step.streetName;
+            text += 
+                (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" ? otp.config.locale.directions.circle_counterclockwise : otp.config.locale.directions.circle_clockwise) +' '+
+                otp.config.locale.ordinal_exit[step.exit]+ ' ' + otp.config.locale.directions.on_to  +' '+step.streetName;
         }
         else {
             if(!step.relativeDirection) text += "Start on" + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + " heading " + step.absoluteDirection.toLowerCase();
             else {
-                text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection)) +
-                            (asHtml ? "</b>" : "") + ' ' + (step.stayOn ? "to continue on" : "on to")  + (asHtml ? " <b>" : " ") +
-                            step.streetName + (asHtml ? "</b>" : "");
+                text += (asHtml ? "<b>" : "") + otp.config.locale.directions[step.relativeDirection.toLowerCase()] +
+                        (asHtml ? "</b>" : "") + ' ' + (step.stayOn ?  otp.config.locale.directions.to_continue : otp.config.locale.directions.on_to)  + (asHtml ? " <b>" : " ") +
+                        step.streetName + (asHtml ? "</b>" : "");
             }
         }
         return text;
@@ -122,4 +123,4 @@ otp.util.Itin = {
     getRouteShortReference : function(routeData) {
         return routeData.routeShortName || routeData.id.id;
     },    
-}
+};

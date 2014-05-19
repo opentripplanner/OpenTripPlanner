@@ -71,7 +71,8 @@ otp.locale.French = {
                 late            : "min en retard",
                 early           : "min en avance", 
                 onTime          : "à l'heure"
-            }
+            },
+            tooMuchWalking		: "La distance totale de marche pour ce trajet dépasse le maximum spécifié"
         },
 
         AnalystLegend :
@@ -86,8 +87,39 @@ otp.locale.French = {
 
         TripOptionsWidget       :
         {
-            title               : "Paramètres"
-        }
+            title               : "Paramètres",
+            use                 : "Use:",
+            ownBike             : "Mon vélo",
+            sharedBike          : "Vélo Partagé"
+        },
+        
+        BikeStationsWidget       :
+        {
+            pickUp              : "Recommandée Pick Up",
+            dropOff             : "Baisse recommandée",
+            bikes               : "Vélos",
+            spaces              : "Places",
+            pick_up_bike		: "PICK UP BIKE",
+            alternate_pick_up	: "ALTERNATE PICKUP",
+            drop_off_bike		: "DROP OFF BIKE",
+            alternate_drop_off	: "ALTERNATE DROP OFF",
+            bike_station		: "BIKE STATION",
+            station				: "Station",
+            bikes_available		: "Bikes Available",
+            docks_available		: "Docks Available",            
+        },
+        
+        InfoWidgets:
+        {
+           about:{
+               title: 'Projet',
+               content: '<p>Sur le projet...</p>',
+           },
+           contact:{
+               title: 'Contact',
+               content: '<p>Envoyer vos commentaires à...</p>'
+            },           
+    	}
     },
 
     modules :
@@ -104,6 +136,13 @@ otp.locale.French = {
             MultimodalPlannerModule : 
             {
                 name        : "Calculateur d'itinéraires multimodal"
+            }
+        },
+        
+        bikeshare : {
+            BikeShareModule : 
+            {
+                name        : "Calculateur d'itinéraires cyclables"
             }
         }
     },
@@ -170,7 +209,8 @@ otp.locale.French = {
 
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : {
-        southeast : "le sud-est",
+    	depart:		"départ",
+    	southeast : "le sud-est",
         southwest : "le sud-ouest",
         northeast : "le nord-est",
         northwest : "le nord-ouest",
@@ -191,7 +231,10 @@ otp.locale.French = {
         at : "à",
         on : "sur",
         to : "vers",
+        on_to: "sur",
         via : "via",
+        uturn_left:			"u turn left",
+        uturn_right:	"u turn right",
         circle_counterclockwise : "prendre le rond-point",
         circle_clockwise : "prendre le rond-point dans le sens horaire",
         // rather than just being a direction, this should be
@@ -242,7 +285,8 @@ otp.locale.French = {
         start : "Départ",
         end : "Arrivée",
 
-        geocoder : "Géocodeur"
+        geocoder : "Géocodeur",
+        to			 : " à "
     },
 
     // see otp.planner.Templates for use
@@ -260,10 +304,28 @@ otp.locale.French = {
         senior_fare  : "",
 
         travel       : "Départ le",
+        time		 : "Durée",
+        totalWalk	 : "Marche",
+        totalBike	 : "Vélo",
+        transfers	 : "Transfers",
         valid        : "Calculé le",
+        link		 : "Lien à l'itinéraire",
+        print		 : "Imprime",
+        email		 : "Email",
+        email_subj	 : "Votre voyage",
         trip_length  : "Durée",
         with_a_walk  : "avec une marche de",
-        alert_for_rt : "Alerte sur la ligne"
+        alert_for_rt : "Alerte sur la ligne",
+        fare         : "Tariff",
+        regular_fare : "Regular",
+        student_fare : "Student",
+        senior_fare  : "Senior",
+        fare_symbol  : "$",
+        start		 : "Start",
+        end			 : "End",
+        at			 : " at ",
+        tripSummary  :"Riepilogo",
+        view_itin_online:"View itinerary online",
     },
 
     // see otp.planner.Templates for use -- one output are the itinerary leg
@@ -302,15 +364,17 @@ otp.locale.French = {
         hour           : "hour",
         hours          : "hours",
 
-        format : "d.m.Y \\à H:i",
-        date_format : "d-m-Y",
-        time_format : "H:i",
         minute : "minute",
         minutes : "minutes",
         minute_abbrev : "min",
         minutes_abbrev : "min",
         second_abbrev : "sec",
         seconds_abbrev : "sec",
+        format         : "D.M.YYYY [à] H:mm", //moment.js
+        date_format    : "D.M.YYYY", //momentjs must be same as date_picker format which is by default: mm/dd/yy
+        time_format    : "H:mm", //momentjs
+        time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
+        
         months : [ 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc' ]
     },
 
@@ -347,7 +411,16 @@ otp.locale.French = {
             go : "Go",
             planTrip : "Calculer un itinéraire",
             newTrip : "Nouvel itinéraire",
-            bannedRoutes : "Itinéraires à éviter"
+            bannedRoutes : "Itinéraires à éviter",
+            your_walk_route: "Your walk route",
+          	your_bike_route: "Your bike route",
+          	your_bikeshare_route: "Your bikeshare route",
+          	with_		  : 'avec',
+          	walk_to_the   : 'Walk to the ',
+          	walk_from_the : 'Walk from the ',
+          	to_your_dest  : 'to your destination',
+          	dock		  : 'dock',	
+          	
         },
 
         // see otp/config.js for where these values are used

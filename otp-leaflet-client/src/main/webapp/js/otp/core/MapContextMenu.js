@@ -32,11 +32,11 @@ otp.core.MapContextMenu =
         this.map = map;
         this.moduleItems = $("<div />").appendTo(this.menu);
 
-        this.addItem("Recenter Map Here", function() {
+        this.addItem(otp.config.locale.contextMenu.centerHere, function() {
             this_.map.lmap.panTo(this_.contextMenuLatLng);
-        }).addItem("Zoom In", function() {
+        }).addItem(otp.config.locale.contextMenu.zoomInHere, function() {
             this_.map.lmap.zoomIn();
-        }).addItem("Zoom Out", function() {
+        }).addItem(otp.config.locale.contextMenu.zoomOutHere, function() {
             this_.map.lmap.zoomOut();
         });
         

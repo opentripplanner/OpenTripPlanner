@@ -41,12 +41,25 @@ otp.widgets.BikeStationsWidget =
 	        end = endStation.toJSON();
 
 		// Fit station names to widget:
-		start.name = start.name.length > 50 ? start.name.substring(0,50) + "..." : start.name;
-		end.name = end.name.length > 50 ? end.name.substring(0,50) + "..." : end.name;
-		
-		// Swap existing button name or create new button:
-		if (this.start_button !== null) {
-			this.start_button.empty();
+                start.name = start.name.length > 50 ? start.name.substring(0,50) + "..." : start.name;
+                end.name = end.name.length > 50 ? end.name.substring(0,50) + "..." : end.name;
+                
+                $("#bikeshare-stationsWidget").empty();
+                
+                ich['otp-pick_drop_btn']({
+                    widgetId : this.id,
+                    bikeWidget: otp.config.locale.widgets.BikeStationsWidget,
+                    startName: start.name,
+                    endName  : end.name,
+                    bikesNr  : start.bikesAvailable,
+                    spaceNr  : end.spacesAvailable
+             }).appendTo(this.$());
+                
+                
+                /*
+                // Swap existing button name or create new button:
+                if (this.start_button !== null) {
+                        this.start_button.empty();
 			this.end_button.empty();
 			this.start_button.html("<strong>Recommended Pick Up:</strong><br /> " + start.name + "<br /><strong>Bikes:</strong> " + start.bikesAvailable);
 			this.end_button.html("<strong>Recommended Drop Off:</strong><br /> " + end.name + "<br /><strong>Spaces:</strong> " + end.spacesAvailable);
@@ -56,24 +69,23 @@ otp.widgets.BikeStationsWidget =
 			this.end_button = $("<div id='dropoff_btn'><strong>Recommended Drop Off:</strong><br /> " + end.name + "<br /><strong>Spaces:</strong> " + end.spacesAvailable + "</div>");
 			
 			this.$().append($("<div class='otp-bikeshare-stationsWidget-left'></div>").append(this.start_button))
-        			.append($("<div class='otp-bikeshare-stationsWidget-right'></div>").append(this.end_button));  
-		    this.show();
-		}
-		
+                                .append($("<div class='otp-bikeshare-stationsWidget-right'></div>").append(this.end_button));  
+                    this.show();
+                }
+                */
         var start_marker = module.getStationMarker(startStation);
         var end_marker = module.getStationMarker(endStation);
-
-        this.start_button.click(function(e) {
-        	e.preventDefault();
-        	start_marker.openPopup();
+        
+        $("#pickup_btn").click(function(e) {
+                e.preventDefault();
+                start_marker.openPopup();
         });
 
-        this.end_button.click(function(e) {
-        	e.preventDefault();
-        	end_marker.openPopup();
+        $("#dropoff_btn").click(function(e) {
+                e.preventDefault();
+                end_marker.openPopup();
         });
-        
-        
+
 	},
 
 	CLASS_NAME : "otp.widgets.BikeStationsWidget"

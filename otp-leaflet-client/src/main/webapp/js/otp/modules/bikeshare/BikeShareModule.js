@@ -64,10 +64,10 @@ otp.modules.bikeshare.Utils = {
 otp.modules.bikeshare.BikeShareModule = 
     otp.Class(otp.modules.planner.PlannerModule, {
     
-    moduleName  : "Bike Share Planner",
+    moduleName  : otp.config.locale.modules.bikeshare.BikeShareModule.name,//"Bike Share Planner",
 
     resultsWidget   : null,
-    
+   
     stations    : null,    
     stationLookup :   { },
     stationsLayer   : null,
@@ -105,7 +105,7 @@ otp.modules.bikeshare.BikeShareModule =
     initOptionsWidget : function() {
         this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
             'otp-'+this.id+'-optionsWidget', this, {
-                title : 'Trip Options'
+                title : otp.config.locale.widgets.MultimodalPlannerModule.title//'Trip Options'
             }
         );
 
@@ -202,29 +202,29 @@ otp.modules.bikeshare.BikeShareModule =
             
             if (station.isWalkableFrom(start, tol)) {
                 // start station
-                this.setStationMarker(station, "PICK UP BIKE", this.icons.startBike);
+                this.setStationMarker(station,otp.config.locale.widgets.BikeStationsWidget.pick_up_bike/* "PICK UP BIKE"*/, this.icons.startBike);
                 start_and_end_stations['start'] = station;
             }
             else if (station.isNearishTo(this.startLatLng, distTol)) {
                 // start-adjacent station
                 var distanceToStart = station.distanceTo(this.startLatLng);
                 var icon = distanceToStart < distTol/2 ? this.icons.getLarge(stationData) : this.icons.getMedium(stationData);
-                this.setStationMarker(station, "ALTERNATE PICKUP", icon);
+                this.setStationMarker(station, otp.config.locale.widgets.BikeStationsWidget.alternate_pick_up, icon);
             }
             else if (station.isWalkableFrom(end, tol)) {
                 // end station
-                this.setStationMarker(station, "DROP OFF BIKE", this.icons.endBike);
+                this.setStationMarker(station, otp.config.locale.widgets.BikeStationsWidget.drop_off_bike, this.icons.endBike);
                 start_and_end_stations['end'] = station;
             }
             else if (station.isNearishTo(this.endLatLng, distTol)) {
                 // end-adjacent station
                 var distanceToEnd = station.distanceTo(this.endLatLng);
                 var icon = distanceToEnd < distTol/2 ? this.icons.getLarge(stationData) : this.icons.getMedium(stationData);
-                this.setStationMarker(station, "ALTERNATE DROP OFF", icon);
+                this.setStationMarker(station, otp.config.locale.widgets.BikeStationsWidget.alternate_drop_off, icon);
             }
             else {
                 icon = icon || this.icons.getSmall(stationData);
-                this.setStationMarker(station, "BIKE STATION", icon);
+                this.setStationMarker(station, otp.config.locale.widgets.BikeStationsWidget.bike_station, icon);
             }
         }, this);
         
@@ -303,13 +303,13 @@ otp.modules.bikeshare.BikeShareModule =
             
     constructStationInfo : function(title, station) {
         if(title == null) {
-            title = (station.markerTitle !== undefined) ? station.markerTitle : "BIKE STATION";
+            title = (station.markerTitle !== undefined) ? station.markerTitle : otp.config.locale.widgets.BikeStationsWidget.bike_station;
         }
         var info = "<strong>"+title+"</strong><br/>";
         station.markerTitle = title;
-        info += '<strong>Station:</strong> '+station.name+'<br/>';
-        info += '<strong>Bikes Available:</strong> '+station.bikesAvailable+'<br/>';
-        info += '<strong>Docks Available:</strong> '+station.spacesAvailable+'<br/>';
+        info += '<strong>'+otp.config.locale.widgets.BikeStationsWidget.station+':</strong> '+station.name+'<br/>';
+        info += '<strong>'+otp.config.locale.widgets.BikeStationsWidget.bikes_available+':</strong> '+station.bikesAvailable+'<br/>';
+        info += '<strong>'+otp.config.locale.widgets.BikeStationsWidget.docks_available+':</strong> '+station.spacesAvailable+'<br/>';
         return info;
     },
                 

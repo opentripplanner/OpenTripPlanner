@@ -28,6 +28,7 @@ otp.widgets.ItinerariesWidget =
     // set to true by next/previous/etc. to indicate to only refresh the currently active itinerary
     refreshActiveOnly : false,
     showButtonRow : true,
+    showValidityDate : true,
     showItineraryLink : true,
     showPrintLink : true,
     showEmailLink : true,
@@ -272,11 +273,11 @@ otp.widgets.ItinerariesWidget =
         div.append('<div style="position:absolute; width: '+(widthPx+5)+'px; height: 2px; left: '+(leftPx-2)+'px; top: 9px; background: black;" />');
         
         var timeStr = otp.util.Time.formatItinTime(itin.getStartTime(), otp.config.locale.time.time_format);
-	/*timeStr = timeStr.substring(0, timeStr.length - 1);*/
+        /*timeStr = timeStr.substring(0, timeStr.length - 1);*/
         div.append('<div class="otp-itinsAccord-header-time" style="left: '+(leftPx-32)+'px;">' + timeStr + '</div>');
         
         var timeStr = otp.util.Time.formatItinTime(itin.getEndTime(), otp.config.locale.time.time_format);
-	/*timeStr = timeStr.substring(0, timeStr.length - 1);*/
+        /*timeStr = timeStr.substring(0, timeStr.length - 1);*/
         div.append('<div class="otp-itinsAccord-header-time" style="left: '+(leftPx+widthPx+2)+'px;">' + timeStr + '</div>');
         
         for(var l=0; l<itin.itinData.legs.length; l++) {
@@ -334,7 +335,7 @@ otp.widgets.ItinerariesWidget =
             var legDiv = $('<div />').appendTo(itinAccord);
 
             var leg = itin.itinData.legs[l];
-            var headerModeText = leg.interlineWithPreviousLeg ? "CONTINUES AS" : otp.util.Itin.modeString(leg.mode).toUpperCase()
+            var headerModeText = leg.interlineWithPreviousLeg ? "CONTINUES AS" : otp.util.Itin.modeString(leg.mode).toUpperCase();
             var headerHtml = "<b>" + headerModeText + "</b>";
 
             // Add info about realtimeness of the leg
@@ -350,7 +351,7 @@ otp.widgets.ItinerariesWidget =
             }
 
             if(leg.mode === "WALK" || leg.mode === "BICYCLE") {
-                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
+                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ otp.config.locale.instructions.to + leg.to.name;
                 
                 if(otp.config.municoderHostname) {
                     var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
@@ -415,7 +416,7 @@ otp.widgets.ItinerariesWidget =
         // add alerts, if applicable
         alerts = alerts || [];
         if(itin.totalWalk > itin.tripPlan.queryParams.maxWalkDistance) {
-            alerts.push("Total walk distance for this trip exceeds specified maximum");
+            alerts.push(otp.config.locale.widgets.ItinerariesWidget.tooMuchWalking);//"Total walk distance for this trip exceeds specified maximum");
         }
         
         for(var i = 0; i < alerts.length; i++) {
@@ -423,52 +424,52 @@ otp.widgets.ItinerariesWidget =
         }
         
         // add start and end time rows and the main leg accordion display 
-        itinDiv.append("<div class='otp-itinStartRow'><b>Start</b>: "+itin.getStartTimeStr()+"</div>");
+        itinDiv.append("<div class='otp-itinStartRow'><b>"+otp.config.locale.instructions.start_at+"</b>: "+itin.getStartTimeStr()+"</div>");
         itinDiv.append(itinAccord);
-        itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+itin.getEndTimeStr()+"</div>");
+        itinDiv.append("<div class='otp-itinEndRow'><b>"+otp.config.locale.instructions.end_at+"</b>: "+itin.getEndTimeStr()+"</div>");
 
         // add trip summary
 
         var tripSummary = $('<div class="otp-itinTripSummary" />')
-        .append('<div class="otp-itinTripSummaryHeader">Trip Summary</div>')
-        .append('<div class="otp-itinTripSummaryLabel">Travel</div><div class="otp-itinTripSummaryText">'+itin.getStartTimeStr()+'</div>')
-        .append('<div class="otp-itinTripSummaryLabel">Time</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>');
+        .append('<div class="otp-itinTripSummaryHeader">'+otp.config.locale.labels.tripSummary+'</div>')
+        .append('<div class="otp-itinTripSummaryLabel">'+otp.config.locale.labels.travel+'</div><div class="otp-itinTripSummaryText">'+itin.getStartTimeStr()+'</div>')
+        .append('<div class="otp-itinTripSummaryLabel">'+otp.config.locale.labels.time+'</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>');
         
         var walkDistance = itin.getModeDistance("WALK");
         if(walkDistance > 0) {
-            tripSummary.append('<div class="otp-itinTripSummaryLabel">Total Walk</div><div class="otp-itinTripSummaryText">' + 
+            tripSummary.append('<div class="otp-itinTripSummaryLabel">'+otp.config.locale.labels.totalWalk+'</div><div class="otp-itinTripSummaryText">' + 
                 otp.util.Itin.distanceString(walkDistance) + '</div>')
         }
 
         var bikeDistance = itin.getModeDistance("BICYCLE");
         if(bikeDistance > 0) {
-            tripSummary.append('<div class="otp-itinTripSummaryLabel">Total Bike</div><div class="otp-itinTripSummaryText">' + 
+            tripSummary.append('<div class="otp-itinTripSummaryLabel">'+otp.config.locale.labels.totalBike+'</div><div class="otp-itinTripSummaryText">' + 
                 otp.util.Itin.distanceString(bikeDistance) + '</div>')
         }
         
         if(itin.hasTransit) {
-            tripSummary.append('<div class="otp-itinTripSummaryLabel">Transfers</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>')
+            tripSummary.append('<div class="otp-itinTripSummaryLabel">'+otp.config.locale.labels.transfers+'</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>')
             /*if(itin.itinData.walkDistance > 0) {
                 tripSummary.append('<div class="otp-itinTripSummaryLabel">Total Walk</div><div class="otp-itinTripSummaryText">' + 
                     otp.util.Itin.distanceString(itin.itinData.walkDistance) + '</div>')
             }*/
-            tripSummary.append('<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+itin.getFareStr()+'</div>');
+            tripSummary.append('<div class="otp-itinTripSummaryLabel">'+otp.config.locale.labels.fare+'</div><div class="otp-itinTripSummaryText">'+itin.getFareStr()+'</div>');
         }
         
         
         
         var tripSummaryFooter = $('<div class="otp-itinTripSummaryFooter" />');
         
-        tripSummaryFooter.append('Valid ' + moment().format(otp.config.locale.time.format));
-        
+        if(this.showValidityDate) {
+                tripSummaryFooter.append(otp.config.locale.labels.valid + ' ' + moment().format(otp.config.locale.time.format) + ' | ' );//'MMM Do YYYY, h:mma'
+        }
         var itinLink = this.constructLink(itin.tripPlan.queryParams, { itinIndex : index });
         if(this.showItineraryLink) {
-            tripSummaryFooter.append(' | <a href="'+itinLink+'">Link to Itinerary</a>');
+            tripSummaryFooter.append('<a href="'+itinLink+'">'+otp.config.locale.labels.link+'</a> | ');
         }
         
         if(this.showPrintLink) {
-            tripSummaryFooter.append(' | ');
-            $('<a href="#">Print</a>').click(function(evt) {
+            $('<a href="#">'+otp.config.locale.labels.print+'</a>').click(function(evt) {
                 evt.preventDefault();
 
                 var printWindow = window.open('','OpenTripPlanner Results','toolbar=yes, scrollbars=yes, height=500, width=800');
@@ -477,9 +478,9 @@ otp.widgets.ItinerariesWidget =
             }).appendTo(tripSummaryFooter);
         }
         if(this.showEmailLink) {
-            var subject = "Your Trip";
+            var subject = otp.config.locale.labels.email_subj;
             var body = itin.getTextNarrative(itinLink);
-            tripSummaryFooter.append(' | <a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" target="_blank">Email</a>');
+            tripSummaryFooter.append(' | <a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" target="_blank">'+otp.config.locale.labels.email+'</a>');
         }
         
         tripSummary.append(tripSummaryFooter)
@@ -498,9 +499,9 @@ otp.widgets.ItinerariesWidget =
 
             // prevaricate if this is a nonstruct frequency trip
             if( leg.isNonExactFrequency === true ){
-            	$('<div class="otp-itin-leg-leftcol">every '+(leg.headway/60)+" mins</div>").appendTo(legDiv);
+                $('<div class="otp-itin-leg-leftcol">every '+(leg.headway/60)+" mins</div>").appendTo(legDiv);
             } else {
-                $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format)+"</div>").appendTo(legDiv);
+                $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
             }
 
             var startHtml = '<div class="otp-itin-leg-endpointDesc">' + (leg.interlineWithPreviousLeg ? "<b>Depart</b> " : "<b>Board</b> at ") +leg.from.name;
@@ -602,9 +603,9 @@ otp.widgets.ItinerariesWidget =
             $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
 
             if( leg.isNonExactFrequency === true ) {
-                $('<div class="otp-itin-leg-leftcol">late as '+otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format)+"</div>").appendTo(legDiv);   
+                $('<div class="otp-itin-leg-leftcol">late as '+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);   
             } else {
-                $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format)+"</div>").appendTo(legDiv);   
+                $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);   
             }
 
             var endAction = (nextLeg && nextLeg.interlineWithPreviousLeg) ? "Stay on board" : "Alight";

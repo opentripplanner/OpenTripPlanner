@@ -73,7 +73,9 @@ otp.locale.English = {
                 late            : "min late",
                 early           : "min early", 
                 onTime          : "on time"
-            }
+            },
+            tooMuchWalking              : "Total walk distance for this trip exceeds specified maximum"
+            
         },
 
         AnalystLegend :
@@ -88,7 +90,38 @@ otp.locale.English = {
 
         TripOptionsWidget       :
         {
-            title               : "Travel Options"
+            title               : "Travel Options",
+            use                 : "Use:",
+            ownBike             : "My Own Bike",
+            sharedBike          : "A Shared Bike"
+        },
+        
+        BikeStationsWidget       :
+        {
+            pickUp              : "Recommended Pick Up",
+            dropOff             : "Recommended Drop Off",
+            bikes               : "Bikes",
+            spaces              : "Spaces",
+            pick_up_bike                : "PICK UP BIKE",
+            alternate_pick_up   : "ALTERNATE PICKUP",
+            drop_off_bike               : "DROP OFF BIKE",
+            alternate_drop_off  : "ALTERNATE DROP OFF",
+            bike_station                : "BIKE STATION",
+            station                             : "Station",
+            bikes_available             : "Bikes Available",
+            docks_available             : "Docks Available",
+        },
+        
+        InfoWidgets:
+        {
+           about:{
+               title: 'About',
+               content: '<p>About this site</p>',
+           },
+           contact:{
+               title: 'Contact',
+               content: '<p>Comments? Contact us at...</p>'
+            },           
         }
     },
 
@@ -106,6 +139,12 @@ otp.locale.English = {
             MultimodalPlannerModule : 
             {
                 name        : "Multimodal Trip Planner"
+            }
+        }
+       ,bikeshare : {
+            BikeShareModule : 
+            {
+                name        : "Bike Share Planner"
             }
         }
     },
@@ -176,6 +215,7 @@ otp.locale.English = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
+        depart:                 "depart",
         southeast:      "southeast",
         southwest:      "southwest",
         northeast:      "northeast",
@@ -197,9 +237,12 @@ otp.locale.English = {
         at:             "at",
         on:             "on",
         to:             "to",
+        on_to:                  "on to",
         via:            "via",
-        circle_counterclockwise: "take roundabout counterclockwise",
-        circle_clockwise:        "take roundabout clockwise",
+        uturn_left:             "u turn left",
+        uturn_right:    "u turn right",
+        circle_counterclockwise: "take roundabout counterclockwise ",
+        circle_clockwise:        "take roundabout clockwise ",
         // rather than just being a direction, this should be
         // full-fledged to take just the exit name at the end
         elevator: "take elevator to"
@@ -248,7 +291,8 @@ otp.locale.English = {
         start        : "Start",
         end          : "End",
 
-        geocoder     : "Geocoder"
+        geocoder     : "Geocoder",
+        to                       : " to "
     },
 
     // see otp.planner.Templates for use
@@ -260,7 +304,15 @@ otp.locale.English = {
         stop_id      : "Stop ID",
         trip_details : "Trip details",
         travel       : "Travel",
+        time             : "Time",
+        totalWalk        : "Total Walk",
+        totalBike        : "Total Bike",
+        transfers        : "Transfers",
         valid        : "Valid",
+        link             : "Link to Itinerary",
+        print            : "Print",
+        email            : "Email",
+        email_subj       : "Your trip",
         trip_length  : "Time",
         with_a_walk  : "with a walk of",
         alert_for_rt : "Alert for route",
@@ -268,7 +320,14 @@ otp.locale.English = {
         regular_fare : "Regular",
         student_fare : "Student",
         senior_fare  : "Senior",
-        fare_symbol  : "$"
+        fare_symbol  : "$",
+        start            : "Start",
+        end                      : "End",
+        at                       : " at ",
+        tripSummary  :"Trip Summary",
+        view_itin_online:"View itinerary online",
+        
+        
     },
 
     // see otp.planner.Templates for use -- one output are the itinerary leg headers
@@ -359,7 +418,16 @@ otp.locale.English = {
             go            : "Go",
             planTrip      : "Plan Your Trip",
             newTrip       : "New trip",
-            bannedRoutes  : "Banned routes"
+            bannedRoutes  : "Banned routes",
+            your_walk_route: "Your walk route",
+                your_bike_route: "Your bike route",
+                your_bikeshare_route: "Your bikeshare route",
+                with_             : ' with ',
+                walk_to_the   : 'Walk to the ',
+                walk_from_the : 'Walk from the ',
+                to_your_dest  : 'to your destination',
+                dock              : ' dock',
+                
         },
 
         // see otp/config.js for where these values are used
