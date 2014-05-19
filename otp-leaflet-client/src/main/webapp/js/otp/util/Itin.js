@@ -84,17 +84,20 @@ otp.util.Itin = {
 
     directionString : function(dir) { 
         var directionStrings= {
-            'DEPART': pgettext("itinerary", "Depart"),
+            // note: keep these lower case (and uppercase via template / code if needed)
+            'DEPART': pgettext("itinerary", "depart"),
             //TRANSLATORS: [Relative direction (Hard/Slightly Left/Right...)] to continue
             //on /on to [streetname]
-            'HARD_LEFT': _tr("Hard Left"),
-            'LEFT': _tr("Left"),
-            'SLIGHTLY_LEFT': _tr("Slight left"), 
-            'CONTINUE': _tr("Continue"),
-            'SLIGHTLY_RIGHT': _tr("Slight right"),
-            'RIGHT': _tr("Right"),
-            'HARD_RIGHT': _tr("Hard right"),
-            'ELEVATOR': _tr("Elevator"),
+            'HARD_LEFT': _tr("hard left"),
+            'LEFT': _tr("left"),
+            'SLIGHTLY_LEFT': _tr("slight left"), 
+            'CONTINUE': _tr("continue"),
+            'SLIGHTLY_RIGHT': _tr("slight right"),
+            'RIGHT': _tr("right"),
+            'HARD_RIGHT': _tr("hard right"),
+            // rather than just being a direction, this should be
+            // full-fledged to take just the exit name at the end
+            'ELEVATOR': _tr("elevator"),
             'UTURN_LEFT': _tr("U-turn left"),
             'UTURN_RIGHT': _tr("U-turn right")
         };

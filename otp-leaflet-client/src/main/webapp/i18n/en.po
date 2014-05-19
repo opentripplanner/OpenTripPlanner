@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-19 10:31+0200\n"
+"POT-Creation-Date: 2014-05-19 10:55+0200\n"
 "PO-Revision-Date: 2014-05-15 19:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -319,7 +319,6 @@ msgstr[1] ""
 
 #. Depart on to street / Board at station in itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:536
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:87
 msgctxt "itinerary"
 msgid "Depart"
 msgstr ""
@@ -459,132 +458,137 @@ msgstr ""
 msgid "Your walk route"
 msgstr ""
 
-#. [Relative direction (Hard/Slightly Left/Right...)] to continue
-#. on /on to [streetname]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:90
-msgid "Hard Left"
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:88
+msgctxt "itinerary"
+msgid "depart"
 msgstr ""
 
+#. [Relative direction (Hard/Slightly Left/Right...)] to continue
+#. on /on to [streetname]
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:91
-msgid "Left"
+msgid "hard left"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:92
-msgid "Slight left"
+msgid "left"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:93
-msgid "Continue"
+msgid "slight left"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:94
-msgid "Slight right"
+msgid "continue"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:95
-msgid "Right"
+msgid "slight right"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:96
-msgid "Hard right"
+msgid "right"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:97
-msgid "Elevator"
+msgid "hard right"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:98
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:100
+msgid "elevator"
+msgstr ""
+
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:101
 msgid "U-turn left"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:99
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:102
 msgid "U-turn right"
 msgstr ""
 
 #. Walk distance to place (itinerary header)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:113
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:116
 msgid "Walk"
 msgstr ""
 
 #. Cycle distance to place (itinerary header)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:115
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:118
 msgid "Cycle"
 msgstr ""
 
 #. Car distance to place (itinerary header)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:117
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:120
 msgid "Car"
 msgstr ""
 
 #. Bus: (route number) Start station to end station (itinerary header)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:119
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:122
 msgid "Bus"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:120
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:123
 msgid "Subway"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:121
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:124
 msgid "Train"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:122
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:125
 msgid "Ferry"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:123
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:126
 msgid "Light Rail"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:124
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:127
 msgid "Cable Car"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:125
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:128
 msgid "Funicular"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:126
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:129
 msgid "Aerial Tram"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:151
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:154
 #, python-format
 msgid "Take roundabout <b>counterclockwise</b> to <b>%s</b> exit on <b>%s</b>"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:153
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:156
 #, python-format
 msgid "Take roundabout counterclockwise to %s exit on %s"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:157
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:160
 #, python-format
 msgid "Take roundabout <b>clockwise</b> to <b>%s</b> exit on <b>%s</b>"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:159
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:162
 #, python-format
 msgid "Take roundabout clockwise to %s exit on %s"
 msgstr ""
 
 #. Start on [stret name] heading [compas direction]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:167
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:170
 msgid "Start on"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:167
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:170
 msgid " heading "
 msgstr ""
 
 #. [Relative direction (Left/Right...)] to continue
 #. on /on to [streetname]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:173
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:176
 msgid "to continue on"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:173
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:176
 msgid "on to"
 msgstr ""
 
