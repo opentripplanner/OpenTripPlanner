@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-17 10:44+0200\n"
+"POT-Creation-Date: 2014-05-19 10:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,55 +20,55 @@ msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:215
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:221
 msgid "Transit"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:218
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:224
 msgid "Bus Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:221
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:227
 msgid "Rail Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:224
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:230
 msgid "Bicycle Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:227
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:233
 msgid "Bicycle &amp; Transit"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:230
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:236
 msgid "Walk Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:233
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:239
 msgid "Drive Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:240
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:246
 msgid "Rented Bicycle"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:243
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:249
 msgid "Transit & Rented Bicycle"
 msgstr ""
 
@@ -413,36 +413,48 @@ msgstr ""
 msgid "Destination"
 msgstr ""
 
+#. %d is error id number Used in showing why trip wasn't
+#. found
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:423
+#, python-format
+msgid "Error %s"
+msgstr ""
+
+#. Title of no trip dialog
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:425
+msgid "No Trip Found"
+msgstr ""
+
 #. %s is bikeshare company name (shown
 #. when clicked on route on map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:478
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:482
 #, python-format
 msgid "Your %s route"
 msgstr ""
 
 #. Text which is shown when clicking bike route
 #. in a map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:484
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:488
 msgid "Your bike route"
 msgstr ""
 
 #. %s is bikeshare company name. Shown in map when
 #. clicking on a route
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:493
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:497
 #, python-format
 msgid "Walk to the %s dock."
 msgstr ""
 
 #. %s is bikeshare company name. Shown in map when
 #. clicking on a route
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:498
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:502
 #, python-format
 msgid "Walk from the %s dock to your destination."
 msgstr ""
 
 #. Text which is shown when clicking walking
 #. route in a map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:504
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:508
 msgid "Your walk route"
 msgstr ""
 
@@ -614,6 +626,10 @@ msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:39
 msgid "tenth"
+msgstr ""
+
+#: otp-leaflet-client/src/main/webapp/js/otp/widgets/Dialogs.js:22
+msgid "OK"
 msgstr ""
 
 #. Minimize widget in context menu

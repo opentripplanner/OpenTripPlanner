@@ -18,7 +18,8 @@ otp.widgets.Dialogs = {
 
     showOkDialog : function(message, title) {
         var dialog = ich['otp-okDialog']({
-            message : message
+            message : message,
+            ok : _tr('OK')
         }).dialog({
             title : title,
             appendTo: 'body',

@@ -417,8 +417,12 @@ otp.modules.planner.PlannerModule =
     
     noTripFound : function(error) {
         var msg = error.msg;
-        if(error.id) msg += ' (Error ' + error.id + ')';
-        otp.widgets.Dialogs.showOkDialog(msg, 'No Trip Found');
+        //FIXME: Why do we need to convert int to string for sprintf?
+        //TRANSLATORS: %d is error id number Used in showing why trip wasn't
+        //found
+        if(error.id) msg += ' (' + _tr('Error %s', error.id.toString()) + ')';
+        //TRANSLATORS: Title of no trip dialog
+        otp.widgets.Dialogs.showOkDialog(msg, _tr('No Trip Found'));
     },
     
     drawItinerary : function(itin) {
