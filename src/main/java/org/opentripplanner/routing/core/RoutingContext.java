@@ -313,10 +313,6 @@ public class RoutingContext implements Cloneable {
         // only be visible to the routing context we are currently constructing.
         for (Vertex vertex : new Vertex[] {fromVertex, toVertex}) {
             if (vertex instanceof StreetLocation) {
-                for (PartialPlainStreetEdge ppse : Iterables.filter(((StreetLocation) vertex).getExtra(),
-                        PartialPlainStreetEdge.class)) {
-                    ppse.visibleTo = this;
-                }
                 ((StreetLocation)vertex).setTemporaryEdgeVisibility(this);
             }
         }

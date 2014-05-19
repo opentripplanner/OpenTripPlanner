@@ -323,10 +323,8 @@ public class StreetLocation extends StreetVertex {
         for (PartialPlainStreetEdge ppse : Iterables.filter(this.extra, PartialPlainStreetEdge.class)) {
             ppse.visibleTo = rctx;
         }
-        for (FreeEdge fe : Iterables.filter(this.extra, FreeEdge.class)) {
-            // TODO also set visibility for "free" edges to street corners.
-            //.visibleTo = rctx;
-        }
+        // There are other temporary edges (FreeEdges) but it's a rabbit hole...
+        // better to fix this be completely redoing how temporary endpoint vertices are created.
     }
 
 }
