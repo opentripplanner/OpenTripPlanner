@@ -288,7 +288,10 @@ public class RoutingContext implements Cloneable {
                     toStreetVertex);
 
             for (PlainStreetEdge pse : overlap) {
-                makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
+                PartialPlainStreetEdge ppse = makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
+                // Register this edge-fragment as a temporary edge so it will be assigned a routing context and cleaned up.
+                // It's connecting the from and to vertices so it could be placed in either vertex's temp edge list.
+                ((StreetLocation)fromVertex).getExtra().add(ppse);
             }
         }
         
@@ -305,6 +308,18 @@ public class RoutingContext implements Cloneable {
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         else
             remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
+
+        // If any temporary half-street-edges were created, record the fact that they should
+        // only be visible to the routing context we are currently constructing.
+        for (Vertex vertex : new Vertex[] {fromVertex, toVertex}) {
+            if (vertex instanceof StreetLocation) {
+                for (PartialPlainStreetEdge ppse : Iterables.filter(((StreetLocation) vertex).getExtra(),
+                        PartialPlainStreetEdge.class)) {
+                    ppse.visibleTo = this;
+                }
+                ((StreetLocation)vertex).setTemporaryEdgeVisibility(this);
+            }
+        }
 
         if (this.origin != null) {
             LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());

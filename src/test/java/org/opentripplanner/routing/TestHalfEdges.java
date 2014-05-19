@@ -440,8 +440,8 @@ public class TestHalfEdges extends TestCase {
                 walking);
         end = (StreetLocation) finder.getVertexForLocation(new GenericLocation(40.008, -74.0),
                 walking);
-        // , start.getExtra());
         assertNotNull(end);
+        // The visibility for temp edges for start and end is set in the setRoutingContext call
         walking.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(walking);
         GraphPath path = spt.getPath(end, false);
