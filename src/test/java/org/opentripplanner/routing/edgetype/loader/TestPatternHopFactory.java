@@ -350,47 +350,6 @@ public class TestPatternHopFactory extends TestCase {
         f_depart.removeIncoming(edge);
     }
 
-    public void testInterlining() throws Exception {
-        Vertex stop_i = graph.getVertex("agency_I_depart");
-        Vertex stop_k = graph.getVertex("agency_K_arrive");
-
-        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 0);
-        RoutingRequest options = new RoutingRequest();
-        options.dateTime = startTime;
-        options.setRoutingContext(graph, stop_i, stop_k);
-        ShortestPathTree spt = aStar.getShortestPathTree(options);
-        
-        GraphPath path = spt.getPath(stop_k, false);
-        int num_alights = 0;
-        for (State s : path.states) {
-            if (s.getBackEdge() instanceof TransitBoardAlight
-                && !((TransitBoardAlight) s.getBackEdge()).isBoarding()) {
-                num_alights += 1;
-            }
-            if (s.getBackEdge() instanceof PatternDwell) {
-                assertEquals(10 * 60, s.getTimeDeltaSeconds());
-            }
-        }
-        assertEquals(1, num_alights);
-        
-        options.setArriveBy(true);
-        options.setRoutingContext(graph, stop_i, stop_k);
-        spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(stop_i, false);
-//        path.reverse();
-        num_alights = 0;
-        for (State s : path.states) {
-            if (s.getBackEdge() instanceof TransitBoardAlight
-                && !((TransitBoardAlight) s.getBackEdge()).isBoarding()) {
-                num_alights += 1;
-            }
-            if (s.getBackEdge() instanceof PatternDwell) {
-                assertEquals(10 * 60, s.getTimeDeltaSeconds());
-            }
-        }
-        assertEquals(1, num_alights);
-    }
-    
     public void testTraverseMode() throws Exception {
         Vertex stop_a = graph.getVertex("agency_A_depart");
         Vertex stop_b = graph.getVertex("agency_B_arrive");
