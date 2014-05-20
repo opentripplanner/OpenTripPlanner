@@ -63,6 +63,10 @@ public abstract class GtfsTest extends TestCase {
 
     public boolean isLongDistance() { return false; }
 
+    private String agencyId;
+
+    public Itinerary itinerary = null;
+
     protected void setUp() {
         File gtfs = new File("src/test/resources/" + getFeedName());
         File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
@@ -74,6 +78,9 @@ public abstract class GtfsTest extends TestCase {
         graph = new Graph();
         gtfsBundle.setTransfersTxtDefinesStationPaths(true);
         gtfsGraphBuilderImpl.buildGraph(graph, null);
+        // Set the agency ID to be used for tests to the first one in the feed.
+        agencyId = graph.getAgencyIds().iterator().next();
+        System.out.printf("Set the agency ID for this test to %s\n", agencyId);
         graph.index(new DefaultStreetVertexIndexFactory());
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.setPurgeExpiredData(false);
@@ -90,7 +97,7 @@ public abstract class GtfsTest extends TestCase {
             for (FeedEntity feedEntity : feedEntityList) {
                 updates.add(feedEntity.getTripUpdate());
             }
-            timetableSnapshotSource.applyTripUpdates(updates, "MMRI");
+            timetableSnapshotSource.applyTripUpdates(updates, agencyId);
             alertsUpdateHandler.update(feedMessage);
         } catch (Exception exception) {}
 
@@ -99,6 +106,7 @@ public abstract class GtfsTest extends TestCase {
             pathService = new LongDistancePathService(null, genericAStar);
         } else {
             pathService = new RetryingPathServiceImpl(null, genericAStar);
+            genericAStar.setNPaths(1);
         }
         planGenerator = new PlanGenerator(null, pathService);
     }
@@ -119,29 +127,30 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setArriveBy(dateTime < 0);
         routingRequest.dateTime = Math.abs(dateTime);
         if (fromVertex != null && !fromVertex.isEmpty()) {
-            routingRequest.setFrom(new GenericLocation(null, "MMRI_" + fromVertex));
+            routingRequest.setFrom(new GenericLocation(null, agencyId + "_" + fromVertex));
         }
         if (toVertex != null && !toVertex.isEmpty()) {
-            routingRequest.setTo(new GenericLocation(null, "MMRI_" + toVertex));
+            routingRequest.setTo(new GenericLocation(null, agencyId + "_" + toVertex));
         }
         if (onTripId != null && !onTripId.isEmpty()) {
-            routingRequest.setStartingTransitTripId(new AgencyAndId("MMRI", onTripId));
+            routingRequest.setStartingTransitTripId(new AgencyAndId(agencyId, onTripId));
         }
         routingRequest.setRoutingContext(graph);
         routingRequest.setWheelchairAccessible(wheelchairAccessible);
         routingRequest.setTransferPenalty(preferLeastTransfers ? 300 : 0);
         routingRequest.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         if (excludedRoute != null && !excludedRoute.isEmpty()) {
-            routingRequest.setBannedRoutes("MMRI__" + excludedRoute);
+            routingRequest.setBannedRoutes(agencyId + "__" + excludedRoute);
         }
         if (excludedStop != null && !excludedStop.isEmpty()) {
-            routingRequest.setBannedStopsHard("MMRI_" + excludedStop);
+            routingRequest.setBannedStopsHard(agencyId + "_" + excludedStop);
         }
         routingRequest.setOtherThanPreferredRoutesPenalty(0);
         routingRequest.setWalkBoardCost(0);
 
         TripPlan tripPlan = planGenerator.generate(routingRequest);
-        Itinerary itinerary = tripPlan.itinerary.get(0);
+        // Stored in instance field for use in individual tests
+        itinerary = tripPlan.itinerary.get(0);
 
         assertEquals(legCount, itinerary.legs.size());
 
@@ -153,9 +162,9 @@ public abstract class GtfsTest extends TestCase {
         assertEquals(startTime, leg.startTime.getTimeInMillis());
         assertEquals(endTime, leg.endTime.getTimeInMillis());
         assertEquals(toStopId, leg.to.stopId.getId());
-        assertEquals("MMRI", leg.to.stopId.getAgencyId());
+        assertEquals(agencyId, leg.to.stopId.getAgencyId());
         if (fromStopId != null) {
-            assertEquals("MMRI", leg.from.stopId.getAgencyId());
+            assertEquals(agencyId, leg.from.stopId.getAgencyId());
             assertEquals(fromStopId, leg.from.stopId.getId());
         } else {
             assertNull(leg.from.stopId);
