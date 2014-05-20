@@ -213,6 +213,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * 
      * It may be tempting to set this as high as or higher than walkReluctance (as studies often find this kind of preferences among riders) but the
      * planner will take this literally and walk down a transit line to avoid waiting at a stop.
+     *
+     * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this problem could disappear.
      */
     public double waitReluctance = 0.95;
 

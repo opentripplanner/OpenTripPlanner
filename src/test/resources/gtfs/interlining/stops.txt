@@ -1,5 +1,5 @@
 stop_id,stop_name,stop_lat,stop_lon
-il0,Stop il0,3.601,3.602
-il1,Stop il1,3.602,3.601
-il2,Stop il2,3.603,3.602
-il3,Stop il3,3.602,3.603
+stop0,Stop Zero,3.601,3.602
+stop1,Stop One,3.602,3.601
+stop2,Stop Two,3.603,3.602
+stop3,Stop Three,3.602,3.603
