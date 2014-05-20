@@ -98,7 +98,13 @@ public class PartialPlainStreetEdgeTest {
                 "partial e1", e1.getLength());
         PartialPlainStreetEdge pEdge2 = new PartialPlainStreetEdge(e2, v2, v3, e2.getGeometry(),
                 "partial e2", e2.getLength());
-        
+
+        // Partial edges are temporary edges. They are only traversable by one routing context.
+        // They are associated with a routing context when an edge is split for a StreetLocation,
+        // but here we're making them manually.
+        pEdge1.visibleTo = options.rctx;
+        pEdge2.visibleTo = options.rctx;
+
         // Traverse both the partial and parent edges.
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
@@ -131,7 +137,9 @@ public class PartialPlainStreetEdgeTest {
         RoutingRequest options = new RoutingRequest();
         options.setMode(TraverseMode.CAR);
         options.setRoutingContext(_graph, v1, v2);
-        
+        // Creating a streetlocation splits a street and makes temporary edges that are only visible to one routing context.
+        intermediate.setTemporaryEdgeVisibility(options.rctx);
+
         // All intersections take 10 minutes - we'll notice if one isn't counted.
         double turnDurationSecs = 10.0 * 60.0;  
         options.setTraversalCostModel(new DummyCostModel(turnDurationSecs));

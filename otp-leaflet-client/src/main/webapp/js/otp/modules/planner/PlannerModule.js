@@ -295,9 +295,11 @@ otp.modules.planner.PlannerModule =
        	    queryParams = {             
                 fromPlace: this.getStartOTPString(),
                 toPlace: this.getEndOTPString(),
-                time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
+                /* let's go for ISO-8601! */
+                time : moment((this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment(),"h:mma").format("HH:mm"),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
-                date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
+                date : moment(this.date||moment()).format("YYYY-MM-DD"),   
+                //date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
                 mode: this.mode,
                 maxWalkDistance: this.maxWalkDistance
             };
@@ -352,7 +354,9 @@ otp.modules.planner.PlannerModule =
                 if(data.plan) {
                     // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
                     otp.config.timeOffset = (otp.config.timeOffset) ||
-                        (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
+                    /*  let's go for ISO8601; see also line 299-301 */
+                   //     (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
+                          (moment(queryParams.date+"T"+queryParams.time) - moment(data.plan.date))/3600000;
 
                     var tripPlan = new otp.modules.planner.TripPlan(data.plan, queryParams);
                     

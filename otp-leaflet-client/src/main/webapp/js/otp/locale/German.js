@@ -296,16 +296,17 @@ otp.locale.German = {
         hours_abbrev: "Std.",
         hour: "Stunde",
         hours: "Stunden",
-
-        format: "d.m.Y \\H:i",
-        date_format: "d.m.Y",
-        time_format: "H:i",
         minute: "Minute",
         minutes: "Minuten",
         minute_abbrev: "Min.",
         minutes_abbrev: "Min.",
         second_abbrev: "Sek.",
         seconds_abbrev: "Sek.",
+        format: "DD.MM.YYYY, h:mm",//"d.m.Y \\H:i"
+        date_format: "DD/MM/YYYY",//"d.m.Y",
+        time_format: "HH:mm",//"H:i",
+        date_format_picker: "dd/mm/yy",
+        time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
         months: [ 'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez' ]
     },
 

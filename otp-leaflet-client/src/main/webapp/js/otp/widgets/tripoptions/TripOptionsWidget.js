@@ -322,6 +322,7 @@ otp.widgets.tripoptions.TimeSelector =
 
         $('#'+this.id+'-date').datepicker({
             timeFormat: otp.config.locale.time.time_format_picker,
+            dateFormat: otp.config.locale.time.date_format_picker,
             onSelect: function(date) {
                 this_.tripWidget.inputChanged({
                     date : date,

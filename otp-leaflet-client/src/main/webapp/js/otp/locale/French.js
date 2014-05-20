@@ -363,18 +363,17 @@ otp.locale.French = {
         hours_abbrev   : "hours",
         hour           : "hour",
         hours          : "hours",
-
         minute : "minute",
         minutes : "minutes",
         minute_abbrev : "min",
         minutes_abbrev : "min",
         second_abbrev : "sec",
         seconds_abbrev : "sec",
-        format         : "D.M.YYYY [à] H:mm", //moment.js
-        date_format    : "D.M.YYYY", //momentjs must be same as date_picker format which is by default: mm/dd/yy
-        time_format    : "H:mm", //momentjs
+        format : "DD.MM.YY [à] h:mm",
+        date_format : "DD/MM/YYYY",
+        time_format : "HH:mm",
+        date_format_picker: "dd/mm/yy",
         time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
-        
         months : [ 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc' ]
     },
 

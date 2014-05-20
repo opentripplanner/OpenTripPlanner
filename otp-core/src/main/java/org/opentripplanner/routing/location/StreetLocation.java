@@ -19,11 +19,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -310,6 +312,22 @@ public class StreetLocation extends StreetVertex {
     public void finalize() {
         if (removeTemporaryEdges() > 0)
             LOG.error("Temporary edges were removed by finalizer: this is a memory leak.");
+    }
+
+
+    /**
+     * Temporary edges are traversable to only one routing context. It was too awkward to rework all the edge-splitting
+     * code to pass the routing context down into the temporary edge constructors. Therefore we set the context for
+     * all temporary edges after they are created.
+     */
+    public void setTemporaryEdgeVisibility(RoutingContext rctx) {
+        for (PartialPlainStreetEdge ppse : Iterables.filter(this.extra, PartialPlainStreetEdge.class)) {
+            ppse.visibleTo = rctx;
+        }
+        for (FreeEdge fe : Iterables.filter(this.extra, FreeEdge.class)) {
+            // TODO also set visibility for "free" edges to street corners.
+            //.visibleTo = rctx;
+        }
     }
 
 }

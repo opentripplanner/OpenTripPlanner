@@ -148,7 +148,7 @@ otp.config = {
      * Formats to use for date and time displays, expressed as ISO-8601 strings.
      */    
      
-    timeFormat  : "h:mma",
+    //timeFormat  : "h:mma",
     dateFormat  : "MMM Do YYYY"
 
 };
