@@ -1,0 +1,1 @@
+This feed contains a block of trips that should be interlined, as well as other trips that are not.

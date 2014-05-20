@@ -1,0 +1,7 @@
+stop_id,stop_name,stop_lat,stop_lon
+2e21,Stop 2e21,2.511,2.510
+2e22,Stop 2e22,2.511,2.513
+2e23,Stop 2e23,2.512,2.512
+2e24,Stop 2e24,2.513,2.512
+2e25,Stop 2e25,2.513,2.510
+2e26,Stop 2e26,2.513,2.513

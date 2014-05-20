@@ -1,0 +1,7 @@
+stop_id,stop_name,stop_lat,stop_lon
+1a1,Stop 1a1,1.101,1.1
+1a2,Stop 1a2,1.102,1.1
+1a3,Stop 1a3,1.103,1.1
+1a4,Stop 1a4,1.104,1.1
+1a5,Stop 1a5,1.105,1.1
+1a6,Stop 1a6,1.106,1.1

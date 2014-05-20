@@ -1,0 +1,3 @@
+route_id,service_id,trip_id
+2e2|1,ignore,2e2|1
+2e2|2,ignore,2e2|2

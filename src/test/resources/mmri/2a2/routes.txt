@@ -1,0 +1,3 @@
+agency_id,route_id,route_short_name,route_long_name,route_type
+MMRI,2a2|bus|1,bus 1,,3
+MMRI,2a2|bus|2,bus 2,,3

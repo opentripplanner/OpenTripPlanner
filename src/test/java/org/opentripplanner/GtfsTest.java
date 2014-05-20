@@ -64,7 +64,7 @@ public abstract class GtfsTest extends TestCase {
     public boolean isLongDistance() { return false; }
 
     protected void setUp() {
-        File gtfs = new File("src/test/resources/" + getFeedName() + ".zip");
+        File gtfs = new File("src/test/resources/" + getFeedName());
         File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
         GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
         List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);

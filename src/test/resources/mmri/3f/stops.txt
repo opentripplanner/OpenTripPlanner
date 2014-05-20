@@ -1,0 +1,5 @@
+stop_id,stop_name,stop_lat,stop_lon
+3f1,Stop 3f1,3.601,3.602
+3f2,Stop 3f2,3.602,3.601
+3f3,Stop 3f3,3.603,3.602
+3f4,Stop 3f4,3.602,3.603

@@ -25,6 +25,7 @@ import lombok.Setter;
 
 import org.apache.http.client.ClientProtocolException;
 import org.onebusaway.csv_entities.CsvInputSource;
+import org.onebusaway.csv_entities.FileCsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
 import org.opentripplanner.graph_builder.impl.DownloadableGtfsInputSource;
 import org.opentripplanner.util.HttpUtils;
@@ -99,7 +100,11 @@ public class GtfsBundle {
     public CsvInputSource getCsvInputSource() throws IOException {
         if (csvInputSource == null) {
             if (path != null) {
-                csvInputSource = new ZipFileCsvInputSource(new ZipFile(path));
+                if (path.isDirectory()) {
+                    csvInputSource = new FileCsvInputSource(path);
+                } else {
+                    csvInputSource = new ZipFileCsvInputSource(new ZipFile(path));
+                }
             } else if (url != null) {
                 DownloadableGtfsInputSource isrc = new DownloadableGtfsInputSource();
                 isrc.setUrl(url);

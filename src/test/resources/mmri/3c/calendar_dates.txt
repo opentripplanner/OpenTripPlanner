@@ -1,0 +1,3 @@
+date,service_id,exception_type
+20140101,ignore,1
+20140103,ignore,1

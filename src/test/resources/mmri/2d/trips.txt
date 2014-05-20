@@ -1,0 +1,4 @@
+route_id,service_id,trip_id
+2d|1,ignore,2d|1|1
+2d|2,ignore,2d|2|1
+2d|2,ignore,2d|2|2

@@ -1,0 +1,7 @@
+stop_id,stop_name,stop_lat,stop_lon
+3g11,Stop 3g11,3.711,3.710
+3g12,Stop 3g12,3.711,3.713
+3g13,Stop 3g13,3.712,3.712
+3g14,Stop 3g14,3.713,3.712
+3g15,Stop 3g15,3.713,3.710
+3g16,Stop 3g16,3.713,3.713

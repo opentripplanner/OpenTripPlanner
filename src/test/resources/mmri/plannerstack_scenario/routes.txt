@@ -1,0 +1,4 @@
+agency_id,route_id,route_short_name,route_long_name,route_type
+MMRI,plannerstack_scenario|intercity,,Intercity,2
+MMRI,plannerstack_scenario|slt|1,,Local train 1,2
+MMRI,plannerstack_scenario|slt|2,,Local train 2,2

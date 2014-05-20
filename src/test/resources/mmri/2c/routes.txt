@@ -1,0 +1,4 @@
+agency_id,route_id,route_short_name,route_long_name,route_type
+MMRI,2c|train|1,,train 1,2
+MMRI,2c|train|2,,train 2,2
+MMRI,2c|bus,bus,,3

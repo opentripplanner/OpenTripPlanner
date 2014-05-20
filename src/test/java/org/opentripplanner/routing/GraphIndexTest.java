@@ -18,7 +18,7 @@ public class GraphIndexTest extends GtfsTest {
 
     @Override
     public String getFeedName() {
-        return "testagency";
+        return "testagency.zip";
     }
 
     public void testIdLookup() {

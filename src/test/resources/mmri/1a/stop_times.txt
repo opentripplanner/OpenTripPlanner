@@ -1,0 +1,7 @@
+trip_id,arrival_time,departure_time,stop_id,stop_sequence
+1a|bus|1,00:01:00,00:01:00,1a1,1
+1a|bus|1,00:02:00,00:02:00,1a2,2
+1a|ferry|1,00:03:00,00:03:00,1a3,3
+1a|ferry|1,00:04:00,00:04:00,1a4,4
+1a|train|1,00:05:00,00:05:00,1a5,5
+1a|train|1,00:06:00,00:06:00,1a6,6
