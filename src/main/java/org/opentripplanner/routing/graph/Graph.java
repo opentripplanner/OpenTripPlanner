@@ -407,7 +407,8 @@ public class Graph implements Serializable {
         for (AgencyAndId sid : data.getServiceIds()) {
             agencies.add(sid.getAgencyId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
-                long t = sd.getAsDate().getTime() / 1000;
+                // Adjust for timezone, assuming there is only one per graph.
+                long t = sd.getAsDate(getTimeZone()).getTime() / 1000;
                 if (t > now) {
                     agenciesWithFutureDates.add(sid.getAgencyId());
                 }
