@@ -210,13 +210,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle
      * time as the same.
-     * 
-     * It may be tempting to set this as high as or higher than walkReluctance (as studies often find this kind of preferences among riders) but the
-     * planner will take this literally and walk down a transit line to avoid waiting at a stop.
+     *
+     * It may be tempting to set this higher than walkReluctance (as studies often find this kind of preferences among
+     * riders) but the planner will take this literally and walk down a transit line to avoid waiting at a stop.
+     * This used to be set less than 1 (0.95) which would make waiting offboard preferable to waiting onboard in an
+     * interlined trip. That is also undesirable.
      *
      * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this problem could disappear.
      */
-    public double waitReluctance = 0.95;
+    public double waitReluctance = 1.0;
 
     /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
     public double waitAtBeginningFactor = 0.2;
