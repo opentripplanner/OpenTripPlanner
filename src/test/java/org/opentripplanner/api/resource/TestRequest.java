@@ -508,10 +508,6 @@ public class TestRequest extends TestCase {
         assertTrue(otherRouter.polygon.getArea() > 0);
     }
 
-    public void testTransitIndex() {
-        fail("The old transit index doesn't exist anymore, but the new one needs to have tests.");
-    }
-
     public void testBannedTrips() {
         // Plan short trip along NE GLISAN ST
         TestPlanner planner = new TestPlanner(

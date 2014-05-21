@@ -71,6 +71,7 @@ public class GraphIndexTest extends GtfsTest {
 
     public void testSpatialIndex() {
         graph.index.stopSpatialIndex.query(1,1,1);
+        fail("The old transit index doesn't exist anymore, and the new one needs more tests.");
     }
 
     public void testParentStations() {
