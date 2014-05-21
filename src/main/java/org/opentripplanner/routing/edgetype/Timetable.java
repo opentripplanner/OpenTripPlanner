@@ -141,10 +141,7 @@ public class Timetable implements Serializable {
         /* Search at the state's time, but relative to midnight on the given service day. */
         int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
         // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
-        /* Establish whether we have a rented _or_ owned bicycle. */
-        boolean haveBicycle = s0.getNonTransitMode() == TraverseMode.BICYCLE; 
         TripTimes bestTrip = null;
-        int index;
         Stop currentStop = pattern.getStop(stopIndex);
         // Linear search through the timetable looking for the best departure.
         // We no longer use a binary search on Timetables because:
@@ -161,16 +158,16 @@ public class Timetable implements Serializable {
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
                 if (depTime < 0) continue;
-                if (depTime >= time && depTime < bestTime && tt.tripAcceptable(s0,
-                        currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
+                if (depTime >= time && depTime < bestTime &&
+                        tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) {
                     bestTrip = tt;
                     bestTime = depTime;
                 }
             } else {
                 int arvTime = tt.getArrivalTime(stopIndex);
                 if (arvTime < 0) continue;
-                if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(s0,
-                        currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
+                if (arvTime <= time && arvTime > bestTime &&
+                        tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) {
                     bestTrip = tt;
                     bestTime = arvTime;
                 }
@@ -186,16 +183,16 @@ public class Timetable implements Serializable {
             if (boarding) {
                 int depTime = freq.nextDepartureTime(stopIndex, time);
                 if (depTime < 0) continue;
-                if (depTime >= time && depTime < bestTime && tt.tripAcceptable(s0,
-                        currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
+                if (depTime >= time && depTime < bestTime &&
+                        tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) {
                     bestFreq = freq;
                     bestTime = depTime;
                 }
             } else {
                 int arvTime = freq.prevArrivalTime(stopIndex, time);
                 if (arvTime < 0) continue;
-                if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(s0,
-                        currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
+                if (arvTime <= time && arvTime > bestTime &&
+                        tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) {
                     bestFreq = freq;
                     bestTime = arvTime;
                 }

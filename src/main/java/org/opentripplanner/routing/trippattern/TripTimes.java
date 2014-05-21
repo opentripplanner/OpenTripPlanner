@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.slf4j.Logger;
@@ -294,8 +295,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility
      * and transfers with minimum time or forbidden transfers.
      */
-    public boolean tripAcceptable(State state0, Stop currentStop, ServiceDay sd, boolean bicycle,
-            int stopIndex, boolean boarding) {
+    public boolean tripAcceptable(State state0, Stop currentStop, ServiceDay sd, int stopIndex, boolean boarding) {
         RoutingRequest options = state0.getOptions();
         BannedStopSet banned = options.bannedTrips.get(trip.getId());
         if (banned != null) {
@@ -306,6 +306,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
             return false;
         }
+        /* Establish whether we have a rented _or_ owned bicycle. */
+        boolean bicycle = state0.getNonTransitMode() == TraverseMode.BICYCLE;
         if (bicycle && BikeAccess.fromTrip(trip) != BikeAccess.ALLOWED) {
             return false;
         }
