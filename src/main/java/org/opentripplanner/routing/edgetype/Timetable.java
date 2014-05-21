@@ -159,19 +159,19 @@ public class Timetable implements Serializable {
         for (TripTimes tt : tripTimes) {
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
-            int minTransferTime = getTransferTime(s0, currentStop, tt.trip, boarding);
-            if (minTransferTime < 0) continue;
+            int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
+            if (adjustedTime == -1) continue; // FIXME adjustedTime can legitimately be -1! But it's useless and might as well be zero.
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
                 if (depTime < 0) continue;
-                if (depTime >= time && depTime < bestTime) {
+                if (depTime >= adjustedTime && depTime < bestTime) {
                     bestTrip = tt;
                     bestTime = depTime;
                 }
             } else {
                 int arvTime = tt.getArrivalTime(stopIndex);
                 if (arvTime < 0) continue;
-                if (arvTime <= time && arvTime > bestTime) {
+                if (arvTime <= adjustedTime && arvTime > bestTime) {
                     bestTrip = tt;
                     bestTime = arvTime;
                 }
@@ -184,20 +184,20 @@ public class Timetable implements Serializable {
             TripTimes tt = freq.tripTimes;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
-            int minTransferTime = getTransferTime(s0, currentStop, tt.trip, boarding);
-            if (minTransferTime < 0) continue;
+            int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
+            if (adjustedTime == -1) continue;
             LOG.debug("  running freq {}", freq);
             if (boarding) {
-                int depTime = freq.nextDepartureTime(stopIndex, time);
+                int depTime = freq.nextDepartureTime(stopIndex, adjustedTime); // min transfer time included in search
                 if (depTime < 0) continue;
-                if (depTime >= time && depTime < bestTime) {
+                if (depTime >= adjustedTime && depTime < bestTime) {
                     bestFreq = freq;
                     bestTime = depTime;
                 }
             } else {
-                int arvTime = freq.prevArrivalTime(stopIndex, time);
+                int arvTime = freq.prevArrivalTime(stopIndex, adjustedTime); // min transfer time included in search
                 if (arvTime < 0) continue;
-                if (arvTime <= time && arvTime > bestTime) {
+                if (arvTime <= adjustedTime && arvTime > bestTime) {
                     bestFreq = freq;
                     bestTime = arvTime;
                 }
@@ -211,15 +211,19 @@ public class Timetable implements Serializable {
         return bestTrip;
     }
 
-    /** Check transfer table rules. Return min transfer time for this particular trip, or -1 if it is not allowed. */
-    private int getTransferTime(State state, Stop currentStop, Trip trip, boolean boarding) {
+    /**
+     * Check transfer table rules. Given the last alight time from the State,
+     * return the boarding time t0 adjusted for this particular trip's minimum transfer time,
+     * or -1 if boarding this trip is not allowed.
+     * Alight time should be relative to midnight on the same service day as t0.
+     */
+    private int adjustTimeForTransfer(State state, Stop currentStop, Trip trip, boolean boarding, ServiceDay serviceDay, int t0) {
         if ( ! state.isEverBoarded()) {
             // This is the first boarding not a transfer.
-            return 0;
+            return t0;
         }
         TransferTable transferTable = state.getOptions().getRoutingContext().transferTable;
-        int transferTime = transferTable.getTransferTime(state.getPreviousStop(),
-                currentStop, state.getPreviousTrip(), trip, boarding);
+        int transferTime = transferTable.getTransferTime(state.getPreviousStop(), currentStop, state.getPreviousTrip(), trip, boarding);
         // Check whether back edge is TimedTransferEdge
         if (state.getBackEdge() instanceof TimedTransferEdge) {
             // Transfer must be of type TIMED_TRANSFER
@@ -228,14 +232,22 @@ public class Timetable implements Serializable {
             }
         }
         if (transferTime == StopTransfer.UNKNOWN_TRANSFER) {
-            return 0; // no special rules, just board
+            return t0; // no special rules, just board
         }
         if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
             // This transfer is forbidden
             return -1;
         }
-        // There is a minimum transfer time to make this transfer
-        return transferTime;
+        // There is a minimum transfer time to make this transfer. Ensure that it is respected.
+        int minTime = serviceDay.secondsSinceMidnight(state.getLastAlightedTimeSeconds());
+        if (boarding) {
+            minTime += transferTime;
+            if (minTime > t0) return minTime;
+        } else {
+            minTime -= transferTime;
+            if (minTime < t0) return minTime;
+        }
+        return t0;
     }
 
     /**

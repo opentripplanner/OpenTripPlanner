@@ -298,15 +298,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public boolean tripAcceptable(State state0, int stopIndex) {
         RoutingRequest options = state0.getOptions();
         BannedStopSet banned = options.bannedTrips.get(trip.getId());
-        if (banned != null) {
-            if (banned.contains(stopIndex)) {
-                return false;
-            }
+        if (banned != null && banned.contains(stopIndex)) {
+            return false;
         }
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
             return false;
         }
-        /* Establish whether we have a rented _or_ owned bicycle. */
+        // Establish whether we have a rented _or_ owned bicycle.
         boolean bicycle = state0.getNonTransitMode() == TraverseMode.BICYCLE;
         if (bicycle && BikeAccess.fromTrip(trip) != BikeAccess.ALLOWED) {
             return false;
