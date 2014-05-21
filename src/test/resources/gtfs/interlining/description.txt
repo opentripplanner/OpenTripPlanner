@@ -4,9 +4,3 @@ other does not. The stoptimes for the two routes are identical, but the one with
 allows you to reach the destination without transferring. That one should be considered optimal, 
 and the resulting route should contain no transfers.
 
-Problem: it's currently cheaper to alight and re-board than to use the interline dwell.
-Since these costs are based on times, first how can re-boarding be cheaper?
-Second, why is there no boarding cost?
-If we remove the time-based cost for the interline dwell, it wins.
-It also works right if there is no time between vehicle arrival and departure.
-Maybe boarding is getting an unfair advantage.
