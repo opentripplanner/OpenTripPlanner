@@ -25,10 +25,13 @@ import lombok.Getter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StopTransfer;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -154,8 +157,10 @@ public class Timetable implements Serializable {
         // Hoping JVM JIT will distribute the loop over the if clauses as needed.
         // We could invert this and skip some service days based on schedule overlap as in RRRR.
         for (TripTimes tt : tripTimes) {
-            if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
-            if ( ! tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) continue;
+            if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
+            if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
+            int minTransferTime = getTransferTime(s0, currentStop, tt.trip, boarding);
+            if (minTransferTime < 0) continue;
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
                 if (depTime < 0) continue;
@@ -177,8 +182,10 @@ public class Timetable implements Serializable {
         FrequencyEntry bestFreq = null;
         for (FrequencyEntry freq : frequencyEntries) {
             TripTimes tt = freq.tripTimes;
-            if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
-            if ( ! tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) continue;
+            if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
+            if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
+            int minTransferTime = getTransferTime(s0, currentStop, tt.trip, boarding);
+            if (minTransferTime < 0) continue;
             LOG.debug("  running freq {}", freq);
             if (boarding) {
                 int depTime = freq.nextDepartureTime(stopIndex, time);
@@ -202,6 +209,33 @@ public class Timetable implements Serializable {
             bestTrip = bestFreq.tripTimes.timeShift(stopIndex, bestTime, boarding);
         }
         return bestTrip;
+    }
+
+    /** Check transfer table rules. Return min transfer time for this particular trip, or -1 if it is not allowed. */
+    private int getTransferTime(State state, Stop currentStop, Trip trip, boolean boarding) {
+        if ( ! state.isEverBoarded()) {
+            // This is the first boarding not a transfer.
+            return 0;
+        }
+        TransferTable transferTable = state.getOptions().getRoutingContext().transferTable;
+        int transferTime = transferTable.getTransferTime(state.getPreviousStop(),
+                currentStop, state.getPreviousTrip(), trip, boarding);
+        // Check whether back edge is TimedTransferEdge
+        if (state.getBackEdge() instanceof TimedTransferEdge) {
+            // Transfer must be of type TIMED_TRANSFER
+            if (transferTime != StopTransfer.TIMED_TRANSFER) {
+                return -1;
+            }
+        }
+        if (transferTime == StopTransfer.UNKNOWN_TRANSFER) {
+            return 0; // no special rules, just board
+        }
+        if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
+            // This transfer is forbidden
+            return -1;
+        }
+        // There is a minimum transfer time to make this transfer
+        return transferTime;
     }
 
     /**

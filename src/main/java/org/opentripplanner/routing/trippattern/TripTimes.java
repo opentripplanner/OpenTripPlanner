@@ -295,7 +295,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility
      * and transfers with minimum time or forbidden transfers.
      */
-    public boolean tripAcceptable(State state0, Stop currentStop, ServiceDay sd, int stopIndex, boolean boarding) {
+    public boolean tripAcceptable(State state0, int stopIndex) {
         RoutingRequest options = state0.getOptions();
         BannedStopSet banned = options.bannedTrips.get(trip.getId());
         if (banned != null) {
@@ -311,42 +311,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         if (bicycle && BikeAccess.fromTrip(trip) != BikeAccess.ALLOWED) {
             return false;
         }
-
-        // Check transfer table rules
-        if (state0.isEverBoarded()) {
-            // This is not the first boarding, thus a transfer
-            TransferTable transferTable = options.getRoutingContext().transferTable;
-            // Get the transfer time
-            int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
-                    currentStop, state0.getPreviousTrip(), trip, boarding);
-            // Check for minimum transfer time and forbidden transfers
-            if (transferTime > 0) {
-                // There is a minimum transfer time to make this transfer
-                if (boarding) {
-                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds())
-                            + transferTime > getDepartureTime(stopIndex)) {
-                        return false;
-                    }
-                } else {
-                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds())
-                            - transferTime < getArrivalTime(stopIndex)) {
-                        return false;
-                    }
-                }
-            } else if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
-                // This transfer is forbidden
-                return false;
-            }
-
-            // Check whether back edge is TimedTransferEdge
-            if (state0.getBackEdge() instanceof TimedTransferEdge) {
-                // Transfer must be of type TIMED_TRANSFER
-                if (transferTime != StopTransfer.TIMED_TRANSFER) {
-                    return false;
-                }
-            }
-        }
-
         return true;
     }
 
