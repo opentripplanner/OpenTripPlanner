@@ -155,19 +155,18 @@ public class Timetable implements Serializable {
         // We could invert this and skip some service days based on schedule overlap as in RRRR.
         for (TripTimes tt : tripTimes) {
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
+            if ( ! tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) continue;
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
                 if (depTime < 0) continue;
-                if (depTime >= time && depTime < bestTime &&
-                        tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) {
+                if (depTime >= time && depTime < bestTime) {
                     bestTrip = tt;
                     bestTime = depTime;
                 }
             } else {
                 int arvTime = tt.getArrivalTime(stopIndex);
                 if (arvTime < 0) continue;
-                if (arvTime <= time && arvTime > bestTime &&
-                        tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) {
+                if (arvTime <= time && arvTime > bestTime) {
                     bestTrip = tt;
                     bestTime = arvTime;
                 }
@@ -179,20 +178,19 @@ public class Timetable implements Serializable {
         for (FrequencyEntry freq : frequencyEntries) {
             TripTimes tt = freq.tripTimes;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
+            if ( ! tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) continue;
             LOG.debug("  running freq {}", freq);
             if (boarding) {
                 int depTime = freq.nextDepartureTime(stopIndex, time);
                 if (depTime < 0) continue;
-                if (depTime >= time && depTime < bestTime &&
-                        tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) {
+                if (depTime >= time && depTime < bestTime) {
                     bestFreq = freq;
                     bestTime = depTime;
                 }
             } else {
                 int arvTime = freq.prevArrivalTime(stopIndex, time);
                 if (arvTime < 0) continue;
-                if (arvTime <= time && arvTime > bestTime &&
-                        tt.tripAcceptable(s0, currentStop, serviceDay, stopIndex, boarding)) {
+                if (arvTime <= time && arvTime > bestTime) {
                     bestFreq = freq;
                     bestTime = arvTime;
                 }
