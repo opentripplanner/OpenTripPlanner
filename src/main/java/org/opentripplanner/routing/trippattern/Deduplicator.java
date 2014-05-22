@@ -3,13 +3,19 @@ package org.opentripplanner.routing.trippattern;
 import com.google.common.collect.Maps;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Map;
 
+/**
+ * Does the same thing as String.intern, but for several different types.
+ * Java's String.intern uses perm gen space and is broken anyway.
+ */
 public class Deduplicator {
 
     // TODO get rid of static so we don't have a big set lying around, and just for good form.
     private static Map<IntArray, IntArray> canonicalIntArrays = Maps.newHashMap();
     private static Map<String, String> canonicalStrings = Maps.newHashMap();
+    private static Map<BitSet, BitSet> canonicalBitSets = Maps.newHashMap();
 
     /** Free up any memory used by the deduplicator. */
     public static void reset() {
@@ -33,6 +39,15 @@ public class Deduplicator {
         if (canonical == null) {
             canonical = original;
             canonicalStrings.put(canonical, canonical);
+        }
+        return canonical;
+    }
+
+    public static BitSet deduplicateBitSet(BitSet original) {
+        BitSet canonical = canonicalBitSets.get(original);
+        if (canonical == null) {
+            canonical = original;
+            canonicalBitSets.put(canonical, canonical);
         }
         return canonical;
     }
