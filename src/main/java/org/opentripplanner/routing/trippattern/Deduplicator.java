@@ -21,6 +21,7 @@ public class Deduplicator {
     public static void reset() {
         canonicalIntArrays.clear();
         canonicalStrings.clear();
+        canonicalBitSets.clear();
     }
 
     /** Used to deduplicate time and stop sequence arrays. The same times may occur in many trips. */
