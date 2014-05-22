@@ -147,7 +147,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.arrivalTimes = null;
         this.departureTimes = null;
         this.timepoints = Deduplicator.deduplicateBitSet(timepoints);
-        LOG.info("trip {} has timepoint at indexes {}", trip, timepoints);
+        LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
     /** This copy constructor does not copy the actual times, only the scheduled times. */
