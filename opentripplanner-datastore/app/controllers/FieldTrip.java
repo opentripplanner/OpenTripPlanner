@@ -293,26 +293,42 @@ public class FieldTrip extends Application {
         String privateKey = (String) Play.configuration.get("recaptcha.private_key");
 
         ReCaptcha captcha = ReCaptchaFactory.newReCaptcha(publicKey, privateKey, false);
-        ReCaptchaResponse response = captcha.checkAnswer(request.remoteAddress, recaptcha_challenge_field, recaptcha_response_field);
+        ReCaptchaResponse captchaResponse = captcha.checkAnswer(request.remoteAddress, recaptcha_challenge_field, recaptcha_response_field);
 
-        boolean validRecaptcha = false;
+        String errCode;
         
-        if (response.isValid()) {
-            validRecaptcha = true;
+        if (!captchaResponse.isValid()) {
+            errCode = "err_recaptcha";
+        }
+        else if(req.teacherName == null || req.teacherName.length() == 0) {
+            errCode = "err_teachername";
+        }
+        else if(!checkDate(req.travelDate)) {
+            errCode = "err_traveldate";
         }
         else {
-            render(req, validRecaptcha);
-        }
-        
-        if(req.teacherName != null && validRecaptcha) {
             req.id = null;
             req.save();
             Long id = req.id;
-            render(req, validRecaptcha);
+            errCode = "ok";
         }
-        else {
-            badRequest();
-        }
+        
+        render(req, errCode);
+    }
+    
+    @Util
+    protected static boolean checkDate(Date date) {
+        if(date == null) return false;
+        
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        cal.add(Calendar.DATE, 1);
+        
+        Calendar now = Calendar.getInstance();
+        
+        if(cal.after(now)) return true;
+        
+        return false;
     }
     
     public static void getRequests(Integer limit) {

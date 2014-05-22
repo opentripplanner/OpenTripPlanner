@@ -2,7 +2,7 @@
 
 <div class="mainContent">
 
-#{if validRecaptcha}
+#{if errCode == 'ok' }
 
     <h2>Request Submitted</h2>
 
@@ -17,11 +17,28 @@
     Fax:  503-962-2482<br>
 
 #{/if}
-#{else}
+
+#{elseif errCode == 'err_recaptcha' }
     <h2>Invalid ReCaptcha Response</h2>
     
     The user verification text you entered was not valid. Please try again. (You may use your browser's "Back" button to return to the request form.)
+#{/elseif}
+
+#{elseif errCode == 'err_teachername' }
+    <h2>Invalid Teacher Name</h2>
+    
+    The teacher name you entered was not valid. Please try again. (You may use your browser's "Back" button to return to the request form.)
+#{/elseif}
+
+#{elseif errCode == 'err_traveldate' }
+    <h2>Invalid Travel Date</h2>
+    
+    The travel date you entered was not valid. Please try again. (You may use your browser's "Back" button to return to the request form.)
+#{/elseif}
+
+#{else}
+    Error submitting request (errCode = ${errCode})
 #{/else}
-      
+
 </div>
 
