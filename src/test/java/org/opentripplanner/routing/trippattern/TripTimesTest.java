@@ -30,6 +30,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.Vertex;
@@ -81,18 +82,18 @@ public class TripTimesTest {
         List<StopTime> stopTimes = Arrays.asList(new StopTime(), new StopTime());
         TripTimes s = new TripTimes(trip, stopTimes);
 
-        RoutingRequest request = new RoutingRequest();
+        RoutingRequest request = new RoutingRequest(TraverseMode.BICYCLE);
         Vertex v = new SimpleConcreteVertex(graph, "", 0.0, 0.0);
         request.setRoutingContext(graph, v, v);
         State s0 = new State(request);
 
-        assertFalse(s.tripAcceptable(s0, null, null, true /* bicycle */, 0, true));
+        assertFalse(s.tripAcceptable(s0, 0));
 
         BikeAccess.setForTrip(trip, BikeAccess.ALLOWED);
-        assertTrue(s.tripAcceptable(s0, null, null, true /* bicycle */, 0, true));
+        assertTrue(s.tripAcceptable(s0, 0));
 
         BikeAccess.setForTrip(trip, BikeAccess.NOT_ALLOWED);
-        assertFalse(s.tripAcceptable(s0, null, null, true /* bicycle */, 0, true));
+        assertFalse(s.tripAcceptable(s0, 0));
     }
 
     @Test
