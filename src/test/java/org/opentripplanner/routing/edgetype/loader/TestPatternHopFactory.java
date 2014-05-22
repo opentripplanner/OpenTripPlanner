@@ -38,18 +38,16 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -486,11 +484,10 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt = aStar.getShortestPathTree(options);
         GraphPath path = spt.getPath(destination, false);
 
-        // TODO this is wrong (milliseconds)
-//        long endTime = path.getEndTime();
-//        Calendar c = new GregorianCalendar();
-//        c.setTimeInMillis(endTime);
-//        assertTrue(endTime - startTime.getTimeInMillis() < 7200);
+        long endTime = path.getEndTime();
+        Calendar c = new GregorianCalendar();
+        c.setTimeInMillis(endTime * 1000L);
+        assertTrue(endTime - TestUtils.toSeconds(startTime) < 7200);
     }
 
     public void testFrequencies() {
