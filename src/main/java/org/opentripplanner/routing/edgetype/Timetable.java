@@ -160,7 +160,7 @@ public class Timetable implements Serializable {
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
-            if (adjustedTime == -1) continue; // FIXME adjustedTime can legitimately be -1! But it's useless and might as well be zero.
+            if (adjustedTime == -1) continue;
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
                 if (depTime < 0) continue;
@@ -215,7 +215,7 @@ public class Timetable implements Serializable {
      * Check transfer table rules. Given the last alight time from the State,
      * return the boarding time t0 adjusted for this particular trip's minimum transfer time,
      * or -1 if boarding this trip is not allowed.
-     * Alight time should be relative to midnight on the same service day as t0.
+     * FIXME adjustedTime can legitimately be -1! But negative times might as well be zero.
      */
     private int adjustTimeForTransfer(State state, Stop currentStop, Trip trip, boolean boarding, ServiceDay serviceDay, int t0) {
         if ( ! state.isEverBoarded()) {
