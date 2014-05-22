@@ -621,13 +621,6 @@ public class TestRequest extends TestCase {
         assertFalse(itinerary.walkLimitExceeded);
     }
 
-    /**
-     * Test the influence of increasing the walk reluctance.
-     */
-    public void testWalkReluctance() {
-        fail("This test may not be appropriate due to its reliance on the specifics of the graph.");
-    }
-
     public void testTransferPenalty() {
         // Plan short trip
         TestPlanner planner = new TestPlanner(
