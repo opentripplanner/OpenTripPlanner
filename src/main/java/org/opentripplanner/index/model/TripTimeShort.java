@@ -19,20 +19,20 @@ public class TripTimeShort {
     public int realtimeDeparture = UNDEFINED ;
     public int arrivalDelay = UNDEFINED ;
     public int departureDelay = UNDEFINED ;
+    public boolean timepoint = false;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
      */
     public TripTimeShort(TripTimes tt, int i, Stop stop) {
         stopId = stop.getId().getId();
-        if (i > 0) {
-            scheduledArrival   = tt.getScheduledArrivalTime(i);
-            realtimeArrival    = tt.getArrivalTime(i);
-            arrivalDelay       = tt.getArrivalDelay(i);
-            scheduledDeparture = tt.getScheduledDepartureTime(i);
-            realtimeDeparture  = tt.getDepartureTime(i);
-            departureDelay     = tt.getDepartureDelay(i);
-        }
+        scheduledArrival   = tt.getScheduledArrivalTime(i);
+        realtimeArrival    = tt.getArrivalTime(i);
+        arrivalDelay       = tt.getArrivalDelay(i);
+        scheduledDeparture = tt.getScheduledDepartureTime(i);
+        realtimeDeparture  = tt.getDepartureTime(i);
+        departureDelay     = tt.getDepartureDelay(i);
+        timepoint          = tt.isTimepoint(i);
     }
 
     /**

@@ -724,13 +724,29 @@ public class GTFSPatternHopFactory {
         if (!st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) {
             st0.setDepartureTime(st0.getArrivalTime());
         }
-        
+
+        /* If the feed does not specify any timepoints, we want to mark all times that are present as timepoints. */
+        boolean hasTimepoints = false;
+        for (StopTime stopTime : stopTimes) {
+            if (stopTime.getTimepoint() == 1) {
+                hasTimepoints = true;
+                break;
+            }
+        }
+        // TODO verify that the first (and last?) stop should always be considered a timepoint.
+        if (!hasTimepoints) st0.setTimepoint(1);
+
         /* Indicates that stop times in this trip are being shifted forward one day. */
         boolean midnightCrossed = false;
         
         for (int i = 1; i < stopTimes.size(); i++) {
             boolean st1bogus = false;
             StopTime st1 = stopTimes.get(i);
+
+            /* If the feed did not specify any timepoints, mark all times that are present as timepoints. */
+            if ( !hasTimepoints && (st1.isDepartureTimeSet() || st1.isArrivalTimeSet())) {
+                st1.setTimepoint(1);
+            }
 
             if (midnightCrossed) {
                 if (st1.isDepartureTimeSet())

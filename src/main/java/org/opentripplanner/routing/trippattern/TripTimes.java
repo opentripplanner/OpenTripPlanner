@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -113,8 +114,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     private boolean cancelled = false;
 
+    /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
+    private BitSet timepoints;
+
     /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
+     * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering step.
      */
     public TripTimes(Trip trip, List<StopTime> stopTimes) {
         this.trip = trip;
@@ -122,6 +127,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         int[] departures = new int[nStops];
         int[] arrivals   = new int[nStops];
         int[] sequences  = new int[nStops];
+        timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
         int s = 0;
@@ -129,6 +135,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             departures[s] = st.getDepartureTime() - timeShift;
             arrivals[s] = st.getArrivalTime() - timeShift;
             sequences[s] = st.getStopSequence();
+            timepoints.set(s, st.getTimepoint() == 1);
             s++;
         }
         this.scheduledDepartureTimes = Deduplicator.deduplicateIntArray(departures);
@@ -139,6 +146,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
         this.arrivalTimes = null;
         this.departureTimes = null;
+        this.timepoints = Deduplicator.deduplicateBitSet(timepoints);
+        LOG.info("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 
     /** This copy constructor does not copy the actual times, only the scheduled times. */
@@ -152,6 +161,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.scheduledDepartureTimes = object.scheduledDepartureTimes;
         this.scheduledArrivalTimes = object.scheduledArrivalTimes;
         this.stopSequences = object.stopSequences;
+        this.timepoints = object.timepoints;
     }
 
     /**
@@ -394,4 +404,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public int getStopSequence(int stop) {
         return stopSequences[stop];
     }
+
+    /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */
+    public boolean isTimepoint(int stopIndex) {
+        return timepoints.get(stopIndex);
+    }
+
 }
