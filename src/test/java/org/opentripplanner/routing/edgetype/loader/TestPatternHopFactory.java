@@ -19,9 +19,11 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -38,6 +40,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -148,6 +151,16 @@ public class TestPatternHopFactory extends TestCase {
         }
     }
 
+    private List<TransitStop> extractStopVertices(GraphPath path) {
+        List<TransitStop> ret = Lists.newArrayList();
+        for (State state : path.states) {
+            if (state.getVertex() instanceof TransitStop) {
+                ret.add(((TransitStop)state.getVertex()));
+            }
+        }
+        return ret;
+    }
+
     public void testRouting() throws Exception {
 
         Vertex stop_a = graph.getVertex("agency_A");
@@ -190,7 +203,9 @@ public class TestPatternHopFactory extends TestCase {
         assertNotNull(path);
         // there are two paths of different lengths 
         // both arrive at 40 minutes after midnight
-        //assertTrue(path.states.size() == 13);
+        List<TransitStop> stops = extractStopVertices(path);
+        assertEquals(stops.size(), 3);
+        assertEquals(stops.get(1), stop_c);
         long endTime = startTime + 40 * 60;
         assertEquals(endTime, path.getEndTime());
 
@@ -199,7 +214,9 @@ public class TestPatternHopFactory extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(stop_e, false);
         assertNotNull(path);
-        assertTrue(path.states.size() == 14);
+        stops = extractStopVertices(path);
+        assertEquals(stops.size(), 3);
+        assertEquals(stops.get(1), stop_c);
         endTime = startTime + 70 * 60;
         assertEquals(endTime, path.getEndTime());
     }
