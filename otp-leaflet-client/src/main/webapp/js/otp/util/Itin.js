@@ -73,6 +73,32 @@ otp.util.Itin = {
         }
         return false;
     },
+    
+    /** 
+     * Returns localized absolute direction string
+     *
+     * @param {string} dir a absolute direction string from a server
+     * @return {string} localized absolute direction string
+     */
+
+    getLocalizedAbsoluteDirectionString : function(dir) { 
+        var directionStrings= {
+            // note: keep these lower case (and uppercase via template / code if needed)
+            //TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation 
+            'NORTH': _tr('north'),
+            'NORTHEAST': _tr('northeast'),
+            'EAST': _tr('east'),
+            'SOUTHEAST': _tr('southeast'),
+            'SOUTH': _tr('south'),
+            'SOUTHWEST': _tr('southwest'),
+            'WEST': _tr('west'),
+            'NORTHWEST': _tr('northwest'),
+        };
+        if (dir in directionStrings) return directionStrings[dir];
+        // This is used if dir isn't found in directionStrings
+        // This shouldn't happen
+        return dir.toLowerCase();
+    },
 
 
     /** 
@@ -82,7 +108,7 @@ otp.util.Itin = {
      * @return {string} localized direction string
      */
 
-    directionString : function(dir) { 
+    getLocalizedRelativeDirectionString : function(dir) { 
         var directionStrings= {
             // note: keep these lower case (and uppercase via template / code if needed)
             'DEPART': pgettext("itinerary", "depart"),
@@ -156,9 +182,9 @@ otp.util.Itin = {
         else {
             //TODO: Absolute direction translation
             //TRANSLATORS: Start on [stret name] heading [compas direction]
-            if(!step.relativeDirection) text += _tr("Start on") + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + _tr(" heading ") + step.absoluteDirection.toLowerCase();
+            if(!step.relativeDirection) text += _tr("Start on") + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + _tr(" heading ") + (asHtml ? "<b>" : "") + this.getLocalizedAbsoluteDirectionString(step.absoluteDirection) + (asHtml ? "</b>" : "");
             else {
-                text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection)) +
+                text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.getLocalizedRelativeDirectionString(step.relativeDirection)) +
                             (asHtml ? "</b>" : "") + ' ' +
                             //TRANSLATORS: [Relative direction (Left/Right...)] to continue
                             //on /on to [streetname]
