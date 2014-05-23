@@ -1062,6 +1062,18 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    public void setWaitReluctance(double waitReluctance) {
+        if (waitReluctance > 0) {
+            this.waitReluctance = waitReluctance;
+        }
+    }
+    
+    public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
+        if (waitAtBeginningFactor > 0) {
+            this.waitAtBeginningFactor = waitAtBeginningFactor;
+        }
+    }
+    
     public void banTrip(AgencyAndId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
     }
