@@ -19,8 +19,6 @@ import java.util.List;
 import lombok.Setter;
 
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.common.pqueue.OTPPriorityQueue;
-import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -66,7 +64,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         public State u;
         public ShortestPathTree spt;
-        OTPPriorityQueue<State> pq;
+        BinHeap<State> pq;
         RemainingWeightHeuristic heuristic;
         public RoutingContext rctx;
         public int nVisited;
@@ -133,10 +131,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // size = O(sqrt(|V|)) << |V|. For reference, a random, undirected search
         // on a uniform 2d grid will examine roughly sqrt(|V|) vertices before
         // reaching its target. 
-        OTPPriorityQueueFactory qFactory = BinHeap.FACTORY;
         int initialSize = runState.rctx.graph.getVertices().size();
         initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
-        runState.pq = qFactory.create(initialSize);
+        runState.pq = new BinHeap<State>(initialSize);
         runState.pq.insert(initialState, 0);
 
 //        options = options.clone();

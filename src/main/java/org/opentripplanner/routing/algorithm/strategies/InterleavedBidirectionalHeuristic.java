@@ -19,7 +19,6 @@ import java.util.Map;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -253,7 +252,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             rr.setArriveBy( ! rr.isArriveBy());
         List<State> stopStates = Lists.newArrayList();
         ShortestPathTree spt = new BasicShortestPathTree(rr);
-        OTPPriorityQueue<State> pq = new BinHeap<State>();
+        BinHeap<State> pq = new BinHeap<State>();
         Vertex initVertex = fromTarget ? rr.rctx.target : rr.rctx.origin;
         State initState = new State(initVertex, rr);
         pq.insert(initState, 0);

@@ -18,7 +18,6 @@ import java.util.Collection;
 import lombok.Setter;
 
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -76,7 +75,7 @@ public class EarliestArrivalSPTService implements SPTService {
         State initialState = new State(options);
         spt.add(initialState);
 
-        OTPPriorityQueue<State> pq = new BinHeap<State>();
+        BinHeap<State> pq = new BinHeap<State>();
         pq.insert(initialState, 0);
 
         while (!pq.empty()) {

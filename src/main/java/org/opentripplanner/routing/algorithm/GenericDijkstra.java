@@ -23,8 +23,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.common.pqueue.OTPPriorityQueue;
-import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
@@ -37,8 +35,6 @@ public class GenericDijkstra {
     private RoutingRequest options;
 
     private ShortestPathTreeFactory shortestPathTreeFactory;
-
-    private OTPPriorityQueueFactory priorityQueueFactory;
 
     private SearchTerminationStrategy searchTerminationStrategy;
 
@@ -56,10 +52,6 @@ public class GenericDijkstra {
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         this.shortestPathTreeFactory = shortestPathTreeFactory;
-    }
-
-    public void setPriorityQueueFactory(OTPPriorityQueueFactory priorityQueueFactory) {
-        this.priorityQueueFactory = priorityQueueFactory;
     }
 
     public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
@@ -80,7 +72,7 @@ public class GenericDijkstra {
             target = initialState.getOptions().rctx.target;
         }
         ShortestPathTree spt = createShortestPathTree(options);
-        OTPPriorityQueue<State> queue = createPriorityQueue();
+        BinHeap<State> queue = new BinHeap<State>(1000);
 
         spt.add(initialState);
         queue.insert(initialState, initialState.getWeight());
@@ -136,12 +128,6 @@ public class GenericDijkstra {
             spt.postVisit(u);
         }
         return spt;
-    }
-
-    protected OTPPriorityQueue<State> createPriorityQueue() {
-        if (priorityQueueFactory != null)
-            return priorityQueueFactory.create(10);
-        return new BinHeap<State>();
     }
 
     protected ShortestPathTree createShortestPathTree(RoutingRequest options) {

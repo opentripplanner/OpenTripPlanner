@@ -21,7 +21,6 @@ import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;

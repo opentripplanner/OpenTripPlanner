@@ -15,9 +15,8 @@ package org.opentripplanner.common.pqueue;
 
 import java.util.Arrays;
 
-public class BinHeap<T> implements OTPPriorityQueue<T> {
+public class BinHeap<T> {
     
-    public static OTPPriorityQueueFactory FACTORY = new BinHeapFactory();
     private static final double GROW_FACTOR = 2.0;
     
     private double[] prio;
@@ -39,17 +38,14 @@ public class BinHeap<T> implements OTPPriorityQueue<T> {
         prio[0] = Double.NEGATIVE_INFINITY;    // set sentinel
     }
     
-    @Override
     public int size() {
     	return size;
     }
     
-    @Override
     public boolean empty() {
     	return size <= 0;
     }
 
-    @Override
     public double peek_min_key() {
     	if (size > 0) 
     		return prio[1];
@@ -57,7 +53,6 @@ public class BinHeap<T> implements OTPPriorityQueue<T> {
     		throw new IllegalStateException("An empty queue does not have a minimum key.");
    	}
     
-    @Override
     public T peek_min() {
     	if (size > 0)
     		return elem[1];
@@ -65,7 +60,6 @@ public class BinHeap<T> implements OTPPriorityQueue<T> {
     		return null;
     }
     
-    @Override
     public void insert_or_dec_key(T e, double p) {
     	throw new UnsupportedOperationException("BinHeap has no decrease key operation.");
     }
@@ -123,7 +117,6 @@ public class BinHeap<T> implements OTPPriorityQueue<T> {
     	size=0;
     } 
 
-    @Override
     public void insert(T e, double p) {
         int i;
         size += 1;
@@ -137,7 +130,6 @@ public class BinHeap<T> implements OTPPriorityQueue<T> {
         prio[i] = p;
     }    
     
-    @Override
     public T extract_min() {
         int    i, child;
         T      minElem  = elem[1];
@@ -169,10 +161,4 @@ public class BinHeap<T> implements OTPPriorityQueue<T> {
     	elem = Arrays.copyOf(elem, capacity + 1);
     }
     
-    private static class BinHeapFactory implements OTPPriorityQueueFactory {
-        @Override
-        public <T> OTPPriorityQueue<T> create(int maxSize) {
-            return new BinHeap<T>(maxSize);
-        }
-    }
 }
