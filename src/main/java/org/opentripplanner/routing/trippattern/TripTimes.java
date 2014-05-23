@@ -110,7 +110,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     private boolean cancelled = false;
 
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
-    private BitSet timepoints;
+    private final BitSet timepoints;
 
     /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
@@ -122,7 +122,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         int[] departures = new int[nStops];
         int[] arrivals   = new int[nStops];
         int[] sequences  = new int[nStops];
-        timepoints = new BitSet(nStops);
+        BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
         int s = 0;
