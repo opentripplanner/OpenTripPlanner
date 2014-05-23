@@ -268,8 +268,13 @@ otp.locale.Italian = {
         continue_as  : "Continua come",
         stay_aboard  : "Rimani a bordo",
 
+<<<<<<< HEAD
         depart       : "Parti alle",
         arrive       : "Arriva alle",
+=======
+        depart       : "Da",
+        arrive       : "A",
+>>>>>>> c59f20fab95c71249f7aca85ceb6484f9f009257
         now          : "Ora",
 
         presets_label: "Presets",
