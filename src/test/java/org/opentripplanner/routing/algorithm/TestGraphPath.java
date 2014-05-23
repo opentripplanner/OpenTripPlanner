@@ -14,7 +14,9 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.io.File;
+import java.util.List;
 
+import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
@@ -22,11 +24,13 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
 
 public class TestGraphPath extends TestCase {
@@ -45,8 +49,9 @@ public class TestGraphPath extends TestCase {
 
     public void testGraphPathOptimize() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A_depart");
-        Vertex stop_e = graph.getVertex("agency_E_arrive");
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_e = graph.getVertex("agency_E");
 
         ShortestPathTree spt;
         GraphPath path;
@@ -58,7 +63,17 @@ public class TestGraphPath extends TestCase {
 
         path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
-        assertTrue(path.states.size() == 12);
+
+        // Check that the resulting path visits the stops in the right order.
+        List<Vertex> stopvs = Lists.newArrayList();
+        for (State state : path.states) {
+            if (state.getVertex() instanceof TransitStop) {
+                stopvs.add(state.getVertex());
+            }
+        }
+        assertTrue(stopvs.get(0) == stop_a);
+        assertTrue(stopvs.get(1) == stop_c);
+        assertTrue(stopvs.get(2) == stop_e);
 
         long bestStart = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 20, 0);
         assertNotSame(bestStart, path.getStartTime());
