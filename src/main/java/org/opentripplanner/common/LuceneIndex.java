@@ -26,6 +26,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -69,7 +70,8 @@ public class LuceneIndex {
         try {
             long startTime = System.currentTimeMillis();
             directory = FSDirectory.open(new File("/var/otp/lucene"));
-            // directory = new RAMDirectory();
+            // TODO reuse the index if it exists?
+            //directory = new RAMDirectory(); // only a little faster
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, analyzer).setOpenMode(OpenMode.CREATE);
             final IndexWriter writer = new IndexWriter(directory, config);
             for (Stop stop : graphIndex.stopForId.values()) {

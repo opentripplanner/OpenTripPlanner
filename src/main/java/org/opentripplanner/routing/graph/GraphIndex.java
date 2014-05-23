@@ -126,7 +126,6 @@ public class GraphIndex {
         // Copy these two service indexes from the graph until we have better ones.
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
-        luceneIndex = new LuceneIndex(this, true);
         LOG.info("Done indexing graph.");
     }
 
