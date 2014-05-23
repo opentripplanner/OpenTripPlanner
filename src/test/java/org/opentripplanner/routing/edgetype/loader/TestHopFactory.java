@@ -14,7 +14,9 @@
 package org.opentripplanner.routing.edgetype.loader;
 
 import java.io.File;
+import java.util.List;
 
+import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
@@ -23,6 +25,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -95,11 +98,11 @@ public class TestHopFactory extends TestCase {
 
     public void testRouting() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A_depart");
-        Vertex stop_b = graph.getVertex("agency_B_arrive");
-        Vertex stop_c = graph.getVertex("agency_C_arrive");
-        Vertex stop_d = graph.getVertex("agency_D_arrive");
-        Vertex stop_e = graph.getVertex("agency_E_arrive");
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_b = graph.getVertex("agency_B");
+        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_d = graph.getVertex("agency_D");
+        Vertex stop_e = graph.getVertex("agency_E");
 
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
@@ -113,7 +116,8 @@ public class TestHopFactory extends TestCase {
 
         path = spt.getPath(stop_b, false);
         assertNotNull(path);
-        assertEquals(4, path.states.size());
+        assertEquals(extractStopVertices(path), Lists.newArrayList(stop_a, stop_b));
+
 
         // A to C
         options.setRoutingContext(graph, stop_a, stop_c);
@@ -121,7 +125,8 @@ public class TestHopFactory extends TestCase {
 
         path = spt.getPath(stop_c, false);
         assertNotNull(path);
-        assertEquals(6, path.states.size());
+        assertEquals(extractStopVertices(path), Lists.newArrayList(stop_a, stop_c));
+
 
         // A to D
         options.setRoutingContext(graph, stop_a, stop_d);
@@ -129,7 +134,7 @@ public class TestHopFactory extends TestCase {
 
         path = spt.getPath(stop_d, false);
         assertNotNull(path);
-        assertTrue(path.states.size() <= 11);
+        assertEquals(extractStopVertices(path), Lists.newArrayList(stop_a, stop_c, stop_d));
         long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0) + 40 * 60;
         assertEquals(endTime, path.getEndTime());
 
@@ -139,8 +144,18 @@ public class TestHopFactory extends TestCase {
 
         path = spt.getPath(stop_e, false);
         assertNotNull(path);
-        assertTrue(path.states.size() <= 12);
+        assertEquals(extractStopVertices(path), Lists.newArrayList(stop_a, stop_c, stop_e));
         endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0) + 70 * 60;
         assertEquals(endTime, path.getEndTime());
+    }
+
+    private List<Vertex> extractStopVertices(GraphPath path) {
+        List<Vertex> ret = Lists.newArrayList();
+        for (State state : path.states) {
+            if (state.getVertex() instanceof TransitStop) {
+                ret.add(state.getVertex());
+            }
+        }
+        return ret;
     }
 }
