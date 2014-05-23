@@ -93,48 +93,4 @@ public class TestAStar extends TestCase {
         assertNull(path);        
     }
 
-    public void testPerformance() throws Exception {
-
-        Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
-        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
-        RoutingRequest options = new RoutingRequest();
-        options.dateTime = startTime;
-        
-        Vertex airport = graph.getVertex("TriMet_10579");
-
-        long startClock, endClock;
-        Random rng = new Random();
-        rng.setSeed(0);
-        
-        final int n_trials = 100;
-        String random[] = new String[n_trials];
-        for (int i = 0; i < n_trials; ++i) {
-            String label;
-            while (true) {
-                int rand_id = rng.nextInt() % 10000;
-                label = "TriMet_" + rand_id;
-                if (graph.getVertex(label) != null) {
-                    break;
-                }
-            }
-            random[i] = label;
-        }
-
-        /* time A* */
-        startClock = System.nanoTime();
-        ShortestPathTree spt = null;
-        for (int i = 0; i < n_trials; ++i) {
-            options.setRoutingContext(graph, random[i], airport.getLabel());
-            spt = aStar.getShortestPathTree(options);
-        }
-
-        endClock = System.nanoTime();
-        long aStarTime = endClock - startClock;
-
-        GraphPath path = spt.getPath(airport, true);
-        assertNotNull("A path could not be found to the airport from " + random[n_trials - 1], path);
-        double time = aStarTime / n_trials / 1000000000.0;
-        assertTrue("Actual time " + time + "s greater than 500 ms", time <= 0.5);
-
-    }
 }
