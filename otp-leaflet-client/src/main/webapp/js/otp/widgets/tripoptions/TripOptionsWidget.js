@@ -322,6 +322,7 @@ otp.widgets.tripoptions.TimeSelector =
 
         $('#'+this.id+'-date').datepicker({
             timeFormat: otp.config.locale.time.time_format_picker,
+            dateFormat: otp.config.locale.time.date_format_picker,
             onSelect: function(date) {
                 this_.tripWidget.inputChanged({
                     date : date,
@@ -379,7 +380,7 @@ otp.widgets.tripoptions.TimeSelector =
         //var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
         //$('#'+this.id+'-picker').datepicker("setDate", new Date(m));
         if(data.queryParams.date) {
-            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, "MM-DD-YYYY")));
+            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, otp.config.locale.time.date_format/*"MM-DD-YYYY"*/)));
             this.tripWidget.module.date = data.queryParams.date;
         }
         if(data.queryParams.time) {

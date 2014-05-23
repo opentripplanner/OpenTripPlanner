@@ -268,8 +268,8 @@ otp.locale.Italian = {
         continue_as  : "Continua come",
         stay_aboard  : "Rimani a bordo",
 
-        depart       : "Da",
-        arrive       : "A",
+        depart       : "Parti alle",
+        arrive       : "Arriva alle",
         now          : "Ora",
 
         presets_label: "Presets",
@@ -363,16 +363,16 @@ otp.locale.Italian = {
         hours_abbrev   : "ore",
         hour           : "ora",
         hours          : "ore",
-
         minute         : "minuto",
         minutes        : "minuti",
         minute_abbrev  : "min",
         minutes_abbrev : "min",
         second_abbrev  : "sec",
         seconds_abbrev : "sec",
-        format         : "D.M.YYYY  H:mm", //moment.js
-        date_format    : "DD.MM.YYYY", //momentjs must be same as date_picker format which is by default: mm/dd/yy
-        time_format    : "H:mm", //momentjs
+        format		   : "DD.MM.YYYY, h:mm",
+        date_format    : "DD/MM/YYYY",
+        time_format    : "HH:mm",
+        date_format_picker: "dd/mm/yy",
         time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
         months         : ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic']
     },
