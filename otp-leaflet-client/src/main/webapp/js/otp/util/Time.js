@@ -48,7 +48,8 @@ otp.util.Time = {
 
     correctAmPmTimeString : function(time, format) {
         // step 0: leave if we don't have what we need...
-        if(otp.config.timeFormat && otp.config.timeFormat.slice(-1) !== 'a') return time;
+    	if(otp.config.locale.time.time_format && otp.config.locale.time.time_format.slice(-1) !== 'a') return time;
+    	if(otp.config.timeFormat && otp.config.timeFormat.slice(-1) !== 'a') return time;
         if(time == null || time.length < 1) return time;
 
 

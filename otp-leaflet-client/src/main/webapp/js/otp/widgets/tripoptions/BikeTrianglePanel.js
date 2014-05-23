@@ -44,9 +44,9 @@ otp.widgets.BikeTrianglePanel = new otp.Class({
     cursorHoriz : null,
     cursor      : null,
 
-    quickName   : "Quick",
-    flatName    : "Flat",
-    safeName    : "Bike Friendly",
+    quickName   : otp.config.locale.bikeTriangle.timeName, //"Quick",
+    flatName    : otp.config.locale.bikeTriangle.hillName, //"Flat",
+    safeName    : otp.config.locale.bikeTriangle.safeName, //"Bike Friendly",
     
     initialize : function(divID) {
         this.div = document.getElementById(divID);
@@ -80,18 +80,18 @@ otp.widgets.BikeTrianglePanel = new otp.Class({
 
         var safeFill = "#bbe070"; 
         var safeFill2 = "#77b300"; 
-        var safeSym  = "B"; //locale.bikeTriangle.safeSym;
+        var safeSym  = otp.config.locale.bikeTriangle.safeSym;//"B"
 
         var flatFill = "#8cc4ff"; 
         var flatFill2 = "#61a7f2"; 
-        var flatSym  = "F"; //locale.bikeTriangle.flatSym;
+        var flatSym  = otp.config.locale.bikeTriangle.hillSym;//"F"
         
         var quickFill = "#ffb2b2";
         var quickFill2 = "#f27979";
-        var quickSym  = "Q"; //locale.bikeTriangle.quickSym;
+        var quickSym  = otp.config.locale.bikeTriangle.timeSym;//"Q"
 
         var labelT = canvas.text(margin + tri_side/2, margin+24, quickSym);
-        labelT.attr({fill:quickFill2, "font-size":labelSize, "font-weight":"bold"});	
+        labelT.attr({fill:quickFill2, "font-size":labelSize, "font-weight":"bold"});    
 
         var labelH = canvas.text(margin + 22, height-margin-14, flatSym);
         labelH.attr({fill:flatFill2, "font-size":labelSize, "font-weight":"bold"});	

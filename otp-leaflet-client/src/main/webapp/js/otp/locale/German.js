@@ -1,28 +1,28 @@
 /* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+   modify it under the terms of the GNU Lesser General Public License
+   as published by the Free Software Foundation, either version 3 of
+   the License, or (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
 
 otp.namespace("otp.locale");
 
 /**
- * @class
- */
+  * @class
+  */
 otp.locale.German = {
 
     config: {
         metricsSystem: "international",
         rightClickMsg: "Klicken Sie mit der rechte Maustaste auf die Karte um Startpunkt und Endpunkt auszuwählen.",
-        attribution: {
+        attribution   : {
             title: "Lizenz",
             content: "Nutzungsbedingungen einfügen"
         }
@@ -44,8 +44,8 @@ otp.locale.German = {
         minimize: "Minimieren",
         bringToFront: "in den Vordergrund",
         sendToBack: "in den Hintergrund"
-    },
-
+            },
+            
     widgets: {
         managerMenu: {
             minimizeAll: "Alle Dialoge minimieren",
@@ -61,38 +61,46 @@ otp.locale.German = {
                 previous: "Vorheriger",
                 next: "Nächster",
                 last: "Letzter"
-            },
+        },
             realtimeDelay: {
                 late: "min Verspätung",
                 early: "min zu früh",
                 onTime: "pünktlich"
-            }
+            },
+        tooMuchWalking              : "Total walk distance for this trip exceeds specified maximum"
         },
+       
 
         AnalystLegend: {
             title: "Legende: Reisezeit in Minuten"
         },
-
+        
         MultimodalPlannerModule: {
             title: "Einstellungen für Routensuche"
         },
-
+        
         TripOptionsWidget: {
             title: "Routeneinstellungen"
         }
     },
 
     modules: {
-        analyst: {
+        analyst : {
             AnalystModule: {
                 name: "Analyse",
                 refresh: "Aktualisieren"
             }
         },
 
-        multimodal: {
+        multimodal : {
             MultimodalPlannerModule: {
                 name: "Multimodaler Routenplaner"
+            }
+        }
+       ,bikeshare : {
+            BikeShareModule : 
+            {
+                name        : "Bike Share Planner"
             }
         }
     },
@@ -116,7 +124,7 @@ otp.locale.German = {
     },
 
     indicators: {
-        ok: "OK",
+        ok         : "OK",
         date: "Datum",
         loading: "Laden",
         searching: "Suche läuft...",
@@ -140,15 +148,15 @@ otp.locale.German = {
         print: "drucken",
         printTip: "<b>Drucken</b><br/>Vereinfachte Version der angezeigten Route druchen (ohne Kartenansicht).",
 
-        link: "Link",
+        link          : "Link",
         linkTip: "<b>Link anzeigen</b><br/>Link für ausgewählte Route anzeigen.",
 
-        feedback: "Feedback",
+        feedback      : "Feedback",
         feedbackTip: "<b>Feedback hinterlassen</b><br/>Hinterlassen Sie Feedback zur Karte und Routenplanung.",
 
         submit: "Bestätigen",
         clearButton: "Zurücksetzen",
-        ok: "OK",
+        ok           : "OK",
         cancel: "Abbrechen",
         yes: "ja",
         no: "nein",
@@ -163,7 +171,7 @@ otp.locale.German = {
         northeast: "nordost",
         northwest: "nordwest",
         north: "nord",
-        west: "west",
+        west:           "west",
         south: "süd",
         east: "ost",
         bound: "Richtung",
@@ -179,7 +187,7 @@ otp.locale.German = {
         at: "um",
         on: "auf",
         to: "bis",
-        via: "via",
+        via:            "via",
         circle_counterclockwise: "nehmen Sie den Kreisverkehr",
         circle_clockwise: "nehmen Sie den Kreisverkehr im Uhrzeigersinn",
         // rather than just being a direction, this should be
@@ -242,11 +250,11 @@ otp.locale.German = {
         trip_details: "Routendetails",
         fare: "Tarif",
         fare_symbol: "\u20ac",
-
+        
         regular_fare: "Normaltarif",
         student_fare: "Ausbildungstarif",
         senior_fare: "Seniorentarif",
-
+        
         travel: "Reise",
         valid: "Gültig bis",
         trip_length: "Dauer",
@@ -263,7 +271,7 @@ otp.locale.German = {
         TRAM: "Straßenbahn",
         SUBWAY: "U-Bahn",
         RAIL: "Bahn",
-        BUS: "Bus",
+        BUS:            "Bus",
         FERRY: "Fähre",
         CABLE_CAR: "Standseilbahn",
         GONDOLA: "Gondel",
@@ -288,16 +296,17 @@ otp.locale.German = {
         hours_abbrev: "Std.",
         hour: "Stunde",
         hours: "Stunden",
-
-        format: "d.m.Y \\H:i",
-        date_format: "d.m.Y",
-        time_format: "H:i",
         minute: "Minute",
         minutes: "Minuten",
         minute_abbrev: "Min.",
         minutes_abbrev: "Min.",
         second_abbrev: "Sek.",
         seconds_abbrev: "Sek.",
+        format: "DD.MM.YYYY, h:mm",//"d.m.Y \\H:i"
+        date_format: "DD/MM/YYYY",//"d.m.Y",
+        time_format: "HH:mm",//"H:i",
+        date_format_picker: "dd/mm/yy",
+        time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
         months: [ 'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez' ]
     },
 
@@ -314,7 +323,7 @@ otp.locale.German = {
             inputTitle: "Routendetails",
             optTitle: "Routeneinstellungen (optional)",
             submitMsg: "Route wird berechnet...",
-            optionalTitle: "",
+            optionalTitle : "",
             date: "Datum",
             time: "Zeit",
             when: "Wann",
@@ -365,7 +374,7 @@ otp.locale.German = {
             geoFromMsg: "Bitte wählen Sie einen Startpunkt: ",
             geoToMsg: "Bitte wählen Sie einen Zielort: "
         },
-
+        
         // default messages from server if a message was not returned ... 'Place' error messages also used when trying to submit without From & To coords.
         msgcodes: {
             200: "Berechnung i. O.",
@@ -391,12 +400,12 @@ otp.locale.German = {
             [ 'SAFE', 'sicherste Route' ],
             [ 'TRIANGLE', 'Personalisieren...']
         ],
-
+    
         arriveDepart: [
             ['false', 'Abfahrt'],
             ['true', 'Ankunft']
         ],
-
+    
         maxWalkDistance: [
             [ '200', '200 m' ],
             [ '500', '500 m' ],
@@ -419,7 +428,7 @@ otp.locale.German = {
             ['2.778', '10 km/h']
         ],
 
-        modes: // leaflet client
+        modes : // leaflet client
         {
             "TRANSIT,WALK": "ÖPNV",
             "BUSISH,WALK": "nur Bus",
@@ -430,7 +439,7 @@ otp.locale.German = {
             "CAR": 'Auto'
         },
 
-        mode: // OL client
+        mode : // OL client
         [
             [ 'TRANSIT,WALK', 'ÖPNV' ],
             [ 'BUSISH,TRAINISH,WALK', 'nur Bus und Bahn' ],
@@ -444,7 +453,7 @@ otp.locale.German = {
         // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
         //       (note that we've been broken for awhile here, since many agencies don't have a 'Train' mode either...this needs attention)
         // IDEA: maybe we start with a big array (like below), and the pull out modes from this array when turning off various modes...
-        with_bikeshare_mode :
+        with_bikeshare_mode : 
         [
             ['TRANSIT,WALK', 'ÖPNV'],
             ['BUSISH,WALK', 'nur Bus'],

@@ -17,8 +17,8 @@ otp.namespace("otp.modules.planner");
 otp.modules.planner.defaultQueryParams = {
     startPlace                      : null,
     endPlace                        : null,
-    time                            : moment().format("h:mma"),
-    date                            : moment().format("MM-DD-YYYY"),
+    time                            : moment().format(otp.config.locale.time.time_format),
+    date                            : moment().format(otp.config.locale.time.date_format),
     arriveBy                        : false,
     mode                            : "TRANSIT,WALK",
     maxWalkDistance                 : 804.672, // 1/2 mi.
@@ -160,10 +160,10 @@ otp.modules.planner.PlannerModule =
     
     addMapContextMenuItems : function() {
         var this_ = this;
-        this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
+        this.webapp.map.addContextMenuItem(otp.config.locale.contextMenu.fromHere, function(latlng) {
             this_.setStartPoint(latlng, true);
         });
-        this.webapp.map.addContextMenuItem("Set as End Location", function(latlng) {
+        this.webapp.map.addContextMenuItem(otp.config.locale.contextMenu.toHere, function(latlng) {
             this_.setEndPoint(latlng, true);
         });
     },
@@ -183,7 +183,7 @@ otp.modules.planner.PlannerModule =
         this.startLatLng = latlng;
         if(this.startMarker == null) {
             this.startMarker = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true});
-            this.startMarker.bindPopup('<strong>Start</strong>');
+            this.startMarker.bindPopup('<strong>'+otp.config.locale.contextMenu.fromHere+'</strong>');
             this.startMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.startLatLng = this.startMarker.getLatLng();
@@ -210,10 +210,10 @@ otp.modules.planner.PlannerModule =
     
     setEndPoint : function(latlng, update, name) {
         this.endName = (typeof name !== 'undefined') ? name : null;
-        this.endLatLng = latlng;    	 
+        this.endLatLng = latlng;         
         if(this.endMarker == null) {
             this.endMarker = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
-            this.endMarker.bindPopup('<strong>Destination</strong>');
+            this.endMarker.bindPopup('<strong>'+otp.config.locale.contextMenu.toHere+'</strong>');
             this.endMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.endLatLng = this.endMarker.getLatLng();
@@ -292,12 +292,15 @@ otp.modules.planner.PlannerModule =
             }
             
             var addToStart = this.arriveBy ? 0 : this.startTimePadding;
+            this.time = otp.util.Time.correctAmPmTimeString(this.time);
        	    queryParams = {             
                 fromPlace: this.getStartOTPString(),
                 toPlace: this.getEndOTPString(),
-                time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
+                /* when calling the rest servlet api, let's go for ISO-8601, */
+                time : moment(this.time, otp.config.locale.time.time_format).format("HH:mm"),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
-                date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
+                date : moment(this.date||moment(),otp.config.locale.time.date_format).format("YYYY-MM-DD"),   
+                //date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
                 mode: this.mode,
                 maxWalkDistance: this.maxWalkDistance
             };
@@ -352,7 +355,9 @@ otp.modules.planner.PlannerModule =
                 if(data.plan) {
                     // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
                     otp.config.timeOffset = (otp.config.timeOffset) ||
-                        (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
+                    /*  let's go for ISO8601; see also line 299-301 */
+                   //     (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
+                          (moment(queryParams.date+"T"+queryParams.time) - moment(data.plan.date))/3600000;
 
                     var tripPlan = new otp.modules.planner.TripPlan(data.plan, queryParams);
                     
@@ -469,26 +474,28 @@ otp.modules.planner.PlannerModule =
             }
             else if(leg.mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
-                	polyline.bindPopup('Your '+otp.config.bikeshareName+' route');
+                        polyline.bindPopup(
+                                otp.config.locale.tripPlanner.labels.your_bikeshare_route + ( otp.config.bikeshareName ?  ' '+otp.config.locale.tripPlanner.labels.with_ + ' '+otp.config.bikeshareName  : "") 
+                                );
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
                 }
                 else { // regular bike trip
-                	polyline.bindPopup('Your bike route');
-                	//this.resetStationMarkers();
-                }	
+                        polyline.bindPopup(otp.config.locale.tripPlanner.labels.your_bike_route);
+                        //this.resetStationMarkers();
+                }       
             }
             else if(leg.mode === 'WALK') {
                 if(queryParams.mode === 'WALK,BICYCLE') { 
                     if(i == 0) {
-                    	polyline.bindPopup('Walk to the '+otp.config.bikeshareName+' dock.');
+                        polyline.bindPopup(otp.config.locale.tripPlanner.labels.walk_to_the  + otp.config.locale.tripPlanner.labels.dock + otp.config.bikeshareName);
                     }
                     if(i == 2) {
-                    	polyline.bindPopup('Walk from the '+otp.config.bikeshareName+' dock to your destination.');
+                        polyline.bindPopup(otp.config.locale.tripPlanner.labels.walk_from_the + otp.config.locale.tripPlanner.labels.dock+ otp.config.bikeshareName + otp.config.locale.tripPlanner.labels.to_your_dest);
                     }
                 }
                 else { // regular walking trip
-                	polyline.bindPopup('Your walk route');
-                	//this.resetStationMarkers();
+                        polyline.bindPopup(otp.config.locale.tripPlanner.labels.your_walk_route);
+                        //this.resetStationMarkers();
                 }
             }
         }
