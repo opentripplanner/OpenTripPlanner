@@ -421,13 +421,16 @@ otp.locale.German = {
 
         modes: // leaflet client
         {
-            "TRANSIT,WALK": "ÖPNV",
-            "BUSISH,WALK": "nur Bus",
-            "TRAINISH,WALK": "nur Bahn",
-            "BICYCLE": 'Fahrrad',
-            "WALK": 'zu Fuß',
-            "TRANSIT,BICYCLE": "ÖPNV und Fahrrad",
-            "CAR": 'Auto'
+            "TRANSIT,WALK"              : "ÖPNV",
+            "BUSISH,WALK"               : "nur Bus",
+            "TRAINISH,WALK"             : "nur Bahn",
+            "BICYCLE"                   : 'Fahrrad',
+            "WALK"                      : 'zu Fuß',
+            "TRANSIT,BICYCLE"           : "ÖPNV und Fahrrad",
+            "CAR"                       : 'Auto',
+            "CAR_PARK,WALK,TRANSIT"     : 'Parken und Reisen',
+            "CAR,WALK,TRANSIT"          : 'Kiss and Ride',
+            "BICYCLE_PARK,WALK,TRANSIT" : 'Bike and Ride'
         },
 
         mode: // OL client

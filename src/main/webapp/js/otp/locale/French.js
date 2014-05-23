@@ -426,13 +426,16 @@ otp.locale.French = {
             		
         modes : // leaflet client
         {
-            "TRANSIT,WALK"      : "Transports en commun", 
-            "BUSISH,WALK"       : "Bus uniquement", 
-            "TRAINISH,WALK"     : "Tram / Train uniquement", 
-            "BICYCLE"           : 'Vélo',
-            "WALK"              : 'Marche',
-            "TRANSIT,BICYCLE"   : "Transports en commun + Vélo",
-            "CAR"               : 'Voiture'
+            "TRANSIT,WALK"              : "Transports en commun",
+            "BUSISH,WALK"               : "Bus uniquement",
+            "TRAINISH,WALK"             : "Tram / Train uniquement",
+            "BICYCLE"                   : 'Vélo',
+            "WALK"                      : 'Marche',
+            "TRANSIT,BICYCLE"           : "Transports en commun + Vélo",
+            "CAR"                       : 'Voiture',
+            "CAR_PARK,WALK,TRANSIT"     : 'Parc Relais',
+            "CAR,WALK,TRANSIT"          : 'Kiss and Ride',
+            "BICYCLE_PARK,WALK,TRANSIT" : 'Parc Relais Vélo'
         },
 
         mode : // OL client
