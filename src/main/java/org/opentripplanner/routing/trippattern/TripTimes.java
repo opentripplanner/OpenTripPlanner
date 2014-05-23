@@ -13,26 +13,21 @@
 
 package org.opentripplanner.routing.trippattern;
 
-import org.onebusaway.gtfs.model.Stop;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.List;
+
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StopTransfer;
-import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.List;
 
 /**
  * A TripTimes represents the arrival and departure times for a single trip in an Timetable. It is carried
@@ -121,7 +116,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
      * The non-interpolated stoptimes should already be marked at timepoints by a previous filtering step.
      */
-    public TripTimes(Trip trip, List<StopTime> stopTimes) {
+    public TripTimes(Trip trip, List<StopTime> stopTimes, Deduplicator deduplicator) {
         this.trip = trip;
         int nStops = stopTimes.size();
         int[] departures = new int[nStops];
@@ -138,15 +133,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             timepoints.set(s, st.getTimepoint() == 1);
             s++;
         }
-        this.scheduledDepartureTimes = Deduplicator.deduplicateIntArray(departures);
-        this.scheduledArrivalTimes = Deduplicator.deduplicateIntArray(arrivals);
-        this.stopSequences = Deduplicator.deduplicateIntArray(sequences);
+        this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
+        this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
+        this.stopSequences = deduplicator.deduplicateIntArray(sequences);
         this.headsigns = makeHeadsignsArray(stopTimes);
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
         this.arrivalTimes = null;
         this.departureTimes = null;
-        this.timepoints = Deduplicator.deduplicateBitSet(timepoints);
+        this.timepoints = deduplicator.deduplicateBitSet(timepoints);
         LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
     }
 

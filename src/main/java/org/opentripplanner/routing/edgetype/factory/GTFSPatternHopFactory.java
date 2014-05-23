@@ -391,7 +391,7 @@ public class GTFSPatternHopFactory {
             }
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
-            TripTimes tripTimes = new TripTimes(trip, stopTimes);
+            TripTimes tripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
 
             /* If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry. */
             List<Frequency> frequencies = frequenciesForTrip.get(trip);

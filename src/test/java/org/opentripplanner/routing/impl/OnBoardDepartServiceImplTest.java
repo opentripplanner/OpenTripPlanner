@@ -40,6 +40,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
@@ -116,7 +117,7 @@ public class OnBoardDepartServiceImplTest {
         trip.setId(agencyAndId);
         trip.setTripHeadsign("The right");
 
-        TripTimes tripTimes = new TripTimes(trip, stopTimes);
+        TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
 
@@ -204,7 +205,7 @@ public class OnBoardDepartServiceImplTest {
         stopTimes.add(stopArriveTime);
         trip.setId(agencyAndId);
 
-        TripTimes tripTimes = new TripTimes(trip, stopTimes);
+        TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
 
@@ -275,7 +276,7 @@ public class OnBoardDepartServiceImplTest {
         stopTimes.add(stopArriveTime);
         trip.setId(agencyAndId);
 
-        TripTimes tripTimes = new TripTimes(trip, stopTimes);
+        TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
         StopPattern stopPattern = new StopPattern(stopTimes);
         TripPattern tripPattern = new TripPattern(route, stopPattern);
 

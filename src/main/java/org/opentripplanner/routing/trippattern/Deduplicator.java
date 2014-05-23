@@ -1,7 +1,21 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.trippattern;
 
 import com.google.common.collect.Maps;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Map;
@@ -10,22 +24,22 @@ import java.util.Map;
  * Does the same thing as String.intern, but for several different types.
  * Java's String.intern uses perm gen space and is broken anyway.
  */
-public class Deduplicator {
+public class Deduplicator implements Serializable {
+    private static final long serialVersionUID = 20140523L;
 
-    // TODO get rid of static so we don't have a big set lying around, and just for good form.
-    private static Map<IntArray, IntArray> canonicalIntArrays = Maps.newHashMap();
-    private static Map<String, String> canonicalStrings = Maps.newHashMap();
-    private static Map<BitSet, BitSet> canonicalBitSets = Maps.newHashMap();
+    private final Map<IntArray, IntArray> canonicalIntArrays = Maps.newHashMap();
+    private final Map<String, String> canonicalStrings = Maps.newHashMap();
+    private final Map<BitSet, BitSet> canonicalBitSets = Maps.newHashMap();
 
     /** Free up any memory used by the deduplicator. */
-    public static void reset() {
+    public void reset() {
         canonicalIntArrays.clear();
         canonicalStrings.clear();
         canonicalBitSets.clear();
     }
 
     /** Used to deduplicate time and stop sequence arrays. The same times may occur in many trips. */
-    public static int[] deduplicateIntArray(int[] original) {
+    public int[] deduplicateIntArray(int[] original) {
         IntArray intArray = new IntArray(original);
         IntArray canonical = canonicalIntArrays.get(intArray);
         if (canonical == null) {
@@ -35,7 +49,7 @@ public class Deduplicator {
         return canonical.array;
     }
 
-    public static String deduplicateString(String original) {
+    public String deduplicateString(String original) {
         String canonical = canonicalStrings.get(original);
         if (canonical == null) {
             canonical = original;
@@ -44,7 +58,7 @@ public class Deduplicator {
         return canonical;
     }
 
-    public static BitSet deduplicateBitSet(BitSet original) {
+    public BitSet deduplicateBitSet(BitSet original) {
         BitSet canonical = canonicalBitSets.get(original);
         if (canonical == null) {
             canonical = original;
@@ -54,7 +68,8 @@ public class Deduplicator {
     }
 
     /** A wrapper for a primitive int array. This is insane but necessary in Java. */
-    private static class IntArray {
+    private static class IntArray implements Serializable {
+        private static final long serialVersionUID = 20140523L;
         int[] array;
         public IntArray(int[] array) {
             this.array = array;
@@ -70,5 +85,4 @@ public class Deduplicator {
             return Arrays.hashCode(array);
         }
     }
-
 }

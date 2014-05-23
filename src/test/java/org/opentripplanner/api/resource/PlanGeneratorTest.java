@@ -83,6 +83,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
@@ -368,9 +369,9 @@ public class PlanGeneratorTest {
         TripPattern secondTripPattern = new TripPattern(secondRoute, secondStopPattern);
         TripPattern thirdTripPattern  = new TripPattern(thirdRoute, thirdStopPattern);
 
-        TripTimes firstTripTimes  = new TripTimes(firstTrip, firstStopTimes);
-        TripTimes secondTripTimes = new TripTimes(secondTrip, secondStopTimes);
-        TripTimes thirdTripTimes  = new TripTimes(thirdTrip, thirdStopTimes);
+        TripTimes firstTripTimes  = new TripTimes(firstTrip, firstStopTimes, new Deduplicator());
+        TripTimes secondTripTimes = new TripTimes(secondTrip, secondStopTimes, new Deduplicator());
+        TripTimes thirdTripTimes  = new TripTimes(thirdTrip, thirdStopTimes, new Deduplicator());
 
         firstTripPattern.add(firstTripTimes);
         secondTripPattern.add(secondTripTimes);

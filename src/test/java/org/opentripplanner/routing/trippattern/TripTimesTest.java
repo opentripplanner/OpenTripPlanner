@@ -70,7 +70,7 @@ public class TripTimesTest {
             stopTimes.add(stopTime);
         }
 
-        originalTripTimes = new TripTimes(trip, stopTimes);
+        originalTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class TripTimesTest {
         Route route = new Route();
         trip.setRoute(route);
         List<StopTime> stopTimes = Arrays.asList(new StopTime(), new StopTime());
-        TripTimes s = new TripTimes(trip, stopTimes);
+        TripTimes s = new TripTimes(trip, stopTimes, new Deduplicator());
 
         RoutingRequest request = new RoutingRequest(TraverseMode.BICYCLE);
         Vertex v = new SimpleConcreteVertex(graph, "", 0.0, 0.0);
@@ -199,7 +199,7 @@ public class TripTimesTest {
         stopTimes.add(stopTime1);
         stopTimes.add(stopTime2);
 
-        TripTimes differingTripTimes = new TripTimes(trip, stopTimes);
+        TripTimes differingTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
         TripTimes updatedTripTimesA = new TripTimes(differingTripTimes);
 
