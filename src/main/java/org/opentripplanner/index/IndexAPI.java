@@ -187,15 +187,13 @@ public class IndexAPI {
        return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
    }
 
-    /** Return all vehicle arrival/departure times at a specific stop. */
+    /** Return upcoming vehicle arrival/departure times at the given stop. */
     @GET
     @Path("/stops/{stopId}/stoptimes")
     public Response getStoptimesForStop (@PathParam("stopId") String stopIdString) {
         Stop stop = index.stopForId.get(AgencyAndId.convertFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        Collection<StopTime> stopTimes;
-        // TODO build response, filter by date and servicecode
-        return Response.status(Status.OK).build(); //.entity(StopTimeShort.list(stopTimes)).build();
+        return Response.status(Status.OK).entity(index.stopTimesForStop(stop)).build();
     }
 
    /** Return a list of all routes in the graph. */

@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -24,14 +23,19 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.index.model.PatternShort;
+import org.opentripplanner.index.model.StopTimesInPattern;
+import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopAtDistance;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
+import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +77,9 @@ public class GraphIndex {
 
     /* Separate transfers for profile routing */
     public Multimap<Stop, ProfileTransfer> transfersForStop;
+
+    /* This is a workaround, and should probably eventually be removed. */
+    public Graph graph;
 
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
@@ -126,6 +133,7 @@ public class GraphIndex {
         // Copy these two service indexes from the graph until we have better ones.
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
+        this.graph = graph;
         LOG.info("Done indexing graph.");
     }
 
@@ -216,4 +224,40 @@ public class GraphIndex {
         }
         return routes;
     }
+
+    /**
+     * Fetch upcoming vehicle arrivals at a stop.
+     * This is a rather convoluted process because all of the departure search functions currently assume the
+     * existence of a State and a routing context. It would be nice to have another function that gives
+     * all departures within a time window at a stop, being careful to get a mix of all patterns passing through
+     * that stop. In fact, such a function could replace the current boarding logic if we want to allow boarding
+     * more than one trip on the same route at once (return more than one state).
+     * The current implementation is a sketch and does not adequately
+     */
+    public Collection<StopTimesInPattern> stopTimesForStop(Stop stop) {
+        List<StopTimesInPattern> ret = Lists.newArrayList();
+        RoutingRequest req = new RoutingRequest();
+        req.setRoutingContext(graph, (Vertex)null, (Vertex)null);
+        State state = new State(req);
+        for (TripPattern pattern : patternsForStop.get(stop)) {
+            StopTimesInPattern times = new StopTimesInPattern(pattern);
+            // Should actually be getUpdatedTimetable
+            Timetable table = pattern.getScheduledTimetable();
+            // A Stop may occur more than once in a pattern, so iterate over all Stops.
+            int sidx = 0;
+            for (Stop currStop : table.getPattern().getStopPattern().stops) {
+                if (currStop != stop) continue;
+                for (ServiceDay sd : req.rctx.serviceDays) {
+                    TripTimes tt = table.getNextTrip(state, sd, sidx, true);
+                    if (tt != null) {
+                        times.times.add(new TripTimeShort(tt, sidx, stop));
+                    }
+                }
+                sidx++;
+            }
+            if ( ! times.times.isEmpty()) ret.add(times);
+        }
+        return ret;
+    }
+
 }
