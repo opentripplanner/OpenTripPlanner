@@ -38,23 +38,16 @@ public class AutomatonTest extends TestCase {
         // NFA nfa = seq(WALK, STATION, star(TRANSIT), STATION, WALK).toNFA();
         // NFA nfa = new NTKleenePlus(new NTTrivial(TRANSIT)).toNFA();
         NFA nfa = itinerary.toNFA();
-        System.out.print(nfa.toGraphViz());
         DFA dfa = new DFA(nfa);
-        System.out.print(dfa.toGraphViz());
-        System.out.print(dfa.dumpTable());
         testParse(dfa);
         nfa = nfa.reverse().reverse().reverse().reverse();
         dfa = new DFA(nfa);
         testParse(dfa);
 
         dfa = dfa.minimize();
-        System.out.print(dfa.toGraphViz());
-        System.out.print(dfa.dumpTable());
         testParse(dfa);
 
         dfa = itinerary.toDFA().minimize();
-        System.out.print(dfa.toGraphViz());
-        System.out.print(dfa.dumpTable());
         testParse(dfa);
 
         // dfa = seq(star(NONTHRU), star(THRU)).toDFA();

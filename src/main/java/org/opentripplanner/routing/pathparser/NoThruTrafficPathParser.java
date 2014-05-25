@@ -39,8 +39,8 @@ public class NoThruTrafficPathParser extends PathParser {
         //T*I*N*I*(T+I*N*I*)*
         Nonterminal rule = seq(star(TRANSIT), star(NOTRAFFIC), star(REGULAR), star(NOTRAFFIC), star(plus(TRANSIT), star(NOTRAFFIC), star(REGULAR), star(NOTRAFFIC)));
         DFA = rule.toDFA().minimize();
-        System.out.println(DFA.toGraphViz());
-        System.out.println(DFA.dumpTable());
+        // System.out.println(DFA.toGraphViz());
+        // System.out.println(DFA.dumpTable());
     }
 
     @Override
