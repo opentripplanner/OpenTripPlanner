@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
@@ -58,6 +59,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -252,40 +254,44 @@ public class TestPatternHopFactory extends TestCase {
         assertTrue(endTime < startTime + 60 * 60);
     }
 
-    // FIXME: Return *which* hop, exactly? The current implementation depends on magic.
-    public PatternHop getHopOut(Vertex v) {
-        PatternHop patternHop = null;
-        for (TransitBoardAlight e : filter(v.getOutgoing(), TransitBoardAlight.class)) {
-            if (!e.isBoarding())
-                continue;
-            
-            for (PatternHop f : filter(e.getToVertex().getOutgoing(), PatternHop.class)) {
-                patternHop = f;
+    /* Somewhat hackish convenience method to grab a hop edge on a particular route leaving a particular stop. */
+    private PatternHop getHopEdge(String stopId, String routeId) {
+        Vertex stopDepartVertex = graph.getVertex("agency_" + stopId + "_depart");
+        for (Edge edge : stopDepartVertex.getOutgoing()) {
+            if (edge instanceof TransitBoardAlight) {
+                TransitBoardAlight tba = ((TransitBoardAlight) edge);
+                if (tba.isBoarding() && tba.getPattern().getRoute().getId().getId().equals(routeId)) {
+                    for (Edge edge2: tba.getToVertex().getOutgoing()) {
+                        if (edge2 instanceof PatternHop) {
+                            return (PatternHop) edge2;
+                        }
+                    }
+                }
             }
         }
-        return patternHop;
+        return null;
     }
 
     public void testShapeByLocation() throws Exception {
-        Vertex stop_g = graph.getVertex("agency_G_depart");
-        PatternHop hop = getHopOut(stop_g);
-        Geometry geometry = hop.getGeometry();
-        assertTrue(geometry.getLength() > 1.0);
-
-        Vertex stop_a = graph.getVertex("agency_A_depart");
-        hop = getHopOut(stop_a);
-        geometry = hop.getGeometry();
-        assertTrue(geometry.getLength() > 0.009999);
-        assertTrue(geometry.getLength() < 0.010001);
-
+        PatternHop hop;
+        Geometry geom;
+        // Only route 4 goes through stop G and route 4 should contain only one pattern.
+        hop = getHopEdge("G", "4");
+        geom = hop.getGeometry();
+        assertEquals(geom.getLength(), 1.16, 0.1);
+        // Only route 1 goes through stop A, and route 1 should contain only one pattern.
+        hop = getHopEdge("A", "1");
+        geom = hop.getGeometry();
+        assertEquals(geom.getLength(), 0.01, 0.005);
     }
 
     public void testShapeByDistance() throws Exception {
-        Vertex stop_i = graph.getVertex("agency_I_depart");
-        PatternHop hop = getHopOut(stop_i);
-        Geometry geometry = hop.getGeometry();
-        assertTrue(geometry.getLength() > 1.0);
-        assertTrue(geometry.getLength() < 2.0);
+        PatternHop hop;
+        Geometry geom;
+        // Both routes 5 and 6 go through stop I.
+        hop = getHopEdge("I", "5");
+        geom = hop.getGeometry();
+        assertEquals(geom.getLength(), 1.73, 0.1);
     }
 
     public void testPickupDropoff() throws Exception {
