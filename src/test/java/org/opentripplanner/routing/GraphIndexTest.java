@@ -10,9 +10,13 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
+import java.util.List;
+
 /**
  * Check that the graph index is created, that GTFS elements can be found in the index, and that
  * the indexes are coherent with one another.
+ *
+ * TODO: The old transit index doesn't exist anymore, and the new one needs more tests.
  */
 public class GraphIndexTest extends GtfsTest {
 
@@ -70,8 +74,18 @@ public class GraphIndexTest extends GtfsTest {
     }
 
     public void testSpatialIndex() {
-        graph.index.stopSpatialIndex.query(1,1,1);
-        fail("The old transit index doesn't exist anymore, and the new one needs more tests.");
+        Stop stopJ = graph.index.stopForId.get(new AgencyAndId("agency", "J"));
+        Stop stopL = graph.index.stopForId.get(new AgencyAndId("agency", "L"));
+        Stop stopM = graph.index.stopForId.get(new AgencyAndId("agency", "M"));
+        TransitStop stopvJ = graph.index.stopVertexForStop.get(stopJ);
+        TransitStop stopvL = graph.index.stopVertexForStop.get(stopL);
+        TransitStop stopvM = graph.index.stopVertexForStop.get(stopM);
+        // There are a two other stops within 100 meters of stop J.
+        List<TransitStop> stops = graph.index.stopSpatialIndex.query(stopJ.getLon(), stopJ.getLat(), 100);
+        assertTrue(stops.contains(stopvJ));
+        assertTrue(stops.contains(stopvL));
+        assertTrue(stops.contains(stopvM));
+        assertEquals(stops.size(), 3);
     }
 
     public void testParentStations() {
