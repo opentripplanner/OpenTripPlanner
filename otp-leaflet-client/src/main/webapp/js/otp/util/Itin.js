@@ -164,17 +164,21 @@ otp.util.Itin = {
         asHtml = (typeof asHtml === "undefined") ? true : asHtml;
         var text = '';
         if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
+            var sprintf_values = {
+                'ordinal_exit_number': otp.util.Text.ordinal(step.exit),
+                'street_name': step.streetName
+            };
             if (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE") {
                 if (asHtml) {
-                    text +=  _tr('Take roundabout <b>counterclockwise</b> to <b>%s</b> exit on <b>%s</b>', otp.util.Text.ordinal(step.exit), step.streetName);
+                    text +=  _tr('Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b> exit on <b>%(street_name)s</b>', sprintf_values);
                 } else {
-                    text +=  _tr('Take roundabout counterclockwise to %s exit on %s', otp.util.Text.ordinal(step.exit), step.streetName);
+                    text +=  _tr('Take roundabout counterclockwise to %(ordinal_exit_number)s exit on %(street_name)s', sprintf_values);
                 }
             } else {
                 if (asHtml) {
-                    text +=  _tr('Take roundabout <b>clockwise</b> to <b>%s</b> exit on <b>%s</b>', otp.util.Text.ordinal(step.exit), step.streetName);
+                    text +=  _tr('Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit on <b>%(street_name)s</b>', sprintf_values);
                 } else {
-                    text +=  _tr('Take roundabout clockwise to %s exit on %s', otp.util.Text.ordinal(step.exit), step.streetName);
+                    text +=  _tr('Take roundabout clockwise to %(ordinal_exit_number)s exit on %(street_name)s', sprintf_values);
                 }
             }
 

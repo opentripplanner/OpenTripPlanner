@@ -26,7 +26,8 @@ otp.util.Text = {
     
     ordinal : function(n) {
         var ordinals = {
-            //TRANSLATORS: Take roundabout to [nth] exit on [streetname]
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             1: _tr('first'),
             2: _tr('second'),
             3: _tr('third'),

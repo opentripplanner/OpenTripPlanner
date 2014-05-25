@@ -160,9 +160,9 @@ var options = {
         keyseparator: '_|_',
 	preload: [otp.config.locale_short],
 	lng: otp.config.locale_short,
-	postProcess: 'add_nekaj', //Adds | around every string that is translated
-	shortcutFunction: 'sprintf',
-	//postProcess: 'sprintf',
+        /*postProcess: 'add_nekaj', //Adds | around every string that is translated*/
+        /*shortcutFunction: 'sprintf',*/
+        /*postProcess: 'sprintf',*/
 	debug: true,
 	getAsync: false, //TODO: make async
 	fallbackOnEmpty: true,
@@ -178,7 +178,32 @@ i18n.addPostProcessor('add_nekaj', function(val, key, opts) {
 
 i18n.init(options, function(t) {
     console.log("loaded");
-    _tr = t;
+    //Accepts Key, value or key, value1 ... valuen
+    //Key is string to be translated
+    //Value is used for sprintf parameter values
+    //http://www.diveintojavascript.com/projects/javascript-sprintf
+    //Value is optional and can be one parameter as javascript object if key
+    //has named parameters
+    //Or can be multiple parameters if used as positional sprintf parameters
+    _tr = function() {
+        var arg_length = arguments.length;
+        //Only key
+        if (arg_length == 1) {
+            key = arguments[0];
+            return t(key); 
+        //key with sprintf values
+        } else if (arg_length > 1) {
+            key = arguments[0];
+            values = [];
+            for(var i = 1; i < arg_length; i++) {
+                values.push(arguments[i]);
+            }
+            return t(key, {postProcess: 'sprintf', sprintf: values}); 
+        } else {
+            console.error("_tr function doesn't have an argument");
+            return "";
+        }
+    };
     ngettext = function(singular, plural, value) {
         return t(singular, {count: value, postProcess: 'sprintf', sprintf: [value]});
     };

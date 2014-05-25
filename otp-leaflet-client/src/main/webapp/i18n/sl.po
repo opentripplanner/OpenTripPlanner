@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-22 13:56+0200\n"
-"PO-Revision-Date: 2014-05-22 13:59+0200\n"
+"POT-Creation-Date: 2014-05-25 15:12+0200\n"
+"PO-Revision-Date: 2014-05-25 15:17+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
@@ -20,55 +20,55 @@ msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:223
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:254
 msgid "Transit"
 msgstr "Javni prevoz"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:226
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:257
 msgid "Bus Only"
 msgstr "Avtobus"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:229
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
 msgid "Rail Only"
 msgstr "Vlak"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:232
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:263
 msgid "Bicycle Only"
 msgstr "Kolo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:235
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:266
 msgid "Bicycle &amp; Transit"
 msgstr "Kolo &amp; Javni prevoz"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:238
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:269
 msgid "Walk Only"
 msgstr "Pešačenje"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:241
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
 msgid "Drive Only"
 msgstr "Avto"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:248
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:279
 msgid "Rented Bicycle"
 msgstr "Sposojeno kolo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:251
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:282
 msgid "Transit & Rented Bicycle"
 msgstr "Sposojeno kolo &amp; Javni prevoz"
 
@@ -229,8 +229,8 @@ msgstr "pravočasno"
 
 #. [distance] to [name of destination]
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:363
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:253
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:339
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:252
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:338
 msgctxt "direction"
 msgid " to "
 msgstr " do "
@@ -239,8 +239,8 @@ msgstr " do "
 #. transport
 #. headsign>. Used in showing itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:382
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:249
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:336
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:248
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:335
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:115
 msgctxt "bus_direction"
 msgid " to "
@@ -267,25 +267,25 @@ msgid "End"
 msgstr "Konec"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:448
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:302
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:301
 msgid "Trip Summary"
 msgstr "Povzetek potovanja"
 
 #. Travel: hour date on which this trip is made
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:450
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:303
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:302
 msgid "Travel"
 msgstr "Potuj na"
 
 #. Time: minutes How long is this trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:452
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:304
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:303
 msgid "Time"
 msgstr "Trajanje"
 
 #. Total foot distance for trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:460
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:308
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:307
 msgid "Total Walk"
 msgstr "Skupno hoje"
 
@@ -296,13 +296,13 @@ msgstr "Skupno kolesa"
 
 #. how many public transit transfers in a trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:473
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:306
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:305
 msgid "Transfers"
 msgstr "Prestopov"
 
 #. cost of trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:479
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:311
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:310
 msgid "Fare"
 msgstr "Cena"
 
@@ -354,8 +354,8 @@ msgid "Stop"
 msgstr "Postaja"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:576
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:264
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:349
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:263
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:348
 msgid "Time in transit"
 msgstr "Časa na vožnji"
 
@@ -377,51 +377,52 @@ msgstr "Ostanite na vozilu"
 #. Alight Public transit route name (agency name
 #. Stop ID ) end time
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:641
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:267
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:352
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:266
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:351
 #, fuzzy
 msgid "Alight"
 msgstr "Izstop"
 
 #. Fare Currency Fare price
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:102
-msgid "%1$s %2$s"
-msgstr "%2$s %1$s"
+#, python-format
+msgid "%(currency)s %(price)s"
+msgstr "%(price)s %(currency)s"
 
 #. Start: location at [time date] (Used in print itinerary
 #. when do you start your trip)
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:238
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:325
-#, fuzzy, python-format
-msgid "Start: %s at %s"
-msgstr "Začetek: %s ob %s"
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:237
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:324
+#, python-format
+msgid "Start: %(location)s at %(time_date)s"
+msgstr "Začetek: %(location)s ob %(time_date)s"
 
 #. Board Public transit route name (agency name
 #. Stop ID ) start time
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:262
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:347
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:261
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:346
 msgid "Board"
 msgstr "Vstop"
 
 #. End: location at [time date] (Used in print itinerary
 #. when do you come at a destination)
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:298
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:371
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:297
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:370
 #, python-format
-msgid "End: %s at %s"
-msgstr "Konec: %s ob %s"
+msgid "End: %(location)s at %(time_date)s"
+msgstr "Konec: %(location)s ob %(time_date)s"
 
 #. text at end of email %s is link to this itinerary
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:375
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:374
 #, python-format
 msgid ""
 "\n"
 "View itinerary online:\n"
-"%s\n"
+"%(itinerary_link)s\n"
 msgstr ""
 "\n"
 "Oglejte si pot na spletu:\n"
-"%s"
+"%(itinerary_link)s\n"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:164
@@ -447,50 +448,46 @@ msgstr "Začetek"
 msgid "Destination"
 msgstr "Cilj"
 
-#. %d is error id number Used in showing why trip wasn't
-#. found
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:423
+#. Used in showing why trip wasn't found
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:421
 #, python-format
-msgid "Error %s"
-msgstr "Napaka %s"
+msgid "Error %(error_id)d"
+msgstr "Napaka %(error_id)d"
 
 #. Title of no trip dialog
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:425
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:423
 #, fuzzy
 msgid "No Trip Found"
 msgstr "Poti ni najdene"
 
-#. %s is bikeshare company name (shown
-#. when clicked on route on map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:482
+#. shown when clicked on route on map
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:479
 #, fuzzy, python-format
-msgid "Your %s route"
-msgstr "Kolesarjenje s kolesom sposojenim pri %s"
+msgid "Your %(bike_share_name)s route"
+msgstr "Kolesarjenje s kolesom sposojenim pri %(bike_share_name)s"
 
 #. Text which is shown when clicking bike route
 #. in a map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:488
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:485
 #, fuzzy
 msgid "Your bike route"
 msgstr "Kolesarska pot"
 
-#. %s is bikeshare company name. Shown in map when
-#. clicking on a route
+#. Shown in map when clicking on a route
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:493
+#, fuzzy, python-format
+msgid "Walk to the %(bike_share_name)s dock."
+msgstr "Hodite do postaje podjetja %(bike_share_name)s."
+
+#. Shown in map when clicking on a route
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:497
 #, fuzzy, python-format
-msgid "Walk to the %s dock."
-msgstr "Hodite do postaje podjetja %s."
-
-#. %s is bikeshare company name. Shown in map when
-#. clicking on a route
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:502
-#, fuzzy, python-format
-msgid "Walk from the %s dock to your destination."
-msgstr "Hodite od postaje podjetja %s do vašega cilja."
+msgid "Walk from the %(bike_share_name)s dock to your destination."
+msgstr "Hodite od postaje podjetja %(bike_share_name)s do vašega cilja."
 
 #. Text which is shown when clicking walking
 #. route in a map
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:508
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:503
 #, fuzzy
 msgid "Your walk route"
 msgstr "Vaša pot"
@@ -624,89 +621,100 @@ msgstr ""
 msgid "Aerial Tram"
 msgstr "Gondola"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:180
-#, python-format
-msgid "Take roundabout <b>counterclockwise</b> to <b>%s</b> exit on <b>%s</b>"
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:184
+#, fuzzy, python-format
+msgid ""
+"Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b>"
+" exit on <b>%(street_name)s</b>"
 msgstr ""
 "V krožišču vozite v <b>nasprotni smeri urinega kazalca</b> in pri "
-"<b>%s</b> izvozu zavijte na <b>%s</b>"
-
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:182
-#, python-format
-msgid "Take roundabout counterclockwise to %s exit on %s"
-msgstr ""
-"V krožišču vozite v nasprotni smeri urinega kazalca in pri %s izvozu "
-"zavijte na %s"
+"<b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:186
-#, python-format
-msgid "Take roundabout <b>clockwise</b> to <b>%s</b> exit on <b>%s</b>"
+#, fuzzy, python-format
+msgid ""
+"Take roundabout counterclockwise to %(ordinal_exit_number)s exit on "
+"%(street_name)s"
 msgstr ""
-"V krožišču vozite v <b>smeri urinega kazalca</b> in pri <b>%s</b> izvozu "
-"zavijte na <b>%s</b>"
+"V krožišču vozite v nasprotni smeri urinega kazalca in pri "
+"%(ordinal_exit_number)s izvozu zavijte na %(street_name)s"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:188
-#, python-format
-msgid "Take roundabout clockwise to %s exit on %s"
-msgstr "V krožišču vozite v smeri urinega kazalca in pri %s izvozu zavijte na %s"
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:190
+#, fuzzy, python-format
+msgid ""
+"Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit "
+"on <b>%(street_name)s</b>"
+msgstr ""
+"V krožišču vozite v <b>smeri urinega kazalca</b> in pri "
+"<b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>"
+
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:192
+#, fuzzy, python-format
+msgid ""
+"Take roundabout clockwise to %(ordinal_exit_number)s exit on "
+"%(street_name)s"
+msgstr ""
+"V krožišču vozite v smeri urinega kazalca in pri %(ordinal_exit_number)s "
+"izvozu zavijte na %(street_name)s"
 
 #. Start on [stret name] heading [compas direction]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:196
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:200
 msgid "Start on"
 msgstr "Začnite na"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:196
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:200
 msgid " heading "
 msgstr " v smeri "
 
 #. [Relative direction (Left/Right...)] to continue
 #. on /on to [streetname]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:202
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:206
 msgid "to continue on"
 msgstr "nadaljujte na"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:202
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:206
 msgid "on to"
 msgstr "na"
 
-#. Take roundabout to [nth] exit on [streetname]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:30
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:31
 msgid "first"
 msgstr "prvem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:31
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:32
 msgid "second"
 msgstr "drugem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:32
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:33
 msgid "third"
 msgstr "tretjem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:33
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:34
 msgid "fourth"
 msgstr "četrtem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:34
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:35
 msgid "fifth"
 msgstr "petem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:35
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:36
 msgid "sixth"
 msgstr "šestem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:36
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:37
 msgid "seventh"
 msgstr "sedmem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:37
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:38
 msgid "eight"
 msgstr "osmem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:38
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:39
 msgid "ninth"
 msgstr "devetem"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:39
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:40
 msgid "tenth"
 msgstr "desetem"
 

@@ -417,10 +417,8 @@ otp.modules.planner.PlannerModule =
     
     noTripFound : function(error) {
         var msg = error.msg;
-        //FIXME: Why do we need to convert int to string for sprintf?
-        //TRANSLATORS: %d is error id number Used in showing why trip wasn't
-        //found
-        if(error.id) msg += ' (' + _tr('Error %s', error.id.toString()) + ')';
+        //TRANSLATORS: Used in showing why trip wasn't found
+        if(error.id) msg += ' (' + _tr('Error %(error_id)d', {'error_id': error.id}) + ')';
         //TRANSLATORS: Title of no trip dialog
         otp.widgets.Dialogs.showOkDialog(msg, _tr('No Trip Found'));
     },
@@ -477,9 +475,8 @@ otp.modules.planner.PlannerModule =
             }
             else if(leg.mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
-                        //TRANSLATORS: %s is bikeshare company name (shown
-                        //when clicked on route on map
-                	polyline.bindPopup(_tr('Your %s route', otp.config.bikeshareName));
+                        //TRANSLATORS: shown when clicked on route on map
+                	polyline.bindPopup(_tr('Your %(bike_share_name)s route', {'bike_share_name': otp.config.bikeshareName}));
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
                 }
                 else { // regular bike trip
@@ -492,14 +489,12 @@ otp.modules.planner.PlannerModule =
             else if(leg.mode === 'WALK') {
                 if(queryParams.mode === 'WALK,BICYCLE') { 
                     if(i == 0) {
-                        //TRANSLATORS:%s is bikeshare company name. Shown in map when
-                        //clicking on a route 
-                    	polyline.bindPopup(_tr('Walk to the %s dock.', otp.config.bikeshareName));
+                        //TRANSLATORS:Shown in map when clicking on a route 
+                    	polyline.bindPopup(_tr('Walk to the %(bike_share_name)s dock.', {'bike_share_name': otp.config.bikeshareName}));
                     }
                     if(i == 2) {
-                        //TRANSLATORS:%s is bikeshare company name. Shown in map when
-                        //clicking on a route 
-                    	polyline.bindPopup(_tr('Walk from the %s dock to your destination.', otp.config.bikeshareName));
+                        //TRANSLATORS: Shown in map when clicking on a route 
+                    	polyline.bindPopup(_tr('Walk from the %(bike_share_name)s dock to your destination.', {'bike_share_name': otp.config.bikeshareName}));
                     }
                 }
                 else { // regular walking trip
