@@ -2,7 +2,7 @@
 
 OpenTripPlanner (OTP) is an open source multi-modal trip planner. It depends on open data in open standard file formats (GTFS and OpenStreetMap), and includes a REST API for journey planning as well as a map-based Javascript client. OpenTripPlanner can also create travel time contour visualizations and compute accessibility indicators for planning and research applications. For more information, see the project website: http://opentripplanner.org
 
-The main Java server code is in `src/main/`. OTP also includes a Javascript client based on the Leaflet mapping library in `src/client/`. The Maven build produces a JAR file at `target/otp.jar` containing all necessary code and dependencies to run OpenTripPlanner. \Following the 0.11.0 release, OpenTripPlanner has changed from a multi-module Maven project to a single Maven module.
+The main Java server code is in `src/main/`. OTP also includes a Javascript client based on the Leaflet mapping library in `src/client/`. The Maven build produces a JAR file at `target/otp.jar` containing all necessary code and dependencies to run OpenTripPlanner. Following the 0.11.0 release, OpenTripPlanner has changed from a multi-module Maven project to a single Maven module.
 
 Additional instructions are available on the [OpenTripPlanner wiki](https://github.com/opentripplanner/OpenTripPlanner/wiki).
 Here's a [quick introduction](https://github.com/opentripplanner/OpenTripPlanner/wiki/TwoMinutes).
