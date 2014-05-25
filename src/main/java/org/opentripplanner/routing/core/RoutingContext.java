@@ -281,6 +281,7 @@ public class RoutingContext implements Cloneable {
         // If the from and to vertices are generated and lie on some of the same edges, we need to wire them
         // up along those edges so that we don't get odd circuitous routes for really short trips.
         // TODO(flamholz): seems like this might be the wrong place for this code? Can't find a better one.
+        //
         if (fromVertex instanceof StreetLocation && toVertex instanceof StreetLocation) {
             StreetVertex fromStreetVertex = (StreetVertex) fromVertex;
             StreetVertex toStreetVertex = (StreetVertex) toVertex;

@@ -28,6 +28,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.Setter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
@@ -38,13 +39,11 @@ import com.vividsolutions.jts.geom.Envelope;
 @Path("/routers/{routerId}/bike_rental")
 @XmlRootElement
 public class BikeRental {
-    private GraphService graphService;
 
     @Context // FIXME inject Application context
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
-    
+    @Setter
+    private GraphService graphService;
+
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public BikeRentalStationList getBikeRentalStations(
