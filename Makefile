@@ -7,7 +7,7 @@ LANGS=sl en
 JS_FILESPATH=./otp-leaflet-client/src/main/webapp/js/otp
 JS_FILES = $(shell find $(JS_FILESPATH)/ -name '*.js')
 LOCALE_FILES = $(shell find $(LOCALE_FOLDER)/ -name '*.po')
-LAN=en
+LAN=sl_SI
 
 .PHONY: all
 all: $(LOCALE_FILES)
@@ -29,11 +29,13 @@ $(LOCALE_FILES): $(TEMPLATE_FILE)
 #Updates js files from new translations in po files
 .PHONY: update_js
 update_js: $(LOCALE_FILES)
-	for LAN in $(LANGS); do i18next-conv -l "$$LAN" -s "$(LOCALE_FOLDER)/$$LAN.po" -t "$(JS_FILESPATH)/locale/$$LAN.json"; done
+	for LAN in $(LANGS); do $(I18NEXT) -l "$$LAN" -s "$(LOCALE_FOLDER)/$$LAN.po" -t "$(JS_FILESPATH)/locale/$$LAN.json"; done
 	touch update_js
 
-#Creates new translation
+#Creates new translation with LAN culture info
 .PHONY: init
 init:
-	$(PYBABEL) init --domain "$(LAN)" --locale "$(LAN)" --input-file $(TEMPLATE_FILE) --output-file $(LOCALE_FOLDER)/"$(LAN).po";
+	#$(PYBABEL) init --domain "$(LAN)" --locale "$(LAN)" --input-file $(TEMPLATE_FILE) --output-file $(LOCALE_FOLDER)/"$(LAN).po";
+	msginit -l "$(LAN)" -i $(TEMPLATE_FILE) -o "$(LOCALE_FOLDER)/$(LAN).po";
+
 
