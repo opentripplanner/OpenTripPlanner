@@ -1,3 +1,25 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [Localization HOWTO](#localization-howto)
+  - [Adding new strings](#adding-new-strings)
+    - [Examples:](#examples)
+      - [Normal string](#normal-string)
+      - [Normal string with context](#normal-string-with-context)
+      - [Plural strings](#plural-strings)
+  - [Updating translations](#updating-translations)
+    - [Babel install](#babel-install)
+    - [i18next-conv install](#i18next-conv-install)
+    - [Updating](#updating)
+  - [Creating new translations](#creating-new-translations)
+      - [Short version](#short-version)
+      - [Long version](#long-version)
+  - [Translating](#translating)
+    - [Gotchas](#gotchas)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Localization HOWTO
 
 
@@ -89,10 +111,11 @@ Babel is used to extract strings from javascript file to translation template an
 
 ### Babel install
 You can install it from a package repository if it is in it or you can use [virtualenv](http://simononsoftware.com/virtualenv-tutorial/).
+
 1. Install virtualenv (This depends on your operating system)
 2. Create virtualenv with name .venv in directory where otp-leaflet and other files resides. `virtualenv2 .venv`
 3. Use virtualenv `source .venv/bin/activate`
-3. Install babel `pip install babel`
+4. Install babel `pip install babel`
 
 If you didn't install babel from virtualenv in root OpenTripPlanner directory you have to add path to babel in Makefile. change `PYBABEL` variable to path to pybabel.
 
