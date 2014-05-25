@@ -56,7 +56,7 @@ public class GrizzlyServer {
 
         /* HTTP (non-encrypted) listener */
         NetworkListener httpListener = new NetworkListener("otp_insecure", params.bindAddress, params.port);
-        // OTP is CPU-bound, we don't want more threads than cores. We should switch to async handling.
+        // OTP is CPU-bound, we don't want more threads than cores. TODO: We should switch to async handling.
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
             .setCorePoolSize(1)
             .setMaxPoolSize(Runtime.getRuntime().availableProcessors());

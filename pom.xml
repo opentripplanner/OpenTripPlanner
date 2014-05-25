@@ -200,11 +200,11 @@
                         </goals>
                         <configuration>
                             <finalName>otp</finalName>
-                            <!-- MinimizeJar removes unused classes, (classes not imported explicitly
-                              by name). Jersey auto-scans for REST resources in OTP, so use include filters
-                              to force-include classes that are dynamically loaded by name/auto-scanned. -->
-                            <!-- It is removing things like org/codehaus/jettison/json/JSONException
-                              even though they are explicitly imported in the source. <minimizeJar>true</minimizeJar>
+                            <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
+                              We have eliminated most Jersey auto-scanning, but there is still some need for include
+                              filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
+                            <!-- This roughly halves the size of the OTP JAR, bringing it down to around 20 MB.
+                              <minimizeJar>true</minimizeJar>
                               <filters> <filter> <artifact>com.sun.jersey:*</artifact> <includes> <include>**</include>
                               </includes> </filter> <filter> <artifact>org.opentripplanner:*</artifact>
                               <includes> <include>**</include> </includes> </filter> </filters> -->
