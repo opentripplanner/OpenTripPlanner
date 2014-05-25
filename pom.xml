@@ -43,6 +43,7 @@
             </resource>
             <resource>
                 <directory>src/main/webapp</directory>
+                <targetPath>client</targetPath>
                 <filtering>false</filtering>
             </resource>
         </resources>

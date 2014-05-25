@@ -81,10 +81,10 @@ public class GrizzlyServer {
         /* 1. A Grizzly wrapper around the Jersey Application. */
         Application app = new OTPApplication(server);
         HttpHandler dynamicHandler = ContainerFactory.createContainer(HttpHandler.class, app);
-        httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp");
+        httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 
-        /* 2. A static content server for the client JS apps etc. Now using classpath! check http://localhost:8080/maven-version.properties */
-        HttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/");
+        /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
+        HttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/client/");
         httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
 
         /* 3. Test alternate method (no Jersey). */
