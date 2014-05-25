@@ -7,15 +7,19 @@ import lombok.Getter;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.spt.GraphPath;
 
 public class Option {
 
-    @Getter List<Segment> segments = Lists.newLinkedList();
-    @Getter int finalWalkTime;
-    @Getter Stats stats;
-    @Getter String summary;
+    public List<Segment> segments = Lists.newLinkedList();
+    public int finalWalkTime;
+    public Stats stats;
+    public String summary;
+    public List<WalkStep> walkSteps;
 
     public Option (Ride ride, int finalWalkTime, TimeWindow window, double walkSpeed) {
         stats = new Stats();
@@ -32,6 +36,7 @@ public class Option {
         summary = generateSegmentSummary();
     }
 
+    /** A constructor for an option that includes only a street mode, not transit. */
     public Option (State state) {
         stats = new Stats();
         int time = (int) state.getElapsedTimeSeconds();
@@ -40,6 +45,8 @@ public class Option {
         TraverseMode mode = state.getNonTransitMode();
         if (mode == TraverseMode.WALK) this.finalWalkTime = time;
         summary = mode.toString();
+        GraphPath path = new GraphPath(state, false);
+        walkSteps = PlanGenerator.generateWalkSteps(path.states.toArray(new State[0]), null);
     }
 
     public String generateSegmentSummary() {
