@@ -1,4 +1,5 @@
-PYBABEL=../test_translations/.venv/bin/pybabel
+PYBABEL=.venv/bin/pybabel
+I18NEXT=./node_modules/.bin/i18next-conv
 LOCALE_FOLDER=./otp-leaflet-client/src/main/webapp/i18n
 BABEL_CFG=$(LOCALE_FOLDER)/babel.cfg
 TEMPLATE_FILE=$(LOCALE_FOLDER)/messages.pot
