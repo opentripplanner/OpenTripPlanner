@@ -9,18 +9,33 @@ In OTP gettext is used for localization. Why?
 - [Context support](http://pology.nedohodnik.net/doc/user/en_US/ch-poformat.html#sec-poautocmnt)
 - Automatic string extraction
 - [Translator comments](http://pology.nedohodnik.net/doc/user/en_US/ch-poformat.html#sec-poautocmnt) support
+- Source reference (It is saved where each string is used)
+
+On frontend [i18next](http://i18next.com) library is used.
+
+3 types of files are used in OTP localization:
+- **POT file** this is message template. It is used for creating new PO files.
+- **PO file** this is file which translators translate.
+- **json file** this is PO translated file converted to json
+
+You must edit only PO file. POT file is created and updated automatically and json also.
+All translation files are in folder **otp-leaflet-client/src/main/webapp/i18n** .
 
 Adding new strings
 ------------------
 
-You add string in Javascript file and you surround it with a call to a special function. Name of the function depends on what string it is:
+You add string in javascript at the place you want to use it and you surround it with a call to a special function. Name of the function depends on what string it is:
 
 - normal string `_tr('string', parameters)`
 - normal string with **context** `ngettext('context', 'string')`
 - string with a plural `ngettext('singular', 'plural', value)`
 - string with a plural and context `npgettext('context', 'singular', 'plural', value)`
 
-When you add strings if you think that translator wouldn't now where string is used or in what way add translator comments:
+More about [Sprintf parameters](http://www.diveintojavascript.com/projects/javascript-sprintf).
+
+Context is any string (preferably without spaces and short) that is used to disambiguate translation of key. It is used when developers get input from translators that some string has to be translated to different translation in different parts of a program. Those parts get different context.
+
+When you add strings if you think that translator wouldn't now how string is used or in what are parameters add translator comments:
 ```javascript
 //TRANSLATORS: Start: location at [time date] (Used in print itinerary  
 //when do you start your trip)                                          
@@ -28,14 +43,49 @@ html += '<h3>' + _tr('Start: %s at %s', this.getStartLocationStr(), this.getStar
 ```
 Translator comments **must** always start with "**TRANSLATORS:**" and must be in the line immediately before translated string otherwise they wouldn't be extracted together with a string.
 
-**TODO: EXAMPLES**
-translators comments, context etc...
+### Examples:
 
-If you add new strings it is nice to update translation template and translations but it is not mandatory. It is also nice to write string change to commit message.
+#### Normal string
+```javascript
+//TRANSLATORS: Board Public transit route name (agency name     
+//Stop ID ) start time                                          
+html += '<li><b>' + _tr('Board') + '</b>: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' +
+
+//with named sprintf parameters ()preferred option)
+
+//TRANSLATORS: Start: location at [time date] (Used in print itinerary  
+//when do you start your trip)                                          
+html += '<h3>' + _tr('Start: %(location)s at %(time_date)s', { 'location': this.getStartLocationStr(), 'time_date': this.getStartTimeStr()}) + '</h3>';
+
+// with positional sprintf parameters
+html += '<h3>' + _tr('End: %1$s at %2$s', this.getEndLocationStr(), this.getEndTimeStr())+'</h3>';
+```
+
+
+
+#### Normal string with context
+```javascript
+ if(leg.headsign) html +=  pgettext("bus_direction", " to ") + leg.headsign;
+ 
+//same string could be different translation
+//TRANSLATORS: [distance] to [name of destination]              
+html += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+leg.to.name;
+
+```
+
+#### Plural strings
+
+```javascript
+//TRANSLATORS: widget title                                             
+this.setTitle(ngettext("%d Itinerary Returned", "%d Itineraries Returned", this.itineraries.length));
+```
+
+If you add new strings it is nice to update translation template and translations but it is not mandatory. It is also nice to write "string change" to commit message.
 
 Updating translations
 ---------------------
-Translations are updated with a help of [Babel](http://babel.pocoo.org/) and [i18next-conv](https://github.com/jamuhl/i18next-gettext-converter) (xgettext doesn't support all things in Javascript yet)
+Translations are updated with a help of [Babel](http://babel.pocoo.org/) and [i18next-conv](https://github.com/jamuhl/i18next-gettext-converter) (xgettext doesn't support all things in Javascript yet).
+Babel is used to extract strings from javascript file to translation template and for updating translation. i18next-conv is used to convert translation files to json which is used in Javascript translation library.
 
 ### Babel install
 You can install it from a package repository if it is in it or you can use [virtualenv](http://simononsoftware.com/virtualenv-tutorial/).
@@ -43,6 +93,8 @@ You can install it from a package repository if it is in it or you can use [virt
 2. Create virtualenv with name .venv in directory where otp-leaflet and other files resides. `virtualenv2 .venv`
 3. Use virtualenv `source .venv/bin/activate`
 3. Install babel `pip install babel`
+
+If you didn't install babel from virtualenv in root OpenTripPlanner directory you have to add path to babel in Makefile. change `PYBABEL` variable to path to pybabel.
 
 ### i18next-conv install
 You need [nodejs](http://nodejs.org/)
@@ -67,13 +119,21 @@ PO files are created from a template with a help of msginit program which is run
 `msginit init -l LAN -i messages.pot -o LAN.po`
 Where LAN is culture code.
 All translation files are in folder **otp-leaflet-client/src/main/webapp/i18n** .
-If you are translating for a country from where this language comes from use two letter country code (example de, fr, es). If you are translating for other country language use full culture (example de-AT, ca-ES).
+
+Use the ISO language code as culture code, such fr.po for French. Only append the country code in the following circumstances:
+
+- variants of international English: for example, en_GB.po
+- Brazillian Portuguese: pt_BR.po (Brazillian Portuguese), as opposed to pt.po for European Portuguese
+- Chinese: traditional zh_TW.po and simplified zh_CN.po
+
+Based on [Launchpad Translation](https://help.launchpad.net/Translations/YourProject/ImportingTranslations)
+
 In Linux you can see all culture codes you have installed with a command `locale -a`. They are also availible [here](http://download1.parallels.com/SiteBuilder/Windows/docs/3.2/en_US/sitebulder-3.2-win-sdk-localization-pack-creation-guide/30801.htm)
 
 Add new culture to Makefile in LANGS variable.
 
 ## Translating
-For translating you can use any program that supports gettext files. You can also use any text editor but program specific for translating is recommended. Most of them support checking parameter correctness, translation memory, web translating services etc..
+For translating you can use any program that supports gettext files. You can also use any text editor but program specific for translating is recommended. Most of them support checking parameter correctness, translation memory, web translating services etc.. and makes your life easier.
 
 Programs (All are free and open source):
 
