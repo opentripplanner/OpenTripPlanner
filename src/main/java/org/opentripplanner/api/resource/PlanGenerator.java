@@ -758,7 +758,7 @@ public class PlanGenerator {
      * 
      * @return
      */
-    private List<WalkStep> generateWalkSteps(State[] states, WalkStep previous) {
+    public static List<WalkStep> generateWalkSteps(State[] states, WalkStep previous) {
         List<WalkStep> steps = new ArrayList<WalkStep>();
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
@@ -1031,11 +1031,11 @@ public class PlanGenerator {
         return steps;
     }
 
-    private boolean isLink(Edge edge) {
+    private static boolean isLink(Edge edge) {
         return edge instanceof StreetEdge && (((StreetEdge)edge).getStreetClass() & StreetEdge.CLASS_LINK) == StreetEdge.CLASS_LINK;
     }
 
-    private double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
+    private static double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
         double angleDiff = thisAngle - lastAngle;
         if (angleDiff < 0) {
             angleDiff += Math.PI * 2;
@@ -1047,7 +1047,7 @@ public class PlanGenerator {
         return angleDiff;
     }
 
-    private WalkStep createWalkStep(State s) {
+    private static WalkStep createWalkStep(State s) {
         Edge en = s.getBackEdge();
         WalkStep step;
         step = new WalkStep();
@@ -1064,7 +1064,7 @@ public class PlanGenerator {
         return step;
     }
 
-    private List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
+    private static List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
         if (!(edge instanceof EdgeWithElevation)) {
             return new ArrayList<P2<Double>>();
         }
