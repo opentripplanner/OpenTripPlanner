@@ -70,6 +70,7 @@
     "%(currency)s %(price)s": "%(price)s %(currency)s",
     "Start: %(location)s at %(time_date)s": "Začetek: %(location)s ob %(time_date)s",
     "Board": "Vstop",
+    "(%(agency_id)s Stop ID #%(stop_id)s),": "(%(agency_id)s),",
     "End: %(location)s at %(time_date)s": "Konec: %(location)s ob %(time_date)s",
     "\nView itinerary online:\n%(itinerary_link)s\n": [
         "",

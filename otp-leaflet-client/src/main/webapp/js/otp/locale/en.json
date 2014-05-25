@@ -62,6 +62,7 @@
     "%(currency)s %(price)s": "",
     "Start: %(location)s at %(time_date)s": "",
     "Board": "",
+    "(%(agency_id)s Stop ID #%(stop_id)s),": "",
     "End: %(location)s at %(time_date)s": "",
     "\nView itinerary online:\n%(itinerary_link)s\n": "",
     "Set as Start Location": "",

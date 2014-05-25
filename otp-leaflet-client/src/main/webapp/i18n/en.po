@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-25 15:12+0200\n"
+"POT-Creation-Date: 2014-05-25 18:24+0200\n"
 "PO-Revision-Date: 2014-05-15 19:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -215,7 +215,7 @@ msgstr ""
 #. [distance] to [name of destination]
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:363
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:252
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:338
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:336
 msgctxt "direction"
 msgid " to "
 msgstr ""
@@ -225,7 +225,7 @@ msgstr ""
 #. headsign>. Used in showing itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:382
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:248
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:335
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:333
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:115
 msgctxt "bus_direction"
 msgid " to "
@@ -250,25 +250,25 @@ msgid "End"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:448
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:301
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:299
 msgid "Trip Summary"
 msgstr ""
 
 #. Travel: hour date on which this trip is made
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:450
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:302
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:300
 msgid "Travel"
 msgstr ""
 
 #. Time: minutes How long is this trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:452
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:303
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:301
 msgid "Time"
 msgstr ""
 
 #. Total foot distance for trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:460
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:307
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:305
 msgid "Total Walk"
 msgstr ""
 
@@ -279,13 +279,13 @@ msgstr ""
 
 #. how many public transit transfers in a trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:473
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:305
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:303
 msgid "Transfers"
 msgstr ""
 
 #. cost of trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:479
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:310
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:308
 msgid "Fare"
 msgstr ""
 
@@ -334,8 +334,8 @@ msgid "Stop"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:576
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:263
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:348
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:262
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:345
 msgid "Time in transit"
 msgstr ""
 
@@ -355,8 +355,8 @@ msgstr ""
 #. Alight Public transit route name (agency name
 #. Stop ID ) end time
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:641
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:266
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:351
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:265
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:348
 msgid "Alight"
 msgstr ""
 
@@ -369,7 +369,7 @@ msgstr ""
 #. Start: location at [time date] (Used in print itinerary
 #. when do you start your trip)
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:237
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:324
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:322
 #, python-format
 msgid "Start: %(location)s at %(time_date)s"
 msgstr ""
@@ -377,20 +377,28 @@ msgstr ""
 #. Board Public transit route name (agency name
 #. Stop ID ) start time
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:261
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:346
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:344
 msgid "Board"
+msgstr ""
+
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:261
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:265
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:344
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:348
+#, python-format
+msgid "(%(agency_id)s Stop ID #%(stop_id)s),"
 msgstr ""
 
 #. End: location at [time date] (Used in print itinerary
 #. when do you come at a destination)
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:297
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:370
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:295
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:366
 #, python-format
 msgid "End: %(location)s at %(time_date)s"
 msgstr ""
 
 #. text at end of email %s is link to this itinerary
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:374
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:370
 #, python-format
 msgid ""
 "\n"
