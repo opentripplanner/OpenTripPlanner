@@ -907,13 +907,6 @@ public class TestRequest extends TestCase {
     }
 
     /**
-     * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
-     */
-    public void testBikeSwitch() {
-        fail("This feature is known to be broken.");
-    }
-
-    /**
      * Add a trip-to-trip transfer time to a transfer table and check the result
      */
     private void addTripToTripTransferTimeToTable(TransferTable table, String fromStopId,
