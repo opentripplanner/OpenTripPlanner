@@ -37,6 +37,7 @@ public class Deduplicator implements Serializable {
         canonicalIntArrays.clear();
         canonicalStrings.clear();
         canonicalBitSets.clear();
+        canonicalStringArrays.clear();
     }
 
     /** Used to deduplicate time and stop sequence arrays. The same times may occur in many trips. */
