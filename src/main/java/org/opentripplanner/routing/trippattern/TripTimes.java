@@ -136,7 +136,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
         this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
         this.stopSequences = deduplicator.deduplicateIntArray(sequences);
-        this.headsigns = makeHeadsignsArray(stopTimes);
+        this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
         // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
         // We cannot point to the scheduled times because they are shifted, and updated times are not.
         this.arrivalTimes = null;
@@ -404,5 +404,4 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     public boolean isTimepoint(int stopIndex) {
         return timepoints.get(stopIndex);
     }
-
 }
