@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-25 18:24+0200\n"
+"POT-Creation-Date: 2014-05-27 08:10+0200\n"
 "PO-Revision-Date: 2014-05-15 19:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -140,6 +140,10 @@ msgstr ""
 #. Context menu set this point as analysis location
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/analyst/AnalystModule.js:93
 msgid "Set as Analysis Location"
+msgstr ""
+
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:67
+msgid "Bike Share Planner"
 msgstr ""
 
 #. widget name

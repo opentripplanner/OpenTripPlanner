@@ -64,7 +64,7 @@ otp.modules.bikeshare.Utils = {
 otp.modules.bikeshare.BikeShareModule = 
     otp.Class(otp.modules.planner.PlannerModule, {
     
-    moduleName  : "Bike Share Planner",
+    moduleName  : _tr("Bike Share Planner"),
 
     resultsWidget   : null,
     

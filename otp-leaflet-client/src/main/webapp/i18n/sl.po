@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-25 18:24+0200\n"
-"PO-Revision-Date: 2014-05-25 17:57+0200\n"
+"POT-Creation-Date: 2014-05-27 08:10+0200\n"
+"PO-Revision-Date: 2014-05-27 08:11+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
@@ -147,6 +147,10 @@ msgstr "Osveži"
 #, fuzzy
 msgid "Set as Analysis Location"
 msgstr "Uporabi kot lokacijo Analitika"
+
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:67
+msgid "Bike Share Planner"
+msgstr "Planer za sposojena kolesa"
 
 #. widget name
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:108
