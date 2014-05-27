@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-05-27 08:10+0200\n"
+"POT-Creation-Date: 2014-05-27 11:38+0200\n"
 "PO-Revision-Date: 2014-05-15 19:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -98,7 +98,7 @@ msgstr ""
 
 #. widget title
 #: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:62
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:555
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:557
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:31
 msgid "Stop Viewer"
 msgstr ""
@@ -195,8 +195,14 @@ msgstr ""
 msgid "Last"
 msgstr ""
 
+#. Used when passengers can stay on vehicle. Continues
+#. as [agency] route name
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:346
+msgid "CONTINUES AS"
+msgstr ""
+
 #. Something in Public transport is x minutes late
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:352
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:354
 #, python-format
 msgid "%d min late"
 msgid_plural "%d mins late"
@@ -204,7 +210,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Something in Public transport is x minutes early
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:355
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:357
 #, python-format
 msgid "%d min early"
 msgid_plural "%d mins early"
@@ -212,12 +218,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Something in Public transport is on time
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:358
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:360
 msgid "on time"
 msgstr ""
 
 #. [distance] to [name of destination]
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:363
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:365
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:252
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:336
 msgctxt "direction"
@@ -227,7 +233,7 @@ msgstr ""
 #. used in sentence like: <Long name of public transport route> "to" <Public
 #. transport
 #. headsign>. Used in showing itinerary
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:382
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:384
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:248
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:333
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:115
@@ -236,85 +242,85 @@ msgid " to "
 msgstr ""
 
 #. Shown as alert text before showing itinerary.
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:431
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:433
 msgid "Total walk distance for this trip exceeds specified maximum"
 msgstr ""
 
 #. Start: Time and date (Shown before path itinerary)
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:440
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:442
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:184
 msgctxt "template"
 msgid "Start"
 msgstr ""
 
 #. End: Time and date (Shown after path itinerary)
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:443
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:445
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:185
 msgid "End"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:448
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:450
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:299
 msgid "Trip Summary"
 msgstr ""
 
 #. Travel: hour date on which this trip is made
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:450
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:452
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:300
 msgid "Travel"
 msgstr ""
 
 #. Time: minutes How long is this trip
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:452
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:454
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:301
 msgid "Time"
 msgstr ""
 
 #. Total foot distance for trip
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:460
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:462
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:305
 msgid "Total Walk"
 msgstr ""
 
 #. Total distance on a bike for this trip
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:467
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:469
 msgid "Total Bike"
 msgstr ""
 
 #. how many public transit transfers in a trip
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:473
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:475
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:303
 msgid "Transfers"
 msgstr ""
 
 #. cost of trip
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:479
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:481
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:308
 msgid "Fare"
 msgstr ""
 
 #. Valid date time; When is this trip correct
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:487
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:489
 msgid "Valid"
 msgstr ""
 
 #. Links to this itinerary
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:492
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:494
 msgid "Link to Itinerary"
 msgstr ""
 
 #. Default subject when sending trip to email
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:507
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:509
 msgid "Your Trip"
 msgstr ""
 
 #. Link to send trip by email
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:510
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:512
 msgid "Email"
 msgstr ""
 
 #. public transport drives every N minutes
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:530
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:532
 #, python-format
 msgid "every %d min"
 msgid_plural "every %d mins"
@@ -322,46 +328,52 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Depart on to street / Board at station in itinerary
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:536
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:538
 msgctxt "itinerary"
 msgid "Depart"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:536
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:538
 msgid "<b>Board</b> at "
 msgstr ""
 
 #. Public transport <Stop> (stop name)
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:555
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:557
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/StopViewerWidget.js:93
 msgid "Stop"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:576
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:578
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:262
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:345
 msgid "Time in transit"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:578
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:580
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/TripViewerWidget.js:35
 msgid "Trip Viewer"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:636
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:638
 msgid "late as"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:641
+#. Stay on board/Alight [at stop name]
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:644
 msgid "Stay on board"
 msgstr ""
 
 #. Alight Public transit route name (agency name
 #. Stop ID ) end time
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:641
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:644
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:265
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:348
 msgid "Alight"
+msgstr ""
+
+#. [Stay on board/Alight] at [stop name]
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:646
+msgid "at"
 msgstr ""
 
 #. Fare Currency Fare price

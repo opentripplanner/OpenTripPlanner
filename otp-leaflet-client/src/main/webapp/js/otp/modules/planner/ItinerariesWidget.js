@@ -341,7 +341,9 @@ otp.widgets.ItinerariesWidget =
             var legDiv = $('<div />').appendTo(itinAccord);
 
             var leg = itin.itinData.legs[l];
-            var headerModeText = leg.interlineWithPreviousLeg ? "CONTINUES AS" : otp.util.Itin.modeString(leg.mode).toUpperCase()
+            //TRANSLATORS: Used when passengers can stay on vehicle. Continues
+            //as [agency] route name
+            var headerModeText = leg.interlineWithPreviousLeg ? _tr("CONTINUES AS") : otp.util.Itin.modeString(leg.mode).toUpperCase()
             var headerHtml = "<b>" + headerModeText + "</b>";
 
             // Add info about realtimeness of the leg
@@ -637,9 +639,11 @@ otp.widgets.ItinerariesWidget =
             } else {
             	$('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);   
             }
-
+            
+            //TRANSLATORS: Stay on board/Alight [at stop name]
             var endAction = (nextLeg && nextLeg.interlineWithPreviousLeg) ? _tr("Stay on board") : _tr("Alight");
-            var endHtml = '<div class="otp-itin-leg-endpointDesc"><b>' + endAction + '</b> at '+leg.to.name;
+            //TRANSLATORS: [Stay on board/Alight] at [stop name]
+            var endHtml = '<div class="otp-itin-leg-endpointDesc"><b>' + endAction + '</b> ' + _tr('at')+ ' ' +leg.to.name;
             if(otp.config.municoderHostname) {
                 spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
                 endHtml += '<span id="'+spanId+'"></span>';
