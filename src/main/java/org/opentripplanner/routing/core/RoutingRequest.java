@@ -903,6 +903,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && maxSlope == other.maxSlope
                 && walkReluctance == other.walkReluctance
                 && waitReluctance == other.waitReluctance
+                && waitAtBeginningFactor == other.waitAtBeginningFactor
                 && walkBoardCost == other.walkBoardCost
                 && bikeBoardCost == other.bikeBoardCost
                 && bannedRoutes.equals(other.bannedRoutes)
@@ -951,6 +952,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
+                + new Double(waitAtBeginningFactor).hashCode() * 15485863
                 + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
                 + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
                 + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
@@ -1094,6 +1096,18 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (walkReluctance > 0) {
             this.walkReluctance = walkReluctance;
             // Do not set bikeWalkingOptions.walkReluctance here, because that needs a higher value.
+        }
+    }
+
+    public void setWaitReluctance(double waitReluctance) {
+        if (waitReluctance > 0) {
+            this.waitReluctance = waitReluctance;
+        }
+    }
+
+    public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
+        if (waitAtBeginningFactor > 0) {
+            this.waitAtBeginningFactor = waitAtBeginningFactor;
         }
     }
 
