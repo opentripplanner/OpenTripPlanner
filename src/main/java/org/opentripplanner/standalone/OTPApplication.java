@@ -12,6 +12,7 @@ import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.ExternalGeocoderResource;
 import org.opentripplanner.api.resource.Metadata;
 import org.opentripplanner.api.resource.Planner;
+import org.opentripplanner.api.resource.PointSetResource;
 import org.opentripplanner.api.resource.ProfileResource;
 import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
@@ -20,6 +21,7 @@ import org.opentripplanner.api.resource.LegendResource;
 import org.opentripplanner.api.resource.Raster;
 import org.opentripplanner.api.resource.SIsochrone;
 import org.opentripplanner.api.resource.SimpleIsochrone;
+import org.opentripplanner.api.resource.SurfaceResource;
 import org.opentripplanner.api.resource.TileService;
 import org.opentripplanner.api.resource.WebMapService;
 import org.opentripplanner.api.resource.TimeGridWs;
@@ -91,6 +93,8 @@ public class OTPApplication extends Application {
             ProfileResource.class,
             SimpleIsochrone.class,
             ServerInfo.class,
+            SurfaceResource.class,
+            PointSetResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             AuthFilter.class,
             CorsFilter.class,

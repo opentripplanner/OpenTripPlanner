@@ -35,17 +35,14 @@ public class SampleFactory implements SampleSource {
 
     public SampleFactory(GeometryIndex index) {
         this.index = index;
+        this.setSearchRadiusM(200);
     }
 
     private GeometryIndex index;
 
     private double searchRadiusM;
-    private double searchRadiusLat;    
+    private double searchRadiusLat;
 
-    public SampleFactory() {
-        this.setSearchRadiusM(100);
-    }
-    
     public void setSearchRadiusM(double radiusMeters) {
         this.searchRadiusM = radiusMeters;
         this.searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);

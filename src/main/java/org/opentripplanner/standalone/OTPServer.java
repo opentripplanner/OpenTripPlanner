@@ -2,6 +2,8 @@ package org.opentripplanner.standalone;
 
 import com.google.common.collect.Maps;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.opentripplanner.analyst.PointSetCache;
+import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
@@ -43,13 +45,15 @@ public class OTPServer {
     public SPTService sptService;
 
     // Optional Analyst Modules
-    protected Renderer renderer;
-    protected SPTCache sptCache;
-    protected TileCache tileCache;
-    protected GeometryIndex geometryIndex;
-    protected SampleFactory sampleFactory;
-    protected IsoChroneSPTRenderer isoChroneSPTRenderer;
-    protected SampleGridRenderer sampleGridRenderer;
+    public Renderer renderer;
+    public SPTCache sptCache;
+    public TileCache tileCache;
+    public GeometryIndex geometryIndex;
+    public SampleFactory sampleFactory;
+    public IsoChroneSPTRenderer isoChroneSPTRenderer;
+    public SampleGridRenderer sampleGridRenderer;
+    public SurfaceCache surfaceCache;
+    public PointSetCache pointSetCache;
 
     public Router getRouter(String routerId) {
         return routers.get(routerId);
@@ -79,15 +83,17 @@ public class OTPServer {
 
         planGenerator = new PlanGenerator(graphService, pathService);
 
-        // Optional Analyst Modules
+        // Optional Analyst Modules. They only work with default graph for now.
         if (params.analyst) {
-            sampleFactory = new SampleFactory();
             geometryIndex = new GeometryIndex(graphService);
+            sampleFactory = new SampleFactory(geometryIndex);
             tileCache = new TileCache(sampleFactory);
             sptCache = new SPTCache(sptService, graphService);
             renderer = new Renderer(tileCache, sptCache);
             sampleGridRenderer = new SampleGridRenderer(graphService, sptService);
             isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(graphService, sptService, sampleGridRenderer);
+            surfaceCache = new SurfaceCache(20);
+            pointSetCache = new PointSetCache(sampleFactory);
         }
 
     }
