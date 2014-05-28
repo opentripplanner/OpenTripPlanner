@@ -728,6 +728,9 @@ public class State implements Cloneable {
                         return this;
                     else
                         return unoptimized.reverse();
+                } else if (ret.getBackMode() != null && orig.getBackMode() != null &&
+                        ret.getBackMode() != orig.getBackMode()) {
+                    ret = ret.next; // Keep the mode the same as on the original graph path (in K+R)
                 }
             }
             else {
