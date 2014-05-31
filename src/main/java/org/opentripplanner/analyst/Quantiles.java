@@ -1,6 +1,9 @@
 package org.opentripplanner.analyst;
 
-import java.util.Arrays;
+import com.google.common.collect.Lists;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A compact, lossy representation of a cumulative distribution.
@@ -12,46 +15,76 @@ import java.util.Arrays;
  */
 public class Quantiles {
 
-    public final int      count;
-    public final double[] breaks;
+    public final int   count;
+    public final int[] breaks;
 
     /**
      * Represent the distribution of the given times using n+1 numbers.
      * @param times the time at which each destination is reached. The array will be sorted in place.
      * @param nq the number of quantiles to produce. This number may be increased but will not be decreased.
      */
-    public Quantiles (float[] times, int nq) {
+    public Quantiles (int[] times, int[] weights, int nq) {
         if (nq < 4) nq = 4; // must have at least 4 quantiles (quartiles)
         if (nq > 20) nq = 20;
-        Arrays.sort(times);
-        if (times[0] < 0) throw new AssertionError();
-        if (times[0] == Float.POSITIVE_INFINITY) count = 0;
-        else {
-            // We need to remove any INFs (unreachable) from the end of the array
-            int lastIdx = Arrays.binarySearch(times, Float.POSITIVE_INFINITY);
-            // If any INFs were found, decrement index to the last index that is non-INF
-            while (lastIdx >= 0 && times[lastIdx] == Float.POSITIVE_INFINITY) lastIdx--;
-            count = (lastIdx >= 0) ? lastIdx + 1 : times.length;
+        if (times.length != weights.length) throw new AssertionError();
+        List<TimeWeight> tws = Lists.newArrayListWithCapacity(times.length);
+        for (int i = 0; i < times.length; i++) {
+            TimeWeight tw = new TimeWeight();
+            tw.weight = weights[i];
+            tw.time = times[i];
+            tws.add(tw);
         }
-        if (count < 2) throw new RuntimeException("Less than two times."); // bail out, algo will fail. maybe this should be a factory method.
-        breaks = new double[nq + 1];
-        // So: (breaks.length - 1) * step == count - 1, or the last index of times.
-        double step = (count - 1) / (double) nq;
-        for (int br = 0; br < breaks.length - 1; br++) {
-            double position = br * step;
-            int index = (int) position; // integer index
-            double frac = position - index; // fractional index remainder
-            float low = times[index];
-            float high = times[index + 1];
-            float range = high - low;
-            breaks[br] = (int)(low + (frac * range));
+        Collections.sort(tws);
+        if (tws.get(0).time < 0) throw new AssertionError("Negative time.");
+        // do one loop through the array summing up the weights and finding the length without INFs
+        int sum = 0;
+        int len = 0;
+        for (TimeWeight tw : tws) {
+            if (tw.time == Integer.MAX_VALUE) break;
+            sum += tw.weight;
+            len += 1;
         }
-        breaks[breaks.length - 1] = times[count - 1]; // final break is max time at which a destination was reached
-
+        count = sum;
+        breaks = new int[nq + 1];
+        if (len < 2) return; // algorithm needs at least 2 elements to work
+        tws = tws.subList(0, len);
+        // Min and max time to reach an opportunity can be simply read off from the sorted array.
+        TimeWeight tw0 = tws.get(0); // a pair of successive tws
+        TimeWeight tw1 = tws.get(1);
+        breaks[0] = tw0.time;
+        breaks[nq] = tws.get(tws.size() - 1).time;
+        int cw0 = 0, cw1 = -1; // cumulative weights
+        // Loop over other intermediate quantiles. -1 ensures that 'while' executes on first iteration.
+        for (int q = 1, wdi = 0; q < nq; q++) {
+            // Determine the cumulative weight value for which we want to read off the time.
+            float cw = ((float) q) * sum / nq;
+            // Accumulate weights until we reach the first pair that includes the target value.
+            while (cw1 < cw) {
+                wdi += 1;
+                tw0 = tws.get(wdi);
+                tw1 = tws.get(wdi + 1);
+                cw0 += tw0.weight; // accumulate weight
+                cw1 = cw0 + tw1.weight;
+            }
+            // Linear interpolation. Range of cumulative values is the same as the weight of tw1 (see assignment above).
+            float frac = (cw - cw0) / tw1.weight;
+            float t = tw0.time + (frac * (tw1.time - tw0.time));
+            breaks[q] = (int) t;
+        }
         // TODO: Here, while we still have the sorted original values and the breaks, we should
         // estimate the cumulative distribution at all points and compute RMS error.
         // beyond a certain error threshold, we should increase the number of breakpoints and re-compute them.
         // i.e. adaptive sizing of the array to avoid excessive error.
+    }
+
+    /** A certain magnitude or number of opportunities at a certain distance away from the origin. */
+    private static class TimeWeight implements Comparable<TimeWeight> {
+        int weight;
+        int time;
+        @Override
+        public int compareTo(TimeWeight other) {
+            return Float.compare(this.time, other.time);
+        }
     }
 
     /** @return how many destinations would be found at or below x using linear interpolation. */

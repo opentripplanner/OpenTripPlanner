@@ -40,22 +40,22 @@ public class SampleSet {
         }
     }
 
-    public float[] eval (TimeSurface surf) {
+    public int[] eval (TimeSurface surf) {
         final float WALK_SPEED = 1.3f;
-        float[] ret = new float[pset.nFeatures];
+        int[] ret = new int[pset.nFeatures];
         for (int i = 0; i < pset.nFeatures; i++) {
-            float m0 = Float.POSITIVE_INFINITY;
-            float m1 = Float.POSITIVE_INFINITY;
+            int m0 = Integer.MAX_VALUE;
+            int m1 = Integer.MAX_VALUE;
             if (v0s[i] != null) {
-                int s0 = surf.getTime(v0s[i]); // TODO change ret type to float?
+                int s0 = surf.getTime(v0s[i]);
                 if (s0 != TimeSurface.UNREACHABLE) {
-                    m0 = s0 + d0s[i] / WALK_SPEED;
+                    m0 = (int) (s0 + d0s[i] / WALK_SPEED);
                 }
             }
             if (v1s[i] != null) {
                 int s1 = surf.getTime(v1s[i]);
                 if (s1 != TimeSurface.UNREACHABLE) {
-                    m1 = s1 + d1s[i] / WALK_SPEED;
+                    m1 = (int) (s1 + d1s[i] / WALK_SPEED);
                 }
             }
             ret[i] = (m0 < m1) ? m0 : m1;

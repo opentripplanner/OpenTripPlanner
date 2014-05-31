@@ -49,13 +49,12 @@ public class Indicator extends PointSet {
         for (Category cat : targets.categories) {
             this.categories.add(new Category(cat));
         }
-        // Evaluate the surface at all points in the sampleset
-        float[] times = targets.samples.eval(surface);
-        Quantiles quant = new Quantiles(times, 10);
+        // Evaluate the surface at all points in the pointset
+        int[] times = targets.samples.eval(surface);
         for (Category cat : categories) {
             for (Attribute attr : cat.attributes) {
                 attr.quantiles = new Quantiles[1];
-                attr.quantiles[0] = quant;
+                attr.quantiles[0] = new Quantiles(times, attr.magnitudes, 10);
             }
         }
     }
@@ -67,6 +66,4 @@ public class Indicator extends PointSet {
     void toCsv() {
 
     }
-
-
 }
