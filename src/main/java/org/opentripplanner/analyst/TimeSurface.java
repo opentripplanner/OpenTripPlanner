@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst;
 
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
@@ -22,6 +23,7 @@ public class TimeSurface {
 
     public final int id;
     public final int[] times; // one time in seconds per vertex
+    public final double lat, lon;
     public Map<String, String> params; // The query params sent by the user, for reference only
 
     public TimeSurface(ShortestPathTree spt) {
@@ -37,6 +39,9 @@ public class TimeSurface {
                 }
             }
         }
+        GenericLocation from = spt.getOptions().getFrom();
+        this.lon = from.getLng();
+        this.lat = from.getLat();
         this.id = makeUniqueId();
     }
 

@@ -18,9 +18,12 @@ public class Quantiles {
     public final int   count;
     public final int[] breaks;
 
+    // TODO allow specifying breaks
+
     /**
      * Represent the distribution of the given times using n+1 numbers.
      * @param times the time at which each destination is reached. The array will be sorted in place.
+     * @param weights the weight or magnitude of each destination reached. parallel to times.
      * @param nq the number of quantiles to produce. This number may be increased but will not be decreased.
      */
     public Quantiles (int[] times, int[] weights, int nq) {
@@ -79,8 +82,8 @@ public class Quantiles {
 
     /** A certain magnitude or number of opportunities at a certain distance away from the origin. */
     private static class TimeWeight implements Comparable<TimeWeight> {
-        int weight;
         int time;
+        int weight;
         @Override
         public int compareTo(TimeWeight other) {
             return Float.compare(this.time, other.time);
