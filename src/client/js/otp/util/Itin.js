@@ -46,6 +46,29 @@ otp.util.Itin = {
             locationStr.split("::")[0] : null;
     },
     
+    /**
+     * Extracts the unqualified mode from an OTP "mode_qualifier" string
+     *
+     * @param {string} qualifiedModeStr an OTP QualifiedMode string
+     * @return {string} the (unqualified) mode component of an OTP qualified mode string
+     */
+
+    getUnqualifiedMode : function(qualifiedModeStr) {
+        return qualifiedModeStr.split("_")[0];
+    },
+
+    /**
+     * Extracts the qualifier from an OTP "mode_qualifier" string, if present
+     *
+     * @param {string} qualifiedModeStr an OTP QualifiedMode string
+     * @return {string} the qualifier component of an OTP qualified mode string, null if not present
+     */
+
+    getModeQualifier : function(qualifiedModeStr) {
+        return qualifiedModeStr.indexOf("_") != -1 ?
+            qualifiedModeStr.split("_")[1] : null;
+    },
+
     isTransit : function(mode) {
         return mode === "TRANSIT" || mode === "SUBWAY" || mode === "RAIL" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH";
     },
@@ -70,6 +93,14 @@ otp.util.Itin = {
         var modeArr = mode.split(",");
         for(var i = 0; i < modeArr.length; i++) {
             if(modeArr[i] === "BICYCLE") return true;
+        }
+        return false;
+    },
+
+    includesAnyBicycle : function(mode) {
+        var modeArr = mode.split(",");
+        for(var i = 0; i < modeArr.length; i++) {
+            if(this.getUnqualifiedMode(modeArr[i]) === "BICYCLE") return true;
         }
         return false;
     },

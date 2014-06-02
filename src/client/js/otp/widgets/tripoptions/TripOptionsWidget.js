@@ -856,7 +856,7 @@ otp.widgets.tripoptions.BikeTriangle =
     },
     
     isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesBicycle(mode);
+        return otp.util.Itin.includesAnyBicycle(mode);
     }      
         
 });
