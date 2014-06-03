@@ -384,12 +384,12 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private boolean walkingBike;
 
-	private double heuristicWeight = 1.0;
-	
-	private boolean softWalkLimiting = true;
-	
-	private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
-	private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
+    private double heuristicWeight = 1.0;
+
+    private boolean softWalkLimiting = true;
+
+    private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
+    private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
 
     private double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit distance limit
     private double preTransitOverageRate = 1.0; // a jump in cost for every meter over the pre-transit distance limit
@@ -1056,7 +1056,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     private String getRouteOrAgencyStr(HashSet<String> strings) {
-    	StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         for (String agency : strings) {
             builder.append(agency);
             builder.append(",");
@@ -1073,7 +1073,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public String getPreferredAgenciesStr() {
-    	return getRouteOrAgencyStr(preferredAgencies);
+        return getRouteOrAgencyStr(preferredAgencies);
     }
 
     public String getUnpreferredRouteStr() {
@@ -1081,7 +1081,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public String getUnpreferredAgenciesStr() {
-    	return getRouteOrAgencyStr(unpreferredAgencies);
+        return getRouteOrAgencyStr(unpreferredAgencies);
     }
 
     public String getBannedRouteStr() {
@@ -1097,7 +1097,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public String getBannedAgenciesStr() {
-    	return getRouteOrAgencyStr(bannedAgencies);
+        return getRouteOrAgencyStr(bannedAgencies);
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
@@ -1163,25 +1163,25 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Check if route is preferred according to this request. */
     public long preferencesPenaltyForRoute(Route route) {
-    	long preferences_penalty = 0;
-    	String agencyID = route.getId().getAgencyId();
+        long preferences_penalty = 0;
+        String agencyID = route.getId().getAgencyId();
         if ((preferredRoutes != null && !preferredRoutes.equals(RouteMatcher.emptyMatcher())) ||
                 (preferredAgencies != null && !preferredAgencies.isEmpty())) {
-    		boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
-    		boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID); 
-    		if (!isPreferedRoute && !isPreferedAgency) {
-    			preferences_penalty += otherThanPreferredRoutesPenalty;
-    		}
-    		else {
-    			preferences_penalty = 0;
-    		}
-    	}
-    	boolean isUnpreferedRoute  = unpreferredRoutes   != null && unpreferredRoutes.matches(route);
-    	boolean isUnpreferedAgency = unpreferredAgencies != null && unpreferredAgencies.contains(agencyID); 
-    	if (isUnpreferedRoute || isUnpreferedAgency) {
-    		preferences_penalty += useUnpreferredRoutesPenalty;
-    	}
-    	return preferences_penalty;
+            boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
+            boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID);
+            if (!isPreferedRoute && !isPreferedAgency) {
+                preferences_penalty += otherThanPreferredRoutesPenalty;
+            }
+            else {
+                preferences_penalty = 0;
+            }
+        }
+        boolean isUnpreferedRoute  = unpreferredRoutes   != null && unpreferredRoutes.matches(route);
+        boolean isUnpreferedAgency = unpreferredAgencies != null && unpreferredAgencies.contains(agencyID);
+        if (isUnpreferedRoute || isUnpreferedAgency) {
+            preferences_penalty += useUnpreferredRoutesPenalty;
+        }
+        return preferences_penalty;
     }
 
 }
