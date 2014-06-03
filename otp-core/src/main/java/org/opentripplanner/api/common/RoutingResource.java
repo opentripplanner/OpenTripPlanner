@@ -28,7 +28,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
@@ -87,6 +86,12 @@ public abstract class RoutingResource {
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
     @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
+
+    /**
+     * The maximum distance (in meters) of pre-transit travel when using drive-to-transit (park and
+     * ride or kiss and ride). Defaults to unlimited.
+     */
+    @QueryParam("maxPreTransitDistance") protected List<Double> maxPreTransitDistance;
 
     /** How much worse walking is than waiting for an equivalent length of time, as a multiplier.
      *  Defaults to 2. */
@@ -330,6 +335,7 @@ public abstract class RoutingResource {
         request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
+        request.setMaxPreTransitDistance(get(maxPreTransitDistance, n, request.getMaxPreTransitDistance()));
         request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
         request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
         double bikeSpeedParam = get(bikeSpeed, n, request.getBikeSpeed());
