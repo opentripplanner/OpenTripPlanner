@@ -23,16 +23,13 @@ import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.request.BannedStopSet;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +85,12 @@ public abstract class RoutingResource {
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
     @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
+
+    /**
+     * The maximum distance (in meters) of pre-transit travel when using drive-to-transit (park and
+     * ride or kiss and ride). Defaults to unlimited.
+     */
+    @QueryParam("maxPreTransitDistance") protected List<Double> maxPreTransitDistance;
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
@@ -355,6 +358,7 @@ public abstract class RoutingResource {
         request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
+        request.setMaxPreTransitDistance(get(maxPreTransitDistance, n, request.getMaxPreTransitDistance()));
         request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
         request.setWaitReluctance(get(waitReluctance, n, request.getWaitReluctance()));
         request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.getWaitAtBeginningFactor()));

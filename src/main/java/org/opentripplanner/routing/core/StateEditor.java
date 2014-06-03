@@ -163,6 +163,10 @@ public class StateEditor {
         return child.walkDistance >= options.maxWalkDistance;
     }
 
+    public boolean isMaxPreTransitDistanceExceeded(RoutingRequest options) {
+        return child.preTransitDistance > options.maxPreTransitDistance;
+    }
+
     public String toString() {
         return "<StateEditor " + child + ">";
     }
@@ -267,6 +271,15 @@ public class StateEditor {
         child.walkDistance += length;
     }
 
+    public void incrementPreTransitDistance(double length) {
+        if (length < 0) {
+            LOG.warn("A state's pre-transit distance is being incremented by a negative amount.");
+            defectiveTraversal = true;
+            return;
+        }
+        child.preTransitDistance += length;
+    }
+
     public void incrementNumBoardings() {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
@@ -326,6 +339,10 @@ public class StateEditor {
 
     public void setWalkDistance(double walkDistance) {
         child.walkDistance = walkDistance;
+    }
+
+    public void setPreTransitDistance(double preTransitDistance) {
+        child.preTransitDistance = preTransitDistance;
     }
 
     public void setZone(String zone) {
@@ -482,6 +499,10 @@ public class StateEditor {
 
     public double getWalkDistance() {
         return child.getWalkDistance();
+    }
+
+    public double getPreTransitDistance() {
+        return child.getPreTransitDistance();
     }
 
     public Vertex getVertex() {

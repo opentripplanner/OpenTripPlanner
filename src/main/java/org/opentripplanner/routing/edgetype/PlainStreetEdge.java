@@ -445,12 +445,17 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             s1.incrementWalkDistance(length);
         }
 
-        /* On the pre-kiss/pre-park leg, make both walking and driving bad relative to transit. */
+        /* On the pre-kiss/pre-park leg, soft-limit both walking and driving. */
         if (options.kissAndRide || options.parkAndRide) {
             if (options.arriveBy) {
-                if ( ! s0.isCarParked()) weight *= options.firstLegReluctance;
+                if (!s0.isCarParked()) s1.incrementPreTransitDistance(length);
             } else {
-                if ( ! s0.isEverBoarded()) weight *= options.firstLegReluctance;
+                if (!s0.isEverBoarded()) s1.incrementPreTransitDistance(length);
+            }
+            if (s1.isMaxPreTransitDistanceExceeded(options)) {
+                weight += calculateOverageWeight(s0.getPreTransitDistance(), s1.getPreTransitDistance(),
+                        options.getMaxPreTransitDistance(), options.getPreTransitPenalty(),
+                                options.getPreTransitOverageRate());
             }
         }
         
@@ -460,19 +465,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             // if we're using a soft walk-limit
             if( options.isSoftWalkLimiting() ){
                 // just slap a penalty for the overage onto s1
-
-                // apply penalty if we stepped over the max walk limit on this traversal
-                double overageLength;
-                if(s0.getWalkDistance() <= options.getMaxWalkDistance() && s1.getWalkDistance() > options.getMaxWalkDistance()){
-                    weight += options.getSoftWalkPenalty();
-                    overageLength = s1.getWalkDistance() - options.getMaxWalkDistance();
-                } else {
-                    overageLength = length;
-                }
-
-                // apply overage
-                weight += options.getSoftWalkOverageRate() * overageLength;
-
+                weight += calculateOverageWeight(s0.getWalkDistance(), s1.getWalkDistance(),
+                        options.getMaxWalkDistance(), options.getSoftWalkPenalty(),
+                                options.getSoftWalkOverageRate());
             } else {
                 // else, it's a hard limit; bail
                 LOG.debug("Too much walking. Bailing.");
@@ -492,6 +487,23 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         }
         
         return s1;
+    }
+
+    private double calculateOverageWeight(double firstDistance, double secondDistance,
+            double maxDistance, double softWalkPenalty, double overageRate) {
+        // apply penalty if we stepped over the limit on this traversal
+        boolean applyPenalty = false;
+        double overageLength;
+
+        if(firstDistance <= maxDistance && secondDistance > maxDistance){
+            applyPenalty = true;
+            overageLength = secondDistance - maxDistance;
+        } else {
+            overageLength = length;
+        }
+
+        // apply overage and add penalty if necessary
+        return (overageRate * overageLength) + (applyPenalty ? softWalkPenalty : 0.0);
     }
 
     /**

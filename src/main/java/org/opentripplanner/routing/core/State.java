@@ -64,6 +64,9 @@ public class State implements Cloneable {
     // we should DEFINITELY rename this variable and the associated methods.
     protected double walkDistance;
 
+    // The distance traveled pre-transit, for park and ride or kiss and ride searches
+    double preTransitDistance;
+
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
     
@@ -120,6 +123,7 @@ public class State implements Cloneable {
             this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         }
         this.walkDistance = 0;
+        this.preTransitDistance = 0;
         this.time = timeSeconds * 1000;
         if (options.rctx != null) {
             this.pathParserStates = new int[options.rctx.pathParsers.length];
@@ -178,6 +182,7 @@ public class State implements Cloneable {
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
                 " d=" + this.getWalkDistance() + 
+                " p=" + this.getPreTransitDistance() +
                 " b=" + this.getNumBoardings() +
                 " br=" + this.isBikeRenting() +
                 " pr=" + this.isCarParked() + ">";
@@ -286,6 +291,10 @@ public class State implements Cloneable {
         return walkDistance;
     }
 
+    public double getPreTransitDistance() {
+        return preTransitDistance;
+    }
+
     public Vertex getVertex() {
         return this.vertex;
     }
@@ -352,6 +361,13 @@ public class State implements Cloneable {
     public double getWalkDistanceDelta () {
         if (backState != null)
             return Math.abs(this.walkDistance - backState.walkDistance);
+        else
+            return 0.0;
+    }
+
+    public double getPreTransitDistanceDelta () {
+        if (backState != null)
+            return Math.abs(this.preTransitDistance - backState.preTransitDistance);
         else
             return 0.0;
     }
@@ -743,6 +759,7 @@ public class State implements Cloneable {
                 editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+                editor.incrementPreTransitDistance(orig.getPreTransitDistanceDelta());
                 
                 // propagate the modes and alerts through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
