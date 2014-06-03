@@ -714,12 +714,17 @@ public class State implements Cloneable {
                 else                   
                     ret = edge.traverse(ret);
 
+                if (ret != null && ret.getBackMode() != null && orig.getBackMode() != null &&
+                        ret.getBackMode() != orig.getBackMode()) {
+                    ret = ret.next; // Keep the mode the same as on the original graph path (in K+R)
+                }
+
                 if (ret == null) {
-                    LOG.warn("Cannot reverse path at edge: " + edge +
-                             ", returning unoptimized path. If edge is a " +
-                             "PatternInterlineDwell or if there is a time-dependent turn " +
-                             "restriction here, this is not totally unexpected; " +
-                             "otherwise, you might want to look into it");
+                    LOG.warn("Cannot reverse path at edge: " + edge + ", returning unoptimized "
+                            + "path. If this edge is a PatternInterlineDwell, or if there is a "
+                            + "time-dependent turn restriction here, or if there is no transit leg "
+                            + "in a K+R result, this is not totally unexpected. Otherwise, you "
+                            + "might want to look into it.");
 
                     // re-enable path parsing
                     stateData.opt.rctx.pathParsers = pathParsers;
@@ -728,9 +733,6 @@ public class State implements Cloneable {
                         return this;
                     else
                         return unoptimized.reverse();
-                } else if (ret.getBackMode() != null && orig.getBackMode() != null &&
-                        ret.getBackMode() != orig.getBackMode()) {
-                    ret = ret.next; // Keep the mode the same as on the original graph path (in K+R)
                 }
             }
             else {
