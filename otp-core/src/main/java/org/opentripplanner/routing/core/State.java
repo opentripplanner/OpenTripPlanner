@@ -64,8 +64,8 @@ public class State implements Cloneable {
     // we should DEFINITELY rename this variable and the associated methods.
     protected double walkDistance;
 
-    // The distance traveled pre-transit, for park and ride or kiss and ride searches
-    double preTransitDistance;
+    // The time traveled pre-transit, for park and ride or kiss and ride searches
+    int preTransitTime;
 
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
@@ -123,7 +123,7 @@ public class State implements Cloneable {
             this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         }
         this.walkDistance = 0;
-        this.preTransitDistance = 0;
+        this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
         if (options.rctx != null) {
             this.pathParserStates = new int[options.rctx.pathParsers.length];
@@ -182,7 +182,7 @@ public class State implements Cloneable {
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
                 " d=" + this.getWalkDistance() + 
-                " p=" + this.getPreTransitDistance() +
+                " p=" + this.getPreTransitTime() +
                 " b=" + this.getNumBoardings() +
                 " br=" + this.isBikeRenting() +
                 " pr=" + this.isCarParked() + ">";
@@ -291,8 +291,8 @@ public class State implements Cloneable {
         return walkDistance;
     }
 
-    public double getPreTransitDistance() {
-        return preTransitDistance;
+    public int getPreTransitTime() {
+        return preTransitTime;
     }
 
     public Vertex getVertex() {
@@ -364,11 +364,11 @@ public class State implements Cloneable {
             return 0.0;
     }
 
-    public double getPreTransitDistanceDelta () {
+    public int getPreTransitTimeDelta () {
         if (backState != null)
-            return Math.abs(this.preTransitDistance - backState.preTransitDistance);
+            return Math.abs(this.preTransitTime - backState.preTransitTime);
         else
-            return 0.0;
+            return 0;
     }
 
     public double getWeightDelta() {
@@ -749,7 +749,7 @@ public class State implements Cloneable {
                 editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
-                editor.incrementPreTransitDistance(orig.getPreTransitDistanceDelta());
+                editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
                 
                 // propagate the modes and alerts through to the reversed edge
                 editor.setBackMode(orig.getBackMode());

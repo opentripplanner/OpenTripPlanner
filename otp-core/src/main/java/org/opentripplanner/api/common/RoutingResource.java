@@ -88,10 +88,10 @@ public abstract class RoutingResource {
     @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
     /**
-     * The maximum distance (in meters) of pre-transit travel when using drive-to-transit (park and
+     * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
      */
-    @QueryParam("maxPreTransitDistance") protected List<Double> maxPreTransitDistance;
+    @DefaultValue("-1") @QueryParam("maxPreTransitTime") protected List<Integer> maxPreTransitTime;
 
     /** How much worse walking is than waiting for an equivalent length of time, as a multiplier.
      *  Defaults to 2. */
@@ -335,7 +335,7 @@ public abstract class RoutingResource {
         request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
-        request.setMaxPreTransitDistance(get(maxPreTransitDistance, n, request.getMaxPreTransitDistance()));
+        request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.getMaxPreTransitTime()));
         request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
         request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
         double bikeSpeedParam = get(bikeSpeed, n, request.getBikeSpeed());
