@@ -87,10 +87,10 @@ public abstract class RoutingResource {
     @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
     /**
-     * The maximum distance (in meters) of pre-transit travel when using drive-to-transit (park and
+     * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
      */
-    @QueryParam("maxPreTransitDistance") protected List<Double> maxPreTransitDistance;
+    @DefaultValue("-1") @QueryParam("maxPreTransitTime") protected List<Integer> maxPreTransitTime;
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
@@ -358,7 +358,7 @@ public abstract class RoutingResource {
         request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
-        request.setMaxPreTransitDistance(get(maxPreTransitDistance, n, request.getMaxPreTransitDistance()));
+        request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.getMaxPreTransitTime()));
         request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
         request.setWaitReluctance(get(waitReluctance, n, request.getWaitReluctance()));
         request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.getWaitAtBeginningFactor()));
