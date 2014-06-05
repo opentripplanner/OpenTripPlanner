@@ -387,6 +387,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     private double heuristicWeight = 1.0;
 
     private boolean softWalkLimiting = true;
+    private boolean softPreTransitLimiting = true;
 
     private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
     private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit

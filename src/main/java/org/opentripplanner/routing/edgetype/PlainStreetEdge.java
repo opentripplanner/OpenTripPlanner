@@ -445,7 +445,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             s1.incrementWalkDistance(length);
         }
 
-        /* On the pre-kiss/pre-park leg, soft-limit both walking and driving. */
+        /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
         int roundedTime = (int) Math.ceil(time);
         if (options.kissAndRide || options.parkAndRide) {
             if (options.arriveBy) {
@@ -454,9 +454,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);
             }
             if (s1.isMaxPreTransitTimeExceeded(options)) {
-                weight += calculateOverageWeight(s0.getPreTransitTime(), s1.getPreTransitTime(),
-                        options.getMaxPreTransitTime(), options.getPreTransitPenalty(),
-                                options.getPreTransitOverageRate());
+                if (options.isSoftPreTransitLimiting()) {
+                    weight += calculateOverageWeight(s0.getPreTransitTime(), s1.getPreTransitTime(),
+                            options.getMaxPreTransitTime(), options.getPreTransitPenalty(),
+                                    options.getPreTransitOverageRate());
+                } else return null;
             }
         }
         
