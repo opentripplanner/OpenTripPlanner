@@ -43,7 +43,7 @@ public class Sample {
     }
     
     public long eval(ShortestPathTree spt) {
-        State s0 = spt.getState(v0).reverse();
+        State s0 = spt.getState(v0);
         State s1 = spt.getState(v1);
         long m0 = Long.MAX_VALUE;
         long m1 = Long.MAX_VALUE;

@@ -46,13 +46,13 @@ public class Indicator extends PointSet {
         this.lons = new double[1];
         this.lats = new double[1];
         // Perform a deep copy of everything but the actual magnitudes for the attributes
-        for (Category cat : targets.categories) {
-            this.categories.add(new Category(cat));
+        for (Category cat : targets.categories.values()) {
+            this.categories.put(cat.id, new Category(cat));
         }
         // Evaluate the surface at all points in the pointset
         int[] times = targets.samples.eval(surface);
-        for (Category cat : categories) {
-            for (Attribute attr : cat.attributes) {
+        for (Category cat : categories.values()) {
+            for (Attribute attr : cat.attributes.values()) {
                 attr.quantiles = new Quantiles[1];
                 attr.quantiles[0] = new Quantiles(times, attr.magnitudes, 10);
             }
