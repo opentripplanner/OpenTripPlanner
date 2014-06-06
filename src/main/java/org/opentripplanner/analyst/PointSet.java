@@ -14,9 +14,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-import org.opentripplanner.analyst.Quantiles;
-import org.opentripplanner.analyst.SampleSet;
-import org.opentripplanner.analyst.core.Sample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -286,12 +283,12 @@ public class PointSet {
     }
     
     public void setCategoryLabel(String id, String label) {
-    	Category cat = getCategoryForColumn(id, true);
+    	Category cat = getCategoryForId(id, true);
     	cat.label = label;
     }
     
     public void setCategoryStyle(String id, String attribute, String value) {
-    	Category cat = getCategoryForColumn(id, true);
+    	Category cat = getCategoryForId(id, true);
     	cat.addStyle(attribute, value);
     }
     
@@ -305,8 +302,13 @@ public class PointSet {
     	attr.addStyle(attribute, value);
     }
     
-    
-    public Category getCategoryForColumn(String id, boolean create) {
+
+    /**
+     * Gets the Category object for the given ID, optionally creating it if it doesn't exist.
+     * @param id the id for the column alone, not the fully-specified column:attribute.
+     * @return a Category with the given ID, or null if it does not exist and we didn't ask to create it.
+     */
+    public Category getCategoryForId(String id, boolean create) {
     
     	Category category = categories.get(id);
         
@@ -336,7 +338,7 @@ public class PointSet {
             }
         }
         
-        Category category = getCategoryForColumn(levels.get(0), create);
+        Category category = getCategoryForId(levels.get(0), create);
         
         if(category == null)
         	return null;
