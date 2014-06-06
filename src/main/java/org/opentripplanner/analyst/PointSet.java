@@ -106,11 +106,11 @@ public class PointSet {
         }
     }
 
-    // one array of int per leaf attribute, containing magnitudes
+    /** The leaves of the OTPA structured properties, with one magnitude or cumulative curve per feature. */
     public static class Attribute extends Structured {
       
     	int[] magnitudes;
-        Quantiles[] quantiles; // should maybe be an array, one per origin for these destinations
+        Quantiles[] quantiles; // An array, one per origin. Length is 1 until we support many-to-many.
         
         /** Shallow copy constructor. */
         public Attribute (String id) { super(id); }
@@ -122,7 +122,10 @@ public class PointSet {
         }
     }
     
- // one array of int per leaf attribute, containing magnitudes
+    /**
+     * Holds the attributes for a single feature when it's being lodaed from GeoJSON.
+     * Not used for the OTP internal representation, just during the loading step.
+     */
     public static class AttributeData {
     	String id;
     	Integer value;
