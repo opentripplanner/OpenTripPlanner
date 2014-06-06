@@ -283,6 +283,9 @@ public class PointSet {
                 current = jp.nextToken();
                 if (key.equals("features")) {
                     while (jp.nextToken() != JsonToken.END_ARRAY) {
+                        if (index >= ret.capacity) {
+                            throw new AssertionError("Number of features seems to have grown since validation.");
+                        }
                         // Read the feature into a tree model, which moves parser to its end.
                         JsonNode feature = jp.readValueAsTree();
                         ret.addFeature(feature, index++);
@@ -307,9 +310,6 @@ public class PointSet {
      */
     private void addFeature(JsonNode feature, int index) {
 
-        String id = null;
-        List<AttributeData> attributes = Lists.newArrayList();
-
         if (feature.getNodeType() != JsonNodeType.OBJECT) return;
         JsonNode type = feature.get("type");
         if (type == null || ! type.asText().equalsIgnoreCase("Feature")) return;
@@ -317,6 +317,7 @@ public class PointSet {
         if (props == null || props.getNodeType() != JsonNodeType.OBJECT) return;
         JsonNode structured = props.get("structured");
         if (structured == null || structured.getNodeType() != JsonNodeType.OBJECT) return;
+        List<AttributeData> attributes = Lists.newArrayList();
         Iterator<Entry<String, JsonNode>> catIter = structured.fields();
         while (catIter.hasNext()) {
             Entry<String, JsonNode> catEntry = catIter.next();
@@ -327,19 +328,23 @@ public class PointSet {
                 Entry<String, JsonNode> attrEntry = attrIter.next();
                 String attrName = attrEntry.getKey();
                 int magnitude = attrEntry.getValue().asInt();
+                // TODO Maybe we should be using a String[2] instead of joined strings.
                 attributes.add(new AttributeData(Joiner.on(':').join(catName, attrName), magnitude));
             }
         }
-        JsonNode geom = feature.get("geometry");
+
+        String id = null;
+        JsonNode idNode = feature.get("id");
+        if (idNode != null) id = idNode.asText();
+
         Geometry jtsGeom = null;
+        JsonNode geom = feature.get("geometry");
         if (geom != null && geom.getNodeType() == JsonNodeType.OBJECT) {
             GeometryDeserializer deserializer = new GeometryDeserializer(); // FIXME lots of short-lived objects...
             jtsGeom = deserializer.parseGeometry(geom);
         }
-        addFeature(id, jtsGeom, attributes, index++);
-        if (index > capacity) {
-            throw new AssertionError("Number of features seems to have grown since validation.");
-        }
+
+        addFeature(id, jtsGeom, attributes, index);
     }
 
     /**
