@@ -576,7 +576,7 @@ public class PointSet {
      * are kept for derivative uses (e.g. visualization)
      * 
      * @param i the feature index
-     * @param jgen jackson JSON tree where the geometry will be written
+     * @param jgen the Jackson streaming JSON generator to which the geometry will be written
      * @throws IOException
      */
     private void writeFeature(int i, JsonGenerator jgen, Boolean forcePoints) throws IOException {
