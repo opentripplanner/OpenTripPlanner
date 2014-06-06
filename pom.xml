@@ -311,7 +311,7 @@
             <url>http://download.java.net/maven/2/</url>
         </repository>
         <repository>
-            <id>mavne.conveyal.com</id>
+            <id>maven.conveyal.com</id>
             <name>Conveyal Repo</name>
             <url>http://maven.conveyal.com/release/</url>
         </repository>
