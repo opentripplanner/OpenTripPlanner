@@ -57,7 +57,6 @@ public class PointSet {
     
     Map<String,Category> categories = new ConcurrentHashMap<String,Category>();
     public int capacity = 0;      // The total number of features this PointSet can hold.
-    private int featureCount = 0; // The actual number of features, which is <= capacity.
     public SampleSet samples;     // Connects this population to vertices in a Graph.
 
     /**
@@ -274,6 +273,7 @@ public class PointSet {
     private static PointSet fromValidatedGeoJson(InputStream is, int n) {
         JsonFactory f = new MappingJsonFactory();
         PointSet ret = new PointSet(n);
+        int index = 0;
         try {
             JsonParser jp = f.createParser(is);
             JsonToken current = jp.nextToken();
@@ -285,7 +285,7 @@ public class PointSet {
                     while (jp.nextToken() != JsonToken.END_ARRAY) {
                         // Read the feature into a tree model, which moves parser to its end.
                         JsonNode feature = jp.readValueAsTree();
-                        ret.addFeature(feature);
+                        ret.addFeature(feature, index++);
                     }
                 } else {
                     jp.skipChildren(); // ignore all other keys except features
@@ -305,7 +305,7 @@ public class PointSet {
      * Geotools also has a GeoJSON parser called GeometryJson (which OTP wraps in GeoJsonDeserializer)
      * but it consumes straight text, not a Jackson model or streaming parser.
      */
-    private void addFeature(JsonNode feature) {
+    private void addFeature(JsonNode feature, int index) {
 
         String id = null;
         List<AttributeData> attributes = Lists.newArrayList();
@@ -336,7 +336,10 @@ public class PointSet {
             GeometryDeserializer deserializer = new GeometryDeserializer(); // FIXME lots of short-lived objects...
             jtsGeom = deserializer.parseGeometry(geom);
         }
-        addFeature(id, jtsGeom, attributes);
+        addFeature(id, jtsGeom, attributes, index++);
+        if (index > capacity) {
+            throw new AssertionError("Number of features seems to have grown since validation.");
+        }
     }
 
     /**
@@ -359,7 +362,7 @@ public class PointSet {
      * @param geom must be a Point, a Polygon, or a single-element MultiPolygon
      */
     
-    public void addFeature(String id, Geometry geom, List<AttributeData> data) {
+    public void addFeature(String id, Geometry geom, List<AttributeData> data, int index) {
     	
         if (geom instanceof MultiPolygon) {
             if (geom.isEmpty()) {
@@ -377,16 +380,16 @@ public class PointSet {
         }
         else if (geom instanceof Polygon) {
             point = geom.getCentroid();
-            polygons[featureCount] = (Polygon) geom;
+            polygons[index] = (Polygon) geom;
         }
     	else {
     		LOG.warn("Non-point, non-polygon Geometry, not supported.");
     		return;
         }
-        lats[featureCount] = point.getCoordinate().y;
-        lons[featureCount] = point.getCoordinate().x;
+        lats[index] = point.getCoordinate().y;
+        lons[index] = point.getCoordinate().x;
 
-    	ids[featureCount] = id;
+    	ids[index] = id;
     	
     	for(AttributeData d : data) {
     		Attribute attr = getAttributeForColumn(d.id, "default", true);
@@ -397,11 +400,9 @@ public class PointSet {
     		if(attr.magnitudes == null)
     			attr.magnitudes = new int[capacity];
     			 
-    		attr.magnitudes[featureCount] = d.value;
+    		attr.magnitudes[index] = d.value;
     		 
     	}
-    	
-    	featureCount++;
     }
     
     public void setCategoryLabel(String id, String label) {
