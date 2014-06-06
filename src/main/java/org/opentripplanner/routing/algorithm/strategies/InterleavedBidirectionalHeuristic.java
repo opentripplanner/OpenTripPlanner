@@ -124,10 +124,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             q.insert(stopState.getVertex(), stopState.getWeight());
         }
         LOG.info("end backward street search {}", System.currentTimeMillis());
-        // once street searches are done, raise the walk limit to max
+        // once street searches are done, raise the limits to max
         // because hard walk limiting is incorrect and is observed to cause problems 
         // for trips near the cutoff
         options.setMaxWalkDistance(Double.POSITIVE_INFINITY);
+        options.setMaxPreTransitTime(Integer.MAX_VALUE);
         LOG.debug("initialized SSSP");
         s.getOptions().rctx.debugOutput.finishedPrecalculating();
     }
