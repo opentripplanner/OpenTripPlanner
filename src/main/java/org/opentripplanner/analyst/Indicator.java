@@ -27,11 +27,9 @@ public class Indicator extends PointSet {
     TimeSurface surface; // actually there is one per origin, not a single one!
 
     public Indicator (PointSet targets, TimeSurface surface) {
+        super(1); // for now we only do one-to-many
         this.targets = targets;
         this.surface = surface;
-        this.capacity = 1;
-        this.lons = new double[1];
-        this.lats = new double[1];
         // Perform a deep copy of everything but the actual magnitudes for the attributes
         for (Category cat : targets.categories.values()) {
             this.categories.put(cat.id, new Category(cat));

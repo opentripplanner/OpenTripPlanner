@@ -203,10 +203,6 @@ public class PointSet {
         return new PointSet(0);
     }
     
-    public PointSet() {
-    	
-    }
-    
     /**
      * Create a PointSet manually by defining capacity and calling addFeature(geom, data) repeatedly.
      * @param capacity expected number of features to be added to this PointSet.
