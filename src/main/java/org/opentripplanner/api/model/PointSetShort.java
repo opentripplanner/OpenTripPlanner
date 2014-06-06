@@ -2,17 +2,7 @@ package org.opentripplanner.api.model;
 
 import com.google.common.collect.Lists;
 import org.opentripplanner.analyst.PointSet;
-import org.opentripplanner.analyst.TimeSurface;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.Lists;
-import org.opentripplanner.analyst.TimeSurface;
-
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +16,7 @@ public class PointSetShort {
 
     public PointSetShort(String id, PointSet pointSet) {
         this.id = id;
-        this.n = pointSet.nFeatures;
+        this.n = pointSet.capacity;
     }
 
     public static List<PointSetShort> list (Map<String, PointSet> in) {

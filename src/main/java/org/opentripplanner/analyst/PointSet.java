@@ -44,11 +44,10 @@ public class PointSet {
     public String description;
     
     Map<String,Category> categories = new ConcurrentHashMap<String,Category>();
-    public int nFeatures = 0;
-    public SampleSet samples; // connects this population to a graph
+    public int capacity = 0;      // The total number of features this PointSet can hold.
+    private int featureCount = 0; // The actual number of features, which is <= capacity.
+    public SampleSet samples;     // Connects this population to vertices in a Graph.
 
-    private int featureCount = 0;
-    
     /**
      * The geometries of the features.
      * Each Attribute must contain an array of magnitudes with the same length as this list.
@@ -195,7 +194,7 @@ public class PointSet {
             ret.lats[rec] = Double.parseDouble(reader.get(latCol));
             ret.lons[rec] = Double.parseDouble(reader.get(lonCol));
         }
-        ret.nFeatures = nRecs;
+        ret.capacity = nRecs;
         return ret;
     }
 
@@ -209,16 +208,15 @@ public class PointSet {
     }
     
     /**
-     * ceate PointSet manually by defining size and calling addFeature(geom, data)
-     * @param size number of features to added to pointset
+     * Create a PointSet manually by defining capacity and calling addFeature(geom, data) repeatedly.
+     * @param capacity expected number of features to be added to this PointSet.
      */
-    
-    public PointSet(int size) {
-    	nFeatures = size;
-    	ids = new String[nFeatures];
-    	polygons = new Polygon[nFeatures];
-    	lats = new double[nFeatures];
-        lons = new double[nFeatures];
+    public PointSet(int capacity) {
+    	this.capacity = capacity;
+    	ids = new String[capacity];
+    	lats = new double[capacity];
+        lons = new double[capacity];
+    	polygons = new Polygon[capacity];
     }
 
     /**
@@ -265,7 +263,7 @@ public class PointSet {
     			 continue;
     		 
     		if(attr.magnitudes == null)
-    			attr.magnitudes = new int[nFeatures];
+    			attr.magnitudes = new int[capacity];
     			 
     		attr.magnitudes[featureCount] = d.value;
     		 
@@ -427,7 +425,7 @@ public class PointSet {
             	} jgen.writeEndObject();
                 
                 jgen.writeArrayFieldStart("features"); {
-                    for (int f = 0; f < nFeatures; f++) {
+                    for (int f = 0; f < capacity; f++) {
                         writeFeature(f, jgen, forcePoints);
                     }
                 } jgen.writeEndArray();

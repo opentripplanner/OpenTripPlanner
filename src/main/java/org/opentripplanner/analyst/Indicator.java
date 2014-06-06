@@ -1,18 +1,5 @@
 package org.opentripplanner.analyst;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.w3c.dom.Attr;
-
-import javax.management.AttributeNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.util.Arrays;
-import java.util.Map;
-
 /**
  * A TimeSurface is evaluated at all the points in a PointSet to yield an Indicator.
  *
@@ -42,7 +29,7 @@ public class Indicator extends PointSet {
     public Indicator (PointSet targets, TimeSurface surface) {
         this.targets = targets;
         this.surface = surface;
-        this.nFeatures = 1;
+        this.capacity = 1;
         this.lons = new double[1];
         this.lats = new double[1];
         // Perform a deep copy of everything but the actual magnitudes for the attributes

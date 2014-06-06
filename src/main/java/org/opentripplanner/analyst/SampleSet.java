@@ -1,6 +1,5 @@
 package org.opentripplanner.analyst;
 
-import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.routing.graph.Vertex;
@@ -22,11 +21,11 @@ public class SampleSet {
 
     public SampleSet (PointSet pset, SampleFactory sfac) {
         this.pset = pset;
-        v0s = new Vertex[pset.nFeatures];
-        v1s = new Vertex[pset.nFeatures];
-        d0s = new float[pset.nFeatures];
-        d1s = new float[pset.nFeatures];
-        for (int i = 0; i < pset.nFeatures; i++) {
+        v0s = new Vertex[pset.capacity];
+        v1s = new Vertex[pset.capacity];
+        d0s = new float[pset.capacity];
+        d1s = new float[pset.capacity];
+        for (int i = 0; i < pset.capacity; i++) {
             Sample sample = sfac.getSample(pset.lons[i], pset.lats[i]);
             if (sample == null) {
                 d0s[i] = Float.NaN;
@@ -42,8 +41,8 @@ public class SampleSet {
 
     public int[] eval (TimeSurface surf) {
         final float WALK_SPEED = 1.3f;
-        int[] ret = new int[pset.nFeatures];
-        for (int i = 0; i < pset.nFeatures; i++) {
+        int[] ret = new int[pset.capacity];
+        for (int i = 0; i < pset.capacity; i++) {
             int m0 = Integer.MAX_VALUE;
             int m1 = Integer.MAX_VALUE;
             if (v0s[i] != null) {
