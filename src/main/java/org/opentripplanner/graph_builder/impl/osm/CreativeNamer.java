@@ -15,6 +15,10 @@ package org.opentripplanner.graph_builder.impl.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
+/**
+ * A CreativeNamer makes up names for ways that don't have one in the OSM data set.
+ * It does this by substituting the values of OSM tags into a template.
+ */
 public class CreativeNamer {
 
     /**

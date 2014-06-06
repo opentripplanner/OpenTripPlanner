@@ -83,6 +83,7 @@ public class ElevationProfileSegment implements Serializable {
         return slopeSpeedEffectiveLength;
     }
 
+    // TODO Do we really want to be using "effective lengths" instead of just edge weights?
     public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
         this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
     }

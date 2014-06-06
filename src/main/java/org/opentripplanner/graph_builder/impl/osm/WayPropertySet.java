@@ -30,30 +30,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.Data;
 
+/**
+ * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc. to edges based on OSM tags.
+ * TODO rename so that the connection with OSM tags is obvious
+ *
+ * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to ways based on how well
+ * their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will win out over all the others based on the
+ * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
+ */
 @Data
 public class WayPropertySet {
     private static Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
     private List<WayPropertyPicker> wayProperties;
 
+    /** Assign names to ways that do not have them based on OSM tags. */
     private List<CreativeNamerPicker> creativeNamers;
 
     private List<SlopeOverridePicker> slopeOverrides;
     
-    /**
-     * SpeedPickers for automobile speeds.
-     */
+    /** Assign automobile speeds based on OSM tags. */
     private List<SpeedPicker> speedPickers;
     
-    /**
-     * The speed for street segments that match no speedPicker.    
-     */
+    /** The automobile speed for street segments that do not match any SpeedPicker. */
     private Float defaultSpeed;
 
     private List<NotePicker> notes;
     
     private Pattern maxSpeedPattern;
-    
+
+    /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
     public WayProperties defaultProperties;
 
     private WayPropertySetSource base;
@@ -63,7 +69,7 @@ public class WayPropertySet {
         defaultProperties = new WayProperties();
         defaultProperties.setSafetyFeatures(new P2<Double>(1.0, 1.0));
         defaultProperties.setPermission(StreetTraversalPermission.ALL);
-        defaultSpeed = 11.2f; // 11.2 m/s, ~25 mph, standard speed limit in the US 
+        defaultSpeed = 11.2f; // 11.2 m/s ~= 25 mph ~= 40 kph, standard speed limit in the US
         wayProperties = new ArrayList<WayPropertyPicker>();
         creativeNamers = new ArrayList<CreativeNamerPicker>();
         slopeOverrides = new ArrayList<SlopeOverridePicker>();
@@ -84,6 +90,10 @@ public class WayPropertySet {
        wayProperties = props.wayProperties;
     }
 
+    /**
+     * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties that are mixins
+     * will have their safety values applied if they match at all.
+     */
     public WayProperties getDataForWay(OSMWithTags way) {
         WayProperties leftResult = defaultProperties;
         WayProperties rightResult = defaultProperties;

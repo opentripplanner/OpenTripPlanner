@@ -17,19 +17,23 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * The common data for ways with a given set of tags: * the safety features * the slope override
- * 
+ * Parameters applied to OSM ways, usually based on their tags:
+ * - Which modes can traverse it
+ * - Dangerousness on a bicycle in both directions (OSM ways can be bidirectional).
+ *
  * @author novalis
- * 
  */
 public class WayProperties implements Cloneable {
 
     private StreetTraversalPermission permission;
 
     /**
-     * How much safer (less safe) this way is than the default, represented in terms of something
-     * like DALYs lost per meter. The first element safety in the direction of the way and the
-     * second is safety in the opposite direction.
+     * A multiplicative parameter expressing how much less safe this way is than the default,
+     * in terms of something like DALYs lost per meter. The first element safety in the direction
+     * of the way and the second is safety in the opposite direction.
+     * TODO change all these identifiers so it's clear that this only applies to bicycles.
+     * TODO change the identifiers to make it clear that this reflects danger, not safety.
+     * TODO I believe the weights are rescaled later in graph building to be >= 1, but verify.
      */
     private static final P2<Double> defaultSafetyFeatures = new P2<Double>(1.0, 1.0);
 

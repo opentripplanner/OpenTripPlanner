@@ -116,14 +116,12 @@ public class OSMWithTags {
                 || "permissive".equals(value) || "unknown".equals(value));
     }
 
-    /**
-     * Gets a tag's value.
-     */
+    /** @return a tag's value, converted to lower case. */
     public String getTag(String tag) {
         tag = tag.toLowerCase();
-        if (_tags != null && _tags.containsKey(tag))
+        if (_tags != null && _tags.containsKey(tag)) {
             return _tags.get(tag);
-
+        }
         return null;
     }
 
