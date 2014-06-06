@@ -1,10 +1,16 @@
 package org.opentripplanner.analyst;
 
-import com.conveyal.geojson.GeometrySerializer;
+import com.bedatadriven.geojson.GeometryDeserializer;
+import com.bedatadriven.geojson.GeometrySerializer;
 import com.csvreader.CsvReader;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -14,10 +20,16 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import org.geotools.geojson.geom.GeometryJSON;
+import org.opentripplanner.model.json_serialization.GeoJSONDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -198,11 +210,82 @@ public class PointSet {
         return ret;
     }
 
-    public PointSet fromJson () {
-    	// TODO...
-        return new PointSet(0);
+    public static PointSet fromGeoJson (String filename) {
+        try {
+            InputStream is = new FileInputStream(filename);
+            return fromGeoJson(is);
+        } catch (FileNotFoundException ex) {
+            LOG.error("GeoJSON file not found: {}", filename);
+            return null;
+        }
     }
-    
+
+    /**
+     * Reads with a combination of streaming and tree-model to allow very large GeoJSON files.
+     */
+    public static PointSet fromGeoJson (InputStream is) {
+        JsonFactory f = new MappingJsonFactory();
+        PointSet ret = new PointSet(1000);
+        try {
+            JsonParser jp = f.createParser(is);
+            JsonToken current = jp.nextToken();
+            if (current != JsonToken.START_OBJECT) {
+                LOG.error("Root of GeoJSON should be a JSON object.");
+                return null;
+            }
+            // Iterate over the key:value pairs in the top-level JSON object
+            while (jp.nextToken() != JsonToken.END_OBJECT) {
+                String key = jp.getCurrentName();
+                current = jp.nextToken();
+                if (key.equals("features")) {
+                    if (current != JsonToken.START_ARRAY) {
+                        LOG.error("Error: GeoJSON features are not in an array.");
+                        jp.skipChildren();
+                    }
+                    // Iterate over the features in the array
+                    while (jp.nextToken() != JsonToken.END_ARRAY) {
+                        // Read the feature into a tree model, which moves parser to its end.
+                        JsonNode feature = jp.readValueAsTree();
+                        ret.addFeature(feature);
+                    }
+                } else {
+                    jp.skipChildren(); // ignore all other keys except features
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error("FAIL");
+            return null;
+        }
+        return ret;
+    }
+
+    /** Add one GeoJSON feature to this PointSet from a GeoJSON feature node tree. */
+    private void addFeature(JsonNode feature) {
+
+        String id = null;
+        List<AttributeData> attributes = Lists.newArrayList();
+
+        if (feature.getNodeType() != JsonNodeType.OBJECT) return;
+        JsonNode type = feature.get("type");
+        if (type == null || ! type.asText().equalsIgnoreCase("Feature")) return;
+        JsonNode props = feature.get("properties");
+        if (props == null || props.getNodeType() != JsonNodeType.OBJECT) return;
+        JsonNode structured = props.get("structured");
+        if (structured == null || structured.getNodeType() != JsonNodeType.OBJECT) return;
+        for (JsonNode category : structured) {
+            for (JsonNode attribute : category) {
+                LOG.warn("attribute {}, {}", attribute);
+            }
+        }
+        JsonNode geom = feature.get("geometry");
+        Geometry jtsGeom = null;
+        if (geom != null && geom.getNodeType() == JsonNodeType.OBJECT) {
+            GeometryDeserializer deserializer = new GeometryDeserializer(); // FIXME lots of short-lived objects...
+            jtsGeom = deserializer.parseGeometry(geom);
+        }
+        addFeature(id, jtsGeom, attributes);
+    }
+
     /**
      * Create a PointSet manually by defining capacity and calling addFeature(geom, data) repeatedly.
      * @param capacity expected number of features to be added to this PointSet.

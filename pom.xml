@@ -311,11 +311,6 @@
             <url>http://download.java.net/maven/2/</url>
         </repository>
         <repository>
-            <id>mavne.conveyal.com</id>
-            <name>Conveyal Repo</name>
-            <url>http://maven.conveyal.com/release/</url>
-        </repository>
-	<repository>
             <id>releases.onebusaway.org</id>
             <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
             <releases>
@@ -355,11 +350,6 @@
             <groupId>org.mapdb</groupId>
             <artifactId>mapdb</artifactId>
             <version>0.9.10</version>
-        </dependency>
-     	<dependency>
-            <groupId>com.conveyal</groupId>
-            <artifactId>jackson2-geojson</artifactId>
-            <version>0.8</version>
         </dependency>
 
 	<!-- Logging library -->

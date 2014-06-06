@@ -19,4 +19,9 @@ public class PointSetTest extends TestCase {
         assertNull(points);
     }
 
+    public void testLoadGeoJson() {
+        PointSet points = PointSet.fromGeoJson("src/test/resources/pointset/population.geo.json");
+        assertNotNull(points);
+    }
+
 }
