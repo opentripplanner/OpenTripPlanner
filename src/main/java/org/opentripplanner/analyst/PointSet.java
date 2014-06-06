@@ -59,7 +59,7 @@ public class PointSet {
     protected double[] lats;
     protected double[] lons;
 
-    protected Geometry[] polygons;
+    protected Polygon[] polygons;
     
     /** A base class for the various levels of the Analyst GeoJSON "structured" attributes. */
     public static abstract class Structured {
@@ -214,16 +214,11 @@ public class PointSet {
      */
     
     public PointSet(int size) {
-    	
     	nFeatures = size;
-    	
     	ids = new String[nFeatures];
-
-    	polygons = new Geometry[nFeatures];
-    	
+    	polygons = new Polygon[nFeatures];
     	lats = new double[nFeatures];
         lons = new double[nFeatures];
-    	
     }
 
     /**
@@ -246,7 +241,7 @@ public class PointSet {
     		lats[featureCount] = p.getCoordinate().y;
     		lons[featureCount] = p.getCoordinate().x;
     		
-    		polygons[featureCount] = geom;	
+    		polygons[featureCount] = (Polygon) geom;
     	}
     	else if(geom instanceof MultiPolygon) {
     		
