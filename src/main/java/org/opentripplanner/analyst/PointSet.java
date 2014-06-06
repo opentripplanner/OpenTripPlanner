@@ -45,7 +45,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Pointsets
  * Indicators
  * TimeSurfaces
- *
  */
 public class PointSet {
 
@@ -65,16 +64,15 @@ public class PointSet {
      */
     
     protected String[] ids;
-
     protected double[] lats;
     protected double[] lons;
-
     protected Polygon[] polygons;
     
     /** A base class for the various levels of the Analyst GeoJSON "structured" attributes. */
     public static abstract class Structured {
         String id;
         String label;
+        String description;
         Style  style;
         
         public Structured (String id) {
@@ -84,13 +82,13 @@ public class PointSet {
             this.id = other.id;
             this.label = other.label;
             this.style = other.style;
+            this.description = other.description;
         }
         
         public void addStyle(String attribute, String value) {
         	if(style == null) {
         		style = new Style();
         	}
-        	
         	style.attributes.put(attribute, value);
         }
     }
@@ -135,11 +133,13 @@ public class PointSet {
      * TODO Should potentially be used in CSV loading for uniformity of methods
      */
     public static class AttributeData {
-    	String id;
+    	String category;
+        String attribute;
     	int value;
 
-    	public AttributeData(String id, int value) {
-    		this.id = id;
+    	public AttributeData(String category, String attribute, int value) {
+    		this.category = category;
+            this.attribute = attribute;
     		this.value = value;
     	}
     }
@@ -182,7 +182,7 @@ public class PointSet {
             } else if (header.equalsIgnoreCase("lon") || header.equalsIgnoreCase("longitude")) {
                 lonCol = c;
             } else {
-                Attribute attr = ret.getAttributeForColumn(header, "default", true);
+                Attribute attr = ret.getAttributeForColumn(header);
                 attributes[c] = attr;
             }
         }
@@ -283,9 +283,6 @@ public class PointSet {
                 current = jp.nextToken();
                 if (key.equals("features")) {
                     while (jp.nextToken() != JsonToken.END_ARRAY) {
-                        if (index >= ret.capacity) {
-                            throw new AssertionError("Number of features seems to have grown since validation.");
-                        }
                         // Read the feature into a tree model, which moves parser to its end.
                         JsonNode feature = jp.readValueAsTree();
                         ret.addFeature(feature, index++);
@@ -316,20 +313,21 @@ public class PointSet {
         JsonNode props = feature.get("properties");
         if (props == null || props.getNodeType() != JsonNodeType.OBJECT) return;
         JsonNode structured = props.get("structured");
-        if (structured == null || structured.getNodeType() != JsonNodeType.OBJECT) return;
         List<AttributeData> attributes = Lists.newArrayList();
-        Iterator<Entry<String, JsonNode>> catIter = structured.fields();
-        while (catIter.hasNext()) {
-            Entry<String, JsonNode> catEntry = catIter.next();
-            String catName = catEntry.getKey();
-            JsonNode catNode = catEntry.getValue();
-            Iterator<Entry<String, JsonNode>> attrIter = catNode.fields();
-            while (attrIter.hasNext()) {
-                Entry<String, JsonNode> attrEntry = attrIter.next();
-                String attrName = attrEntry.getKey();
-                int magnitude = attrEntry.getValue().asInt();
-                // TODO Maybe we should be using a String[2] instead of joined strings.
-                attributes.add(new AttributeData(Joiner.on(':').join(catName, attrName), magnitude));
+        if (structured != null && structured.getNodeType() == JsonNodeType.OBJECT) {
+            Iterator<Entry<String, JsonNode>> catIter = structured.fields();
+            while (catIter.hasNext()) {
+                Entry<String, JsonNode> catEntry = catIter.next();
+                String catName = catEntry.getKey();
+                JsonNode catNode = catEntry.getValue();
+                Iterator<Entry<String, JsonNode>> attrIter = catNode.fields();
+                while (attrIter.hasNext()) {
+                    Entry<String, JsonNode> attrEntry = attrIter.next();
+                    String attrName = attrEntry.getKey();
+                    int magnitude = attrEntry.getValue().asInt();
+                    // TODO Maybe we should be using a String[2] instead of joined strings.
+                    attributes.add(new AttributeData(catName, attrName, magnitude));
+                }
             }
         }
 
@@ -367,8 +365,10 @@ public class PointSet {
      * @param geom must be a Point, a Polygon, or a single-element MultiPolygon
      */
     
-    public void addFeature(String id, Geometry geom, List<AttributeData> data, int index) {
-    	
+    public void addFeature(String id, Geometry geom, List<AttributeData> attributes, int index) {
+    	if (index >= capacity) {
+            throw new AssertionError("Number of features seems to have grown since validation.");
+        }
         if (geom instanceof MultiPolygon) {
             if (geom.isEmpty()) {
                 LOG.warn("Empty MultiPolygon, skipping.");
@@ -396,8 +396,8 @@ public class PointSet {
 
     	ids[index] = id;
     	
-    	for(AttributeData d : data) {
-    		Attribute attr = getAttributeForColumn(d.id, "default", true);
+    	for(AttributeData ad : attributes) {
+    		Attribute attr = getAttributeFor(ad.category, ad.attribute);
     		
     		if (attr == null)
     			 continue;
@@ -405,49 +405,22 @@ public class PointSet {
     		if(attr.magnitudes == null)
     			attr.magnitudes = new int[capacity];
     			 
-    		attr.magnitudes[index] = d.value;
+    		attr.magnitudes[index] = ad.value;
     		 
     	}
     }
     
-    public void setCategoryLabel(String id, String label) {
-    	Category cat = getCategoryForId(id, true);
-    	cat.label = label;
-    }
-    
-    public void setCategoryStyle(String id, String attribute, String value) {
-    	Category cat = getCategoryForId(id, true);
-    	cat.addStyle(attribute, value);
-    }
-    
-    public void setAttributeLabel(String id, String label) {
-    	Attribute attr = getAttributeForColumn(id, "default", true);
-    	attr.label = label;
-    }
- 
-    public void setAttributeStyle(String id, String attribute, String value) {
-    	Attribute attr = getAttributeForColumn(id, "default", true);
-    	attr.addStyle(attribute, value);
-    }
-    
-
     /**
-     * Gets the Category object for the given ID, optionally creating it if it doesn't exist.
-     * @param id the id for the column alone, not the fully-specified column:attribute.
-     * @return a Category with the given ID, or null if it does not exist and we didn't ask to create it.
+     * Gets the Category object for the given ID, creating it if it doesn't exist.
+     * @param id the id for the category alone, not the fully-specified category:attribute.
+     * @return a Category with the given ID.
      */
-    public Category getCategoryForId(String id, boolean create) {
-    
+    public Category getCategoryForId(String id) {
     	Category category = categories.get(id);
-        
         if (category == null) {
-            if (create) {
-                category = new Category(id);
-                categories.put(id, category);
-            }
-            else return null;
+            category = new Category(id);
+            categories.put(id, category);
         }
-    	
         return category;
     }
     
@@ -456,26 +429,21 @@ public class PointSet {
      * @return null if there are too many levels or the attribute does not exist and you did not
      * ask to create it.
      */
-    public Attribute getAttributeForColumn(String heading, String def, boolean create) {
-        List<String> levels = Arrays.asList(heading.split(":"));
-        if (levels.size() > 2) return null; //
-        if (levels.size() < 2) { // should be 3? 
-            levels = Lists.newLinkedList(levels);
-            while (levels.size() < 2) {
-                levels.add(0, def); // pad the levels on the left with the default
-            }
+    public Attribute getAttributeForColumn(String heading) {
+        String[] levels = heading.split(":", 2);
+        // There will always be at least one field if heading is non-null.
+        if (levels.length == 1) {
+            return getAttributeFor("NONE", levels[0]);
         }
-        
-        Category category = getCategoryForId(levels.get(0), create);
-        
-        if(category == null)
-        	return null;
-        
-        Attribute attribute = category.attributes.get(levels.get(1));
+        return getAttributeFor(levels[0], levels[1]);
+    }
 
-        if (attribute == null && create) {
-            attribute = new Attribute(levels.get(1));
-            category.attributes.put(levels.get(1), attribute);
+    public Attribute getAttributeFor(String cat, String attr) {
+        Category category = getCategoryForId(cat);
+        Attribute attribute = category.attributes.get(attr);
+        if (attribute == null) {
+            attribute = new Attribute(attr);
+            category.attributes.put(attr, attribute);
         }
         return attribute;
     }
@@ -515,7 +483,6 @@ public class PointSet {
 	                	for(Category cat : this.categories.values()) {
 	                		
 	                		jgen.writeObjectFieldStart(cat.id); {
-	                			
 	                			if(cat.label != null)
 	                				jgen.writeStringField("label", cat.label);
 	                			jgen.writeStringField("type", "Category");   
@@ -625,7 +592,9 @@ public class PointSet {
                 if (attr.quantiles != null) {
                     jgen.writeObjectField(attr.id, attr.quantiles[i]);
                 } else if (attr.magnitudes != null) {
-                    jgen.writeNumberField(attr.id, attr.magnitudes[i]);
+                    if (attr.magnitudes[i] > 0) { // skip zeros for space and boolean/enum attribs
+                        jgen.writeNumberField(attr.id, attr.magnitudes[i]);
+                    }
                 }
             }
             jgen.writeEndObject();
