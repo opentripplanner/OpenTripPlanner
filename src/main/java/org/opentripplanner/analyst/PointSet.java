@@ -222,43 +222,40 @@ public class PointSet {
     }
 
     /**
-     * add a single feature with a variable number of attributes 
-     * attribute data contains id value pairs, ids are in form "cat_id:attr_id" 
-     * 
-     * @param geom
-     * @param data
+     * Add a single feature with a variable number of free-form attributes.
+     * Attribute data contains id value pairs, ids are in form "cat_id:attr_id".
+     * If the attributes and categories do not exist, they will be created.
+     * TODO: read explicit schema or infer it and validate attribute presence as they're read
+     * @param geom must be a Point, a Polygon, or a single-element MultiPolygon
      */
     
     public void addFeature(String id, Geometry geom, List<AttributeData> data) {
     	
-    	if(geom instanceof Point) {
-    		lats[featureCount] = geom.getCoordinate().y;
-    		lons[featureCount] = geom.getCoordinate().x;
-    	}
-    	else if(geom instanceof Polygon) {
-    		Point p = geom.getCentroid();
-    		
-    		lats[featureCount] = p.getCoordinate().y;
-    		lons[featureCount] = p.getCoordinate().x;
-    		
-    		polygons[featureCount] = (Polygon) geom;
-    	}
-    	else if(geom instanceof MultiPolygon) {
-    		
-    		if(geom.getNumGeometries() > 1)
-    			return;
-    		
-    		Point p = geom.getGeometryN(0).getCentroid();
-    		
-    		lats[featureCount] = p.getCoordinate().y;
-    		lons[featureCount] = p.getCoordinate().x;
-    		
-    		polygons[featureCount] = (Polygon)geom.getGeometryN(0);	
-    	}
-    	else 
-    		// not currently handling non-point/polygon features
+        if (geom instanceof MultiPolygon) {
+            if (geom.isEmpty()) {
+                LOG.warn("Empty MultiPolygon, skipping.");
+                return;
+            }
+            if (geom.getNumGeometries() > 1) {
+                LOG.warn("Multiple polygons in MultiPolygon, using only the first.");
+            }
+            geom = geom.getGeometryN(0);
+        }
+        Point point;
+        if (geom instanceof Point) {
+            point = (Point) geom;
+        }
+        else if (geom instanceof Polygon) {
+            point = geom.getCentroid();
+            polygons[featureCount] = (Polygon) geom;
+        }
+    	else {
+    		LOG.warn("Non-point, non-polygon Geometry, not supported.");
     		return;
-    	
+        }
+        lats[featureCount] = point.getCoordinate().y;
+        lons[featureCount] = point.getCoordinate().x;
+
     	ids[featureCount] = id;
     	
     	for(AttributeData d : data) {
@@ -319,7 +316,7 @@ public class PointSet {
     }
     
     /**
-     * @heading in the form "schools:primary"  (currently supports two levels)
+     * @heading in the form "schools:primary" (i.e. category:attribute, currently supports two levels)
      * @return null if there are too many levels or the attribute does not exist and you did not
      * ask to create it.
      */
