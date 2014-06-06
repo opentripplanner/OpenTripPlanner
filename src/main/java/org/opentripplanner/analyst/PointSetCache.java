@@ -45,14 +45,24 @@ public class PointSetCache {
                 try {
                     PointSet pset = PointSet.fromCsv(file.getAbsolutePath());
                     if (pset == null) {
-                        LOG.warn("skipping this pointset.");
+                        LOG.warn("Failure, skipping this pointset.");
                     }
                     pset.samples = new SampleSet(pset, sfac);
                     pointSets.put(baseName, pset);
                 } catch (IOException ioex) {
                     LOG.warn("Exception while loading pointset: {}", ioex);
                 }
+            } else if (name.endsWith(".json")) {
+                String baseName = name.substring(0, name.length() - 5);
+                LOG.info("loading '{}' with ID '{}'", file, baseName);
+                PointSet pset = PointSet.fromGeoJson(file.getAbsolutePath());
+                if (pset == null) {
+                    LOG.warn("Failure, skipping this pointset.");
+                }
+                pset.samples = new SampleSet(pset, sfac);
+                pointSets.put(baseName, pset);
             }
+
         }
     }
 
