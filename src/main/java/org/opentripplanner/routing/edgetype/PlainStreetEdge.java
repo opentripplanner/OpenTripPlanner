@@ -445,17 +445,20 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             s1.incrementWalkDistance(length);
         }
 
-        /* On the pre-kiss/pre-park leg, soft-limit both walking and driving. */
+        /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
+        int roundedTime = (int) Math.ceil(time);
         if (options.kissAndRide || options.parkAndRide) {
             if (options.arriveBy) {
-                if (!s0.isCarParked()) s1.incrementPreTransitDistance(length);
+                if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
             } else {
-                if (!s0.isEverBoarded()) s1.incrementPreTransitDistance(length);
+                if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);
             }
-            if (s1.isMaxPreTransitDistanceExceeded(options)) {
-                weight += calculateOverageWeight(s0.getPreTransitDistance(), s1.getPreTransitDistance(),
-                        options.getMaxPreTransitDistance(), options.getPreTransitPenalty(),
-                                options.getPreTransitOverageRate());
+            if (s1.isMaxPreTransitTimeExceeded(options)) {
+                if (options.isSoftPreTransitLimiting()) {
+                    weight += calculateOverageWeight(s0.getPreTransitTime(), s1.getPreTransitTime(),
+                            options.getMaxPreTransitTime(), options.getPreTransitPenalty(),
+                                    options.getPreTransitOverageRate());
+                } else return null;
             }
         }
         
@@ -475,8 +478,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             }
         }
 
-        int timeLong = (int) Math.ceil(time);
-        s1.incrementTimeInSeconds(timeLong);
+        s1.incrementTimeInSeconds(roundedTime);
         
         s1.incrementWeight(weight);
         
@@ -489,21 +491,21 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return s1;
     }
 
-    private double calculateOverageWeight(double firstDistance, double secondDistance,
-            double maxDistance, double softWalkPenalty, double overageRate) {
+    private double calculateOverageWeight(double firstValue, double secondValue, double maxValue,
+            double softPenalty, double overageRate) {
         // apply penalty if we stepped over the limit on this traversal
         boolean applyPenalty = false;
-        double overageLength;
+        double overageValue;
 
-        if(firstDistance <= maxDistance && secondDistance > maxDistance){
+        if(firstValue <= maxValue && secondValue > maxValue){
             applyPenalty = true;
-            overageLength = secondDistance - maxDistance;
+            overageValue = secondValue - maxValue;
         } else {
-            overageLength = length;
+            overageValue = secondValue - firstValue;
         }
 
         // apply overage and add penalty if necessary
-        return (overageRate * overageLength) + (applyPenalty ? softWalkPenalty : 0.0);
+        return (overageRate * overageValue) + (applyPenalty ? softPenalty : 0.0);
     }
 
     /**

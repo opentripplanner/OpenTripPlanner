@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -49,6 +50,7 @@ public class StationStopEdge extends Edge {
     @Override
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);
+        s1.setBackMode(TraverseMode.LEG_SWITCH);
         s1.incrementWeight(1);
         // Increment weight, but not time. See Javadoc on this class.
         return s1.makeState();
