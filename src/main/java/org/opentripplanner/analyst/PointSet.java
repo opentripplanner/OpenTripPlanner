@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -20,12 +21,9 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-import org.geotools.geojson.geom.GeometryJSON;
-import org.opentripplanner.model.json_serialization.GeoJSONDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -33,8 +31,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -66,7 +66,7 @@ public class PointSet {
      */
     
     protected String[] ids;
-     
+
     protected double[] lats;
     protected double[] lons;
 
@@ -131,14 +131,15 @@ public class PointSet {
     }
     
     /**
-     * Holds the attributes for a single feature when it's being lodaed from GeoJSON.
+     * Holds the attributes for a single feature when it's being loaded from GeoJSON.
      * Not used for the OTP internal representation, just during the loading step.
+     * TODO Should potentially be used in CSV loading for uniformity of methods
      */
     public static class AttributeData {
     	String id;
-    	Integer value;
-    
-    	public AttributeData(String id, Integer value) {
+    	int value;
+
+    	public AttributeData(String id, int value) {
     		this.id = id;
     		this.value = value;
     	}
@@ -212,26 +213,33 @@ public class PointSet {
 
     public static PointSet fromGeoJson (String filename) {
         try {
-            InputStream is = new FileInputStream(filename);
-            return fromGeoJson(is);
+            FileInputStream fis = new FileInputStream(filename);
+            int n = validateGeoJson(fis);
+            if (n < 0) return null;
+            fis.getChannel().position(0); // rewind file
+            return fromValidatedGeoJson(fis, n);
         } catch (FileNotFoundException ex) {
             LOG.error("GeoJSON file not found: {}", filename);
+            return null;
+        } catch (IOException ex) {
+            LOG.error("I/O exception while reading GeoJSON file: {}", filename);
             return null;
         }
     }
 
     /**
-     * Reads with a combination of streaming and tree-model to allow very large GeoJSON files.
+     * Examines a JSON stream to see if it matches the expected OTPA format.
+     * @return the number of features in the collection if it's valid, or -1 if it doesn't fit the OTPA format.
      */
-    public static PointSet fromGeoJson (InputStream is) {
-        JsonFactory f = new MappingJsonFactory();
-        PointSet ret = new PointSet(1000);
+    public static int validateGeoJson (InputStream is) {
+        int n = 0;
+        JsonFactory f = new JsonFactory();
         try {
             JsonParser jp = f.createParser(is);
             JsonToken current = jp.nextToken();
             if (current != JsonToken.START_OBJECT) {
-                LOG.error("Root of GeoJSON should be a JSON object.");
-                return null;
+                LOG.error("Root of OTPA GeoJSON should be a JSON object.");
+                return -1;
             }
             // Iterate over the key:value pairs in the top-level JSON object
             while (jp.nextToken() != JsonToken.END_OBJECT) {
@@ -240,9 +248,40 @@ public class PointSet {
                 if (key.equals("features")) {
                     if (current != JsonToken.START_ARRAY) {
                         LOG.error("Error: GeoJSON features are not in an array.");
-                        jp.skipChildren();
+                        return -1;
                     }
                     // Iterate over the features in the array
+                    while (jp.nextToken() != JsonToken.END_ARRAY) {
+                        n += 1;
+                        jp.skipChildren();
+                    }
+                } else {
+                    jp.skipChildren(); // ignore all other keys except features
+                }
+            }
+            if (n == 0) return -1; // JSON has no features
+            return n;
+        } catch (Exception ex) {
+            LOG.error("Exception while validating GeoJSON: {}", ex);
+            return -1;
+        }
+    }
+
+    /**
+     * Reads with a combination of streaming and tree-model to allow very large GeoJSON files.
+     * The JSON should be already validated, and you must pass in the maximum number of features from that validation step.
+     */
+    private static PointSet fromValidatedGeoJson(InputStream is, int n) {
+        JsonFactory f = new MappingJsonFactory();
+        PointSet ret = new PointSet(n);
+        try {
+            JsonParser jp = f.createParser(is);
+            JsonToken current = jp.nextToken();
+            // Iterate over the key:value pairs in the top-level JSON object
+            while (jp.nextToken() != JsonToken.END_OBJECT) {
+                String key = jp.getCurrentName();
+                current = jp.nextToken();
+                if (key.equals("features")) {
                     while (jp.nextToken() != JsonToken.END_ARRAY) {
                         // Read the feature into a tree model, which moves parser to its end.
                         JsonNode feature = jp.readValueAsTree();
@@ -253,13 +292,19 @@ public class PointSet {
                 }
             }
         } catch (Exception ex) {
-            LOG.error("FAIL");
+            LOG.error("GeoJSON parsing failure.");
             return null;
         }
         return ret;
     }
 
-    /** Add one GeoJSON feature to this PointSet from a GeoJSON feature node tree. */
+    /**
+     * Add one GeoJSON feature to this PointSet from a Jackson node tree.
+     * com.bedatadriven.geojson only exposed its streaming Geometry parser as a public method.
+     * I made its tree parser public as well.
+     * Geotools also has a GeoJSON parser called GeometryJson (which OTP wraps in GeoJsonDeserializer)
+     * but it consumes straight text, not a Jackson model or streaming parser.
+     */
     private void addFeature(JsonNode feature) {
 
         String id = null;
@@ -272,9 +317,17 @@ public class PointSet {
         if (props == null || props.getNodeType() != JsonNodeType.OBJECT) return;
         JsonNode structured = props.get("structured");
         if (structured == null || structured.getNodeType() != JsonNodeType.OBJECT) return;
-        for (JsonNode category : structured) {
-            for (JsonNode attribute : category) {
-                LOG.warn("attribute {}, {}", attribute);
+        Iterator<Entry<String, JsonNode>> catIter = structured.fields();
+        while (catIter.hasNext()) {
+            Entry<String, JsonNode> catEntry = catIter.next();
+            String catName = catEntry.getKey();
+            JsonNode catNode = catEntry.getValue();
+            Iterator<Entry<String, JsonNode>> attrIter = catNode.fields();
+            while (attrIter.hasNext()) {
+                Entry<String, JsonNode> attrEntry = attrIter.next();
+                String attrName = attrEntry.getKey();
+                int magnitude = attrEntry.getValue().asInt();
+                attributes.add(new AttributeData(Joiner.on(':').join(catName, attrName), magnitude));
             }
         }
         JsonNode geom = feature.get("geometry");

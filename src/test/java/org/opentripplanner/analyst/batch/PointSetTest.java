@@ -22,6 +22,8 @@ public class PointSetTest extends TestCase {
     public void testLoadGeoJson() {
         PointSet points = PointSet.fromGeoJson("src/test/resources/pointset/population.geo.json");
         assertNotNull(points);
+        points.writeJson(System.out);
+        System.out.println();
     }
 
 }
