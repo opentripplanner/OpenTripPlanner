@@ -91,6 +91,35 @@ otp.modules.planner.PlannerModule =
     
     icons       : null,
 
+    // this messages are used in noTripFound localization. Values are copied
+    // from Java source and Message properties.
+    error_messages : {
+        500 : _tr("We're sorry. The trip planner is temporarily unavailable. Please try again later."),
+        503 : _tr("We're sorry. The trip planner is temporarily unavailable. Please try again later."),
+        400 : _tr("Trip is not possible.  You might be trying to plan a trip outside the map data boundary."),
+        404 : _tr("Trip is not possible.  Your start or end point might not be safely accessible (for instance), you might be starting on a residential street connected only to a highway)."),
+        406 : _tr("No transit times available. The date may be past or too far in the future or there may not be transit service for your trip at the time you chose."),
+        408 : _tr("The trip planner is taking way too long to process your request. Please try again later."),
+        413 : _tr("The request has errors that the server is not willing or able to process."),
+        440 : _tr("Origin is unknown. Can you be a bit more descriptive?"),
+        450 : _tr("Destination is unknown.  Can you be a bit more descriptive?"),
+        460 : _tr("Both origin and destination are unknown. Can you be a bit more descriptive?"),
+        470 : _tr("Both origin and destination are not wheelchair accessible"),
+        409 : _tr("Origin is within a trivial distance of the destination."),
+
+        340 : _tr("The trip planner is unsure of the location you want to start from. Please select from the following options, or be more specific."),
+        350 : _tr("The trip planner is unsure of the destination you want to go to. Please select from the following options, or be more specific."),
+        360 : _tr("Both origin and destination are ambiguous. Please select from the following options, or be more specific."),
+
+        370 : _tr("All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must be set if any are"),
+        371 : _tr("The values of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must sum to 1"),
+        372 : _tr("If triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor are provided, OptimizeType must be TRIANGLE"),
+        373 : _tr("If OptimizeType is TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must be set"),
+    },
+
+
+
+
     //templateFile : 'otp/modules/planner/planner-templates.html',
 
     initialize : function(webapp, id, options) {
@@ -417,6 +446,9 @@ otp.modules.planner.PlannerModule =
     
     noTripFound : function(error) {
         var msg = error.msg;
+        if (error.id in this.error_messages) {
+            msg = this.error_messages[error.id];
+        }
         //TRANSLATORS: Used in showing why trip wasn't found
         if(error.id) msg += ' (' + _tr('Error %(error_id)d', {'error_id': error.id}) + ')';
         //TRANSLATORS: Title of no trip dialog
