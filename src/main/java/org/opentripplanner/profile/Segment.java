@@ -8,6 +8,9 @@ import lombok.Getter;
 import com.beust.jcommander.internal.Lists;
 import org.opentripplanner.gtfs.GtfsLibrary;
 
+/**
+ * The equivalent of a ride in an API response. All information degenerates to Strings and ints here.
+ */
 public class Segment {
 
     public static class SegmentPattern implements Comparable<SegmentPattern> {

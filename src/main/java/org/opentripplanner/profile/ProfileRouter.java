@@ -47,10 +47,11 @@ import com.google.common.collect.Sets;
 public class ProfileRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
+
     static final int SLACK = 60; // sec
     static final int TIMEOUT = 10; // sec
     static final Stop fakeTargetStop = new Stop();
-    
+
     static {
         fakeTargetStop.setId(new AgencyAndId("FAKE", "TARGET"));
     }

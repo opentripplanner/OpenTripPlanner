@@ -1,9 +1,8 @@
 package org.opentripplanner.profile;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import lombok.Getter;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -15,22 +14,29 @@ import org.opentripplanner.routing.spt.GraphPath;
 
 public class Option {
 
-    public List<Segment> segments = Lists.newLinkedList();
+    public List<Segment> segments = Lists.newArrayList();
     public int finalWalkTime;
     public Stats stats;
     public String summary;
     public List<WalkStep> walkSteps;
+    public List<DCFareCalculator.Fare> fares;
 
-    public Option (Ride ride, int finalWalkTime, TimeWindow window, double walkSpeed) {
+    public Option (Ride tail, int finalWalkTime, TimeWindow window, double walkSpeed) {
         stats = new Stats();
-        while (ride != null) {
+        List<Ride> rides = Lists.newArrayList();
+        for (Ride ride = tail; ride != null; ride = ride.previous) {
+            rides.add(ride);
+        }
+        Collections.reverse(rides);
+        for (Ride ride : rides) {
             Segment segment = new Segment (ride, window, walkSpeed);
-            segments.add(0, segment);
+            segments.add(segment);
             stats.add(segment.walkTime);
             stats.add(segment.waitStats);
             stats.add(segment.rideStats);
-            ride = ride.previous;
         }
+        // Really should be one per segment, with transfers to the same operator having a price of 0.
+        fares = DCFareCalculator.calculateFares(rides);
         this.finalWalkTime = finalWalkTime;
         stats.add(finalWalkTime);
         summary = generateSegmentSummary();
