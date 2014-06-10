@@ -31,6 +31,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -43,8 +44,11 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.PoiVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -65,6 +69,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private static final boolean VIDEO = false;
 
     private static final String VIDEO_PATH = "/home/syncopate/pathimage/";
+
+    private static Logger LOG = LoggerFactory.getLogger(ShowGraph.class);
 
     private int videoFrameNumber = 0;
 
@@ -126,6 +132,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     boolean drawStreetVertices = false;
 
     boolean drawTransitStopVertices = true;
+
+    boolean drawPoiVertices = true;
 
     private static double lastLabelY;
 
@@ -308,7 +316,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
                     continue;
                 if (e instanceof PatternEdge || e instanceof StreetTransitLink
                         || e instanceof StreetEdge || e instanceof PathwayEdge
-                        || e instanceof SimpleTransfer) {
+                        || e instanceof SimpleTransfer || e instanceof FreeEdge) {
                     env = e.getGeometry().getEnvelopeInternal();
                     edgeIndex.insert(env, e);
                 }
@@ -328,7 +336,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             if (de instanceof PatternEdge) {
                 visibleTransitEdges.add(de);
             }
-            else if (de instanceof PathwayEdge || de instanceof StreetTransitLink || de instanceof SimpleTransfer) {
+            else if (de instanceof PathwayEdge || de instanceof StreetTransitLink ||
+                    de instanceof SimpleTransfer || de instanceof FreeEdge) {
                 visibleLinkEdges.add(de);
             }
             else if (de instanceof StreetEdge) {
@@ -540,8 +549,12 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             /* Draw selected visible vertices */
             fill(60, 60, 200);
             for (Vertex v : visibleVertices) {
+                fill(60, 60, 200);
                 if (drawTransitStopVertices && v instanceof TransitStationStop) {
                     drawVertex(v, 5);
+                } else if (v instanceof PoiVertex) {
+                    fill(200, 60, 60);
+                    drawVertex(v, 4);
                 } else if (v instanceof IntersectionVertex) {
                     IntersectionVertex iv = (IntersectionVertex) v;
                     if (iv.isTrafficLight()) {

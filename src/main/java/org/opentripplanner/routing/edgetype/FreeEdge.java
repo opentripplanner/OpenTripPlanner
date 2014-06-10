@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -48,9 +50,9 @@ public class FreeEdge extends Edge {
         return 0;
     }
 
-    @Override
     public LineString getGeometry() {
-        return null;
+        Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()};
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
     @Override
