@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-09 14:18+0200\n"
+"POT-Creation-Date: 2014-06-10 10:13+0200\n"
 "PO-Revision-Date: 2014-05-15 19:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -150,6 +150,77 @@ msgstr ""
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:108
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:44
 msgid "Trip Options"
+msgstr ""
+
+#. Pupup title
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:206
+msgid "PICK UP BIKE"
+msgstr ""
+
+#. Pupup title alternative station to pickup bike on bike
+#. sharing
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:215
+msgid "ALTERNATE PICKUP"
+msgstr ""
+
+#. Pupup title
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:220
+msgid "DROP OFF BIKE"
+msgstr ""
+
+#. Pupup title
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:228
+msgid "ALTERNATE DROP OFF"
+msgstr ""
+
+#. Pupup title Bike sharing station
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:233
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:312
+msgid "BIKE STATION"
+msgstr ""
+
+#. Bike sharing station: station name
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:317
+msgid "Station:"
+msgstr ""
+
+#. number of bikes
+#. availible in a bike sharing
+#. station
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:318
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:57
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:69
+#, python-format
+msgid "<strong>%d</strong> bike available"
+msgid_plural "<strong>%d</strong> bikes available"
+msgstr[0] ""
+msgstr[1] ""
+
+#. number of free
+#. places to put bikes
+#. in a bike sharing
+#. station
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:320
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:65
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:71
+#, fuzzy, python-format
+msgid "<strong>%d</strong> dock available"
+msgid_plural "<strong>%d</strong> docks available"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Recommended Pick Up: bike sharing
+#. station name
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:53
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:68
+msgid "Recommended Pick Up:"
+msgstr ""
+
+#. Recommended Drop Off: bike sharing
+#. station name
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:60
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:70
+msgid "Recommended Drop Off:"
 msgstr ""
 
 #. module name

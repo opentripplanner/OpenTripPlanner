@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-09 14:18+0200\n"
-"PO-Revision-Date: 2014-06-09 14:23+0200\n"
+"POT-Creation-Date: 2014-06-10 10:13+0200\n"
+"PO-Revision-Date: 2014-06-10 10:22+0100\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 "
@@ -157,6 +157,86 @@ msgstr "Planer za sposojena kolesa"
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:44
 msgid "Trip Options"
 msgstr "Nastavitve potovanja"
+
+#. Pupup title
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:206
+#, fuzzy
+msgid "PICK UP BIKE"
+msgstr "SPOSOJA KOLESA"
+
+#. Pupup title alternative station to pickup bike on bike
+#. sharing
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:215
+#, fuzzy
+msgid "ALTERNATE PICKUP"
+msgstr "VARIANTA SPOSOJE"
+
+#. Pupup title
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:220
+#, fuzzy
+msgid "DROP OFF BIKE"
+msgstr "VRNITEV KOLESA"
+
+#. Pupup title
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:228
+#, fuzzy
+msgid "ALTERNATE DROP OFF"
+msgstr "VARIANTA VRNITVE"
+
+#. Pupup title Bike sharing station
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:233
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:312
+#, fuzzy
+msgid "BIKE STATION"
+msgstr "SPOSOJEVALNA POSTAJA"
+
+#. Bike sharing station: station name
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:317
+msgid "Station:"
+msgstr "Postaja:"
+
+#. number of bikes
+#. availible in a bike sharing
+#. station
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:318
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:57
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:69
+#, python-format
+msgid "<strong>%d</strong> bike available"
+msgid_plural "<strong>%d</strong> bikes available"
+msgstr[0] "<strong>%d</strong> koles na voljo"
+msgstr[1] "<strong>%d</strong> kolo na voljo"
+msgstr[2] "<strong>%d</strong> kolesi na voljo"
+msgstr[3] "<strong>%d</strong> kolesa na voljo"
+
+#. number of free
+#. places to put bikes
+#. in a bike sharing
+#. station
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:320
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:65
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:71
+#, python-format
+msgid "<strong>%d</strong> dock available"
+msgid_plural "<strong>%d</strong> docks available"
+msgstr[0] "<strong>%d</strong> prostorov na voljo"
+msgstr[1] "<strong>%d</strong> prostor na voljo"
+msgstr[2] "<strong>%d</strong> prostora na voljo"
+msgstr[3] "<strong>%d</strong> prostori na voljo"
+
+#. Recommended Pick Up: bike sharing
+#. station name
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:53
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:68
+msgid "Recommended Pick Up:"
+msgstr "Predlagana postaja za sposojo kolesa:"
+
+#. Recommended Drop Off: bike sharing
+#. station name
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:60
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeStationsWidget.js:70
+msgid "Recommended Drop Off:"
+msgstr "Predlagana postaja za vrnitev kolesa:"
 
 #. module name
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:22
@@ -341,10 +421,10 @@ msgstr "E-pošta"
 #, python-format
 msgid "every %d min"
 msgid_plural "every %d mins"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "vsakih %d min"
+msgstr[1] "vsako %d min"
+msgstr[2] "vsaki %d min"
+msgstr[3] "vsake %d min"
 
 #. Depart on to street / Board at station in itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:545

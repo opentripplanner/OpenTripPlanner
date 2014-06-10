@@ -202,29 +202,36 @@ otp.modules.bikeshare.BikeShareModule =
             
             if (station.isWalkableFrom(start, tol)) {
                 // start station
-                this.setStationMarker(station, "PICK UP BIKE", this.icons.startBike);
+                // TRANSLATORS: Popup title station from where bike is picked
+                // up
+                this.setStationMarker(station, _tr("PICK UP BIKE"), this.icons.startBike);
                 start_and_end_stations['start'] = station;
             }
             else if (station.isNearishTo(this.startLatLng, distTol)) {
                 // start-adjacent station
                 var distanceToStart = station.distanceTo(this.startLatLng);
                 var icon = distanceToStart < distTol/2 ? this.icons.getLarge(stationData) : this.icons.getMedium(stationData);
-                this.setStationMarker(station, "ALTERNATE PICKUP", icon);
+                // TRANSLATORS: Popup title alternative station to pickup bike on bike
+                // sharing
+                this.setStationMarker(station, _tr("ALTERNATE PICKUP"), icon);
             }
             else if (station.isWalkableFrom(end, tol)) {
                 // end station
-                this.setStationMarker(station, "DROP OFF BIKE", this.icons.endBike);
+                // TRANSLATORS: Popup title 
+                this.setStationMarker(station, _tr("DROP OFF BIKE"), this.icons.endBike);
                 start_and_end_stations['end'] = station;
             }
             else if (station.isNearishTo(this.endLatLng, distTol)) {
                 // end-adjacent station
                 var distanceToEnd = station.distanceTo(this.endLatLng);
                 var icon = distanceToEnd < distTol/2 ? this.icons.getLarge(stationData) : this.icons.getMedium(stationData);
-                this.setStationMarker(station, "ALTERNATE DROP OFF", icon);
+                // TRANSLATORS: Popup title
+                this.setStationMarker(station, _tr("ALTERNATE DROP OFF"), icon);
             }
             else {
                 icon = icon || this.icons.getSmall(stationData);
-                this.setStationMarker(station, "BIKE STATION", icon);
+                // TRANSLATORS: Popup title Bike sharing station
+                this.setStationMarker(station, _tr("BIKE STATION"), icon);
             }
         }, this);
         
@@ -303,13 +310,14 @@ otp.modules.bikeshare.BikeShareModule =
             
     constructStationInfo : function(title, station) {
         if(title == null) {
-            title = (station.markerTitle !== undefined) ? station.markerTitle : "BIKE STATION";
+            title = (station.markerTitle !== undefined) ? station.markerTitle : _tr("BIKE STATION");
         }
         var info = "<strong>"+title+"</strong><br/>";
         station.markerTitle = title;
-        info += '<strong>Station:</strong> '+station.name+'<br/>';
-        info += '<strong>Bikes Available:</strong> '+station.bikesAvailable+'<br/>';
-        info += '<strong>Docks Available:</strong> '+station.spacesAvailable+'<br/>';
+        //TRANSLATORS: Bike sharing station: station name
+        info += '<strong>' + _tr("Station:") + '</strong> '+station.name+'<br/>';
+        info += ngettext("<strong>%d</strong> bike available", "<strong>%d</strong> bikes available", station.bikesAvailable) + "<br />";
+        info += ngettext("<strong>%d</strong> dock available", "<strong>%d</strong> docks available", station.spacesAvailable) + '<br />';
         return info;
     },
                 
