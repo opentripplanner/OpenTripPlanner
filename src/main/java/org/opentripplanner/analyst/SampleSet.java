@@ -34,8 +34,8 @@ public class SampleSet {
             }
             v0s[i] = sample.v0;
             v1s[i] = sample.v1;
-            d0s[i] = sample.t0; // TODO time not distance
-            d1s[i] = sample.t1;
+            d0s[i] = sample.t0; // TODO time not distance in samples
+            d1s[i] = sample.t1; // TODO time not distance in samples
         }
     }
 

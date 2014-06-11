@@ -1,5 +1,8 @@
 package org.opentripplanner.analyst;
 
+import com.google.common.collect.Lists;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -8,7 +11,9 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +29,8 @@ public class TimeSurface {
     public final int id;
     public final int[] times; // one time in seconds per vertex
     public final double lat, lon;
+    public int cutoffMinutes;
+    public long dateTime;
     public Map<String, String> params; // The query params sent by the user, for reference only
 
     public TimeSurface(ShortestPathTree spt) {
@@ -43,6 +50,7 @@ public class TimeSurface {
         this.lon = from.getLng();
         this.lat = from.getLat();
         this.id = makeUniqueId();
+        this.dateTime = spt.getOptions().dateTime;
     }
 
     public int getTime(Vertex v) {
@@ -53,5 +61,6 @@ public class TimeSurface {
         int id = nextId++;
         return id;
     }
+
 
 }

@@ -58,6 +58,9 @@ public class PointSet {
     public int capacity = 0;      // The total number of features this PointSet can hold.
     public SampleSet samples;     // Connects this population to vertices in a Graph.
 
+    /* In a detailed Indicator, the time to reach each target, for each origin. Null in non-indicator pointsets. */
+    public int[][] times;
+
     /**
      * The geometries of the features.
      * Each Attribute must contain an array of magnitudes with the same length as this list.
@@ -525,10 +528,8 @@ public class PointSet {
 	                	}
 	                	
 	                } jgen.writeEndObject();
-	                
-	           
             	} jgen.writeEndObject();
-                
+
                 jgen.writeArrayFieldStart("features"); {
                     for (int f = 0; f < capacity; f++) {
                         writeFeature(f, jgen, forcePoints);
@@ -541,6 +542,18 @@ public class PointSet {
         }
     }
 
+    /**
+     * Pairs an array of times with the array of features in this pointset, writing out the resulting (ID,time)
+     * pairs to a JSON object.
+     */
+    private void writeTimes(JsonGenerator jgen, int[] times) throws IOException {
+        jgen.writeObjectFieldStart("times");
+        for (int i = 0; i < times.length; i++) { // capacity is now 1 if this is a one-to-many indicator
+            int t = times[i];
+            if (t != Integer.MAX_VALUE) jgen.writeNumberField(ids[i], t);
+        }
+        jgen.writeEndObject();
+    }
     
     /**
      * This writes either a polygon or lat/lon point defining the feature. In the case of polygons, 
@@ -573,6 +586,10 @@ public class PointSet {
             }
             jgen.writeObjectFieldStart("properties"); {
                 writeStructured(i, jgen);
+                /* Write out travel times to each target ID if this is a detailed indicator. */
+                if (this instanceof Indicator && times != null) {
+                    ((Indicator)this).targets.writeTimes(jgen, times[i]);
+                }
             } jgen.writeEndObject();
         } jgen.writeEndObject();
     }

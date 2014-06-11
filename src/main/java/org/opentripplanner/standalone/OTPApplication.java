@@ -23,7 +23,6 @@ import org.opentripplanner.api.resource.SIsochrone;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.api.resource.SurfaceResource;
 import org.opentripplanner.api.resource.TileService;
-import org.opentripplanner.api.resource.WebMapService;
 import org.opentripplanner.api.resource.TimeGridWs;
 import org.opentripplanner.index.GeocoderResource;
 import org.opentripplanner.index.IndexAPI;
@@ -82,7 +81,6 @@ public class OTPApplication extends Application {
             LIsochrone.class,
             ExternalGeocoderResource.class,
             TimeGridWs.class,
-            WebMapService.class,
             AlertPatcher.class,
             Planner.class,
             SIsochrone.class,

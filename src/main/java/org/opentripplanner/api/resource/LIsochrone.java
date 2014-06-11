@@ -103,7 +103,7 @@ public class LIsochrone extends RoutingResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getGeoJsonIsochrone() throws Exception {
-        SimpleFeatureCollection contourFeatures = makeContourFeatures();
+        SimpleFeatureCollection contourFeatures = makeContourFeatures(computeIsochrone());
         StringWriter writer = new StringWriter();
         FeatureJSON fj = new FeatureJSON();
         fj.writeFeatureCollection(contourFeatures, writer);
@@ -117,7 +117,7 @@ public class LIsochrone extends RoutingResource {
     @Produces("application/x-zip-compressed")
     public Response getZippedShapefileIsochrone(@QueryParam("shpName") String shpName,
             @QueryParam("stream") @DefaultValue("true") boolean stream) throws Exception {
-        SimpleFeatureCollection contourFeatures = makeContourFeatures();
+        SimpleFeatureCollection contourFeatures = makeContourFeatures(computeIsochrone());
         /* Output the staged features to Shapefile */
         final File shapeDir = Files.createTempDir();
         File shapeFile = new File(shapeDir, shpName + ".shp");
@@ -142,8 +142,7 @@ public class LIsochrone extends RoutingResource {
         }
     }
 
-    private SimpleFeatureCollection makeContourFeatures() throws Exception {
-        List<IsochroneData> isochrones = computeIsochrone();
+    public static SimpleFeatureCollection makeContourFeatures(List<IsochroneData> isochrones) {
         DefaultFeatureCollection featureCollection = new DefaultFeatureCollection(null,
                 contourSchema);
         SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(contourSchema);
@@ -200,7 +199,7 @@ public class LIsochrone extends RoutingResource {
         tbuilder.setName("contours");
         tbuilder.setCRS(DefaultGeographicCRS.WGS84);
         tbuilder.add("Geometry", MultiPolygon.class);
-        tbuilder.add("Time", Integer.class);
+        tbuilder.add("Time", Integer.class); // TODO change to something more descriptive and lowercase
         return tbuilder.buildFeatureType();
     }
 

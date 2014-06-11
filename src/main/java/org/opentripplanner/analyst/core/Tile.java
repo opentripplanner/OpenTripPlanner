@@ -27,6 +27,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.parameter.Style;
@@ -267,7 +268,7 @@ public abstract class Tile {
     
     final byte UNREACHABLE = Byte.MIN_VALUE;
 
-    public BufferedImage generateImage(ShortestPathTree spt, RenderRequest renderRequest) {
+    public BufferedImage generateImage(TimeSurface surf, RenderRequest renderRequest) {
         long t0 = System.currentTimeMillis();
         BufferedImage image = getEmptyImage(renderRequest.style);
         byte[] imagePixelData = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
@@ -276,9 +277,9 @@ public abstract class Tile {
             byte pixel;
             if (s != null) {
                 if (renderRequest.style == Style.BOARDINGS) {
-                    pixel = s.evalBoardings(spt);
+                    pixel = 0; // FIXME s.evalBoardings(surf);
                 } else {
-                    long t = s.eval(spt); // renderRequest.style
+                    long t = s.eval(surf); // renderRequest.style
                     if (t == Long.MAX_VALUE)
                         pixel = UNREACHABLE;
                     else {
@@ -302,8 +303,8 @@ public abstract class Tile {
     }
 
     public BufferedImage linearCombination(
-            double k1, ShortestPathTree spt1, 
-            double k2, ShortestPathTree spt2, 
+            double k1, TimeSurface surfA,
+            double k2, TimeSurface surfB,
             double intercept, RenderRequest renderRequest) {
         long t0 = System.currentTimeMillis();
         BufferedImage image = getEmptyImage(renderRequest.style);
@@ -312,8 +313,8 @@ public abstract class Tile {
         for (Sample s : getSamples()) {
             byte pixel = UNREACHABLE;
             if (s != null) {
-                long t1 = s.eval(spt1);
-                long t2 = s.eval(spt2);
+                long t1 = s.eval(surfA);
+                long t2 = s.eval(surfB);
                 if (t1 != Long.MAX_VALUE && t2 != Long.MAX_VALUE) {
                     double t = (k1 * t1 + k2 * t2) / 60 + intercept; 
                     if (t < -120)

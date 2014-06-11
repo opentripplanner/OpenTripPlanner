@@ -24,6 +24,7 @@ import org.geotools.gce.geotiff.GeoTiffWriteParams;
 import org.geotools.gce.geotiff.GeoTiffWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.core.Tile;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -43,26 +44,24 @@ public class Renderer {
         this.sptCache = sptCache;
     }
 
-    public Response getResponse (TileRequest tileRequest,
-            RoutingRequest sptRequestA, RoutingRequest sptRequestB, 
+    public Response getResponse (
+            TileRequest tileRequest,
+            TimeSurface surfA, TimeSurface surfB,
             RenderRequest renderRequest) throws Exception {
 
         Tile tile = tileCache.get(tileRequest);
-        ShortestPathTree sptA = sptCache.get(sptRequestA);
-        ShortestPathTree sptB = sptCache.get(sptRequestB);
-        
         BufferedImage image;
         switch (renderRequest.layer) {
         case DIFFERENCE :
-            image = tile.linearCombination(1, sptA, -1, sptB, 0, renderRequest);
+            image = tile.linearCombination(1, surfA, -1, surfB, 0, renderRequest);
             break;
         case HAGERSTRAND :
-            long elapsed = Math.abs(sptRequestB.dateTime - sptRequestA.dateTime);
-            image = tile.linearCombination(-1, sptA, -1, sptB, elapsed/60, renderRequest);
+            long elapsed = Math.abs(surfB.dateTime - surfA.dateTime);
+            image = tile.linearCombination(-1, surfA, -1, surfB, elapsed/60, renderRequest);
             break;
         case TRAVELTIME :
         default :
-            image = tile.generateImage(sptA, renderRequest);
+            image = tile.generateImage(surfA, renderRequest);
         }
         
         // add a timestamp to the image if requested. 
@@ -70,9 +69,8 @@ public class Renderer {
         if (renderRequest.timestamp) {
             DateFormat df = DateFormat.getDateTimeInstance();
             df.setTimeZone(TimeZone.getTimeZone("America/New_York"));
-            String ds = df.format(new Date(sptRequestA.dateTime * 1000));
-            shadowWrite(image, ds, sptRequestA.from.toString());
-
+            String ds = df.format(new Date(surfA.dateTime * 1000));
+            shadowWrite(image, ds, String.format("%f, %f", surfA.lat, surfA.lon));
             Graphics2D g2d = image.createGraphics();
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
             BufferedImage legend = Tile.getLegend(renderRequest.style, 300, 50);

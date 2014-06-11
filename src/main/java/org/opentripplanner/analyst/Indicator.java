@@ -1,5 +1,9 @@
 package org.opentripplanner.analyst;
 
+import com.google.common.collect.Maps;
+
+import java.util.Map;
+
 /**
  * A TimeSurface is evaluated at all the points in a PointSet to yield an Indicator.
  *
@@ -26,7 +30,7 @@ public class Indicator extends PointSet {
     PointSet targets; // the targets that were checked for reachability in this indicator
     TimeSurface surface; // actually there is one per origin, not a single one!
 
-    public Indicator (PointSet targets, TimeSurface surface) {
+    public Indicator (PointSet targets, TimeSurface surface, boolean retainTimes) {
         super(1); // for now we only do one-to-many
         this.targets = targets;
         this.surface = surface;
@@ -41,6 +45,11 @@ public class Indicator extends PointSet {
                 attr.quantiles = new Quantiles[1];
                 attr.quantiles[0] = new Quantiles(times, attr.magnitudes, 10);
             }
+        }
+        /* If requested, provide a detailed map from target IDs to travel times. */
+        if (retainTimes) {
+            this.times = new int[1][]; // we only support one-to-many currently.
+            this.times[0] = times;
         }
     }
 

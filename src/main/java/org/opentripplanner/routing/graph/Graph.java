@@ -119,6 +119,7 @@ public class Graph implements Serializable {
 
     private boolean debugData = true;
 
+    // TODO this would be more efficient if it was just an array.
     private transient Map<Integer, Vertex> vertexById;
 
     private transient Map<Integer, Edge> edgeById;

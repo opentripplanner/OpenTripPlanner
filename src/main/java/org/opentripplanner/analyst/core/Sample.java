@@ -54,6 +54,25 @@ public class Sample {
         return (m0 < m1) ? m0 : m1; 
     }
 
+    /* DUPLICATES code in sampleSet.eval(). should be deduplicated using a common function of vertices/dists. */
+    public long eval(TimeSurface surf) {
+        int m0 = Integer.MAX_VALUE;
+        int m1 = Integer.MAX_VALUE;
+        if (v0 != null) {
+            int s0 = surf.getTime(v0);
+            if (s0 != TimeSurface.UNREACHABLE) {
+                m0 = (int) (s0 + t0);
+            }
+        }
+        if (v1 != null) {
+            int s1 = surf.getTime(v1);
+            if (s1 != TimeSurface.UNREACHABLE) {
+                m1 = (int) (s1 + t1);
+            }
+        }
+        return (m0 < m1) ? m0 : m1;
+    }
+
     public String toString() {
         return String.format("Sample: %s in %d sec or %s in %d sec\n", v0, t0, v1, t1);
     }

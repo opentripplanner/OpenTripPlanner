@@ -5,6 +5,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import com.bedatadriven.geojson.GeoJsonModule;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -56,6 +57,7 @@ public class JSONObjectMapperProvider implements ContextResolver<ObjectMapper> {
         // and named, versioned reusable modules.
         mapper = new ObjectMapper()
                 .registerModule(AgencyAndIdSerializer.makeModule())
+                // .registerModule(new GeoJsonModule()) // serializes GeoJSON properly
                 .setSerializationInclusion(Include.NON_NULL); // skip null fields
     }
 

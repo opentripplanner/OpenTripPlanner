@@ -92,7 +92,7 @@ public class OTPServer {
             renderer = new Renderer(tileCache, sptCache);
             sampleGridRenderer = new SampleGridRenderer(graphService, sptService);
             isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(graphService, sptService, sampleGridRenderer);
-            surfaceCache = new SurfaceCache(20);
+            surfaceCache = new SurfaceCache(30);
             pointSetCache = new PointSetCache(sampleFactory);
         }
 

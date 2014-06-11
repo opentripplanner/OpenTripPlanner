@@ -58,12 +58,17 @@ public class Quantiles {
         breaks[nq] = tws.get(tws.size() - 1).time;
         int cw0 = 0, cw1 = -1; // cumulative weights
         // Loop over other intermediate quantiles. -1 ensures that 'while' executes on first iteration.
-        for (int q = 1, wdi = 0; q < nq; q++) {
+        for (int q = 1, wdi = -1; q < nq; q++) {
             // Determine the cumulative weight value for which we want to read off the time.
             float cw = ((float) q) * sum / nq;
             // Accumulate weights until we reach the first pair that includes the target value.
             while (cw1 < cw) {
-                wdi += 1;
+                // wdi starts out at -1, so increments to 0 on first iteration.
+                wdi += 1; // TODO When cw falls between 0 and first value, extrapolation should happen via negative frac?
+                if (wdi + 1 >= tws.size()) {
+                    System.out.println("Out of range.");
+                    break; // should never happen
+                }
                 tw0 = tws.get(wdi);
                 tw1 = tws.get(wdi + 1);
                 cw0 += tw0.weight; // accumulate weight
