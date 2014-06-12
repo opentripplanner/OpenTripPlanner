@@ -1,6 +1,11 @@
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.graph_builder.impl;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,14 +40,6 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
         this.setUrl(url);
     }
 
-    public List<String> getPrerequisites() {
-        return Collections.emptyList();
-    }
-
-    public List<String> provides() {
-        return Arrays.asList("poi");
-    }
-
     void setPath(File path) {
         this.path = path;
     }
@@ -52,9 +49,18 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
     }
 
     @Override
+    public List<String> getPrerequisites() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> provides() {
+        return Arrays.asList("poi");
+    }
+
+    @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         BufferedReader reader = null;
-        JSONArray jsonArray = new JSONArray();
 
         if (path != null) {
             try {
@@ -72,6 +78,7 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
         }
 
         JSONParser jsonParser = new JSONParser();
+        JSONArray jsonArray = new JSONArray();
         try {
             jsonArray = (JSONArray) jsonParser.parse(reader);
         } catch (ParseException | IOException e) {
@@ -81,8 +88,8 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
             try {
                 JSONObject object = (JSONObject) jsonObject;
                 new PoiVertex(graph, "tprek-" + object.get("id"), (double) object.get("longitude"),
-                        (double) object.get("latitude"), (String) object.get("name_fi"));
-                LOG.info("Added POI with id tprek-" + object.get("id"));
+                        (double) object.get("latitude"), (String) object.get("name_fi"),
+                        (String )object.get("accessibility_viewpoints"));
             } catch (Exception e) {
                 LOG.warn("Error in parsing POI {}", jsonObject);
             }
@@ -93,10 +100,10 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
     public void checkInputs() {
         if (path != null) {
             if (!path.exists()) {
-                throw new RuntimeException("ServiceMap Path " + path + " does not exist.");
+                throw new RuntimeException("ServiceMap path " + path + " does not exist.");
             }
             if (!path.canRead()) {
-                throw new RuntimeException("ServiceMap Path " + path + " cannot be read.");
+                throw new RuntimeException("ServiceMap path " + path + " cannot be read.");
             }
         } else if (url != null) {
             try {
