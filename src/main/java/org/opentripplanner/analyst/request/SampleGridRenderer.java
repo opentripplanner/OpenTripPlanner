@@ -19,6 +19,7 @@ import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler.AccumulativeMetric;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.IsolineBuilder;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.ZSampleGrid;
@@ -109,11 +110,13 @@ public class SampleGridRenderer {
      * @param spt
      * @return
      */
-    public void sampleSPT(ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid, final double d0,
+    public static void sampleSPT(ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid, final double d0,
             final double gridSizeMeters, final double v0, final double maxWalkDistance,
             final double cosLat) {
 
         final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
+        // Below is a closure that makes use of the parameters to the enclosing function.
 
         /**
          * Any given sample is weighted according to the inverse of the squared normalized distance
@@ -149,7 +152,7 @@ public class SampleGridRenderer {
              * distance of all enclosing samples, plus the grid size, and 2) as time the minimum
              * time of all enclosing samples plus the grid size * off-road walk speed as additional
              * time. All this are approximations.
-             * 
+             *
              * TODO Is there a better way of computing this? Here the computation will be different
              * based on the order where we close the samples.
              */
@@ -233,7 +236,7 @@ public class SampleGridRenderer {
     }
 
     /**
-     * The default TZ data we keep for each sample.
+     * The default TZ data we keep for each sample: Weighted Time and Walk Distance
      * 
      * For now we keep all possible values in the vector; we may want to remove the values that will
      * not be used in the process (for example # of boardings). Currently the filtering is done
@@ -264,5 +267,37 @@ public class SampleGridRenderer {
         public String toString() {
             return String.format("[t/w=%f,w=%f,d=%f]", wTime / w, w, d);
         }
+
+        public static class IsolineMetric implements IsolineBuilder.ZMetric<WTWD> {
+            @Override
+            public int cut(WTWD zA, SampleGridRenderer.WTWD zB, WTWD z0) {
+                double t0 = z0.wTime / z0.w;
+                double tA = zA.d > z0.d ? Double.POSITIVE_INFINITY : zA.wTime / zA.w;
+                double tB = zB.d > z0.d ? Double.POSITIVE_INFINITY : zB.wTime / zB.w;
+                if (tA < t0 && t0 <= tB)
+                    return 1;
+                if (tB < t0 && t0 <= tA)
+                    return -1;
+                return 0;
+            }
+            @Override
+            public double interpolate(WTWD zA, WTWD zB, WTWD z0) {
+                if (zA.d > z0.d || zB.d > z0.d) {
+                    if (zA.d > z0.d && zB.d > z0.d)
+                        throw new AssertionError("dA > d0 && dB > d0");
+                    // Interpolate on d
+                    double k = zA.d == zB.d ? 0.5 : (z0.d - zA.d) / (zB.d - zA.d);
+                    return k;
+                } else {
+                    // Interpolate on t
+                    double tA = zA.wTime / zA.w;
+                    double tB = zB.wTime / zB.w;
+                    double t0 = z0.wTime / z0.w;
+                    double k = tA == tB ? 0.5 : (t0 - tA) / (tB - tA);
+                    return k;
+                }
+            }
+        }
     }
+
 }

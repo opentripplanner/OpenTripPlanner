@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import org.apache.commons.math3.util.FastMath;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geojson.geom.GeometryJSON;
@@ -16,8 +17,11 @@ import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SlippyTile;
+import org.opentripplanner.analyst.request.IsoChroneRequest;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
+import org.opentripplanner.analyst.request.SampleGridRenderer;
+import org.opentripplanner.analyst.request.SampleGridRequest;
 import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
@@ -27,20 +31,30 @@ import org.opentripplanner.api.parameter.LayerList;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.api.parameter.Style;
 import org.opentripplanner.api.parameter.StyleList;
+import org.opentripplanner.common.geometry.AccumulativeGridSampler;
+import org.opentripplanner.common.geometry.DelaunayIsolineBuilder;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.IsolineBuilder;
 import org.opentripplanner.common.geometry.RecursiveGridIsolineBuilder;
+import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.routing.algorithm.EarliestArrivalSPTService;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.SPTService;
+import org.opentripplanner.routing.spt.SPTWalker;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -63,9 +77,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.math3.util.FastMath.toRadians;
+
 @Path("/surfaces")
 @Produces({ MediaType.APPLICATION_JSON })
 public class SurfaceResource extends RoutingResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TimeSurface.class);
 
     @Context
     OTPServer server;
@@ -151,7 +169,7 @@ public class SurfaceResource extends RoutingResource {
             cutoffs.add(surf.cutoffMinutes);
             cutoffs.add(surf.cutoffMinutes / 2);
         }
-        List<IsochroneData> isochrones = getIsochrones(surf, cutoffs);
+        List<IsochroneData> isochrones = getIsochronesAccumulative(surf, cutoffs);
         final FeatureCollection fc = LIsochrone.makeContourFeatures(isochrones);
         return Response.ok().entity(new StreamingOutput() {
             @Override
@@ -160,6 +178,24 @@ public class SurfaceResource extends RoutingResource {
                 fj.writeFeatureCollection(fc, output);
             }
         }).build();
+    }
+
+    @Path("/{surfaceId}/isotiles/{z}/{x}/{y}.png")
+    @GET @Produces("image/png")
+    public Response tileGet(@PathParam("surfaceId") Integer surfaceId,
+                            @PathParam("x") int x,
+                            @PathParam("y") int y,
+                            @PathParam("z") int z) throws Exception {
+
+        Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
+        TileRequest tileRequest = new TileRequest(env, 256, 256);
+        TimeSurface surfA = server.surfaceCache.get(surfaceId);
+        if (surfA == null) return badRequest("Unrecognized surface ID.");
+        MIMEImageFormat imageFormat = new MIMEImageFormat("image/png");
+        RenderRequest renderRequest =
+                new RenderRequest(imageFormat, Layer.TRAVELTIME, Style.COLOR30, true, false);
+        // TODO why can't the renderer be static?
+        return server.renderer.getResponse(tileRequest, surfA, null, renderRequest);
     }
 
     private Response badRequest(String message) {
@@ -175,7 +211,7 @@ public class SurfaceResource extends RoutingResource {
      * Based on IsoChroneSPTRendererRecursiveGrid.getIsochrones()
      * We could also do accumulative sampling into a grid and store that grid.
      */
-    private List<IsochroneData> getIsochrones(final TimeSurface surf, List<Integer> cutoffs) {
+    private List<IsochroneData> getIsochronesRecursive(final TimeSurface surf, List<Integer> cutoffs) {
         List<Coordinate> initialPoints = Lists.newArrayList();
         Graph graph = server.graphService.getGraph();
         for (StreetVertex sv : Iterables.filter(graph.getVertices(), StreetVertex.class)) {
@@ -195,8 +231,7 @@ public class SurfaceResource extends RoutingResource {
         double gridSizeMeters = 400;
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / Math.cos(Math.toRadians(center.x));
-        RecursiveGridIsolineBuilder isolineBuilder =
-                new RecursiveGridIsolineBuilder(dX, dY, center, timeFunc, initialPoints);
+        RecursiveGridIsolineBuilder isolineBuilder = new RecursiveGridIsolineBuilder(dX, dY, center, timeFunc, initialPoints);
         List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
         for (int cutoff : cutoffs) {
             int cutoffSec = cutoff * 60;
@@ -207,23 +242,32 @@ public class SurfaceResource extends RoutingResource {
         return isochrones;
     }
 
-    @Path("/{surfaceId}/isotiles/{z}/{x}/{y}.png")
-    @GET @Produces("image/png")
-    public Response tileGet(@PathParam("surfaceId") Integer surfaceId,
-                            @PathParam("x") int x,
-                            @PathParam("y") int y,
-                            @PathParam("z") int z) throws Exception {
+    /**
+     * Use Laurent's accumulative grid sampler. Cutoffs in minutes.
+     * The grid and delaunay triangulation are cached, so subsequent requests are very fast.
+     */
+    public List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, List<Integer> cutoffs) {
 
-            Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
-            TileRequest tileRequest = new TileRequest(env, 256, 256);
-            TimeSurface surfA = server.surfaceCache.get(surfaceId);
-            if (surfA == null) return badRequest("Unrecognized surface ID.");
-            MIMEImageFormat imageFormat = new MIMEImageFormat("image/png");
-            RenderRequest renderRequest =
-                new RenderRequest(imageFormat, Layer.TRAVELTIME, Style.COLOR30, true, false);
-            // TODO why can't the renderer be static?
-            return server.renderer.getResponse(tileRequest, surfA, null, renderRequest);
+        long t0 = System.currentTimeMillis();
+        DelaunayIsolineBuilder<WTWD> isolineBuilder = new DelaunayIsolineBuilder<WTWD>(
+                surf.sampleGrid.delaunayTriangulate(), new WTWD.IsolineMetric());
+
+        double D0 = 400.0; // TODO ? Set properly
+        List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
+        for (int cutoffMinutes : cutoffs) {
+            int cutoffSec = cutoffMinutes * 60;
+            WTWD z0 = new WTWD();
+            z0.w = 1.0;
+            z0.wTime = cutoffSec;
+            z0.d = D0;
+            IsochroneData isochrone = new IsochroneData(cutoffSec, isolineBuilder.computeIsoline(z0));
+            isochrones.add(isochrone);
         }
 
+        long t1 = System.currentTimeMillis();
+        LOG.debug("Computed {} isochrones in {}msec", isochrones.size(), (int) (t1 - t0));
+
+        return isochrones;
+    }
 
 }

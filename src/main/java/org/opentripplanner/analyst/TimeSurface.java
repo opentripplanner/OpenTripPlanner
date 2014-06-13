@@ -2,7 +2,12 @@ package org.opentripplanner.analyst;
 
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
+import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.core.IsochroneData;
+import org.opentripplanner.analyst.request.SampleGridRenderer;
+import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -10,11 +15,16 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
  * A travel time surface. Timing information from the leaves of a ShortestPathTree.
@@ -23,6 +33,7 @@ import java.util.Map;
  */
 public class TimeSurface {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TimeSurface.class);
     public static final int UNREACHABLE = -1;
     private static int nextId = 0;
 
@@ -33,7 +44,10 @@ public class TimeSurface {
     public long dateTime;
     public Map<String, String> params; // The query params sent by the user, for reference only
 
+    public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
+
     public TimeSurface(ShortestPathTree spt) {
+        long t0 = System.currentTimeMillis();
         times = new int[Vertex.getMaxIndex()]; // memory leak due to temp vertices?
         Arrays.fill(times, UNREACHABLE);
         for (State state : spt.getAllStates()) {
@@ -51,6 +65,9 @@ public class TimeSurface {
         this.lat = from.getLat();
         this.id = makeUniqueId();
         this.dateTime = spt.getOptions().dateTime;
+        long t1 = System.currentTimeMillis();
+        LOG.info("Made TimeSurface from SPT in {} msec.", (int) (t1 - t0));
+        makeSampleGrid(spt);
     }
 
     public int getTime(Vertex v) {
@@ -62,5 +79,25 @@ public class TimeSurface {
         return id;
     }
 
+    public int size() { return nextId; }
 
+    // TODO Lazy-initialize sample grid on demand so initial SPT finishes faster, and only isolines lag behind.
+    // however, the existing sampler needs an SPT, not general vertex-time mappings.
+    public void makeSampleGrid (ShortestPathTree spt) {
+        long t0 = System.currentTimeMillis();
+        final double gridSizeMeters = 400;
+        // Off-road max distance MUST be APPROX EQUALS to the grid precision
+        // TODO: Loosen this restriction (by adding more closing sample).
+        // Change the 0.8 magic factor here with caution.
+        final double D0 = 0.8 * gridSizeMeters; // offroad walk distance roughly grid size
+        final double V0 = 1.00; // off-road walk speed in m/sec
+        Coordinate coordinateOrigin = new Coordinate();
+        final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));
+        double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
+        double dX = dY / cosLat;
+        sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16, spt.getVertexCount(), dX, dY, coordinateOrigin);
+        SampleGridRenderer.sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0, spt.getOptions().getMaxWalkDistance(), cosLat);
+        long t1 = System.currentTimeMillis();
+        LOG.info("Made SampleGrid from SPT in {} msec.", (int) (t1 - t0));
+    }
 }
