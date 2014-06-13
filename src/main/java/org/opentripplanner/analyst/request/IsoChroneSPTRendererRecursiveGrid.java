@@ -98,7 +98,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
         Coordinate center = sptRequest.getFrom().getCoordinate();
         double gridSizeMeters = isoChroneRequest.getPrecisionMeters();
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
-        double dX = dY / Math.cos(center.x);
+        double dX = dY / Math.cos(Math.toRadians(center.x));
         LOG.info("dX={}, dY={}", dX, dY);
         RecursiveGridIsolineBuilder isolineBuilder = new RecursiveGridIsolineBuilder(dX, dY,
                 center, timeFunc, initialPoints);
