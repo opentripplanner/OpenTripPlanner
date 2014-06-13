@@ -72,4 +72,31 @@ public class SparseMatrixTest extends TestCase {
         assertEquals(all, elements);
         assertEquals(402, elements.size());
     }
+
+    /* Demonstrate storing two 32 bit integers in a long. */
+    public void testBitOperationsA() {
+        int a = Integer.MIN_VALUE;
+        int b = Integer.MAX_VALUE;
+        long c = (((long) a) << 32) | (((long) b) & 0xFFFFFFFFL);
+        assertEquals(a, (int) (c >>> 32));
+        assertEquals(b, (int) (c << 32 >>> 32));
+    }
+
+    /* Demonstrate storing two 32 bit integers in a long. */
+    public void testBitOperationsB() {
+        int a = -1;
+        int b = -5280;
+        int ac = a >>> 8;
+        int bc = b >>> 8;
+        int ai = a & 0xFF; // index in chunk
+        int bi = b & 0xFF; // index in chunk
+        long c = (((long) ac) << 32) | (((long) bc) & 0xFFFFFFFFL);
+        int ac2 = (int) (c >> 32);
+        int bc2 = (int) (c & 0xFFFFFFFFL);
+        assertEquals(ac, ac2);
+        assertEquals(bc, bc2);
+        assertEquals(a, (ac2 << 8) | ai);
+        assertEquals(b, (bc2 << 8) | bi);
+    }
+
 }

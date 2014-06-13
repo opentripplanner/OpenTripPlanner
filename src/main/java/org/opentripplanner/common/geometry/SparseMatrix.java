@@ -20,49 +20,52 @@ import java.util.Map;
 import lombok.Getter;
 
 /**
- * Implementation of a fast sparse 2D matrix of T elements.
- * 
- * We use a hash map of chunks of smaller chunkSize x chunkSize arrays. Do not implement any
- * collection interface for simplicity and to keep it fast.
- * 
+ * A fast sparse 2D matrix holding elements of type T.
+ * The x and y indexes into the sparse matrix are _signed_ 32-bit integers (negative indexes are allowed).
+ * Square sub-chunks of size chunkSize x chunkSize are stored in a hashmap,
+ * keyed on a combination of the x and y coordinates.
+ * Does not implement the collection interface for simplicity and speed.
  * Not thread-safe!
  * 
  * @author laurent
  */
 public class SparseMatrix<T> implements Iterable<T> {
 
-    /* The biggest negative 32 bits value that is a multiple of 128 */
-    private static final long INDEX_OFFSET = 2147483520L;
+    private int shift; // How many low order bits to shift off to get the index of a chunk.
 
-    private int shift;
+    private int mask; // The low order bits to retain when finding the index within a chunk.
 
-    private int mask;
+    private Map<Key, T[]> chunks;
 
-    private Map<Long, T[]> chunks;
+    int size = 0; // The number of elements currently stored in this matrix (number of cells containing a T).
 
-    int size = 0, matSize, chunkSize;
+    int matSize; // The capacity of a single chunk TODO rename
+
+    int chunkSize; // The dimension of a single chunk in each of two dimensions TODO rename
 
     @Getter
-    int xMin, xMax, yMin, yMax;
+    int xMin, xMax, yMin, yMax; // The maximum and minimum indices where an element is stored.
 
     /**
-     * @param chunkSize Chunk size, must be a power of two. Keep it small (8, 16, 32...). Number of
-     *        elements in each matrix chunk will be the square of this value.
-     * @param totalSize Estimated total size of the matrix.
+     * @param chunkSize Must be a power of two so chunk indexes can be determined by shifting off low order bits.
+     *        Keep it small (8, 16, 32...). Chunks are square, with this many elements in each of two dimensions,
+     *        so the number of elements in each chunk will be the square of this value.
+     * @param totalSize Estimated total number of elements to be stored in the matrix (actual use, not capacity).
      */
     public SparseMatrix(int chunkSize, int totalSize) {
         shift = 0;
         this.chunkSize = chunkSize;
-        mask = chunkSize - 1;
+        mask = chunkSize - 1; // all low order bits below the given power of two
+        this.matSize = chunkSize * chunkSize; // capacity of a single chunk
+        /* Find log_2 chunkSize, the number of low order bits to shift off an index to get its chunk index. */
         while (chunkSize > 1) {
             if (chunkSize % 2 != 0)
                 throw new IllegalArgumentException("Chunk size must be a power of 2");
             chunkSize /= 2;
             shift++;
         }
-        this.matSize = (mask + 1) * (mask + 1);
         // We assume here that each chunk will be filled at ~25% (thus the x4)
-        this.chunks = new HashMap<Long, T[]>(totalSize / matSize * 4);
+        this.chunks = new HashMap<Key, T[]>(totalSize / matSize * 4);
         this.xMin = Integer.MAX_VALUE;
         this.yMin = Integer.MAX_VALUE;
         this.xMax = Integer.MIN_VALUE;
@@ -70,10 +73,7 @@ public class SparseMatrix<T> implements Iterable<T> {
     }
 
     public final T get(int x, int y) {
-        long x0 = ((long) x + INDEX_OFFSET) >> shift;
-        long y0 = ((long) y + INDEX_OFFSET) >> shift;
-        Long key = x0 + (y0 << 32);
-        T[] ts = chunks.get(key);
+        T[] ts = chunks.get(new Key(x, y, shift));
         if (ts == null) {
             return null;
         }
@@ -83,6 +83,7 @@ public class SparseMatrix<T> implements Iterable<T> {
 
     @SuppressWarnings("unchecked")
     public final T put(int x, int y, T t) {
+        /* Keep a bounding box around all matrix cells in use. */
         if (x < xMin)
             xMin = x;
         if (x > xMax)
@@ -91,15 +92,13 @@ public class SparseMatrix<T> implements Iterable<T> {
             yMin = y;
         if (y > yMax)
             yMax = y;
-        long x0 = ((long) x + INDEX_OFFSET) >> shift;
-        long y0 = ((long) y + INDEX_OFFSET) >> shift;
-        Long key = x0 + (y0 << 32);
+        Key key = new Key(x, y, shift);
         T[] ts = chunks.get(key);
         if (ts == null) {
-            // Java do not allow us to create an array of generics...
-            ts = (T[]) (new Object[matSize]);
+            ts = (T[]) (new Object[matSize]); // Java does not allow arrays of generics.
             chunks.put(key, ts);
         }
+        /* Find index within chunk: concatenated low order bits of x and y. */
         int index = ((x & mask) << shift) + (y & mask);
         if (ts[index] == null)
             size++;
@@ -109,10 +108,6 @@ public class SparseMatrix<T> implements Iterable<T> {
 
     public int size() {
         return size;
-    }
-
-    public int getChunkSize() {
-        return chunkSize;
     }
 
     /*
@@ -175,14 +170,14 @@ public class SparseMatrix<T> implements Iterable<T> {
     }
 
     /**
-     * A public representation of the internal structure of the sparse matrix, ie a map of chunks
-     * (bi-dimentional array). We need to publish the internal structure to be able to efficiently
-     * export it through web-services.
+     * A public representation of the internal structure of the sparse matrix, i.e. a map of chunks
+     * (each of which is a flattened two-dimensional array).
+     * We need to publish the internal structure to be able to efficiently export it through web-services.
      */
     public class SparseMatrixChunk {
 
         @Getter
-        public int x0, y0;
+        public int x0, y0; // the coordinates of the minimum corner of this chunk (i.e. with the low bits)
 
         public T[] ts;
 
@@ -202,23 +197,24 @@ public class SparseMatrix<T> implements Iterable<T> {
             @Override
             public Iterator<SparseMatrixChunk> iterator() {
                 // Again, we rely on the indexIterator to check for concurrent modification.
-                final Iterator<Long> indexIterator = chunks.keySet().iterator();
+                final Iterator<Key> keyIterator = chunks.keySet().iterator();
                 return new Iterator<SparseMatrixChunk>() {
 
                     @Override
                     public boolean hasNext() {
-                        return indexIterator.hasNext();
+                        return keyIterator.hasNext();
                     }
 
                     @Override
                     public SparseMatrixChunk next() {
-                        long index = indexIterator.next();
-                        T[] ts = chunks.get(index);
+                        Key key = keyIterator.next();
+                        T[] ts = chunks.get(key);
                         if (ts == null) {
                             return null;
                         }
-                        int x0 = (int) (((index & 0xFFFFFFFFL) << shift) - INDEX_OFFSET);
-                        int y0 = (int) ((((index & 0xFFFFFFFF00000000L) >> 32) << shift) - INDEX_OFFSET);
+                        // extract the indexes for the minimum corner of this chunk
+                        int x0 = key.x << shift;
+                        int y0 = key.y << shift;
                         return new SparseMatrixChunk(x0, y0, ts);
                     }
 
@@ -229,6 +225,25 @@ public class SparseMatrix<T> implements Iterable<T> {
                 };
             }
         };
+    }
+
+    /**
+     * We were previously bit-shifting two 32 bit integers into a long. These are used as map keys, so they had to be
+     * Long objects rather than primitive long ints. This purpose-built key object should be roughly the same in terms
+     * of space and speed, and more readable.
+     */
+    static class Key {
+        int x, y;
+        public Key(int x, int y, int shift) {
+            this.x = x >>> shift; // shift off low order bits (index within chunk) retaining only the chunk number
+            this.y = y >>> shift; // same for y coordinate
+        }
+        @Override public int hashCode() {
+            return x ^ y;
+        }
+        @Override public boolean equals(Object other) {
+            return other instanceof Key && ((Key)other).x == x && ((Key)other).y == y;
+        }
     }
 
 }
