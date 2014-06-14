@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-13 18:59+0200\n"
+"POT-Creation-Date: 2014-06-14 20:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -872,6 +872,32 @@ msgstr ""
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:40
 msgid "tenth"
 msgstr ""
+
+#. n hour/hours use short form
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Time.js:29
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Time.js:42
+#, python-format
+msgid "%d hr"
+msgid_plural "%d hrs"
+msgstr[0] ""
+msgstr[1] ""
+
+#. n minute/minutes use short form
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Time.js:31
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Time.js:42
+#, python-format
+msgid "%d min"
+msgid_plural "%d mins"
+msgstr[0] ""
+msgstr[1] ""
+
+#. n second/seconds use short form
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Time.js:44
+#, python-format
+msgid "%d sec"
+msgid_plural "%d secs"
+msgstr[0] ""
+msgstr[1] ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/Dialogs.js:22
 msgid "OK"

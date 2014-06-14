@@ -574,7 +574,6 @@ otp.widgets.ItinerariesWidget =
 
             var inTransitDiv = $('<div class="otp-itin-leg-elapsedDesc" />').appendTo(legDiv);
 
-            //TODO: when secsToHrMin is localized this should be ngettext
             $('<span><i>' + _tr("Time in transit") + ": " + otp.util.Time.secsToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
 
             $('<span>&nbsp;[<a href="#">' + _tr("Trip Viewer") + '</a>]</span>')
