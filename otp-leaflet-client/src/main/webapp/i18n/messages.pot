@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-14 20:03+0200\n"
+"POT-Creation-Date: 2014-06-14 20:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -414,36 +414,36 @@ msgstr ""
 msgid "Stop"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:578
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:577
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:262
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:345
 msgid "Time in transit"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:580
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:579
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/TripViewerWidget.js:35
 msgid "Trip Viewer"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:638
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:637
 msgid "late as"
 msgstr ""
 
 #. Stay on board/Alight [at stop name]
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:644
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:643
 msgid "Stay on board"
 msgstr ""
 
 #. Alight Public transit route name (agency name
 #. Stop ID ) end time
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:644
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:643
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:265
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:348
 msgid "Alight"
 msgstr ""
 
 #. [Stay on board/Alight] at [stop name]
-#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:646
+#: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:645
 msgid "at"
 msgstr ""
 
@@ -837,39 +837,57 @@ msgstr ""
 msgid "first"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:32
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:34
 msgid "second"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:33
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:37
 msgid "third"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:34
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:40
 msgid "fourth"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:35
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:43
 msgid "fifth"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:36
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:46
 msgid "sixth"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:37
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:49
 msgid "seventh"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:38
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:52
 msgid "eight"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:39
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:55
 msgid "ninth"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:40
+#. Take roundabout to [nth] exit on [streetname] used
+#. as ordinal_exit number parameter for roundabouts
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Text.js:58
 msgid "tenth"
 msgstr ""
 

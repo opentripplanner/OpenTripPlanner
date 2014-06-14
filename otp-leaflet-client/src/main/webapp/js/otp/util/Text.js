@@ -29,14 +29,32 @@ otp.util.Text = {
             //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
             //as ordinal_exit number parameter for roundabouts
             1: _tr('first'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             2: _tr('second'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             3: _tr('third'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             4: _tr('fourth'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             5: _tr('fifth'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             6: _tr('sixth'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             7: _tr('seventh'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             8: _tr('eight'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             9: _tr('ninth'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
             10: _tr('tenth')
         };
         if (n in ordinals) {
