@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-06-13 18:59+0200\n"
-"PO-Revision-Date: 2014-06-13 18:53+0200\n"
+"PO-Revision-Date: 2014-06-14 18:32+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 "
@@ -74,9 +74,8 @@ msgstr "Izposojeno kolo &amp; Javni prevoz"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:36
-#, fuzzy
 msgid "Recenter Map Here"
-msgstr "Centriraj mapo tukaj"
+msgstr "Prikaži karto tukaj"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:39
@@ -105,26 +104,22 @@ msgstr "Pregledovalnik postaj"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
 #: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:64
-#, fuzzy
 msgid "Plan Trip"
-msgstr "Načrtujte pot"
+msgstr "Načrtuj pot"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
 #: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:66
-#, fuzzy
 msgid "From Stop"
-msgstr "Iz postaje"
+msgstr "Začetna postaja"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
 #: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:68
-#, fuzzy
 msgid "To Stop"
-msgstr "Do postaje"
+msgstr "Končna postaja"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/layers/StopsLayer.js:69
-#, fuzzy
 msgid "Routes Serving Stop"
-msgstr "Linije, ki ustavljajo na postaji"
+msgstr "Avtobusi, ki ustavljajo na postaji"
 
 #. Legend title in Analyst
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/analyst/AnalystLegendWidget.js:26
@@ -534,7 +529,7 @@ msgstr "Opravičujemo se. Daljinar trenutno ni na voljo. Prosim poskusite kasnej
 msgid ""
 "Trip is not possible.  You might be trying to plan a trip outside the map"
 " data boundary."
-msgstr "Pot ni mogoča. Mogoče poskušate planirati pot zunaj meje karte."
+msgstr "Pot ni mogoča. Mogoče poskušate načrtovati pot izven meja karte."
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:100
 #, fuzzy
@@ -1181,5 +1176,5 @@ msgstr "Izposojeno kolo"
 #. button to send query for trip planning
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:1046
 msgid "Plan Your Trip"
-msgstr "Načrtujte pot"
+msgstr "Načrtuj pot"
 
