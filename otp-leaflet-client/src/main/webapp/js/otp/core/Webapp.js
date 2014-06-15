@@ -182,6 +182,11 @@ otp.core.Webapp = otp.Class({
                 var options = {};
                 if(_.has(otp.config.infoWidgets[i], 'title')) options.title = otp.config.infoWidgets[i].title;
                 if(_.has(otp.config.infoWidgets[i], 'cssClass')) options.cssClass = otp.config.infoWidgets[i].cssClass;
+                //Creates frontend language chooser
+                if(_.has(otp.config.infoWidgets[i], 'languages')) {
+                   options.content = otp.config.languageChooser();
+                   otp.config.infoWidgets[i].content = options.content;
+                }
                 
                 this.infoWidgets[id] = new otp.widgets.InfoWidget(otp.config.infoWidgets[i].styleId,
                                                                   this, options, otp.config.infoWidgets[i].content);

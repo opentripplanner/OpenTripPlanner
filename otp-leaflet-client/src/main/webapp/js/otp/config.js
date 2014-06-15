@@ -4,6 +4,35 @@ otp.config = {
     locale: otp.locale.English,
     locale_short: 'en',
 
+    //Add all locales you want to see in your frontend langzuage chooser
+    //code must be the same as locale name in js/locale withoud .js part
+    //name must be name of the language in that language
+    active_locales : [
+        { 
+            code: 'en',
+            name: 'English'
+        },
+        {
+            code:'de',
+            name: 'Deutsch'
+        }
+    ],
+
+    languageChooser : function() {
+        var str = "<ul>";
+        var localesLength = otp.config.active_locales.length;
+        var param_name = i18n.options.detectLngQS;
+        for (var i = 0; i < localesLength; i++) {
+            var current_locale = otp.config.active_locales[i];
+            var url_param = {};
+            url_param[param_name] = current_locale.code;
+            str += '<li><a href="?' + $.param(url_param) + '">' + current_locale.name + ' (' + current_locale.code + ')</a></li>';
+        }
+        str += "</ul>";
+        return str;
+    },
+
+
     /**
      * The OTP web service locations
      */
@@ -133,6 +162,11 @@ otp.config = {
             title: 'Contact',
             content: '<p>Comments? Contact us at...</p>'
         },           
+        //Enable this if you want to show frontend language chooser
+        {
+            title: '<img src="/images/language_icon.svg" width="30px" height="30px"/>', //TODO: image fallback onerror
+            languages: true
+        }
     ],
     
     
@@ -159,7 +193,8 @@ var options = {
         nsseparator: ';;', //Fixes problem when : is in translation text
         keyseparator: '_|_',
 	preload: [otp.config.locale_short],
-	lng: otp.config.locale_short,
+        //TODO: Language choosing works only with this disabled
+        /*lng: otp.config.locale_short,*/
         /*postProcess: 'add_nekaj', //Adds | around every string that is translated*/
         /*shortcutFunction: 'sprintf',*/
         /*postProcess: 'sprintf',*/
