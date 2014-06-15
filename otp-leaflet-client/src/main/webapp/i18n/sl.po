@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-15 18:25+0200\n"
-"PO-Revision-Date: 2014-06-15 19:23+0200\n"
+"POT-Creation-Date: 2014-06-16 01:14+0200\n"
+"PO-Revision-Date: 2014-06-16 01:14+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 "
@@ -20,55 +20,55 @@ msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:264
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
 msgid "Transit"
 msgstr "Javni prevoz"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:267
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:263
 msgid "Bus Only"
 msgstr "Avtobus"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:270
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:266
 msgid "Rail Only"
 msgstr "Vlak"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:273
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:269
 msgid "Bicycle Only"
 msgstr "Kolo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:276
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
 msgid "Bicycle &amp; Transit"
 msgstr "Kolo &amp; Javni prevoz"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:279
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:275
 msgid "Walk Only"
 msgstr "Pešačenje"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:282
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:278
 msgid "Drive Only"
 msgstr "Avto"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:289
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:285
 msgid "Rented Bicycle"
 msgstr "Izposojeno kolo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:292
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:288
 msgid "Transit & Rented Bicycle"
 msgstr "Izposojeno kolo &amp; Javni prevoz"
 
@@ -151,7 +151,7 @@ msgstr "Planer za izposojena kolesa"
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:108
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:44
 msgid "Trip Options"
-msgstr "Nastavitve potovanja"
+msgstr "Nastavitve poti"
 
 #. Popup title station from where bike is picked
 #. up
@@ -232,7 +232,7 @@ msgstr "Predlagana postaja za vrnitev kolesa:"
 #. module name
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:22
 msgid "Multimodal Trip Planner"
-msgstr "Načrtovalnik potovanj"
+msgstr "Načrtovalnik poti"
 
 #. Widget title
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:131
@@ -348,7 +348,7 @@ msgstr "Konec"
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:450
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:299
 msgid "Trip Summary"
-msgstr "Povzetek potovanja"
+msgstr "Povzetek poti"
 
 #. Travel: hour date on which this trip is made
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:452
@@ -402,7 +402,7 @@ msgstr "Natisni"
 #. Default subject when sending trip to email
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:509
 msgid "Your Trip"
-msgstr "Vaše potovanje"
+msgstr "Vaša pot"
 
 #. Link to send trip by email
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:512
@@ -444,7 +444,6 @@ msgstr "Časa na vožnji"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:579
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/transit/TripViewerWidget.js:35
-#, fuzzy
 msgid "Trip Viewer"
 msgstr "Pregledovalnik poti"
 
@@ -541,7 +540,7 @@ msgid ""
 "connected only to a highway)."
 msgstr ""
 "Pot ni mogoča. Do začetne ali končne točke ni mogoče varno priti (na "
-"primer). Mogoče začenjate na lokalni cesti, ki je povezana samo na "
+"primer), mogoče začenjate na lokalni cesti, ki je povezana samo na "
 "avtocesto."
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:101
