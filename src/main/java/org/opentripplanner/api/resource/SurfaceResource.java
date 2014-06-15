@@ -92,12 +92,25 @@ public class SurfaceResource extends RoutingResource {
     UriInfo uriInfo;
 
     @POST
-    public Response createSurface(@QueryParam("cutoffMinutes") @DefaultValue("90") int cutoffMinutes) {
+    public Response createSurface(@QueryParam("cutoffMinutes") 
+    @DefaultValue("90") int cutoffMinutes,
+    @QueryParam("routerId") String routerId) {
 
         // Build the request
         try {
             RoutingRequest req = buildRequest(0); // batch must be true
-            Graph graph = server.graphService.getGraph();
+           
+            Graph graph;
+            
+            // routerId is optional -- select default graph if not set
+        	if(routerId == null || routerId.isEmpty()) {
+        		graph = server.graphService.getGraph();
+        	}
+        	else
+        		graph = server.graphService.getGraph(routerId);
+            
+        	req.setRoutingContext(graph);
+        	
             req.setRoutingContext(graph);
             EarliestArrivalSPTService sptService = new EarliestArrivalSPTService();
             sptService.setMaxDuration(60 * cutoffMinutes);
@@ -125,7 +138,7 @@ public class SurfaceResource extends RoutingResource {
     /** List all the available surfaces. */
     @GET
     public Response getTimeSurfaceList () {
-        return Response.ok().entity(TimeSurfaceShort.list(server.surfaceCache.cache)).build();
+        return Response.ok().entity(TimeSurfaceShort.list(server.surfaceCache.cache.values())).build();
     }
 
     /** Describe a specific surface. */
@@ -143,7 +156,9 @@ public class SurfaceResource extends RoutingResource {
                                   @QueryParam("origins")  String  originPointSetId,
                                   @QueryParam("detail")   boolean detail) {
 
-        final TimeSurface surf = server.surfaceCache.get(surfaceId);
+
+    	final TimeSurface surf = server.surfaceCache.get(surfaceId);
+    	
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
         final PointSet pset = server.pointSetCache.get(targetPointSetId);
         if (pset == null) return badRequest("Missing or invalid target PointSet ID.");
@@ -188,9 +203,11 @@ public class SurfaceResource extends RoutingResource {
                             @PathParam("z") int z) throws Exception {
 
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
-        TileRequest tileRequest = new TileRequest(env, 256, 256);
         TimeSurface surfA = server.surfaceCache.get(surfaceId);
         if (surfA == null) return badRequest("Unrecognized surface ID.");
+        	
+        TileRequest tileRequest = new TileRequest(surfA.routerId, env, 256, 256);
+       
         MIMEImageFormat imageFormat = new MIMEImageFormat("image/png");
         RenderRequest renderRequest =
                 new RenderRequest(imageFormat, Layer.TRAVELTIME, Style.COLOR30, true, false);
@@ -213,15 +230,18 @@ public class SurfaceResource extends RoutingResource {
      */
     private List<IsochroneData> getIsochronesRecursive(final TimeSurface surf, List<Integer> cutoffs) {
         List<Coordinate> initialPoints = Lists.newArrayList();
-        Graph graph = server.graphService.getGraph();
+        
+        
+        final Graph graph = server.graphService.getGraph(surf.routerId);
         for (StreetVertex sv : Iterables.filter(graph.getVertices(), StreetVertex.class)) {
             if (surf.getTime(sv) != TimeSurface.UNREACHABLE) initialPoints.add(sv.getCoordinate());
         }
+
         RecursiveGridIsolineBuilder.ZFunc timeFunc = new RecursiveGridIsolineBuilder.ZFunc() {
             @Override
             public long z(Coordinate c) {
                 // TODO not multi-graph compatible
-                Sample sample = server.sampleFactory.getSample(c.x, c.y);
+                Sample sample = graph.getSampleFactory().getSample(c.x, c.y);
                 if (sample == null) return Long.MAX_VALUE;
                 Long z = sample.eval(surf);
                 return z;

@@ -54,10 +54,8 @@ public class GeometryIndex implements GeometryIndexService {
     
     private STRtree pedestrianIndex;
 
-    public GeometryIndex(GraphService graphService) {
-        this.graphService = graphService;
-        Graph graph = graphService.getGraph();
-        if (graph == null) { // analyst currently depends on there being a single default graph
+    public GeometryIndex(Graph graph) {
+        if (graph == null) { 
             String message = "Could not retrieve default Graph from GraphService. Check its configuration.";
             LOG.error(message);
             throw new IllegalStateException(message);

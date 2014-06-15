@@ -39,7 +39,7 @@ public class Indicator extends PointSet {
             this.categories.put(cat.id, new Category(cat));
         }
         // Evaluate the surface at all points in the pointset
-        int[] times = targets.samples.eval(surface);
+        int[] times = targets.getSampleSet(surface.routerId).eval(surface);
         for (Category cat : categories.values()) {
             for (Attribute attr : cat.attributes.values()) {
                 attr.quantiles = new Quantiles[1];

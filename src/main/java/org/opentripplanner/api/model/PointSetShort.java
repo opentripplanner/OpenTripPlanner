@@ -12,13 +12,22 @@ import java.util.Map;
 public class PointSetShort {
 
     public String id;
-    public int n;
+    public Integer n;
 
     public PointSetShort(String id, PointSet pointSet) {
         this.id = id;
-        this.n = pointSet.capacity;
+        if(pointSet != null)
+        	this.n = pointSet.capacity;
     }
 
+    public static List<PointSetShort> list (List<String> in) {
+        List<PointSetShort> out = Lists.newArrayList();
+        for (String id : in) {
+            out.add(new PointSetShort(id, null));
+        }
+        return out;
+    }
+    
     public static List<PointSetShort> list (Map<String, PointSet> in) {
         List<PointSetShort> out = Lists.newArrayList();
         for (String id : in.keySet()) {

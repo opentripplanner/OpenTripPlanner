@@ -2,9 +2,13 @@ package org.opentripplanner.analyst;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+
+import org.apache.commons.collections.map.LRUMap;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 /**
@@ -16,31 +20,19 @@ import java.util.Queue;
 public class SurfaceCache {
 
     public static final int NONE = -1;
-    public final List<TimeSurface> cache;
-    public final int capacity;
+    public final Map<Integer, TimeSurface> cache;
 
     public SurfaceCache (int capacity) {
-        this.cache = Lists.newArrayList();
-        this.capacity = capacity;
+        this.cache = Collections.synchronizedMap(new LRUMap(capacity));
     }
 
     public int add(TimeSurface surface) {
-        synchronized (this) {
-            if (cache.size() >= capacity) {
-                cache.remove(0);
-            }
-            cache.add(surface);
-        }
-        return surface.id;
+    	this.cache.put(surface.id, surface);
+    	return surface.id;
     }
 
     public TimeSurface get(int id) {
-        for (TimeSurface surface : cache) {
-            if (surface.id == id) {
-                return surface;
-            }
-        }
-        return null;
+        return this.cache.get(id);
     }
 
 }

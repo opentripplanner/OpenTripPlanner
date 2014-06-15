@@ -19,6 +19,7 @@ import lombok.Setter;
 
 import org.opentripplanner.analyst.core.TemplateTile;
 import org.opentripplanner.analyst.core.Tile;
+import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +33,10 @@ public class TileCache extends CacheLoader<TileRequest, Tile>
     
     private static final Logger LOG = LoggerFactory.getLogger(TileCache.class);
 
-    private SampleFactory sampleFactory;
+    private GraphService graphService;
 
-    public TileCache(SampleFactory sampleFactory) {
-        this.sampleFactory = sampleFactory;
+    public TileCache(GraphService graphService) {
+        this.graphService = graphService;
         this.tileCache = CacheBuilder.newBuilder()
                 .concurrencyLevel(concurrency)
                 .maximumSize(size)
@@ -50,7 +51,7 @@ public class TileCache extends CacheLoader<TileRequest, Tile>
     /** completes the abstract CacheLoader superclass */
     public Tile load(TileRequest req) throws Exception {
         LOG.debug("tile cache miss; cache size is {}", this.tileCache.size());
-        return new TemplateTile(req, sampleFactory);
+        return new TemplateTile(req, graphService);
         //return new TemplateTile(req, hashSampler);
         //return new DynamicTile(req, hashSampler);
         //return new DynamicTile(req, sampleFactory);

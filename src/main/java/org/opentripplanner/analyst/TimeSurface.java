@@ -37,6 +37,8 @@ public class TimeSurface {
     public static final int UNREACHABLE = -1;
     private static int nextId = 0;
 
+    public final String routerId;
+    
     public final int id;
     public final int[] times; // one time in seconds per vertex
     public final double lat, lon;
@@ -47,6 +49,8 @@ public class TimeSurface {
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
 
     public TimeSurface(ShortestPathTree spt) {
+    	
+    	routerId = spt.getOptions().routerId;
         long t0 = System.currentTimeMillis();
         times = new int[Vertex.getMaxIndex()]; // memory leak due to temp vertices?
         Arrays.fill(times, UNREACHABLE);
@@ -60,6 +64,8 @@ public class TimeSurface {
                 }
             }
         }
+        
+        // TODO make this work as either to or from query
         GenericLocation from = spt.getOptions().getFrom();
         this.lon = from.getLng();
         this.lat = from.getLat();

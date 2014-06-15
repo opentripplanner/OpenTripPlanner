@@ -21,6 +21,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +59,12 @@ public class PointSet {
     
     Map<String,Category> categories = new ConcurrentHashMap<String,Category>();
     public int capacity = 0;      // The total number of features this PointSet can hold.
-    public SampleSet samples;     // Connects this population to vertices in a Graph.
+    
+    private HashMap<String,SampleSet> samples = new HashMap<String,SampleSet>();     // Connects this population to vertices in a given Graph (map of graph ids to sample sets).
 
+    protected GraphService graphService;
+    
+    
     /* In a detailed Indicator, the time to reach each target, for each origin. Null in non-indicator pointsets. */
     public int[][] times;
 
@@ -360,6 +367,37 @@ public class PointSet {
     	polygons = new Polygon[capacity];
     }
 
+    /** 
+     * Adds a grpah service to allow for auto creation of SampleSets for a given graph
+     * @param reference to the application graph service
+     */
+    
+    public void setGraphService(GraphService graphService) {
+    	this.graphService = graphService;
+    }	
+    
+    /** 
+     * gets a sample set for a given graph id 
+     * @param a valid graph id
+     */
+    
+    public SampleSet getSampleSet(String routerId) {
+    	
+    	if(this.samples.containsKey(routerId))
+    		return this.samples.get(routerId);
+    	
+    	Graph g = this.graphService.getGraph(routerId);
+    	
+    	if(g == null)
+    		return null;
+    	
+    	SampleSet sampleSet = new SampleSet(this, g.getSampleFactory());
+    	
+    	this.samples.put(routerId, sampleSet);
+    	
+    	return sampleSet;
+    }
+    
     /**
      * Add a single feature with a variable number of free-form attributes.
      * Attribute data contains id value pairs, ids are in form "cat_id:attr_id".

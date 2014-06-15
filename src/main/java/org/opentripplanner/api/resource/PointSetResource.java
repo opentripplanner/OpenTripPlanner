@@ -4,6 +4,7 @@ import org.opentripplanner.analyst.Indicator;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.model.PointSetShort;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
 
 import javax.ws.rs.GET;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -40,13 +42,16 @@ public class PointSetResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPointSets () {
-        return Response.ok().entity(PointSetShort.list(server.pointSetCache.pointSets)).build();
+        return Response.ok().entity(PointSetShort.list(server.pointSetService.getPointSetIds())).build();
     }
 
     @GET
     @Path("/{pointSetId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPointSet (@PathParam("pointSetId") String pointSetId) {
+    public Response getPointSet (
+    		@PathParam("pointSetId") String pointSetId) {
+    	
+    	
         final PointSet pset = server.pointSetCache.get(pointSetId);
         if (pset == null) {
             return Response.status(Status.NOT_FOUND).entity("Invalid PointSet ID.").build();

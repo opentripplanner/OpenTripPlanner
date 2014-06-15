@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.opentripplanner.analyst.request.SampleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -245,7 +246,7 @@ public class RecursiveGridIsolineBuilder {
     private boolean debugCrossingEdges = false;
 
     private Geometry debugGeometry = null;
-
+        
     // private List<Coordinate> __p0List;
 
     /**
@@ -258,9 +259,12 @@ public class RecursiveGridIsolineBuilder {
      * @param fz Function returning the z-value for a xy-coordinate
      * @param p0List Initial set of coverage points to seed the heuristics
      */
-    public RecursiveGridIsolineBuilder(double dX, double dY, Coordinate center, ZFunc fz,
+    public RecursiveGridIsolineBuilder( double dX, double dY, Coordinate center, ZFunc fz,
             List<Coordinate> p0List) {
-        this.dX = dX;
+       
+    	
+    	
+    	this.dX = dX;
         this.dY = dY;
         /*
          * Center position only purpose is to serve as a reference value to the XY integer indexing,
