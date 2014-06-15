@@ -17,8 +17,8 @@ otp.namespace("otp.modules.planner");
 otp.modules.planner.defaultQueryParams = {
     startPlace                      : null,
     endPlace                        : null,
-    time                            : moment().format("h:mma"),
-    date                            : moment().format("MM-DD-YYYY"),
+    time                            : moment().format(otp.config.locale.time.time_format),
+    date                            : moment().format(otp.config.locale.time.date_format),
     arriveBy                        : false,
     mode                            : "TRANSIT,WALK",
     maxWalkDistance                 : 804.672, // 1/2 mi.
