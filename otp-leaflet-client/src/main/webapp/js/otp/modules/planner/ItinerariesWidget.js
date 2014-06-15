@@ -496,7 +496,7 @@ otp.widgets.ItinerariesWidget =
         
         if(this.showPrintLink) {
             tripSummaryFooter.append(' | ');
-            $('<a href="#">Print</a>').click(function(evt) {
+            $('<a href="#">' + _tr('Print') +'</a>').click(function(evt) {
                 evt.preventDefault();
 
                 var printWindow = window.open('','OpenTripPlanner Results','toolbar=yes, scrollbars=yes, height=500, width=800');
