@@ -164,7 +164,7 @@ otp.config = {
         },           
         //Enable this if you want to show frontend language chooser
         {
-            title: '<img src="/images/language_icon.svg" width="30px" height="30px"/>', //TODO: image fallback onerror
+            title: '<img src="/images/language_icon.svg" onerror="this.onerror=\'\';this.src=\'/images/language_icon.png\'" width="30px" height="30px"/>', 
             languages: true
         }
     ],
