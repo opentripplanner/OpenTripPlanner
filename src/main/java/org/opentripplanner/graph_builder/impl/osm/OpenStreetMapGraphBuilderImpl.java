@@ -1633,7 +1633,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             || "bus_stop".equals(osmEndNode.getTag("highway"))
                             || "tram_stop".equals(osmEndNode.getTag("railway"))
                             || "station".equals(osmEndNode.getTag("railway"))
-                            || "halt".equals(osmEndNode.getTag("railway"))) {
+                            || "halt".equals(osmEndNode.getTag("railway"))
+                            || "bus_station".equals(osmEndNode.getTag("amenity"))) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
 
                         geometry = GeometryUtils.getGeometryFactory().createLineString(
@@ -2788,7 +2789,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if ("bus_stop".equals(node.getTag("highway"))
                         || "tram_stop".equals(node.getTag("railway"))
                         || "station".equals(node.getTag("railway"))
-                        || "halt".equals(node.getTag("railway"))) {
+                        || "halt".equals(node.getTag("railway"))
+                        || "bus_station".equals(node.getTag("amenity"))) {
                     String ref = node.getTag("ref");
                     String name = node.getTag("name");
                     if (ref != null) {
