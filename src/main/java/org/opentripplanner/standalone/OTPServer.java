@@ -3,9 +3,8 @@ package org.opentripplanner.standalone;
 import com.google.common.collect.Maps;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.opentripplanner.analyst.LocalDiskPointSetService;
+import org.opentripplanner.analyst.DiskBackedPointSetCache;
 import org.opentripplanner.analyst.PointSetCache;
-import org.opentripplanner.analyst.PointSetService;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
@@ -50,7 +49,6 @@ public class OTPServer {
     public SPTService sptService;
 
     // Optional Analyst Modules
-    public PointSetService pointSetService;
     public Renderer renderer;
     public SPTCache sptCache;
     public TileCache tileCache;
@@ -89,14 +87,13 @@ public class OTPServer {
 
         // Optional Analyst Modules.
         if (params.analyst) {
-        	pointSetService = new LocalDiskPointSetService(new File("/var/otp/pointsets/"), graphService);
             tileCache = new TileCache(graphService);
             sptCache = new SPTCache(sptService, graphService);
             renderer = new Renderer(tileCache, sptCache);
             sampleGridRenderer = new SampleGridRenderer(graphService, sptService);
             isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(graphService, sptService, sampleGridRenderer);
             surfaceCache = new SurfaceCache(30);
-            pointSetCache = new PointSetCache(pointSetService);
+            pointSetCache = new DiskBackedPointSetCache(100, new File("/var/otp/pointsets/"), graphService);
         }
 
     }

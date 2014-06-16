@@ -42,7 +42,7 @@ public class PointSetResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPointSets () {
-        return Response.ok().entity(PointSetShort.list(server.pointSetService.getPointSetIds())).build();
+        return Response.ok().entity(PointSetShort.list(server.pointSetCache.getPointSetIds())).build();
     }
 
     @GET

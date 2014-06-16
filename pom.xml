@@ -210,7 +210,6 @@
                               <includes> <include>**</include> </includes> </filter> </filters> -->
                             <artifactSet>
                                 <excludes>
-                                    <!-- <exclude>com.fasterxml.jackson.core:*</exclude> -->
 			            <!-- Do not explode the client WAR. -->
                                     <!-- Actually, shade seems to skip the WAR even without this exclusion (verify) -->
                                     <exclude>org.opentripplanner:otp-leaflet-client</exclude>
@@ -543,12 +542,6 @@
             <artifactId>commons-compress</artifactId>
             <version>1.0</version>
         </dependency>
-        <!-- used for LRU cache implementation -->
-	<dependency>
-		<groupId>commons-collections</groupId>
-		<artifactId>commons-collections</artifactId>
-		<version>3.2.1</version>
-	</dependency>
         <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
             <groupId>net.java.dev.jets3t</groupId>

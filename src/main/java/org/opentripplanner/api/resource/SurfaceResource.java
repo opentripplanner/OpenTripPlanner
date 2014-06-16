@@ -138,7 +138,7 @@ public class SurfaceResource extends RoutingResource {
     /** List all the available surfaces. */
     @GET
     public Response getTimeSurfaceList () {
-        return Response.ok().entity(TimeSurfaceShort.list(server.surfaceCache.cache.values())).build();
+        return Response.ok().entity(TimeSurfaceShort.list(server.surfaceCache.cache.asMap().values())).build();
     }
 
     /** Describe a specific surface. */

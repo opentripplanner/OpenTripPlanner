@@ -60,7 +60,10 @@ public class PointSet {
     Map<String,Category> categories = new ConcurrentHashMap<String,Category>();
     public int capacity = 0;      // The total number of features this PointSet can hold.
     
-    private HashMap<String,SampleSet> samples = new HashMap<String,SampleSet>();     // Connects this population to vertices in a given Graph (map of graph ids to sample sets).
+    /* Connects this population to vertices in a given Graph (map of graph ids to sample sets).
+     * Keeping  as a graphId->sampleSet map to prevent duplication of pointset when used across multiple graphs
+     */
+    private HashMap<String,SampleSet> samples = new HashMap<String,SampleSet>();     
 
     protected GraphService graphService;
     
@@ -382,19 +385,13 @@ public class PointSet {
      */
     
     public SampleSet getSampleSet(String routerId) {
-    	
     	if(this.samples.containsKey(routerId))
     		return this.samples.get(routerId);
-    	
     	Graph g = this.graphService.getGraph(routerId);
-    	
     	if(g == null)
-    		return null;
-    	
+    		return null;    	
     	SampleSet sampleSet = new SampleSet(this, g.getSampleFactory());
-    	
     	this.samples.put(routerId, sampleSet);
-    	
     	return sampleSet;
     }
     
@@ -585,7 +582,7 @@ public class PointSet {
      * pairs to a JSON object.
      */
     private void writeTimes(JsonGenerator jgen, int[] times) throws IOException {
-        jgen.writeObjectFieldStart("times");
+    	jgen.writeObjectFieldStart("times");
         for (int i = 0; i < times.length; i++) { // capacity is now 1 if this is a one-to-many indicator
             int t = times[i];
             if (t != Integer.MAX_VALUE) jgen.writeNumberField(ids[i], t);

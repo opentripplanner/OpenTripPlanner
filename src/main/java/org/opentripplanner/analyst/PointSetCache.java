@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst;
 
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 
 import org.opentripplanner.analyst.request.SampleFactory;
@@ -9,26 +10,24 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
-public class PointSetCache {
+public abstract class PointSetCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(PointSetCache.class);
     
-    public final Map<String, PointSet> pointSets = Maps.newHashMap();
+    LoadingCache<String, PointSet> pointSets;
     
-    private PointSetService pointSetService;
+    protected GraphService graphService;
     
-    public PointSetCache (PointSetService pointSetService) {
-    	this.pointSetService = pointSetService;
-    	
+    public PointSetCache (GraphService graphService) {
+    	this.graphService = graphService;
     }
 
-    public PointSet get(String pointSetId) {
-
-    	if(!pointSets.containsKey(pointSetId))
-    		pointSets.put(pointSetId, pointSetService.getPointSet(pointSetId));
-    	
-    	return pointSets.get(pointSetId);
-    }
+    public  PointSet get(String pointSetId) {
+    	return pointSets.getUnchecked(pointSetId);
+    };
+	
+	public abstract List<String> getPointSetIds();
 }
