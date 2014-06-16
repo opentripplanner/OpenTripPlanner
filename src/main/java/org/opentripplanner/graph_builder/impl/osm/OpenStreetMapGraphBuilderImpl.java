@@ -93,6 +93,7 @@ import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
+import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.visibility.Environment;
 import org.opentripplanner.visibility.VLPoint;
@@ -2784,20 +2785,22 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
 
-                if (iv == null) {
-                    iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
-                    if (node.hasTrafficLight()) {
-                        iv.setTrafficLight(true);
-                    }
-                }
-
                 if ("bus_stop".equals(node.getTag("highway"))
                         || "tram_stop".equals(node.getTag("railway"))
                         || "station".equals(node.getTag("railway"))
                         || "halt".equals(node.getTag("railway"))) {
                     String ref = node.getTag("ref");
+                    String name = node.getTag("name");
                     if (ref != null) {
-                        iv.setStopCode(ref);
+                        TransitStopStreetVertex tsv = new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, name, ref);
+                        iv = tsv;
+                    }
+                }
+
+                if (iv == null) {
+                    iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
+                    if (node.hasTrafficLight()) {
+                        iv.setTrafficLight(true);
                     }
                 }
 

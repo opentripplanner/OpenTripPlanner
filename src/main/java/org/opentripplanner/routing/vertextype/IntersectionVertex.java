@@ -39,10 +39,6 @@ public class IntersectionVertex extends StreetVertex {
     @Setter
     private boolean freeFlowing;
 
-    @Getter
-    @Setter
-    private String stopCode;
-
     /** Returns true if this.freeFlowing or if it appears that this vertex is free-flowing */
     public boolean inferredFreeFlowing() {
         if (this.freeFlowing) {

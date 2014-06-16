@@ -8,9 +8,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,22 +68,24 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
     }
 
     private boolean connectVertexToStop(TransitStop ts, boolean wheelchairAccessible) {
-        String ref = ts.getStopCode();
-        if (ref == null) {
-            return false;
-        }
+        String stopCode = ts.getStopCode();
+        String stopId = ts.getStopId().getId();
         Envelope envelope = new Envelope(ts.getCoordinate());
-        envelope.expandBy(0.002); // ~= 100-200 meters
+        envelope.expandBy(0.003); // ~200 meters
         Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
         for (Vertex v : vertices){
-            if (!(v instanceof IntersectionVertex)){
+            if (!(v instanceof TransitStopStreetVertex)){
                 continue;
             }
-            if (((IntersectionVertex) v).getStopCode() != null && ((IntersectionVertex) v).getStopCode().matches(ref)){
-                new StreetTransitLink(ts, (StreetVertex) v, wheelchairAccessible);
-                new StreetTransitLink((StreetVertex) v, ts, wheelchairAccessible);
-                LOG.info("Connected " + ts.toString() + " to " + v.getLabel());
-                return true;
+            TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
+            if (tsv.getStopCode() != null) {
+                if ((stopId != null && tsv.getStopCode().matches(stopId))
+                        || (stopCode != null && tsv.getStopCode().matches(stopCode))) {
+                    new StreetTransitLink(ts, tsv, wheelchairAccessible);
+                    new StreetTransitLink(tsv, ts, wheelchairAccessible);
+                    LOG.info("Connected " + ts.toString() + " to " + tsv.getLabel());
+                    return true;
+                }
             }
         }
         return false;
