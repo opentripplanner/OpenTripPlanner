@@ -106,7 +106,6 @@ public abstract class GtfsTest extends TestCase {
             pathService = new LongDistancePathService(null, genericAStar);
         } else {
             pathService = new RetryingPathServiceImpl(null, genericAStar);
-            genericAStar.setNPaths(1);
         }
         planGenerator = new PlanGenerator(null, pathService);
     }
@@ -123,7 +122,8 @@ public abstract class GtfsTest extends TestCase {
                String excludedRoute, String excludedStop, int legCount) {
         final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
         RoutingRequest routingRequest = new RoutingRequest();
-
+        routingRequest.setNumItineraries(1);
+        
         routingRequest.setArriveBy(dateTime < 0);
         routingRequest.dateTime = Math.abs(dateTime);
         if (fromVertex != null && !fromVertex.isEmpty()) {

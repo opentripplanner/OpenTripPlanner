@@ -336,7 +336,8 @@ public class ProfileRouter {
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         GenericAStar astar = new GenericAStar();
-        astar.setNPaths(1);
+        int oldNumItineraries = rr.getNumItineraries();
+        rr.setNumItineraries(1);
         final List<StopAtDistance> ret = Lists.newArrayList();
         astar.setTraverseVisitor(new TraverseVisitor() {
             @Override public void visitEdge(Edge edge, State state) { }
@@ -353,6 +354,7 @@ public class ProfileRouter {
             }
         });
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
+        rr.setNumItineraries(oldNumItineraries);
         rr.rctx.destroy();
         return ret;
     }
@@ -371,13 +373,15 @@ public class ProfileRouter {
         rr.setWalkSpeed(request.walkSpeed);
         rr.setBikeSpeed(request.bikeSpeed);
         GenericAStar astar = new GenericAStar();
-        astar.setNPaths(1);
+        int oldNumItineraries = rr.getNumItineraries();
+        rr.setNumItineraries(1);
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
         State state = spt.getState(rr.rctx.target);
         if (state != null) {
             LOG.info("Found non-transit option for mode {}", mode);
             directOptions.add(new Option(state));
         }
+        rr.setNumItineraries(oldNumItineraries);
         rr.rctx.destroy();
     }
 

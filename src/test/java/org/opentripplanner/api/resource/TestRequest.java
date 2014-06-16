@@ -231,7 +231,8 @@ class Context {
             }
         }
         // to make test results more deterministic, only find the single best path
-        ((GenericAStar) otpServer.sptService).setNPaths(1);
+        // If this is really needed, it should be set in the RoutingRequest in individual tests
+        //((GenericAStar) otpServer.sptService).setNPaths(1);
 
         // Create dummy TimetableResolver
         TimetableResolver resolver = new TimetableResolver();
