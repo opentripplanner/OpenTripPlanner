@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-06-16 01:14+0200\n"
-"PO-Revision-Date: 2014-06-16 01:14+0200\n"
+"PO-Revision-Date: 2014-06-16 10:54+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 "
@@ -238,17 +238,17 @@ msgstr "Načrtovalnik poti"
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:131
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:42
 msgid "Itineraries"
-msgstr "Itinerarji"
+msgstr "Načrti poti"
 
 #. widget title
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:98
 #, python-format
 msgid "%d Itinerary Returned"
 msgid_plural "%d Itineraries Returned"
-msgstr[0] "%d vrnjenih itinerarjev"
-msgstr[1] "%d vrnjen itinerar"
-msgstr[2] "%d vrnjena itinerarja"
-msgstr[3] "%d vrnjeni itinerarji"
+msgstr[0] "%d vrnjenih načrtov poti"
+msgstr[1] "%d vrnjen načrt poti"
+msgstr[2] "%d vrnjena načrta poti"
+msgstr[3] "%d vrnjeni načrti poti"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:112
 msgid "Link to search"
@@ -393,7 +393,7 @@ msgstr "Veljavno"
 #. Links to this itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:494
 msgid "Link to Itinerary"
-msgstr "Itinerar"
+msgstr "Načrt poti"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:499
 msgid "Print"
@@ -517,7 +517,7 @@ msgid ""
 "%(itinerary_link)s\n"
 msgstr ""
 "\n"
-"Oglejte si itinerar na spletu:\n"
+"Oglejte si načrt poti na spletu:\n"
 "%(itinerary_link)s\n"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:97
