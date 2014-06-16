@@ -93,7 +93,7 @@ public class OTPServer {
             sampleGridRenderer = new SampleGridRenderer(graphService, sptService);
             isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(graphService, sptService, sampleGridRenderer);
             surfaceCache = new SurfaceCache(30);
-            pointSetCache = new DiskBackedPointSetCache(100, new File("/var/otp/pointsets/"), graphService);
+            pointSetCache = new DiskBackedPointSetCache(100, new File(params.pointSetDirectory), graphService);
         }
 
     }

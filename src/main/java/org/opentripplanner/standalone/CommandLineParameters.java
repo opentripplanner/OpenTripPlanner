@@ -36,6 +36,7 @@ public class CommandLineParameters {
     private static final int DEFAULT_SECURE_PORT = 8081;
     private static final String DEFAULT_GRAPH_DIRECTORY  = "/var/otp/graphs";
     private static final String DEFAULT_CACHE_DIRECTORY  = "/var/otp/cache";
+    private static final String DEFAULT_POINTSET_DIRECTORY  = "/var/otp/pointsets";
     private static final String DEFAULT_ROUTER_ID = "";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
@@ -130,8 +131,12 @@ public class CommandLineParameters {
     description = "server port")
     Integer port;
 
+    @Parameter( names = { "-P", "--pointSet"}, validateWith =  ReadableDirectory.class, 
+    		description = "path to pointSet directory")
+    String pointSetDirectory;
+    
     @Parameter( names = { "-r", "--router"}, validateWith = RouterId.class,
-    description = "Router ID, first one being the default")
+    		description = "Router ID, first one being the default")
     List<String> routerIds;
 
     @Parameter( names = { "-s", "--server"}, 
@@ -152,6 +157,7 @@ public class CommandLineParameters {
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
         if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
         if (cacheDirectory == null) cacheDirectory = DEFAULT_CACHE_DIRECTORY;
+        if (pointSetDirectory == null) pointSetDirectory = DEFAULT_POINTSET_DIRECTORY;
         if (server && port == null) {
             port = DEFAULT_PORT;
             new AvailablePort().validate(port);

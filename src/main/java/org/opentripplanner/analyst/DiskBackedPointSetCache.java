@@ -18,7 +18,7 @@ public class DiskBackedPointSetCache extends PointSetCache {
 
 	protected File pointSetPath;
 	
-	protected class Loader extends CacheLoader<String, PointSet> {
+	protected class PointSetLoader extends CacheLoader<String, PointSet> {
 	
 		@Override
 		public PointSet load(String pointSetId) throws Exception {
@@ -83,10 +83,12 @@ public class DiskBackedPointSetCache extends PointSetCache {
 	public DiskBackedPointSetCache(Integer maxCacheSize, File pointSetPath, GraphService graphService) {
 		super(graphService);
 		
+		this.pointSetPath = pointSetPath;
+		
 		// TODO could convert to a weight-based eviction strategy based on pointset size
 		this.pointSets = CacheBuilder.newBuilder()
 			       .maximumSize(maxCacheSize)
-			       .build(new Loader());
+			       .build(new PointSetLoader());
 		
 	}
 
