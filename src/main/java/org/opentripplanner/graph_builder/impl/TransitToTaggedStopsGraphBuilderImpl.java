@@ -69,12 +69,12 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
 
     private boolean connectVertexToStop(TransitStop ts, boolean wheelchairAccessible) {
         String stopCode = ts.getStopCode();
-        Envelope envelope = new Envelope(ts.getCoordinate());
-        envelope.expandBy(0.003); // ~200 meters
-        Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
         if (stopCode == null){
             return false;
         }
+        Envelope envelope = new Envelope(ts.getCoordinate());
+        envelope.expandBy(0.003); // ~200 meters
+        Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
         for (Vertex v : vertices){
             if (!(v instanceof TransitStopStreetVertex)){
                 continue;
