@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.vertextype;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
@@ -16,18 +18,26 @@ public class PoiVertex extends Vertex {
 
     @Getter
     @Setter
-    Map<String, String> accessibility_viewpoints = new HashMap<>();
+    Map<String, String> accessibilityViewpoints = new HashMap<>();
 
-    public PoiVertex(Graph g, String label, double x, double y, String name,
-                     String accessibility_viewpoints) {
-        super(g, label, x, y, name);
-        for (String accessibility_string : accessibility_viewpoints.split(",")) {
-            this.accessibility_viewpoints.put(accessibility_string.split(":")[0],
-                    accessibility_string.split(":")[1]);
+    @Getter
+    List<String> categories = new ArrayList<>();
+
+    public PoiVertex(Graph g, String label, double x, double y, String name) {
+        super(g, "poi:" + label, x, y, name);
+    }
+
+    public void setAccessibilityViewpoints(String accessibility) {
+        for (String accessibilityString : accessibility.split(",")) {
+            this.accessibilityViewpoints.put(accessibilityString.split(":")[0],
+                    accessibilityString.split(":")[1]);
         }
     }
 
-    public PoiVertex(Graph g, String label, double x, double y, String name) {
-        super(g, label, x, y, name);
+    public void setCategories(List<Object> list){
+        for (Object o: list){
+            categories.add("poi:category:" + o.toString());
+        }
     }
+
 }

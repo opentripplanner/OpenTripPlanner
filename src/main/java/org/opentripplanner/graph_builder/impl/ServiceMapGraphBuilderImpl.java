@@ -87,9 +87,10 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
         for (Object jsonObject : jsonArray) {
             try {
                 JSONObject object = (JSONObject) jsonObject;
-                new PoiVertex(graph, "tprek-" + object.get("id"), (double) object.get("longitude"),
-                        (double) object.get("latitude"), (String) object.get("name_fi"),
-                        (String )object.get("accessibility_viewpoints"));
+                PoiVertex pv = new PoiVertex(graph, "tprek:" + object.get("id"), (double) object.get("longitude"),
+                        (double) object.get("latitude"), (String) object.get("name_fi"));
+                pv.setAccessibilityViewpoints((String )object.get("accessibility_viewpoints"));
+                pv.setCategories((JSONArray)object.get("service_ids"));
             } catch (Exception e) {
                 LOG.warn("Error in parsing POI {}", jsonObject);
             }

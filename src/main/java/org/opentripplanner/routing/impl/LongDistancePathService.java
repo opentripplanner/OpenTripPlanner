@@ -26,7 +26,9 @@ import lombok.Setter;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.PoiClassTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
@@ -88,9 +90,15 @@ public class LongDistancePathService implements PathService {
         }
 
         LOG.debug("rreq={}", options);
-        
+
+        boolean oneToMany = false;
+        if (options.to.getPlace().startsWith("poi:category:")){
+            oneToMany = true;
+        }
+
+
         RemainingWeightHeuristic heuristic;
-        if (options.isDisableRemainingWeightHeuristic()) {
+        if (options.isDisableRemainingWeightHeuristic() || oneToMany) {
             heuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
             // Only use the BiDi heuristic for transit.
@@ -107,7 +115,11 @@ public class LongDistancePathService implements PathService {
         options.setMaxTransfers(10);
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
-        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+        SearchTerminationStrategy strategy = null;
+        if (oneToMany){
+            strategy = new PoiClassTerminationStrategy(options.to.getPlace());
+        }
+        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout, strategy);
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         
         if (spt == null) { // timeout or other fail
