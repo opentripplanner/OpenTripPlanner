@@ -60,7 +60,7 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!connectVertexToStop(ts, wheelchairAccessible)) {
-                    LOG.info("Could not connect " + ts.toString());
+                    LOG.debug("Could not connect " + ts.toString());
                     //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
             }
@@ -85,7 +85,7 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
             if (tsv.getStopCode() != null && tsv.getStopCode().matches(stopCode)) {
                 new StreetTransitLink(ts, tsv, wheelchairAccessible);
                 new StreetTransitLink(tsv, ts, wheelchairAccessible);
-                LOG.info("Connected " + ts.toString() + " to " + tsv.getLabel());
+                LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());
                 return true;
             }
         }
