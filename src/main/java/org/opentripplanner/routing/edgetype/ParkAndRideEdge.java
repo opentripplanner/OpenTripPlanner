@@ -63,6 +63,7 @@ public class ParkAndRideEdge extends Edge {
             s1.incrementWeight(time);
             s1.incrementTimeInSeconds(time);
             s1.setCarParked(false);
+            s1.setBackMode(TraverseMode.LEG_SWITCH);
             return s1.makeState();
         } else {
             /*
@@ -79,6 +80,7 @@ public class ParkAndRideEdge extends Edge {
             s1.incrementWeight(time);
             s1.incrementTimeInSeconds(time);
             s1.setCarParked(true);
+            s1.setBackMode(TraverseMode.LEG_SWITCH);
             return s1.makeState();
         }
     }
