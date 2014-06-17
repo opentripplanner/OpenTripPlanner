@@ -69,23 +69,24 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
 
     private boolean connectVertexToStop(TransitStop ts, boolean wheelchairAccessible) {
         String stopCode = ts.getStopCode();
-        String stopId = ts.getStopId().getId();
         Envelope envelope = new Envelope(ts.getCoordinate());
         envelope.expandBy(0.003); // ~200 meters
         Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
+        if (stopCode == null){
+            return false;
+        }
         for (Vertex v : vertices){
             if (!(v instanceof TransitStopStreetVertex)){
                 continue;
             }
             TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
-            if (tsv.getStopCode() != null) {
-                if ((stopId != null && tsv.getStopCode().matches(stopId))
-                        || (stopCode != null && tsv.getStopCode().matches(stopCode))) {
-                    new StreetTransitLink(ts, tsv, wheelchairAccessible);
-                    new StreetTransitLink(tsv, ts, wheelchairAccessible);
-                    LOG.info("Connected " + ts.toString() + " to " + tsv.getLabel());
-                    return true;
-                }
+
+            // Only use stop codes for linking TODO: find better method to connect stops without stop code
+            if (tsv.getStopCode() != null && tsv.getStopCode().matches(stopCode)) {
+                new StreetTransitLink(ts, tsv, wheelchairAccessible);
+                new StreetTransitLink(tsv, ts, wheelchairAccessible);
+                LOG.info("Connected " + ts.toString() + " to " + tsv.getLabel());
+                return true;
             }
         }
         return false;
