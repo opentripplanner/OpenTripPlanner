@@ -84,6 +84,10 @@ public class LongDistancePathService implements PathService {
             return null;
         }
 
+        if (options.to.getPlace().startsWith("poi:category:")){
+            options.setOneToMany(true);
+        }
+
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.getRouterId()));
             options.rctx.pathParsers = new PathParser[] { new Parser() };
@@ -91,14 +95,8 @@ public class LongDistancePathService implements PathService {
 
         LOG.debug("rreq={}", options);
 
-        boolean oneToMany = false;
-        if (options.to.getPlace().startsWith("poi:category:")){
-            oneToMany = true;
-        }
-
-
         RemainingWeightHeuristic heuristic;
-        if (options.isDisableRemainingWeightHeuristic() || oneToMany) {
+        if (options.isDisableRemainingWeightHeuristic() || options.isOneToMany()) {
             heuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
             // Only use the BiDi heuristic for transit.
@@ -116,7 +114,7 @@ public class LongDistancePathService implements PathService {
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         SearchTerminationStrategy strategy = null;
-        if (oneToMany){
+        if (options.isOneToMany()){
             strategy = new PoiClassTerminationStrategy(options.to.getPlace());
         }
         ShortestPathTree spt = sptService.getShortestPathTree(options, timeout, strategy);
