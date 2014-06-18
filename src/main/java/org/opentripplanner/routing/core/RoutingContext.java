@@ -81,7 +81,7 @@ public class RoutingContext implements Cloneable {
     public final Vertex origin;
 
     // target means "where this search will terminate" not "the end of the trip from the user's perspective"
-    public final Vertex target;
+    public Vertex target;
     
     // The back edge associated with the origin - i.e. continuing a previous search.
     // NOTE: not final so that it can be modified post-construction for testing.

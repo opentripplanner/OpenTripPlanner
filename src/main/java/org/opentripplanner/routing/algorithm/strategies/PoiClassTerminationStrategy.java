@@ -19,9 +19,10 @@ public class PoiClassTerminationStrategy implements SearchTerminationStrategy{
         Vertex currentVertex = current.getVertex();
         if (currentVertex instanceof PoiVertex){
             if (((PoiVertex) currentVertex).getCategories().contains(category)){
-                return true;
+                traverseOptions.rctx.target = currentVertex;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
