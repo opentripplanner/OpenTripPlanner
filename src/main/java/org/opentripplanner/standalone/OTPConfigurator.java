@@ -28,6 +28,7 @@ import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
 import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.TransitToTaggedStopsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.ElevationGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
@@ -191,6 +192,7 @@ public class OTPConfigurator {
                 }
             } 
             if ( hasOSM ) {
+                graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
                 // The stops can be linked to each other once they have links to the street network.
                 if (params.longDistance && params.useStreetsForLinking && !params.useTransfersTxt) {
