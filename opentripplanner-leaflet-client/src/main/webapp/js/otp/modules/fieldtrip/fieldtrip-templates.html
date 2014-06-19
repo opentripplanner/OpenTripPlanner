@@ -42,8 +42,12 @@
     <div class="otp-fieldTripRequests-listRow">
         <h5>{{schoolName}} Trip on {{formattedDate}} (#{{id}})</h5>
         Submitted by {{teacherName}} on {{timeStamp}}<br>
-        <b>Outbound Trip:</b> {{#outboundDesc}}{{outboundDesc}}{{/outboundDesc}}{{^outboundDesc}}Not Planned{{/outboundDesc}}<br>
-        <b>Inbound Trip:</b> {{#inboundDesc}}{{inboundDesc}}{{/inboundDesc}}{{^inboundDesc}}Not Planned{{/inboundDesc}}
+        <b>Outbound Trip:</b> 
+            {{#outboundTripStatus}}{{outboundTripStatus}}{{/outboundTripStatus}}
+            {{^outboundTripStatus}}Not Planned{{/outboundTripStatus}}<br>
+        <b>Inbound Trip:</b>
+            {{#inboundTripStatus}}{{inboundTripStatus}}{{/inboundTripStatus}}
+            {{^inboundTripStatus}}Not Planned{{/inboundTripStatus}}
     
     </div>
 </script>

@@ -23,11 +23,14 @@ POST    /fieldtrip/newTrip                      FieldTrip.newTrip
 POST    /fieldtrip/addItinerary                 FieldTrip.addItinerary
 POST    /fieldtrip/deleteTrip                   FieldTrip.deleteTrip
 
+GET     /fieldtrip/getRequest                   FieldTrip.getRequest
 GET     /fieldtrip/getRequests                  FieldTrip.getRequests
+GET     /fieldtrip/getRequestsSummary           FieldTrip.getRequestsSummary
 GET     /fieldtrip/searchRequests               FieldTrip.searchRequests
 POST    /fieldtrip/setInboundTrip               FieldTrip.setInboundTrip
 POST    /fieldtrip/setOutboundTrip              FieldTrip.setOutboundTrip
 POST    /fieldtrip/setRequestStatus             FieldTrip.setRequestStatus
+POST    /fieldtrip/updateRequests               FieldTrip.updateRequests
 
 POST    /public/fieldtrip/newRequest            FieldTrip.newRequest
 GET     /public/fieldtrip/newRequestForm        FieldTrip.newRequestForm

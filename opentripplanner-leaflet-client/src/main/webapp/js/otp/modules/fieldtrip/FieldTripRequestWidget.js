@@ -233,6 +233,12 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         dialog.find(".cancelButton").button().click(function() {
             dialog.dialog("close");
         });
-    },     
+    },
+
+    savingTrip : function(requestOrder) {
+        console.log('saving ' + requestOrder);
+        if(requestOrder === 0) this.content.find('.outboundPlanInfo').html('Saving...');
+        if(requestOrder === 1) this.content.find('.inboundPlanInfo').html('Saving...');
+    }
     
 });

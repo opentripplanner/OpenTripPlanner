@@ -2,6 +2,7 @@ package models.fieldtrip;
 
 import com.google.gson.annotations.Expose;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import javax.persistence.*;
 import play.data.binding.As;
@@ -99,15 +100,13 @@ public class FieldTripRequest extends GenericModel  {
     @Expose
     public String classpassId;
 
-    /*@Expose
-    @OneToOne(mappedBy="outboundRequest", cascade=CascadeType.ALL)
-    public ScheduledFieldTrip outboundTrip;
+    @Expose
+    public String outboundTripStatus;
 
     @Expose
-    @OneToOne(mappedBy="inboundRequest", cascade=CascadeType.ALL)
-    public ScheduledFieldTrip inboundTrip;*/
-    
-    @OneToMany(mappedBy="request", cascade=CascadeType.ALL)
+    public String inboundTripStatus;
+
+    @OneToMany(mappedBy="request", cascade=CascadeType.REMOVE)
     @Expose
     public List<ScheduledFieldTrip> trips;
     
@@ -132,10 +131,21 @@ public class FieldTripRequest extends GenericModel  {
     public String status = "active";
 
 
-  public FieldTripRequest() {
-    this.timeStamp = new Date();
-  }
+    public FieldTripRequest() {
+        this.timeStamp = new Date();
+    }
 
+    public void updateTripStatusFields() {
+        for (Iterator<ScheduledFieldTrip> it = trips.iterator(); it.hasNext();) {
+            ScheduledFieldTrip trip = it.next();
+            if(trip.requestOrder == 0) {
+                this.outboundTripStatus = "Planned by " + trip.createdBy + " on " + trip.timeStamp;
+            }
+            if(trip.requestOrder == 1) {
+                this.inboundTripStatus = "Planned by " + trip.createdBy + " on " + trip.timeStamp;
+            }
+        }
+    }
     
 }
 
