@@ -111,7 +111,6 @@ public class SurfaceResource extends RoutingResource {
             
         	req.setRoutingContext(graph);
         	
-            req.setRoutingContext(graph);
             EarliestArrivalSPTService sptService = new EarliestArrivalSPTService();
             sptService.setMaxDuration(60 * cutoffMinutes);
             ShortestPathTree spt = sptService.getShortestPathTree(req);

@@ -2,7 +2,9 @@ package org.opentripplanner.analyst;
 
 import com.google.common.collect.Maps;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A TimeSurface is evaluated at all the points in a PointSet to yield an Indicator.
@@ -26,10 +28,12 @@ import java.util.Map;
  */
 public class Indicator extends PointSet {
 
-    PointSet origins; // the origins, which correspond one-to-one with the Quantiles array
-    PointSet targets; // the targets that were checked for reachability in this indicator
-    TimeSurface surface; // actually there is one per origin, not a single one!
-
+	protected PointSet origins; // the origins, which correspond one-to-one with the Quantiles array
+    protected PointSet targets; // the targets that were checked for reachability in this indicator
+    protected TimeSurface surface; // actually there is one per origin, not a single one!
+    
+    Map<String,Integer> idTimeIndex = new ConcurrentHashMap<String,Integer>();
+ 
     public Indicator (PointSet targets, TimeSurface surface, boolean retainTimes) {
         super(1); // for now we only do one-to-many
         this.targets = targets;
@@ -52,12 +56,34 @@ public class Indicator extends PointSet {
             this.times[0] = times;
         }
     }
-
+		
+    public Integer getTime(String id) {
+    	
+    	if(times != null){
+    		synchronized(idTimeIndex) {
+        		if(idTimeIndex.keySet().size() < this.times[0].length) {
+            		idTimeIndex.clear();
+            		int i = 0;
+            		for(String sampleId : this.targets.ids) {
+            			idTimeIndex.put(sampleId, this.times[0][i]);
+            			i++;
+            		}
+            	}
+        	}
+        	return idTimeIndex.get(id);
+    	}
+    	else
+    		return null;
+    	
+    }
+    
     /**
      * Each origin will yield CSV with columns category,min,q25,q50,q75,max
      * Another column for the origin ID would allow this to extend to many-to-many.
      */
     void toCsv() {
+    	
+    	
 
     }
 }

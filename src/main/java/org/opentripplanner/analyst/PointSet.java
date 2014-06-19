@@ -63,7 +63,7 @@ public class PointSet {
     /* Connects this population to vertices in a given Graph (map of graph ids to sample sets).
      * Keeping  as a graphId->sampleSet map to prevent duplication of pointset when used across multiple graphs
      */
-    private HashMap<String,SampleSet> samples = new HashMap<String,SampleSet>();     
+    private Map<String,SampleSet> samples = new ConcurrentHashMap<String,SampleSet>();     
 
     protected GraphService graphService;
     
