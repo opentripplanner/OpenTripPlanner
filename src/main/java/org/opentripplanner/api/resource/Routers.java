@@ -127,6 +127,7 @@ public class Routers {
         RouterInfo routerInfo = new RouterInfo();
         routerInfo.routerId = routerId;
         routerInfo.polygon = graph.getHull();
+        routerInfo.buildTime = graph.getBuildTime();
         return routerInfo;
     }
 

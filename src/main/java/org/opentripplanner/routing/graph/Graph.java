@@ -51,7 +51,6 @@ import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
-import org.opentripplanner.analyst.core.SampleSource;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.api.resource.GraphMetadata;
 import org.opentripplanner.common.IterableLibrary;
@@ -182,6 +181,9 @@ public class Graph implements Serializable {
     @Getter
     @Setter
     private transient GraphUpdaterManager updaterManager = null;
+
+    @Getter
+    private final Date buildTime = new Date();
 
     public Graph(Graph basedOn) {
         this();
