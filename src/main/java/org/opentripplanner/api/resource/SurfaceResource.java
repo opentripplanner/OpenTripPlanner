@@ -176,18 +176,15 @@ public class SurfaceResource extends RoutingResource {
     @GET @Path("/{surfaceId}/isochrone")
     public Response getIsochrone (
             @PathParam("surfaceId") Integer surfaceId,
-            @QueryParam("cutoffMinutes") List<Integer> cutoffs) {
+            @QueryParam("spacing") int spacing) {
         final TimeSurface surf = server.surfaceCache.get(surfaceId);
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
-        if (cutoffs == null || cutoffs.isEmpty()) {
-            cutoffs.add(surf.cutoffMinutes);
-            cutoffs.add(surf.cutoffMinutes / 2);
-        }
-        List<IsochroneData> isochrones = getIsochronesAccumulative(surf, cutoffs);
+        if (spacing < 1) spacing = 5;
+        List<IsochroneData> isochrones = getIsochronesAccumulative(surf, spacing);
         final FeatureCollection fc = LIsochrone.makeContourFeatures(isochrones);
         return Response.ok().entity(new StreamingOutput() {
             @Override
-            public void write(OutputStream output) throws IOException, WebApplicationException {
+            public void write(OutputStream output) throws IOException {
                 FeatureJSON fj = new FeatureJSON();
                 fj.writeFeatureCollection(fc, output);
             }
@@ -223,63 +220,23 @@ public class SurfaceResource extends RoutingResource {
     }
 
     /**
-     * Use Laurent's recursive grid sampler. Cutoffs in minutes.
-     * Based on IsoChroneSPTRendererRecursiveGrid.getIsochrones()
-     * We could also do accumulative sampling into a grid and store that grid.
-     */
-    private List<IsochroneData> getIsochronesRecursive(final TimeSurface surf, List<Integer> cutoffs) {
-        List<Coordinate> initialPoints = Lists.newArrayList();
-        
-        
-        final Graph graph = server.graphService.getGraph(surf.routerId);
-        for (StreetVertex sv : Iterables.filter(graph.getVertices(), StreetVertex.class)) {
-            if (surf.getTime(sv) != TimeSurface.UNREACHABLE) initialPoints.add(sv.getCoordinate());
-        }
-
-        RecursiveGridIsolineBuilder.ZFunc timeFunc = new RecursiveGridIsolineBuilder.ZFunc() {
-            @Override
-            public long z(Coordinate c) {
-                // TODO not multi-graph compatible
-                Sample sample = graph.getSampleFactory().getSample(c.x, c.y);
-                if (sample == null) return Long.MAX_VALUE;
-                Long z = sample.eval(surf);
-                return z;
-            }
-        };
-        Coordinate center = new Coordinate(surf.lon, surf.lat);
-        double gridSizeMeters = 400;
-        double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
-        double dX = dY / Math.cos(Math.toRadians(center.x));
-        RecursiveGridIsolineBuilder isolineBuilder = new RecursiveGridIsolineBuilder(dX, dY, center, timeFunc, initialPoints);
-        List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
-        for (int cutoff : cutoffs) {
-            int cutoffSec = cutoff * 60;
-            Geometry isoline = isolineBuilder.computeIsoline(cutoffSec);
-            IsochroneData isochrone = new IsochroneData(cutoffSec, isoline);
-            isochrones.add(isochrone);
-        }
-        return isochrones;
-    }
-
-    /**
      * Use Laurent's accumulative grid sampler. Cutoffs in minutes.
-     * The grid and delaunay triangulation are cached, so subsequent requests are very fast.
+     * The grid and Delaunay triangulation are cached, so subsequent requests are very fast.
      */
-    public List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, List<Integer> cutoffs) {
+    public List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing) {
 
         long t0 = System.currentTimeMillis();
         DelaunayIsolineBuilder<WTWD> isolineBuilder = new DelaunayIsolineBuilder<WTWD>(
                 surf.sampleGrid.delaunayTriangulate(), new WTWD.IsolineMetric());
 
-        double D0 = 400.0; // TODO ? Set properly
         List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
-        for (int cutoffMinutes : cutoffs) {
-            int cutoffSec = cutoffMinutes * 60;
+        for (int minutes = spacing; minutes <= surf.cutoffMinutes; minutes += spacing) {
+            int seconds = minutes * 60;
             WTWD z0 = new WTWD();
             z0.w = 1.0;
-            z0.wTime = cutoffSec;
-            z0.d = D0;
-            IsochroneData isochrone = new IsochroneData(cutoffSec, isolineBuilder.computeIsoline(z0));
+            z0.wTime = seconds;
+            z0.d = 300; // meters. TODO set dynamically / properly, make sure it matches grid cell size?
+            IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
             isochrones.add(isochrone);
         }
 

@@ -91,7 +91,7 @@ public class TimeSurface {
     // however, the existing sampler needs an SPT, not general vertex-time mappings.
     public void makeSampleGrid (ShortestPathTree spt) {
         long t0 = System.currentTimeMillis();
-        final double gridSizeMeters = 400;
+        final double gridSizeMeters = 300; // Todo: set dynamically and make sure this matches isoline builder params
         // Off-road max distance MUST be APPROX EQUALS to the grid precision
         // TODO: Loosen this restriction (by adding more closing sample).
         // Change the 0.8 magic factor here with caution.
