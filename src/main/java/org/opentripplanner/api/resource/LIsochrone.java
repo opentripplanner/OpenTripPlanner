@@ -142,6 +142,10 @@ public class LIsochrone extends RoutingResource {
         }
     }
 
+    /**
+     * Create a geotools feature collection from a list of isochrones in the OTPA internal format.
+     * Once in a FeatureCollection, they can for example be exported as GeoJSON.
+     */
     public static SimpleFeatureCollection makeContourFeatures(List<IsochroneData> isochrones) {
         DefaultFeatureCollection featureCollection = new DefaultFeatureCollection(null,
                 contourSchema);
