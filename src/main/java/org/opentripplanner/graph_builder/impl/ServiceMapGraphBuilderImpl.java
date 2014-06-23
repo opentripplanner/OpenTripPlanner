@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
@@ -27,6 +28,8 @@ import org.slf4j.LoggerFactory;
 public class ServiceMapGraphBuilderImpl implements GraphBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceMapGraphBuilderImpl.class);
+
+    public static final String POI_PREFIX = "tprek:";
 
     private File path;
 
@@ -60,22 +63,7 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        BufferedReader reader = null;
-
-        if (path != null) {
-            try {
-                reader = new BufferedReader(new FileReader(path));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                InputStream is = url.openConnection().getInputStream();
-                reader = new BufferedReader(new InputStreamReader(is));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        BufferedReader reader = getBufferedReader();
 
         JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = new JSONArray();
@@ -87,14 +75,37 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
         for (Object jsonObject : jsonArray) {
             try {
                 JSONObject object = (JSONObject) jsonObject;
-                PoiVertex pv = new PoiVertex(graph, "tprek:" + object.get("id"), (double) object.get("longitude"),
+                PoiVertex pv = new PoiVertex(graph, POI_PREFIX + object.get("id"), (double) object.get("longitude"),
                         (double) object.get("latitude"), (String) object.get("name_fi"));
-                pv.setAccessibilityViewpoints((String )object.get("accessibility_viewpoints"));
-                pv.setCategories((JSONArray)object.get("service_ids"));
+                List<Object> accessibilityList = new LinkedList<>();
+                for (Object s :(JSONArray)object.get("service_ids")){
+                    accessibilityList.add(POI_PREFIX + s.toString());
+                }
+                pv.setCategories(accessibilityList);
             } catch (Exception e) {
                 LOG.warn("Error in parsing POI {}", jsonObject);
             }
         }
+    }
+
+    private BufferedReader getBufferedReader() {
+        BufferedReader reader = null;
+        if (path != null) {
+            try {
+                reader = new BufferedReader(new FileReader(path));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                InputStream is = url.openConnection().getInputStream();
+                reader = new BufferedReader(new InputStreamReader(is));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return reader;
     }
 
     @Override
@@ -117,5 +128,4 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
             }
         }
     }
-
 }
