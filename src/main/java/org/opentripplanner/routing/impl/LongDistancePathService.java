@@ -20,6 +20,7 @@ import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import lombok.Setter;
@@ -42,6 +43,7 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -115,7 +117,7 @@ public class LongDistancePathService implements PathService {
         LOG.debug("BEGIN SEARCH");
         SearchTerminationStrategy strategy = null;
         if (options.isOneToMany()){
-            strategy = new PoiClassTerminationStrategy(options.to.getPlace());
+            strategy = new PoiClassTerminationStrategy(options.to.getPlace(), options.getNumItineraries());
         }
         ShortestPathTree spt = sptService.getShortestPathTree(options, timeout, strategy);
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
@@ -125,7 +127,15 @@ public class LongDistancePathService implements PathService {
             return null;
         }
         //spt.getPaths().get(0).dump();
-        List<GraphPath> paths = spt.getPaths();
+        List<GraphPath> paths;
+        if (options.isOneToMany()){
+            paths = new LinkedList<>();
+            for(Vertex v : ((PoiClassTerminationStrategy)strategy).getFoundVertices()){
+                paths.add(spt.getPath(v, true));
+            }
+        } else {
+            paths = spt.getPaths();
+        }
         Collections.sort(paths, new PathWeightComparator());
         return paths;
     }
