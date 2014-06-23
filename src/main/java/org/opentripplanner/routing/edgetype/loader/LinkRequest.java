@@ -35,6 +35,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.PoiLinkEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -104,7 +105,7 @@ public class LinkRequest {
             result = false;
         } else {
             for (StreetVertex sv : nearbyStreetVertices) {
-                addEdges(new FreeEdge(sv, v), new FreeEdge(v, sv));
+                addEdges(new PoiLinkEdge(sv, v), new PoiLinkEdge(v, sv));
             }
             result = true;
         }
