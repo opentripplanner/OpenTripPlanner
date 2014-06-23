@@ -1,18 +1,7 @@
 package org.opentripplanner.graph_builder.impl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
+import lombok.Setter;
 import org.apache.http.client.ClientProtocolException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -25,40 +14,46 @@ import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ServiceMapGraphBuilderImpl implements GraphBuilder {
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceMapGraphBuilderImpl.class);
+public class ServiceMapAccessibilityGraphBuilderImpl implements GraphBuilder {
 
-    public static final String POI_PREFIX = "tprek:";
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceMapAccessibilityGraphBuilderImpl.class);
 
+    public static final String POI_PREFIX = "poi:tprek:";
+
+    @Setter
     private File path;
 
+    @Setter
     private URL url;
 
-    public ServiceMapGraphBuilderImpl(File path) {
+    public ServiceMapAccessibilityGraphBuilderImpl(File path) {
         this.setPath(path);
     }
 
-    public ServiceMapGraphBuilderImpl(URL url) {
+    public ServiceMapAccessibilityGraphBuilderImpl(URL url) {
         this.setUrl(url);
-    }
-
-    void setPath(File path) {
-        this.path = path;
-    }
-
-    void setUrl(URL url) {
-        this.url = url;
     }
 
     @Override
     public List<String> getPrerequisites() {
-        return Collections.emptyList();
+        return Arrays.asList("poi");
     }
 
     @Override
     public List<String> provides() {
-        return Arrays.asList("poi");
+        return Arrays.asList("poi_accessibility");
     }
 
     @Override
@@ -67,23 +62,38 @@ public class ServiceMapGraphBuilderImpl implements GraphBuilder {
 
         JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = new JSONArray();
+
         try {
             jsonArray = (JSONArray) jsonParser.parse(reader);
         } catch (ParseException | IOException e) {
             e.printStackTrace();
         }
+
+        Map<String, Map> pois = new HashMap<>();
+
         for (Object jsonObject : jsonArray) {
             try {
                 JSONObject object = (JSONObject) jsonObject;
-                PoiVertex pv = new PoiVertex(graph, POI_PREFIX + object.get("id"), (double) object.get("longitude"),
-                        (double) object.get("latitude"), (String) object.get("name_fi"));
-                List<Object> serviceIdList = new LinkedList<>();
-                for (Object s :(JSONArray)object.get("service_ids")){
-                    serviceIdList.add(POI_PREFIX + s.toString());
+                String id = object.get("unit_id").toString();
+                Map<String, String> map;
+                if ((map = pois.get(id)) == null){
+                    map = new HashMap<>();
+                    pois.put(id, map);
                 }
-                pv.setCategories(serviceIdList);
+                map.put((String) object.get("variable_name"), (String) object.get("value"));
             } catch (Exception e) {
                 LOG.warn("Error in parsing POI {}", jsonObject);
+                e.printStackTrace();
+            }
+        }
+
+        for (Map.Entry<String, Map> entry : pois.entrySet()) {
+            PoiVertex pv = (PoiVertex) graph.getVertex(POI_PREFIX + entry.getKey());
+            if (pv != null){
+                pv.setAccessibilityViewpoints(entry.getValue());
+                LOG.debug(String.valueOf(entry.getValue()));
+            } else {
+                LOG.warn("Could not find: " + entry.getKey());
             }
         }
     }

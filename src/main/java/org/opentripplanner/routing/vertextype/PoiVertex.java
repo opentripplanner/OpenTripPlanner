@@ -18,7 +18,7 @@ public class PoiVertex extends Vertex {
 
     @Getter
     @Setter
-    Map<String, String> accessibilityViewpoints = new HashMap<>();
+    Map<String, String> accessibilityViewpoints;
 
     @Getter
     List<String> categories = new ArrayList<>();
@@ -28,10 +28,15 @@ public class PoiVertex extends Vertex {
     }
 
     public void setAccessibilityViewpoints(String accessibility) {
+        accessibilityViewpoints = new HashMap<>();
         for (String accessibilityString : accessibility.split(",")) {
             this.accessibilityViewpoints.put(accessibilityString.split(":")[0],
                     accessibilityString.split(":")[1]);
         }
+    }
+
+    public void setAccessibilityViewpoints(Map<String, String> map){
+        this.accessibilityViewpoints = map;
     }
 
     public void setCategories(List<Object> list){
