@@ -109,6 +109,8 @@ public class DCFareCalculator {
         // automatically compose string using 'free' or 'discounted' and route name
         private void calcFare() {
             RideType prevType = (prev == null) ? null : prev.type;
+            if (type == null)
+                return;
             switch (type) {
             case METRO_RAIL:
                 fare = METRORAIL.lookup(from, to);
