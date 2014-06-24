@@ -4,7 +4,7 @@ otp.config = {
     locale: otp.locale.English,
     locale_short: 'en',
 
-    //Add all locales you want to see in your frontend langzuage chooser
+    //Add all locales you want to see in your frontend language chooser
     //code must be the same as locale name in js/locale withoud .js part
     //name must be name of the language in that language
     active_locales : [
@@ -93,6 +93,8 @@ otp.config = {
     siteDescription     : "An OpenTripPlanner deployment.",
     logoGraphic         : 'images/otp_logo_darkbg_40px.png',
     // bikeshareName    : "",
+    //Enable this if you want to show frontend language chooser
+    showLanguageChooser : true,
 
     showLogo            : true,
     showTitle           : true,
@@ -142,8 +144,9 @@ otp.config = {
 
     
     /**
-     * Info Widgets: a list of the non-module-specific "information widgets"
-     * that can be accessed from the top bar of the client display. Expressed as
+     * Info WidgetsTranslation: object of lists of the non-module-specific "information widgets"
+     * that can be accessed from the top bar of the client display.
+     * Each element is for each translation of widgets which consist of
      * an array of objects, where each object has the following fields:
      *   - content: <string> the HTML content of the widget
      *   - [title]: <string> the title of the widget
@@ -152,22 +155,36 @@ otp.config = {
      */
 
 
-    infoWidgets: [
-        {
-            title: 'About',
-            content: '<p>About this site</p>',
-            //cssClass: 'otp-contactWidget',
-        },
-        {
-            title: 'Contact',
-            content: '<p>Comments? Contact us at...</p>'
-        },           
-        //Enable this if you want to show frontend language chooser
-        {
-            title: '<img src="/images/language_icon.svg" onerror="this.onerror=\'\';this.src=\'/images/language_icon.png\'" width="30px" height="30px"/>', 
-            languages: true
-        }
-    ],
+    infoWidgetsTranslations: {
+        'en':[
+            {
+                title: 'About',
+                content: '<p>About this site</p>',
+                //cssClass: 'otp-contactWidget',
+            },
+            {
+                title: 'Contact',
+                content: '<p>Comments? Contact us at...</p>'
+            },           
+        ],
+        'de':[
+            {
+                title: 'Über uns',
+                content: '<p>Über diese Seite</p>',
+                //cssClass: 'otp-contactWidget',
+            },
+            {
+                title: 'Kontakt',
+                content: '<p>Kommentare? Kontaktieren Sie uns unter...</p>'
+            },           
+        ],
+    },
+
+    //This is shown if showLanguageChooser is true
+    infoWidgetLangChooser : {
+        title: '<img src="/images/language_icon.svg" onerror="this.onerror=\'\';this.src=\'/images/language_icon.png\'" width="30px" height="30px"/>', 
+        languages: true
+    },
     
     
     /**
@@ -212,7 +229,14 @@ i18n.addPostProcessor('add_nekaj', function(val, key, opts) {
 });
 
 i18n.init(options, function(t) {
-    console.log("loaded");
+    if (i18n.lng() in otp.config.infoWidgetsTranslations) {
+        otp.config.infoWidgets=otp.config.infoWidgetsTranslations[i18n.lng()];
+    } else {
+        otp.config.infoWidgets=otp.config.infoWidgetsTranslations["en"];
+    }
+    if (otp.config.showLanguageChooser) {
+        otp.config.infoWidgets.push(otp.config.infoWidgetLangChooser);
+    }
     //Accepts Key, value or key, value1 ... valuen
     //Key is string to be translated
     //Value is used for sprintf parameter values
