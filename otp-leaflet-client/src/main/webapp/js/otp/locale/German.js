@@ -40,6 +40,27 @@ otp.locale.German = {
         datepicker_locale_short: "de"
     },
 
+    /**
+     * Info Widgets: a list of the non-module-specific "information widgets"
+     * that can be accessed from the top bar of the client display. Expressed as
+     * an array of objects, where each object has the following fields:
+     * - content: <string> the HTML content of the widget
+     * - [title]: <string> the title of the widget
+     * - [cssClass]: <string> the name of a CSS class to apply to the widget.
+     * If not specified, the default styling is used.
+     */
+    infoWidgets: [
+            {
+                title: 'Über uns',
+                content: '<p>Über diese Seite</p>',
+                //cssClass: 'otp-contactWidget',
+            },
+            {
+                title: 'Kontakt',
+                content: '<p>Kommentare? Kontaktieren Sie uns unter...</p>'
+            },
+    ],
+
 
     time: {
         hour_abbrev: "Std.",

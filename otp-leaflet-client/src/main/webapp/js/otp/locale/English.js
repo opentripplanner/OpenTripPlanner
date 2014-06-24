@@ -42,6 +42,27 @@ otp.locale.English = {
 
     },
 
+    /**
+     * Info Widgets: a list of the non-module-specific "information widgets"
+     * that can be accessed from the top bar of the client display. Expressed as
+     * an array of objects, where each object has the following fields:
+     * - content: <string> the HTML content of the widget
+     * - [title]: <string> the title of the widget
+     * - [cssClass]: <string> the name of a CSS class to apply to the widget.
+     * If not specified, the default styling is used.
+     */
+    infoWidgets : [
+            {
+                title: 'About',
+                content: '<p>About this site</p>',
+                //cssClass: 'otp-contactWidget',
+            },
+            {
+                title: 'Contact',
+                content: '<p>Comments? Contact us at...</p>'
+            },
+    ],
+
 
     //Time options are used in timeFixes branch
     //Left in for now for better merging

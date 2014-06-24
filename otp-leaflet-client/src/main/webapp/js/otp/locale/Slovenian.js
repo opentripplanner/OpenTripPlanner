@@ -41,6 +41,27 @@ otp.locale.Slovenian = {
         datepicker_locale_short: "sl"
     },
 
+    /**
+     * Info Widgets: a list of the non-module-specific "information widgets"
+     * that can be accessed from the top bar of the client display. Expressed as
+     * an array of objects, where each object has the following fields:
+     * - content: <string> the HTML content of the widget
+     * - [title]: <string> the title of the widget
+     * - [cssClass]: <string> the name of a CSS class to apply to the widget.
+     * If not specified, the default styling is used.
+     */
+    infoWidgets : [
+            {
+                title: 'O strani',
+                content: '<p>Informacije o strani</p>',
+                //cssClass: 'otp-contactWidget',
+            },
+            {
+                title: 'Kontakt',
+                content: '<p>Komentarji? Kontaktirate nas lahko...</p>'
+            },
+    ],
+
 
     time:
     {

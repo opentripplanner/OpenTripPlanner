@@ -145,42 +145,6 @@ otp.config = {
     ],
 
     
-    /**
-     * Info WidgetsTranslation: object of lists of the non-module-specific "information widgets"
-     * that can be accessed from the top bar of the client display.
-     * Each element is for each translation of widgets which consist of
-     * an array of objects, where each object has the following fields:
-     *   - content: <string> the HTML content of the widget
-     *   - [title]: <string> the title of the widget
-     *   - [cssClass]: <string> the name of a CSS class to apply to the widget.
-     *        If not specified, the default styling is used.
-     */
-
-
-    infoWidgetsTranslations: {
-        'en':[
-            {
-                title: 'About',
-                content: '<p>About this site</p>',
-                //cssClass: 'otp-contactWidget',
-            },
-            {
-                title: 'Contact',
-                content: '<p>Comments? Contact us at...</p>'
-            },           
-        ],
-        'de':[
-            {
-                title: 'Über uns',
-                content: '<p>Über diese Seite</p>',
-                //cssClass: 'otp-contactWidget',
-            },
-            {
-                title: 'Kontakt',
-                content: '<p>Kommentare? Kontaktieren Sie uns unter...</p>'
-            },           
-        ],
-    },
 
     //This is shown if showLanguageChooser is true
     infoWidgetLangChooser : {
@@ -238,11 +202,14 @@ i18n.init(options, function(t) {
         //Conditionally load datepicker-lang.js?
     } 
 
-    if (i18n.lng() in otp.config.infoWidgetsTranslations) {
-        otp.config.infoWidgets=otp.config.infoWidgetsTranslations[i18n.lng()];
+    //Use infoWidgets from locale
+    //Default locale is English which has infoWidgets
+    if ("infoWidgets" in otp.config.locale) {
+        otp.config.infoWidgets=otp.config.locale.infoWidgets;
     } else {
-        otp.config.infoWidgets=otp.config.infoWidgetsTranslations["en"];
+        otp.config.infoWidgets=otp.locale.English.infoWidgets;
     }
+
     if (otp.config.showLanguageChooser) {
         otp.config.infoWidgets.push(otp.config.infoWidgetLangChooser);
     }
