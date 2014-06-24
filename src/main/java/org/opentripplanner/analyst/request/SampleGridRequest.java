@@ -31,6 +31,10 @@ public class SampleGridRequest {
 
     @Getter
     @Setter
+    private int offRoadDistanceMeters = 150;
+
+    @Getter
+    @Setter
     private int maxTimeSec = 0;
 
     @Getter

@@ -73,12 +73,12 @@ public class SampleGridRenderer {
      */
     public ZSampleGrid<WTWD> getSampleGrid(SampleGridRequest spgRequest, RoutingRequest sptRequest) {
 
-        final double D0 = getOffRoadDistanceMeters(spgRequest.getPrecisionMeters());
-        final double V0 = 1.00; // m/s, off-road walk speed
+        double offRoadDistanceMeters = spgRequest.getOffRoadDistanceMeters();
+        final double offRoadWalkSpeedMps = 1.00; // m/s,
 
         // 1. Compute the Shortest Path Tree.
         long t0 = System.currentTimeMillis();
-        long tOvershot = (long) (2 * D0 / V0);
+        long tOvershot = (long) (2 * offRoadDistanceMeters / offRoadWalkSpeedMps);
         sptRequest.setWorstTime(sptRequest.dateTime
                 + (sptRequest.arriveBy ? -spgRequest.getMaxTimeSec() - tOvershot : spgRequest
                         .getMaxTimeSec() + tOvershot));
@@ -98,8 +98,7 @@ public class SampleGridRenderer {
 
         SparseMatrixZSampleGrid<WTWD> sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16,
                 spt.getVertexCount(), dX, dY, coordinateOrigin);
-        double offRoadDistanceMeters = getOffRoadDistanceMeters(gridSizeMeters);
-        sampleSPT(spt, sampleGrid, gridSizeMeters, offRoadDistanceMeters, V0,
+        sampleSPT(spt, sampleGrid, gridSizeMeters, offRoadDistanceMeters, offRoadWalkSpeedMps,
                 sptRequest.getMaxWalkDistance(), cosLat);
         sptRequest.cleanup();
 
@@ -117,8 +116,8 @@ public class SampleGridRenderer {
      * @return
      */
     public static void sampleSPT(ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid,
-            final double gridSizeMeters, final double offRoadDistanceMeters, final double v0,
-            final double maxWalkDistance, final double cosLat) {
+            final double gridSizeMeters, final double offRoadDistanceMeters,
+            final double offRoadWalkSpeedMps, final double maxWalkDistance, final double cosLat) {
 
         final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -141,7 +140,7 @@ public class SampleGridRenderer {
                 double wd = z.wWalkDist / z.w;
                 double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
                 // additionnal time
-                double dt = d / v0;
+                double dt = d / offRoadWalkSpeedMps;
                 /*
                  * Compute weight for time. The weight function to distance here is somehow
                  * arbitrary. It only purpose is to weight the samples when there is various samples
@@ -205,7 +204,7 @@ public class SampleGridRenderer {
                  * The computations below are approximation, but we are on the edge anyway and the
                  * current sample does not correspond to any computed value.
                  */
-                z.wTime = tMin + gridSizeMeters / v0;
+                z.wTime = tMin + gridSizeMeters / offRoadWalkSpeedMps;
                 z.wBoardings = bMin;
                 z.wWalkDist = wdMin + gridSizeMeters;
                 z.d = dMin + gridSizeMeters;
@@ -228,9 +227,9 @@ public class SampleGridRenderer {
                 double wd0 = s0.getWalkDistance() + d0;
                 double wd1 = s0.getWalkDistance() + d1;
                 double t0 = wd0 > maxWalkDistance ? Double.POSITIVE_INFINITY : s0.getActiveTime()
-                        + d0 / v0;
+                        + d0 / offRoadWalkSpeedMps;
                 double t1 = wd1 > maxWalkDistance ? Double.POSITIVE_INFINITY : s1.getActiveTime()
-                        + d1 / v0;
+                        + d1 / offRoadWalkSpeedMps;
                 if (!Double.isInfinite(t0) || !Double.isInfinite(t1)) {
                     WTWD z = new WTWD();
                     z.w = 1.0;
@@ -249,13 +248,6 @@ public class SampleGridRenderer {
             }
         }, walkerSplitDistanceMeters);
         gridSampler.close();
-    }
-
-    public double getOffRoadDistanceMeters(double precisionMeters) {
-        /*
-         * TODO: Make this parametrable, this can be made independant from the precision now.
-         */
-        return 1.2 * precisionMeters;
     }
 
     /**

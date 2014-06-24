@@ -90,6 +90,10 @@ public class LIsochrone extends RoutingResource {
     @DefaultValue("200")
     private Integer precisionMeters;
 
+    @QueryParam("offRoadDistanceMeters")
+    @DefaultValue("150")
+    private Integer offRoadDistanceMeters;
+
     @QueryParam("coordinateOrigin")
     private String coordinateOrigin = null;
 
@@ -170,6 +174,7 @@ public class LIsochrone extends RoutingResource {
         IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
         isoChroneRequest.setIncludeDebugGeometry(debug);
         isoChroneRequest.setPrecisionMeters(precisionMeters);
+        isoChroneRequest.setOffRoadDistanceMeters(offRoadDistanceMeters);
         if (coordinateOrigin != null)
             isoChroneRequest.setCoordinateOrigin(new GenericLocation(null, coordinateOrigin)
                     .getCoordinate());
