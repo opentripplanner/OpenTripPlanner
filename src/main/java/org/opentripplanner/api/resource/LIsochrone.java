@@ -46,11 +46,10 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.IsoChroneRequest;
-import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
-import org.opentripplanner.analyst.request.IsoChroneSPTRendererRecursiveGrid;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,11 +72,7 @@ public class LIsochrone extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(LIsochrone.class);
 
-    @Context // FIXME inject Application context
-    private IsoChroneSPTRendererAccSampling accSamplingRenderer;
-
-    @Context // FIXME inject Application context
-    private IsoChroneSPTRendererRecursiveGrid recursiveGridRenderer;
+    @Context OTPServer server;
 
     @QueryParam("cutoffSec")
     private List<Integer> cutoffSecList;
@@ -113,7 +108,7 @@ public class LIsochrone extends RoutingResource {
         return Response.ok().entity(writer.toString()).cacheControl(cc).build();
     }
 
-    @GET
+    @GET @Path("shapefile")
     @Produces("application/x-zip-compressed")
     public Response getZippedShapefileIsochrone(@QueryParam("shpName") String shpName,
             @QueryParam("stream") @DefaultValue("true") boolean stream) throws Exception {
@@ -187,13 +182,9 @@ public class LIsochrone extends RoutingResource {
         }
 
         List<IsochroneData> isochrones;
-        if (algorithm == null || "accSampling".equals(algorithm)) {
-            isochrones = accSamplingRenderer.getIsochrones(isoChroneRequest, sptRequest);
-        } else if ("recursiveGrid".equals(algorithm)) {
-            isochrones = recursiveGridRenderer.getIsochrones(isoChroneRequest, sptRequest);
-        } else {
-            throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
-        }
+        if (algorithm != null)
+            throw new IllegalArgumentException("Deprecated argument: algorithm.");
+        isochrones = otpServer.isoChroneSPTRenderer.getIsochrones(isoChroneRequest, sptRequest);
         return isochrones;
     }
 
