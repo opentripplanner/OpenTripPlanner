@@ -1,4 +1,4 @@
-# Translations template for OpenTripPlanner.
+# Catalan (Spain) translations for OpenTripPlanner.
 # Copyright (C) 2014 ORGANIZATION
 # This file is distributed under the same license as the OpenTripPlanner
 # project.
@@ -8,69 +8,67 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-16 01:14+0200\n"
+"POT-Creation-Date: 2014-06-24 17:23+0200\n"
 "PO-Revision-Date: 2014-06-24 10:24+0100\n"
 "Last-Translator: \n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: ca_ES <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
-"X-Generator: Poedit 1.6.5\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: ca_ES\n"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:291
 msgid "Transit"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:263
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:294
 msgid "Bus Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:266
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:297
 msgid "Rail Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:269
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:300
 msgid "Bicycle Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:303
 msgid "Bicycle &amp; Transit"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:275
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:306
 msgid "Walk Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:278
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:309
 msgid "Drive Only"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:285
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:316
 msgid "Rented Bicycle"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:288
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:319
 msgid "Transit & Rented Bicycle"
 msgstr ""
 
@@ -514,14 +512,14 @@ msgstr ""
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:97
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:98
 msgid ""
-"We're sorry. The trip planner is temporarily unavailable. Please try again "
-"later."
+"We're sorry. The trip planner is temporarily unavailable. Please try "
+"again later."
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:99
 msgid ""
-"Trip is not possible.  You might be trying to plan a trip outside the map "
-"data boundary."
+"Trip is not possible.  You might be trying to plan a trip outside the map"
+" data boundary."
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:100
@@ -533,19 +531,18 @@ msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:101
 msgid ""
-"No transit times available. The date may be past or too far in the future or "
-"there may not be transit service for your trip at the time you chose."
+"No transit times available. The date may be past or too far in the future"
+" or there may not be transit service for your trip at the time you chose."
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:102
 msgid ""
-"The trip planner is taking way too long to process your request. Please try "
-"again later."
+"The trip planner is taking way too long to process your request. Please "
+"try again later."
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:103
-msgid ""
-"The request has errors that the server is not willing or able to process."
+msgid "The request has errors that the server is not willing or able to process."
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:104
@@ -558,7 +555,8 @@ msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:106
 msgid ""
-"Both origin and destination are unknown. Can you be a bit more descriptive?"
+"Both origin and destination are unknown. Can you be a bit more "
+"descriptive?"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:107
@@ -571,8 +569,8 @@ msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:110
 msgid ""
-"The trip planner is unsure of the location you want to start from. Please "
-"select from the following options, or be more specific."
+"The trip planner is unsure of the location you want to start from. Please"
+" select from the following options, or be more specific."
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:111
@@ -583,8 +581,8 @@ msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:112
 msgid ""
-"Both origin and destination are ambiguous. Please select from the following "
-"options, or be more specific."
+"Both origin and destination are ambiguous. Please select from the "
+"following options, or be more specific."
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:114
@@ -607,8 +605,8 @@ msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/PlannerModule.js:117
 msgid ""
-"If OptimizeType is TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, and "
-"triangleTimeFactor must be set"
+"If OptimizeType is TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, "
+"and triangleTimeFactor must be set"
 msgstr ""
 
 #. Context menu
@@ -826,8 +824,8 @@ msgstr ""
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:173
 #, python-format
 msgid ""
-"Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b> "
-"exit on <b>%(street_name)s</b>"
+"Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b>"
+" exit on <b>%(street_name)s</b>"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:175
@@ -840,14 +838,15 @@ msgstr ""
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:179
 #, python-format
 msgid ""
-"Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit on "
-"<b>%(street_name)s</b>"
+"Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit "
+"on <b>%(street_name)s</b>"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:181
 #, python-format
 msgid ""
-"Take roundabout clockwise to %(ordinal_exit_number)s exit on %(street_name)s"
+"Take roundabout clockwise to %(ordinal_exit_number)s exit on "
+"%(street_name)s"
 msgstr ""
 
 #. Start on [stret name] heading [compas direction]
@@ -1211,3 +1210,4 @@ msgstr ""
 #, fuzzy
 msgid "Plan Your Trip"
 msgstr "Planificar el viatge"
+
