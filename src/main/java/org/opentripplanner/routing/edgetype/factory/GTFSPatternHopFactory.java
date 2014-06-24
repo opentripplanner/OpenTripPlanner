@@ -614,6 +614,7 @@ public class GTFSPatternHopFactory {
             // linking, even though theoretically we could do better.
 
             for (int i = 0; i < stopTimes.size() - 1; ++i) {
+                if (hops[i] == null) continue;
                 st0 = stopTimes.get(i);
                 StopTime st1 = stopTimes.get(i + 1);
                 LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
