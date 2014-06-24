@@ -49,8 +49,14 @@ public class TimeSurface {
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
 
     public TimeSurface(ShortestPathTree spt) {
-    	
-    	routerId = spt.getOptions().routerId;
+
+        String routerId = spt.getOptions().routerId;
+        if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
+            routerId = "default";
+        }
+        // Here we use the key "default" unlike the graphservice which substitutes in the default ID.
+        // We don't want to keep that default in sync across two modules.
+    	this.routerId = routerId;
         long t0 = System.currentTimeMillis();
         times = new int[Vertex.getMaxIndex()]; // memory leak due to temp vertices?
         Arrays.fill(times, UNREACHABLE);
