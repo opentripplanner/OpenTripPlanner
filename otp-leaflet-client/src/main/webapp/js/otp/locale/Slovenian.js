@@ -21,6 +21,9 @@ otp.locale.Slovenian = {
 
     config :
     {
+        //Name of a language written in a language itself (Used in Frontend to
+        //choose a language)
+        name: 'Slovensko',
         //FALSE-imperial units are used
         //TRUE-Metric units are used
         metric : true, 

@@ -20,6 +20,9 @@ otp.namespace("otp.locale");
 otp.locale.German = {
 
     config: {
+        //Name of a language written in a language itself (Used in Frontend to
+        //choose a language)
+        name: 'Deutsch',
         //FALSE-imperial units are used
         //TRUE-Metric units are used
         metric : true, 

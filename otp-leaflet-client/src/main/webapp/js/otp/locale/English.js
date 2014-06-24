@@ -21,6 +21,9 @@ otp.locale.English = {
 
     config :
     {
+        //Name of a language written in a language itself (Used in Frontend to
+        //choose a language)
+        name: 'English',
         //FALSE-imperial units are used
         //TRUE-Metric units are used
         metric : false, 

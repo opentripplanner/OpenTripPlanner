@@ -6,7 +6,10 @@ otp.config = {
     //user cookie > language set in browser (Not accept-language) 
     locale: otp.locale.English,
 
-    //This and active_locales should be joined
+    //All avalible locales
+    //key is translation name. Must be the same as po file or .json file
+    //value is name of settings file for localization in locale subfolder
+    //File should be loaded in index.html
     locales : {
         'en': otp.locale.English,
         'de': otp.locale.German,
@@ -14,41 +17,16 @@ otp.config = {
         'fr': otp.locale.French
     },
 
-    //Add all locales you want to see in your frontend language chooser
-    //code must be the same as locale name in js/locale withoud .js part
-    //name must be name of the language in that language
-    active_locales : [
-        { 
-            code: 'en',
-            name: 'English',
-            locale: otp.locale.English
-        },
-        {
-            code:'de',
-            name: 'Deutsch',
-            locale: otp.locale.German
-        },
-        {
-            code:'fr',
-            name: 'le français',
-            locale: otp.locale.French
-        },
-        {
-            code: 'sl',
-            name: 'Slovensko',
-            locale: otp.locale.Slovenian
-        }
-    ],
-
     languageChooser : function() {
+        var active_locales = _.values(otp.config.locales);
         var str = "<ul>";
-        var localesLength = otp.config.active_locales.length;
+        var localesLength = active_locales.length;
         var param_name = i18n.options.detectLngQS;
         for (var i = 0; i < localesLength; i++) {
-            var current_locale = otp.config.active_locales[i];
+            var current_locale = active_locales[i];
             var url_param = {};
-            url_param[param_name] = current_locale.code;
-            str += '<li><a href="?' + $.param(url_param) + '">' + current_locale.name + ' (' + current_locale.code + ')</a></li>';
+            url_param[param_name] = current_locale.config.locale_short;
+            str += '<li><a href="?' + $.param(url_param) + '">' + current_locale.config.name + ' (' + current_locale.config.locale_short + ')</a></li>';
         }
         str += "</ul>";
         return str;
