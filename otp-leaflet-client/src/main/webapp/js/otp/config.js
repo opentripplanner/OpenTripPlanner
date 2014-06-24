@@ -1,8 +1,18 @@
 otp.config = {
     debug: false,
 
+    //This is default locale when wanted locale isn't found
+    //Locale language is set based on wanted language in url >
+    //user cookie > language set in browser (Not accept-language) 
     locale: otp.locale.English,
-    locale_short: 'en',
+
+    //This and active_locales should be joined
+    locales : {
+        'en': otp.locale.English,
+        'de': otp.locale.German,
+        'sl': otp.locale.Slovenian,
+        'fr': otp.locale.French
+    },
 
     //Add all locales you want to see in your frontend language chooser
     //code must be the same as locale name in js/locale withoud .js part
@@ -10,11 +20,23 @@ otp.config = {
     active_locales : [
         { 
             code: 'en',
-            name: 'English'
+            name: 'English',
+            locale: otp.locale.English
         },
         {
             code:'de',
-            name: 'Deutsch'
+            name: 'Deutsch',
+            locale: otp.locale.German
+        },
+        {
+            code:'fr',
+            name: 'le français',
+            locale: otp.locale.French
+        },
+        {
+            code: 'sl',
+            name: 'Slovensko',
+            locale: otp.locale.Slovenian
         }
     ],
 
@@ -99,7 +121,7 @@ otp.config = {
     showLogo            : true,
     showTitle           : true,
     showModuleSelector  : true,
-    metric              : true,
+    metric              : false,
 
 
     /**
@@ -209,7 +231,7 @@ var options = {
 	fallbackLng: 'en',
         nsseparator: ';;', //Fixes problem when : is in translation text
         keyseparator: '_|_',
-	preload: [otp.config.locale_short],
+	preload: ['en'],
         //TODO: Language choosing works only with this disabled
         /*lng: otp.config.locale_short,*/
         /*postProcess: 'add_nekaj', //Adds | around every string that is translated*/
@@ -229,6 +251,13 @@ i18n.addPostProcessor('add_nekaj', function(val, key, opts) {
 });
 
 i18n.init(options, function(t) {
+    //Sets locale and metric based on currently selected/detected language
+    if (i18n.lng() in otp.config.locales) {
+        otp.config.locale = otp.config.locales[i18n.lng()];
+        otp.config.metric = otp.config.locale.config.metric;
+        //Conditionally load datepicker-lang.js?
+    } 
+
     if (i18n.lng() in otp.config.infoWidgetsTranslations) {
         otp.config.infoWidgets=otp.config.infoWidgetsTranslations[i18n.lng()];
     } else {

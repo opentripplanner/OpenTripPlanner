@@ -17,15 +17,15 @@ otp.namespace("otp.locale");
 /**
   * @class
   */
-otp.locale.English = {
+otp.locale.Slovenian = {
 
     config :
     {
         //FALSE-imperial units are used
         //TRUE-Metric units are used
-        metric : false, 
+        metric : true, 
         //Name of localization file (*.po file) in otp-leaflet-client/src/main/webapp/i18n
-        locale_short : "en",
+        locale_short : "sl",
         //Name of datepicker localization in
         //otp-leaflet-client/src/main/webapp/js/lib/jquery-ui/i18n (usually
         //same as locale_short)
@@ -35,13 +35,10 @@ otp.locale.English = {
         //into otp-leaflet-client/src/main/webapp/js/lib/jquery-ui/i18n
         //and add it in index.html after other localizations
         //It will be used automatically when UI is switched to this locale
-        datepicker_locale_short: "" //Doesn't use localization
-
+        datepicker_locale_short: "sl"
     },
 
 
-    //Time options are used in timeFixes branch
-    //Left in for now for better merging
     time:
     {
         hour_abbrev    : "hour",
@@ -55,12 +52,14 @@ otp.locale.English = {
         minutes_abbrev : "mins",
         second_abbrev  : "sec",
         seconds_abbrev : "secs",
-        format         : "F jS, Y @ g:ia",
-        date_format    : "n/j/Y",
-        time_format    : "g:ia",
-        months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        format         : "D. MMM. YYYY H:mm", //momentjs
+        date_format    : "D.M.YYYY", //momentjs
+        time_format    : "H:mm", //prej je blo H:i momentjs
+        time_format_picker : "HH:mm", //http://trentrichardson.com/examples/timepicker/#tp-formatting
+        months         : ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
     },
 
-    CLASS_NAME : "otp.locale.English"
+
+    CLASS_NAME : "otp.locale.Slovenian"
 };
 
