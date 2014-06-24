@@ -37,13 +37,9 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
     private static final Logger LOG = LoggerFactory
             .getLogger(IsoChroneSPTRendererAccSampling.class);
 
-    private GraphService graphService;
-    private SPTService sptService;
     private SampleGridRenderer sampleGridRenderer;
 
     public IsoChroneSPTRendererAccSampling(GraphService graphService, SPTService sptService, SampleGridRenderer sampleGridRenderer) {
-        this.graphService = graphService;
-        this.sptService = sptService;
         this.sampleGridRenderer = sampleGridRenderer;
     }
 
