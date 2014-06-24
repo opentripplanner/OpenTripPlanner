@@ -59,7 +59,9 @@ public abstract class RoutingResource {
 
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
      *  label. For example, <code>40.714476,-74.005966</code> or
-     *  <code>mtanyctsubway_A27_S</code>.  */
+     *  <code>mtanyctsubway_A27_S</code>,<code>osm:node:664811220</code> or <code>poi:tprek:21254</code>.
+     *  In order to do a one-to-many search based on service id, use the following
+     *  <code>poi:category:tprek:25996</code>. */
     @QueryParam("fromPlace") protected List<String> fromPlace;
 
     /** The end location (see fromPlace for format). */

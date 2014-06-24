@@ -71,7 +71,7 @@ public class Place {
     public Calendar departure = null;
 
     /**
-      * Information regarding the accessibility of the stop.
+      * Information regarding the accessibility of the place.
       */
     @XmlElement
     public Map<String, String> accessibilityInformation = null;
