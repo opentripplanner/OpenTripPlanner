@@ -9,7 +9,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 var INIT_LOCATION = new L.LatLng(47.217, -1.557); // Nantes
@@ -22,6 +22,7 @@ var DATE = '2014/06/01';
 var TIME = '12:00:00';
 var MODES = 'WALK,TRANSIT';
 var PRECISION = 50; // meters
+var OFFROAD = 80; // meters
 var MAX_WALK_DISTANCE = 1000;
 
 // Initialize a map
@@ -69,7 +70,7 @@ function updateIsochrones() {
     var xhr = new XMLHttpRequest();
     var req = '/otp/routers/' + ROUTER_ID + '/isochrone?fromPlace=' + origMarker.getLatLng().lat + ','
             + origMarker.getLatLng().lng + '&date=' + DATE + '&time=' + TIME + '&mode=' + MODES + '&maxWalkDistance='
-            + MAX_WALK_DISTANCE + '&precisionMeters=' + PRECISION;
+            + MAX_WALK_DISTANCE + '&precisionMeters=' + PRECISION + '&offRoadDistanceMeters=' + OFFROAD;
     for (var i = 0; i < ISOCHRONE_TIMES.length; i++) {
         req = req + '&cutoffSec=' + ISOCHRONE_TIMES[i];
     }
