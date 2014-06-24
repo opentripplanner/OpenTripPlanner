@@ -46,11 +46,10 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.IsoChroneRequest;
-import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
-import org.opentripplanner.analyst.request.IsoChroneSPTRendererRecursiveGrid;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +62,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * Example of request:
  * 
  * <code>
- * http://localhost:8080/otp-rest-servlet/ws/isochrone?routerId=bordeaux&algorithm=accSampling&fromPlace=47.059,-0.880&date=2013/10/01&time=12:00:00&maxWalkDistance=1000&mode=WALK,TRANSIT&cutoffSec=1800&cutoffSec=3600
+ * http://localhost:8080/otp/routers/default/isochrone?fromPlace=47.2165,-1.5665&date=2014/06/01&time=12:00:00&mode=WALK,TRANSIT&maxWalkDistance=1000&precisionMeters=100&cutoffSec=900&cutoffSec=1800&cutoffSec=2700
  * </code>
  * 
  * @author laurent
@@ -73,11 +72,7 @@ public class LIsochrone extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(LIsochrone.class);
 
-    @Context // FIXME inject Application context
-    private IsoChroneSPTRendererAccSampling accSamplingRenderer;
-
-    @Context // FIXME inject Application context
-    private IsoChroneSPTRendererRecursiveGrid recursiveGridRenderer;
+    @Context OTPServer server;
 
     @QueryParam("cutoffSec")
     private List<Integer> cutoffSecList;
@@ -94,6 +89,10 @@ public class LIsochrone extends RoutingResource {
     @QueryParam("precisionMeters")
     @DefaultValue("200")
     private Integer precisionMeters;
+
+    @QueryParam("offRoadDistanceMeters")
+    @DefaultValue("150")
+    private Integer offRoadDistanceMeters;
 
     @QueryParam("coordinateOrigin")
     private String coordinateOrigin = null;
@@ -113,7 +112,7 @@ public class LIsochrone extends RoutingResource {
         return Response.ok().entity(writer.toString()).cacheControl(cc).build();
     }
 
-    @GET
+    @GET @Path("shapefile")
     @Produces("application/x-zip-compressed")
     public Response getZippedShapefileIsochrone(@QueryParam("shpName") String shpName,
             @QueryParam("stream") @DefaultValue("true") boolean stream) throws Exception {
@@ -175,6 +174,7 @@ public class LIsochrone extends RoutingResource {
         IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
         isoChroneRequest.setIncludeDebugGeometry(debug);
         isoChroneRequest.setPrecisionMeters(precisionMeters);
+        isoChroneRequest.setOffRoadDistanceMeters(offRoadDistanceMeters);
         if (coordinateOrigin != null)
             isoChroneRequest.setCoordinateOrigin(new GenericLocation(null, coordinateOrigin)
                     .getCoordinate());
@@ -187,13 +187,9 @@ public class LIsochrone extends RoutingResource {
         }
 
         List<IsochroneData> isochrones;
-        if (algorithm == null || "accSampling".equals(algorithm)) {
-            isochrones = accSamplingRenderer.getIsochrones(isoChroneRequest, sptRequest);
-        } else if ("recursiveGrid".equals(algorithm)) {
-            isochrones = recursiveGridRenderer.getIsochrones(isoChroneRequest, sptRequest);
-        } else {
-            throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
-        }
+        if (algorithm != null)
+            throw new IllegalArgumentException("Deprecated argument: algorithm.");
+        isochrones = otpServer.isoChroneSPTRenderer.getIsochrones(isoChroneRequest, sptRequest);
         return isochrones;
     }
 

@@ -37,13 +37,10 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
     private static final Logger LOG = LoggerFactory
             .getLogger(IsoChroneSPTRendererAccSampling.class);
 
-    private GraphService graphService;
-    private SPTService sptService;
     private SampleGridRenderer sampleGridRenderer;
 
-    public IsoChroneSPTRendererAccSampling(GraphService graphService, SPTService sptService, SampleGridRenderer sampleGridRenderer) {
-        this.graphService = graphService;
-        this.sptService = sptService;
+    public IsoChroneSPTRendererAccSampling(GraphService graphService, SPTService sptService,
+            SampleGridRenderer sampleGridRenderer) {
         this.sampleGridRenderer = sampleGridRenderer;
     }
 
@@ -56,13 +53,13 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
     public List<IsochroneData> getIsochrones(IsoChroneRequest isoChroneRequest,
             RoutingRequest sptRequest) {
 
-        final double D0 = sampleGridRenderer.getOffRoadDistanceMeters(isoChroneRequest
-                .getPrecisionMeters());
+        final double offRoadDistanceMeters = isoChroneRequest.getOffRoadDistanceMeters();
 
         // 1. Create a sample grid from the SPT, using the TimeGridRenderer
         SampleGridRequest tgRequest = new SampleGridRequest();
         tgRequest.setMaxTimeSec(isoChroneRequest.getMaxTimeSec());
         tgRequest.setPrecisionMeters(isoChroneRequest.getPrecisionMeters());
+        tgRequest.setOffRoadDistanceMeters(isoChroneRequest.getOffRoadDistanceMeters());
         tgRequest.setCoordinateOrigin(isoChroneRequest.getCoordinateOrigin());
         ZSampleGrid<WTWD> sampleGrid = sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
 
@@ -108,7 +105,7 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
             WTWD z0 = new WTWD();
             z0.w = 1.0;
             z0.wTime = cutoffSec;
-            z0.d = D0;
+            z0.d = offRoadDistanceMeters;
             IsochroneData isochrone = new IsochroneData(cutoffSec,
                     isolineBuilder.computeIsoline(z0));
             if (isoChroneRequest.isIncludeDebugGeometry())

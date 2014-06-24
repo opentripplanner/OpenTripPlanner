@@ -15,6 +15,9 @@ package org.opentripplanner.analyst.request;
 
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler.AccumulativeMetric;
@@ -23,6 +26,7 @@ import org.opentripplanner.common.geometry.IsolineBuilder;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.ZSampleGrid;
+import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -54,6 +58,7 @@ public class SampleGridRenderer {
     private static final Logger LOG = LoggerFactory.getLogger(SampleGridRenderer.class);
 
     private GraphService graphService;
+
     private SPTService sptService;
 
     public SampleGridRenderer(GraphService graphService, SPTService sptService) {
@@ -68,12 +73,12 @@ public class SampleGridRenderer {
      */
     public ZSampleGrid<WTWD> getSampleGrid(SampleGridRequest spgRequest, RoutingRequest sptRequest) {
 
-        final double D0 = getOffRoadDistanceMeters(spgRequest.getPrecisionMeters());
-        final double V0 = 1.00; // m/s, off-road walk speed
+        double offRoadDistanceMeters = spgRequest.getOffRoadDistanceMeters();
+        final double offRoadWalkSpeedMps = 1.00; // m/s,
 
         // 1. Compute the Shortest Path Tree.
         long t0 = System.currentTimeMillis();
-        long tOvershot = (long) (2 * D0 / V0);
+        long tOvershot = (long) (2 * offRoadDistanceMeters / offRoadWalkSpeedMps);
         sptRequest.setWorstTime(sptRequest.dateTime
                 + (sptRequest.arriveBy ? -spgRequest.getMaxTimeSec() - tOvershot : spgRequest
                         .getMaxTimeSec() + tOvershot));
@@ -93,7 +98,7 @@ public class SampleGridRenderer {
 
         SparseMatrixZSampleGrid<WTWD> sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16,
                 spt.getVertexCount(), dX, dY, coordinateOrigin);
-        sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0,
+        sampleSPT(spt, sampleGrid, gridSizeMeters, offRoadDistanceMeters, offRoadWalkSpeedMps,
                 sptRequest.getMaxWalkDistance(), cosLat);
         sptRequest.cleanup();
 
@@ -110,11 +115,15 @@ public class SampleGridRenderer {
      * @param spt
      * @return
      */
-    public static void sampleSPT(ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid, final double d0,
-            final double gridSizeMeters, final double v0, final double maxWalkDistance,
-            final double cosLat) {
+    public static void sampleSPT(ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid,
+            final double gridSizeMeters, final double offRoadDistanceMeters,
+            final double offRoadWalkSpeedMps, final double maxWalkDistance, final double cosLat) {
 
         final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
+        // At which distance we split edges along the geometry during sampling.
+        // For best results, this should be slighly lower than the grid size.
+        double walkerSplitDistanceMeters = gridSizeMeters * 0.5;
 
         // Below is a closure that makes use of the parameters to the enclosing function.
 
@@ -131,9 +140,14 @@ public class SampleGridRenderer {
                 double wd = z.wWalkDist / z.w;
                 double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
                 // additionnal time
-                double dt = d / v0;
-                // t weight
-                double w = 1 / ((d + d0) * (d + d0));
+                double dt = d / offRoadWalkSpeedMps;
+                /*
+                 * Compute weight for time. The weight function to distance here is somehow
+                 * arbitrary. It only purpose is to weight the samples when there is various samples
+                 * within the same "cell", giving more weight to the closests samples to the cell
+                 * center.
+                 */
+                double w = 1 / ((d + gridSizeMeters) * (d + gridSizeMeters));
                 if (zS == null) {
                     zS = new WTWD();
                     zS.d = Double.MAX_VALUE;
@@ -152,19 +166,26 @@ public class SampleGridRenderer {
              * distance of all enclosing samples, plus the grid size, and 2) as time the minimum
              * time of all enclosing samples plus the grid size * off-road walk speed as additional
              * time. All this are approximations.
-             *
+             * 
              * TODO Is there a better way of computing this? Here the computation will be different
              * based on the order where we close the samples.
              */
             @Override
-            public WTWD closeSample(WTWD zUp, WTWD zDown, WTWD zRight, WTWD zLeft) {
+            public boolean closeSample(ZSamplePoint<WTWD> point) {
                 double dMin = Double.MAX_VALUE;
                 double tMin = Double.MAX_VALUE;
                 double bMin = Double.MAX_VALUE;
                 double wdMin = Double.MAX_VALUE;
-                for (WTWD z : new WTWD[] { zUp, zDown, zRight, zLeft }) {
-                    if (z == null)
-                        continue;
+                List<WTWD> zz = new ArrayList<WTWD>(4);
+                if (point.up() != null)
+                    zz.add(point.up().getZ());
+                if (point.down() != null)
+                    zz.add(point.down().getZ());
+                if (point.right() != null)
+                    zz.add(point.right().getZ());
+                if (point.left() != null)
+                    zz.add(point.left().getZ());
+                for (WTWD z : zz) {
                     if (z.d < dMin)
                         dMin = z.d;
                     double t = z.wTime / z.w;
@@ -183,11 +204,12 @@ public class SampleGridRenderer {
                  * The computations below are approximation, but we are on the edge anyway and the
                  * current sample does not correspond to any computed value.
                  */
-                z.wTime = tMin + gridSizeMeters / v0;
+                z.wTime = tMin + gridSizeMeters / offRoadWalkSpeedMps;
                 z.wBoardings = bMin;
                 z.wWalkDist = wdMin + gridSizeMeters;
                 z.d = dMin + gridSizeMeters;
-                return z;
+                point.setZ(z);
+                return dMin > offRoadDistanceMeters;
             }
         };
         final AccumulativeGridSampler<WTWD> gridSampler = new AccumulativeGridSampler<WTWD>(
@@ -205,9 +227,9 @@ public class SampleGridRenderer {
                 double wd0 = s0.getWalkDistance() + d0;
                 double wd1 = s0.getWalkDistance() + d1;
                 double t0 = wd0 > maxWalkDistance ? Double.POSITIVE_INFINITY : s0.getActiveTime()
-                        + d0 / v0;
+                        + d0 / offRoadWalkSpeedMps;
                 double t1 = wd1 > maxWalkDistance ? Double.POSITIVE_INFINITY : s1.getActiveTime()
-                        + d1 / v0;
+                        + d1 / offRoadWalkSpeedMps;
                 if (!Double.isInfinite(t0) || !Double.isInfinite(t1)) {
                     WTWD z = new WTWD();
                     z.w = 1.0;
@@ -224,15 +246,8 @@ public class SampleGridRenderer {
                     gridSampler.addSamplingPoint(c, z);
                 }
             }
-        }, d0);
+        }, walkerSplitDistanceMeters);
         gridSampler.close();
-    }
-
-    public double getOffRoadDistanceMeters(double precisionMeters) {
-        // Off-road max distance MUST be APPROX EQUALS to the grid precision
-        // TODO: Loosen this restriction (by adding more closing sample).
-        // Change the 0.8 magic factor here with caution.
-        return 0.8 * precisionMeters;
     }
 
     /**
@@ -280,6 +295,7 @@ public class SampleGridRenderer {
                     return -1;
                 return 0;
             }
+
             @Override
             public double interpolate(WTWD zA, WTWD zB, WTWD z0) {
                 if (zA.d > z0.d || zB.d > z0.d) {
