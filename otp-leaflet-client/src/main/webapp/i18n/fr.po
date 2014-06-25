@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-24 17:23+0200\n"
+"POT-Creation-Date: 2014-06-25 11:37+0200\n"
 "PO-Revision-Date: 2014-06-24 10:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: fr <LL@li.org>\n"
@@ -20,62 +20,62 @@ msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:291
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
 #, fuzzy
 msgid "Transit"
 msgstr "Transports en commun"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:294
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:263
 #, fuzzy
 msgid "Bus Only"
 msgstr "Bus uniquement"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:297
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:266
 #, fuzzy
 msgid "Rail Only"
 msgstr "Tram / Train uniquement"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:300
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:269
 #, fuzzy
 msgid "Bicycle Only"
 msgstr "Vélo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:303
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
 #, fuzzy
 msgid "Bicycle &amp; Transit"
 msgstr "Transports en commun + Vélo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:306
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:275
 #, fuzzy
 msgid "Walk Only"
 msgstr "Marche"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:309
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:278
 #, fuzzy
 msgid "Drive Only"
 msgstr "Voiture"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:316
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:285
 msgid "Rented Bicycle"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:319
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:288
 msgid "Transit & Rented Bicycle"
 msgstr ""
 

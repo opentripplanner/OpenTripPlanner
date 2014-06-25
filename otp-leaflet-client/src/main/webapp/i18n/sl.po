@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-24 17:23+0200\n"
+"POT-Creation-Date: 2014-06-25 11:37+0200\n"
 "PO-Revision-Date: 2014-06-16 10:54+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
@@ -20,55 +20,55 @@ msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:291
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
 msgid "Transit"
 msgstr "Javni prevoz"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:294
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:263
 msgid "Bus Only"
 msgstr "Avtobus"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:297
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:266
 msgid "Rail Only"
 msgstr "Vlak"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:300
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:269
 msgid "Bicycle Only"
 msgstr "Kolo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:303
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
 msgid "Bicycle &amp; Transit"
 msgstr "Kolo &amp; Javni prevoz"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:306
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:275
 msgid "Walk Only"
 msgstr "Pešačenje"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:309
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:278
 msgid "Drive Only"
 msgstr "Avto"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:316
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:285
 msgid "Rented Bicycle"
 msgstr "Izposojeno kolo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: otp-leaflet-client/src/main/webapp/js/otp/config.js:319
+#: otp-leaflet-client/src/main/webapp/js/otp/config.js:288
 msgid "Transit & Rented Bicycle"
 msgstr "Izposojeno kolo &amp; Javni prevoz"
 
