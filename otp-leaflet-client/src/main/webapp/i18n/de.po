@@ -21,49 +21,42 @@ msgstr ""
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
-#, fuzzy
 msgid "Transit"
 msgstr "ÖPNV"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:263
-#, fuzzy
 msgid "Bus Only"
 msgstr "nur Bus"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:266
-#, fuzzy
 msgid "Rail Only"
 msgstr "nur Bahn"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:269
-#, fuzzy
 msgid "Bicycle Only"
 msgstr "Fahrrad"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
-#, fuzzy
 msgid "Bicycle &amp; Transit"
 msgstr "ÖPNV und Fahrrad"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:275
-#, fuzzy
 msgid "Walk Only"
 msgstr "zu Fuß"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:278
-#, fuzzy
 msgid "Drive Only"
 msgstr "Auto"
 
@@ -71,28 +64,27 @@ msgstr "Auto"
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:285
 msgid "Rented Bicycle"
-msgstr ""
+msgstr "Fahrradverleih"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:288
 msgid "Transit & Rented Bicycle"
-msgstr ""
+msgstr "ÖPNV und Fahrradverleih"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:36
+#, fuzzy
 msgid "Recenter Map Here"
-msgstr ""
+msgstr "Karte hier zentrieren"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:39
-#, fuzzy
 msgid "Zoom In"
 msgstr "hineinzoomen"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:42
-#, fuzzy
 msgid "Zoom Out"
 msgstr "herauszoomen"
 
@@ -134,25 +126,21 @@ msgstr ""
 
 #. Legend title in Analyst
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/analyst/AnalystLegendWidget.js:26
-#, fuzzy
 msgid "Legend : travel time in minutes"
 msgstr "Legende: Reisezeit in Minuten"
 
 #. module name
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/analyst/AnalystModule.js:22
-#, fuzzy
 msgid "Analyst"
 msgstr "Analyse"
 
 #. Button to update analyst information
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/analyst/AnalystModule.js:64
-#, fuzzy
 msgid "Refresh"
 msgstr "Aktualisieren"
 
 #. Context menu set this point as analysis location
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/analyst/AnalystModule.js:93
-#, fuzzy
 msgid "Set as Analysis Location"
 msgstr "Ausgangspunkt für Analyse setzen"
 
@@ -163,7 +151,6 @@ msgstr ""
 #. widget name
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/bikeshare/BikeShareModule.js:108
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:44
-#, fuzzy
 msgid "Trip Options"
 msgstr "Einstellungen für Routensuche"
 
@@ -248,7 +235,6 @@ msgstr "Multimodaler Routenplaner"
 #. Widget title
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/multimodal/MultimodalPlannerModule.js:131
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:42
-#, fuzzy
 msgid "Itineraries"
 msgstr "Routenvorschläge"
 
@@ -267,25 +253,21 @@ msgstr "Link für diese Suche erstellen"
 
 #. button to first itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:171
-#, fuzzy
 msgid "First"
 msgstr "Erster"
 
 #. button to previous itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:186
-#, fuzzy
 msgid "Previous"
 msgstr "Vorheriger"
 
 #. button to next itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:202
-#, fuzzy
 msgid "Next"
 msgstr "Nächster"
 
 #. button to last itinerary
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:218
-#, fuzzy
 msgid "Last"
 msgstr "Letzter"
 
@@ -298,23 +280,22 @@ msgstr "Weiterfahren"
 
 #. Something in Public transport is x minutes late
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:354
-#, python-format
+#, python-format, fuzzy
 msgid "%d min late"
 msgid_plural "%d mins late"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d min Verspätung"
+msgstr[1] "%d min Verspätung"
 
 #. Something in Public transport is x minutes early
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:357
-#, python-format
+#, python-format, fuzzy
 msgid "%d min early"
 msgid_plural "%d mins early"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d min zu früh"
+msgstr[1] "%d min zu früh"
 
 #. Something in Public transport is on time
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:360
-#, fuzzy
 msgid "on time"
 msgstr "pünktlich"
 
@@ -365,14 +346,12 @@ msgstr ""
 #. Travel: hour date on which this trip is made
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:452
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:300
-#, fuzzy
 msgid "Travel"
 msgstr "Reise"
 
 #. Time: minutes How long is this trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:454
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:301
-#, fuzzy
 msgid "Time"
 msgstr "Dauer"
 
@@ -397,7 +376,6 @@ msgstr "Umsteigepunkt"
 #. cost of trip
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:481
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/Itinerary.js:308
-#, fuzzy
 msgid "Fare"
 msgstr "Tarif"
 
@@ -413,7 +391,6 @@ msgid "Link to Itinerary"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:499
-#, fuzzy
 msgid "Print"
 msgstr "drucken"
 
@@ -469,7 +446,6 @@ msgstr ""
 
 #. Stay on board/Alight [at stop name]
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:643
-#, fuzzy
 msgid "Stay on board"
 msgstr "an Bord bleiben"
 
@@ -699,42 +675,34 @@ msgstr ""
 #. Start on [street name] heading [Absolute direction] used in travel plan
 #. generation
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:88
-#, fuzzy
 msgid "north"
 msgstr "nord"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:89
-#, fuzzy
 msgid "northeast"
 msgstr "nordost"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:90
-#, fuzzy
 msgid "east"
 msgstr "ost"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:91
-#, fuzzy
 msgid "southeast"
 msgstr "südost"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:92
-#, fuzzy
 msgid "south"
 msgstr "süd"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:93
-#, fuzzy
 msgid "southwest"
 msgstr "südwest"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:94
-#, fuzzy
 msgid "west"
 msgstr "west"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:95
-#, fuzzy
 msgid "northwest"
 msgstr "nordwest"
 
@@ -747,17 +715,14 @@ msgstr "Abfahrt"
 #. [Relative direction (Hard/Slightly Left/Right...)] to continue
 #. on /on to [streetname]
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:117
-#, fuzzy
 msgid "hard left"
 msgstr "scharf links"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:118
-#, fuzzy
 msgid "left"
 msgstr "links"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:119
-#, fuzzy
 msgid "slight left"
 msgstr "links halten"
 
@@ -766,17 +731,14 @@ msgid "continue"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:121
-#, fuzzy
 msgid "slight right"
 msgstr "rechts halten"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:122
-#, fuzzy
 msgid "right"
 msgstr "rechts"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:123
-#, fuzzy
 msgid "hard right"
 msgstr "scharf rechts"
 
@@ -794,13 +756,15 @@ msgstr ""
 
 #. Walk distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:142
+#, fuzzy
 msgid "Walk"
-msgstr ""
+msgstr "zu Fuß gehen"
 
 #. Cycle distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:144
+#, fuzzy
 msgid "Cycle"
-msgstr ""
+msgstr "Fahrrad"
 
 #. Car distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:146
@@ -820,11 +784,11 @@ msgid "Subway"
 msgstr "U-Bahn"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:150
+#, fuzzy
 msgid "Train"
-msgstr ""
+msgstr "Bahn"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:151
-#, fuzzy
 msgid "Ferry"
 msgstr "Fähre"
 
@@ -833,12 +797,10 @@ msgid "Light Rail"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:153
-#, fuzzy
 msgid "Cable Car"
 msgstr "Standseilbahn"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:154
-#, fuzzy
 msgid "Funicular"
 msgstr "Seilbahn"
 
@@ -988,19 +950,16 @@ msgstr "OK"
 
 #. Minimize widget in context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/Widget.js:107
-#, fuzzy
 msgid "Minimize"
 msgstr "Minimieren"
 
 #. Bring widget to front in context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/Widget.js:110
-#, fuzzy
 msgid "Bring to front"
 msgstr "in den Vordergrund"
 
 #. Send widget to back in context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/Widget.js:113
-#, fuzzy
 msgid "Send to back"
 msgstr "in den Hintergrund"
 
@@ -1083,39 +1042,33 @@ msgstr ""
 #. Optimization for bicycle shown in bike triangle. Optimized
 #. for speed
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/BikeTrianglePanel.js:49
-#, fuzzy
 msgid "Quick"
 msgstr "Schnellste"
 
 #. Optimization for bicycle shown in bike triangle. Optimized
 #. for flat terrain
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/BikeTrianglePanel.js:52
-#, fuzzy
 msgid "Flat"
 msgstr "Flach"
 
 #. Optimization for bicycle shown in bike triangle. Optimized
 #. for bike friendly infrastructure. Cycle roads etc...
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/BikeTrianglePanel.js:55
-#, fuzzy
 msgid "Bike Friendly"
 msgstr "Fahrradgeeignet"
 
 #. First letter of Bike Friendly
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/BikeTrianglePanel.js:90
-#, fuzzy
 msgid "B"
 msgstr "F"
 
 #. First letter of Flat
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/BikeTrianglePanel.js:95
-#, fuzzy
 msgid "F"
 msgstr "Fl"
 
 #. First letter of Quick
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/BikeTrianglePanel.js:100
-#, fuzzy
 msgid "Q"
 msgstr "S"
 
@@ -1135,13 +1088,11 @@ msgstr "Speichern"
 #. Close preffered/banned public transport routes
 #. widget
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/RoutesSelectorWidget.js:52
-#, fuzzy
 msgid "Close"
 msgstr "Schließen"
 
 #. Widget title
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:32
-#, fuzzy
 msgid "Travel Options"
 msgstr "Routeneinstellungen"
 
@@ -1167,7 +1118,6 @@ msgstr "Ankunft"
 
 #. on button that sets time and date of arrival/departure to now
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:317
-#, fuzzy
 msgid "Now"
 msgstr "Jetzt"
 
@@ -1233,7 +1183,6 @@ msgstr "Gewichtung"
 #. Widget title
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:766
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:772
-#, fuzzy
 msgid "Banned routes"
 msgstr "ausgeschlossene Routen"
 
@@ -1254,7 +1203,6 @@ msgstr ""
 
 #. button to send query for trip planning
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:1046
-#, fuzzy
 msgid "Plan Your Trip"
 msgstr "Route berechnen"
 

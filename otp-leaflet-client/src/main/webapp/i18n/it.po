@@ -81,8 +81,9 @@ msgstr ""
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:36
+#, fuzzy
 msgid "Recenter Map Here"
-msgstr ""
+msgstr "Centra la mappa qui"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:39

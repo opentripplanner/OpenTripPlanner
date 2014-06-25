@@ -22,43 +22,43 @@ msgstr ""
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
 msgid "Transit"
-msgstr ""
+msgstr "Transport p\xFAblic"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:263
 msgid "Bus Only"
-msgstr ""
+msgstr "Només bus"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:266
 msgid "Rail Only"
-msgstr ""
+msgstr "Només tren"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:269
 msgid "Bicycle Only"
-msgstr ""
+msgstr "Bicicleta"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
 msgid "Bicycle &amp; Transit"
-msgstr ""
+msgstr "Transport p\xFAblic i bicicleta"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:275
 msgid "Walk Only"
-msgstr ""
+msgstr "Només a peu"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:278
 msgid "Drive Only"
-msgstr ""
+msgstr "Cotxe"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
@@ -75,7 +75,7 @@ msgstr ""
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:36
 msgid "Recenter Map Here"
-msgstr ""
+msgstr "Centrar mapa aqu\xED"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:39
@@ -271,9 +271,8 @@ msgstr ""
 #. Used when passengers can stay on vehicle. Continues
 #. as [agency] route name
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:346
-#, fuzzy
 msgid "CONTINUES AS"
-msgstr "Continues as"
+msgstr ""
 
 #. Something in Public transport is x minutes late
 #: otp-leaflet-client/src/main/webapp/js/otp/modules/planner/ItinerariesWidget.js:354
@@ -769,19 +768,21 @@ msgstr ""
 
 #. Walk distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:142
+#, fuzzy
 msgid "Walk"
-msgstr ""
+msgstr "A peu"
 
 #. Cycle distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:144
+#, fuzzy
 msgid "Cycle"
-msgstr ""
+msgstr "Bicicleta"
 
 #. Car distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:146
 #, fuzzy
 msgid "Car"
-msgstr "COTXE"
+msgstr "Cotxe"
 
 #. Bus: (route number) Start station to end station (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:148
@@ -795,8 +796,9 @@ msgid "Subway"
 msgstr "METRO"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:150
+#, fuzzy
 msgid "Train"
-msgstr ""
+msgstr "Tren"
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:151
 #, fuzzy
@@ -1166,7 +1168,7 @@ msgstr ""
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:654
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:763
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #. Words in brackets when no Preffered public transport route is set
 #: otp-leaflet-client/src/main/webapp/js/otp/widgets/tripoptions/TripOptionsWidget.js:656

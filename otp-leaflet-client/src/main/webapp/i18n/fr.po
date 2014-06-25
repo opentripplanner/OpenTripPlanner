@@ -21,49 +21,42 @@ msgstr ""
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
-#, fuzzy
 msgid "Transit"
 msgstr "Transports en commun"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:263
-#, fuzzy
 msgid "Bus Only"
 msgstr "Bus uniquement"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:266
-#, fuzzy
 msgid "Rail Only"
 msgstr "Tram / Train uniquement"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:269
-#, fuzzy
 msgid "Bicycle Only"
 msgstr "Vélo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
-#, fuzzy
 msgid "Bicycle &amp; Transit"
 msgstr "Transports en commun + Vélo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:275
-#, fuzzy
 msgid "Walk Only"
 msgstr "Marche"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:278
-#, fuzzy
 msgid "Drive Only"
 msgstr "Voiture"
 
@@ -82,7 +75,7 @@ msgstr ""
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:36
 msgid "Recenter Map Here"
-msgstr ""
+msgstr "Centrer la carte ici"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:39
@@ -794,13 +787,15 @@ msgstr ""
 
 #. Walk distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:142
+#, fuzzy
 msgid "Walk"
-msgstr ""
+msgstr "Marche à pied"
 
 #. Cycle distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:144
+#, fuzzy
 msgid "Cycle"
-msgstr ""
+msgstr "Vélo"
 
 #. Car distance to place (itinerary header)
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:146
@@ -824,9 +819,8 @@ msgid "Train"
 msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:151
-#, fuzzy
 msgid "Ferry"
-msgstr "Ferry"
+msgstr ""
 
 #: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:152
 msgid "Light Rail"
