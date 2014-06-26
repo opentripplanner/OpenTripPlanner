@@ -17,7 +17,7 @@ public abstract class PointSetCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(PointSetCache.class);
     
-    LoadingCache<String, PointSet> pointSets;
+    protected LoadingCache<String, PointSet> pointSets;
     
     protected GraphService graphService;
     

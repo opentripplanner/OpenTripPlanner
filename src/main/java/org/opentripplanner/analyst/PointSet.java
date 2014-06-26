@@ -403,6 +403,11 @@ public class PointSet {
      * @param geom must be a Point, a Polygon, or a single-element MultiPolygon
      */
     
+    public int featureCount() {
+    	return ids.length;
+    }
+    
+    
     public void addFeature(String id, Geometry geom, List<AttributeData> attributes, int index) {
     	if (index >= capacity) {
             throw new AssertionError("Number of features seems to have grown since validation.");
@@ -446,6 +451,50 @@ public class PointSet {
     		attr.magnitudes[index] = ad.value;
     		 
     	}
+    }
+    
+    public void setLabel(String catId, String label) {
+    	setLabel(catId, null, label);
+    }
+    
+    public void setLabel(String catId, String attrId, String label) {
+    	Category category = categories.get(catId);
+    	
+    	if(category == null)
+    		return;
+    	
+    	if(attrId != null) {
+    		Attribute attribute = category.attributes.get(attrId);
+    		
+    		if(attribute == null)
+        		return;
+    		
+    		attribute.label = label;
+    	}
+    	else
+    		category.label = label;
+    }
+    
+    public void setStyle(String catId, String styleAttribute, String styleValue) {
+    	setStyle(catId, null, styleAttribute, styleValue);
+    }
+    
+    public void setStyle(String catId, String attrId, String styleAttribute, String styleValue) {
+    	Category category = categories.get(catId);
+    	
+    	if(category == null)
+    		return;
+    	
+    	if(attrId != null) {
+    		Attribute attribute = category.attributes.get(attrId);
+    		
+    		if(attribute == null)
+        		return;
+    		
+    		attribute.addStyle(styleAttribute, styleValue);
+    	}
+    	else
+    		category.addStyle(styleAttribute, styleValue);
     }
     
     /**
