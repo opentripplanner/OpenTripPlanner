@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-27 12:10+0200\n"
+"POT-Creation-Date: 2014-06-27 12:30+0200\n"
 "PO-Revision-Date: 2014-06-16 10:54+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
@@ -695,136 +695,136 @@ msgstr "Pot peš"
 
 #. Start on [street name] heading [Absolute direction] used in travel plan
 #. generation
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:88
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:80
 msgid "north"
 msgstr "sever"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:89
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:81
 msgid "northeast"
 msgstr "severovzhod"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:90
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:82
 msgid "east"
 msgstr "vzhod"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:91
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:83
 msgid "southeast"
 msgstr "jugovzhod"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:92
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:84
 msgid "south"
 msgstr "jug"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:93
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:85
 msgid "southwest"
 msgstr "jugozahod"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:94
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:86
 msgid "west"
 msgstr "zahod"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:95
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:87
 msgid "northwest"
 msgstr "severozahod"
 
 #. depart at street name/corner of x y etc. (First instruction in
 #. itinerary)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:116
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:108
 msgctxt "itinerary"
 msgid "depart"
 msgstr "začni pot"
 
 #. [Relative direction (Hard/Slightly Left/Right...)] to continue
 #. on /on to [streetname]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:119
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:111
 msgid "hard left"
 msgstr "ostro levo"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:120
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:112
 msgid "left"
 msgstr "levo"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:121
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:113
 msgid "slight left"
 msgstr "rahlo levo"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:122
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:114
 msgid "continue"
 msgstr "nadaljujte"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:123
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:115
 msgid "slight right"
 msgstr "rahlo desno"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:124
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:116
 msgid "right"
 msgstr "desno"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:125
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:117
 msgid "hard right"
 msgstr "ostro desno"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:128
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:120
 msgid "elevator"
 msgstr "pojdite z dvigalom"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:129
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:121
 msgid "U-turn left"
 msgstr "Polkrožno obrnite v levo"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:130
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:122
 msgid "U-turn right"
 msgstr "Polkrožno obrnite v desno"
 
 #. Walk distance to place (itinerary header)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:144
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:146
 msgid "Walk"
 msgstr "Pešačite"
 
 #. Cycle distance to place (itinerary header)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:146
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:148
 msgid "Cycle"
 msgstr "Kolesarite"
 
 #. Car distance to place (itinerary header)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:148
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:150
 msgid "Car"
 msgstr "Avto"
 
 #. Bus: (route number) Start station to end station (itinerary header)
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:150
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:152
 msgid "Bus"
 msgstr "Avtobus"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:151
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:153
 msgid "Subway"
 msgstr "Podzemna železnica"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:152
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:154
 msgid "Train"
 msgstr "Vlak"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:153
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:155
 msgid "Ferry"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:154
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:156
 msgid "Light Rail"
 msgstr "Tramvaj"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:155
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:157
 msgid "Cable Car"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:156
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:158
 msgid "Funicular"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:157
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:159
 msgid "Aerial Tram"
 msgstr "Gondola"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:175
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:177
 #, fuzzy, python-format
 msgid ""
 "Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b>"
@@ -833,7 +833,7 @@ msgstr ""
 "V krožišču vozite v <b>nasprotni smeri urinega kazalca</b> in pri "
 "<b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:177
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:179
 #, fuzzy, python-format
 msgid ""
 "Take roundabout counterclockwise to %(ordinal_exit_number)s exit on "
@@ -842,7 +842,7 @@ msgstr ""
 "V krožišču vozite v nasprotni smeri urinega kazalca in pri "
 "%(ordinal_exit_number)s izvozu zavijte na %(street_name)s"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:181
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:183
 #, fuzzy, python-format
 msgid ""
 "Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit "
@@ -851,7 +851,7 @@ msgstr ""
 "V krožišču vozite v <b>smeri urinega kazalca</b> in pri "
 "<b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:183
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:185
 #, fuzzy, python-format
 msgid ""
 "Take roundabout clockwise to %(ordinal_exit_number)s exit on "
@@ -861,21 +861,21 @@ msgstr ""
 "izvozu zavijte na %(street_name)s"
 
 #. Start on [stret name] heading [compas direction]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:191
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:193
 msgid "Start on"
 msgstr "Začnite na"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:191
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:193
 msgid " heading "
 msgstr " v smeri "
 
 #. [Relative direction (Left/Right...)] to continue
 #. on /on to [streetname]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:197
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:199
 msgid "to continue on"
 msgstr "nadaljujte na"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:197
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:199
 msgid "on to"
 msgstr "na"
 

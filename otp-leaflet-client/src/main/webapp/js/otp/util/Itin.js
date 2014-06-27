@@ -73,6 +73,19 @@ otp.util.Itin = {
         }
         return false;
     },
+
+    absoluteDirectionStrings : {
+        // note: keep these lower case (and uppercase via template / code if needed)
+        //TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation 
+        'NORTH': _tr('north'),
+        'NORTHEAST': _tr('northeast'),
+        'EAST': _tr('east'),
+        'SOUTHEAST': _tr('southeast'),
+        'SOUTH': _tr('south'),
+        'SOUTHWEST': _tr('southwest'),
+        'WEST': _tr('west'),
+        'NORTHWEST': _tr('northwest'),
+    },
     
     /** 
      * Returns localized absolute direction string
@@ -82,22 +95,31 @@ otp.util.Itin = {
      */
 
     getLocalizedAbsoluteDirectionString : function(dir) { 
-        var directionStrings= {
-            // note: keep these lower case (and uppercase via template / code if needed)
-            //TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation 
-            'NORTH': _tr('north'),
-            'NORTHEAST': _tr('northeast'),
-            'EAST': _tr('east'),
-            'SOUTHEAST': _tr('southeast'),
-            'SOUTH': _tr('south'),
-            'SOUTHWEST': _tr('southwest'),
-            'WEST': _tr('west'),
-            'NORTHWEST': _tr('northwest'),
-        };
-        if (dir in directionStrings) return directionStrings[dir];
+        if (dir in this.absoluteDirectionStrings) return this.absoluteDirectionStrings[dir];
         // This is used if dir isn't found in directionStrings
         // This shouldn't happen
         return dir.toLowerCase();
+    },
+
+    relativeDirectionStrings : {
+        // note: keep these lower case (and uppercase via template / code if needed)
+        //TRANSLATORS: depart at street name/corner of x y etc. (First instruction in
+        //itinerary)
+        'DEPART': pgettext("itinerary", "depart"),
+        //TRANSLATORS: [Relative direction (Hard/Slightly Left/Right...)] to continue
+        //on /on to [streetname]
+        'HARD_LEFT': _tr("hard left"),
+        'LEFT': _tr("left"),
+        'SLIGHTLY_LEFT': _tr("slight left"), 
+        'CONTINUE': _tr("continue"),
+        'SLIGHTLY_RIGHT': _tr("slight right"),
+        'RIGHT': _tr("right"),
+        'HARD_RIGHT': _tr("hard right"),
+        // rather than just being a direction, this should be
+        // full-fledged to take just the exit name at the end
+        'ELEVATOR': _tr("elevator"),
+        'UTURN_LEFT': _tr("U-turn left"),
+        'UTURN_RIGHT': _tr("U-turn right")
     },
 
 
@@ -109,27 +131,7 @@ otp.util.Itin = {
      */
 
     getLocalizedRelativeDirectionString : function(dir) { 
-        var directionStrings= {
-            // note: keep these lower case (and uppercase via template / code if needed)
-            //TRANSLATORS: depart at street name/corner of x y etc. (First instruction in
-            //itinerary)
-            'DEPART': pgettext("itinerary", "depart"),
-            //TRANSLATORS: [Relative direction (Hard/Slightly Left/Right...)] to continue
-            //on /on to [streetname]
-            'HARD_LEFT': _tr("hard left"),
-            'LEFT': _tr("left"),
-            'SLIGHTLY_LEFT': _tr("slight left"), 
-            'CONTINUE': _tr("continue"),
-            'SLIGHTLY_RIGHT': _tr("slight right"),
-            'RIGHT': _tr("right"),
-            'HARD_RIGHT': _tr("hard right"),
-            // rather than just being a direction, this should be
-            // full-fledged to take just the exit name at the end
-            'ELEVATOR': _tr("elevator"),
-            'UTURN_LEFT': _tr("U-turn left"),
-            'UTURN_RIGHT': _tr("U-turn right")
-        };
-        if (dir in directionStrings) return directionStrings[dir];
+        if (dir in this.relativeDirectionStrings) return this.relativeDirectionStrings[dir];
         // This is used if dir isn't found in directionStrings
         // This shouldn't happen
         return dir.toLowerCase().replace('_',' ').replace('ly','');
