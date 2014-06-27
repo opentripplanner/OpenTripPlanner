@@ -99,7 +99,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             LOG.debug("reusing existing heuristic");
             return;
         }
-        LOG.info("begin init heuristic        {}", System.currentTimeMillis());
+        long start = System.currentTimeMillis();
+        LOG.info("initialize()");
         this.target = target;
         // int nVertices = AbstractVertex.getMaxIndex(); // will be ever increasing?
         int nVertices = graph.countVertices();
@@ -114,7 +115,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // forward street search first, sets values around origin to 0
         List<State> search = streetSearch(options, false, abortTime); // ~30 msec
         if (search == null) return; // Search timed out
-        LOG.info("end foreward street search {}", System.currentTimeMillis());
+        LOG.info("end foreward street search {} ms", System.currentTimeMillis() - start);
         // create a new priority queue
         q = new BinHeap<Vertex>();
         // enqueue states for each stop within walking distance of the destination
@@ -123,7 +124,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         for (State stopState : search) { // backward street search
             q.insert(stopState.getVertex(), stopState.getWeight());
         }
-        LOG.info("end backward street search {}", System.currentTimeMillis());
+        LOG.info("end backward street search {} ms", System.currentTimeMillis() - start);
         // once street searches are done, raise the limits to max
         // because hard walk limiting is incorrect and is observed to cause problems 
         // for trips near the cutoff
