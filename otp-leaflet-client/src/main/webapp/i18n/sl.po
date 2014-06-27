@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-27 12:30+0200\n"
+"POT-Creation-Date: 2014-06-27 12:39+0200\n"
 "PO-Revision-Date: 2014-06-16 10:54+0200\n"
 "Last-Translator: Marko Burjek\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
@@ -800,31 +800,39 @@ msgstr "Avtobus"
 msgid "Subway"
 msgstr "Podzemna železnica"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:154
+#. Used for intercity or long-distance travel.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:155
 msgid "Train"
 msgstr "Vlak"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:155
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:156
 msgid "Ferry"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:156
+#. Tram, Streetcar, Light rail. Any light rail or street
+#. level system within a metropolitan area.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:159
 msgid "Light Rail"
 msgstr "Tramvaj"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:157
+#. Used for street-level cable cars where the cable runs
+#. beneath the car.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:162
 msgid "Cable Car"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:158
+#. Any rail system designed for steep inclines.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:164
 msgid "Funicular"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:159
+#. Gondola, Suspended cable car. Typically used for aerial
+#. cable cars where the car is suspended from the cable.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:167
 msgid "Aerial Tram"
 msgstr "Gondola"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:177
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:185
 #, fuzzy, python-format
 msgid ""
 "Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b>"
@@ -833,7 +841,7 @@ msgstr ""
 "V krožišču vozite v <b>nasprotni smeri urinega kazalca</b> in pri "
 "<b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:179
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:187
 #, fuzzy, python-format
 msgid ""
 "Take roundabout counterclockwise to %(ordinal_exit_number)s exit on "
@@ -842,7 +850,7 @@ msgstr ""
 "V krožišču vozite v nasprotni smeri urinega kazalca in pri "
 "%(ordinal_exit_number)s izvozu zavijte na %(street_name)s"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:183
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:191
 #, fuzzy, python-format
 msgid ""
 "Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit "
@@ -851,7 +859,7 @@ msgstr ""
 "V krožišču vozite v <b>smeri urinega kazalca</b> in pri "
 "<b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:185
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:193
 #, fuzzy, python-format
 msgid ""
 "Take roundabout clockwise to %(ordinal_exit_number)s exit on "
@@ -861,21 +869,21 @@ msgstr ""
 "izvozu zavijte na %(street_name)s"
 
 #. Start on [stret name] heading [compas direction]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:193
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:201
 msgid "Start on"
 msgstr "Začnite na"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:193
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:201
 msgid " heading "
 msgstr " v smeri "
 
 #. [Relative direction (Left/Right...)] to continue
 #. on /on to [streetname]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:199
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:207
 msgid "to continue on"
 msgstr "nadaljujte na"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:199
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:207
 msgid "on to"
 msgstr "na"
 

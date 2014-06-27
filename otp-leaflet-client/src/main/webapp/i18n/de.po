@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-06-27 12:30+0200\n"
+"POT-Creation-Date: 2014-06-27 12:39+0200\n"
 "PO-Revision-Date: 2014-06-24 10:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: de <LL@li.org>\n"
@@ -785,53 +785,61 @@ msgstr "Bus"
 msgid "Subway"
 msgstr "U-Bahn"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:154
+#. Used for intercity or long-distance travel.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:155
 #, fuzzy
 msgid "Train"
 msgstr "Bahn"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:155
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:156
 msgid "Ferry"
 msgstr "Fähre"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:156
+#. Tram, Streetcar, Light rail. Any light rail or street
+#. level system within a metropolitan area.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:159
 msgid "Light Rail"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:157
+#. Used for street-level cable cars where the cable runs
+#. beneath the car.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:162
 msgid "Cable Car"
 msgstr "Standseilbahn"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:158
+#. Any rail system designed for steep inclines.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:164
 msgid "Funicular"
 msgstr "Seilbahn"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:159
+#. Gondola, Suspended cable car. Typically used for aerial
+#. cable cars where the car is suspended from the cable.
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:167
 msgid "Aerial Tram"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:177
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:185
 #, python-format
 msgid ""
 "Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b>"
 " exit on <b>%(street_name)s</b>"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:179
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:187
 #, python-format
 msgid ""
 "Take roundabout counterclockwise to %(ordinal_exit_number)s exit on "
 "%(street_name)s"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:183
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:191
 #, python-format
 msgid ""
 "Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit "
 "on <b>%(street_name)s</b>"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:185
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:193
 #, python-format
 msgid ""
 "Take roundabout clockwise to %(ordinal_exit_number)s exit on "
@@ -839,22 +847,22 @@ msgid ""
 msgstr ""
 
 #. Start on [stret name] heading [compas direction]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:193
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:201
 msgid "Start on"
 msgstr ""
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:193
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:201
 msgid " heading "
 msgstr ""
 
 #. [Relative direction (Left/Right...)] to continue
 #. on /on to [streetname]
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:199
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:207
 #, fuzzy
 msgid "to continue on"
 msgstr "weiter auf"
 
-#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:199
+#: otp-leaflet-client/src/main/webapp/js/otp/util/Itin.js:207
 msgid "on to"
 msgstr ""
 

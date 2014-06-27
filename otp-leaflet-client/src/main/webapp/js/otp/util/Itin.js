@@ -151,11 +151,19 @@ otp.util.Itin = {
         //TRANSLATORS: Bus: (route number) Start station to end station (itinerary header)
         'BUS' : _tr('Bus'),
         'SUBWAY' : _tr('Subway'),
+        //TRANSLATORS: Used for intercity or long-distance travel.
         'RAIL' : _tr('Train'),
         'FERRY' : _tr('Ferry'),
+        //TRANSLATORS: Tram, Streetcar, Light rail. Any light rail or street
+        //level system within a metropolitan area.
         'TRAM' : _tr('Light Rail'),
+        //TRANSLATORS: Used for street-level cable cars where the cable runs
+        //beneath the car.
         'CABLE_CAR': _tr('Cable Car'),
+        //TRANSLATORS: Any rail system designed for steep inclines.
         'FUNICULAR': _tr('Funicular'),
+        //TRANSLATORS: Gondola, Suspended cable car. Typically used for aerial
+        //cable cars where the car is suspended from the cable.
         'GONDOLA' : _tr('Aerial Tram'),
     },
     
