@@ -33,6 +33,7 @@ import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StationEdge;
 import org.opentripplanner.routing.edgetype.StationStopEdge;
@@ -211,6 +212,7 @@ public class LongDistancePathService implements PathService {
             if (e instanceof TransferEdge)      return TRANSFER;
             if (e instanceof TimedTransferEdge) return TRANSFER;
             if (e instanceof StreetTransitLink) return LINK;
+            if (e instanceof PathwayEdge)       return LINK;
             // Is it really correct to clasify all other edges as STREET?
             return STREET;
         }
