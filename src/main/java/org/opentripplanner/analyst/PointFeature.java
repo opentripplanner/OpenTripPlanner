@@ -43,15 +43,14 @@ public class PointFeature {
 				// TODO percolate this warning up somehow
 			}
 			this.geom = geom.getGeometryN(0);
-		}
-		
-		if (geom instanceof Point) {
-			this.point = (Point) geom;
-		} else if (geom instanceof Polygon) {
-			this.point = geom.getCentroid();
+		} else if( geom instanceof Point || geom instanceof Polygon){
+			this.geom = geom;
 		} else {
 			throw new UnsupportedGeometryException( "Non-point, non-polygon Geometry, not supported." );
 		}
+		
+		// cache a representative point
+		this.point = geom.getCentroid();
 	}
 	
 	public Polygon getPolygon(){
