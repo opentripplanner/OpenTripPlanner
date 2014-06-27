@@ -22,7 +22,7 @@ msgstr ""
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:260
 msgid "Transit"
-msgstr "Transport p\xFAblic"
+msgstr "Transport públic"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
@@ -46,7 +46,7 @@ msgstr "Bicicleta"
 #. Options widgets)
 #: otp-leaflet-client/src/main/webapp/js/otp/config.js:272
 msgid "Bicycle &amp; Transit"
-msgstr "Transport p\xFAblic i bicicleta"
+msgstr "Transport públic i bicicleta"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
@@ -75,7 +75,7 @@ msgstr ""
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:36
 msgid "Recenter Map Here"
-msgstr "Centrar mapa aqu\xED"
+msgstr "Centrar mapa aquí"
 
 #. Context menu
 #: otp-leaflet-client/src/main/webapp/js/otp/core/MapContextMenu.js:39
