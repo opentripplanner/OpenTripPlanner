@@ -48,7 +48,11 @@ otp.util.Time = {
 
     correctAmPmTimeString : function(time, format) {
         // step 0: leave if we don't have what we need...
-        if(otp.config.timeFormat && otp.config.timeFormat.slice(-1) !== 'a') return time;
+        if(otp.config.locale.time.time_format && otp.config.locale.time.time_format.slice(-1) !== 'a') {
+            //It should always return 12 hour am/pm time because that is what
+            //server expects
+            return moment(time, otp.config.locale.time.time_format).format("h:mma");
+        }
         if(time == null || time.length < 1) return time;
 
 

@@ -317,7 +317,10 @@ otp.modules.planner.IconFactory = otp.Class({
         html += '<img src="'+otp.config.resourcePath+'images/mode/'+mode+'.png">';
         if(isOrigin) html += '<img src="'+otp.config.resourcePath+'images/mode/arrow.png" style="margin-left:2px;">';
         html += '</div>';
-        html +=  otp.util.Time.formatItinTime(time, "h:mm");
+        //Removes AM/PM at the end of time if it exists (Time is too long
+        //otherwise)
+        var time_format = (otp.config.locale.time.time_format.slice(-1) === 'a') ? otp.config.locale.time.time_format.slice(0, -1) : otp.config.locale.time.time_format;
+        html +=  otp.util.Time.formatItinTime(time, time_format);
         
         if(quadrant === 'nw') anchor = [32,44];
         if(quadrant === 'ne') anchor = [0,44];
