@@ -111,6 +111,8 @@ otp.util.Itin = {
     getLocalizedRelativeDirectionString : function(dir) { 
         var directionStrings= {
             // note: keep these lower case (and uppercase via template / code if needed)
+            //TRANSLATORS: depart at street name/corner of x y etc. (First instruction in
+            //itinerary)
             'DEPART': pgettext("itinerary", "depart"),
             //TRANSLATORS: [Relative direction (Hard/Slightly Left/Right...)] to continue
             //on /on to [streetname]

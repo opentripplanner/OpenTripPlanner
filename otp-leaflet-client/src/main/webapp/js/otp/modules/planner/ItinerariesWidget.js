@@ -534,7 +534,7 @@ otp.widgets.ItinerariesWidget =
                 $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
             }
             
-            //TRANSLATORS: Depart on to street / Board at station in itinerary
+            //TRANSLATORS: Depart station / Board at station in itinerary
             var startHtml = '<div class="otp-itin-leg-endpointDesc">' + (leg.interlineWithPreviousLeg ? "<b>" + pgettext("itinerary", "Depart") + "</b> " : _tr("<b>Board</b> at ")) +leg.from.name;
             if(otp.config.municoderHostname) {
                 var spanId = this.newMunicoderRequest(leg.from.lat, leg.from.lon);
