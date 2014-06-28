@@ -24,10 +24,16 @@ public class PointFeature {
 	private double lat;
 	private double lon;
 	
-	PointFeature(String id){
+	public PointFeature(String id){
 		this.id = id;
 		this.geom = null;
 		this.attributes = new ArrayList<AttributeData>();
+	}
+	
+	public PointFeature(String id, Geometry g,  ArrayList<AttributeData> ad) throws EmptyPolygonException, UnsupportedGeometryException{
+		this.id = id;
+		this.setGeom(g);
+		this.attributes = ad;
 	}
 	
 	public void addAttribute( AttributeData data ){
