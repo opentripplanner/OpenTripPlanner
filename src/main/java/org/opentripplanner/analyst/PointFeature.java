@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,13 +17,20 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class PointFeature {
+public class PointFeature implements Serializable {
 
+	private static final long serialVersionUID = -613136927314702334L;
+	
 	private String id;
 	private Geometry geom;
 	private List<AttributeData> attributes;
 	private double lat;
 	private double lon;
+	
+	public PointFeature(){
+		// blank constructor for deserialization
+		this(null);
+	}
 	
 	public PointFeature(String id){
 		this.id = id;

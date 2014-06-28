@@ -31,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -47,7 +48,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * PointSets are one of the three main web analyst resources: Pointsets
  * Indicators TimeSurfaces
  */
-public class PointSet {
+public class PointSet implements Serializable{
+
+	private static final long serialVersionUID = -8962916330731463238L;
 
 	private static final Logger LOG = LoggerFactory.getLogger(PointSet.class);
 
@@ -93,6 +96,10 @@ public class PointSet {
 		String label;
 		String description;
 		Style style;
+		
+		public Structured(){
+			this.id=null;
+		}
 
 		public Structured(String id) {
 			this.id = id;
@@ -117,8 +124,16 @@ public class PointSet {
 		Map<String, String> attributes = new ConcurrentHashMap<String, String>();
 	}
 
-	public static class Category extends Structured {
+	public static class Category extends Structured implements Serializable {
+
+		private static final long serialVersionUID = -1976567868590201059L;
+		
 		Map<String, Attribute> attributes = new ConcurrentHashMap<String, Attribute>();
+		
+		public Category(){
+			// blank constructor for deserialization
+			super();
+		}
 
 		public Category(String id) {
 			super(id);
@@ -150,11 +165,18 @@ public class PointSet {
 	 * The leaves of the OTPA structured properties, with one magnitude or
 	 * cumulative curve per feature.
 	 */
-	public static class Attribute extends Structured {
+	public static class Attribute extends Structured implements Serializable{
 
+		private static final long serialVersionUID = -6525345212775303158L;
+		
 		int[] magnitudes;
 		Quantiles[] quantiles; // An array, one per origin. Length is 1 until we
 								// support many-to-many.
+		
+		public Attribute(){
+			//blank constructor for deserialization
+			super();
+		}
 
 		/** Shallow copy constructor. */
 		public Attribute(String id) {
@@ -198,10 +220,16 @@ public class PointSet {
 	 * loading step. TODO Should potentially be used in CSV loading for
 	 * uniformity of methods
 	 */
-	public static class AttributeData {
+	public static class AttributeData implements Serializable {
+		private static final long serialVersionUID = 8485179983326803500L;
+		
 		public String category;
 		public String attribute;
 		public int value;
+		
+		public AttributeData() {
+			this(null,null,0);
+		}
 
 		public AttributeData(String category, String attribute, int value) {
 			this.category = category;
