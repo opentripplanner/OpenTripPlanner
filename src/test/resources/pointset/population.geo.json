@@ -22,8 +22,8 @@
     "features": [
         {
             "type": "Feature",
+            "id": "XYZ0001",
             "properties": {
-                "id": "XYZ0001",
                 "label": "Block One",
                 "structured": {
                     "age": {
@@ -45,8 +45,8 @@
         },
         {
             "type": "Feature",
+            "id": "XYZ0002",
             "properties": {
-                "id": "XYZ0002",
                 "label": "Block Two",
                 "structured": {
                     "age": {
