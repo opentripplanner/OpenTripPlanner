@@ -131,6 +131,19 @@ public class PointSet {
 				attributes.put(key, new Attribute(other.attributes.get(key)));
 			}
 		}
+
+		public Category slice(int start, int end) {
+			Category ret = new Category(this.id);
+			ret.description = this.description;
+			ret.label = this.label;
+			ret.style = this.style;
+			
+			for(Entry<String,Attribute> attr : this.attributes.entrySet()){
+				ret.attributes.put( attr.getKey(), attr.getValue().slice(start,end) );
+			}
+			
+			return ret;
+		}
 	}
 
 	/**
@@ -152,6 +165,24 @@ public class PointSet {
 			super(other);
 			this.magnitudes = other.magnitudes;
 			this.quantiles = other.quantiles;
+		}
+		
+		public Attribute slice(int start, int end) {
+			Attribute ret = new Attribute(this.id);
+			ret.description = this.description;
+			ret.label = this.label;
+			ret.style = this.style;
+			
+			this.magnitudes = new int[end-start];
+			this.quantiles = new Quantiles[end-start];
+			
+			int n=0;
+			for(int i=start; i<end; i++){
+				ret.magnitudes[n] = this.magnitudes[i];
+				ret.quantiles[n] = this.quantiles[i];
+			}
+			
+			return ret;
 		}
 	}
 
@@ -354,7 +385,7 @@ public class PointSet {
 			LOG.warn("Empty MultiPolygon, skipping.");
 			return;
 		} catch (UnsupportedGeometryException e) {
-			LOG.warn( e.message );
+			LOG.warn(e.message);
 			return;
 		}
 
@@ -431,9 +462,8 @@ public class PointSet {
 		}
 
 		polygons[index] = feat.getPolygon();
-		Point point = feat.getPoint();
-		lats[index] = point.getCoordinate().y;
-		lons[index] = point.getCoordinate().x;
+		lats[index] = feat.getLat();
+		lons[index] = feat.getLon();
 
 		ids[index] = feat.getId();
 
@@ -450,10 +480,39 @@ public class PointSet {
 
 		}
 	}
-	
-//	public PointFeature getFeature( int index ){
-//		
-//	}
+
+	public PointFeature getFeature(int index) {
+		PointFeature ret = new PointFeature(ids[index]);
+
+		if (polygons[index] != null) {
+			try {
+				ret.setGeom(polygons[index]);
+			} catch (Exception e) {
+				// The polygon is clean; this should never happen. We
+				// could pass the exception up but that'd just make the calling
+				// function deal with an exception that will never pop. So
+				// we'll make the compiler happy by catching it here silently.
+			}
+		}
+
+		// ret.setGeom, if it was called, will already set the lat and lon
+		// properties. But since every item in this pointset is guaranteed
+		// to have a lat/lon coordinate, we defer to it as more authoritative.
+		ret.setLat(lats[index]);
+		ret.setLon(lons[index]);
+
+		for (Entry<String, Category> category : this.categories.entrySet()) {
+			for (Entry<String, Attribute> attribute : category.getValue().attributes.entrySet()) {
+				String catLabel = category.getKey();
+				String attrLabel = attribute.getKey();
+				int mag = attribute.getValue().magnitudes[index];
+
+				ret.addAttribute(new AttributeData(catLabel, attrLabel, mag));
+			}
+		}
+
+		return ret;
+	}
 
 	public void setLabel(String catId, String label) {
 		setLabel(catId, null, label);
@@ -740,6 +799,29 @@ public class PointSet {
 			jgen.writeEndObject();
 		}
 		jgen.writeEndObject();
+	}
+
+	public PointSet slice(int start, int end) {
+		PointSet ret = new PointSet(end - start);
+
+		ret.id = id;
+		ret.label = label;
+		ret.description = description;
+
+		int n = 0;
+		for (int i = start; i < end; i++) {
+			ret.lats[n] = this.lats[i];
+			ret.lons[n] = this.lons[i];
+			ret.ids[n] = this.ids[i];
+			ret.polygons[n] = this.polygons[i];
+			n++;
+		}
+
+		for(Entry<String,Category> category : this.categories.entrySet()) {
+			ret.categories.put( category.getKey(), category.getValue().slice(start,end) );
+		}
+
+		return ret;
 	}
 
 }
