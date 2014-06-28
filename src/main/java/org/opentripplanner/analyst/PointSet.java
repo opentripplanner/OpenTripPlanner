@@ -173,13 +173,19 @@ public class PointSet {
 			ret.label = this.label;
 			ret.style = this.style;
 			
-			this.magnitudes = new int[end-start];
-			this.quantiles = new Quantiles[end-start];
+			ret.magnitudes = new int[end-start];
+			
+			if(this.quantiles!=null){
+				ret.quantiles = new Quantiles[end-start];
+			}
 			
 			int n=0;
 			for(int i=start; i<end; i++){
 				ret.magnitudes[n] = this.magnitudes[i];
-				ret.quantiles[n] = this.quantiles[i];
+				
+				if(this.quantiles!=null){
+					ret.quantiles[n] = this.quantiles[i];
+				}
 			}
 			
 			return ret;
@@ -193,14 +199,18 @@ public class PointSet {
 	 * uniformity of methods
 	 */
 	public static class AttributeData {
-		String category;
-		String attribute;
-		int value;
+		public String category;
+		public String attribute;
+		public int value;
 
 		public AttributeData(String category, String attribute, int value) {
 			this.category = category;
 			this.attribute = attribute;
 			this.value = value;
+		}
+		
+		public String toString(){
+			return category+"."+attribute+":"+value;
 		}
 	}
 
