@@ -21,7 +21,8 @@ public class PointFeature {
 	private String id;
 	private Geometry geom;
 	private List<AttributeData> attributes;
-	private Point point;
+	private double lat;
+	private double lon;
 	
 	public PointFeature(String id){
 		this.id = id;
@@ -56,7 +57,9 @@ public class PointFeature {
 		}
 		
 		// cache a representative point
-		this.point = geom.getCentroid();
+		Point point = geom.getCentroid();
+		this.lat = point.getY();
+		this.lon = point.getX();
 	}
 	
 	public Polygon getPolygon(){
@@ -135,12 +138,24 @@ public class PointFeature {
 		this.attributes = attributes;
 	}
 
-	private void setId(String id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public Point getPoint() {
-		return this.point;
+	public double getLat() {
+		return this.lat;
+	}
+	
+	public double getLon() {
+		return this.lon;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public void setLon(double lon) {
+		this.lon = lon;
 	}
 
 }
