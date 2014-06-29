@@ -25,6 +25,12 @@
 <script src="js/lib/jquery-ui/addons/jquery-ui-timepicker.js"></script>
 <link rel="stylesheet" href="js/lib/jquery-ui/addons/jquery-ui-timepicker.css" />
 
+<script src="./js/lib/jquery-ui/i18n/jquery.ui.datepicker-sl.js"></script>
+<script src="./js/lib/jquery-ui/i18n/jquery.ui.datepicker-de.js"></script>
+<script src="./js/lib/jquery-ui/i18n/jquery.ui.datepicker-fr.js"></script>
+<script src="./js/lib/jquery-ui/i18n/jquery.ui.datepicker-it.js"></script>
+<script src="./js/lib/jquery-ui/i18n/jquery.ui.datepicker-ca.js"></script>
+
 <!-- backbone -->
 <script src="js/lib/underscore.js"></script>
 <script src="js/lib/backbone.js"></script>
@@ -58,9 +64,13 @@
 <script src="js/otp/otp.js?v=1"></script>
 
 <!-- otp-locales -->
+<script language="javascript" src="js/lib/i18next-1.7.3.min.js"></script>
 <script src="js/otp/locale/English.js?v=1"></script>
 <script src="js/otp/locale/French.js?v=1"></script>
 <script src="js/otp/locale/German.js?v=1"></script>
+<script src="js/otp/locale/Slovenian.js?v=1"></script>
+<script src="js/otp/locale/Italian.js?v=1"></script>
+<script src="js/otp/locale/Catalan.js?v=1"></script>
 
 <script src="js/otp/config.js?v=1"></script>
 
@@ -172,6 +182,8 @@
 
 
 $(document).ready(function() {
+	//Sets datepicker language based on selected/detected language in config.js
+	$.datepicker.setDefaults($.datepicker.regional[otp.config.locale.config.datepicker_locale_short]);
     var templateUrls = [ //new Array(
         'js/otp/layers/layers-templates.html',
         'js/otp/widgets/widget-templates.html',

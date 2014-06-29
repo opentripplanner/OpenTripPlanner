@@ -9,16 +9,16 @@
         <div style="font-style: italic; font-size: 11px;">{{stopDesc}}</div>
         <div style="font-size: 10px;">
             [
-            <a href="#" class="stopViewerLink">Stop Viewer</a>
+			<a href="#" class="stopViewerLink">{{stop_viewer}}</a>
             {{#stopUrl}}
                 | <a href="{{stopUrl}}" target="_blank">{{agencyStopLinkText}}</a>
             {{/stopUrl}}
             ]
         </div>
-        <div style="margin-top: 6px;"><b>Plan Trip</b>: [ <a href="#" class="planFromLink">From Stop</a> | <a href="#" class="planToLink">To Stop</a> ]</div>
+		<div style="margin-top: 6px;"><b>{{plan_trip}}</b>: [ <a href="#" class="planFromLink">{{from_stop}}</a> | <a href="#" class="planToLink">{{to_stop}}</a> ]</div>
         
         <div style="margin-top: 6px;" >
-            <b>Routes Serving Stop</b>
+			<b>{{routes_on_stop}}</b>:
             <ul class="routeList"/>
         </div>
     </div>

@@ -94,8 +94,12 @@ otp.modules.planner.Itinerary = otp.Class({
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
         if(this.itinData.fare && this.itinData.fare.fare.regular) {
             var decimalPlaces = this.itinData.fare.fare.regular.currency.defaultFractionDigits;
-            return this.itinData.fare.fare.regular.currency.symbol +
-                (this.itinData.fare.fare.regular.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces);
+            var fare_info = {
+                'currency': this.itinData.fare.fare.regular.currency.symbol,
+                'price': (this.itinData.fare.fare.regular.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces),
+            }
+            //TRANSLATORS: Fare Currency Fare price
+            return _tr('%(currency)s %(price)s', fare_info);
         }
         return "N/A";
     },
@@ -228,7 +232,9 @@ otp.modules.planner.Itinerary = otp.Class({
         html += '<link rel="stylesheet" href="js/otp/modules/planner/planner-style.css" />';
         html += '<div class="otp-itin-printWindow">';
         
-        html += '<h3>Start: '+this.getStartLocationStr()+' at '+this.getStartTimeStr()+'</h3>';
+        //TRANSLATORS: Start: location at [time date] (Used in print itinerary
+        //when do you start your trip)
+        html += '<h3>' + _tr('Start: %(location)s at %(time_date)s', { 'location': this.getStartLocationStr(), 'time_date': this.getStartTimeStr()}) + '</h3>';
         
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
@@ -239,21 +245,24 @@ otp.modules.planner.Itinerary = otp.Class({
                 html += ': ';
                 if(leg.route !== leg.routeLongName) html += "("+leg.route+") ";
                 html += leg.routeLongName;
-                if(leg.headsign) html +=  " to " + leg.headsign;
+                if(leg.headsign) html +=  pgettext("bus_direction", " to ") + leg.headsign;
             }
             else { // walk / bike / car
-                html += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
+                //TRANSLATORS: [distance] to [name of destination]
+                html += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+leg.to.name;
             }
             html += '</h4>'
             
             // main content
             if(otp.util.Itin.isTransit(leg.mode)) { // transit
                 html += '<ul>';
-                html += '<li><b>Board</b>: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' + 
-                        leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format) + '</li>';
-                html += '<li><i>Time in transit: '+otp.util.Time.secsToHrMin(leg.duration)+'</i></li>';
-                html += '<li><b>Alight</b>: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' Stop ID #' + 
-                        leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '</li>';
+                //TRANSLATORS: Board Public transit route name (agency name
+                //Stop ID ) start time
+                html += '<li><b>' + _tr('Board') + '</b>: ' + leg.from.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.from.stopId.agencyId, 'stop_id': leg.from.stopId.id }) + ' ' + otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format) + '</li>';
+                html += '<li><i>' + _tr('Time in transit') +': '+otp.util.Time.secsToHrMin(leg.duration)+'</i></li>';
+                //TRANSLATORS: Alight Public transit route name (agency name
+                //Stop ID ) end time
+                html += '<li><b>' + _tr('Alight') + '</b>: ' + leg.to.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.to.stopId.agencyId, 'stop_id': leg.to.stopId.id }) + ' ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '</li>';
                 
                 html += '</ul>';
             }
@@ -281,20 +290,22 @@ otp.modules.planner.Itinerary = otp.Class({
 
         }
         
-        html += '<h3>End: '+this.getEndLocationStr()+' at '+this.getEndTimeStr()+'</h3>';
+        //TRANSLATORS: End: location at [time date] (Used in print itinerary
+        //when do you come at a destination)
+        html += '<h3>' + _tr('End: %(location)s at %(time_date)s', { 'location': this.getEndLocationStr(), 'time_date': this.getEndTimeStr()} )+'</h3>';
 
         // trip summary
         html += '<div class="otp-itinTripSummary" style="font-size: .9em">';
-        html += '<div class="otp-itinTripSummaryHeader">Trip Summary</div>';
-        html += '<div class="otp-itinTripSummaryLabel">Travel</div><div class="otp-itinTripSummaryText">'+this.getStartTimeStr()+'</div>';
-        html += '<div class="otp-itinTripSummaryLabel">Time</div><div class="otp-itinTripSummaryText">'+this.getDurationStr()+'</div>';
+        html += '<div class="otp-itinTripSummaryHeader">' + _tr('Trip Summary') +'</div>';
+        html += '<div class="otp-itinTripSummaryLabel">' + _tr('Travel') + '</div><div class="otp-itinTripSummaryText">'+this.getStartTimeStr()+'</div>';
+        html += '<div class="otp-itinTripSummaryLabel">' + _tr('Time') + '</div><div class="otp-itinTripSummaryText">'+this.getDurationStr()+'</div>';
         if(this.hasTransit) {
-            html += '<div class="otp-itinTripSummaryLabel">Transfers</div><div class="otp-itinTripSummaryText">'+this.itinData.transfers+'</div>';
+            html += '<div class="otp-itinTripSummaryLabel">' + _tr('Transfers') + '</div><div class="otp-itinTripSummaryText">'+this.itinData.transfers+'</div>';
             if(this.itinData.walkDistance > 0) {
-                html += '<div class="otp-itinTripSummaryLabel">Total Walk</div><div class="otp-itinTripSummaryText">' + 
+                html += '<div class="otp-itinTripSummaryLabel">' + _tr('Total Walk') + '</div><div class="otp-itinTripSummaryText">' + 
                     otp.util.Itin.distanceString(this.itinData.walkDistance) + '</div>';
             }
-            html += '<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+this.getFareStr()+'</div>';
+            html += '<div class="otp-itinTripSummaryLabel">' + _tr('Fare') + '</div><div class="otp-itinTripSummaryText">'+this.getFareStr()+'</div>';
         }
         html += '</div>';
 
@@ -305,7 +316,10 @@ otp.modules.planner.Itinerary = otp.Class({
     
     getTextNarrative : function(itinLink) {
         var text = ''
-        text += 'Start: '+this.getStartLocationStr()+' at '+this.getStartTimeStr()+'\n\n';
+
+        //TRANSLATORS: Start: location at [time date] (Used in print itinerary
+        //when do you start your trip)
+        text += _tr('Start: %(location)s at %(time_date)s', { 'location': this.getStartLocationStr(), 'time_date': this.getStartTimeStr()}) + '\n\n';
         
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
@@ -316,20 +330,22 @@ otp.modules.planner.Itinerary = otp.Class({
                 text += ': ';
                 if(leg.route !== leg.routeLongName) text += "("+leg.route+") ";
                 text += leg.routeLongName;
-                if(leg.headsign) text +=  " to " + leg.headsign;
+                if(leg.headsign) text +=  pgettext("bus_direction", " to ") + leg.headsign;
             }
             else { // walk / bike / car
-                text += ' '+ otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
+                text += ' '+ otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ") +leg.to.name;
             }
             text += '\n';
             
             // content
             if(otp.util.Itin.isTransit(leg.mode)) {
-                text += ' - Board: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' + 
-                        leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format) + '\n';
-                text += ' - Time in transit: '+otp.util.Time.secsToHrMin(leg.duration) + '\n';
-                text += ' - Alight: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' Stop ID #' + 
-                        leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '\n';
+                //TRANSLATORS: Board Public transit route name (agency name
+                //Stop ID ) start time
+                text += ' - ' + _tr('Board') + ': ' + leg.from.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.from.stopId.agencyId, 'stop_id': leg.from.stopId.id }) + ' ' + otp.util.Time.formatItinTime(leg.startTime, otp.config.locale.time.time_format) + '\n';
+                text += ' - ' + _tr('Time in transit') + ': '+otp.util.Time.secsToHrMin(leg.duration) + '\n';
+                //TRANSLATORS: Alight Public transit route name (agency name
+                //Stop ID ) end time
+                text += ' - ' + _tr('Alight') + ': ' + leg.to.name + ' ' + _tr("(%(agency_id)s Stop ID #%(stop_id)s),", {'agency_id': leg.to.stopId.agencyId, 'stop_id': leg.to.stopId.id }) + ' ' + otp.util.Time.formatItinTime(leg.endTime, otp.config.locale.time.time_format) + '\n';
             }
             else if (leg.steps) { // walk / bike / car
             
@@ -345,10 +361,13 @@ otp.modules.planner.Itinerary = otp.Class({
             
         }
         
-        text += 'End: '+this.getEndLocationStr()+' at '+this.getEndTimeStr()+'\n';
+        //TRANSLATORS: End: location at [time date] (Used in print itinerary
+        //when do you come at a destination)
+        text += _tr('End: %(location)s at %(time_date)s', { 'location': this.getEndLocationStr(), 'time_date': this.getEndTimeStr()} )+'\n';
         
         if(itinLink) {
-            text += '\nView itinerary online:\n' + itinLink + '\n';
+            //TRANSLATORS: text at end of email %s is link to this itinerary
+            text += _tr('\nView itinerary online:\n%(itinerary_link)s\n', {'itinerary_link': itinLink});
         }
         return text;
     }
