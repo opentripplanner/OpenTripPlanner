@@ -1,10 +1,10 @@
 PYBABEL=.venv/bin/pybabel
 I18NEXT=./node_modules/.bin/i18next-conv
-LOCALE_FOLDER=./otp-leaflet-client/src/main/webapp/i18n
+LOCALE_FOLDER=./src/client/i18n
 BABEL_CFG=$(LOCALE_FOLDER)/babel.cfg
 TEMPLATE_FILE=$(LOCALE_FOLDER)/messages.pot
 LANGS=sl en fr de it ca_ES
-JS_FILESPATH=./otp-leaflet-client/src/main/webapp/js/otp
+JS_FILESPATH=./src/client/js/otp
 JS_FILES = $(shell find $(JS_FILESPATH)/ -name '*.js')
 LOCALE_FILES = $(shell find $(LOCALE_FOLDER)/ -name '*.po')
 LAN=sl_SI

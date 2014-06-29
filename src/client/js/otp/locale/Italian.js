@@ -27,15 +27,15 @@ otp.locale.Italian = {
         //FALSE-imperial units are used
         //TRUE-Metric units are used
         metric : true, 
-        //Name of localization file (*.po file) in otp-leaflet-client/src/main/webapp/i18n
+        //Name of localization file (*.po file) in src/client/i18n
         locale_short : "it",
         //Name of datepicker localization in
-        //otp-leaflet-client/src/main/webapp/js/lib/jquery-ui/i18n (usually
+        //src/client/js/lib/jquery-ui/i18n (usually
         //same as locale_short)
         //this is index in $.datepicker.regional array
         //If file for your language doesn't exist download it from here
         //https://github.com/jquery/jquery-ui/tree/1-9-stable/ui/i18n
-        //into otp-leaflet-client/src/main/webapp/js/lib/jquery-ui/i18n
+        //into src/client/js/lib/jquery-ui/i18n
         //and add it in index.html after other localizations
         //It will be used automatically when UI is switched to this locale
         datepicker_locale_short: "it" 
