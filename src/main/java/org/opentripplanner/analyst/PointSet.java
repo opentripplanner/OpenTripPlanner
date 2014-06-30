@@ -69,6 +69,10 @@ public class PointSet implements Serializable{
 	 */
 	private Map<String, SampleSet> samples = new ConcurrentHashMap<String, SampleSet>();
 
+	
+	/*
+	 * Used to generate SampleSets on an as needed basis. 
+	 */
 	protected GraphService graphService;
 
 	/*
@@ -462,22 +466,37 @@ public class PointSet implements Serializable{
 	}
 
 	/**
-	 * gets a sample set for a given graph id
+	 * gets a sample set for a given graph id -- requires graphservice to be set
 	 * 
-	 * @param a
-	 *            valid graph id
+	 * @param a valid graph id
+	 * @return sampleset for graph
 	 */
 
 	public SampleSet getSampleSet(String routerId) {
+		if(this.graphService == null) 
+			return null;
+		
 		if (this.samples.containsKey(routerId))
 			return this.samples.get(routerId);
 		Graph g = this.graphService.getGraph(routerId);
+		
+		return getSampleSet(g);
+	}
+	
+	/** 
+	 * gets a sample set for a graph object -- does not require graph service to be set 
+	 * @param g a graph objects
+	 * @return sampleset for graph
+	 */
+	
+	public SampleSet getSampleSet(Graph g) {	
 		if (g == null)
 			return null;
 		SampleSet sampleSet = new SampleSet(this, g.getSampleFactory());
-		this.samples.put(routerId, sampleSet);
+		this.samples.put(g.getRouterId(), sampleSet);
 		return sampleSet;
 	}
+	
 
 	/**
 	 * Add a single feature with a variable number of free-form attributes.
