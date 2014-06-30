@@ -15,6 +15,7 @@
   - [Creating new translations](#creating-new-translations)
       - [Short version](#short-version)
       - [Long version](#long-version)
+      - [Both versions](#both-versions)
   - [Translating](#translating)
     - [Gotchas](#gotchas)
 
@@ -39,8 +40,9 @@ On frontend [i18next](http://i18next.com) library is used.
 - **POT file** this is message template. It is used for creating new PO files.
 - **PO file** this is file which translators translate.
 - **json file** this is PO translated file converted to json
+- **js file** this is language file which specifies units, and time/date formats
 
-You must edit only PO file. POT file is created and updated automatically and json also.
+You must edit only PO file and js file. POT file is created and updated automatically and json also.
 All translation files are in folder **otp-leaflet-client/src/main/webapp/i18n** .
 
 Adding new strings
@@ -127,19 +129,24 @@ Do `npm install i18next-conv` in same directory where you created virtualenv.
 ### Updating
 
 Then run `make`. This extracts translations from javascript files and updates translation template messages.pot and all translation files.
-After that you can translate some strings and after you save po file run
-`make update_js`. This transforms po files to json which is used by Javascript translation library. After you rebuild (`mvn project`) All new strings should be visible.
+After that you can translate some strings and after you save PO file run
+`make update_js`. This transforms PO files to json which is used by Javascript translation library. After you rebuild (`mvn project`) All new strings should be visible.
 
 ## Creating new translations
 
 #### Short version
 
-Post to opentripplanner-dev mailinglist what language/country you want to translate and you will get a PO file. Or you can use poedit to create new translation from message template (POT file).
+Post to opentripplanner-dev mailinglist what language/country you want to translate and you will get a PO file. Or you can use Poedit to create new translation from message template (POT file).
+
+Copy English.js from otp-leaflet-client/src/main/webapp/js/otp/locale to YourLanguage.js and customize it to your language.
+Change name, metric, locale_short and datepicker_locale_short.
+Translate infoWidgets and localize time/date formats.
+
 
 #### Long version
 
 PO files are created from a template with a help of msginit program which is run like this:
-`msginit init -l LAN -i messages.pot -o LAN.po`
+`msginit init -l LAN -i messages.pot -o LAN.po` or with the help of Poedit.
 Where LAN is culture code.
 All translation files are in folder **otp-leaflet-client/src/main/webapp/i18n** .
 
@@ -153,7 +160,12 @@ Based on [Launchpad Translation](https://help.launchpad.net/Translations/YourPro
 
 In Linux you can see all culture codes you have installed with a command `locale -a`. They are also availible [here](http://download1.parallels.com/SiteBuilder/Windows/docs/3.2/en_US/sitebulder-3.2-win-sdk-localization-pack-creation-guide/30801.htm)
 
-Add new culture to Makefile in LANGS variable.
+#### Both versions
+
+Add new culture (PO file) to Makefile in LANGS variable.
+Add new Language.js to locales variable in otp-leaflet-client/src/main/webapp/js/otp/config.js
+Add new datepicker translation to otp-leaflet-client/src/main/webapp/js/lib/jquery-ui/i18n
+Load new datepicker translation and Language.js in otp-leaflet-client/src/main/webapp/index.html
 
 ## Translating
 For translating you can use any program that supports gettext files. You can also use any text editor but program specific for translating is recommended. Most of them support checking parameter correctness, translation memory, web translating services etc.. and makes your life easier.
@@ -169,5 +181,5 @@ Programs (All are free and open source):
 All the programs support setting string to Fuzzy/needs review etc. this is used if you translate something but aren't sure of it's correctness. Sometimes it is set automatically if original string changed and it is up to a translator to see if translation is still corect.
 
 ### Gotchas
-Be careful when translating that translated strings have same format. If spaces are at start and end of strings they must also be in translation. Order of parameters of course depends on a translation
+Be careful when translating that translated strings have same format. If spaces are at start and end of strings they must also be in translation. Order of unnamed parameters of course depends on a translation. But you can change the order of named parameters if this is better in your language. You can also leave parameter out of a translation.
     
