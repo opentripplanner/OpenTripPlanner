@@ -64,26 +64,12 @@ otp.locale.English = {
     ],
 
 
-    //Time options are used in timeFixes branch
-    //Left in for now for better merging
     time:
     {
-        hour_abbrev    : "hour",
-        hours_abbrev   : "hours",
-        hour           : "hour",
-        hours          : "hours",
-
-        minute         : "minute",
-        minutes        : "minutes",
-        minute_abbrev  : "min",
-        minutes_abbrev : "mins",
-        second_abbrev  : "sec",
-        seconds_abbrev : "secs",
         format         : "MMM Do YYYY, h:mma", //moment.js
         date_format    : "MM/DD/YYYY", //momentjs must be same as date_picker format which is by default: mm/dd/yy
         time_format    : "h:mma", //momentjs
         time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
-        months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
 
     CLASS_NAME : "otp.locale.English"

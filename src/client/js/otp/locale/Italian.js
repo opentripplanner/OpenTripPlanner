@@ -44,22 +44,10 @@ otp.locale.Italian = {
 
     time:
     {
-        hour_abbrev    : "ora",
-        hours_abbrev   : "ore",
-        hour           : "ora",
-        hours          : "ore",
-
-        minute         : "minuto",
-        minutes        : "minuti",
-        minute_abbrev  : "min",
-        minutes_abbrev : "min",
-        second_abbrev  : "sec",
-        seconds_abbrev : "sec",
-        format: "DD.MM.YYYY, HH:mm",//"d.m.Y \\H:i"
-        date_format: "DD/MM/YYYY",//"d.m.Y",
-        time_format: "HH:mm",//"H:i",
+        format: "DD.MM.YYYY, HH:mm",
+        date_format: "DD/MM/YYYY",
+        time_format: "HH:mm",
         time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
-        months         : ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic']
     },
 
 

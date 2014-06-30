@@ -44,23 +44,10 @@ otp.locale.Catalan = {
 
     time:
     {
-        // TODO
-        hour_abbrev    : "hora",
-        hours_abbrev   : "hores",
-        hour           : "hora",
-        hours          : "hores",
-
-        minute         : "minut",
-        minutes        : "minuts",
-        minute_abbrev  : "min",
-        minutes_abbrev : "mins",
-        second_abbrev  : "seg",
-        seconds_abbrev : "segs",
         format         : "DD M HH:mm",
         date_format    : "DD/MM/YYYY", //momentjs must be same as date_picker format which is by default: mm/dd/yy
         time_format    : "HH:mm",
         time_format_picker : "HH:mm", //http://trentrichardson.com/examples/timepicker/#tp-formatting
-        months         : ['gen', 'feb', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'oct', 'nov', 'des']
     },
 
 

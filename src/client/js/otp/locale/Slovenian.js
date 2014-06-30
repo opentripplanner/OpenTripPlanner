@@ -65,22 +65,10 @@ otp.locale.Slovenian = {
 
     time:
     {
-        hour_abbrev    : "hour",
-        hours_abbrev   : "hours",
-        hour           : "hour",
-        hours          : "hours",
-
-        minute         : "minute",
-        minutes        : "minutes",
-        minute_abbrev  : "min",
-        minutes_abbrev : "mins",
-        second_abbrev  : "sec",
-        seconds_abbrev : "secs",
         format         : "D. MM. YYYY H:mm", //momentjs
         date_format    : "DD.MM.YYYY", //momentjs
-        time_format    : "H:mm", //prej je blo H:i momentjs
+        time_format    : "H:mm", //momentjs
         time_format_picker : "HH:mm", //http://trentrichardson.com/examples/timepicker/#tp-formatting
-        months         : ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
     },
 
 

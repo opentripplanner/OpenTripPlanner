@@ -63,22 +63,10 @@ otp.locale.German = {
 
 
     time: {
-        hour_abbrev: "Std.",
-        hours_abbrev: "Std.",
-        hour: "Stunde",
-        hours: "Stunden",
-
-        minute: "Minute",
-        minutes: "Minuten",
-        minute_abbrev: "Min.",
-        minutes_abbrev: "Min.",
-        second_abbrev: "Sek.",
-        seconds_abbrev: "Sek.",
         format         : "D. MM. YYYY H:mm", //momentjs
         date_format    : "DD.MM.YYYY", //momentjs
         time_format    : "H:mm", //prej je blo H:i momentjs
         time_format_picker : "HH:mm", //http://trentrichardson.com/examples/timepicker/#tp-formatting
-        months: [ 'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez' ]
     },
 
 
