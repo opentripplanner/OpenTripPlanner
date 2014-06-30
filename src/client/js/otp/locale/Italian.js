@@ -55,10 +55,9 @@ otp.locale.Italian = {
         minutes_abbrev : "min",
         second_abbrev  : "sec",
         seconds_abbrev : "sec",
-        format: "DD.MM.YYYY, h:mm",//"d.m.Y \\H:i"
+        format: "DD.MM.YYYY, HH:mm",//"d.m.Y \\H:i"
         date_format: "DD/MM/YYYY",//"d.m.Y",
         time_format: "HH:mm",//"H:i",
-        date_format_picker: "dd/mm/yy",
         time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
         months         : ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic']
     },
