@@ -44,9 +44,9 @@ otp.locale.Italian = {
 
     time:
     {
-        format: "DD.MM.YYYY, HH:mm",
-        date_format: "DD/MM/YYYY",
-        time_format: "HH:mm",
+        format: "DD.MM.YYYY, HH:mm", //momentjs
+        date_format: "DD/MM/YYYY", //momentjs
+        time_format: "HH:mm", //momentjs
         time_format_picker : "hh:mmtt", //http://trentrichardson.com/examples/timepicker/#tp-formatting
     },
 

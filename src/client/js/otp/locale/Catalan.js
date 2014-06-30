@@ -44,9 +44,9 @@ otp.locale.Catalan = {
 
     time:
     {
-        format         : "DD M HH:mm",
+        format         : "DD M HH:mm", //momentjs
         date_format    : "DD/MM/YYYY", //momentjs must be same as date_picker format which is by default: mm/dd/yy
-        time_format    : "HH:mm",
+        time_format    : "HH:mm", //momentjs
         time_format_picker : "HH:mm", //http://trentrichardson.com/examples/timepicker/#tp-formatting
     },
 
