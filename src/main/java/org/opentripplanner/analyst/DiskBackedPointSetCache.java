@@ -54,8 +54,6 @@ public class DiskBackedPointSetCache extends PointSetCache {
 	                    LOG.warn("Failure, skipping this pointset.");
 	                }
 	                
-	                pset.setGraphService(graphService);
-
 	                return pset;
 	                
 	            } catch (IOException ioex) {
@@ -69,9 +67,7 @@ public class DiskBackedPointSetCache extends PointSetCache {
 	            if (pset == null) {
 	                LOG.warn("Failure, skipping this pointset.");
 	            }
-	            
-	            pset.setGraphService(graphService);
-	            
+	            	            
 	            return pset;
 	        }
 			
@@ -80,8 +76,8 @@ public class DiskBackedPointSetCache extends PointSetCache {
 		
 	}
 	
-	public DiskBackedPointSetCache(Integer maxCacheSize, File pointSetPath, GraphService graphService) {
-		super(graphService);
+	public DiskBackedPointSetCache(Integer maxCacheSize, File pointSetPath) {
+		super();
 		
 		this.pointSetPath = pointSetPath;
 		

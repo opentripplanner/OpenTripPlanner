@@ -58,24 +58,9 @@ public class PointSet implements Serializable{
 	public String label;
 	public String description;
 
-	Map<String, Category> categories = new ConcurrentHashMap<String, Category>();
+	public Map<String, Category> categories = new ConcurrentHashMap<String, Category>();
 	public int capacity = 0; // The total number of features this PointSet can
 								// hold.
-
-	/*
-	 * Connects this population to vertices in a given Graph (map of graph ids
-	 * to sample sets). Keeping as a graphId->sampleSet map to prevent
-	 * duplication of pointset when used across multiple graphs
-	 */
-	private Map<String, SampleSet> samples = new ConcurrentHashMap<String, SampleSet>();
-
-	protected GraphService graphService;
-
-	/*
-	 * In a detailed Indicator, the time to reach each target, for each origin.
-	 * Null in non-indicator pointsets.
-	 */
-	public int[][] times;
 
 	/**
 	 * The geometries of the features. Each Attribute must contain an array of
@@ -91,7 +76,9 @@ public class PointSet implements Serializable{
 	 * A base class for the various levels of the Analyst GeoJSON "structured"
 	 * attributes.
 	 */
-	public static abstract class Structured {
+	public static abstract class Structured implements Serializable{
+		private static final long serialVersionUID = 1001662681953599754L;
+		
 		String id;
 		String label;
 		String description;
@@ -117,6 +104,18 @@ public class PointSet implements Serializable{
 				style = new Style();
 			}
 			style.attributes.put(attribute, value);
+		}
+		
+		public String getId(){
+			return this.id;
+		}
+		
+		public String getlabel(){
+			return this.label;
+		}
+		
+		public String getDescription(){
+			return this.description;
 		}
 	}
 
@@ -450,33 +449,14 @@ public class PointSet implements Serializable{
 	}
 
 	/**
-	 * Adds a grpah service to allow for auto creation of SampleSets for a given
-	 * graph
-	 * 
-	 * @param reference
-	 *            to the application graph service
-	 */
-
-	public void setGraphService(GraphService graphService) {
-		this.graphService = graphService;
-	}
-
-	/**
 	 * gets a sample set for a given graph id
 	 * 
 	 * @param a
 	 *            valid graph id
 	 */
 
-	public SampleSet getSampleSet(String routerId) {
-		if (this.samples.containsKey(routerId))
-			return this.samples.get(routerId);
-		Graph g = this.graphService.getGraph(routerId);
-		if (g == null)
-			return null;
-		SampleSet sampleSet = new SampleSet(this, g.getSampleFactory());
-		this.samples.put(routerId, sampleSet);
-		return sampleSet;
+	public SampleSet getSampleSet(Graph g) {
+		return new SampleSet(this, g.getSampleFactory());
 	}
 
 	/**
@@ -751,7 +731,7 @@ public class PointSet implements Serializable{
 	 * Pairs an array of times with the array of features in this pointset,
 	 * writing out the resulting (ID,time) pairs to a JSON object.
 	 */
-	private void writeTimes(JsonGenerator jgen, int[] times) throws IOException {
+	protected void writeTimes(JsonGenerator jgen, int[] times) throws IOException {
 		jgen.writeObjectFieldStart("times");
 		for (int i = 0; i < times.length; i++) { // capacity is now 1 if this is
 													// a one-to-many indicator
@@ -800,13 +780,6 @@ public class PointSet implements Serializable{
 			jgen.writeObjectFieldStart("properties");
 			{
 				writeStructured(i, jgen);
-				/*
-				 * Write out travel times to each target ID if this is a
-				 * detailed indicator.
-				 */
-				if (this instanceof Indicator && times != null) {
-					((Indicator) this).targets.writeTimes(jgen, times[i]);
-				}
 			}
 			jgen.writeEndObject();
 		}
@@ -817,7 +790,7 @@ public class PointSet implements Serializable{
 	 * This will be called once per point in an origin/destination pointset, and
 	 * once per origin in a one- or many-to-many indicator.
 	 */
-	private void writeStructured(int i, JsonGenerator jgen) throws IOException {
+	protected void writeStructured(int i, JsonGenerator jgen) throws IOException {
 		jgen.writeObjectFieldStart("structured");
 		for (String cat_id : categories.keySet()) {
 			jgen.writeObjectFieldStart(cat_id);

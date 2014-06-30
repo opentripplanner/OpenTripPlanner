@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.commons.math3.util.FastMath;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geojson.feature.FeatureJSON;
@@ -13,6 +14,7 @@ import org.geotools.geojson.geom.GeometryJSON;
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.analyst.Indicator;
 import org.opentripplanner.analyst.PointSet;
+import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.core.Sample;
@@ -70,6 +72,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Time;
@@ -161,7 +164,12 @@ public class SurfaceResource extends RoutingResource {
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
         final PointSet pset = server.pointSetCache.get(targetPointSetId);
         if (pset == null) return badRequest("Missing or invalid target PointSet ID.");
-        final Indicator indicator = new Indicator(pset, surf, detail);
+        
+        //TODO cache this sampleset
+        Graph gg = server.graphService.getGraph(surf.routerId);
+        SampleSet samples = pset.getSampleSet( gg );
+        
+        final Indicator indicator = new Indicator(samples, surf, detail);
         if (indicator == null) return badServer("Could not compute indicator as requested.");
         return Response.ok().entity(new StreamingOutput() {
             @Override
