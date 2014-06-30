@@ -191,7 +191,7 @@ public class PointSet implements Serializable{
 		private static final long serialVersionUID = -6525345212775303158L;
 		
 		int[] magnitudes;
-		Quantiles[] quantiles; // An array, one per origin. Length is 1 until we
+		Histogram[] histogram; // An array, one per origin. Length is 1 until we
 								// support many-to-many.
 		
 		public Attribute(){
@@ -207,7 +207,7 @@ public class PointSet implements Serializable{
 		public Attribute(Attribute other) {
 			super(other);
 			this.magnitudes = other.magnitudes;
-			this.quantiles = other.quantiles;
+			this.histogram = other.histogram;
 		}
 		
 		public Attribute slice(int start, int end) {
@@ -218,16 +218,16 @@ public class PointSet implements Serializable{
 			
 			ret.magnitudes = new int[end-start];
 			
-			if(this.quantiles!=null){
-				ret.quantiles = new Quantiles[end-start];
+			if(this.histogram!=null){
+				ret.histogram = new Histogram[end-start];
 			}
 			
 			int n=0;
 			for(int i=start; i<end; i++){
 				ret.magnitudes[n] = this.magnitudes[i];
 				
-				if(this.quantiles!=null){
-					ret.quantiles[n] = this.quantiles[i];
+				if(this.histogram!=null){
+					ret.histogram[n] = this.histogram[i];
 				}
 			}
 			
@@ -238,8 +238,8 @@ public class PointSet implements Serializable{
 			return this.magnitudes;
 		}
 		
-		public Quantiles[] getQuantiles(){
-			return this.quantiles;
+		public Histogram[] getHistogram(){
+			return this.histogram;
 		}
 	}
 
@@ -863,8 +863,8 @@ public class PointSet implements Serializable{
 
 				Attribute attr = categories.get(cat_id).attributes.get(attr_id);
 
-				if (attr.quantiles != null) {
-					jgen.writeObjectField(attr.id, attr.quantiles[i]);
+				if (attr.histogram != null) {
+					jgen.writeObjectField(attr.id, attr.histogram[i]);
 				} else if (attr.magnitudes != null) {
 					if (attr.magnitudes[i] > 0) { // skip zeros for space and
 													// boolean/enum attribs

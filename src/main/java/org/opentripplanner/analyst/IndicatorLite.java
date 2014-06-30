@@ -50,8 +50,8 @@ public class IndicatorLite extends PointSet {
         int[] times = samples.eval(surface);
         for (Category cat : categories.values()) {
             for (Attribute attr : cat.attributes.values()) {
-                attr.quantiles = new Quantiles[1];
-                attr.quantiles[0] = new Quantiles(times, attr.magnitudes, 10);
+                attr.histogram = new Histogram[1];
+                attr.histogram[0] = new Histogram(times, attr.magnitudes);
             }
         }
         /* If requested, provide a detailed map from target IDs to travel times. */
