@@ -158,6 +158,10 @@ public class PointSet implements Serializable{
 			
 			return ret;
 		}
+		
+		public Map<String, Attribute> getAttributes(){
+			return this.attributes;
+		}
 	}
 
 	/**
@@ -210,6 +214,14 @@ public class PointSet implements Serializable{
 			}
 			
 			return ret;
+		}
+		
+		public int[] getMagnitudes(){
+			return this.magnitudes;
+		}
+		
+		public Quantiles[] getQuantiles(){
+			return this.quantiles;
 		}
 	}
 

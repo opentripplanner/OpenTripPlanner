@@ -114,5 +114,9 @@ public class Quantiles implements Serializable {
         }
         return count; // all points fall below the given x
     }
+    
+    public int[] getBreaks(){
+    	return this.breaks;
+    }
 
 }
