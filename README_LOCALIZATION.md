@@ -43,7 +43,7 @@ On frontend [i18next](http://i18next.com) library is used.
 - **js file** this is language file which specifies units, and time/date formats
 
 You must edit only PO file and js file. POT file is created and updated automatically and json also.
-All translation files are in folder **otp-leaflet-client/src/main/webapp/i18n** .
+All translation files are in folder **src/client/i18n** .
 
 Adding new strings
 ------------------
@@ -115,7 +115,7 @@ Babel is used to extract strings from javascript file to translation template an
 You can install it from a package repository if it is in it or you can use [virtualenv](http://simononsoftware.com/virtualenv-tutorial/).
 
 1. Install virtualenv (This depends on your operating system)
-2. Create virtualenv with name .venv in directory where otp-leaflet and other files resides. `virtualenv2 .venv`
+2. Create virtualenv with name .venv in directory where src and other files resides (Root OpenTripPlanner directory). `virtualenv2 .venv`
 3. Use virtualenv `source .venv/bin/activate`
 4. Install babel `pip install babel`
 
@@ -138,7 +138,7 @@ After that you can translate some strings and after you save PO file run
 
 Post to opentripplanner-dev mailinglist what language/country you want to translate and you will get a PO file. Or you can use Poedit to create new translation from message template (POT file).
 
-Copy English.js from otp-leaflet-client/src/main/webapp/js/otp/locale to YourLanguage.js and customize it to your language.
+Copy English.js from src/client/js/otp/locale to YourLanguage.js and customize it to your language.
 Change name, metric, locale_short and datepicker_locale_short.
 Translate infoWidgets and localize time/date formats.
 
@@ -148,7 +148,7 @@ Translate infoWidgets and localize time/date formats.
 PO files are created from a template with a help of msginit program which is run like this:
 `msginit init -l LAN -i messages.pot -o LAN.po` or with the help of Poedit.
 Where LAN is culture code.
-All translation files are in folder **otp-leaflet-client/src/main/webapp/i18n** .
+All translation files are in folder **src/client/i18n** .
 
 Use the ISO language code as culture code, such fr.po for French. Only append the country code in the following circumstances:
 
@@ -163,9 +163,9 @@ In Linux you can see all culture codes you have installed with a command `locale
 #### Both versions
 
 Add new culture (PO file) to Makefile in LANGS variable.
-Add new Language.js to locales variable in otp-leaflet-client/src/main/webapp/js/otp/config.js
-Add new datepicker translation to otp-leaflet-client/src/main/webapp/js/lib/jquery-ui/i18n
-Load new datepicker translation and Language.js in otp-leaflet-client/src/main/webapp/index.html
+Add new Language.js to locales variable in src/client/js/otp/config.js
+Add new datepicker translation to src/client/js/lib/jquery-ui/i18n
+Load new datepicker translation and Language.js in src/client/index.html
 
 ## Translating
 For translating you can use any program that supports gettext files. You can also use any text editor but program specific for translating is recommended. Most of them support checking parameter correctness, translation memory, web translating services etc.. and makes your life easier.
