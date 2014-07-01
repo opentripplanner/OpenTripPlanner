@@ -66,6 +66,10 @@ public class CommandLineParameters {
     @Parameter(names = { "-m", "--inMemory"},
     description = "pass the graph to the server in-memory after building it, without saving to disk")
     boolean inMemory;
+ 
+    @Parameter(names = { "--preFlight"},
+    description = "pass the graph to the server in-memory after building it, and saving to disk")
+    boolean preFlight;
     
     @Parameter(names = {"--noTransit"},
     description = "skip all transit input files (GTFS)")
@@ -153,7 +157,7 @@ public class CommandLineParameters {
 
     /** Set some convenience parameters based on other parameters' values. */
     public void infer () {
-        server |= ( inMemory || port != null );
+        server |= ( inMemory || preFlight || port != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
         if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
         if (cacheDirectory == null) cacheDirectory = DEFAULT_CACHE_DIRECTORY;

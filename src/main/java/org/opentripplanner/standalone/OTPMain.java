@@ -60,7 +60,7 @@ public class OTPMain {
         if (graphBuilder != null) {
             graphBuilder.run();
             // Inform configurator which graph is to be used for in-memory handoff.
-            if (params.inMemory) configurator.makeGraphService(graphBuilder.getGraph());
+            if (params.inMemory || params.preFlight) configurator.makeGraphService(graphBuilder.getGraph());
         }
         
         // start visualizer, if asked for
