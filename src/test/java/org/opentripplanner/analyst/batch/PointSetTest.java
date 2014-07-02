@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.analyst.PointFeature;
 import org.opentripplanner.analyst.PointSet;
-import org.opentripplanner.analyst.pointset.AttributeData;
 
 import java.io.IOException;
 import java.util.List;
