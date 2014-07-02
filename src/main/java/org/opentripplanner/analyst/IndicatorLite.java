@@ -1,13 +1,7 @@
 package org.opentripplanner.analyst;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.opentripplanner.analyst.PointSet.Attribute;
-import org.opentripplanner.analyst.PointSet.Category;
-
-import com.fasterxml.jackson.core.JsonGenerator;
+import org.opentripplanner.analyst.pointset.Attribute;
+import org.opentripplanner.analyst.pointset.Category;
 
 /**
  * A TimeSurface is evaluated at all the points in a PointSet to yield an Indicator.

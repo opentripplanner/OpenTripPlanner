@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.opentripplanner.analyst.PointSet.AttributeData;
+import org.opentripplanner.analyst.pointset.AttributeData;
 
 import com.bedatadriven.geojson.GeometryDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
