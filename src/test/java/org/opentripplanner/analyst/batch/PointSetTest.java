@@ -8,6 +8,8 @@ import org.opentripplanner.analyst.pointset.AttributeData;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class PointSetTest extends TestCase {
 
@@ -35,9 +37,9 @@ public class PointSetTest extends TestCase {
         
         assertNotNull(pt);
         assertEquals( pt.getId(), "XYZ0001");
-        List<AttributeData> attrs = pt.getAttributes();
+        Map<String,Integer> attrs = pt.getAttributes();
         assertEquals( attrs.size(), 6 );
-        assertEquals( attrs.get(0).toString(), "age.senior:5" );
+        assertEquals( pt.getProperty( "age:child" ), 10 );
     }
     
     public void testSlice() {

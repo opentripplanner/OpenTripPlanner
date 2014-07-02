@@ -372,8 +372,11 @@ public class PointSet implements Serializable{
 
 		ids[index] = feat.getId();
 
-		for (AttributeData ad : feat.getAttributes()) {
-			Attribute attr = getAttributeFor(ad.category, ad.attribute);
+		for (Entry<String,Integer> ad : feat.getAttributes().entrySet()) {
+			String attrId = ad.getKey();
+			Integer attrVal = ad.getValue();
+			
+			Attribute attr = getAttributeFor(attrId);
 
 			if (attr == null)
 				continue;
@@ -381,7 +384,7 @@ public class PointSet implements Serializable{
 			if (attr.magnitudes == null)
 				attr.magnitudes = new int[capacity];
 
-			attr.magnitudes[index] = ad.value;
+			attr.magnitudes[index] = attrVal;
 
 		}
 	}
@@ -412,7 +415,7 @@ public class PointSet implements Serializable{
 				String attrLabel = attribute.getKey();
 				int mag = attribute.getValue().magnitudes[index];
 
-				ret.addAttribute(new AttributeData(catLabel, attrLabel, mag));
+				ret.addAttribute(catLabel+":"+attrLabel, mag);
 			}
 		}
 
@@ -489,12 +492,16 @@ public class PointSet implements Serializable{
 		String[] levels = heading.split(":", 2);
 		// There will always be at least one field if heading is non-null.
 		if (levels.length == 1) {
-			return getAttributeFor("NONE", levels[0]);
+			return getAttributeFor("NONE"+":"+levels[0]);
 		}
-		return getAttributeFor(levels[0], levels[1]);
+		return getAttributeFor(levels[0]+":"+levels[1]);
 	}
 
-	public Attribute getAttributeFor(String cat, String attr) {
+	public Attribute getAttributeFor(String attrId) {
+		String[] parts = attrId.split(":");
+		String cat = parts[0];
+		String attr = parts[1];
+		
 		Category category = getCategoryForId(cat);
 		Attribute attribute = category.attributes.get(attr);
 		if (attribute == null) {

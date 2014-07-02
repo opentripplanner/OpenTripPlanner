@@ -2,8 +2,10 @@ package org.opentripplanner.analyst;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.opentripplanner.analyst.pointset.AttributeData;
@@ -23,7 +25,7 @@ public class PointFeature implements Serializable {
 	
 	private String id;
 	private Geometry geom;
-	private List<AttributeData> attributes;
+	private Map<String,Integer> attributes;
 	private double lat;
 	private double lon;
 	
@@ -35,17 +37,17 @@ public class PointFeature implements Serializable {
 	public PointFeature(String id){
 		this.id = id;
 		this.geom = null;
-		this.attributes = new ArrayList<AttributeData>();
+		this.attributes = new HashMap<String,Integer>();
 	}
 	
-	public PointFeature(String id, Geometry g,  ArrayList<AttributeData> ad) throws EmptyPolygonException, UnsupportedGeometryException{
+	public PointFeature(String id, Geometry g,  HashMap<String,Integer> ad) throws EmptyPolygonException, UnsupportedGeometryException{
 		this.id = id;
 		this.setGeom(g);
 		this.attributes = ad;
 	}
 	
-	public void addAttribute( AttributeData data ){
-		this.attributes.add( data );
+	public void addAttribute( String id, Integer val ){
+		this.attributes.put(id, val);
 	}
 
 	public void setGeom(Geometry geom) throws EmptyPolygonException, UnsupportedGeometryException {
@@ -82,7 +84,7 @@ public class PointFeature implements Serializable {
 		return geom;
 	}
 
-	public List<AttributeData> getAttributes() {
+	public Map<String,Integer> getAttributes() {
 		return attributes;
 	}
 
@@ -100,7 +102,7 @@ public class PointFeature implements Serializable {
 		if (props == null || props.getNodeType() != JsonNodeType.OBJECT)
 			return null;
 		JsonNode structured = props.get("structured");
-		List<AttributeData> attributes = Lists.newArrayList();
+		Map<String,Integer> attributes = new HashMap<String,Integer>();
 		if (structured != null && structured.getNodeType() == JsonNodeType.OBJECT) {
 			Iterator<Entry<String, JsonNode>> catIter = structured.fields();
 			while (catIter.hasNext()) {
@@ -114,7 +116,7 @@ public class PointFeature implements Serializable {
 					int magnitude = attrEntry.getValue().asInt();
 					// TODO Maybe we should be using a String[2] instead of
 					// joined strings.
-					attributes.add(new AttributeData(catName, attrName, magnitude));
+					attributes.put(catName+":"+attrName, magnitude);
 				}
 			}
 		}
@@ -142,7 +144,7 @@ public class PointFeature implements Serializable {
 		return ret;
 	}
 
-	private void setAttributes(List<AttributeData> attributes) {
+	private void setAttributes(Map<String,Integer> attributes) {
 		this.attributes = attributes;
 	}
 
@@ -164,6 +166,10 @@ public class PointFeature implements Serializable {
 
 	public void setLon(double lon) {
 		this.lon = lon;
+	}
+
+	public int getProperty(String id) {
+		return this.attributes.get(id);
 	}
 
 }
