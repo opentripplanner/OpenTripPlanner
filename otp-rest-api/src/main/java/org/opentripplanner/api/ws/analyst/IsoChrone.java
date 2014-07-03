@@ -233,14 +233,14 @@ public class IsoChrone extends RoutingResource {
 
         // create the ShortestPathTree
         try {
-            sptRequestA.setRoutingContext(graphService.getGraph());
+            sptRequestA.setRoutingContext(graphService.getGraph(sptRequestA.routerId));
         } catch (Exception e) {
             // if we get an exception here, and in particular a VertexNotFoundException,
             // then it is likely that we chose a (transit) mode without having that (transit) modes data
             LOG.debug("cannot set RoutingContext: " + e.toString());
             LOG.debug("cannot set RoutingContext: setting mode=WALK");
             sptRequestA.setMode(TraverseMode.WALK); // fall back to walk mode
-            sptRequestA.setRoutingContext(graphService.getGraph());
+            sptRequestA.setRoutingContext(graphService.getGraph(sptRequestA.routerId));
         }
         ShortestPathTree sptA = sptService.getShortestPathTree(sptRequestA);
         StreetLocation origin = (StreetLocation) sptRequestA.rctx.fromVertex;
