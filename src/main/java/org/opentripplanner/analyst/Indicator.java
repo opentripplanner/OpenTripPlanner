@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.collect.Maps;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,40 +22,41 @@ public class Indicator extends IndicatorLite {
     Map<String,Integer> idTimeIndex = new ConcurrentHashMap<String,Integer>();
      
     public Indicator (SampleSet samples, TimeSurface surface, boolean retainTimes) {
-        super(samples, surface, retainTimes); // for now we only do one-to-many
+        super(samples, surface); // for now we only do one-to-many
         this.surface = surface;
         this.targets = samples.pset;
     }
     
     public Integer getTime(String id) {
+		return null;
     	
-    	if(times != null){
-    		synchronized(idTimeIndex) {
-        		if(idTimeIndex.keySet().size() < this.times[0].length) {
-            		idTimeIndex.clear();
-            		int i = 0;
-            		for(String sampleId : this.targets.ids) {
-            			idTimeIndex.put(sampleId, this.times[0][i]);
-            			i++;
-            		}
-            	}
-        	}
-        	return idTimeIndex.get(id);
-    	}
-    	else
-    		return null;
+//    	if(times != null){
+//    		synchronized(idTimeIndex) {
+//        		if(idTimeIndex.keySet().size() < this.times[0].length) {
+//            		idTimeIndex.clear();
+//            		int i = 0;
+//            		for(String sampleId : this.targets.ids) {
+//            			idTimeIndex.put(sampleId, this.times[0][i]);
+//            			i++;
+//            		}
+//            	}
+//        	}
+//        	return idTimeIndex.get(id);
+//    	}
+//    	else
+//    		return null;
     	
     }
     
     protected void writeStructured(int i , JsonGenerator jgen) throws IOException{
-    	super.writeStructured(i, jgen);
-		/*
-		 * Write out travel times to each target ID if this is a
-		 * detailed indicator.
-		 */
-		if (this instanceof Indicator && times != null) {
-			((Indicator) this).targets.writeTimes(jgen, times[i]);
-		}
+//    	super.writeStructured(i, jgen);
+//		/*
+//		 * Write out travel times to each target ID if this is a
+//		 * detailed indicator.
+//		 */
+//		if (this instanceof Indicator && times != null) {
+//			((Indicator) this).targets.writeTimes(jgen, times[i]);
+//		}
     }
 		
 }

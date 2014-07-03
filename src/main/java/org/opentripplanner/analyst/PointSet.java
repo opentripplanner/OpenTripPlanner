@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 
 import org.opentripplanner.analyst.pointset.Attribute;
 import org.opentripplanner.analyst.pointset.Category;
+import org.opentripplanner.analyst.pointset.CategoryMetadata;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
@@ -60,7 +61,8 @@ public class PointSet implements Serializable{
 	public String label;
 	public String description;
 
-	public Map<String, Category> categories = new ConcurrentHashMap<String, Category>();
+	public Map<String, CategoryMetadata> catMetadata = new HashMap<String, CategoryMetadata>();
+	public Map<String, int[]> categories = new ConcurrentHashMap<String, int[]>();
 	public int capacity = 0; // The total number of features this PointSet can
 								// hold.
 	/*
@@ -124,7 +126,7 @@ public class PointSet implements Serializable{
 		int latCol = -1;
 		int lonCol = -1;
 
-		Attribute[] attributes = new Attribute[nCols];
+		int[][] attributes = new int[nCols][ret.capacity];
 		for (int c = 0; c < nCols; c++) {
 			String header = reader.getHeader(c);
 			if (header.equalsIgnoreCase("lat") || header.equalsIgnoreCase("latitude")) {
@@ -132,28 +134,27 @@ public class PointSet implements Serializable{
 			} else if (header.equalsIgnoreCase("lon") || header.equalsIgnoreCase("longitude")) {
 				lonCol = c;
 			} else {
-				Attribute attr = ret.getAttributeForColumn(header);
-				attributes[c] = attr;
+				ret.getOrCreateCategoryForId(header);
+				attributes[c] = ret.categories.get(header);
 			}
 		}
 		if (latCol < 0 || lonCol < 0) {
 			LOG.error("CSV file did not contain a latitude or longitude column.");
 			throw new IOException();
 		}
-		for (Attribute attr : attributes) {
-			if (attr != null)
-				attr.magnitudes = new int[nRecs];
+		for (int i=0; i<attributes.length; i++) {
+			attributes[i] = new int[nRecs];
 		}
 		ret.lats = new double[nRecs];
 		ret.lons = new double[nRecs];
 		while (reader.readRecord()) {
 			int rec = (int) reader.getCurrentRecord();
 			for (int c = 0; c < nCols; c++) {
-				Attribute attr = attributes[c];
+				int[] attr = attributes[c];
 				if (attr == null)
 					continue; // skip lat and lon columns
 				int mag = Integer.parseInt(reader.get(c));
-				attr.magnitudes[rec] = mag;
+				attr[rec] = mag;
 			}
 			ret.lats[rec] = Double.parseDouble(reader.get(latCol));
 			ret.lons[rec] = Double.parseDouble(reader.get(lonCol));
@@ -375,15 +376,7 @@ public class PointSet implements Serializable{
 			String attrId = ad.getKey();
 			Integer attrVal = ad.getValue();
 			
-			Attribute attr = getAttributeFor(attrId);
-
-			if (attr == null)
-				continue;
-
-			if (attr.magnitudes == null)
-				attr.magnitudes = new int[capacity];
-
-			attr.magnitudes[index] = attrVal;
+			this.categories.get(attrId)[index] = attrVal;
 
 		}
 	}
@@ -408,59 +401,26 @@ public class PointSet implements Serializable{
 		ret.setLat(lats[index]);
 		ret.setLon(lons[index]);
 
-		for (Entry<String, Category> category : this.categories.entrySet()) {
-			for (Entry<String, Attribute> attribute : category.getValue().attributes.entrySet()) {
-				String catLabel = category.getKey();
-				String attrLabel = attribute.getKey();
-				int mag = attribute.getValue().magnitudes[index];
-
-				ret.addAttribute(catLabel+":"+attrLabel, mag);
-			}
+		for (Entry<String, int[]> category : this.categories.entrySet()) {
+			ret.addAttribute( category.getKey(), category.getValue()[index]);
 		}
 
 		return ret;
 	}
 
 	public void setLabel(String catId, String label) {
-		setLabel(catId, null, label);
-	}
-
-	public void setLabel(String catId, String attrId, String label) {
-		Category category = categories.get(catId);
-
-		if (category == null)
-			return;
-
-		if (attrId != null) {
-			Attribute attribute = category.attributes.get(attrId);
-
-			if (attribute == null)
-				return;
-
-			attribute.label = label;
-		} else
-			category.label = label;
+		CategoryMetadata meta = this.catMetadata.get(catId);
+		if(meta!=null){
+			meta.setLabel( label );
+		}		
 	}
 
 	public void setStyle(String catId, String styleAttribute, String styleValue) {
-		setStyle(catId, null, styleAttribute, styleValue);
-	}
-
-	public void setStyle(String catId, String attrId, String styleAttribute, String styleValue) {
-		Category category = categories.get(catId);
-
-		if (category == null)
-			return;
-
-		if (attrId != null) {
-			Attribute attribute = category.attributes.get(attrId);
-
-			if (attribute == null)
-				return;
-
-			attribute.addStyle(styleAttribute, styleValue);
-		} else
-			category.addStyle(styleAttribute, styleValue);
+		CategoryMetadata meta = catMetadata.get(catId);
+		
+		if(meta!=null){
+			meta.addStyle( styleAttribute, styleValue );
+		}
 	}
 
 	/**
@@ -472,42 +432,14 @@ public class PointSet implements Serializable{
 	 *            category:attribute.
 	 * @return a Category with the given ID.
 	 */
-	public Category getCategoryForId(String id) {
-		Category category = categories.get(id);
+	public CategoryMetadata getOrCreateCategoryForId(String id) {
+		CategoryMetadata category = catMetadata.get(id);
 		if (category == null) {
-			category = new Category(id);
-			categories.put(id, category);
+			category = new CategoryMetadata(id);
+			catMetadata.put(id, category);
+			categories.put(id, new int[capacity]);
 		}
 		return category;
-	}
-
-	/**
-	 * @heading in the form "schools:primary" (i.e. category:attribute,
-	 *          currently supports two levels)
-	 * @return null if there are too many levels or the attribute does not exist
-	 *         and you did not ask to create it.
-	 */
-	public Attribute getAttributeForColumn(String heading) {
-		String[] levels = heading.split(":", 2);
-		// There will always be at least one field if heading is non-null.
-		if (levels.length == 1) {
-			return getAttributeFor("NONE"+":"+levels[0]);
-		}
-		return getAttributeFor(levels[0]+":"+levels[1]);
-	}
-
-	public Attribute getAttributeFor(String attrId) {
-		String[] parts = attrId.split(":");
-		String cat = parts[0];
-		String attr = parts[1];
-		
-		Category category = getCategoryForId(cat);
-		Attribute attribute = category.attributes.get(attr);
-		if (attribute == null) {
-			attribute = new Attribute(attr);
-			category.attributes.put(attr, attribute);
-		}
-		return attribute;
 	}
 
 	public void writeJson(OutputStream out) {
@@ -546,7 +478,7 @@ public class PointSet implements Serializable{
 					jgen.writeObjectFieldStart("schema");
 					{
 
-						for (Category cat : this.categories.values()) {
+						for (CategoryMetadata cat : this.catMetadata.values()) {
 
 							jgen.writeObjectFieldStart(cat.id);
 							{
@@ -569,31 +501,6 @@ public class PointSet implements Serializable{
 
 							}
 							jgen.writeEndObject();
-
-							for (Attribute attr : cat.attributes.values()) {
-
-								jgen.writeObjectFieldStart(cat.id + ":" + attr.id);
-								{
-									if (attr.label != null)
-										jgen.writeStringField("label", attr.label);
-									jgen.writeStringField("type", "Attribute");
-
-									if (attr.style != null && attr.style.attributes != null) {
-
-										jgen.writeObjectFieldStart("style");
-										{
-
-											for (String styleKey : attr.style.attributes.keySet()) {
-												jgen.writeStringField(styleKey, attr.style.attributes.get(styleKey));
-											}
-										}
-										jgen.writeEndObject();
-
-									}
-
-								}
-								jgen.writeEndObject();
-							}
 
 							// two-level hierarchy for now... could be extended
 							// to recursively map
@@ -685,22 +592,8 @@ public class PointSet implements Serializable{
 	 */
 	protected void writeStructured(int i, JsonGenerator jgen) throws IOException {
 		jgen.writeObjectFieldStart("structured");
-		for (String cat_id : categories.keySet()) {
-			jgen.writeObjectFieldStart(cat_id);
-			for (String attr_id : categories.get(cat_id).attributes.keySet()) {
-
-				Attribute attr = categories.get(cat_id).attributes.get(attr_id);
-
-				if (attr.histogram != null) {
-					jgen.writeObjectField(attr.id, attr.histogram[i]);
-				} else if (attr.magnitudes != null) {
-					if (attr.magnitudes[i] > 0) { // skip zeros for space and
-													// boolean/enum attribs
-						jgen.writeNumberField(attr.id, attr.magnitudes[i]);
-					}
-				}
-			}
-			jgen.writeEndObject();
+		for (Entry<String,int[]> entry : categories.entrySet()) {
+			jgen.writeNumberField( entry.getKey(), entry.getValue()[i] );
 		}
 		jgen.writeEndObject();
 	}
@@ -721,8 +614,17 @@ public class PointSet implements Serializable{
 			n++;
 		}
 
-		for(Entry<String,Category> category : this.categories.entrySet()) {
-			ret.categories.put( category.getKey(), category.getValue().slice(start,end) );
+		for(Entry<String, int[]> category : this.categories.entrySet()) {
+			int[] data = category.getValue();
+			
+			int[] magSlice = new int[end-start];
+			n=0;
+			for(int i=start; i<end; i++){
+				magSlice[n] = data[i];
+				n++;
+			}
+			
+			ret.categories.put( category.getKey(), magSlice );
 		}
 
 		return ret;

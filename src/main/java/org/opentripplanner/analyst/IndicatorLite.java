@@ -1,5 +1,10 @@
 package org.opentripplanner.analyst;
 
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.opentripplanner.analyst.pointset.Attribute;
 import org.opentripplanner.analyst.pointset.Category;
 
@@ -24,39 +29,27 @@ import org.opentripplanner.analyst.pointset.Category;
  * it's many-to-many.
  */
 
-public class IndicatorLite extends PointSet {
+public class IndicatorLite {
 
 	private static final long serialVersionUID = -6723127825189535112L;
     
 	/*
 	 * The time to reach each target, for each origin.
 	 */
-	public int[][] times;
+	public Map<String,Histogram> histograms;
 	
-    public IndicatorLite (SampleSet samples, TimeSurface surface, boolean retainTimes) {
-        super(1); // for now we only do one-to-many
+    public IndicatorLite (SampleSet samples, TimeSurface surface) {
+    	histograms = new HashMap<String,Histogram>();
+    	
         PointSet targets = samples.pset;
-        // Perform a deep copy of everything but the actual magnitudes for the attributes
-        for (Category cat : targets.categories.values()) {
-            this.categories.put(cat.id, new Category(cat));
-        }
         // Evaluate the surface at all points in the pointset
         int[] times = samples.eval(surface);
-        for (Category cat : categories.values()) {
-            for (Attribute attr : cat.attributes.values()) {
-                attr.histogram = new Histogram[1];
-                attr.histogram[0] = new Histogram(times, attr.magnitudes);
-            }
+        for (Entry<String, int[]> cat : targets.categories.entrySet()) {
+        	String catId = cat.getKey();
+        	int[] mags = cat.getValue();
+        	
+        	this.histograms.put(catId, new Histogram(times, mags));
         }
-        /* If requested, provide a detailed map from target IDs to travel times. */
-        if (retainTimes) {
-            this.times = new int[1][]; // we only support one-to-many currently.
-            this.times[0] = times;
-        }
-    }
-    
-    public IndicatorLite (SampleSet samples, TimeSurface surface) {
-    	this( samples, surface, false );
     }
     
     /**
@@ -68,6 +61,11 @@ public class IndicatorLite extends PointSet {
     	
 
     }
+    
+	public void writeJson(OutputStream output) {
+		// TODO Auto-generated method stub
+		
+	}
     
 
 
