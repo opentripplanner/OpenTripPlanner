@@ -80,6 +80,14 @@ public abstract class RoutingResource {
     /** The maximum distance (in meters) the user is willing to walk. Defaults to approximately 1/2 mile. */
     @DefaultValue("-1") @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
+    /** A factor to control weighted cost of waiting rather than travel.
+     *  Defaults to 0.95. */
+    @DefaultValue("-1") @QueryParam("waitReluctance") protected List<Double> waitReluctance;
+
+    /** A factor to control weighted cost of waiting at beginning of trips.
+     *  Defaults to 0.2. */
+    @DefaultValue("-1") @QueryParam("waitAtBeginningFactor") protected List<Double> waitAtBeginningFactor;    
+
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
     @QueryParam("walkSpeed") protected List<Double> walkSpeed;
 
@@ -149,6 +157,22 @@ public abstract class RoutingResource {
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
     @DefaultValue("") @QueryParam("bannedTrips") protected List<String> bannedTrips;
+
+    /**
+     * An OTP trip 'cost' for boarding transit vehicles by walking. The value is in OTP's
+     * internal weight units, which are roughly equivalent to seconds. This is considered
+     * by OTP to be a "base" transfer cost for this mode, it can be increased by the
+     * transferPenalty param.
+     */
+    @DefaultValue("-1") @QueryParam("walkBoardCost") protected List<Integer> walkBoardCost;
+
+    /**
+     * An OTP trip 'cost' for boarding transit vehicles by bike. The value is in OTP's
+     * internal weight units, which are roughly equivalent to seconds. This is considered
+     * by OTP to be a "base" transfer cost for this mode, it can be increased by the
+     * transferPenalty param.
+     */
+    @DefaultValue("-1") @QueryParam("bikeBoardCost") protected List<Integer> bikeBoardCost;    
 
     /** An additional penalty added to boardings after the first.  The value is in OTP's
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
@@ -318,6 +342,10 @@ public abstract class RoutingResource {
             request.setBannedTrips(bannedTripMap);
         }
         
+        request.setWalkBoardCost(get(walkBoardCost, n, request.getWalkBoardCost()));
+        request.setBikeBoardCost(get(bikeBoardCost, n, request.getBikeBoardCost()));
+        request.setWaitReluctance(get(waitReluctance, n, request.getWaitReluctance()));
+        request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.getWaitAtBeginningFactor()));
         // "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
         if (opt == OptimizeType.TRANSFERS) {
