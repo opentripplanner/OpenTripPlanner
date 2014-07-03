@@ -88,14 +88,21 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Pref
         // Jackson ObjectMapper to read in JSON
         // TODO: test against real data
         ObjectMapper mapper = new ObjectMapper();
+              
         for (JsonNode stationNode : mapper.readTree(data)) {
+            
             BikeRentalStation brStation = new BikeRentalStation();
-            brStation.id = stationNode.get("id").textValue();
+            brStation.id = String.valueOf(stationNode.get("id").intValue());
             brStation.x = stationNode.get("lng").doubleValue() / 1000000.0;
             brStation.y = stationNode.get("lat").doubleValue() / 1000000.0;
             brStation.name = stationNode.get("name").textValue();
             brStation.bikesAvailable = stationNode.get("bikes").intValue();
             brStation.spacesAvailable = stationNode.get("free").intValue();
+            
+            if (brStation != null && brStation.id != null) {
+            	out.add(brStation);           
+            }
+            
         }
         synchronized (this) {
             stations = out;

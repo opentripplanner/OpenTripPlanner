@@ -109,6 +109,7 @@ public class OTPServer {
             @Override
             protected void configure() {
                 bind(OTPServer.this).to(OTPServer.class);
+                bind(graphService).to(GraphService.class);
             }
         };
     }

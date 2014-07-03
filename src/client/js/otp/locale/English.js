@@ -463,6 +463,7 @@ otp.locale.English = {
             "BUSISH,WALK"               : "Bus Only",
             "TRAINISH,WALK"             : "Rail Only",
             "BICYCLE"                   : 'Bicycle Only',
+			"BICYCLE_RENT"				: 'Rented Bicycle',
             "WALK"                      : 'Walk Only',
             "TRANSIT,BICYCLE"           : "Bicycle &amp; Transit",
             "CAR"                       : 'Drive Only',
