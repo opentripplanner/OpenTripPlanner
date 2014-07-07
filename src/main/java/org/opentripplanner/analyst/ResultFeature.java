@@ -9,9 +9,7 @@ public class ResultFeature {
 
 	private static final long serialVersionUID = -6723127825189535112L;
     
-	/*
-	 * The time to reach each target, for each origin.
-	 */
+	public String id;
 	public Map<String,Histogram> histograms;
 	
 	public ResultFeature(){
