@@ -1,7 +1,10 @@
 package org.opentripplanner.analyst;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.collect.Lists;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,5 +53,22 @@ public class Histogram implements Serializable {
     		counts[i] = tmpCounts[i];
     		sums[i] = tmpSums[i];
     	}   	
+    }
+    
+    public void writeJson(JsonGenerator jgen) throws JsonGenerationException, IOException {
+    	
+    	jgen.writeArrayFieldStart("sums"); {
+    		for(int sum : sums) {
+    			jgen.writeNumber(sum);
+    		}
+    	}
+    	jgen.writeEndArray();
+    	
+    	jgen.writeArrayFieldStart("counts"); {
+    		for(int count : counts) {
+    			jgen.writeNumber(count);
+    		}
+    	}
+    	jgen.writeEndArray();
     }
 }
