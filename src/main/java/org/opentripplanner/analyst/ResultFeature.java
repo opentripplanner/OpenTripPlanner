@@ -24,7 +24,7 @@ public class ResultFeature {
         PointSet targets = samples.pset;
         // Evaluate the surface at all points in the pointset
         int[] times = samples.eval(surface);
-        for (Entry<String, int[]> cat : targets.categories.entrySet()) {
+        for (Entry<String, int[]> cat : targets.properties.entrySet()) {
         	String catId = cat.getKey();
         	int[] mags = cat.getValue();
         	

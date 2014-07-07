@@ -23,7 +23,7 @@ public class PointFeature implements Serializable {
 	
 	private String id;
 	private Geometry geom;
-	private Map<String,Integer> attributes;
+	private Map<String,Integer> properties;
 	private double lat;
 	private double lon;
 	
@@ -35,17 +35,17 @@ public class PointFeature implements Serializable {
 	public PointFeature(String id){
 		this.id = id;
 		this.geom = null;
-		this.attributes = new HashMap<String,Integer>();
+		this.properties = new HashMap<String,Integer>();
 	}
 	
 	public PointFeature(String id, Geometry g,  HashMap<String,Integer> ad) throws EmptyPolygonException, UnsupportedGeometryException{
 		this.id = id;
 		this.setGeom(g);
-		this.attributes = ad;
+		this.properties = ad;
 	}
 	
 	public void addAttribute( String id, Integer val ){
-		this.attributes.put(id, val);
+		this.properties.put(id, val);
 	}
 
 	public void setGeom(Geometry geom) throws EmptyPolygonException, UnsupportedGeometryException {
@@ -82,8 +82,8 @@ public class PointFeature implements Serializable {
 		return geom;
 	}
 
-	public Map<String,Integer> getAttributes() {
-		return attributes;
+	public Map<String,Integer> getProperties() {
+		return properties;
 	}
 
 	public String getId() {
@@ -100,21 +100,21 @@ public class PointFeature implements Serializable {
 		if (props == null || props.getNodeType() != JsonNodeType.OBJECT)
 			return null;
 		JsonNode structured = props.get("structured");
-		Map<String,Integer> attributes = new HashMap<String,Integer>();
+		Map<String,Integer> properties = new HashMap<String,Integer>();
 		if (structured != null && structured.getNodeType() == JsonNodeType.OBJECT) {
 			Iterator<Entry<String, JsonNode>> catIter = structured.fields();
 			while (catIter.hasNext()) {
 				Entry<String, JsonNode> catEntry = catIter.next();
 				String catName = catEntry.getKey();
 				JsonNode catNode = catEntry.getValue();
-				Iterator<Entry<String, JsonNode>> attrIter = catNode.fields();
-				while (attrIter.hasNext()) {
-					Entry<String, JsonNode> attrEntry = attrIter.next();
-					String attrName = attrEntry.getKey();
-					int magnitude = attrEntry.getValue().asInt();
+				Iterator<Entry<String, JsonNode>> propIter = catNode.fields();
+				while (propIter.hasNext()) {
+					Entry<String, JsonNode> propEntry = propIter.next();
+					String propName = propEntry.getKey();
+					int magnitude = propEntry.getValue().asInt();
 					// TODO Maybe we should be using a String[2] instead of
 					// joined strings.
-					attributes.put(catName+":"+attrName, magnitude);
+					properties.put(catName+":"+propName, magnitude);
 				}
 			}
 		}
@@ -137,13 +137,13 @@ public class PointFeature implements Serializable {
 
 		PointFeature ret = new PointFeature(id);
 		ret.setGeom(jtsGeom);
-		ret.setAttributes(attributes);
+		ret.setAttributes(properties);
 
 		return ret;
 	}
 
-	private void setAttributes(Map<String,Integer> attributes) {
-		this.attributes = attributes;
+	private void setAttributes(Map<String,Integer> properties) {
+		this.properties = properties;
 	}
 
 	public void setId(String id) {
@@ -167,7 +167,7 @@ public class PointFeature implements Serializable {
 	}
 
 	public int getProperty(String id) {
-		return this.attributes.get(id);
+		return this.properties.get(id);
 	}
 
 }

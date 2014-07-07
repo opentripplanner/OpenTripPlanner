@@ -21,7 +21,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-import org.opentripplanner.analyst.pointset.CategoryMetadata;
+import org.opentripplanner.analyst.pointset.PropertyMetadata;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
@@ -59,8 +59,8 @@ public class PointSet implements Serializable{
 	public String label;
 	public String description;
 
-	public Map<String, CategoryMetadata> catMetadata = new HashMap<String, CategoryMetadata>();
-	public Map<String, int[]> categories = new ConcurrentHashMap<String, int[]>();
+	public Map<String, PropertyMetadata> propMetadata = new HashMap<String, PropertyMetadata>();
+	public Map<String, int[]> properties = new ConcurrentHashMap<String, int[]>();
 	public int capacity = 0; // The total number of features this PointSet can
 								// hold.
 	/*
@@ -124,7 +124,7 @@ public class PointSet implements Serializable{
 		int latCol = -1;
 		int lonCol = -1;
 
-		int[][] attributes = new int[nCols][ret.capacity];
+		int[][] properties = new int[nCols][ret.capacity];
 		for (int c = 0; c < nCols; c++) {
 			String header = reader.getHeader(c);
 			if (header.equalsIgnoreCase("lat") || header.equalsIgnoreCase("latitude")) {
@@ -132,16 +132,16 @@ public class PointSet implements Serializable{
 			} else if (header.equalsIgnoreCase("lon") || header.equalsIgnoreCase("longitude")) {
 				lonCol = c;
 			} else {
-				ret.getOrCreateCategoryForId(header);
-				attributes[c] = ret.categories.get(header);
+				ret.getOrCreatePropertyForId(header);
+				properties[c] = ret.properties.get(header);
 			}
 		}
 		if (latCol < 0 || lonCol < 0) {
 			LOG.error("CSV file did not contain a latitude or longitude column.");
 			throw new IOException();
 		}
-		for (int i=0; i<attributes.length; i++) {
-			attributes[i] = new int[nRecs];
+		for (int i=0; i<properties.length; i++) {
+			properties[i] = new int[nRecs];
 		}
 		ret.lats = new double[nRecs];
 		ret.lons = new double[nRecs];
@@ -152,9 +152,9 @@ public class PointSet implements Serializable{
 					continue;
 				}
 				
-				int[] attr = attributes[c];
+				int[] prop = properties[c];
 				int mag = Integer.parseInt(reader.get(c));
-				attr[rec] = mag;
+				prop[rec] = mag;
 			}
 			ret.lats[rec] = Double.parseDouble(reader.get(latCol));
 			ret.lons[rec] = Double.parseDouble(reader.get(lonCol));
@@ -347,10 +347,10 @@ public class PointSet implements Serializable{
 	
 
 	/**
-	 * Add a single feature with a variable number of free-form attributes.
-	 * Attribute data contains id value pairs, ids are in form "cat_id:attr_id".
-	 * If the attributes and categories do not exist, they will be created.
-	 * TODO: read explicit schema or infer it and validate attribute presence as
+	 * Add a single feature with a variable number of free-form properties.
+	 * Attribute data contains id value pairs, ids are in form "cat_id:prop_id".
+	 * If the properties and categories do not exist, they will be created.
+	 * TODO: read explicit schema or infer it and validate property presence as
 	 * they're read
 	 * 
 	 * @param geom
@@ -372,12 +372,12 @@ public class PointSet implements Serializable{
 
 		ids[index] = feat.getId();
 
-		for (Entry<String,Integer> ad : feat.getAttributes().entrySet()) {
-			String attrId = ad.getKey();
-			Integer attrVal = ad.getValue();
+		for (Entry<String,Integer> ad : feat.getProperties().entrySet()) {
+			String propId = ad.getKey();
+			Integer propVal = ad.getValue();
 			
-			this.getOrCreateCategoryForId(attrId);
-			this.categories.get(attrId)[index] = attrVal;
+			this.getOrCreatePropertyForId(propId);
+			this.properties.get(propId)[index] = propVal;
 
 
 		}
@@ -403,22 +403,22 @@ public class PointSet implements Serializable{
 		ret.setLat(lats[index]);
 		ret.setLon(lons[index]);
 
-		for (Entry<String, int[]> category : this.categories.entrySet()) {
-			ret.addAttribute( category.getKey(), category.getValue()[index]);
+		for (Entry<String, int[]> property : this.properties.entrySet()) {
+			ret.addAttribute( property.getKey(), property.getValue()[index]);
 		}
 
 		return ret;
 	}
 
 	public void setLabel(String catId, String label) {
-		CategoryMetadata meta = this.catMetadata.get(catId);
+		PropertyMetadata meta = this.propMetadata.get(catId);
 		if(meta!=null){
 			meta.setLabel( label );
 		}		
 	}
 
 	public void setStyle(String catId, String styleAttribute, String styleValue) {
-		CategoryMetadata meta = catMetadata.get(catId);
+		PropertyMetadata meta = propMetadata.get(catId);
 		
 		if(meta!=null){
 			meta.addStyle( styleAttribute, styleValue );
@@ -431,17 +431,17 @@ public class PointSet implements Serializable{
 	 * 
 	 * @param id
 	 *            the id for the category alone, not the fully-specified
-	 *            category:attribute.
+	 *            category:property.
 	 * @return a Category with the given ID.
 	 */
-	public CategoryMetadata getOrCreateCategoryForId(String id) {
-		CategoryMetadata category = catMetadata.get(id);
-		if (category == null) {
-			category = new CategoryMetadata(id);
-			catMetadata.put(id, category);
-			categories.put(id, new int[capacity]);
+	public PropertyMetadata getOrCreatePropertyForId(String id) {
+		PropertyMetadata property = propMetadata.get(id);
+		if (property == null) {
+			property = new PropertyMetadata(id);
+			propMetadata.put(id, property);
+			properties.put(id, new int[capacity]);
 		}
-		return category;
+		return property;
 	}
 
 	public void writeJson(OutputStream out) {
@@ -475,12 +475,12 @@ public class PointSet implements Serializable{
 						jgen.writeStringField("description", description);
 
 					// writes schema as a flat namespace with cat_id and
-					// cat_id:attr_id interleaved
+					// cat_id:prop_id interleaved
 
 					jgen.writeObjectFieldStart("schema");
 					{
 
-						for (CategoryMetadata cat : this.catMetadata.values()) {
+						for (PropertyMetadata cat : this.propMetadata.values()) {
 
 							jgen.writeObjectFieldStart(cat.id);
 							{
@@ -594,7 +594,7 @@ public class PointSet implements Serializable{
 	 */
 	protected void writeStructured(int i, JsonGenerator jgen) throws IOException {
 		jgen.writeObjectFieldStart("structured");
-		for (Entry<String,int[]> entry : categories.entrySet()) {
+		for (Entry<String,int[]> entry : properties.entrySet()) {
 			jgen.writeNumberField( entry.getKey(), entry.getValue()[i] );
 		}
 		jgen.writeEndObject();
@@ -616,8 +616,8 @@ public class PointSet implements Serializable{
 			n++;
 		}
 
-		for(Entry<String, int[]> category : this.categories.entrySet()) {
-			int[] data = category.getValue();
+		for(Entry<String, int[]> property : this.properties.entrySet()) {
+			int[] data = property.getValue();
 			
 			int[] magSlice = new int[end-start];
 			n=0;
@@ -626,7 +626,7 @@ public class PointSet implements Serializable{
 				n++;
 			}
 			
-			ret.categories.put( category.getKey(), magSlice );
+			ret.properties.put( property.getKey(), magSlice );
 		}
 
 		return ret;

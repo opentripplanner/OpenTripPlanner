@@ -1,12 +1,12 @@
 package org.opentripplanner.analyst.pointset;
 
-public class CategoryMetadata {
+public class PropertyMetadata {
 
 	public String label;
 	public Style style;
 	public String id;
 	
-	public CategoryMetadata(String id){
+	public PropertyMetadata(String id){
 		this.style = new Style();
 		this.id = id;
 	}

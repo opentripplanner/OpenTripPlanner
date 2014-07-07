@@ -36,7 +36,7 @@ public class PointSetTest extends TestCase {
         
         assertNotNull(pt);
         assertEquals( pt.getId(), "XYZ0001");
-        Map<String,Integer> attrs = pt.getAttributes();
+        Map<String,Integer> attrs = pt.getProperties();
         assertEquals( attrs.size(), 6 );
         assertEquals( pt.getProperty( "age:child" ), 10 );
     }
