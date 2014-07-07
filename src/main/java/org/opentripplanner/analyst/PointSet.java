@@ -150,9 +150,11 @@ public class PointSet implements Serializable{
 		while (reader.readRecord()) {
 			int rec = (int) reader.getCurrentRecord();
 			for (int c = 0; c < nCols; c++) {
+				if(c==latCol || c==lonCol){
+					continue;
+				}
+				
 				int[] attr = attributes[c];
-				if (attr == null)
-					continue; // skip lat and lon columns
 				int mag = Integer.parseInt(reader.get(c));
 				attr[rec] = mag;
 			}
