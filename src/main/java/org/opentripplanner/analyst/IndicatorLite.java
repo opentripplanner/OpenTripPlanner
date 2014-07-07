@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.opentripplanner.analyst.pointset.Attribute;
-import org.opentripplanner.analyst.pointset.Category;
-
 /**
  * A TimeSurface is evaluated at all the points in a PointSet to yield an Indicator.
  *

@@ -21,8 +21,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-import org.opentripplanner.analyst.pointset.Attribute;
-import org.opentripplanner.analyst.pointset.Category;
 import org.opentripplanner.analyst.pointset.CategoryMetadata;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
