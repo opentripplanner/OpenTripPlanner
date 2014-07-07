@@ -5,28 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/**
- * A TimeSurface is evaluated at all the points in a PointSet to yield an Indicator.
- *
- * These are represented as a constrained format of GeoJSON.
- * They provide cumulative distributions for access to the opportunities in the PointSet
- * with respect to travel time from a particular origin.
- *
- * Indicators these are one of the three main web analyst resources:
- * Pointsets
- * Indicators
- * TimeSurfaces
- *
- * note: A TimeSurface is a lot like a Coverage. A Pointset is a lot like a FeatureCollection.
- *
- * An Indicator is structured exactly like a pointset.
- * In fact, it could be a subclass of Pointset with an extra field in each Attribute.
- *
- * Is it a one-to-many indicator, or many to many? Attributes.quantiles is an array, so
- * it's many-to-many.
- */
-
-public class IndicatorLite {
+public class ResultFeature {
 
 	private static final long serialVersionUID = -6723127825189535112L;
     
@@ -35,7 +14,7 @@ public class IndicatorLite {
 	 */
 	public Map<String,Histogram> histograms;
 	
-    public IndicatorLite (SampleSet samples, TimeSurface surface) {
+    public ResultFeature (SampleSet samples, TimeSurface surface) {
     	histograms = new HashMap<String,Histogram>();
     	
         PointSet targets = samples.pset;
