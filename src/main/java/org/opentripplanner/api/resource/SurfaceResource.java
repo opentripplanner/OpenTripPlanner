@@ -169,7 +169,7 @@ public class SurfaceResource extends RoutingResource {
         Graph gg = server.graphService.getGraph(surf.routerId);
         SampleSet samples = pset.getSampleSet( gg );
         
-        final ResultFeature indicator = new ResultFeature(samples, surf);
+        final ResultFeature indicator = ResultFeature.eval(samples, surf);
         if (indicator == null) return badServer("Could not compute indicator as requested.");
         return Response.ok().entity(new StreamingOutput() {
             @Override

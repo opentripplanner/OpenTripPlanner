@@ -14,8 +14,12 @@ public class ResultFeature {
 	 */
 	public Map<String,Histogram> histograms;
 	
-    public ResultFeature (SampleSet samples, TimeSurface surface) {
-    	histograms = new HashMap<String,Histogram>();
+	public ResultFeature(){
+		histograms = new HashMap<String,Histogram>();
+	}
+	
+    public static ResultFeature eval(SampleSet samples, TimeSurface surface) {
+    	ResultFeature ret = new ResultFeature();
     	
         PointSet targets = samples.pset;
         // Evaluate the surface at all points in the pointset
@@ -24,8 +28,10 @@ public class ResultFeature {
         	String catId = cat.getKey();
         	int[] mags = cat.getValue();
         	
-        	this.histograms.put(catId, new Histogram(times, mags));
+        	ret.histograms.put(catId, new Histogram(times, mags));
         }
+        
+        return ret;
     }
     
     /**
