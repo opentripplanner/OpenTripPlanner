@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.index.strtree.STRtree;
 
 public class HashGridSampler implements SampleSource {
 
@@ -76,7 +77,20 @@ public class HashGridSampler implements SampleSource {
         double d1 = Double.MAX_VALUE;
 
         // query
-        HashGrid index = this.indexes.get(routerId);
+        HashGrid index = null;
+        if (routerId == null || routerId.isEmpty()) {
+            routerId = graphService.getDefaultRouterId();
+            LOG.debug("routerId not specified, set to default of '{}'", routerId);
+        }
+        synchronized (this.indexes) {
+            if ( ! indexes.containsKey(routerId)) {
+                LOG.error("no index registered with the routerId '{}'", routerId);
+                return null;
+            } else {
+                index = this.indexes.get(routerId);
+            }
+        }
+        
         List<Object> os = index.query(lon, lat, SEARCH_RADIUS_M);
         // query always returns a (possibly empty) list, but never null.
         // find two closest among nearby geometries

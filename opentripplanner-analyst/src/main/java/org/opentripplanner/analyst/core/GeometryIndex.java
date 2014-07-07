@@ -95,8 +95,19 @@ public class GeometryIndex implements GeometryIndexService {
     
     @SuppressWarnings("rawtypes")
     public List queryPedestrian(Envelope env, String routerId) {
-        STRtree pedIndex = pedestrianIndexes.get(routerId);
-        return pedIndex.query(env);
+        if (routerId == null || routerId.isEmpty()) {
+            routerId = graphService.getDefaultRouterId();
+            LOG.debug("routerId not specified, set to default of '{}'", routerId);
+        }
+        synchronized (pedestrianIndexes) {
+            if ( ! pedestrianIndexes.containsKey(routerId)) {
+                LOG.error("no ped index registered with the routerId '{}'", routerId);
+                return null;
+            } else {
+            	STRtree pedIndex = pedestrianIndexes.get(routerId);
+                return pedIndex.query(env);            	
+            }
+        }
     }
     
     @Override

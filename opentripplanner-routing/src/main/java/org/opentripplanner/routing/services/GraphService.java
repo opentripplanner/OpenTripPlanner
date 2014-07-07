@@ -48,6 +48,9 @@ public interface GraphService {
     /** @return a collection of all valid router IDs for this server */
     public Collection<String> getRouterIds();
 
+    /** @return the default router ID for this server */
+    public String getDefaultRouterId();
+    
     /**
      * Blocking method to associate the specified router ID with the corresponding graph file on 
      * disk, load that serialized graph, and enable its use in routing.
