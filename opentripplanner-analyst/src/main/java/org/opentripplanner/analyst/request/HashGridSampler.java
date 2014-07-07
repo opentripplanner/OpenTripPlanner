@@ -13,7 +13,9 @@
 
 package org.opentripplanner.analyst.request;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -39,20 +41,23 @@ public class HashGridSampler implements SampleSource {
     private static final double SEARCH_RADIUS_M = 100;
     @Autowired
     private GraphService graphService;
-    private HashGrid index;
+    private Map<String, HashGrid> indexes = new HashMap<String, HashGrid>();
 
     @PostConstruct
     public void initialize() {
-        index = new HashGrid(50, 2000, 2000);
-        Graph graph = graphService.getGraph();
-        LOG.debug("Rasterizing streets into index...");
-        for (StreetVertex vertex : IterableLibrary.filter(graph.getVertices(), StreetVertex.class)) {
-            for (Edge e: vertex.getOutgoing()) {
-                index.rasterize(e.getGeometry(), e);
+        for (String routerId : graphService.getRouterIds()) {
+            HashGrid index = new HashGrid(50, 2000, 2000);
+            Graph graph = graphService.getGraph(routerId);
+            LOG.debug("Rasterizing streets into index for graph {}...", routerId);
+            for (StreetVertex vertex : IterableLibrary.filter(graph.getVertices(), StreetVertex.class)) {
+                for (Edge e: vertex.getOutgoing()) {
+                    index.rasterize(e.getGeometry(), e);
+                }
             }
+            LOG.debug("Done rasterizing streets into index.");
+            //System.out.println(index.densityMap());
+            this.indexes.put(routerId, index);
         }
-        LOG.debug("Done rasterizing streets into index.");
-        //System.out.println(index.densityMap());
     }
     
     @Override
@@ -71,6 +76,7 @@ public class HashGridSampler implements SampleSource {
         double d1 = Double.MAX_VALUE;
 
         // query
+        HashGrid index = this.indexes.get(routerId);
         List<Object> os = index.query(lon, lat, SEARCH_RADIUS_M);
         // query always returns a (possibly empty) list, but never null.
         // find two closest among nearby geometries
