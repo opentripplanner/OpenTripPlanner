@@ -30,6 +30,8 @@ public class TemplateTile extends Tile {
     
     public TemplateTile(TileRequest req, SampleSource sampleSource) {
         super(req);
+        LOG.debug("In TemplateTile constructor: about to create samples (rId = {})",
+            req.routerId);
         this.samples = new Sample[width * height];
         CoordinateReferenceSystem crs = gg.getCoordinateReferenceSystem2D(); 
         int i = 0;
@@ -53,7 +55,7 @@ public class TemplateTile extends Tile {
                     double lon = sourcePos.getOrdinate(0);
                     double lat = sourcePos.getOrdinate(1);
                     // TODO: axes are reversed in the default mathtransform
-                    Sample s = sampleSource.getSample(lon, lat);
+                    Sample s = sampleSource.getSample(lon, lat, req.routerId);
                     samples[i++] = s;
                 }
             }

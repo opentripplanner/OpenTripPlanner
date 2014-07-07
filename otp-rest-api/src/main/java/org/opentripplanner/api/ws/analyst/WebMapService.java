@@ -122,7 +122,7 @@ public class WebMapService extends RoutingResource {
 //            sptRequestB = new SPTRequest(originLonB, originLatB, timeB);
 //        } 
 //        
-        TileRequest tileRequest = new TileRequest(bbox, width, height);
+        TileRequest tileRequest = new TileRequest(bbox, width, height, reqA.routerId);
         Layer layer = layers.get(0);
         Style style = styles.get(0);
         RenderRequest renderRequest = new RenderRequest(format, layer, style, transparent, timestamp);

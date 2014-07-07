@@ -49,8 +49,11 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Tile {
 
+    protected final String routerId;
+
     /* STATIC */
     private static final Logger LOG = LoggerFactory.getLogger(Tile.class);
+
 
     /**
      *  Creates an interpolated 8-bit color map from the supplied array of color values.
@@ -199,6 +202,7 @@ public abstract class Tile {
     final int width, height;
     
     Tile(TileRequest req) {
+        this.routerId = req.routerId;
         GridEnvelope2D gridEnv = new GridEnvelope2D(0, 0, req.width, req.height);
         this.gg = new GridGeometry2D(gridEnv, (org.opengis.geometry.Envelope)(req.bbox));
         // TODO: check that gg intersects graph area 

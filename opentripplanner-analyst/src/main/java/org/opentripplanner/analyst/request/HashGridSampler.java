@@ -57,7 +57,8 @@ public class HashGridSampler implements SampleSource {
     
     @Override
     /** implements SampleSource interface */
-    public Sample getSample(double lon, double lat) {
+    public Sample getSample(double lon, double lat, String routerId) {
+        LOG.debug("In HashGridSample.getSample()");
         Coordinate coord = new Coordinate(lon, lat);
 //        Point p = geometryFactory.createPoint(c);
         

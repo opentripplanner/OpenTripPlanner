@@ -13,6 +13,7 @@
 
 package org.opentripplanner.analyst.core;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,44 +55,54 @@ public class GeometryIndex implements GeometryIndexService {
     @Autowired @Setter
     GraphService graphService;
     
-    private STRtree pedestrianIndex;
+    private Map<String, STRtree> pedestrianIndexes = new HashMap<String, STRtree>();
     
     @PostConstruct
     public void initialzeComponent() {
-        Graph graph = graphService.getGraph();
-        if (graph == null) { // analyst currently depends on there being a single default graph
-            String message = "Could not retrieve default Graph from GraphService. Check its configuration.";
+        LOG.debug("In GeometryIndex.initialzeComponent()");
+        Integer gi = 0;
+        for (String routerId : graphService.getRouterIds()) {
+            LOG.debug("...building index for graph {}", routerId);
+            Graph graph = graphService.getGraph(routerId);
+            Map<ReversibleLineStringWrapper, StreetEdge> edges = Maps.newHashMap();
+            for (StreetVertex vertex : IterableLibrary.filter(graph.getVertices(), StreetVertex.class)) {
+                for (StreetEdge e: IterableLibrary.filter(vertex.getOutgoing(), StreetEdge.class)) {
+                    LineString geom = e.getGeometry();
+                    if (e.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
+                        edges.put(new ReversibleLineStringWrapper(geom), e);
+                    }
+                }
+            }
+            // insert unique edges
+            STRtree pedIndex = new STRtree();
+            for (StreetEdge e : edges.values()) {
+                LineString geom = e.getGeometry();
+                pedIndex.insert(geom.getEnvelopeInternal(), e);
+            }
+            pedIndex.build();
+            pedestrianIndexes.put(routerId, pedIndex);
+            gi += 1;
+            LOG.debug("spatial index size: {}", pedIndex.size());
+        }
+
+        if (gi == 0) {
+            String message = "Could not retrieve any Graphs from GraphService. Check its configuration.";
             LOG.error(message);
             throw new IllegalStateException(message);
         }
-        Map<ReversibleLineStringWrapper, StreetEdge> edges = Maps.newHashMap();
-        for (StreetVertex vertex : IterableLibrary.filter(graph.getVertices(), StreetVertex.class)) {
-            for (StreetEdge e: IterableLibrary.filter(vertex.getOutgoing(), StreetEdge.class)) {
-                LineString geom = e.getGeometry();
-                if (e.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
-                    edges.put(new ReversibleLineStringWrapper(geom), e);
-                }
-            }
-        }
-        // insert unique edges
-        pedestrianIndex = new STRtree();
-        for (StreetEdge e : edges.values()) {
-            LineString geom = e.getGeometry();
-            pedestrianIndex.insert(geom.getEnvelopeInternal(), e);
-        }
-        pedestrianIndex.build();
-        LOG.debug("spatial index size: {}", pedestrianIndex.size());
+        LOG.debug("... done in GeometryIndex.initialzeComponent()");
     }
     
     @SuppressWarnings("rawtypes")
-    public List queryPedestrian(Envelope env) {
-        return pedestrianIndex.query(env);
+    public List queryPedestrian(Envelope env, String routerId) {
+        STRtree pedIndex = pedestrianIndexes.get(routerId);
+        return pedIndex.query(env);
     }
     
     @Override
-    public BoundingBox getBoundingBox(CoordinateReferenceSystem crs) {
+    public BoundingBox getBoundingBox(CoordinateReferenceSystem crs, String routerId) {
         try {
-            Envelope bounds = (Envelope) pedestrianIndex.getRoot().getBounds();
+            Envelope bounds = (Envelope) pedestrianIndexes.get(routerId).getRoot().getBounds();
             ReferencedEnvelope refEnv = new ReferencedEnvelope(bounds, CRS.decode("EPSG:4326", true));
             return refEnv.toBounds(crs);
         } catch (Exception e) {

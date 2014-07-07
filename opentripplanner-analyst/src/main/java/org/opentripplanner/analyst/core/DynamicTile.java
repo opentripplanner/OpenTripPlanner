@@ -53,7 +53,7 @@ public class DynamicTile extends Tile {
                     // axis order can vary
                     double lon = sourcePos.getOrdinate(0);
                     double lat = sourcePos.getOrdinate(1);
-                    Sample s = ss.getSample(lon, lat);
+                    Sample s = ss.getSample(lon, lat, this.routerId);
                     if (s != null)
                         ns++;
                     ret[i] = s;
