@@ -140,9 +140,6 @@ public class PointSet implements Serializable{
 			LOG.error("CSV file did not contain a latitude or longitude column.");
 			throw new IOException();
 		}
-		for (int i=0; i<properties.length; i++) {
-			properties[i] = new int[nRecs];
-		}
 		ret.lats = new double[nRecs];
 		ret.lons = new double[nRecs];
 		while (reader.readRecord()) {

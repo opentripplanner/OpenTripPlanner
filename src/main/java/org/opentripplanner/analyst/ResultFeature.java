@@ -1,11 +1,12 @@
 package org.opentripplanner.analyst;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class ResultFeature {
+public class ResultFeature implements Serializable{
 
 	private static final long serialVersionUID = -6723127825189535112L;
     

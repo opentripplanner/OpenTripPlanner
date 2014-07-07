@@ -1,6 +1,8 @@
 package org.opentripplanner.analyst.pointset;
 
-public class PropertyMetadata {
+import java.io.Serializable;
+
+public class PropertyMetadata implements Serializable{
 
 	public String label;
 	public Style style;
