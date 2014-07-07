@@ -252,7 +252,7 @@ public class PointSet implements Serializable{
 					jp.skipChildren(); // ignore all other keys except features
 				}
 			}
-		} catch (Exception ex) {
+		} catch (Exception ex) {			
 			LOG.error("GeoJSON parsing failure.");
 			return null;
 		}
@@ -378,7 +378,9 @@ public class PointSet implements Serializable{
 			String attrId = ad.getKey();
 			Integer attrVal = ad.getValue();
 			
+			this.getOrCreateCategoryForId(attrId);
 			this.categories.get(attrId)[index] = attrVal;
+
 
 		}
 	}
