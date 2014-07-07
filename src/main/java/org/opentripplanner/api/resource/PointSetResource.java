@@ -1,6 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.analyst.Indicator;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.model.PointSetShort;
