@@ -399,6 +399,51 @@ otp.widgets.tripoptions.TimeSelector =
 });
 
 
+//** WheelChairSelector **//
+
+otp.widgets.tripoptions.WheelChairSelector =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+    id           :  null,
+    //TODO: add localization when localization branch is merged
+    label        : "Wheelchair accesible trip:",
+
+    initialize : function(tripWidget) {
+
+        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+
+        this.id = tripWidget.id;
+
+
+        ich['otp-tripOptions-wheelchair']({
+            widgetId : this.id,
+            label : this.label,
+        }).appendTo(this.$());
+
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+
+        $("#"+this.id+"-wheelchair-input").change(function() {
+            this_.tripWidget.module.wheelchair = this.checked;
+        });
+    },
+
+    restorePlan : function(data) {
+        if(data.queryParams.wheelchair) {
+            $("#"+this.id+"-wheelchair-input").prop("checked", data.queryParams.wheelchair);
+        }
+    },
+
+    isApplicableForMode : function(mode) {
+        //wheelchair mode is shown on transit and walk trips that
+        //doesn't include a bicycle
+        return (otp.util.Itin.includesTransit(mode)  || mode == "WALK") && !otp.util.Itin.includesBicycle(mode);
+    }
+});
+
+
 //** ModeSelector **//
 
 otp.widgets.tripoptions.ModeSelector = 
