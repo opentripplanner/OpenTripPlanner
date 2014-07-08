@@ -2,8 +2,12 @@ package org.opentripplanner.analyst.batch;
 
 import junit.framework.TestCase;
 
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opentripplanner.analyst.EmptyPolygonException;
 import org.opentripplanner.analyst.PointFeature;
 import org.opentripplanner.analyst.PointSet;
+import org.opentripplanner.analyst.UnsupportedGeometryException;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +32,14 @@ public class PointSetTest extends TestCase {
         PointSet points = PointSet.fromGeoJson("src/test/resources/pointset/population.geo.json");
         assertNotNull(points);
         assertEquals(points.capacity, 2);
+    }
+    
+    public void testLoadShapefile() throws NoSuchAuthorityCodeException, IOException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
+        PointSet points = PointSet.fromShapefile("src/test/resources/pointset/shp/austin.shp");
+        assertNotNull(points);
+        PointFeature ft = points.getFeature(0);
+        int pop = ft.getProperty("DEC_10_S_2");
+        assertEquals( pop, 42 );
     }
     
     public void testGetFeature() {

@@ -21,12 +21,27 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import org.geotools.data.FileDataStore;
+import org.geotools.data.FileDataStoreFinder;
+import org.geotools.data.Query;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.referencing.CRS;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.PropertyType;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opentripplanner.analyst.batch.Individual;
 import org.opentripplanner.analyst.pointset.PropertyMetadata;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,6 +50,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -158,6 +174,62 @@ public class PointSet implements Serializable{
 		}
 		ret.capacity = nRecs;
 		return ret;
+	}
+	
+	public static PointSet fromShapefile( String filename ) throws IOException, NoSuchAuthorityCodeException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
+		File file = new File(filename);
+        if ( ! file.exists())
+            throw new RuntimeException("Shapefile does not exist.");
+        
+        FileDataStore store = FileDataStoreFinder.getDataStore(file);
+        SimpleFeatureSource featureSource = store.getFeatureSource();
+
+        CoordinateReferenceSystem sourceCRS = featureSource.getInfo().getCRS();
+        CoordinateReferenceSystem WGS84 = CRS.decode("EPSG:4326", true);
+        
+        Query query = new Query();
+        query.setCoordinateSystem(sourceCRS);
+        query.setCoordinateSystemReproject(WGS84);
+        SimpleFeatureCollection featureCollection = featureSource.getFeatures(query);
+        
+        SimpleFeatureIterator it = featureCollection.features();
+        
+        PointSet ret = new PointSet(featureCollection.size());
+        int i=0;
+        while (it.hasNext()) {
+            SimpleFeature feature = it.next();
+            Geometry geom = (Geometry) feature.getDefaultGeometry();
+            
+            PointFeature ft = new PointFeature();
+            ft.setGeom(geom);
+            for(Property prop : feature.getProperties() ){
+            	Object binding = prop.getType().getBinding();
+            	
+            	//attempt to coerce the prop's value into an integer
+            	int val;
+            	if(binding.equals(Integer.class)){
+            		val = (Integer)prop.getValue();
+            	} else if(binding.equals(Long.class)){
+            		val = ((Long)prop.getValue()).intValue();
+            	} else if(binding.equals(String.class)){
+            		try{
+            			val = Integer.parseInt((String)prop.getValue());
+            		} catch (NumberFormatException ex ){
+            			continue;
+            		}
+            	} else {
+            		continue;
+            	}
+            	
+            	ft.addAttribute(prop.getName().toString(), val);
+            }
+            
+            ret.addFeature(ft, i);
+            
+            i++;
+        }
+        
+        return ret;
 	}
 
 	public static PointSet fromGeoJson(String filename) {
