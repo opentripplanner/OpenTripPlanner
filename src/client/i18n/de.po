@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-07-01 09:23+0200\n"
+"POT-Creation-Date: 2014-07-10 12:11+0200\n"
 "PO-Revision-Date: 2014-06-24 10:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: de <LL@li.org>\n"
@@ -62,13 +62,32 @@ msgstr "Auto"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:293
+#: src/client/js/otp/config.js:289
+msgid "Park and Ride"
+msgstr "Parken und Reisen"
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets) http://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride
+#: src/client/js/otp/config.js:292
+msgid "Kiss and Ride"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets) (Park bicycle at Public transit station and take a
+#. transit
+#: src/client/js/otp/config.js:296
+msgid "Bike and Ride"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:303
 msgid "Rented Bicycle"
 msgstr "Fahrradverleih"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:296
+#: src/client/js/otp/config.js:306
 msgid "Transit & Rented Bicycle"
 msgstr "ÖPNV und Fahrradverleih"
 

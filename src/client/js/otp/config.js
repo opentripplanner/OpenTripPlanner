@@ -284,10 +284,20 @@ otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
         "CAR"                 : _tr('Drive Only'),
-        //uncomment only if bike rental exists in a map
-        // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
-        //       (note that we've been broken for awhile here, since many agencies don't have a 'Train' mode either...this needs attention)
-        // IDEA: maybe we start with a big array (like below), and the pull out modes from this array when turning off various modes...
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets)
+    "CAR_PARK,WALK,TRANSIT"     : _tr('Park and Ride'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets) http://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride
+    "CAR,WALK,TRANSIT"          : _tr('Kiss and Ride'),
+    //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
+    //Options widgets) (Park bicycle at Public transit station and take a
+    //transit
+    "BICYCLE_PARK,WALK,TRANSIT" : _tr('Bike and Ride'),
+    //uncomment only if bike rental exists in a map
+    // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
+    //       (note that we've been broken for awhile here, since many agencies don't have a 'Train' mode either...this needs attention)
+    // IDEA: maybe we start with a big array (like below), and the pull out modes from this array when turning off various modes...
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
         'WALK,BICYCLE'        :_tr('Rented Bicycle'),
