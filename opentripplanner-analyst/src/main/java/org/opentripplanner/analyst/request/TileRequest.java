@@ -43,11 +43,16 @@ public class TileRequest {
     public boolean equals(Object other) {
         if (other instanceof TileRequest) {
             TileRequest that = (TileRequest) other;
-            return this.bbox.equals(that.bbox) &&
+            boolean eqPartial = this.bbox.equals(that.bbox) &&
                    this.width  == that.width   &&
                    this.height == that.height  &&
-                   this.routerId.equals(that.routerId) &&
-                   this.routerId2.equals(that.routerId2);
+                   this.routerId.equals(that.routerId);
+            if (this.routerId2 == null) {
+                return eqPartial && this.routerId2 == that.routerId2;
+            }
+            else {
+                return eqPartial && this.routerId2.equals(that.routerId2);
+            }
         }
         return false;
     }
