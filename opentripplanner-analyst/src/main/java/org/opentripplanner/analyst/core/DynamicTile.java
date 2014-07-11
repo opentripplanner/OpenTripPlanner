@@ -33,7 +33,16 @@ public class DynamicTile extends Tile {
         this.ss = sampleSource;
     }
     
-    public Sample[] getSamples() {
+    public Sample[] getSamples(String routerIdArg) {
+        if (routerIdArg == null) {
+            routerIdArg = this.routerId;
+        }
+        else if (routerIdArg != this.routerId || routerIdArg != this.routerId2) {
+            LOG.error("bad routerId passed in to Tile.getSamples(), wasn't "+
+                      "one of two allowed routerIds passed to constructor.");
+            return null;
+        }
+        
         Sample[] ret = new Sample[width * height];
         long t0 = System.currentTimeMillis();
         CoordinateReferenceSystem crs = gg.getCoordinateReferenceSystem2D();
@@ -53,7 +62,7 @@ public class DynamicTile extends Tile {
                     // axis order can vary
                     double lon = sourcePos.getOrdinate(0);
                     double lat = sourcePos.getOrdinate(1);
-                    Sample s = ss.getSample(lon, lat, this.routerId);
+                    Sample s = ss.getSample(lon, lat, routerIdArg);
                     if (s != null)
                         ns++;
                     ret[i] = s;

@@ -13,6 +13,9 @@
 
 package org.opentripplanner.analyst.core;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -26,13 +29,22 @@ import org.slf4j.LoggerFactory;
 public class TemplateTile extends Tile {
 
     private static final Logger LOG = LoggerFactory.getLogger(TemplateTile.class);
-    Sample[] samples;
+    private Map<String, Sample[]> samples = new HashMap<String, Sample[]>();
     
     public TemplateTile(TileRequest req, SampleSource sampleSource) {
         super(req);
         LOG.debug("In TemplateTile constructor: about to create samples (rId = {})",
             req.routerId);
-        this.samples = new Sample[width * height];
+        this.samples.put(req.routerId, createSamples(sampleSource, req.routerId));
+        if (req.routerId2 != null) {
+            LOG.debug("In TemplateTile constructor: about to create samples (rId = {})",
+                    req.routerId2);
+        	this.samples.put(req.routerId2, createSamples(sampleSource, req.routerId2));
+        }
+    }
+    
+    private Sample[] createSamples(SampleSource sampleSource, String routerIdArg) {
+        Sample[] sampleSet = new Sample[width * height];
         CoordinateReferenceSystem crs = gg.getCoordinateReferenceSystem2D(); 
         int i = 0;
         try {
@@ -55,18 +67,26 @@ public class TemplateTile extends Tile {
                     double lon = sourcePos.getOrdinate(0);
                     double lat = sourcePos.getOrdinate(1);
                     // TODO: axes are reversed in the default mathtransform
-                    Sample s = sampleSource.getSample(lon, lat, req.routerId);
-                    samples[i++] = s;
+                    Sample s = sampleSource.getSample(lon, lat, routerIdArg);
+                    sampleSet[i++] = s;
                 }
             }
         } catch (Exception e) {
             LOG.error(e.toString());
             e.printStackTrace();
         }
+        return sampleSet;
     }
     
-    public Sample[] getSamples() {
-        return this.samples;
+    public Sample[] getSamples(String routerIdArg) {
+    	if (routerIdArg == null) {
+    		routerIdArg = this.routerId;
+    	}
+    	else if (routerIdArg != this.routerId || routerIdArg != this.routerId2) {
+            LOG.error("bad routerId passed in to Tile.getSamples(), wasn't "+
+            		  "one of two allowed routerIds passed to constructor.");
+            return null;
+    	}
+    	return this.samples.get(routerIdArg);
     }
-
 }

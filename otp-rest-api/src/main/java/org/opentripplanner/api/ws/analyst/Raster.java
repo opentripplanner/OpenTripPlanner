@@ -71,7 +71,7 @@ public class Raster {
             width  = (int) Math.ceil(bbox.width  / resolution);
             height = (int) Math.ceil(bbox.height / resolution);
         }
-        TileRequest tileRequest = new TileRequest(bbox, width, height, routerId);
+        TileRequest tileRequest = new TileRequest(bbox, width, height, routerId, null);
         SPTRequest sptRequest = new SPTRequest(x, y, time);
         RenderRequest renderRequest = new RenderRequest(format, Layer.TRAVELTIME, Style.GRAY, false, false);
 

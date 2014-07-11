@@ -21,12 +21,19 @@ public class TileRequest {
     public final int width; 
     public final int height; 
     public final String routerId;
+    public final String routerId2;
     
-    public TileRequest(Envelope2D bbox, Integer width, Integer height, String routerId) {
+    public TileRequest(Envelope2D bbox, Integer width, Integer height, String routerId, String routerId2) {
         this.bbox = bbox;
         this.width = width;
         this.height = height;
         this.routerId = routerId;
+        if (routerId2 == null || routerId2.equals(routerId)) {
+        	this.routerId2 = null;
+        }
+        else {
+        	this.routerId2 = routerId2;
+        }
     }
     
     public int hashCode() {
@@ -39,14 +46,15 @@ public class TileRequest {
             return this.bbox.equals(that.bbox) &&
                    this.width  == that.width   &&
                    this.height == that.height  &&
-                   this.routerId.equals(that.routerId);
+                   this.routerId.equals(that.routerId) &&
+                   this.routerId2.equals(that.routerId2);
         }
         return false;
     }
     
     public String toString() {
-        return String.format("<tile request, bbox=%s width=%d height=%d routerId=%s>", 
-                bbox, width, height, routerId);
+        return String.format("<tile request, bbox=%s width=%d height=%d routerId=%s routerId2=%s>", 
+                bbox, width, height, routerId, routerId2);
     }
     
     // implement iterable to iterate over pixels?

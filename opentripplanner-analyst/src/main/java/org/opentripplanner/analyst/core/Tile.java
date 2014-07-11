@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 public abstract class Tile {
 
     protected final String routerId;
+    protected final String routerId2;
 
     /* STATIC */
     private static final Logger LOG = LoggerFactory.getLogger(Tile.class);
@@ -203,6 +204,12 @@ public abstract class Tile {
     
     Tile(TileRequest req) {
         this.routerId = req.routerId;
+        if (req.routerId2 == null || req.routerId2.equals(req.routerId)) {
+            this.routerId2 = null;
+        }
+        else {
+            this.routerId2 = req.routerId2;
+        }
         GridEnvelope2D gridEnv = new GridEnvelope2D(0, 0, req.width, req.height);
         this.gg = new GridGeometry2D(gridEnv, (org.opengis.geometry.Envelope)(req.bbox));
         // TODO: check that gg intersects graph area 
@@ -312,12 +319,28 @@ public abstract class Tile {
         long t0 = System.currentTimeMillis();
         BufferedImage image = getEmptyImage(renderRequest.style);
         byte[] imagePixelData = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
-        int i = 0;
-        for (Sample s : getSamples()) {
-            byte pixel = UNREACHABLE;
-            if (s != null) {
+        Sample[] samples = this.getSamples(this.routerId);
+        Sample[] samples2;
+        if (this.routerId2 == null || this.routerId2.equals(this.routerId)) {
+            // Don't need to copy, since we're not going to modify arrays
+            samples2 = samples;
+        }
+        else {
+            samples2 = this.getSamples(this.routerId2);
+        }
+        if (samples.length != samples2.length) {
+            LOG.error("Problem occurred with generating samples in tile "+
+                      "linearCombination calc: "+
+                      "samples in this region not the same between graphs.");
+            return null;
+        }
+        for (int si = 0; si < samples.length; si++) {
+            Sample s = samples[si];
+            Sample s2 = samples2[si];
+        	byte pixel = UNREACHABLE;
+            if (s != null && s2 != null) {
                 long t1 = s.eval(spt1);
-                long t2 = s.eval(spt2);
+                long t2 = s2.eval(spt2);
                 if (t1 != Long.MAX_VALUE && t2 != Long.MAX_VALUE) {
                     double t = (k1 * t1 + k2 * t2) / 60 + intercept; 
                     if (t < -120)
@@ -327,8 +350,7 @@ public abstract class Tile {
                     pixel = (byte) t;
                 }
             }
-            imagePixelData[i] = pixel;
-            i++;
+            imagePixelData[si] = pixel;
         }
         long t1 = System.currentTimeMillis();
         LOG.debug("filled in tile image from SPT in {}msec", t1 - t0);
@@ -341,8 +363,13 @@ public abstract class Tile {
         return gridCoverage;
     }
 
-    public abstract Sample[] getSamples();
+    public final Sample[] getSamples() {
+        // mimic functionality with GraphContext to use default graph routerId 
+        return this.getSamples(null);
+    }
 
+    public abstract Sample[] getSamples(String routerId);
+    
     public static BufferedImage getLegend(Style style, int width, int height) {
         final int NBANDS = 150;
         final int LABEL_SPACING = 30; 
