@@ -37,9 +37,11 @@ public class DynamicTile extends Tile {
         if (routerIdArg == null) {
             routerIdArg = this.routerId;
         }
-        else if (routerIdArg != this.routerId || routerIdArg != this.routerId2) {
-            LOG.error("bad routerId passed in to Tile.getSamples(), wasn't "+
-                      "one of two allowed routerIds passed to constructor.");
+        else if (!(routerIdArg.equals(this.routerId) ||
+                (this.routerId2 != null && routerIdArg.equals(this.routerId2)))) {
+            LOG.error("bad routerId passed in to Tile.getSamples() ({}), wasn't "+
+                    "one of two allowed routerIds passed to constructor ({}, {}).",
+                    routerIdArg, this.routerId, this.routerId2);
             return null;
         }
         
