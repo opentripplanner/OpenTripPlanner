@@ -21,6 +21,7 @@ public class DCFareCalculator {
     private static RideType classify (Ride ride) {
         // NOTE the agencyId string of the route's agencyAndId is not the same as the one given by route.getAgency.
         // The former is the same for all routes in the feed. The latter is the true agency of the feed.
+
         String agency = ride.route.getAgency().getId();
         String agency_url = ride.route.getAgency().getUrl(); // this is used in single-agency feeds so it should work
         String short_name = ride.route.getShortName();

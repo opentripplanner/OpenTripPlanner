@@ -75,7 +75,7 @@ class Stats implements Cloneable {
 
     /** Construct a Stats containing the min, max, average, and count of the given ints. */
     public Stats (Collection<Integer> ints) {
-        if (ints == null || ints.isEmpty()) return; // all zeros
+        if (ints == null || ints.isEmpty()) throw new AssertionError("Stats are undefined if there are no values.");
         min = Integer.MAX_VALUE;
         double accumulated = 0;
         for (int i : ints) {
@@ -96,6 +96,7 @@ class Stats implements Cloneable {
         Stats s = new Stats ();
         s.min = Integer.MAX_VALUE;
         s.num = 0;
+        // TODO maybe we should prefilter the triptimes so we aren't constantly iterating over the trips whose service is not running
         for (TripTimes tripTimes : pattern.getScheduledTimetable().getTripTimes()) {
             int depart = tripTimes.getDepartureTime(stop0);
             int arrive = tripTimes.getArrivalTime(stop1);

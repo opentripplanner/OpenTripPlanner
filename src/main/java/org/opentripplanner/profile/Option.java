@@ -21,7 +21,7 @@ public class Option {
     public List<WalkStep> walkSteps;
     public List<DCFareCalculator.Fare> fares;
 
-    public Option (Ride tail, int finalWalkTime, TimeWindow window, double walkSpeed) {
+    public Option (Ride tail, int finalWalkTime) {
         stats = new Stats();
         List<Ride> rides = Lists.newArrayList();
         for (Ride ride = tail; ride != null; ride = ride.previous) {
@@ -29,17 +29,17 @@ public class Option {
         }
         Collections.reverse(rides);
         for (Ride ride : rides) {
-            Segment segment = new Segment (ride, window, walkSpeed);
+            Segment segment = new Segment(ride);
             segments.add(segment);
             stats.add(segment.walkTime);
-            stats.add(segment.waitStats);
+            if(segment.waitStats != null) stats.add(segment.waitStats);
             stats.add(segment.rideStats);
         }
         // Really should be one per segment, with transfers to the same operator having a price of 0.
-        fares = DCFareCalculator.calculateFares(rides);
+        fares = null; //DCFareCalculator.calculateFares(rides);
         this.finalWalkTime = finalWalkTime;
         stats.add(finalWalkTime);
-        summary = generateSegmentSummary();
+        //summary = generateSegmentSummary();
     }
 
     /** A constructor for an option that includes only a street mode, not transit. */

@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Getter;
 
 import com.beust.jcommander.internal.Lists;
+import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.gtfs.GtfsLibrary;
 
 /**
@@ -47,24 +48,24 @@ public class Segment {
     @Getter Stats rideStats;
     @Getter List<SegmentPattern> segmentPatterns = Lists.newArrayList();
 
-    public Segment (Ride ride, TimeWindow window, double walkSpeed) {
-        route = ride.route.getId().getId();
-        mode = GtfsLibrary.getTraverseMode(ride.route).toString();
-        routeShortName = ride.route.getShortName();
-        routeLongName = ride.route.getLongName();
+    public Segment (Ride ride) {
+        //route = ride.route.getId().getId();
+        Route route = ride.patternRides.get(0).pattern.getRoute();
+        mode = GtfsLibrary.getTraverseMode(route).toString();
+        //routeShortName = ride.route.getShortName();
+        //routeLongName = ride.route.getLongName();
         from = ride.from.getId().getId();
         to = ride.to.getId().getId();
         fromName = ride.from.getName();
         toName = ride.to.getName();
-        rideStats = ride.getStats();
+        rideStats = ride.rideStats;
         for (PatternRide patternRide : ride.patternRides) {
             segmentPatterns.add(new SegmentPattern(patternRide));
         }
         Collections.sort(segmentPatterns);
         walkDistance = (int) ride.getTransferDistance();
-        walkTime = (int) (ride.getTransferDistance() / walkSpeed);
-        /* At this point we know all patterns on rides. Calculate transfer time information. */
-        waitStats = ride.statsForTransfer (window, walkSpeed);
+        walkTime = (int) (ride.getTransferDistance()); // TODO / walkSpeed);
+        waitStats = ride.waitStats;
     }
 
 }
