@@ -341,8 +341,6 @@ public abstract class Tile {
     public abstract Sample[] getSamples();
 
     public static BufferedImage getLegend(Style style, int width, int height) {
-        final int NBANDS = 150;
-        final int LABEL_SPACING = 30; 
         IndexColorModel model = modelsByStyle.get(style);
         if (width < 140 || width > 2000)
             width = 140;
@@ -350,18 +348,30 @@ public abstract class Tile {
             height = 25;
         if (model == null)
             return null;
+
+        // These params control spacing of colour bar.
+        int startVal = 0;
+        int finalVal = 150;
+        int labelSpacing = 30; 
+        if (style == Style.DIFFERENCE) {
+            startVal = -120;
+            finalVal = 120;
+            labelSpacing = 30;
+        }
+	int bandsTotal = finalVal - startVal;
+
         WritableRaster raster = model.createCompatibleWritableRaster(width, height);
         byte[] pixels = ((DataBufferByte) raster.getDataBuffer()).getData();
         for (int row = 0; row < height; row++)
             for (int col = 0; col < width; col++)
-                pixels[row * width + col] = (byte) (col * NBANDS / width);
+                pixels[row * width + col] = (byte) (startVal + col * bandsTotal / width);
         BufferedImage legend = model.convertToIntDiscrete(raster, false);
         Graphics2D gr = legend.createGraphics();
         gr.setColor(new Color(0));
         gr.drawString("travel time (minutes)", 0, 10);
-        float scale = width / (float) NBANDS;
-        for (int i = 0; i < NBANDS; i += LABEL_SPACING)
-            gr.drawString(Integer.toString(i), i * scale, height);
+        float scale = width / (float) bandsTotal;
+        for (int i = startVal; i < bandsTotal; i += labelSpacing)
+            gr.drawString(Integer.toString(i), scale * (-startVal + i), height);
         return legend;
     }
 
