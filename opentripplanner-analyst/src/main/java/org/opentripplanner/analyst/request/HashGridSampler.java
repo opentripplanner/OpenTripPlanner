@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.index.strtree.STRtree;
 
 public class HashGridSampler implements SampleSource {
 
