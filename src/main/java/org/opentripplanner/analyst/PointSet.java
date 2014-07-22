@@ -177,8 +177,7 @@ public class PointSet implements Serializable{
 		return ret;
 	}
 	
-	public static PointSet fromShapefile( String filename ) throws IOException, NoSuchAuthorityCodeException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
-		File file = new File(filename);
+	public static PointSet fromShapefile( File file ) throws IOException, NoSuchAuthorityCodeException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
         if ( ! file.exists())
             throw new RuntimeException("Shapefile does not exist.");
         

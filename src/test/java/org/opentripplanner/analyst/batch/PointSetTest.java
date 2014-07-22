@@ -18,9 +18,9 @@ import java.util.Map.Entry;
 public class PointSetTest extends TestCase {
 
     public void testPointSets() throws IOException {
-        PointSet schools = PointSet.fromCsv(new File("src/test/resources/pointset/schools.csv"));
-        assertNotNull(schools);
-        assertEquals(schools.capacity, 9);
+        PointSet austin = PointSet.fromCsv(new File("src/test/resources/pointset/austin.csv"));
+        assertNotNull(austin);
+        assertEquals(austin.capacity, 15922);
     }
 
     /** Factory method should return null but not throw an exception on malformed CSV. */
@@ -36,7 +36,7 @@ public class PointSetTest extends TestCase {
     }
     
     public void testLoadShapefile() throws NoSuchAuthorityCodeException, IOException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
-        PointSet points = PointSet.fromShapefile("src/test/resources/pointset/shp/austin.shp");
+        PointSet points = PointSet.fromShapefile(new File("src/test/resources/pointset/shp/austin.shp"));
         assertNotNull(points);
         PointFeature ft = points.getFeature(0);
         int pop = ft.getProperty("DEC_10_S_2");
