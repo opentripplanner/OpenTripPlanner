@@ -1,6 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import com.bedatadriven.geojson.GeometrySerializer;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -39,7 +38,6 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.IsolineBuilder;
 import org.opentripplanner.common.geometry.RecursiveGridIsolineBuilder;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.routing.algorithm.EarliestArrivalSPTService;
 import org.opentripplanner.routing.algorithm.GenericAStar;
@@ -169,7 +167,7 @@ public class SurfaceResource extends RoutingResource {
         Graph gg = server.graphService.getGraph(surf.routerId);
         SampleSet samples = pset.getSampleSet( gg );
         
-        final ResultFeature indicator = ResultFeature.eval(samples, surf);
+        final ResultFeature indicator = new ResultFeature(samples, surf);
         if (indicator == null) return badServer("Could not compute indicator as requested.");
         return Response.ok().entity(new StreamingOutput() {
             @Override

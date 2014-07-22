@@ -7,41 +7,57 @@ public class ResultFeatureWithTimes extends ResultFeature {
 
 	private static final long serialVersionUID = -6723127825189535112L;
     
-	public String id;
-	public Map<String,Histogram> histograms;
-	
-	public PointSet targets;
 	public int[] times;
 	
 	public Map<String,Integer> timeIdMap = new ConcurrentHashMap<String,Integer>();
 	
-	public ResultFeatureWithTimes(){
-		super();
+	public ResultFeatureWithTimes() {
+		
+	}
+	
+	public ResultFeatureWithTimes(SampleSet samples, TimeSurface surface) {
+		id = samples.pset.id + "_" + surface.id + "_times";
+		
+		// Evaluate the surface at all points in the pointset
+        times = samples.eval(surface);
+        
+        buildHistograms(times, samples.pset);
+        
+		int i = 0;
+		for(String id : samples.pset.ids) {
+			timeIdMap.put(id, times[i]);
+			i++;
+		}
 	}
 	
 	public Integer getTime(String featureId) {
 		return timeIdMap.get(featureId);
 	}
 	
-    public static ResultFeatureWithTimes eval(SampleSet samples, TimeSurface surface) {
-    	ResultFeatureWithTimes ret = new ResultFeatureWithTimes();
-    	
-    	// keep targets and times in resultfeature object
-        ret.targets = samples.pset;
-        // Evaluate the surface at all points in the pointset
-        ret.times = samples.eval(surface);
-        
-        ret.buildHistograms(ret.times, ret.targets);
-        
-		int i = 0;
-		for(String id : ret.targets.ids) {
-			
-			ret.timeIdMap.put(id, ret.times[i]);
-			
-			i++;
+	public Integer minTime() {
+		
+		int minTime = Integer.MAX_VALUE;
+		
+		for(int t : times) {
+			if(t < minTime) 
+				minTime = t;
 		}
-        
-        return ret;
-    }
-
+		
+		if(minTime == Integer.MAX_VALUE)
+			minTime = 0;
+		
+		return minTime;
+	}
+	
+	public Integer maxTime() {
+		
+		int maxTime = 0;
+		for(int t : times) {
+			if(t > maxTime) 
+				maxTime = t;
+		}
+		
+		return maxTime;
+		
+	}
 }

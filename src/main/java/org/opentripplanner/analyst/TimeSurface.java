@@ -51,7 +51,9 @@ public class TimeSurface implements Serializable{
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
 
     public TimeSurface(ShortestPathTree spt) {
-
+    	
+    	params = spt.getOptions().parameters;
+    	
         String routerId = spt.getOptions().routerId;
         if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
             routerId = "default";

@@ -4,6 +4,7 @@ import com.bedatadriven.geojson.GeometryDeserializer;
 import com.bedatadriven.geojson.GeometrySerializer;
 import com.csvreader.CsvReader;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -27,6 +28,7 @@ import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -98,9 +100,9 @@ public class PointSet implements Serializable{
 	 * This includes column headers in the category:subcategory:attribute format
 	 * and coordinates in WGS84. Comments begin with a #.
 	 */
-	public static PointSet fromCsv(String filename) throws IOException {
+	public static PointSet fromCsv(File filename) throws IOException {
 		/* First, scan through the file to count lines and check for errors. */
-		CsvReader reader = new CsvReader(filename, ',', Charset.forName("UTF8"));
+		CsvReader reader = new CsvReader(filename.getAbsolutePath(), ',', Charset.forName("UTF8"));
 		reader.readHeaders();
 		int nCols = reader.getHeaderCount();
 		while (reader.readRecord()) {
@@ -114,7 +116,7 @@ public class PointSet implements Serializable{
 		int nRecs = (int) reader.getCurrentRecord() + 1;
 		reader.close();
 		/* If we reached here, the file is entirely readable. Start over. */
-		reader = new CsvReader(filename, ',', Charset.forName("UTF8"));
+		reader = new CsvReader(filename.getAbsolutePath(), ',', Charset.forName("UTF8"));
 		PointSet ret = new PointSet(nRecs);
 		reader.readHeaders();
 		if (reader.getHeaderCount() != nCols) {
@@ -160,7 +162,7 @@ public class PointSet implements Serializable{
 		return ret;
 	}
 
-	public static PointSet fromGeoJson(String filename) {
+	public static PointSet fromGeoJson(File filename) {
 		try {
 			FileInputStream fis = new FileInputStream(filename);
 			int n = validateGeoJson(fis);
@@ -386,7 +388,7 @@ public class PointSet implements Serializable{
 		if (polygons[index] != null) {
 			try {
 				ret.setGeom(polygons[index]);
-			} catch (Exception e) {
+			} catch (Exception e) {	
 				// The polygon is clean; this should never happen. We
 				// could pass the exception up but that'd just make the calling
 				// function deal with an exception that will never pop. So
@@ -461,56 +463,8 @@ public class PointSet implements Serializable{
 
 				jgen.writeStringField("type", "FeatureCollection");
 
-				jgen.writeObjectFieldStart("properties");
-				{
-
-					if (id != null)
-						jgen.writeStringField("id", id);
-					if (label != null)
-						jgen.writeStringField("label", label);
-					if (description != null)
-						jgen.writeStringField("description", description);
-
-					// writes schema as a flat namespace with cat_id and
-					// cat_id:prop_id interleaved
-
-					jgen.writeObjectFieldStart("schema");
-					{
-
-						for (PropertyMetadata cat : this.propMetadata.values()) {
-
-							jgen.writeObjectFieldStart(cat.id);
-							{
-								if (cat.label != null)
-									jgen.writeStringField("label", cat.label);
-								jgen.writeStringField("type", "Category");
-
-								if (cat.style != null && cat.style.attributes != null) {
-
-									jgen.writeObjectFieldStart("style");
-									{
-
-										for (String styleKey : cat.style.attributes.keySet()) {
-											jgen.writeStringField(styleKey, cat.style.attributes.get(styleKey));
-										}
-									}
-									jgen.writeEndObject();
-
-								}
-
-							}
-							jgen.writeEndObject();
-
-							// two-level hierarchy for now... could be extended
-							// to recursively map
-							// categories,sub-categories,attributes
-						}
-
-					}
-					jgen.writeEndObject();
-				}
-				jgen.writeEndObject();
-
+				writeJsonProperties(jgen);
+				
 				jgen.writeArrayFieldStart("features");
 				{
 					for (int f = 0; f < capacity; f++) {
@@ -524,6 +478,59 @@ public class PointSet implements Serializable{
 		} catch (IOException ioex) {
 			LOG.info("IOException, connection may have been closed while streaming JSON.");
 		}
+	}
+	
+	public void writeJsonProperties(JsonGenerator jgen) throws JsonGenerationException, IOException {
+		jgen.writeObjectFieldStart("properties");
+		{
+
+			if (id != null)
+				jgen.writeStringField("id", id);
+			if (label != null)
+				jgen.writeStringField("label", label);
+			if (description != null)
+				jgen.writeStringField("description", description);
+
+			// writes schema as a flat namespace with cat_id and
+			// cat_id:prop_id interleaved
+
+			jgen.writeObjectFieldStart("schema");
+			{
+
+				for (PropertyMetadata cat : this.propMetadata.values()) {
+
+					jgen.writeObjectFieldStart(cat.id);
+					{
+						if (cat.label != null)
+							jgen.writeStringField("label", cat.label);
+						jgen.writeStringField("type", "Category");
+
+						if (cat.style != null && cat.style.attributes != null) {
+
+							jgen.writeObjectFieldStart("style");
+							{
+
+								for (String styleKey : cat.style.attributes.keySet()) {
+									jgen.writeStringField(styleKey, cat.style.attributes.get(styleKey));
+								}
+							}
+							jgen.writeEndObject();
+
+						}
+
+					}
+					jgen.writeEndObject();
+
+					// two-level hierarchy for now... could be extended
+					// to recursively map
+					// categories,sub-categories,attributes
+				}
+
+			}
+			jgen.writeEndObject();
+		}
+		jgen.writeEndObject();
+
 	}
 
 	/**
