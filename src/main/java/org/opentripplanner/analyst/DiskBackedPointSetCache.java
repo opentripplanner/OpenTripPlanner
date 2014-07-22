@@ -28,14 +28,12 @@ public class DiskBackedPointSetCache extends PointSetCache {
             }
     		
     		for (File file : pointSetPath.listFiles()) {
-               
                 if(file.getName().toLowerCase().startsWith(pointSetId.toLowerCase())) {
                 	
                 	PointSet pointSet = this.loadFromFile(file);
                 	
                 	if(pointSet != null)
                 		return pointSet;
-                	
                 }
             }
 			return null;
@@ -49,7 +47,7 @@ public class DiskBackedPointSetCache extends PointSetCache {
 	            String baseName = name.substring(0, name.length() - 4);
 	            LOG.info("loading '{}' with ID '{}'", pointSetData, baseName);
 	            try {
-	                PointSet pset = PointSet.fromCsv(pointSetData.getAbsolutePath());
+	                PointSet pset = PointSet.fromCsv(pointSetData);
 	                if (pset == null) {
 	                    LOG.warn("Failure, skipping this pointset.");
 	                }
@@ -63,17 +61,14 @@ public class DiskBackedPointSetCache extends PointSetCache {
 	        } else if (name.endsWith(".json")) {
 	            String baseName = name.substring(0, name.length() - 5);
 	            LOG.info("loading '{}' with ID '{}'", pointSetData, baseName);
-	            PointSet pset = PointSet.fromGeoJson(pointSetData.getAbsolutePath());
+	            PointSet pset = PointSet.fromGeoJson(pointSetData);
 	            if (pset == null) {
 	                LOG.warn("Failure, skipping this pointset.");
-	            }
-	            	            
+	            }       	            
 	            return pset;
 	        }
-			
 			return null;
 		}
-		
 	}
 	
 	public DiskBackedPointSetCache(Integer maxCacheSize, File pointSetPath) {
@@ -104,9 +99,8 @@ public class DiskBackedPointSetCache extends PointSetCache {
 		        String baseName = name.substring(0, name.length() - 5);
 		        ids.add(baseName);
 			}
-			
 		}
-		
+
 		return ids;
 	}
 	

@@ -19,27 +19,25 @@ public class ResultFeature implements Serializable{
 
 	private static final long serialVersionUID = -6723127825189535112L;
 	
-
 	private static final Logger LOG = LoggerFactory.getLogger(ResultFeature.class);
     
 	public String id;
-	public Map<String,Histogram> histograms;
+	public Map<String,Histogram> histograms = new HashMap<String,Histogram>();
 	
-	public ResultFeature(){
-		histograms = new HashMap<String,Histogram>();
+	public ResultFeature() {
+		
 	}
 	
-    public static ResultFeature eval(SampleSet samples, TimeSurface surface) {
-    	ResultFeature ret = new ResultFeature();
+	public ResultFeature(SampleSet samples, TimeSurface surface){
+    	id = samples.pset.id + "_" + surface.id;
     	
         PointSet targets = samples.pset;
         // Evaluate the surface at all points in the pointset
         int[] times = samples.eval(surface);
-        ret.buildHistograms(times, targets);
+        buildHistograms(times, targets);
         
-        return ret;
-    }
-    
+	}
+	
     protected void buildHistograms(int[] times, PointSet targets) {
     	for (Entry<String, int[]> cat : targets.properties.entrySet()) {
         	String catId = cat.getKey();
@@ -54,12 +52,14 @@ public class ResultFeature implements Serializable{
      * Another column for the origin ID would allow this to extend to many-to-many.
      */
     void toCsv() {
-    	
-    	
 
     }
     
-	public void writeJson(OutputStream output) {
+    public void writeJson(OutputStream output) {
+    	writeJson(output, null);
+    }
+    
+	public void writeJson(OutputStream output, PointSet ps) {
 		try {
 			JsonFactory jsonFactory = new JsonFactory(); 
 			
@@ -67,12 +67,18 @@ public class ResultFeature implements Serializable{
 			jgen.setCodec(new ObjectMapper());
 			
 			jgen.writeStartObject(); {	
-				jgen.writeObjectFieldStart("properties"); {
-					if (id != null)
-						jgen.writeStringField("id", id);
-				}
-				jgen.writeEndObject();
 				
+				if(ps == null) {
+					jgen.writeObjectFieldStart("properties"); {
+						if (id != null)
+							jgen.writeStringField("id", id);
+					}
+					jgen.writeEndObject();
+				}
+				else {
+					ps.writeJsonProperties(jgen);
+				}
+								
 				jgen.writeObjectFieldStart("data"); {
 					for(String propertyId : histograms.keySet()) {
 						
