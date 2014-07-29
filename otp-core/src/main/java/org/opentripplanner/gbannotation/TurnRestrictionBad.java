@@ -21,12 +21,18 @@ public class TurnRestrictionBad extends GraphBuilderAnnotation {
     private static final long serialVersionUID = 1L;
 
     public static final String FMT = "Bad turn restriction at relation %s";
+    public static final String HTMLFMT = "Bad turn restriction at relation <a href='http://www.openstreetmap.org/relation/%s'>%s</a>";
     
     final long id;
     
     @Override
     public String getMessage() {
         return String.format(FMT, id);
+    }
+
+    @Override
+    public String getHTMLMessage() {
+        return String.format(HTMLFMT, id, id);
     }
 
 }

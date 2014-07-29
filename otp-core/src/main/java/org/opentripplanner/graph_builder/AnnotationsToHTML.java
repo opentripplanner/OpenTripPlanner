@@ -55,7 +55,7 @@ public class AnnotationsToHTML {
         System.out.println("<html><head><title>Graph report for " + path + "</title></head><body>");
 
         for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
-            System.out.println("<p>" + annotation.getMessage() + "</p>");
+            System.out.println("<p>" + annotation.getHTMLMessage() + "</p>");
             
         }
         System.out.println("</body></html>");
