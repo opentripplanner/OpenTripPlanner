@@ -13,9 +13,16 @@
 
 package org.opentripplanner.graph_builder;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.logging.Level;
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -25,6 +32,23 @@ public class AnnotationsToHTML {
 
     private static Logger LOG = LoggerFactory.getLogger(AnnotationsToHTML .class); 
 
+    @Parameter(names = { "-h", "--help"}, description = "Print this help message and exit", help = true)
+    private boolean help;
+
+    @Parameter(names = { "-g", "--graph"}, description = "path to the graph file", required = true)
+    private String graphPath;
+
+    @Parameter(names = { "-o", "--out"}, description = "output file")
+    private String outPath;
+
+    private AnnotationEndpoints annotationEndpoints = new AnnotationEndpoints();
+
+    private JCommander jc;
+
+    private Graph graph;
+
+    private HTMLWriter writer;
+
     public static void main(String[] args) throws IOException {
         // FIXME turn off all logging to avoid mixing log entries and HTML
 //        @SuppressWarnings("unchecked")
@@ -33,32 +57,104 @@ public class AnnotationsToHTML {
 //        for ( Logger logger : loggers ) {
 //            logger.setLevel(Level.OFF);
 //        }
-        if (args.length < 1) {
-            System.out.println("Usage: AnnotationsToHTML /path/to/graph");
-        }
+        AnnotationsToHTML annotationsToHTML = new AnnotationsToHTML(args);
+        annotationsToHTML.run();
+        
+    }
 
-        String graphPath = args[0];
+    public AnnotationsToHTML(String[] args) {
+        jc = new JCommander(this);
+        jc.addCommand(annotationEndpoints);
 
-        File path = new File(graphPath);
-        if (path.getName().equals("Graph.obj")) {
-            path = path.getParentFile();
-        }
         try {
-            Graph graph = Graph.load(new File(graphPath), Graph.LoadLevel.DEBUG);
-            process(graph, graphPath);
+            jc.parse(args);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            jc.usage();
+            System.exit(1);
+        }
+
+        if (help || jc.getParsedCommand() == null) {
+            jc.usage();
+            System.exit(0);
         }
     }
 
-    private static void process(Graph graph, String path) {
-        System.out.println("<html><head><title>Graph report for " + path + "</title></head><body>");
+
+    private void run() {
+
+        try {
+            graph = Graph.load(new File(graphPath), Graph.LoadLevel.DEBUG);
+        } catch (Exception e) {
+            LOG.error("Exception while loading graph from " + graphPath);
+            e.printStackTrace();
+            return;
+        }
+        LOG.info("done loading graph.");
+
+        if (outPath != null) {
+            try {
+                writer = new HTMLWriter(outPath);
+            } catch (FileNotFoundException ex) {
+                java.util.logging.Logger.getLogger(AnnotationsToHTML.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.error("Exception while opening output file {}:{}", outPath, ex.getMessage());
+                return;
+            }
+        } else {
+            writer = new HTMLWriter(System.out);
+        }
+
+        String command = jc.getParsedCommand();
+        if (command.equals("annotate")) {
+            annotationEndpoints.run();
+        }
+
+        if (outPath != null) {
+            LOG.info("HTML is in {}", outPath);
+        }
+
+        writer.close();
+    }
+
+    private void process(Graph graph, String path) {
+        writer.println("<html><head><title>Graph report for " + path + "</title></head><body>");
 
         for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
-            System.out.println("<p>" + annotation.getHTMLMessage() + "</p>");
-            
+            writer.println("<p>" + annotation.getHTMLMessage() + "</p>");
+
         }
-        System.out.println("</body></html>");
+        writer.println("</body></html>");
+    }
+
+    @Parameters(commandNames = "annotate", commandDescription = "Dumps annotations in HTML")
+    class AnnotationEndpoints {
+
+        public void run() {
+            LOG.info("Annotating log");
+            process(graph, graphPath);
+            LOG.info("Done annotating log");
+        }
+    }
+
+    class HTMLWriter {
+        private PrintStream out;
+
+        public HTMLWriter(OutputStream out) {
+            this.out = new PrintStream(out);
+        }
+
+        public HTMLWriter(String filePath) throws FileNotFoundException {
+            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+            this.out = new PrintStream(fileOutputStream);
+        }
+
+        private void println(String bodyhtml) {
+            out.println(bodyhtml);
+        }
+
+        private void close() {
+            out.close();
+        }
     }
 
 }
