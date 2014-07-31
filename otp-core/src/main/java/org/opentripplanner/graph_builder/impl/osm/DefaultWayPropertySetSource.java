@@ -549,14 +549,14 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     }
 
     private void createNames(WayPropertySet propset, String spec, String patternKey) {
-        String pattern = localize(patternKey);
+        String pattern = patternKey; // localize(patternKey);
         CreativeNamer namer = new CreativeNamer(pattern);
         propset.addCreativeNamer(new OSMSpecifier(spec), namer);
     }
 
     private void createNotes(WayPropertySet propset, String spec, String patternKey) {
         NoteProperties properties = new NoteProperties();
-        String pattern = localize(patternKey);
+        String pattern = patternKey; // localize(patternKey);
         properties.setNotePattern(pattern);
         propset.addNote(new OSMSpecifier(spec), properties);
     }

@@ -13,13 +13,18 @@
 
 package org.opentripplanner.api.ws;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
-
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -77,10 +82,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-
 @Service @Scope("singleton")
 public class PlanGenerator {
 
@@ -90,6 +91,8 @@ public class PlanGenerator {
 
     @Autowired public PathService pathService;
     @Autowired GraphService graphService;
+    private Locale requestedLocale;
+    ResourceBundle resources;
     
     /** Generates a TripPlan from a Request */
     public TripPlan generate(RoutingRequest options) {
@@ -100,6 +103,16 @@ public class PlanGenerator {
         
         // Copy options to keep originals
         RoutingRequest originalOptions = options.clone();
+        
+        //TODO: Does this work with threading?
+        //not first request
+        if (requestedLocale != null && resources != null) {
+            //reset resource bundle when current locale is different from previous one
+            if (options.getLocale() != requestedLocale) {
+                resources = null;
+            }
+        }
+        requestedLocale = options.getLocale();
 
         /* try to plan the trip */
         List<GraphPath> paths = null;
@@ -147,6 +160,17 @@ public class PlanGenerator {
      * Generates a TripPlan from a set of paths
      */
     TripPlan generatePlan(List<GraphPath> paths, RoutingRequest request) {
+
+        //TODO: Does this work with threading?
+        //not first request
+        if (requestedLocale != null && resources != null) {
+            //reset resource bundle when current locale is different from previous one
+            if (request.getLocale() != requestedLocale) {
+                resources = null;
+            }
+        }
+
+        requestedLocale = request.getLocale();
 
         GraphPath exemplar = paths.get(0);
         Vertex tripStartVertex = exemplar.getStartVertex();
@@ -604,7 +628,7 @@ public class PlanGenerator {
 
             leg.agencyId = id;
             leg.headsign = states[states.length - 1].getBackDirection();
-            leg.route = states[states.length - 1].getBackEdge().getName();
+            leg.route = localize(states[states.length - 1].getBackEdge().getName());
             leg.routeColor = route.getColor();
             leg.routeId = route.getId().getId();
             leg.routeLongName = route.getLongName();
@@ -783,7 +807,7 @@ public class PlanGenerator {
                 // exit != null and uses to <exit>
                 // the floor name is the AlightEdge name
                 // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-                step.streetName = ((ElevatorAlightEdge) edge).getName();
+                step.streetName = localize(((ElevatorAlightEdge) edge).getName());
 
                 step.relativeDirection = RelativeDirection.ELEVATOR;
 
@@ -791,7 +815,7 @@ public class PlanGenerator {
                 continue;
             }
 
-            String streetName = edge.getName();
+            String streetName = localize(edge.getName());
             int idx = streetName.indexOf('(');
             String streetNameNoParens;
             if (idx > 0)
@@ -840,7 +864,7 @@ public class PlanGenerator {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
-                    roundaboutPreviousStreet = backState.getBackEdge().getName();
+                    roundaboutPreviousStreet = localize(backState.getBackEdge().getName());
                     idx = roundaboutPreviousStreet.indexOf('(');
                     if (idx > 0)
                         roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
@@ -877,7 +901,7 @@ public class PlanGenerator {
                         // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
-                            if (alternative.getName().equals(streetName)) {
+                            if (localize(alternative.getName()).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -902,7 +926,7 @@ public class PlanGenerator {
                                 continue; // this is not an alternative
                             }
                             alternative = alternatives.get(0);
-                            if (alternative.getName().equals(streetName)) {
+                            if (localize(alternative.getName()).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -1038,7 +1062,7 @@ public class PlanGenerator {
         Edge en = s.getBackEdge();
         WalkStep step;
         step = new WalkStep();
-        step.streetName = en.getName();
+        step.streetName = localize(en.getName());
         step.lon = en.getFromVertex().getX();
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
@@ -1126,6 +1150,24 @@ public class PlanGenerator {
             throw new RuntimeException(
                     "TransitIndexBuilder is required for first/last/next/previous trip");
         }
+    }
+    
+    private String localize(String key) {
+        try {
+            String retval = getResourceBundle().getString(key);
+            LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
+            return retval;
+        } catch (MissingResourceException e) {
+            LOG.warn("Missing translation for key: " + key);
+            return key;
+        }
+    }
+
+    private ResourceBundle getResourceBundle() {
+        if (resources == null) {
+            resources = ResourceBundle.getBundle("WayProperties", requestedLocale);
+        }
+        return resources;
     }
 
 }
