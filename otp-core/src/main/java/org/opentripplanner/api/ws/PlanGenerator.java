@@ -1161,7 +1161,7 @@ public class PlanGenerator {
             LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
             return retval;
         } catch (MissingResourceException e) {
-            LOG.warn("Missing translation for key: " + key);
+            LOG.debug("Missing translation for key: " + key);
             return key;
         }
     }
