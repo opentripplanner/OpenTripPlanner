@@ -182,7 +182,7 @@ public class WayPropertySet {
         if (bestNamer == null) {
             return null;
         }
-        return bestNamer.generateCreativeName(way);
+        return bestNamer.generateCreativeName(way).intern();
     }
     
     /**
