@@ -175,8 +175,8 @@ public class PlanGenerator {
         GraphPath exemplar = paths.get(0);
         Vertex tripStartVertex = exemplar.getStartVertex();
         Vertex tripEndVertex = exemplar.getEndVertex();
-        String startName = tripStartVertex.getName();
-        String endName = tripEndVertex.getName();
+        String startName = localize(tripStartVertex.getName());
+        String endName = localize(tripEndVertex.getName());
 
         // Use vertex labels if they don't have names
         if (startName == null) {
@@ -672,9 +672,9 @@ public class PlanGenerator {
         Edge firstEdge = edges[0];
         Edge lastEdge = edges[edges.length - 1];
 
-        leg.from = new Place(firstVertex.getX(), firstVertex.getY(), firstVertex.getName(),
+        leg.from = new Place(firstVertex.getX(), firstVertex.getY(), localize(firstVertex.getName()),
                 null, makeCalendar(states[0]));
-        leg.to = new Place(lastVertex.getX(), lastVertex.getY(), lastVertex.getName(),
+        leg.to = new Place(lastVertex.getX(), lastVertex.getY(), localize(lastVertex.getName()),
                 makeCalendar(states[states.length - 1]), null);
 
         Stop firstStop = null;
@@ -1153,6 +1153,9 @@ public class PlanGenerator {
     }
     
     private String localize(String key) {
+        if (key == null) {
+            return null;
+        }
         try {
             String retval = getResourceBundle().getString(key);
             LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
