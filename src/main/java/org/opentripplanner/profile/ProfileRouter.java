@@ -52,33 +52,40 @@ public class ProfileRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
 
-    static final int SLACK = 60; // sec
-    static final int TIMEOUT = 10; // sec
-    static final Stop fakeTargetStop = new Stop();
+    /* Search configuration constants */
+    public static final int SLACK = 60; // in seconds, time required to catch a transit vehicle
+    private static final int TIMEOUT = 10; // in seconds, maximum computation time
+    private static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
+    private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
+    private static final List<TraverseMode> ACCESS_MODES =
+            Lists.newArrayList(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR);
+    private static final List<TraverseMode> EGRESS_MODES =
+            Lists.newArrayList(TraverseMode.WALK);
 
+    /* A stop which represents the destination */
+    private static final Stop fakeTargetStop = new Stop();
     static {
         fakeTargetStop.setId(new AgencyAndId("FAKE", "TARGET"));
     }
 
     private final Graph graph;
     private final ProfileRequest request;
-    private List<Option> directOptions = Lists.newArrayList();
-
     public ProfileRouter(Graph graph, ProfileRequest request) {
         this.graph = graph;
         this.request = request;
     }
 
-    // Search state.
-    Multimap<Stop, Ride> rides = ArrayListMultimap.create();
-    BinHeap<Ride> queue = new BinHeap<Ride>();
+    /* Search state */
+    // while finding direct paths:
+    // if dist < M meters OR we don't yet have N stations: record station
+    List<Option> directOptions = Lists.newArrayList(); // ways to reach the destination without transit
+    Multimap<Stop, Ride> rides = ArrayListMultimap.create(); // at each destination stop, the rides that are worth continuing to explore.
+    BinHeap<Ride> queue = new BinHeap<Ride>(); // rides to be explored, prioritized by minumum travel time
     Map<TripPattern, StopAtDistance> fromStops, toStops;
-    Set<Ride> targetRides = Sets.newHashSet();
-    TimeWindow window;
+    Set<Ride> targetRides = Sets.newHashSet(); // transit rides that reach the destination
+    TimeWindow window; // filters trips used by time of day and service schedule
 
-    /**
-     * @return true if the given stop has at least one transfer from the given pattern.
-     */
+    /** @return true if the given stop has at least one transfer coming from the given pattern. */
     private boolean hasTransfers(Stop stop, TripPattern pattern) {
         for (ProfileTransfer tr : graph.index.transfersForStop.get(stop)) {
             if (tr.tp1 == pattern) return true;
@@ -86,38 +93,42 @@ public class ProfileRouter {
         return false;
     }
 
-    /** Add a ride to its target stop if it is deemed worthwhile to explore. */
+    /** Add a ride to its target stop if it is deemed worthwhile to explore. TODO complete */
     private boolean addRide(Ride newRide) {
         for (Ride ride : rides.get(newRide.to)) {
-            // if (ride.durationUpperBound())
+            if (newRide.durationLowerBound() < ride.durationUpperBound()) {
+                // The new ride is sometimes better than an existing ride. Explore it.
+                rides.put(newRide.to, newRide);
+                queue.insert(newRide, newRide.durationLowerBound());
+                return true;
+            }
         }
-        rides.put(newRide.to, newRide);
-        queue.insert();
+        return false;
     }
 
     /* Maybe don't even try to accumulate stats and weights on the fly, just enumerate options. */
     /* TODO Or actually use a priority queue based on the min time. */
 
-    // TimeWindow could actually be resolved and created in the caller, which does have access to the profiledata.
     public ProfileResponse route () {
+
+        // Establish search timeouts
         long searchBeginTime = System.currentTimeMillis();
         long abortTime = searchBeginTime + TIMEOUT * 1000;
-        final int maxPathDuration = 60 * 90; // paths longer than this will not be reported
-        /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
-        final int ROUNDS = 3;
-        int finalRound = ROUNDS - 1;
-        int penultimateRound = ROUNDS - 2;
+
+        // TimeWindow could constructed in the caller, which does have access to the graph index.
+        this.window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
+
         // Lazy-initialize profile transfers
         if (graph.index.transfersForStop == null) {
             graph.index.initializeProfileTransfers();
         }
+
         findStreetOptions();
         findClosestPatterns();
         LOG.info("from stops: {}", fromStops);
         LOG.info("to stops: {}", toStops);
-        this.window = new TimeWindow (request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
 
-        /* Enqueue one or more PatternRides for each pattern/stop near the origin. */
+        /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
         Map<Stop, Ride> initialRides = Maps.newHashMap();
         for (Entry<TripPattern, StopAtDistance> entry : fromStops.entrySet()) {
             TripPattern pattern = entry.getKey();
@@ -146,7 +157,7 @@ public class ProfileRouter {
             /* Get the minimum-time unfinished ride off the queue. */
             Ride ride = queue.extract_min();
             //ride.dump();
-            // maybe when ride is complete, then transfer here.
+            // maybe when ride is complete, then find transfers here, but that makes for more queue operations.
             if (ride.to != null) throw new AssertionError("Ride should be unfinished.");
             /* Track finished rides by their destination stop, so we can add PatternRides to them. */
             Map<Stop, Ride> rides = Maps.newHashMap();
@@ -164,8 +175,8 @@ public class ProfileRouter {
                 for (int s = pr.fromIndex + 1; s < stops.size(); ++s) {
                     Stop stop = stops.get(s);
                     boolean isTarget = (targetStop != null && targetStop == stop);
+                    /* If this destination stop is useful in the search, extend the PatternRide to it. */
                     if (isTarget || hasTransfers(stop, pr.pattern)){
-                        // If this destination stop is useful in the search, extend the PatternRide to it.
                         PatternRide pr2 = pr.extendToIndex(s, window);
                         // PatternRide may be empty because there are no trips in time window.
                         if (pr2 == null) continue PR;
@@ -194,8 +205,8 @@ public class ProfileRouter {
                     targetRides.remove(r1);
                     continue;
                 }
-                // Do not transfer too many times. Continue after calculating stats since they will still be used!
-                if (r1.pathLength() >= 3) continue;
+                // Do not transfer too many times. Continue after calculating stats since they are still needed!
+                if (r1.pathLength() >= MAX_RIDES) continue;
                 // r1.to should be the same as r1's key in rides
                 // TODO benchmark, this is so not efficient
                 for (ProfileTransfer tr : graph.index.transfersForStop.get(r1.to)) {
@@ -220,17 +231,17 @@ public class ProfileRouter {
                     }
                 }
             }
-            /* Enqueue non-excessive new incomplete Rides. */
+            /* Enqueue new incomplete Rides with non-excessive durations. */
             for (Ride xr : xferRides.values()) {
                 int dlb = xr.previous.durationLowerBound(); // this ride is not finished so it has no times...
-                if (dlb > maxPathDuration) continue;
+                if (dlb > MAX_DURATION) continue;
                 queue.insert(xr, dlb);
             }
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
         }
         /* Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
-        for (Ride ride : targetRides) ride.dump();
+        // for (Ride ride : targetRides) ride.dump();
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
             int dist = toStops.get(ride.patternRides.get(0).pattern).distance;
@@ -247,7 +258,7 @@ public class ProfileRouter {
     }
 
     public void findStreetOptions() {
-        for (TraverseMode mode : Lists.newArrayList(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR)) {
+        for (TraverseMode mode : ACCESS_MODES) {
             if (request.modes.contains(mode)) {
                 findStreetOption(mode);
             }
@@ -384,7 +395,7 @@ public class ProfileRouter {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         // TODO set mode and speed.
-        rr.setRoutingContext(graph, VERTEX);
+        rr.setRoutingContext(graph); // TODO set origin vertex with second parameter
         // Set batch after context, so both origin and dest vertices will be found.
         rr.setBatch(true);
         rr.setWalkSpeed(request.walkSpeed);
@@ -396,23 +407,26 @@ public class ProfileRouter {
         final int[] maxs = new int[Vertex.getMaxIndex()];
         Arrays.fill(mins, Integer.MAX_VALUE);
         Arrays.fill(maxs, Integer.MIN_VALUE);
-        final int minmin = Integer.MAX_VALUE;
-        final int minmax = Integer.MAX_VALUE;
+        int minmin = Integer.MAX_VALUE;
+        int minmax = Integer.MAX_VALUE;
         for (Ride ride : rides) {
             int min = ride.durationLowerBound();
             int max = ride.durationUpperBound();
             if (min < minmin) minmin = min;
             if (max < minmax) minmax = max;
         }
+        // aaargh Java
+        final int finalminmin = minmin;
+        final int finalminmax = minmax;
         astar.setNPaths(1);
         astar.setTraverseVisitor(new TraverseVisitor() {
             @Override public void visitEdge(Edge edge, State state) { }
             @Override public void visitEnqueue(State state) { }
             @Override public void visitVertex(State state) {
+                int min = finalminmin + (int) state.getElapsedTimeSeconds();
+                int max = finalminmax + (int) state.getElapsedTimeSeconds();
                 Vertex vertex = state.getVertex();
                 int index = vertex.getIndex();
-                int min = minmin + (int) state.getElapsedTimeSeconds();
-                int max = minmax + (int) state.getElapsedTimeSeconds();
                 if (mins[index] > min)
                     mins[index] = min;
                 if (maxs[index] < max)

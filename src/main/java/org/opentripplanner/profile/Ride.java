@@ -41,7 +41,7 @@ public class Ride {
     final Stop from;
     final Stop to;
     final Ride previous;
-    Route route; // UNUSED
+//    Route route; // UNUSED
     final List<PatternRide> patternRides = Lists.newArrayList();
     Stats rideStats; // filled in only once the ride is complete (has all PatternRides).
     Stats waitStats; // filled in only once the ride is complete (has all PatternRides).
