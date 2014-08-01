@@ -52,6 +52,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
+import java.util.MissingResourceException;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods used during network linking and trip planning.
@@ -222,14 +223,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     if (options == null) {
                         locale = new Locale("en");
                     } else {
-                        locale = options.getLocale();
-                    }
+                        locale = options.getLocale(); 
+                   }
                     ResourceBundle resources = ResourceBundle.getBundle("internals", locale);
+
+                    ResourceBundle resources_names = ResourceBundle.getBundle("WayProperties", locale);
                     String fmt = resources.getString("corner");
                     if (uniqueNames.size() > 1) {
-                        calculatedName = String.format(fmt, uniqueNames.get(0), uniqueNames.get(1));
+                        calculatedName = String.format(fmt, localize(uniqueNames.get(0), resources_names),
+                                localize(uniqueNames.get(1), resources_names));
                     } else if (uniqueNames.size() == 1) {
-                        calculatedName = uniqueNames.get(0);
+                        calculatedName = localize(uniqueNames.get(0), resources_names);
                     } else {
                         calculatedName = resources.getString("unnamedStreet");
                     }
@@ -509,6 +513,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // this should probably only be used in tests,
         // though it does allow routing from stop to stop.
         return graph.getVertex(place);
+    }
+    
+        private String localize(String key, ResourceBundle resourceBundle) {
+        if (key == null) {
+            return null;
+        }
+        try {
+            String retval = resourceBundle.getString(key);
+            LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
+            return retval;
+        } catch (MissingResourceException e) {
+            LOG.debug("Missing translation for key: " + key);
+            return key;
+        }
     }
 
 }
