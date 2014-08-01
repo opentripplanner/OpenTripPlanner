@@ -251,4 +251,18 @@ public class Ride {
         return new Stats (waits);
     }
 
+    /**  @return the stop at which the rider would board the chain of Rides this Ride belongs to. */
+    public Stop getAccessStop() {
+        Ride ride = this;
+        while (ride.previous != null) {
+            ride = ride.previous;
+        }
+        return ride.from;
+    }
+
+    /** @return the stop from which the rider will walk to the final destination, assuming this is the final Ride in a chain. */
+    public Stop getEgressStop() {
+        return this.to;
+    }
+
 }

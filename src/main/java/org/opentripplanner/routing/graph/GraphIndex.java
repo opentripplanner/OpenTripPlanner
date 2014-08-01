@@ -26,6 +26,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.profile.ProfileRouter;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopAtDistance;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -158,15 +159,14 @@ public class GraphIndex {
         LOG.info("Finding transfers...");
         for (Stop s0 : stopForId.values()) {
             Collection<TripPattern> ps0 = patternsForStop.get(s0);
-            for (StopAtDistance sd : findTransitStops(s0.getLon(), s0.getLat(), TRANSFER_RADIUS)) {
-                Stop s1 = sd.stop;
+            Map<Stop, Double> stops = findTransitStops(s0.getLon(), s0.getLat(), TRANSFER_RADIUS);
+            for (Stop s1 : stops.keySet()) {
+                double distance = stops.get(s1);
                 Collection<TripPattern> ps1 = patternsForStop.get(s1);
                 for (TripPattern p0 : ps0) {
                     for (TripPattern p1 : ps1) {
-                        if (p0 == p1)
-                            continue;
-                        bestTransfers.putMin(new P2<TripPattern>(p0, p1), new ProfileTransfer(p0, p1,
-                                s0, s1, sd.distance));
+                        if (p0 == p1) continue;
+                        bestTransfers.putMin(new P2<TripPattern>(p0, p1), new ProfileTransfer(p0, p1, s0, s1, (int)distance));
                     }
                 }
             }
@@ -182,17 +182,14 @@ public class GraphIndex {
         LOG.info("Done finding transfers.");
     }
 
-    /**
-     * For profile routing. Actually, now only used for finding transfers.
-     * TODO replace with an on-street search.
-     */
-    public List<StopAtDistance> findTransitStops(double lon, double lat, double radius) {
-        List<StopAtDistance> ret = Lists.newArrayList();
+    /** Find transfers for profile routing. TODO replace with an on-street search using the existing profile router functions. */
+    public Map<Stop, Double> findTransitStops(double lon, double lat, double radius) {
+        Map<Stop, Double> ret = Maps.newHashMap();
         for (TransitStop tstop : stopSpatialIndex.query(lon, lat, radius)) {
             Stop stop = tstop.getStop();
-            int distance = (int) distlib.distance(lat, lon, stop.getLat(), stop.getLon());
+            double distance = distlib.distance(lat, lon, stop.getLat(), stop.getLon());
             if (distance < radius)
-                ret.add(new StopAtDistance(stop, distance));
+                ret.put(stop, distance);
         }
         return ret;
     }

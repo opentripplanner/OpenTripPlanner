@@ -1,33 +1,37 @@
 package org.opentripplanner.profile;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import org.opentripplanner.api.model.WalkStep;
-import org.opentripplanner.api.resource.PlanGenerator;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.spt.GraphPath;
+import java.util.Map;
 
 public class Option {
 
     public List<Segment> segments = Lists.newArrayList();
-    public int finalWalkTime;
+    public List<StreetSegment> access;
+    public List<StreetSegment> egress;
     public Stats stats;
     public String summary;
     public List<WalkStep> walkSteps;
     public List<DCFareCalculator.Fare> fares;
 
-    public Option (Ride tail, int finalWalkTime) {
+    public Option (Ride tail, Collection<StopAtDistance> accessPaths, Collection<StopAtDistance> egressPaths) {
         stats = new Stats();
         List<Ride> rides = Lists.newArrayList();
         for (Ride ride = tail; ride != null; ride = ride.previous) {
             rides.add(ride);
         }
         Collections.reverse(rides);
+        access = StreetSegment.list(accessPaths);
+        egress = StreetSegment.list(egressPaths);
         for (Ride ride : rides) {
             Segment segment = new Segment(ride);
             segments.add(segment);
@@ -37,10 +41,10 @@ public class Option {
         }
         // Really should be one per segment, with transfers to the same operator having a price of 0.
         fares = null; //DCFareCalculator.calculateFares(rides);
-        this.finalWalkTime = finalWalkTime;
-        stats.add(finalWalkTime);
+        // TODO stats.add(finalWalkTime);
         //summary = generateSegmentSummary();
     }
+
 
     /** A constructor for an option that includes only a street mode, not transit. */
     public Option (State state) {
@@ -49,10 +53,8 @@ public class Option {
         stats.add(time);
         // this might not work if there is a transition to another mode
         TraverseMode mode = state.getNonTransitMode();
-        if (mode == TraverseMode.WALK) this.finalWalkTime = time;
         summary = mode.toString();
-        GraphPath path = new GraphPath(state, false);
-        walkSteps = PlanGenerator.generateWalkSteps(path.states.toArray(new State[0]), null);
+        access = Lists.newArrayList(new StreetSegment(state));
     }
 
     public String generateSegmentSummary() {

@@ -1,6 +1,8 @@
 package org.opentripplanner.profile;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +32,7 @@ import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrateg
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -57,6 +60,7 @@ public class ProfileRouter {
     private static final int TIMEOUT = 10; // in seconds, maximum computation time
     private static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
     private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
+    private static final int MIN_DRIVE_TIME = 10 * 60; // in seconds
     private static final List<TraverseMode> ACCESS_MODES =
             Lists.newArrayList(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR);
     private static final List<TraverseMode> EGRESS_MODES =
@@ -76,11 +80,14 @@ public class ProfileRouter {
     }
 
     /* Search state */
+    Multimap<Stop, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop
+
     // while finding direct paths:
     // if dist < M meters OR we don't yet have N stations: record station
     List<Option> directOptions = Lists.newArrayList(); // ways to reach the destination without transit
     Multimap<Stop, Ride> rides = ArrayListMultimap.create(); // at each destination stop, the rides that are worth continuing to explore.
     BinHeap<Ride> queue = new BinHeap<Ride>(); // rides to be explored, prioritized by minumum travel time
+    // TODO rename fromStopsByPattern
     Map<TripPattern, StopAtDistance> fromStops, toStops;
     Set<Ride> targetRides = Sets.newHashSet(); // transit rides that reach the destination
     TimeWindow window; // filters trips used by time of day and service schedule
@@ -111,6 +118,13 @@ public class ProfileRouter {
 
     public ProfileResponse route () {
 
+        // Lazy-initialize profile transfers (before setting timeouts, since this is slow)
+        if (graph.index.transfersForStop == null) {
+            graph.index.initializeProfileTransfers();
+        }
+
+        LOG.info("modes: {}", request.modes);
+
         // Establish search timeouts
         long searchBeginTime = System.currentTimeMillis();
         long abortTime = searchBeginTime + TIMEOUT * 1000;
@@ -118,15 +132,23 @@ public class ProfileRouter {
         // TimeWindow could constructed in the caller, which does have access to the graph index.
         this.window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
 
-        // Lazy-initialize profile transfers
-        if (graph.index.transfersForStop == null) {
-            graph.index.initializeProfileTransfers();
+        // Look for options connecting origin to destination with no transit
+        for (TraverseMode mode : ACCESS_MODES) {
+            if (request.modes.contains(mode)) findStreetOption(mode);
         }
 
-        findStreetOptions();
-        findClosestPatterns();
-        LOG.info("from stops: {}", fromStops);
-        LOG.info("to stops: {}", toStops);
+        // Look for stops that are within a given time threshold of the origin and destination
+        fromStopPaths = findClosestStops(false);
+        toStopPaths = findClosestStops(true);
+
+        // Find the closest stop on each pattern near the origin and destination
+        // TODO consider that some stops may be closer by one mode than another
+        // and that some stops may be accessible by one mode but not another
+        fromStops = findClosestPatterns(fromStopPaths);
+        toStops = findClosestPatterns(toStopPaths);
+
+        LOG.info("from patterns/stops: {}", fromStops);
+        LOG.info("to patterns/stops: {}", toStops);
 
         /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
         Map<Stop, Ride> initialRides = Maps.newHashMap();
@@ -138,7 +160,9 @@ public class ProfileRouter {
                 if (pattern.getStops().get(i) == sd.stop) {
                     if (request.modes.contains(pattern.mode)) {
                         /* Pseudo-transfer from null indicates first leg. */
-                        ProfileTransfer xfer = new ProfileTransfer(null, pattern, null, sd.stop, sd.distance);
+                        // TODO time vs dist
+                        // TODO do not use transfers for accesss/egress, use null
+                        ProfileTransfer xfer = new ProfileTransfer(null, pattern, null, sd.stop, sd.etime);
                         Ride ride = initialRides.get(sd.stop);
                         if (ride == null) {
                             ride = new Ride(sd.stop, null);
@@ -233,7 +257,7 @@ public class ProfileRouter {
             }
             /* Enqueue new incomplete Rides with non-excessive durations. */
             for (Ride xr : xferRides.values()) {
-                int dlb = xr.previous.durationLowerBound(); // this ride is not finished so it has no times...
+                int dlb = xr.previous.durationLowerBound(); // this ride is unfinished so it has no times...
                 if (dlb > MAX_DURATION) continue;
                 queue.insert(xr, dlb);
             }
@@ -244,10 +268,13 @@ public class ProfileRouter {
         // for (Ride ride : targetRides) ride.dump();
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
-            int dist = toStops.get(ride.patternRides.get(0).pattern).distance;
-            // we could also make a fake ride to the destination, and add an egress segment to the option.
-            Option option = new Option(ride, dist);
-            if ( ! option.hasEmptyRides()) options.add(option); 
+            int dist = toStops.get(ride.patternRides.get(0).pattern).etime; // TODO time vs dist
+            Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStop());
+            Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStop());
+            Option option = new Option(ride, accessPaths, egressPaths);
+            Stop s0 = ride.getAccessStop();
+            Stop s1 = ride.getEgressStop();
+            if ( ! option.hasEmptyRides()) options.add(option);
         }
         /* Include the direct (no-transit) biking, driving, and walking options. */
         for (Option option : directOptions) {
@@ -257,41 +284,23 @@ public class ProfileRouter {
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
-    public void findStreetOptions() {
-        for (TraverseMode mode : ACCESS_MODES) {
-            if (request.modes.contains(mode)) {
-                findStreetOption(mode);
-            }
-        }
-    }
-
-    // We don't need to retain a routing context or any temp vertices.
-    public void findClosestPatterns() {
-        LOG.info("Finding nearby routes...");
-        // First search forward
-        fromStops  = findClosestPatterns(false);
-        // Then search backward
-        toStops    = findClosestPatterns(true);
-        LOG.info("Done.");
-    }
-
     /**
-     * Find all patterns that stop close to a given vertex.
-     * Return a map from each pattern to the closest stop on that pattern.
-     * We want a single stop object rather than an index within the pattern because we want to consider
-     * stops that appear more than once in a pattern at every index where they occur.
-     * Therefore this is not the right place to convert stop objects to stop indexes.
+     * Find all patterns that pass through the given stops, and pick the closest stop on each pattern
+     * based on the distances provided for each stop and mode.
+     * We want stop objects rather than indexes within the patterns because when stops that appear more than
+     * once in a pattern, we want to consider boarding or alighting from them at every index where they occur.
      */
-    public Map<TripPattern, StopAtDistance> findClosestPatterns(boolean back) {
+    public Map<TripPattern, StopAtDistance> findClosestPatterns(Multimap<Stop, StopAtDistance> stops) {
         SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closest = new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
-        for (StopAtDistance stopDist : findClosestStops(back)) {
+        // Iterate over all StopAtDistance for all Stops. The fastest mode will win at each stop.
+        for (StopAtDistance stopDist : stops.values()) {
             for (TripPattern pattern : graph.index.patternsForStop.get(stopDist.stop)) {
                 closest.putMin(pattern, stopDist);
             }
         }
-
-        if (closest.size() > 50) {
-            // Truncate the list to include a mix of nearby bus and train patterns
+        // Truncate long lists to include a mix of nearby bus and train patterns
+        if (closest.size() > 500) {
+            LOG.warn("Truncating long list of patterns.");
             Multimap<StopAtDistance, TripPattern> busPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
             Multimap<StopAtDistance, TripPattern> otherPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
             Multimap<StopAtDistance, TripPattern> patterns;
@@ -319,23 +328,42 @@ public class ProfileRouter {
     }
 
     /**
-     * Perform an on-street search at the origin and destination points
-     * to find nearby stops, as well as a path to the destination if possible.
+     * Perform an on-street search around a point with each of several modes to find nearby stops.
+     * @return one or more paths to each reachable stop using the various modes.
      */
-    private List<StopAtDistance> findClosestStops(boolean back) {
+    private Multimap<Stop, StopAtDistance> findClosestStops(boolean dest) {
+        Multimap<Stop, StopAtDistance> pathsByStop = ArrayListMultimap.create();
+        for (TraverseMode mode: (dest ? EGRESS_MODES : ACCESS_MODES)) {
+            if (request.modes.contains(mode)) {
+                LOG.info("{} mode {}", dest ? "egress" : "access", mode);
+                List<StopAtDistance> stops = findClosestStops(mode, dest);
+                for (StopAtDistance sd : stops) {
+                    pathsByStop.put(sd.stop, sd);
+                }
+            }
+        }
+        return pathsByStop;
+    }
+
+    /**
+     * Perform an on-street search around a point with a specific mode to find nearby stops.
+     * @param dest : whether to search at the destination instead of the origin.
+     */
+    private List<StopAtDistance> findClosestStops(final TraverseMode mode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        // TODO set walk speed!
         rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
         rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
-        rr.setArriveBy(back);
+        rr.setArriveBy(dest);
+        rr.setMode(mode);
+        // TODO CAR does not seem to work. rr.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
         rr.setBatch(true);
         rr.setWalkSpeed(request.walkSpeed);
         // If this is not set, searches are very slow.
-        int worstElapsedTime = request.accessTime * 60; // from minutes to seconds
-        if (back) worstElapsedTime *= -1;
+        int worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
+        if (dest) worstElapsedTime *= -1;
         rr.setWorstTime(rr.dateTime + worstElapsedTime);
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
@@ -349,10 +377,11 @@ public class ProfileRouter {
             @Override public void visitVertex(State state) {
                 Vertex vertex = state.getVertex();
                 if (vertex instanceof TransitStop) {
-                    TransitStop tstop = (TransitStop) vertex;
-                    LOG.debug("found stop: {} ({}m)", tstop.getStopId(), state.getWalkDistance());
-                    LOG.debug("  elapsed time {}", state.getElapsedTimeSeconds());
-                    ret.add(new StopAtDistance(tstop.getStop(), (int) state.getWalkDistance()));
+                    StopAtDistance sd = new StopAtDistance(state);
+                    sd.mode = mode;
+                    if (sd.mode == TraverseMode.CAR && sd.etime < MIN_DRIVE_TIME) return;
+                    LOG.debug("found stop: {}", sd);
+                    ret.add(sd);
                 }
             }
         });
