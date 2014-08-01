@@ -16,7 +16,9 @@ package org.opentripplanner.api.ws;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -50,10 +52,33 @@ public class BikeRental {
     public BikeRentalStationList getBikeRentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
-            @QueryParam("routerId") String routerId) {
+            @QueryParam("routerId") String routerId,
+            @QueryParam("locale") String locale_param) {
 
         Graph graph = graphService.getGraph(routerId);
         if (graph == null) return null;
+        Locale locale;
+        if (locale_param == null || locale_param.isEmpty()) {
+            locale = new Locale("en", "US");
+        } else {
+            //FIXME: currently copied from routingResource
+            String[] localeSpecParts = locale_param.split("_");
+            switch (localeSpecParts.length) {
+                case 1:
+                    locale = new Locale(localeSpecParts[0]);
+                    break;
+                case 2:
+                    locale = new Locale(localeSpecParts[0]);
+                    break;
+                case 3:
+                    locale = new Locale(localeSpecParts[0]);
+                    break;
+                default:
+                    //LOG.debug("Bogus locale " + localeSpec + ", defaulting to en");
+                    locale = new Locale("en");
+            }
+        }
+        ResourceBundle resources_names = ResourceBundle.getBundle("WayProperties", locale);
         BikeRentalStationService bikeRentalService = graph.getService(BikeRentalStationService.class);
         if (bikeRentalService == null) return new BikeRentalStationList();
         Envelope envelope;
@@ -66,12 +91,27 @@ public class BikeRental {
         List<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
         for (BikeRentalStation station : stations) {
             if (envelope.contains(station.x, station.y)) {
+                station.name = String.format(localize(station.pattern, resources_names).replace("{name}", "%s"), station.station_name);
                 out.add(station);
             }
         }
         BikeRentalStationList brsl = new BikeRentalStationList();
         brsl.stations = out;
         return brsl;
+    }
+    
+    private String localize(String key, ResourceBundle resourceBundle) {
+        if (key == null) {
+            return null;
+        }
+        try {
+            String retval = resourceBundle.getString(key);
+            //LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
+            return retval;
+        } catch (MissingResourceException e) {
+            //LOG.debug("Missing translation for key: " + key);
+            return key;
+        }
     }
 
 }

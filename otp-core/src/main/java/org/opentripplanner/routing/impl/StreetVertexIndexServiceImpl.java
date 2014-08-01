@@ -515,7 +515,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return graph.getVertex(place);
     }
     
-        private String localize(String key, ResourceBundle resourceBundle) {
+    private String localize(String key, ResourceBundle resourceBundle) {
         if (key == null) {
             return null;
         }

@@ -872,7 +872,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
                 BikeRentalStation station = new BikeRentalStation();
                 station.id = "" + node.getId();
-                station.name = creativeName;
+                //FIXME: This is hack for translating bikeStation name
+                //Problem is what happens if this name is read from vertex.
+                //We have no idea from name that this is bikeRental
+                station.station_name = node.getTag("name");
+                station.name = node.getTag("name");
+                station.pattern = creativeName;
                 station.x = node.getLon();
                 station.y = node.getLat();
                 // The following make sure that spaces+bikes=capacity, always.

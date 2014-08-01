@@ -13,9 +13,11 @@
 
 package org.opentripplanner.routing.bike_rental;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -37,6 +39,12 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public int spacesAvailable = Integer.MAX_VALUE;
+    @XmlTransient
+    @JsonIgnore
+    public String pattern;
+    @XmlTransient
+    @JsonIgnore
+    public String station_name;
     
     /**
      * Whether this station is static (usually coming from OSM data) or a real-time source. If no real-time data, users should take
