@@ -37,12 +37,16 @@
         var qstring = '?from=' + fromPos.lat + ',' + fromPos.lng;
         qstring += '&to=' + toPos.lat + ',' + toPos.lng;
         qstring += '&modes=WALK,BICYCLE,TRANSIT'; // note that TRANSIT or specific transit modes must be included
+        /* AJAX
         req.open('GET', url + qstring, true);
         req.onload  = function() {
             var resp = JSON.parse(req.responseText);
             console.log(resp);
         };
         req.send(null);
+         */
+        // Open directly in new tab
+        window.open(url + qstring, '_blank');
     }
 
     fromMarker.on("dragend",function(ev){
