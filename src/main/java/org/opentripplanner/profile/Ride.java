@@ -232,8 +232,8 @@ public class Ride {
     public Stats calcStatsForTransfer (TimeWindow window, double walkSpeed) {
         /* If there is no previous ride, assume uniformly distributed arrival times. */
         if (previous == null) return this.statsForBoarding (window); 
-        List<Integer> departures = getSortedStoptimes(window, false);
-        List<Integer> arrivals   = getSortedStoptimes(window, true);
+        List<Integer> arrivals = previous.getSortedStoptimes(window, true);
+        List<Integer> departures = this.getSortedStoptimes(window, false);
         int walkTime = (int) (getTransferDistance() / walkSpeed);
         List<Integer> waits = Lists.newArrayList();        
         Iterator<Integer> departureIterator = departures.iterator(); 

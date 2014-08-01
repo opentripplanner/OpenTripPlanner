@@ -1,7 +1,9 @@
 package org.opentripplanner.profile;
 
 import java.util.Collection;
+import java.util.List;
 
+import com.google.common.collect.Lists;
 import lombok.Getter;
 
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -47,6 +49,15 @@ class Stats implements Cloneable {
         avg += x;
         max += x;
         num = 1; // it's poorly defined here
+    }
+
+    /** */
+    public void add(Collection<StreetSegment> segs) {
+        if (segs == null || segs.isEmpty()) return;
+        List<Integer> times = Lists.newArrayList();
+        for (StreetSegment seg : segs) times.add(seg.time);
+        Stats s = new Stats(times);
+        add(s);
     }
 
     /**

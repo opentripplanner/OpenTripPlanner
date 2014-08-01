@@ -2,9 +2,14 @@ package org.opentripplanner.profile;
 
 import lombok.AllArgsConstructor;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
+
+import java.util.List;
 
 /**
  * A stop associated with its elapsed time from a search location and the path for reaching it.
@@ -17,16 +22,22 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     public TraverseMode mode;
     public int etime;
     public int distance; // deprecate?
-    public State state;
+    //public State state;
+    public List<WalkStep> walkSteps;
 
     /** @param state a state at a TransitStop */
     public StopAtDistance (State state) {
-        TransitStop tstop = (TransitStop) state.getVertex();
-        this.state = state;
-        stop = tstop.getStop();
+        //this.state = state;
+        // This might be inefficient -- finding paths for every stop we encounter.
+        GraphPath path = new GraphPath(state, false);
+        walkSteps = PlanGenerator.generateWalkSteps(path.states.toArray(new State[0]), null);
         etime = (int) state.getElapsedTimeSeconds();
         distance = (int) state.getWalkDistance(); // TODO includes driving? Is this really needed?
         mode = state.getNonTransitMode(); // not sure if this is reliable, reset in caller.
+        if (state.getVertex() instanceof TransitStop) {
+            TransitStop tstop = (TransitStop) state.getVertex();
+            stop = tstop.getStop();
+        }
     }
 
     @Override

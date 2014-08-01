@@ -50,7 +50,7 @@ public class ProfileResource {
             @QueryParam("endTime")    @DefaultValue("09:00") HourMinuteSecond toTime,
             @QueryParam("walkSpeed")  @DefaultValue("1.4")   float walkSpeed, // m/sec
             @QueryParam("bikeSpeed")  @DefaultValue("4.1")   float bikeSpeed, // m/sec
-            @QueryParam("streetTime") @DefaultValue("200")   int streetTime,  // max minutes to reach destination with no transit
+            @QueryParam("streetTime") @DefaultValue("90")    int streetTime,  // max minutes to reach destination with no transit
             @QueryParam("accessTime") @DefaultValue("15")    int accessTime,  // max minutes to reach transit
             @QueryParam("orderBy")    @DefaultValue("MIN")   Option.SortOrder orderBy,
             @QueryParam("limit")      @DefaultValue("10")    int limit,
@@ -78,6 +78,7 @@ public class ProfileResource {
 
         ProfileRouter router = new ProfileRouter(graph, req);
         ProfileResponse response = router.route();
+        // catch exceptions and tear down rctx here?
         return Response.status(Status.OK).entity(response).build();
     
     }

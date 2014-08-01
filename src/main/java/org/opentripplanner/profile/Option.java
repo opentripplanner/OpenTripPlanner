@@ -15,38 +15,40 @@ import java.util.Map;
 
 public class Option {
 
-    public List<Segment> segments = Lists.newArrayList();
+    public List<Segment> transit;
     public List<StreetSegment> access;
     public List<StreetSegment> egress;
-    public Stats stats;
+    public Stats stats = new Stats();
     public String summary;
-    public List<WalkStep> walkSteps;
     public List<DCFareCalculator.Fare> fares;
 
     public Option (Ride tail, Collection<StopAtDistance> accessPaths, Collection<StopAtDistance> egressPaths) {
-        stats = new Stats();
-        List<Ride> rides = Lists.newArrayList();
-        for (Ride ride = tail; ride != null; ride = ride.previous) {
-            rides.add(ride);
-        }
-        Collections.reverse(rides);
         access = StreetSegment.list(accessPaths);
         egress = StreetSegment.list(egressPaths);
-        for (Ride ride : rides) {
-            Segment segment = new Segment(ride);
-            segments.add(segment);
-            stats.add(segment.walkTime);
-            if(segment.waitStats != null) stats.add(segment.waitStats);
-            stats.add(segment.rideStats);
+        // FIXME In the event that there is only access, N will still be 1 which is strange.
+        stats.add(access);
+        stats.add(egress);
+        List<Ride> rides = Lists.newArrayList();
+        for (Ride ride = tail; ride != null; ride = ride.previous) rides.add(ride);
+        if ( ! rides.isEmpty()) {
+            Collections.reverse(rides);
+            transit = Lists.newArrayList();
+            for (Ride ride : rides) {
+                Segment segment = new Segment(ride);
+                transit.add(segment);
+                stats.add(segment.walkTime);
+                if(segment.waitStats != null) stats.add(segment.waitStats);
+                stats.add(segment.rideStats);
+            }
         }
         // Really should be one per segment, with transfers to the same operator having a price of 0.
-        fares = null; //DCFareCalculator.calculateFares(rides);
-        // TODO stats.add(finalWalkTime);
-        //summary = generateSegmentSummary();
+        // TODO fares = DCFareCalculator.calculateFares(rides);
+        // TODO summary = generateSegmentSummary();
     }
 
 
     /** A constructor for an option that includes only a street mode, not transit. */
+    /*
     public Option (State state) {
         stats = new Stats();
         int time = (int) state.getElapsedTimeSeconds();
@@ -56,13 +58,14 @@ public class Option {
         summary = mode.toString();
         access = Lists.newArrayList(new StreetSegment(state));
     }
+    */
 
     public String generateSegmentSummary() {
         StringBuilder sb = new StringBuilder();
         sb.append("routes ");
         List<String> routeShortNames = Lists.newArrayList();
         List<String> vias = Lists.newArrayList();
-        for (Segment segment : segments) {
+        for (Segment segment : transit) {
             String routeName = segment.routeShortName == null 
                     ? segment.routeLongName : segment.routeShortName;
             routeShortNames.add(routeName);
@@ -106,7 +109,7 @@ public class Option {
      * Rides or transfers may contain no patterns after applying time window.
      */
     public boolean hasEmptyRides() {
-        for (Segment seg : segments) {
+        for (Segment seg : transit) {
             if (seg.rideStats.num == 0 || seg.waitStats.num == 0) {
                 return true;
             }

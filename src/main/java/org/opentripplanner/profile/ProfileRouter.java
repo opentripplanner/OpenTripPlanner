@@ -1,55 +1,40 @@
 package org.opentripplanner.profile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.concurrent.TimeoutException;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import com.google.common.collect.TreeMultimap;
-import org.joda.time.LocalDate;
-import org.onebusaway.gtfs.impl.StopTimeArray;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
-import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
-import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class ProfileRouter {
 
@@ -84,7 +69,7 @@ public class ProfileRouter {
 
     // while finding direct paths:
     // if dist < M meters OR we don't yet have N stations: record station
-    List<Option> directOptions = Lists.newArrayList(); // ways to reach the destination without transit
+    Collection<StopAtDistance> directPaths = Lists.newArrayList(); // ways to reach the destination without transit
     Multimap<Stop, Ride> rides = ArrayListMultimap.create(); // at each destination stop, the rides that are worth continuing to explore.
     BinHeap<Ride> queue = new BinHeap<Ride>(); // rides to be explored, prioritized by minumum travel time
     // TODO rename fromStopsByPattern
@@ -137,6 +122,7 @@ public class ProfileRouter {
             if (request.modes.contains(mode)) findStreetOption(mode);
         }
 
+        LOG.info("finding access/egress stops.");
         // Look for stops that are within a given time threshold of the origin and destination
         fromStopPaths = findClosestStops(false);
         toStopPaths = findClosestStops(true);
@@ -146,6 +132,7 @@ public class ProfileRouter {
         // and that some stops may be accessible by one mode but not another
         fromStops = findClosestPatterns(fromStopPaths);
         toStops = findClosestPatterns(toStopPaths);
+        LOG.info("done finding access/egress stops.");
 
         LOG.info("from patterns/stops: {}", fromStops);
         LOG.info("to patterns/stops: {}", toStops);
@@ -230,7 +217,9 @@ public class ProfileRouter {
                     continue;
                 }
                 // Do not transfer too many times. Continue after calculating stats since they are still needed!
-                if (r1.pathLength() >= MAX_RIDES) continue;
+                int nRides = r1.pathLength();
+                if (nRides >= MAX_RIDES) continue;
+                boolean penultimateRide = (nRides == MAX_RIDES - 1);
                 // r1.to should be the same as r1's key in rides
                 // TODO benchmark, this is so not efficient
                 for (ProfileTransfer tr : graph.index.transfersForStop.get(r1.to)) {
@@ -238,6 +227,8 @@ public class ProfileRouter {
                         // Prune loopy or repetitive paths.
                         if (r1.pathContainsRoute(tr.tp2.route)) continue;
                         if (tr.s1 != tr.s2 && r1.pathContainsStop(tr.s2)) continue;
+                        // Optimization: on last ride, only transfer to patterns that pass near the destination.
+                        if (penultimateRide && ! toStops.containsKey(tr.tp2)) continue;
                         // Scan through stops because a stop might appear more than once in a pattern.
                         for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
                             if (tr.tp2.getStops().get(i) == tr.s2) {
@@ -277,9 +268,7 @@ public class ProfileRouter {
             if ( ! option.hasEmptyRides()) options.add(option);
         }
         /* Include the direct (no-transit) biking, driving, and walking options. */
-        for (Option option : directOptions) {
-            options.add(option);
-        }
+        options.add(new Option(null, directPaths, null));
         LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
@@ -410,9 +399,9 @@ public class ProfileRouter {
         State state = spt.getState(rr.rctx.target);
         if (state != null) {
             LOG.info("Found non-transit option for mode {}", mode);
-            directOptions.add(new Option(state));
+            directPaths.add(new StopAtDistance(state));
         }
-        rr.rctx.destroy();
+        rr.rctx.destroy(); // after making StopAtDistance which includes walksteps and needs temporary edges
     }
 
     /** Make two time surfaces, one for the minimum and one for the maximum. */

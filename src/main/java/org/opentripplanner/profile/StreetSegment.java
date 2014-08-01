@@ -27,7 +27,8 @@ public class StreetSegment {
 
     /** A StreetSegment is very similar to a StopAtDistance but it's a response object so the State has to be rendered into walksteps. */
     public StreetSegment (StopAtDistance sd) {
-        this(sd.state); // TODO fix NPEs
+        //this(sd.state); // FIXME NPEs due to routing contexts being torn down (temp edges are disconnected)
+        walkSteps = sd.walkSteps;
         mode = sd.mode;
         time = sd.etime;
     }
