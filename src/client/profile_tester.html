@@ -9,50 +9,58 @@
         <div id="map"></div>
         <script>
 
-// Basic test of profile routing served up at http://localhost:8080/profile_tester.html
-// When you move the markers, sends a JSON request to OTP profile router and prints the resulting JSON in the JS console.
+(function () { // create a context for the purpose of namespacing and applying strict syntax
+    'use strict';
 
-var arlington = new L.LatLng(38.868, -77.14);
-var dc = new L.LatLng(38.896, -77.022);
-var map = L.map('map');
-map.setView(dc, 13);
+    // Basic test of profile routing served up at http://localhost:8080/profile_tester.html
+    // Or access using a file:// URL to allow modifying this client while using a running OTP server.
+    // When you move the markers, sends a JSON request to OTP profile router and prints the resulting JSON in the JS console.
 
-L.tileLayer('http://otile4.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map);
+    var arlington = new L.LatLng(38.868, -77.14);
+    var dc = new L.LatLng(38.896, -77.022);
+    var map = L.map('map');
+    map.setView(dc, 13);
 
-var fromMarker = L.marker(arlington, {draggable: true});
-var toMarker = L.marker(dc, {draggable: true});
+    L.tileLayer('http://otile4.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
 
-function profileRoute() {
-    var req = new XMLHttpRequest();
-    req.overrideMimeType("application/json");
-    var url = "http://localhost:8080/otp/routers/dc/profile";
-    var fromPos = fromMarker.getLatLng();
-    var toPos = toMarker.getLatLng();
-    var qstring = '?from=' + fromPos.lat + ',' + fromPos.lng + '&' + 'to=' + toPos.lat + ',' + toPos.lng;
-    req.open('GET', url + qstring, true);
-    req.onload  = function() {
-        var resp = JSON.parse(req.responseText);
-        console.log(resp);
-    };
-    req.send(null);
-}
+    var fromMarker = L.marker(arlington, {draggable: true});
+    var toMarker = L.marker(dc, {draggable: true});
 
-fromMarker.on("dragend",function(ev){
-    var pos = ev.target.getLatLng();
-    this.bindPopup(pos.toString()).openPopup();
-    profileRoute();
-});
+    function profileRoute() {
+        var req = new XMLHttpRequest();
+        req.overrideMimeType("application/json");
+        var url = "http://localhost:8080/otp/routers/dc/profile";
+        var fromPos = fromMarker.getLatLng();
+        var toPos = toMarker.getLatLng();
+        var qstring = '?from=' + fromPos.lat + ',' + fromPos.lng;
+        qstring += '&to=' + toPos.lat + ',' + toPos.lng;
+        qstring += '&modes=WALK,BICYCLE,TRANSIT'; // note that TRANSIT or specific transit modes must be included
+        req.open('GET', url + qstring, true);
+        req.onload  = function() {
+            var resp = JSON.parse(req.responseText);
+            console.log(resp);
+        };
+        req.send(null);
+    }
 
-toMarker.on("dragend",function(ev){
-    var pos = ev.target.getLatLng();
-    this.bindPopup(pos.toString()).openPopup();
-    profileRoute();
-});
+    fromMarker.on("dragend",function(ev){
+        var pos = ev.target.getLatLng();
+        this.bindPopup(pos.toString()).openPopup();
+        profileRoute();
+    });
 
-fromMarker.addTo(map);
-toMarker.addTo(map);
+    toMarker.on("dragend",function(ev){
+        var pos = ev.target.getLatLng();
+        this.bindPopup(pos.toString()).openPopup();
+        profileRoute();
+    });
+
+    fromMarker.addTo(map);
+    toMarker.addTo(map);
+
+}()); // close namespace and call to execute.
 
         </script>
     </body>
