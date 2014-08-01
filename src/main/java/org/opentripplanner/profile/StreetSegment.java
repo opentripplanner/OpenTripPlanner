@@ -35,11 +35,10 @@ public class StreetSegment {
 
     /** Make a collections of StreetSegments from a collection of StopAtDistance. */
     public static List<StreetSegment> list(Collection<StopAtDistance> sds) {
+        if (sds == null || sds.isEmpty()) return null;
         List<StreetSegment> ret = Lists.newArrayList();
-        if (sds != null) {
-            for (StopAtDistance sd : sds) {
-                ret.add(new StreetSegment(sd));
-            }
+        for (StopAtDistance sd : sds) {
+            ret.add(new StreetSegment(sd));
         }
         return ret;
     }

@@ -158,7 +158,8 @@ public class Ride {
      * @return the distance walked from the end of the previous ride to the beginning of this ride.
      */
     public double getTransferDistance() {
-        return patternRides.get(0).xfer.distance;
+        ProfileTransfer xfer = patternRides.get(0).xfer;
+        return xfer == null ? 0 : xfer.distance;
     }
 
     /**

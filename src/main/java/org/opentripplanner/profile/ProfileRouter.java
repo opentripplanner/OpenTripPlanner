@@ -146,16 +146,12 @@ public class ProfileRouter {
             for (int i = 0; i < pattern.getStops().size(); ++i) {
                 if (pattern.getStops().get(i) == sd.stop) {
                     if (request.modes.contains(pattern.mode)) {
-                        /* Pseudo-transfer from null indicates first leg. */
-                        // TODO time vs dist
-                        // TODO do not use transfers for accesss/egress, use null
-                        ProfileTransfer xfer = new ProfileTransfer(null, pattern, null, sd.stop, sd.etime);
                         Ride ride = initialRides.get(sd.stop);
                         if (ride == null) {
                             ride = new Ride(sd.stop, null);
                             initialRides.put(sd.stop, ride);
                         }
-                        ride.patternRides.add(new PatternRide(pattern, i, null, xfer));
+                        ride.patternRides.add(new PatternRide(pattern, i, null, null));
                     }
                 }
             }
