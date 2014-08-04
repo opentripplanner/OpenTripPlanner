@@ -261,6 +261,7 @@ public class Ride {
         return ride.from;
     }
 
+
     /** @return the stop from which the rider will walk to the final destination, assuming this is the final Ride in a chain. */
     public Stop getEgressStop() {
         return this.to;

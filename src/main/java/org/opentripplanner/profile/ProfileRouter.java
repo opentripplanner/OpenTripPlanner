@@ -70,7 +70,7 @@ public class ProfileRouter {
     // while finding direct paths:
     // if dist < M meters OR we don't yet have N stations: record station
     Collection<StopAtDistance> directPaths = Lists.newArrayList(); // ways to reach the destination without transit
-    Multimap<Stop, Ride> rides = ArrayListMultimap.create(); // at each destination stop, the rides that are worth continuing to explore.
+    Multimap<Stop, Ride> retainedRides = ArrayListMultimap.create(); // the rides arriving at each stop that are worth continuing to explore.
     BinHeap<Ride> queue = new BinHeap<Ride>(); // rides to be explored, prioritized by minumum travel time
     // TODO rename fromStopsByPattern
     Map<TripPattern, StopAtDistance> fromStops, toStops;
@@ -81,19 +81,6 @@ public class ProfileRouter {
     private boolean hasTransfers(Stop stop, TripPattern pattern) {
         for (ProfileTransfer tr : graph.index.transfersForStop.get(stop)) {
             if (tr.tp1 == pattern) return true;
-        }
-        return false;
-    }
-
-    /** Add a ride to its target stop if it is deemed worthwhile to explore. TODO complete */
-    private boolean addRide(Ride newRide) {
-        for (Ride ride : rides.get(newRide.to)) {
-            if (newRide.durationLowerBound() < ride.durationUpperBound()) {
-                // The new ride is sometimes better than an existing ride. Explore it.
-                rides.put(newRide.to, newRide);
-                queue.insert(newRide, newRide.durationLowerBound());
-                return true;
-            }
         }
         return false;
     }
@@ -163,6 +150,7 @@ public class ProfileRouter {
         while ( ! queue.empty()) {
             /* Get the minimum-time unfinished ride off the queue. */
             Ride ride = queue.extract_min();
+            //LOG.info("dequeued ride {}", ride);
             //ride.dump();
             // maybe when ride is complete, then find transfers here, but that makes for more queue operations.
             if (ride.to != null) throw new AssertionError("Ride should be unfinished.");
@@ -225,7 +213,7 @@ public class ProfileRouter {
                         if (tr.s1 != tr.s2 && r1.pathContainsStop(tr.s2)) continue;
                         // Optimization: on last ride, only transfer to patterns that pass near the destination.
                         if (penultimateRide && ! toStops.containsKey(tr.tp2)) continue;
-                        // Scan through stops because a stop might appear more than once in a pattern.
+                        // Scan through stops looking for transfer target: stop might appear more than once in a pattern.
                         for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
                             if (tr.tp2.getStops().get(i) == tr.s2) {
                                 if (request.modes.contains(tr.tp2.mode)) {
@@ -243,11 +231,8 @@ public class ProfileRouter {
                 }
             }
             /* Enqueue new incomplete Rides with non-excessive durations. */
-            for (Ride xr : xferRides.values()) {
-                int dlb = xr.previous.durationLowerBound(); // this ride is unfinished so it has no times...
-                if (dlb > MAX_DURATION) continue;
-                queue.insert(xr, dlb);
-            }
+            // TODO maybe check excessive time before transferring (above, where we prune loopy paths)
+            for (Ride r : xferRides.values()) maybeAddRide(r);
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
         }
         /* Build the list of Options by following the back-pointers in Rides. */
@@ -267,6 +252,21 @@ public class ProfileRouter {
         options.add(new Option(null, directPaths, null));
         LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
         return new ProfileResponse(options, request.orderBy, request.limit);
+    }
+
+    public boolean maybeAddRide(Ride newRide) {
+        int dlb = newRide.previous.durationLowerBound(); // this ride is unfinished so it has no times yet
+        if (dlb > MAX_DURATION) return false;
+        // Check whether any existing rides at the same location (stop) dominate the new one
+        for (Ride oldRide : retainedRides.get(newRide.from)) { // fromv because this is an unfinished ride
+            if (dlb < oldRide.previous.durationUpperBound()) {
+                return false;
+            }
+        }
+        // No existing ride is strictly better than the new ride.
+        retainedRides.put(newRide.from, newRide);
+        queue.insert(newRide, dlb);
+        return true;
     }
 
     /**

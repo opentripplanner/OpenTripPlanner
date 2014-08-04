@@ -11,6 +11,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 
 /**
  * The equivalent of a ride in an API response. All information degenerates to Strings and ints here.
+ * TODO rename to TransitSegment
  */
 public class Segment {
 
@@ -50,6 +51,9 @@ public class Segment {
 
     public Segment (Ride ride) {
         //route = ride.route.getId().getId();
+        // Note that despite the fact that multiple patterns from different routes will appear in the same ride,
+        // in practice all the patterns within a ride will be from the same operator and mode because they all pass
+        // through the same stops. TODO display more than one route per ride/segment, but warn if they're not the same mode.
         Route route = ride.patternRides.get(0).pattern.getRoute();
         mode = GtfsLibrary.getTraverseMode(route).toString();
         //routeShortName = ride.route.getShortName();
