@@ -164,8 +164,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private int drawOffset = 0;
     private boolean drawHighlighted = true;
 	private HashMap<Edge, Double> trunkiness = new HashMap<Edge,Double>();
-	private LinkedBlockingQueue<State> trunkQueue = new LinkedBlockingQueue<State>();
-	private boolean drawSPT = true;
+	private LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<State>();
+	private boolean drawEdges = true;
 
 	class Trunk{
 		public Edge edge;
@@ -487,35 +487,28 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         } else if (drawLevel == DRAW_VERTICES) {
             drawVertices();
         } else if (drawLevel == DRAW_MINIMAL) {
-        	boolean success = drawTrunks(startMillis);
-        	if(!success){
-        		return;
-        	}
+        	drawNewEdges();
         }
         drawOffset = 0;
         if (drawLevel > DRAW_MINIMAL)
             drawLevel -= 1; // move to next layer
     }
     
-	private boolean drawTrunks(int startMillis) {
-		if( drawSPT  ){
+    private void drawNewEdges() {
+    	if( drawEdges  ){
 			stroke(255,255,255); //white	
 			noFill();
-			while (!trunkQueue.isEmpty()) {
-				State leaf = trunkQueue.poll();
-				List<Trunk> trunks = this.updateTrunkiness(leaf);
+			while (!newSPTEdges.isEmpty()) {
+				State leaf = newSPTEdges.poll();
   	
-			for( Trunk trunk : trunks ) {
-				strokeWeight((int)(0.1*Math.pow(trunk.trunkiness, 0.3)));
-				drawEdge(trunk.edge);
-			}
-
-			if (millis() - startMillis > FRAME_TIME)
-				return false;
+				if(leaf != null){
+					if( leaf.getBackEdge() != null ){
+						drawEdge(leaf.getBackEdge());
+					}
+				}
 			}
 
 		}
-		return true;
 	}
 
 	private void drawMinimal() {
@@ -950,7 +943,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	}
 	
 	public void enqueueTrunkiness(State state) {
-		this.trunkQueue.add( state );
+		this.newSPTEdges.add( state );
 	}
 
 }
