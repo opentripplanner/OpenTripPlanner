@@ -205,13 +205,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		
 		public void draw() {
 			stroke(255,255,0);
-			strokeWeight(1);
-			for( SPTNode node : nodes.values() ){
-				if( node.state.getBackEdge() != null ){
-					strokeWeight( (float) (0.1*Math.pow(node.weight,0.3)) );
-					drawEdge( node.state.getBackEdge() );
-				}
-			}
+			root.draw();
 		}
 	}
 
@@ -228,6 +222,17 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		SPTNode(State state){
 			this.state = state;
 			this.children = new ArrayList<SPTNode>();
+		}
+		
+		public void draw() {
+			if(state.getBackEdge() != null){
+				strokeWeight( (float) (0.1*Math.pow(weight,0.3)) );
+				drawEdge( state.getBackEdge() );
+			}
+	
+			for( SPTNode child : children ){
+				child.draw();
+			}
 		}
 		
 		public void setWeight() {
