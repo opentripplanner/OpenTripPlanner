@@ -898,6 +898,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JLabel pathsLabel = new JLabel("Paths");
         vertexDataPanel.add(pathsLabel);
         pathsList = new JList();
+        pathsList.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent ev) {
+				GraphPath path = (GraphPath) pathsList.getSelectedValue();
+				showGraph.highlightGraphPath(path);		
+			}
+	
+        });
         JScrollPane pathsScrollPane = new JScrollPane(pathsList);
         vertexDataPanel.add(pathsScrollPane);
 	}
@@ -1143,10 +1151,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         	data.addElement( paths.get(i) );
         }
         pathsList.setModel(data);
+        if( data.size()>0 ){
+        	pathsList.setSelectedIndex(0); // select the first item on the list to fire path drawing
+        }
         
-        GraphPath gp = paths.get(0);
-        
-        showGraph.highlightGraphPath(gp);
         options.cleanup();
     }
 
