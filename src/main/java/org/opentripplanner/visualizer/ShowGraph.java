@@ -577,12 +577,14 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         } else if (drawLevel == DRAW_VERTICES) {
             drawVertices();
         } else if (drawLevel == DRAW_MINIMAL) {
-        	drawMinimal();
+        	if (!newHighlightedEdges.isEmpty())
+        		handleNewHighlights();
         	drawNewEdges();
         	if(drawSPTNext){
         		simpleSPT.draw();
         		drawSPTNext = false;
         	}
+        	drawCoords();
         }
         drawOffset = 0;
         if (drawLevel > DRAW_MINIMAL)
@@ -606,9 +608,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		}
 	}
 
-	private void drawMinimal() {
-		if (!newHighlightedEdges.isEmpty())
-		    handleNewHighlights();
+    private void drawCoords() {
 		// Black background box
 		fill(0, 0, 0);
 		stroke(30, 128, 30);
