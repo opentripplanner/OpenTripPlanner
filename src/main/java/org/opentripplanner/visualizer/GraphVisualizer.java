@@ -942,7 +942,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 
 
-        // row: launch and clear path search
+        // row: launch, continue, and clear path search
         JButton routeButton = new JButton("path search");
         routeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -952,6 +952,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
         });
         routingPanel.add(routeButton);
+        JButton continueButton = new JButton("continue");
+        continueButton.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	//TODO continue search
+	        }
+        });
+        routingPanel.add(continueButton);
         JButton clearRouteButton = new JButton("clear path");
         clearRouteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
