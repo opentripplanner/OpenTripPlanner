@@ -1229,6 +1229,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             return;
         }
         
+        showGraph.resetTrunks();
+        
         // show paths in a list panel
         DefaultListModel data = new DefaultListModel();
         for(GraphPath gp : paths ){

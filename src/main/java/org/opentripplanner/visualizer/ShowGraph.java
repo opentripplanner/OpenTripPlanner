@@ -24,10 +24,12 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -161,6 +163,19 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     private int drawOffset = 0;
     private boolean drawHighlighted = true;
+	private HashMap<Edge, Double> trunkiness = new HashMap<Edge,Double>();
+	private LinkedBlockingQueue<Trunk> trunkQueue = new LinkedBlockingQueue<Trunk>();
+	private boolean drawSPT = true;
+
+	class Trunk{
+		public Edge edge;
+		public Double trunkiness;
+
+		Trunk(Edge edge, Double trunkiness){
+			this.edge = edge;
+			this.trunkiness = trunkiness;
+		}
+	}
 
     /*
      * Constructor. Call processing constructor, and register the listener to notify when the user selects vertices.
@@ -482,6 +497,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	private void drawMinimal() {
 		if (!newHighlightedEdges.isEmpty())
 		    handleNewHighlights();
+		if (!trunkQueue.isEmpty()){
+			handleNewTrunks();
+		}
 		// Black background box
 		fill(0, 0, 0);
 		stroke(30, 128, 30);
@@ -659,6 +677,19 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         if (VIDEO)
             saveVideoFrame();
     }
+    
+	private void handleNewTrunks() {
+		if( drawSPT  ){
+			stroke(255,255,255); //white	
+			noFill();
+			while (!trunkQueue.isEmpty()) {
+				Trunk trunk = trunkQueue.poll();
+
+				strokeWeight((int)(0.01*Math.pow(trunk.trunkiness, 0.5)));
+				drawEdge(trunk.edge);
+			}
+		}
+	}
 
     private void saveVideoFrame() {
         save(VIDEO_PATH + "/" + videoFrameNumber++ + ".bmp");
@@ -879,4 +910,31 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		drawLevel = DRAW_ALL;
 	}
     
+	public void updateTrunkiness(State tip) {
+		// Increment all parent edges of tip with tip's weight, and add them to drawing queue
+		State cur = tip;
+
+		while( cur!=null ){
+			Edge backEdge = cur.getBackEdge();
+			if(backEdge==null){
+				break;
+			}
+
+			Double prevWeight = this.trunkiness.get(backEdge);
+			if(prevWeight==null){
+				prevWeight = 0.0;
+			}
+			Double trunkiness = prevWeight+tip.getWeight();
+			this.trunkiness.put(backEdge, trunkiness);
+
+			this.trunkQueue.add(new Trunk(backEdge,trunkiness));
+
+			cur = cur.getBackState();
+		}
+	}
+
+	public void resetTrunks() {
+		this.trunkiness = new HashMap<Edge,Double>();
+	}
+
 }
