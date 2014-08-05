@@ -218,7 +218,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 			SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
 			String startTime = shortDateFormat.format(new Date(gp.getStartTime()*1000));
 			String endTime = shortDateFormat.format(new Date(gp.getEndTime()*1000));
-			return "Path ("+startTime+"-"+endTime+") weight:"+gp.getWeight()+" dur:"+gp.getDuration()+" walk:"+gp.getWalkDistance()+" nTrips:"+gp.getTrips().size();
+			return "Path ("+startTime+"-"+endTime+") weight:"+gp.getWeight()+" dur:"+(gp.getDuration()/60.0)+" walk:"+gp.getWalkDistance()+" nTrips:"+gp.getTrips().size();
 		}
 	}
 
@@ -750,6 +750,122 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         });
         buttonPanel.add(snapButton);
 	}
+	
+		
+	    private void getMetadata(Object selected) {
+	        Class<?> c = selected.getClass();
+	        Field[] fields;
+	        while (c != null && c != Object.class) {
+	            metadataModel.addElement("Class:" + c);
+	            fields = c.getDeclaredFields();
+	            for (int i = 0; i < fields.length; i++) {
+	                Field field = fields[i];
+	                int modifiers = field.getModifiers();
+	                if ((modifiers & Modifier.STATIC) != 0) {
+	                    continue;
+	                }
+	                field.setAccessible(true);
+	                String name = field.getName();
+	
+	                String value = "(unknown -- see console for stack trace)";
+	                try {
+	                    value = "" + field.get(selected);
+	                } catch (IllegalArgumentException e1) {
+	                    e1.printStackTrace();
+	                } catch (IllegalAccessException e1) {
+	                    e1.printStackTrace();
+	                }
+	                metadataModel.addElement(name + ": " + value);
+	            }
+	            c = c.getSuperclass();
+	        }
+	    }
+		
+		private void reactToEdgeSelection(Edge selected, boolean outgoing){
+	        if (selected == null) {
+	            departurePattern.removeAll();
+	            return;
+	        }
+	        showGraph.highlightEdge(selected);
+	
+	        /* for turns, highlight the outgoing street's ends */
+	        if (selected instanceof StreetEdge) {
+	            List<Vertex> vertices = new ArrayList<Vertex>();
+	            List<Edge> edges = new ArrayList<Edge>();
+	            Vertex tov = selected.getToVertex();
+	            for (Edge og : tov.getOutgoing()) {
+	                if (og instanceof StreetEdge) {
+	                    edges.add(og);
+	                    vertices.add(og.getToVertex());
+	                    break;
+	                }
+	            }
+	            Vertex fromv = selected.getFromVertex();
+	            for (Edge ic : fromv.getIncoming()) {
+	                if (ic instanceof StreetEdge) {
+	                    edges.add(ic);
+	                    vertices.add(ic.getFromVertex());
+	                    break;
+	                }
+	            }
+	            // showGraph.setHighlightedVertices(vertices);
+	            showGraph.setHighlightedEdges(edges);
+	        }
+	
+	        /* add the connected vertices to the list of vertices */
+	        VertexList nearbyModel = (VertexList) nearbyVertices.getModel();
+	        List<Vertex> vertices = nearbyModel.selected;
+	
+	        Vertex v;
+	        if (outgoing) {
+	            v = selected.getToVertex();
+	        } else {
+	            v = selected.getFromVertex();
+	        }
+	        if (!vertices.contains(v)) {
+	            vertices.add(v);
+	            nearbyModel = new VertexList(vertices);
+	            nearbyVertices.setModel(nearbyModel); // this should just be an event, but for
+	                                                  // some reason, JList doesn't implement
+	                                                  // the right event.
+	        }
+	
+	        /* set up metadata tab */
+	        metadataModel.clear();
+	        Class<?> c;
+	        Field[] fields;
+	        getMetadata(selected);
+	        // fromv
+	        Vertex fromv = selected.getFromVertex();
+	        getMetadata(fromv);
+	        if (selected instanceof EdgeWithElevation) {
+	            getMetadata(((EdgeWithElevation) selected).getElevationProfileSegment());
+	        }
+	        metadataList.revalidate();
+	
+	        // figure out the pattern, if any
+	        TripPattern pattern = null;
+	        int stopIndex = 0;
+	        if (selected instanceof TransitBoardAlight
+	                && ((TransitBoardAlight) selected).isBoarding()) {
+	            TransitBoardAlight boardEdge = (TransitBoardAlight) selected;
+	            pattern = boardEdge.getPattern();
+	            stopIndex = boardEdge.getStopIndex();
+	        } else if (selected instanceof TransitBoardAlight
+	                && !((TransitBoardAlight) selected).isBoarding()) {
+	            TransitBoardAlight alightEdge = (TransitBoardAlight) selected;
+	            pattern = alightEdge.getPattern();
+	            stopIndex = alightEdge.getStopIndex();
+	        } else {
+	            departurePattern.removeAll();
+	            return;
+	        }
+	        ListModel model = new TripPatternListModel(pattern, stopIndex);
+	        departurePattern.setModel(model);
+	
+	        Trip trip = pattern.getExemplar();
+	        serviceIdLabel.setText(trip.getServiceId().toString());
+		}
 
 	private void initVertexInfoSubpanel() {
 		/* VERTEX INFO SUBPANEL */
@@ -786,119 +902,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
                 JList edgeList = (JList) e.getSource();
                 Edge selected = (Edge) edgeList.getSelectedValue();
-                if (selected == null) {
-                    departurePattern.removeAll();
-                    return;
-                }
-                showGraph.highlightEdge(selected);
-
-                /* for turns, highlight the outgoing street's ends */
-                if (selected instanceof StreetEdge) {
-                    List<Vertex> vertices = new ArrayList<Vertex>();
-                    List<Edge> edges = new ArrayList<Edge>();
-                    Vertex tov = selected.getToVertex();
-                    for (Edge og : tov.getOutgoing()) {
-                        if (og instanceof StreetEdge) {
-                            edges.add(og);
-                            vertices.add(og.getToVertex());
-                            break;
-                        }
-                    }
-                    Vertex fromv = selected.getFromVertex();
-                    for (Edge ic : fromv.getIncoming()) {
-                        if (ic instanceof StreetEdge) {
-                            edges.add(ic);
-                            vertices.add(ic.getFromVertex());
-                            break;
-                        }
-                    }
-                    // showGraph.setHighlightedVertices(vertices);
-                    showGraph.setHighlightedEdges(edges);
-                }
-
-                /* add the connected vertices to the list of vertices */
-                VertexList nearbyModel = (VertexList) nearbyVertices.getModel();
-                List<Vertex> vertices = nearbyModel.selected;
-
-                Vertex v;
-                if (edgeList == outgoingEdges) {
-                    v = selected.getToVertex();
-                } else {
-                    v = selected.getFromVertex();
-                }
-                if (!vertices.contains(v)) {
-                    vertices.add(v);
-                    nearbyModel = new VertexList(vertices);
-                    nearbyVertices.setModel(nearbyModel); // this should just be an event, but for
-                                                          // some reason, JList doesn't implement
-                                                          // the right event.
-                }
-
-                /* set up metadata tab */
-                metadataModel.clear();
-                Class<?> c;
-                Field[] fields;
-                getMetadata(selected);
-                // fromv
-                Vertex fromv = selected.getFromVertex();
-                getMetadata(fromv);
-                if (selected instanceof EdgeWithElevation) {
-                    getMetadata(((EdgeWithElevation) selected).getElevationProfileSegment());
-                }
-                metadataList.revalidate();
-
-                // figure out the pattern, if any
-                TripPattern pattern = null;
-                int stopIndex = 0;
-                if (selected instanceof TransitBoardAlight
-                        && ((TransitBoardAlight) selected).isBoarding()) {
-                    TransitBoardAlight boardEdge = (TransitBoardAlight) selected;
-                    pattern = boardEdge.getPattern();
-                    stopIndex = boardEdge.getStopIndex();
-                } else if (selected instanceof TransitBoardAlight
-                        && !((TransitBoardAlight) selected).isBoarding()) {
-                    TransitBoardAlight alightEdge = (TransitBoardAlight) selected;
-                    pattern = alightEdge.getPattern();
-                    stopIndex = alightEdge.getStopIndex();
-                } else {
-                    departurePattern.removeAll();
-                    return;
-                }
-                ListModel model = new TripPatternListModel(pattern, stopIndex);
-                departurePattern.setModel(model);
-
-                Trip trip = null; // pattern.getExemplar();
-                serviceIdLabel.setText(trip.getServiceId().toString());
+                
+                boolean outgoing = (edgeList==outgoingEdges);
+                reactToEdgeSelection( selected, outgoing );
             }
 
-            private void getMetadata(Object selected) {
-                Class<?> c = selected.getClass();
-                Field[] fields;
-                while (c != null && c != Object.class) {
-                    metadataModel.addElement("Class:" + c);
-                    fields = c.getDeclaredFields();
-                    for (int i = 0; i < fields.length; i++) {
-                        Field field = fields[i];
-                        int modifiers = field.getModifiers();
-                        if ((modifiers & Modifier.STATIC) != 0) {
-                            continue;
-                        }
-                        field.setAccessible(true);
-                        String name = field.getName();
-
-                        String value = "(unknown -- see console for stack trace)";
-                        try {
-                            value = "" + field.get(selected);
-                        } catch (IllegalArgumentException e1) {
-                            e1.printStackTrace();
-                        } catch (IllegalAccessException e1) {
-                            e1.printStackTrace();
-                        }
-                        metadataModel.addElement(name + ": " + value);
-                    }
-                    c = c.getSuperclass();
-                }
-            }
         };
 
         outgoingEdges.addListSelectionListener(edgeChanged);

@@ -625,4 +625,11 @@ public class TripPattern implements Serializable {
         return String.format("<TripPattern %s>", this.code);
     }
 
+	public Trip getExemplar() {
+		if(this.trips.isEmpty()){
+			return null;
+		}
+		return this.trips.get(0);
+	}
+
 }
