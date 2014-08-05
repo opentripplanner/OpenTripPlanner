@@ -225,7 +225,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		}
 		
 		public void draw() {
+			colorMode(HSB);
+			
 			if(state.getBackEdge() != null){
+				stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
 				strokeWeight( (float) (0.1*Math.pow(weight,0.3)) );
 				drawEdge( state.getBackEdge() );
 			}
@@ -233,6 +236,22 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			for( SPTNode child : children ){
 				child.draw();
 			}
+			
+			colorMode(RGB);
+		}
+		
+		private int colorRamp(int aa) {
+			int NHUES = 6;
+			int HUELEN = 256;
+			int RAMPLEN = NHUES*HUELEN;
+			int BRIGHTNESS = 220;
+
+			aa = aa%RAMPLEN; //make sure aa fits within the color ramp
+			int hueIndex = aa/HUELEN; //establish the hue
+			int hue = hueIndex*(HUELEN/NHUES); //convert that to a hue value
+			int saturation = HUELEN-aa%HUELEN;
+
+			return color(hue,saturation,BRIGHTNESS);
 		}
 		
 		public void setWeight() {
