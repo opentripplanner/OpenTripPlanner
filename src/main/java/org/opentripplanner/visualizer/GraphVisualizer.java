@@ -310,6 +310,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private JCheckBox dontUseGraphicalCallbackCheckBox;
 	
 	private JTextField nPaths;
+	
+	private JList pathsList;
 
     public GraphVisualizer(GraphService graphService) {
         super();
@@ -892,6 +894,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                 }
             }
         });
+        
+        JLabel pathsLabel = new JLabel("Paths");
+        vertexDataPanel.add(pathsLabel);
+        pathsList = new JList();
+        JScrollPane pathsScrollPane = new JScrollPane(pathsList);
+        vertexDataPanel.add(pathsScrollPane);
 	}
 
 	private void initRoutingSubpanel() {
@@ -1128,6 +1136,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             showGraph.highlightGraphPath(null);
             return;
         }
+        
+        DefaultListModel data = new DefaultListModel();
+        for(int i=0; i<paths.size(); i++){
+        	data.addElement( paths.get(i) );
+        }
+        pathsList.setModel(data);
+        
         GraphPath gp = paths.get(0);
         for (State s : gp.states) {
             System.out.print(s.toString() + " <- ");
