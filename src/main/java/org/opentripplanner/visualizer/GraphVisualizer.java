@@ -308,6 +308,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private JLabel searchTimeElapsedLabel;
 
 	private JCheckBox dontUseGraphicalCallbackCheckBox;
+	
+	private JTextField nPaths;
 
     public GraphVisualizer(GraphService graphService) {
         super();
@@ -453,6 +455,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // radio buttons: optimize type
         JLabel optimizeTypeLabel = new JLabel("Optimize type:");
         pane.add(optimizeTypeLabel);
+        
+        // row: nPaths
+        JLabel nPathsLabel = new JLabel("nPaths:");
+        pane.add(nPathsLabel);
+        nPaths = new JTextField("1");
+        pane.add(nPaths);
         
         opQuick = new JRadioButton("Quick");
         opQuick.setSelected(true);
@@ -1092,6 +1100,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
+        
+        sptService.setNPaths( Integer.parseInt( this.nPaths.getText() ) );
         
         // apply callback if the options call for it
         if( dontUseGraphicalCallbackCheckBox.isSelected() ){
