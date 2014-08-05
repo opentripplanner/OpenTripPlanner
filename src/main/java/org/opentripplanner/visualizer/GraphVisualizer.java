@@ -1217,6 +1217,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         	sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
         }
         
+        showGraph.resetTrunks();
+        
         long t0 = System.currentTimeMillis();
         // TODO: check options properly intialized (AMB)
         List<GraphPath> paths = pathservice.getPaths(options);
@@ -1228,9 +1230,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             showGraph.highlightGraphPath(null);
             return;
         }
-        
-        showGraph.resetTrunks();
-        
+                
         // show paths in a list panel
         DefaultListModel data = new DefaultListModel();
         for(GraphPath gp : paths ){

@@ -164,7 +164,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private int drawOffset = 0;
     private boolean drawHighlighted = true;
 	private HashMap<Edge, Double> trunkiness = new HashMap<Edge,Double>();
-	private LinkedBlockingQueue<Trunk> trunkQueue = new LinkedBlockingQueue<Trunk>();
+	private LinkedBlockingQueue<State> trunkQueue = new LinkedBlockingQueue<State>();
 	private boolean drawSPT = true;
 
 	class Trunk{
@@ -487,19 +487,40 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         } else if (drawLevel == DRAW_VERTICES) {
             drawVertices();
         } else if (drawLevel == DRAW_MINIMAL) {
-            drawMinimal();
+        	boolean success = drawTrunks(startMillis);
+        	if(!success){
+        		return;
+        	}
         }
         drawOffset = 0;
         if (drawLevel > DRAW_MINIMAL)
             drawLevel -= 1; // move to next layer
     }
+    
+	private boolean drawTrunks(int startMillis) {
+		if( drawSPT  ){
+			stroke(255,255,255); //white	
+			noFill();
+			while (!trunkQueue.isEmpty()) {
+				State leaf = trunkQueue.poll();
+				List<Trunk> trunks = this.updateTrunkiness(leaf);
+  	
+			for( Trunk trunk : trunks ) {
+				strokeWeight((int)(0.1*Math.pow(trunk.trunkiness, 0.3)));
+				drawEdge(trunk.edge);
+			}
+
+			if (millis() - startMillis > FRAME_TIME)
+				return false;
+			}
+
+		}
+		return true;
+	}
 
 	private void drawMinimal() {
 		if (!newHighlightedEdges.isEmpty())
 		    handleNewHighlights();
-		if (!trunkQueue.isEmpty()){
-			handleNewTrunks();
-		}
 		// Black background box
 		fill(0, 0, 0);
 		stroke(30, 128, 30);
@@ -677,19 +698,6 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         if (VIDEO)
             saveVideoFrame();
     }
-    
-	private void handleNewTrunks() {
-		if( drawSPT  ){
-			stroke(255,255,255); //white	
-			noFill();
-			while (!trunkQueue.isEmpty()) {
-				Trunk trunk = trunkQueue.poll();
-
-				strokeWeight((int)(0.01*Math.pow(trunk.trunkiness, 0.5)));
-				drawEdge(trunk.edge);
-			}
-		}
-	}
 
     private void saveVideoFrame() {
         save(VIDEO_PATH + "/" + videoFrameNumber++ + ".bmp");
@@ -910,8 +918,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		drawLevel = DRAW_ALL;
 	}
     
-	public void updateTrunkiness(State tip) {
-		// Increment all parent edges of tip with tip's weight, and add them to drawing queue
+	public List<Trunk> updateTrunkiness(State tip) {
+		List<Trunk> ret = new ArrayList<Trunk>();
+
+		// Increment all parent edges of tip with tip's weight, and return updated trunks
 		State cur = tip;
 
 		while( cur!=null ){
@@ -927,14 +937,20 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			Double trunkiness = prevWeight+tip.getWeight();
 			this.trunkiness.put(backEdge, trunkiness);
 
-			this.trunkQueue.add(new Trunk(backEdge,trunkiness));
+			ret.add( new Trunk(backEdge, trunkiness) );
 
 			cur = cur.getBackState();
 		}
+		
+		return ret;
 	}
 
 	public void resetTrunks() {
 		this.trunkiness = new HashMap<Edge,Double>();
+	}
+	
+	public void enqueueTrunkiness(State state) {
+		this.trunkQueue.add( state );
 	}
 
 }

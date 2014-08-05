@@ -50,7 +50,7 @@ public class VisualTraverseVisitor implements TraverseVisitor {
                 e.printStackTrace();
             }
         }
-        gui.updateTrunkiness( state );
+        gui.enqueueTrunkiness( state );
     }
 
     @Override
