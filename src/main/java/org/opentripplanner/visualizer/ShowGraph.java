@@ -130,7 +130,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     boolean drawLinkEdges = true;
 
-    boolean drawStreetVertices = false;
+    boolean drawStreetVertices = true;
 
     boolean drawTransitStopVertices = true;
 
@@ -160,6 +160,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private int drawLevel = DRAW_ALL;
 
     private int drawOffset = 0;
+    private boolean drawHighlighted = true;
 
     /*
      * Constructor. Call processing constructor, and register the listener to notify when the user selects vertices.
@@ -499,13 +500,13 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	private void drawVertices() {
 		/* turn off vertex display when zoomed out */
 		final double METERS_PER_DEGREE_LAT = 111111.111111;
-		drawTransitStopVertices = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 4);
+		boolean closeEnough = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 4);
 		/* Draw selected visible vertices */
 		fill(60, 60, 200);
 		for (Vertex v : visibleVertices) {
-		    if (drawTransitStopVertices && v instanceof TransitStationStop) {
+			if (drawTransitStopVertices && closeEnough && v instanceof TransitStationStop) {
 		        drawVertex(v, 5);
-		    } else if (v instanceof IntersectionVertex) {
+			} else if (drawStreetVertices && v instanceof IntersectionVertex) {
 		        IntersectionVertex iv = (IntersectionVertex) v;
 		        if (iv.isTrafficLight()) {
 		            drawVertex(v, 7);
@@ -516,7 +517,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		noFill();
 		stroke(200, 200, 000, 16); // yellow transparent edge highlight
 		strokeWeight(8);
-		if (highlightedEdges != null) {
+		if (drawHighlighted  && highlightedEdges != null) {
 		    for (Edge e : highlightedEdges) {
 		        drawEdge(e);
 		    }
@@ -860,4 +861,22 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         this.draw();
     }
 
+	public void setShowTransit(boolean selected) {
+		drawTransitEdges = selected;
+		drawTransitStopVertices = selected;
+	}
+
+	public void setShowStreets(boolean selected) {
+		drawStreetEdges = selected;
+		drawStreetVertices = selected;
+	}
+
+	public void setShowHightlights(boolean selected) {
+		drawHighlighted = selected;
+	}
+
+	public void redraw(){
+		drawLevel = DRAW_ALL;
+	}
+    
 }
