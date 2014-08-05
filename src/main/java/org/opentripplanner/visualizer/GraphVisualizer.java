@@ -549,6 +549,21 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JScrollPane stScrollPane = new JScrollPane(pathStates);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("path states", stScrollPane);
+        
+        // when you select a path component state, it prints the backedge's metadata
+        pathStates.addListSelectionListener(new ListSelectionListener(){
+	        @Override
+	        public void valueChanged(ListSelectionEvent e) {
+	        	outgoingEdges.clearSelection();
+	        	incomingEdges.clearSelection();
+		
+	        	JList theList = (JList)e.getSource();
+	        	State st = (State)theList.getSelectedValue();
+	        	Edge edge = st.getBackEdge();
+	        	reactToEdgeSelection( edge, false );
+	        }
+        });
+         
 
         metadataList = new JList();
         metadataModel = new DefaultListModel();

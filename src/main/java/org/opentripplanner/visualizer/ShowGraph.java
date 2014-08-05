@@ -564,8 +564,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             }
             /* Draw (single) highlighted edge in highlight color */
             if (highlightedEdge != null && highlightedEdge.getGeometry() != null) {
-                stroke(200, 10, 10, 128);
-                strokeWeight(8);
+            	stroke(10, 200, 10, 128);
+            	strokeWeight(12);
                 drawEdge(highlightedEdge);
             }
             /* Draw highlighted vertices */
