@@ -208,6 +208,19 @@ class VertexList extends AbstractListModel {
  * a bunch of weird buttons designed to debug specific cases.
  */
 public class GraphVisualizer extends JFrame implements VertexSelectionListener {
+	
+	class PathPrinter{
+		GraphPath gp;
+		PathPrinter(GraphPath gp){
+			this.gp=gp;
+		}
+		public String toString(){
+			SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
+			String startTime = shortDateFormat.format(new Date(gp.getStartTime()*1000));
+			String endTime = shortDateFormat.format(new Date(gp.getEndTime()*1000));
+			return "Path ("+startTime+"-"+endTime+") weight:"+gp.getWeight()+" dur:"+gp.getDuration()+" walk:"+gp.getWalkDistance()+" nTrips:"+gp.getTrips().size();
+		}
+	}
 
     private static final long serialVersionUID = 1L;
 
@@ -911,7 +924,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pathsList.addListSelectionListener(new ListSelectionListener(){
 			@Override
 			public void valueChanged(ListSelectionEvent ev) {
-				GraphPath path = (GraphPath) pathsList.getSelectedValue();
+				GraphPath path = ((PathPrinter) pathsList.getSelectedValue()).gp;
 				
 				DefaultListModel pathModel = new DefaultListModel();
 				for( State st : path.states ){
@@ -1164,8 +1177,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         // show paths in a list panel
         DefaultListModel data = new DefaultListModel();
-        for(int i=0; i<paths.size(); i++){
-        	data.addElement( paths.get(i) );
+        for(GraphPath gp : paths ){
+        	data.addElement( new PathPrinter(gp) );
         }
         pathsList.setModel(data);
         if( data.size()>0 ){
