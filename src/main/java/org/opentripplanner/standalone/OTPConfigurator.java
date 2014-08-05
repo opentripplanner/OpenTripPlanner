@@ -79,7 +79,7 @@ public class OTPConfigurator {
     /** Create a cached GraphService that will be shared between all OTP components. */
     public void makeGraphService(Graph graph) {
         /* Hand off graph in memory to server in a single-graph in-memory GraphServiceImpl. */
-        if (graph != null && params.inMemory) {
+        if (graph != null && ( params.inMemory || params.preFlight) ) {
             try {
                 FileInputStream graphConfiguration = new FileInputStream(params.graphConfigFile);
                 Preferences config = new PropertiesPreferences(graphConfiguration);
@@ -212,7 +212,7 @@ public class OTPConfigurator {
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
         }
-        graphBuilder.setSerializeGraph( ! params.inMemory);
+        graphBuilder.setSerializeGraph( ( ! params.inMemory ) || params.preFlight );
         return graphBuilder;
     }
 
