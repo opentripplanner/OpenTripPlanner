@@ -163,7 +163,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     private int drawOffset = 0;
     private boolean drawHighlighted = true;
-	private HashMap<Edge, Double> trunkiness = new HashMap<Edge,Double>();
+    private HashMap<State, SPTNode> simpleSPT = new HashMap<State,SPTNode>();
 	private LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<State>();
 	private boolean drawEdges = true;
 
@@ -174,6 +174,26 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		Trunk(Edge edge, Double trunkiness){
 			this.edge = edge;
 			this.trunkiness = trunkiness;
+		}
+	}
+	
+
+	class SPTNode{
+		// this is a tool for the traverse visitor to build a very simple
+		// shortest path tree, which we can use to come up with the trunkiness
+		// of every SPT edge.
+
+		State state;
+		SPTNode parent;
+		List<SPTNode> children;
+
+		SPTNode(State state){
+			this.state = state;
+			this.children = new ArrayList<SPTNode>();
+		}
+
+		void addChild(SPTNode child){
+			this.children.add( child );
 		}
 	}
 
@@ -911,39 +931,18 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		drawLevel = DRAW_ALL;
 	}
     
-	public List<Trunk> updateTrunkiness(State tip) {
-		List<Trunk> ret = new ArrayList<Trunk>();
-
-		// Increment all parent edges of tip with tip's weight, and return updated trunks
-		State cur = tip;
-
-		while( cur!=null ){
-			Edge backEdge = cur.getBackEdge();
-			if(backEdge==null){
-				break;
-			}
-
-			Double prevWeight = this.trunkiness.get(backEdge);
-			if(prevWeight==null){
-				prevWeight = 0.0;
-			}
-			Double trunkiness = prevWeight+tip.getWeight();
-			this.trunkiness.put(backEdge, trunkiness);
-
-			ret.add( new Trunk(backEdge, trunkiness) );
-
-			cur = cur.getBackState();
+	public void addNewSPTEdge(State state) {
+		this.newSPTEdges.add( state );
+		
+		// create simpleSPT entry
+		SPTNode curNode = new SPTNode(state);
+		SPTNode parentNode = simpleSPT.get(state.getBackState());
+		if(parentNode!=null){
+			parentNode.children.add(curNode);
 		}
 		
-		return ret;
-	}
-
-	public void resetTrunks() {
-		this.trunkiness = new HashMap<Edge,Double>();
-	}
-	
-	public void enqueueTrunkiness(State state) {
-		this.newSPTEdges.add( state );
+		curNode.parent = parentNode;
+		this.simpleSPT.put(state, curNode);
 	}
 
 }
