@@ -57,6 +57,13 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * map - Left click to send a list of nearby vertices to the associated VertexSelectionListener.
  */
 public class ShowGraph extends PApplet implements MouseWheelListener {
+	
+	// how many edges to draw before checking whether we need to move on to the next frame
+	private final int BLOCK_SIZE = 1000; 
+	// how many edges to skip over (to ensure a sampling of edges throughout the visible area)
+	private final long DECIMATE = 40;
+	// 800 instead of 1000 msec, leaving 20% of the time for work other than drawing.
+	private final int FRAME_TIME = 800 / FRAME_RATE;
 
     private static final int FRAME_RATE = 30;
 
@@ -443,166 +450,196 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
 
     public synchronized void draw() {
-        // how many edges to draw before checking whether we need to move on to the next frame
-        final int BLOCK_SIZE = 1000; 
-        // how many edges to skip over (to ensure a sampling of edges throughout the visible area)
-        final long DECIMATE = 40;
-        // 800 instead of 1000 msec, leaving 20% of the time for work other than drawing.
-        final int FRAME_TIME = 800 / FRAME_RATE;
         int startMillis = millis();
         if (drawLevel == DRAW_PARTIAL) {
-            background(15);
-            stroke(30, 128, 30);
-            strokeWeight(1);
-            noFill();
-            // noSmooth();
-            int drawIndex = 0;
-            int drawStart = 0;
-            int drawCount = 0;
-            while (drawStart < DECIMATE && drawStart < visibleStreetEdges.size()) {
-                if (drawFast)
-                    drawEdgeFast(visibleStreetEdges.get(drawIndex));
-                else
-                    drawEdge(visibleStreetEdges.get(drawIndex));
-                drawIndex += DECIMATE;
-                drawCount += 1;
-                if (drawCount % BLOCK_SIZE == 0 && millis() - startMillis > FRAME_TIME) {
-                    // ran out of time to draw this frame.
-                    // enable fast-drawing when too few edges were drawn:
-                    // drawFast = drawCount < visibleStreetEdges.size() / 10;
-                    // leave edge drawing loop to let other work happen.
-                    break;
-                }
-                if (drawIndex >= visibleStreetEdges.size()) {
-                    // start over drawing every DECIMATEth edge, offset by 1
-                    drawStart += 1;
-                    drawIndex = drawStart;
-                }
-            }
+            drawPartial(startMillis);
         } else if (drawLevel == DRAW_ALL) {
-            // } else if (drawLevel == DRAW_STREETS) {
-            // smooth();
-            if (drawOffset == 0) {
-                findVisibleElements();
-                background(15);
-            }
-            if (drawStreetEdges) {
-                stroke(30, 128, 30); // dark green
-                strokeWeight(1);
-                noFill();
-                // for (Edge e : visibleStreetEdges) drawEdge(e);
-                while (drawOffset < visibleStreetEdges.size()) {
-                    drawEdge(visibleStreetEdges.get(drawOffset));
-                    drawOffset += 1;
-                    // if (drawOffset % FRAME_SIZE == 0) return;
-                    if (drawOffset % BLOCK_SIZE == 0) {
-                        if (millis() - startMillis > FRAME_TIME)
-                            return;
-                    }
-                }
+            boolean success = drawAll(startMillis);
+            if(!success){
+            	return;
             }
         } else if (drawLevel == DRAW_LINKS) {
-            if (drawLinkEdges) {
-                stroke(256, 165, 0, 30); // transparent blue
-                strokeWeight(3);
-                noFill();
-                // for (Edge e : visibleTransitEdges) {
-                while (drawOffset < visibleLinkEdges.size()) {
-                    Edge e = visibleLinkEdges.get(drawOffset);
-                    drawEdge(e);
-                    drawOffset += 1;
-                    if (drawOffset % BLOCK_SIZE == 0) {
-                        if (millis() - startMillis > FRAME_TIME)
-                            return;
-                    }
-                }
+            boolean success = drawLinks(startMillis);
+            if(!success){
+            	return;
             }
         } else if (drawLevel == DRAW_TRANSIT) {
-            if (drawTransitEdges) {
-                stroke(40, 40, 128, 30); // transparent blue
-                strokeWeight(4);
-                noFill();
-                // for (Edge e : visibleTransitEdges) {
-                while (drawOffset < visibleTransitEdges.size()) {
-                    Edge e = visibleTransitEdges.get(drawOffset);
-                    drawEdge(e);
-                    drawOffset += 1;
-                    if (drawOffset % BLOCK_SIZE == 0) {
-                        if (millis() - startMillis > FRAME_TIME)
-                            return;
-                    }
-                }
+            boolean success = drawTransit(startMillis);
+            if(!success){
+            	return;
             }
         } else if (drawLevel == DRAW_VERTICES) {
-            /* turn off vertex display when zoomed out */
-            final double METERS_PER_DEGREE_LAT = 111111.111111;
-            drawTransitStopVertices = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 4);
-            /* Draw selected visible vertices */
-            fill(60, 60, 200);
-            for (Vertex v : visibleVertices) {
-                if (drawTransitStopVertices && v instanceof TransitStationStop) {
-                    drawVertex(v, 5);
-                } else if (v instanceof IntersectionVertex) {
-                    IntersectionVertex iv = (IntersectionVertex) v;
-                    if (iv.isTrafficLight()) {
-                        drawVertex(v, 7);
-                    }
-                }
-            }
-            /* Draw highlighted edges in another color */
-            noFill();
-            stroke(200, 200, 000, 16); // yellow transparent edge highlight
-            strokeWeight(8);
-            if (highlightedEdges != null) {
-                for (Edge e : highlightedEdges) {
-                    drawEdge(e);
-                }
-            }
-            /* Draw highlighted graph path in another color */
-            if (highlightedGraphPath != null) {
-                drawGraphPath(highlightedGraphPath);
-            }
-            /* Draw (single) highlighted edge in highlight color */
-            if (highlightedEdge != null && highlightedEdge.getGeometry() != null) {
-            	stroke(10, 200, 10, 128);
-            	strokeWeight(12);
-                drawEdge(highlightedEdge);
-            }
-            /* Draw highlighted vertices */
-            fill(255, 127, 0); // orange fill
-            noStroke();
-            if (highlightedVertices != null) {
-                for (Vertex v : highlightedVertices) {
-                    drawVertex(v, 8);
-                }
-            }
-            /* Draw (single) highlighed vertex in a different color */
-            if (highlightedVertex != null) {
-                fill(255, 255, 30);
-                drawVertex(highlightedVertex, 7);
-            }
-            noFill();
+            drawVertices();
         } else if (drawLevel == DRAW_MINIMAL) {
-            if (!newHighlightedEdges.isEmpty())
-                handleNewHighlights();
-            // Black background box
-            fill(0, 0, 0);
-            stroke(30, 128, 30);
-            // noStroke();
-            strokeWeight(1);
-            rect(3, 3, 303, textAscent() + textDescent() + 6);
-            // Print lat & lon coordinates
-            fill(128, 128, 256);
-            // noStroke();
-            String output = lonFormatter.format(mouseModelX) + " "
-                    + latFormatter.format(mouseModelY);
-            textAlign(LEFT, TOP);
-            text(output, 6, 6);
+            drawMinimal();
         }
         drawOffset = 0;
         if (drawLevel > DRAW_MINIMAL)
             drawLevel -= 1; // move to next layer
     }
+
+	private void drawMinimal() {
+		if (!newHighlightedEdges.isEmpty())
+		    handleNewHighlights();
+		// Black background box
+		fill(0, 0, 0);
+		stroke(30, 128, 30);
+		// noStroke();
+		strokeWeight(1);
+		rect(3, 3, 303, textAscent() + textDescent() + 6);
+		// Print lat & lon coordinates
+		fill(128, 128, 256);
+		// noStroke();
+		String output = lonFormatter.format(mouseModelX) + " "
+		        + latFormatter.format(mouseModelY);
+		textAlign(LEFT, TOP);
+		text(output, 6, 6);
+	}
+
+	private void drawVertices() {
+		/* turn off vertex display when zoomed out */
+		final double METERS_PER_DEGREE_LAT = 111111.111111;
+		drawTransitStopVertices = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 4);
+		/* Draw selected visible vertices */
+		fill(60, 60, 200);
+		for (Vertex v : visibleVertices) {
+		    if (drawTransitStopVertices && v instanceof TransitStationStop) {
+		        drawVertex(v, 5);
+		    } else if (v instanceof IntersectionVertex) {
+		        IntersectionVertex iv = (IntersectionVertex) v;
+		        if (iv.isTrafficLight()) {
+		            drawVertex(v, 7);
+		        }
+		    }
+		}
+		/* Draw highlighted edges in another color */
+		noFill();
+		stroke(200, 200, 000, 16); // yellow transparent edge highlight
+		strokeWeight(8);
+		if (highlightedEdges != null) {
+		    for (Edge e : highlightedEdges) {
+		        drawEdge(e);
+		    }
+		}
+		/* Draw highlighted graph path in another color */
+		if (highlightedGraphPath != null) {
+		    drawGraphPath(highlightedGraphPath);
+		}
+		/* Draw (single) highlighted edge in highlight color */
+		if (highlightedEdge != null && highlightedEdge.getGeometry() != null) {
+			stroke(10, 200, 10, 128);
+			strokeWeight(12);
+		    drawEdge(highlightedEdge);
+		}
+		/* Draw highlighted vertices */
+		fill(255, 127, 0); // orange fill
+		noStroke();
+		if (highlightedVertices != null) {
+		    for (Vertex v : highlightedVertices) {
+		        drawVertex(v, 8);
+		    }
+		}
+		/* Draw (single) highlighed vertex in a different color */
+		if (highlightedVertex != null) {
+		    fill(255, 255, 30);
+		    drawVertex(highlightedVertex, 7);
+		}
+		noFill();
+	}
+
+	private boolean drawTransit(int startMillis) {
+		if (drawTransitEdges) {
+		    stroke(40, 40, 128, 30); // transparent blue
+		    strokeWeight(4);
+		    noFill();
+		    // for (Edge e : visibleTransitEdges) {
+		    while (drawOffset < visibleTransitEdges.size()) {
+		        Edge e = visibleTransitEdges.get(drawOffset);
+		        drawEdge(e);
+		        drawOffset += 1;
+		        if (drawOffset % BLOCK_SIZE == 0) {
+		            if (millis() - startMillis > FRAME_TIME)
+		                return false;
+		        }
+		    }
+		}
+		return true;
+	}
+
+	private boolean drawLinks(int startMillis) {
+		if (drawLinkEdges) {
+		    stroke(256, 165, 0, 30); // transparent blue
+		    strokeWeight(3);
+		    noFill();
+		    // for (Edge e : visibleTransitEdges) {
+		    while (drawOffset < visibleLinkEdges.size()) {
+		        Edge e = visibleLinkEdges.get(drawOffset);
+		        drawEdge(e);
+		        drawOffset += 1;
+		        if (drawOffset % BLOCK_SIZE == 0) {
+		            if (millis() - startMillis > FRAME_TIME)
+		                return false;
+		        }
+		    }
+		}
+		return true;
+	}
+
+	private boolean drawAll(int startMillis) {
+		// } else if (drawLevel == DRAW_STREETS) {
+		// smooth();
+		if (drawOffset == 0) {
+		    findVisibleElements();
+		    background(15);
+		}
+		if (drawStreetEdges) {
+		    stroke(30, 128, 30); // dark green
+		    strokeWeight(1);
+		    noFill();
+		    // for (Edge e : visibleStreetEdges) drawEdge(e);
+		    while (drawOffset < visibleStreetEdges.size()) {
+		        drawEdge(visibleStreetEdges.get(drawOffset));
+		        drawOffset += 1;
+		        // if (drawOffset % FRAME_SIZE == 0) return;
+		        if (drawOffset % BLOCK_SIZE == 0) {
+		            if (millis() - startMillis > FRAME_TIME)
+		                return false;
+		        }
+		    }
+		}
+		return true;
+	}
+
+	private void drawPartial(int startMillis) {
+		background(15);
+		stroke(30, 128, 30);
+		strokeWeight(1);
+		noFill();
+		// noSmooth();
+		int drawIndex = 0;
+		int drawStart = 0;
+		int drawCount = 0;
+		while (drawStart < DECIMATE && drawStart < visibleStreetEdges.size()) {
+		    if (drawFast)
+		        drawEdgeFast(visibleStreetEdges.get(drawIndex));
+		    else
+		        drawEdge(visibleStreetEdges.get(drawIndex));
+		    drawIndex += DECIMATE;
+		    drawCount += 1;
+		    if (drawCount % BLOCK_SIZE == 0 && millis() - startMillis > FRAME_TIME) {
+		        // ran out of time to draw this frame.
+		        // enable fast-drawing when too few edges were drawn:
+		        // drawFast = drawCount < visibleStreetEdges.size() / 10;
+		        // leave edge drawing loop to let other work happen.
+		        break;
+		    }
+		    if (drawIndex >= visibleStreetEdges.size()) {
+		        // start over drawing every DECIMATEth edge, offset by 1
+		        drawStart += 1;
+		        drawIndex = drawStart;
+		    }
+		}
+	}
 
     private void handleNewHighlights() {
         // fill(0, 0, 0, 1);
