@@ -341,7 +341,7 @@ public class RoutingContext implements Cloneable {
                 notFound.add("from");
 
         // check destination present when not doing a depart-after batch search
-        if (!opt.batch || opt.arriveBy) //
+        if ((!opt.batch || opt.arriveBy) && !opt.isOneToMany()) //
             if (toVertex == null)
                 notFound.add("to");
 

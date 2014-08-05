@@ -20,13 +20,16 @@ import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import lombok.Setter;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.PoiClassTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
@@ -41,6 +44,7 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -83,15 +87,19 @@ public class LongDistancePathService implements PathService {
             return null;
         }
 
+        if (options.to.getPlace().startsWith("poi:category:")){
+            options.setOneToMany(true);
+        }
+
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.getRouterId()));
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 
         LOG.debug("rreq={}", options);
-        
+
         RemainingWeightHeuristic heuristic;
-        if (options.isDisableRemainingWeightHeuristic()) {
+        if (options.isDisableRemainingWeightHeuristic() || options.isOneToMany()) {
             heuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
             // Only use the BiDi heuristic for transit.
@@ -108,7 +116,11 @@ public class LongDistancePathService implements PathService {
         options.setMaxTransfers(10);
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
-        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+        SearchTerminationStrategy strategy = null;
+        if (options.isOneToMany()){
+            strategy = new PoiClassTerminationStrategy(options.to.getPlace(), options.getNumItineraries());
+        }
+        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout, strategy);
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         
         if (spt == null) { // timeout or other fail
@@ -116,7 +128,15 @@ public class LongDistancePathService implements PathService {
             return null;
         }
         //spt.getPaths().get(0).dump();
-        List<GraphPath> paths = spt.getPaths();
+        List<GraphPath> paths;
+        if (options.isOneToMany()){
+            paths = new LinkedList<>();
+            for(Vertex v : ((PoiClassTerminationStrategy)strategy).getFoundVertices()){
+                paths.add(spt.getPath(v, true));
+            }
+        } else {
+            paths = spt.getPaths();
+        }
         Collections.sort(paths, new PathWeightComparator());
         return paths;
     }

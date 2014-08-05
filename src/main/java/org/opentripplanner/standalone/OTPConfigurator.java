@@ -15,7 +15,6 @@ package org.opentripplanner.standalone;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
@@ -25,6 +24,8 @@ import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.impl.ServiceMapAccessibilityGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.ServiceMapGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
 import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
@@ -57,7 +58,7 @@ public class OTPConfigurator {
     private final CommandLineParameters params;
     
     private GraphService graphService = null;
-    
+
     public OTPConfigurator (CommandLineParameters params) {
         this.params = params;
     }
@@ -120,6 +121,8 @@ public class OTPConfigurator {
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         File configFile = null;
+        File servicemapFile = null;
+        File servicemapAccessibilityFile = null;
         /* For now this is adding files from all directories listed, rather than building multiple graphs. */
         for (File dir : params.build) {
             LOG.info("Searching for graph builder input files in {}", dir);
@@ -137,6 +140,14 @@ public class OTPConfigurator {
                 case OSM:
                     LOG.info("Found OSM file {}", file);
                     osmFiles.add(file);
+                    break;
+                case SERVICEMAP:
+                    LOG.info("Found ServiceMap file {}", file);
+                    servicemapFile = file;
+                    break;
+                case SERVICEMAP_ACCESSIBILITY:
+                    LOG.info("Found ServiceMap accessibility file {}", file);
+                    servicemapAccessibilityFile = file;
                     break;
                 case CONFIG:
                     if (!params.noEmbedConfig) {
@@ -168,6 +179,12 @@ public class OTPConfigurator {
             graphBuilder.addGraphBuilder(osmBuilder);
             graphBuilder.addGraphBuilder(new PruneFloatingIslands());            
         }
+        if (servicemapFile != null) {
+            graphBuilder.addGraphBuilder(new ServiceMapGraphBuilderImpl(servicemapFile));
+            if (servicemapAccessibilityFile != null){
+                graphBuilder.addGraphBuilder(new ServiceMapAccessibilityGraphBuilderImpl(servicemapAccessibilityFile));
+            }
+        }
         if ( hasGTFS ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (File gtfsFile : gtfsFiles) {
@@ -190,7 +207,7 @@ public class OTPConfigurator {
                         graphBuilder.addGraphBuilder(new StreetlessStopLinker());
                     }
                 }
-            } 
+            }
             if ( hasOSM ) {
                 graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
@@ -233,7 +250,8 @@ public class OTPConfigurator {
     }
 
     private static enum InputFileType {
-        GTFS, OSM, CONFIG, OTHER;
+        GTFS, OSM, CONFIG, OTHER, SERVICEMAP, SERVICEMAP_ACCESSIBILITY;
+
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -248,6 +266,8 @@ public class OTPConfigurator {
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.equals("Embed.properties")) return CONFIG;
+            if (name.equals("unit.json")) return SERVICEMAP;
+            if (name.equals("accessibility_property.json")) return SERVICEMAP_ACCESSIBILITY;
             return OTHER;
         }
     }

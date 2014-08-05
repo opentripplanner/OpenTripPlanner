@@ -319,6 +319,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** when true, do not use goal direction or stop at the target, build a full SPT */
     public boolean batch = false;
 
+    /** are we doing a one-to-many search, without any defined destination vertex?**/
+    public boolean oneToMany = false;
+
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */

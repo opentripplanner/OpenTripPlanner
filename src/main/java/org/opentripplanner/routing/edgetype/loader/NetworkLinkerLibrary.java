@@ -30,6 +30,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.PoiVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -42,12 +43,12 @@ public class NetworkLinkerLibrary {
 
     /* for each original bundle of (turn)edges making up a street, a list of 
        edge pairs that will replace it */
-    HashMap<HashSet<StreetEdge>, LinkedList<P2<PlainStreetEdge>>> replacements = 
+    HashMap<HashSet<StreetEdge>, LinkedList<P2<PlainStreetEdge>>> replacements =
         new HashMap<HashSet<StreetEdge>, LinkedList<P2<PlainStreetEdge>>>();
-    
+
     /* a map to track which vertices were associated with each transit stop, to avoid repeat splitting */
-    HashMap<Vertex, Collection<StreetVertex>> splitVertices = 
-            new HashMap<Vertex, Collection<StreetVertex>> (); 
+    HashMap<Vertex, Collection<StreetVertex>> splitVertices =
+            new HashMap<Vertex, Collection<StreetVertex>> ();
 
     /* by default traverse options allow walking only, which is what we want */
     RoutingRequest options = new RoutingRequest();
@@ -71,7 +72,7 @@ public class NetworkLinkerLibrary {
 
     /**
      * The entry point for networklinker to link each transit stop.
-     * 
+     *
      * @param v
      * @param wheelchairAccessible
      * @return true if the links were successfully added, otherwise false
@@ -84,10 +85,21 @@ public class NetworkLinkerLibrary {
 
     /**
      * The entry point for networklinker to link each bike rental station.
-     * 
+     *
      * @param v
      */
     public LinkRequest connectVertexToStreets(BikeRentalStationVertex v) {
+        LinkRequest request = new LinkRequest(this);
+        request.connectVertexToStreets(v);
+        return request;
+    }
+
+    /**
+     * The entry point for networklinker to link each poi.
+     *
+     * @param v
+     */
+    public LinkRequest connectVertexToStreets(PoiVertex v) {
         LinkRequest request = new LinkRequest(this);
         request.connectVertexToStreets(v);
         return request;

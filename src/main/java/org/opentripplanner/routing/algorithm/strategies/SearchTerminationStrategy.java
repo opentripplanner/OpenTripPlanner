@@ -33,7 +33,7 @@ public interface SearchTerminationStrategy {
      * @param current the current shortest path tree vertex
      * @param spt the current shortest path tree
      * @param traverseOptions the traverse options
-     * @return true if the specified search should be terminated
+     * @return false if the specified search should be terminated
      */
     public boolean shouldSearchContinue(Vertex origin, Vertex target, State current,
             ShortestPathTree spt, RoutingRequest traverseOptions);

@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
+import org.opentripplanner.graph_builder.annotation.PoiUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.PoiVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,6 +119,13 @@ public class NetworkLinker {
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
+            }
+        }
+
+        LOG.debug("Linking POIs...");
+        for (PoiVertex v : IterableLibrary.filter(vertices, PoiVertex.class)) {
+            if (!networkLinkerLibrary.connectVertexToStreets(v).getResult()) {
+                LOG.warn(graph.addBuilderAnnotation(new PoiUnlinked(v)));
             }
         }
     }
