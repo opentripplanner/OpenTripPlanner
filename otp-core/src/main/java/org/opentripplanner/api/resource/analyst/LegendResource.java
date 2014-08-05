@@ -31,7 +31,7 @@ import org.opentripplanner.api.parameter.StyleList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/analyst/legend.{format}")
+@Path("/routers/{routerId}/analyst/legend.{format}")
 public class LegendResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(LegendResource.class);
