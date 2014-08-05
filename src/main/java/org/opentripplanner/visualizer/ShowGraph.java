@@ -163,7 +163,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     private int drawOffset = 0;
     private boolean drawHighlighted = true;
-    public SimpleSPT simpleSPT;
+    public SimpleSPT simpleSPT = new SimpleSPT();
 	private LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<State>();
 	private boolean drawEdges = true;
 	private boolean drawSPTNext;
@@ -200,10 +200,16 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		}
 		
 		void setWeights(){
+			if(root==null){
+				return;
+			}
 			root.setWeight();
 		}
 		
 		public void draw() {
+			if(root==null){
+				return;
+			}
 			stroke(255,255,0);
 			root.draw();
 		}
@@ -556,6 +562,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
 
     public synchronized void draw() {
+    	smooth();
         int startMillis = millis();
         if (drawLevel == DRAW_PARTIAL) {
             drawPartial(startMillis);
@@ -576,14 +583,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             }
         } else if (drawLevel == DRAW_VERTICES) {
             drawVertices();
+            simpleSPT.draw();
         } else if (drawLevel == DRAW_MINIMAL) {
         	if (!newHighlightedEdges.isEmpty())
         		handleNewHighlights();
         	drawNewEdges();
-        	if(drawSPTNext){
-        		simpleSPT.draw();
-        		drawSPTNext = false;
-        	}
         	drawCoords();
         }
         drawOffset = 0;
@@ -593,6 +597,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     
     private void drawNewEdges() {
     	if( drawEdges  ){
+    		strokeWeight(1);
 			stroke(255,255,255); //white	
 			noFill();
 			while (!newSPTEdges.isEmpty()) {
