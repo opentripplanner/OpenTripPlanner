@@ -1204,9 +1204,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         	data.addElement( new PathPrinter(gp) );
         }
         pathsList.setModel(data);
-        if( data.size()>0 ){
-        	pathsList.setSelectedIndex(0); // select the first item on the list to fire path drawing
-        }
         
         options.cleanup();
     }
