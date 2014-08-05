@@ -1137,6 +1137,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             return;
         }
         
+        // show paths in a list panel
         DefaultListModel data = new DefaultListModel();
         for(int i=0; i<paths.size(); i++){
         	data.addElement( paths.get(i) );
@@ -1144,10 +1145,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pathsList.setModel(data);
         
         GraphPath gp = paths.get(0);
-        for (State s : gp.states) {
-            System.out.print(s.toString() + " <- ");
-            System.out.println(s.getBackEdge());
-        }
         
         showGraph.highlightGraphPath(gp);
         options.cleanup();

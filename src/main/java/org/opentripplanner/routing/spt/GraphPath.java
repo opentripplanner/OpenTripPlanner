@@ -159,7 +159,7 @@ public class GraphPath {
     }
 
     public String toString() {
-        return "GraphPath(" + states.toString() + ")";
+    	return "GraphPath(nStates=" + states.size() + ")";
     }
 
     /**
