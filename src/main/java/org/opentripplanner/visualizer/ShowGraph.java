@@ -147,17 +147,13 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     /* Layer constants */
     static final int DRAW_MINIMAL = 0; // XY coordinates
 
-    static final int DRAW_VERTICES = 1;
-
-    static final int DRAW_TRANSIT = 2;
-
-    static final int DRAW_LINKS = 3;
-
-    static final int DRAW_STREETS = 4;
-
-    static final int DRAW_ALL = 5;
-
-    static final int DRAW_PARTIAL = 6;
+    static final int DRAW_SPT = 1;
+    static final int DRAW_VERTICES = 2;
+    static final int DRAW_TRANSIT = 3;
+    static final int DRAW_LINKS = 4;
+    static final int DRAW_STREETS = 5;
+    static final int DRAW_ALL = 6;
+    static final int DRAW_PARTIAL = 7;
 
     private int drawLevel = DRAW_ALL;
 
@@ -166,7 +162,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     public SimpleSPT simpleSPT = new SimpleSPT();
 	private LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<State>();
 	private boolean drawEdges = true;
-	private boolean drawSPTNext;
+	private LinkedBlockingQueue<SPTNode> sptEdgeQueue;
 
 	class Trunk{
 		public Edge edge;
@@ -213,6 +209,14 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			stroke(255,255,0);
 			root.draw();
 		}
+		
+		public LinkedBlockingQueue<SPTNode> getEdgeQueue() {
+			LinkedBlockingQueue<SPTNode> ret = new LinkedBlockingQueue<SPTNode>();
+			if(root!=null){
+				root.addToEdgeQueue(ret);
+			}
+			return ret;
+		}
 	}
 
 	class SPTNode{
@@ -230,7 +234,14 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			this.children = new ArrayList<SPTNode>();
 		}
 		
-		public void draw() {
+		public void addToEdgeQueue(LinkedBlockingQueue<SPTNode> ret) {
+			ret.add(this);
+			for( SPTNode child : children ){
+				child.addToEdgeQueue(ret);
+			}
+		}
+
+		public void drawRecursive() {
 			colorMode(HSB);
 			
 			if(state.getBackEdge() != null){
@@ -240,7 +251,19 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			}
 	
 			for( SPTNode child : children ){
-				child.draw();
+				child.drawRecursive();
+			}
+
+			colorMode(RGB);
+		}
+
+		public void draw() {
+			colorMode(HSB);
+
+			if(state.getBackEdge() != null){
+				stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
+				strokeWeight( (float) (0.1*Math.pow(weight,0.3)) );
+				drawEdge( state.getBackEdge() );
 			}
 			
 			colorMode(RGB);
@@ -583,7 +606,19 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             }
         } else if (drawLevel == DRAW_VERTICES) {
             drawVertices();
-            simpleSPT.draw();
+        } else if (drawLevel == DRAW_SPT){
+        	if(sptEdgeQueue==null){
+        		sptEdgeQueue = simpleSPT.getEdgeQueue();
+        	}
+        	int i=0;
+        	while(!sptEdgeQueue.isEmpty()){
+        		SPTNode node = sptEdgeQueue.poll();
+        		i++;
+        		node.draw();
+        		if ((i%BLOCK_SIZE==0) && (millis() - startMillis > FRAME_TIME))
+        			return;
+        	}
+        	sptEdgeQueue=null;
         } else if (drawLevel == DRAW_MINIMAL) {
         	if (!newHighlightedEdges.isEmpty())
         		handleNewHighlights();
@@ -1020,7 +1055,4 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		this.simpleSPT = new SimpleSPT();
 	}
 	
-	public void intentDrawSPT() {
-		this.drawSPTNext = true;
-	}
 }
