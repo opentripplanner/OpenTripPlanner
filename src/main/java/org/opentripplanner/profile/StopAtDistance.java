@@ -28,7 +28,9 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     /** @param state a state at a TransitStop */
     public StopAtDistance (State state) {
         //this.state = state;
-        // This might be inefficient -- finding paths for every stop we encounter.
+        // This is rather slow. We are finding paths for every stop we encounter, not just those in the result.
+        // TODO Retain the routing contexts and destroy them all at request's end, so we can generate walksteps only as needed.
+        // TODO profile why generating the path or the walksteps is slow
         GraphPath path = new GraphPath(state, false);
         walkSteps = PlanGenerator.generateWalkSteps(path.states.toArray(new State[0]), null);
         etime = (int) state.getElapsedTimeSeconds();

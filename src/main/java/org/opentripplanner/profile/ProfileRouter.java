@@ -16,6 +16,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
+import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -23,7 +24,9 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.EarliestArrivalShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,9 +66,19 @@ public class ProfileRouter {
         this.graph = graph;
         this.request = request;
     }
+    private final ShortestPathTreeFactory sptFactory = new ShortestPathTreeFactory() {
+        @Override
+        public ShortestPathTree create(RoutingRequest options) {
+            return new EarliestArrivalShortestPathTree(options);
+        }
+    };
 
     /* Search state */
     Multimap<Stop, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop
+
+    /* Analyst: time bounds for each vertex */
+    int[] mins = new int[Vertex.getMaxIndex()];
+    int[] maxs = new int[Vertex.getMaxIndex()];
 
     // while finding direct paths:
     // if dist < M meters OR we don't yet have N stations: record station
@@ -94,6 +107,9 @@ public class ProfileRouter {
         if (graph.index.transfersForStop == null) {
             graph.index.initializeProfileTransfers();
         }
+        // Analyst
+        Arrays.fill(mins, Integer.MAX_VALUE);
+        Arrays.fill(maxs, Integer.MAX_VALUE);
 
         LOG.info("modes: {}", request.modes);
 
@@ -104,25 +120,24 @@ public class ProfileRouter {
         // TimeWindow could constructed in the caller, which does have access to the graph index.
         this.window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
 
-        // Look for options connecting origin to destination with no transit
-        for (TraverseMode mode : ACCESS_MODES) {
-            if (request.modes.contains(mode)) findStreetOption(mode);
-        }
-
-        LOG.info("finding access/egress stops.");
+        LOG.info("Finding access/egress paths.");
         // Look for stops that are within a given time threshold of the origin and destination
-        fromStopPaths = findClosestStops(false);
-        toStopPaths = findClosestStops(true);
-
         // Find the closest stop on each pattern near the origin and destination
         // TODO consider that some stops may be closer by one mode than another
         // and that some stops may be accessible by one mode but not another
+        fromStopPaths = findClosestStops(false);
         fromStops = findClosestPatterns(fromStopPaths);
-        toStops = findClosestPatterns(toStopPaths);
-        LOG.info("done finding access/egress stops.");
-
-        LOG.info("from patterns/stops: {}", fromStops);
-        LOG.info("to patterns/stops: {}", toStops);
+        if ( !request.analyst) {
+            toStopPaths = findClosestStops(true);
+            toStops = findClosestPatterns(toStopPaths);
+            // Also look for options connecting origin to destination with no transit.
+            for (TraverseMode mode : ACCESS_MODES) {
+                if (request.modes.contains(mode)) findStreetOption(mode);
+            }
+        }
+        LOG.info("Done finding access/egress paths.");
+        LOG.info("From patterns/stops: {}", fromStops);
+        LOG.info("To patterns/stops: {}", toStops);
 
         /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
         Map<Stop, Ride> initialRides = Maps.newHashMap();
@@ -163,7 +178,7 @@ public class ProfileRouter {
                 // LOG.info(" {}", pr);
                 List<Stop> stops = pr.pattern.getStops();
                 Stop targetStop = null;
-                if (toStops.containsKey(pr.pattern)) {
+                if (toStops != null && toStops.containsKey(pr.pattern)) {
                     /* This pattern has a stop near the destination. Retrieve it. */
                     targetStop = toStops.get(pr.pattern).stop;
                 }
@@ -171,7 +186,7 @@ public class ProfileRouter {
                     Stop stop = stops.get(s);
                     boolean isTarget = (targetStop != null && targetStop == stop);
                     /* If this destination stop is useful in the search, extend the PatternRide to it. */
-                    if (isTarget || hasTransfers(stop, pr.pattern)){
+//                    if (isTarget || hasTransfers(stop, pr.pattern)){
                         PatternRide pr2 = pr.extendToIndex(s, window);
                         // PatternRide may be empty because there are no trips in time window.
                         if (pr2 == null) continue PR;
@@ -186,7 +201,7 @@ public class ProfileRouter {
                         ride2.patternRides.add(pr2);
                         // Record this ride as a way to reach the destination.
                         if (isTarget) targetRides.add(ride2);
-                    }
+//                    }
                 }
             }
             /* Build new downstream Rides by transferring from patterns in current Rides. */
@@ -200,6 +215,18 @@ public class ProfileRouter {
                     targetRides.remove(r1);
                     continue;
                 }
+                // We now have a new completed ride. Record its lower and upper bounds at the arrival stop.
+                if (request.analyst) {
+                    TransitStop tstop = graph.index.stopVertexForStop.get(r1.to);
+                    int tsidx = tstop.getIndex();
+                    int lb = r1.durationLowerBound();
+                    int ub = r1.durationUpperBound();
+                    if (mins[tsidx] > lb)
+                        mins[tsidx] = lb;
+                    if (maxs[tsidx] > ub)
+                        maxs[tsidx] = ub;
+
+                }
                 // Do not transfer too many times. Continue after calculating stats since they are still needed!
                 int nRides = r1.pathLength();
                 if (nRides >= MAX_RIDES) continue;
@@ -211,8 +238,9 @@ public class ProfileRouter {
                         // Prune loopy or repetitive paths.
                         if (r1.pathContainsRoute(tr.tp2.route)) continue;
                         if (tr.s1 != tr.s2 && r1.pathContainsStop(tr.s2)) continue;
-                        // Optimization: on last ride, only transfer to patterns that pass near the destination.
-                        if (penultimateRide && ! toStops.containsKey(tr.tp2)) continue;
+                        // Optimization: on the last ride of point-to-point searches,
+                        // only transfer to patterns that pass near the destination.
+                        if ( ! request.analyst && penultimateRide && ! toStops.containsKey(tr.tp2)) continue;
                         // Scan through stops looking for transfer target: stop might appear more than once in a pattern.
                         for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
                             if (tr.tp2.getStops().get(i) == tr.s2) {
@@ -235,7 +263,12 @@ public class ProfileRouter {
             for (Ride r : xferRides.values()) maybeAddRide(r);
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
         }
-        /* Build the list of Options by following the back-pointers in Rides. */
+        LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
+        if (request.analyst) {
+            makeSurfaces();
+            return null;
+        }
+        /* Non-analyst. Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
         // for (Ride ride : targetRides) ride.dump();
         for (Ride ride : targetRides) {
@@ -250,7 +283,17 @@ public class ProfileRouter {
         }
         /* Include the direct (no-transit) biking, driving, and walking options. */
         options.add(new Option(null, directPaths, null));
-        LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
+/*
+        for (Stop stop : graph.index.stopVertexForStop.keySet()) {
+            TransitStop tstop = graph.index.stopVertexForStop.get(stop);
+            int min = mins[tstop.getIndex()];
+            int max = maxs[tstop.getIndex()];
+            if (min == Integer.MAX_VALUE)
+                LOG.info("{} unreachable", tstop.getName());
+            else
+                LOG.info("{} min {} max {}", tstop.getName(), min, max);
+        }
+*/
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
@@ -346,33 +389,42 @@ public class ProfileRouter {
         // Set batch after context, so both origin and dest vertices will be found.
         rr.setBatch(true);
         rr.setWalkSpeed(request.walkSpeed);
-        // If this is not set, searches are very slow.
-        int worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
+        // RR dateTime defaults to currentTime.
+        // If elapsed time is not capped, searches are very slow.
+        long worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
         if (dest) worstElapsedTime *= -1;
         rr.setWorstTime(rr.dateTime + worstElapsedTime);
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         GenericAStar astar = new GenericAStar();
+        astar.setShortestPathTreeFactory(sptFactory);
         astar.setNPaths(1);
-        final List<StopAtDistance> ret = Lists.newArrayList();
-        astar.setTraverseVisitor(new TraverseVisitor() {
-            @Override public void visitEdge(Edge edge, State state) { }
-            @Override public void visitEnqueue(State state) { }
-            /* 1. Accumulate stops into ret as the search runs. */
-            @Override public void visitVertex(State state) {
-                Vertex vertex = state.getVertex();
-                if (vertex instanceof TransitStop) {
-                    StopAtDistance sd = new StopAtDistance(state);
-                    sd.mode = mode;
-                    if (sd.mode == TraverseMode.CAR && sd.etime < MIN_DRIVE_TIME) return;
-                    LOG.debug("found stop: {}", sd);
-                    ret.add(sd);
-                }
-            }
-        });
-        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
+//        /*
+        StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode);
+        astar.setTraverseVisitor(visitor);
+//        */
+        ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
         rr.rctx.destroy();
-        return ret;
+        return visitor.stopsFound;
+    }
+
+    static class StopFinderTraverseVisitor implements TraverseVisitor {
+        TraverseMode mode;
+        List<StopAtDistance> stopsFound = Lists.newArrayList();
+        public StopFinderTraverseVisitor(TraverseMode mode) { this.mode = mode; }
+        @Override public void visitEdge(Edge edge, State state) { }
+        @Override public void visitEnqueue(State state) { }
+        // Accumulate stops into ret as the search runs.
+        @Override public void visitVertex(State state) {
+            Vertex vertex = state.getVertex();
+            if (vertex instanceof TransitStop) {
+                StopAtDistance sd = new StopAtDistance(state);
+                sd.mode = mode;
+                if (sd.mode == TraverseMode.CAR && sd.etime < MIN_DRIVE_TIME) return;
+                LOG.debug("found stop: {}", sd);
+                stopsFound.add(sd);
+            }
+        }
     }
 
     /** Look for an option connecting origin to destination with no transit. */
@@ -400,56 +452,53 @@ public class ProfileRouter {
         rr.rctx.destroy(); // after making StopAtDistance which includes walksteps and needs temporary edges
     }
 
+    // Major change: This needs to include all stops, not just those where transfers occur or those near the destination.
     /** Make two time surfaces, one for the minimum and one for the maximum. */
-    public P2<TimeSurface> makeSurfaces(List<Ride> rides) {
-        // Iterate over the Multimap<Stop, Ride> entries.
-        // In a one-to-one search that included only stops near the destination.
-        // For making analyst surfaces, that will include ALL reached stops.
-
+    public P2<TimeSurface> makeSurfaces() {
+        LOG.info("propagating profile router result to street vertices");
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        // TODO set mode and speed.
-        rr.setRoutingContext(graph); // TODO set origin vertex with second parameter
-        // Set batch after context, so both origin and dest vertices will be found.
-        rr.setBatch(true);
+        rr.setMode(TraverseMode.WALK);
         rr.setWalkSpeed(request.walkSpeed);
-        // If time is not limited, searches are very slow.
+        // If max trip duration is not limited, searches are of course much slower.
         int worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
         rr.setWorstTime(rr.dateTime + worstElapsedTime);
+        rr.setBatch(true);
         GenericAStar astar = new GenericAStar();
-        final int[] mins = new int[Vertex.getMaxIndex()];
-        final int[] maxs = new int[Vertex.getMaxIndex()];
-        Arrays.fill(mins, Integer.MAX_VALUE);
-        Arrays.fill(maxs, Integer.MIN_VALUE);
-        int minmin = Integer.MAX_VALUE;
-        int minmax = Integer.MAX_VALUE;
-        for (Ride ride : rides) {
-            int min = ride.durationLowerBound();
-            int max = ride.durationUpperBound();
-            if (min < minmin) minmin = min;
-            if (max < minmax) minmax = max;
-        }
-        // aaargh Java
-        final int finalminmin = minmin;
-        final int finalminmax = minmax;
         astar.setNPaths(1);
-        astar.setTraverseVisitor(new TraverseVisitor() {
-            @Override public void visitEdge(Edge edge, State state) { }
-            @Override public void visitEnqueue(State state) { }
-            @Override public void visitVertex(State state) {
-                int min = finalminmin + (int) state.getElapsedTimeSeconds();
-                int max = finalminmax + (int) state.getElapsedTimeSeconds();
-                Vertex vertex = state.getVertex();
-                int index = vertex.getIndex();
-                if (mins[index] > min)
-                    mins[index] = min;
-                if (maxs[index] < max)
-                    maxs[index] = max;
-            }
-        });
-        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
-        rr.rctx.destroy();
+        for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
+            int index = tstop.getIndex();
+            if (mins[index] == Integer.MAX_VALUE || maxs[index] == Integer.MAX_VALUE) continue;
+            // Both origin and dest vertices will be found in check?
+            rr.setRoutingContext(graph, tstop, null); // Set origin vertex directly instead of generating links
+            astar.setTraverseVisitor(new ExtremaPropagationTraverseVisitor(mins[index], maxs[index]));
+            ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
+            rr.rctx.destroy();
+        }
+        LOG.info("done {} {}.", mins[0], maxs[0]); // thwart optimization
         return null;
+    }
+
+    /** Given a minimum and maximum at a starting vertex, build an on-street SPT and propagate those values outward. */
+    class ExtremaPropagationTraverseVisitor implements TraverseVisitor {
+        final int min0;
+        final int max0;
+        ExtremaPropagationTraverseVisitor(int min0, int max0) {
+            this.min0 = min0;
+            this.max0 = max0;
+        }
+        @Override public void visitEdge(Edge edge, State state) { }
+        @Override public void visitEnqueue(State state) { }
+        @Override public void visitVertex(State state) {
+            int min = min0 + (int) state.getElapsedTimeSeconds();
+            int max = max0 + (int) state.getElapsedTimeSeconds();
+            Vertex vertex = state.getVertex();
+            int index = vertex.getIndex();
+            if (mins[index] > min)
+                mins[index] = min;
+            if (maxs[index] < max)
+                maxs[index] = max;
+        }
     }
 
 }

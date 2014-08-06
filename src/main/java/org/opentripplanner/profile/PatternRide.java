@@ -29,10 +29,10 @@ class PatternRide {
     public PatternRide (TripPattern pattern, int fromIndex, Ride previous, ProfileTransfer xfer) {
         this.pattern   = pattern;
         this.fromIndex = fromIndex;
-        this.previous  = previous;
-        this.xfer      = xfer;
+        this.previous  = previous; // TODO REMOVE not used anywhere
+        this.xfer      = xfer;     // TODO move up to Ride level
     }
-    
+
     /** Construct an unfinished PatternRide (lacking toIndex and stats) from another PatternRide. */
     public PatternRide (PatternRide other) {
         this.pattern   = other.pattern;
