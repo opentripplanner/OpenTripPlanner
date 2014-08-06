@@ -147,13 +147,14 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     /* Layer constants */
     static final int DRAW_MINIMAL = 0; // XY coordinates
 
-    static final int DRAW_SPT = 1;
-    static final int DRAW_VERTICES = 2;
-    static final int DRAW_TRANSIT = 3;
-    static final int DRAW_LINKS = 4;
-    static final int DRAW_STREETS = 5;
-    static final int DRAW_ALL = 6;
-    static final int DRAW_PARTIAL = 7;
+    static final int DRAW_HIGHLIGHTED = 1;
+    static final int DRAW_SPT = 2;
+    static final int DRAW_VERTICES = 3;
+    static final int DRAW_TRANSIT = 4;
+    static final int DRAW_LINKS = 5;
+    static final int DRAW_STREETS = 6;
+    static final int DRAW_ALL = 7;
+    static final int DRAW_PARTIAL = 8;
 
     private int drawLevel = DRAW_ALL;
 
@@ -611,6 +612,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         	if(!finished){
         		return;
         	}
+        } else if (drawLevel == DRAW_HIGHLIGHTED){
+        	drawHighlighted();
         } else if (drawLevel == DRAW_MINIMAL) {
         	if (!newHighlightedEdges.isEmpty())
         		handleNewHighlights();
@@ -623,6 +626,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
     
 	private boolean drawSPT(int startMillis) {
+		noFill();
 		if(sptEdgeQueue==null){
 			sptEdgeQueue = simpleSPT.getEdgeQueue();
 		}
@@ -688,6 +692,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		        }
 		    }
 		}
+	}
+
+	private void drawHighlighted() {
 		/* Draw highlighted edges in another color */
 		noFill();
 		stroke(200, 200, 000, 16); // yellow transparent edge highlight

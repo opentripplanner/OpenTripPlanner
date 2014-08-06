@@ -1068,6 +1068,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             public void actionPerformed(ActionEvent e) {
                 showGraph.highlightGraphPath(null);
                 showGraph.clearHighlights();
+                showGraph.resetSPT();
             }
         });
         routingPanel.add(clearRouteButton);
@@ -1235,11 +1236,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             return;
         }
         
-        // show shortest path tree
-        t0 = System.currentTimeMillis();
+        // now's a convenient time to set graphical SPT weights
         showGraph.simpleSPT.setWeights();
-        dt = System.currentTimeMillis() - t0;
-        System.out.println( "weight "+showGraph.simpleSPT.root.weight+" set in "+dt+" ms" );
                         
         // show paths in a list panel
         DefaultListModel data = new DefaultListModel();
@@ -1247,6 +1245,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         	data.addElement( new PathPrinter(gp) );
         }
         pathsList.setModel(data);
+        
+        showGraph.redraw();
         
         options.cleanup();
     }
