@@ -164,6 +164,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	private LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<State>();
 	private boolean drawEdges = true;
 	private LinkedBlockingQueue<SPTNode> sptEdgeQueue;
+	private boolean sptVisible = true;
 
 	class Trunk{
 		public Edge edge;
@@ -626,6 +627,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
     
 	private boolean drawSPT(int startMillis) {
+		if(!sptVisible){
+			return true;
+		}
+		
 		noFill();
 		if(sptEdgeQueue==null){
 			sptEdgeQueue = simpleSPT.getEdgeQueue();
@@ -1064,6 +1069,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
 	public void resetSPT() {
 		this.simpleSPT = new SimpleSPT();
+	}
+	
+	public void setShowSPT(boolean selected) {
+		sptVisible = selected;
 	}
 	
 }

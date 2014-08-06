@@ -335,6 +335,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private JCheckBox showStreetsCheckbox;
 
 	private JCheckBox showHighlightedCheckbox;
+	
+	private JCheckBox showSPTCheckbox;
 
     public GraphVisualizer(GraphService graphService) {
         super();
@@ -494,6 +496,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         		showGraph.setShowTransit( showTransitCheckbox.isSelected() );
         		showGraph.setShowStreets( showStreetsCheckbox.isSelected() );
         		showGraph.setShowHightlights( showHighlightedCheckbox.isSelected() );
+        		showGraph.setShowSPT( showSPTCheckbox.isSelected() );
         		showGraph.redraw();
         	}
         };
@@ -509,6 +512,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     	showHighlightedCheckbox.setSelected(true);
     	showHighlightedCheckbox.addItemListener( onChangeVizPrefs );
     	pane.add(showHighlightedCheckbox);     
+    	showSPTCheckbox = new JCheckBox("show SPT");
+    	showSPTCheckbox.setSelected(true);
+    	showSPTCheckbox.addItemListener( onChangeVizPrefs );
+    	pane.add(showSPTCheckbox);
         
         opQuick = new JRadioButton("Quick");
         opQuick.setSelected(true);
