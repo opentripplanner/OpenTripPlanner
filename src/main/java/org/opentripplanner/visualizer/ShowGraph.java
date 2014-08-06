@@ -590,25 +590,25 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         if (drawLevel == DRAW_PARTIAL) {
             drawPartial(startMillis);
         } else if (drawLevel == DRAW_ALL) {
-            boolean success = drawAll(startMillis);
-            if(!success){
+            boolean finished = drawAll(startMillis);
+            if(!finished){
             	return;
             }
         } else if (drawLevel == DRAW_LINKS) {
-            boolean success = drawLinks(startMillis);
-            if(!success){
+            boolean finished = drawLinks(startMillis);
+            if(!finished){
             	return;
             }
         } else if (drawLevel == DRAW_TRANSIT) {
-            boolean success = drawTransit(startMillis);
-            if(!success){
+            boolean finished = drawTransit(startMillis);
+            if(!finished){
             	return;
             }
         } else if (drawLevel == DRAW_VERTICES) {
             drawVertices();
         } else if (drawLevel == DRAW_SPT){
-        	boolean success = drawSPT(startMillis);
-        	if(!success){
+        	boolean finished = drawSPT(startMillis);
+        	if(!finished){
         		return;
         	}
         } else if (drawLevel == DRAW_MINIMAL) {
