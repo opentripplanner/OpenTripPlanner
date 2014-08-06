@@ -24,23 +24,18 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.TimeZone;
 
 import javassist.Modifier;
 
@@ -90,7 +85,6 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.visualizer.GraphVisualizer.PathPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -294,8 +288,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     private HashSet<Vertex> seen;
 
     private JList<String> metadataList;
-
-    private final GraphService graphService;
     
     private final Graph graph;
 
@@ -353,7 +345,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         super();
         LOG.info("Starting up graph visualizer...");
         
-        this.graphService = graphService;
         this.graph = graphService.getGraph();
         sptService.setShortestPathTreeFactory(sptFactory);
         this.pathservice = new ParetoPathService(graphService, sptService);
@@ -925,8 +916,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	        /* set up metadata tab */
 	        metadataModel.clear();
-	        Class<?> c;
-	        Field[] fields;
 	        getMetadata(selected);
 	        // fromv
 	        Vertex fromv = selected.getFromVertex();
@@ -953,7 +942,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	            departurePattern.removeAll();
 	            return;
 	        }
-	        ListModel model = new TripPatternListModel(pattern, stopIndex);
+	        ListModel<String> model = new TripPatternListModel(pattern, stopIndex);
 	        departurePattern.setModel(model);
 	
 	        Trip trip = pattern.getExemplar();
