@@ -15,6 +15,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A vertex acting as a starting point for planning a trip while onboard an existing trip.
@@ -27,7 +28,7 @@ public class OnboardDepartVertex extends Vertex {
 
     public OnboardDepartVertex(String label, double lon, double lat) {
         // This vertex is *alway* temporary, so graph is always null.
-        super(null, label, lon, lat, label);
+        super(null, label, lon, lat, new NonLocalizedString(label));
     }
 
     @Override

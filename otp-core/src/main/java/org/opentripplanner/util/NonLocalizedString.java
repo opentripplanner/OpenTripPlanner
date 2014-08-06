@@ -6,13 +6,14 @@
 
 package org.opentripplanner.util;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 /**
  *
  * @author mabu
  */
-public class NonLocalizedString implements I18NString {
+public class NonLocalizedString implements I18NString, Serializable {
     private String name;
 
     public NonLocalizedString(String name) {

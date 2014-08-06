@@ -26,6 +26,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /** 
  * This represents the connection between a street vertex and a transit vertex
@@ -72,6 +73,12 @@ public class StreetTransitLink extends Edge {
 
     public String getName() {
         return "street transit link";
+    }
+    
+    @Override
+    public String getName(Locale locale) {
+        //TODO: localize
+        return this.getName();
     }
 
     public State traverse(State s0) {

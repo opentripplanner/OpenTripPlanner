@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -21,8 +23,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
-
-import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -55,6 +55,13 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
     public String getName() {
         return GtfsLibrary.getRouteName(getPattern().getExemplar().getRoute());
     }
+    
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
+    }
+    
+    
 
     public State traverse(State state0) {
         //int trip = state0.getTrip();

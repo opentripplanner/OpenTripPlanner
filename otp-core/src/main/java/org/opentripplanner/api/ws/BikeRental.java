@@ -91,7 +91,9 @@ public class BikeRental {
         List<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
         for (BikeRentalStation station : stations) {
             if (envelope.contains(station.x, station.y)) {
-                station.name = String.format(localize(station.pattern, resources_names).replace("{name}", "%s"), station.station_name);
+                if (station.raw_name != null) {
+                    station.name = station.raw_name.toString(locale);
+                }
                 out.add(station);
             }
         }

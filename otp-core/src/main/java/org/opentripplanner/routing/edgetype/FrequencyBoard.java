@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 public class FrequencyBoard extends Edge implements OnboardEdge, PatternEdge {
     private static final long serialVersionUID = 7919511656529752927L;
@@ -75,6 +76,12 @@ public class FrequencyBoard extends Edge implements OnboardEdge, PatternEdge {
 
     public String getName() {
         return "leave street network for transit network";
+    }
+    
+    @Override
+    public String getName(Locale locale) {
+        //TODO: localize
+        return this.getName();
     }
 
     public State traverse(State state0) {

@@ -22,6 +22,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.I18NString;
 
 public class DefaultOSMPlainStreetEdgeFactory implements OSMPlainStreetEdgeFactory {
 
@@ -40,7 +41,7 @@ public class DefaultOSMPlainStreetEdgeFactory implements OSMPlainStreetEdgeFacto
     @Override
     public PlainStreetEdge createEdge(OSMNode fromNode, OSMNode toNode, OSMWithTags way,
             IntersectionVertex startEndpoint, IntersectionVertex endEndpoint, LineString geometry,
-            String name, double length, StreetTraversalPermission permissions, boolean back,
+            I18NString name, double length, StreetTraversalPermission permissions, boolean back,
             float carSpeed) {
         PlainStreetEdge pse = new PlainStreetEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,
                 back, carSpeed);
@@ -51,7 +52,7 @@ public class DefaultOSMPlainStreetEdgeFactory implements OSMPlainStreetEdgeFacto
     @Override
     public AreaEdge createAreaEdge(OSMNode nodeI, OSMNode nodeJ,
             OSMWithTags areaEntity, IntersectionVertex startEndpoint,
-            IntersectionVertex endEndpoint, LineString geometry, String name,
+            IntersectionVertex endEndpoint, LineString geometry, I18NString name,
             double length, StreetTraversalPermission permissions,
             boolean back, float carSpeed, AreaEdgeList area) {
         AreaEdge ae = new AreaEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,

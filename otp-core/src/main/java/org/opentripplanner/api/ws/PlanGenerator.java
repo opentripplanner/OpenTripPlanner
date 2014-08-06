@@ -175,8 +175,8 @@ public class PlanGenerator {
         GraphPath exemplar = paths.get(0);
         Vertex tripStartVertex = exemplar.getStartVertex();
         Vertex tripEndVertex = exemplar.getEndVertex();
-        String startName = localize(tripStartVertex.getName());
-        String endName = localize(tripEndVertex.getName());
+        String startName = tripStartVertex.getName(requestedLocale);
+        String endName = tripEndVertex.getName(requestedLocale);
 
         // Use vertex labels if they don't have names
         if (startName == null) {
@@ -628,7 +628,7 @@ public class PlanGenerator {
 
             leg.agencyId = id;
             leg.headsign = states[states.length - 1].getBackDirection();
-            leg.route = localize(states[states.length - 1].getBackEdge().getName());
+            leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
             leg.routeId = route.getId().getId();
             leg.routeLongName = route.getLongName();
@@ -672,9 +672,9 @@ public class PlanGenerator {
         Edge firstEdge = edges[0];
         Edge lastEdge = edges[edges.length - 1];
 
-        leg.from = new Place(firstVertex.getX(), firstVertex.getY(), localize(firstVertex.getName()),
+        leg.from = new Place(firstVertex.getX(), firstVertex.getY(), firstVertex.getName(requestedLocale),
                 null, makeCalendar(states[0]));
-        leg.to = new Place(lastVertex.getX(), lastVertex.getY(), localize(lastVertex.getName()),
+        leg.to = new Place(lastVertex.getX(), lastVertex.getY(), lastVertex.getName(requestedLocale),
                 makeCalendar(states[states.length - 1]), null);
 
         Stop firstStop = null;
@@ -807,7 +807,7 @@ public class PlanGenerator {
                 // exit != null and uses to <exit>
                 // the floor name is the AlightEdge name
                 // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-                step.streetName = localize(((ElevatorAlightEdge) edge).getName());
+                step.streetName = ((ElevatorAlightEdge) edge).getName(requestedLocale); 
 
                 step.relativeDirection = RelativeDirection.ELEVATOR;
 
@@ -815,7 +815,7 @@ public class PlanGenerator {
                 continue;
             }
 
-            String streetName = localize(edge.getName());
+            String streetName = edge.getName(requestedLocale);
             int idx = streetName.indexOf('(');
             String streetNameNoParens;
             if (idx > 0)
@@ -864,7 +864,7 @@ public class PlanGenerator {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
-                    roundaboutPreviousStreet = localize(backState.getBackEdge().getName());
+                    roundaboutPreviousStreet = backState.getBackEdge().getName(requestedLocale);
                     idx = roundaboutPreviousStreet.indexOf('(');
                     if (idx > 0)
                         roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
@@ -901,7 +901,7 @@ public class PlanGenerator {
                         // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
-                            if (localize(alternative.getName()).equals(streetName)) {
+                            if (alternative.getName(requestedLocale).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -926,7 +926,7 @@ public class PlanGenerator {
                                 continue; // this is not an alternative
                             }
                             alternative = alternatives.get(0);
-                            if (localize(alternative.getName()).equals(streetName)) {
+                            if (alternative.getName(requestedLocale).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -1062,7 +1062,7 @@ public class PlanGenerator {
         Edge en = s.getBackEdge();
         WalkStep step;
         step = new WalkStep();
-        step.streetName = localize(en.getName());
+        step.streetName = en.getName(requestedLocale);
         step.lon = en.getFromVertex().getX();
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
@@ -1150,27 +1150,6 @@ public class PlanGenerator {
             throw new RuntimeException(
                     "TransitIndexBuilder is required for first/last/next/previous trip");
         }
-    }
-    
-    private String localize(String key) {
-        if (key == null) {
-            return null;
-        }
-        try {
-            String retval = getResourceBundle().getString(key);
-            LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
-            return retval;
-        } catch (MissingResourceException e) {
-            LOG.debug("Missing translation for key: " + key);
-            return key;
-        }
-    }
-
-    private ResourceBundle getResourceBundle() {
-        if (resources == null) {
-            resources = ResourceBundle.getBundle("WayProperties", requestedLocale);
-        }
-        return resources;
     }
 
 }

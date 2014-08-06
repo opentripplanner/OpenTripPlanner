@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
+import org.opentripplanner.util.I18NString;
 
 /**
  * This represents a street segment.
@@ -66,8 +68,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Getter
     private LineString geometry;
     
-    @Getter @Setter
-    private String name;
+    @Setter
+    private I18NString name;
 
     @Getter @Setter
     private String label;
@@ -130,6 +132,18 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     /** 0 -> 360 degree angle - the angle at the end of the edge geometry */
     @Getter
     public int outAngle;
+    
+    public String getName() {
+        return this.name.toString();
+    }
+    
+    public I18NString getRawName() {
+        return this.name;
+    }
+    
+    public String getName(Locale locale) {
+        return this.name.toString(locale);
+    }
 
     /**
      * No-arg constructor used only for customization -- do not call this unless you know
@@ -140,7 +154,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     public PlainStreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, 
-            String name, double length,
+            I18NString name, double length,
             StreetTraversalPermission permission, boolean back) {
         // use a default car speed of ~25 mph for splitter vertices and the like
         // TODO(flamholz): do something smarter with the car speed here.
@@ -148,7 +162,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     public PlainStreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, 
-            String name, double length,
+            I18NString name, double length,
             StreetTraversalPermission permission, boolean back, float carSpeed) {
         super(v1, v2);
         this.geometry = geometry;

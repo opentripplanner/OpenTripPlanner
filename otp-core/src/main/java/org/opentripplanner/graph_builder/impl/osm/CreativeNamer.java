@@ -14,6 +14,8 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.LocalizedString;
 
 public class CreativeNamer {
 
@@ -33,8 +35,18 @@ public class CreativeNamer {
     public CreativeNamer() {
     }
 
+    /*
+    /**
+     * 
+     * @deprecated
+     * There is now translation API
+     *
     public String generateCreativeName(OSMWithTags way) {
         return TemplateLibrary.generate(creativeNamePattern, way);
+    }*/
+    
+    public I18NString generateCreativeName(OSMWithTags way) {
+        return new LocalizedString(creativeNamePattern, way);
     }
 
     public void setCreativeNamePattern(String creativeNamePattern) {

@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Represents a location on a street, somewhere between the two corners. This is used when computing the first and last segments of a trip, for trips
@@ -61,7 +62,7 @@ public class StreetLocation extends StreetVertex {
     private Graph graph;
 
     // maybe name should just be pulled from street being split
-    public StreetLocation(Graph graph, String id, Coordinate nearestPoint, String name) {
+    public StreetLocation(Graph graph, String id, Coordinate nearestPoint, I18NString name) {
         // calling constructor with null graph means this vertex is temporary
         super(null, id, nearestPoint.x, nearestPoint.y, name);
         this.graph = graph;
@@ -82,7 +83,7 @@ public class StreetLocation extends StreetVertex {
      * 
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(Graph graph, String label, String name,
+    public static StreetLocation createStreetLocation(Graph graph, String label, I18NString name,
             Iterable<StreetEdge> edges, Coordinate nearestPoint, Coordinate originalCoordinate) {
 
         /* linking vertex with epsilon transitions */
@@ -119,7 +120,7 @@ public class StreetLocation extends StreetVertex {
     /**
      * Creates the StreetLocation along the given edges regardless of how close it is to the endpoints of the edge.
      */
-    public static StreetLocation createStreetLocationOnEdges(Graph graph, String label, String name,
+    public static StreetLocation createStreetLocationOnEdges(Graph graph, String label, I18NString name,
             Iterable<StreetEdge> edges, Coordinate nearestPoint) {
 
         boolean wheelchairAccessible = false;
@@ -149,7 +150,7 @@ public class StreetLocation extends StreetVertex {
 
     }
     
-    public static StreetLocation createStreetLocation(Graph graph, String label, String name,
+    public static StreetLocation createStreetLocation(Graph graph, String label, I18NString name,
             Iterable<StreetEdge> edges, Coordinate nearestPoint) {
 
         boolean wheelchairAccessible = false;
@@ -202,7 +203,7 @@ public class StreetLocation extends StreetVertex {
     }
 
     private static void createHalfLocation(Graph graph, StreetLocation base, String label,
-            String name, Coordinate nearestPoint, StreetEdge street) {
+            I18NString name, Coordinate nearestPoint, StreetEdge street) {
 
         StreetVertex tov = (StreetVertex) street.getToVertex();
         StreetVertex fromv = (StreetVertex) street.getFromVertex();

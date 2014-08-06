@@ -52,7 +52,8 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
-import java.util.MissingResourceException;
+import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods used during network linking and trip planning.
@@ -213,33 +214,34 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     LOG.debug("found intersection {}. not splitting.", intersection);
                     // generate names for corners when no name was given
                     Set<String> uniqueNameSet = new HashSet<String>();
-                    for (Edge e : intersection.getOutgoing()) {
-                        if (e instanceof StreetEdge) {
-                            uniqueNameSet.add(e.getName());
-                        }
-                    }
-                    List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
                     Locale locale;
                     if (options == null) {
                         locale = new Locale("en");
                     } else {
                         locale = options.getLocale(); 
-                   }
+                    }
+                    for (Edge e : intersection.getOutgoing()) {
+                        if (e instanceof StreetEdge) {
+                            uniqueNameSet.add(e.getName(locale));
+                        }
+                    }
+                    List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
+                    
                     ResourceBundle resources = ResourceBundle.getBundle("internals", locale);
 
                     ResourceBundle resources_names = ResourceBundle.getBundle("WayProperties", locale);
-                    String fmt = resources.getString("corner");
+                    String fmt = ResourceBundleSingleton.INSTANCE.localize("corner", locale);
                     if (uniqueNames.size() > 1) {
-                        calculatedName = String.format(fmt, localize(uniqueNames.get(0), resources_names),
-                                localize(uniqueNames.get(1), resources_names));
+                        calculatedName = String.format(fmt, uniqueNames.get(0),
+                                uniqueNames.get(1));
                     } else if (uniqueNames.size() == 1) {
-                        calculatedName = localize(uniqueNames.get(0), resources_names);
+                        calculatedName = uniqueNames.get(0);
                     } else {
-                        calculatedName = resources.getString("unnamedStreet");
+                        calculatedName = ResourceBundleSingleton.INSTANCE.localize("unnamedStreet", locale);
                     }
                 }
                 StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(), coord,
-                        calculatedName);
+                        new NonLocalizedString(calculatedName));
                 FreeEdge e = new FreeEdge(closest, intersection);
                 closest.getExtra().add(e);
                 e = new FreeEdge(intersection, closest);
@@ -278,8 +280,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             if (calculatedName == null || "".equals(calculatedName)) {
                 calculatedName = bestStreet.getName();
             }
+            //TODO: where is this used. localize this.
             String closestName = String.format("%s_%s", bestStreet.getName(), location.toString());
-            closestStreet = StreetLocation.createStreetLocation(graph, closestName, calculatedName,
+            closestStreet = StreetLocation.createStreetLocation(graph, closestName, new NonLocalizedString(calculatedName),
                     bundle.toEdgeList(), nearestPoint, coord);
         }
 
@@ -513,20 +516,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // this should probably only be used in tests,
         // though it does allow routing from stop to stop.
         return graph.getVertex(place);
-    }
-    
-    private String localize(String key, ResourceBundle resourceBundle) {
-        if (key == null) {
-            return null;
-        }
-        try {
-            String retval = resourceBundle.getString(key);
-            LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
-            return retval;
-        } catch (MissingResourceException e) {
-            LOG.debug("Missing translation for key: " + key);
-            return key;
-        }
     }
 
 }

@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import org.opentripplanner.util.I18NString;
 
 /**
  * This class keeps track of all of the edges created during a particular case of network linking
@@ -214,7 +215,7 @@ public class LinkRequest {
         PlainStreetEdge e1 = bestPair.getFirst();
         PlainStreetEdge e2 = bestPair.getSecond();
 
-        String name = e1.getName();
+        I18NString name = e1.getRawName();
         StreetVertex e1v1 = (StreetVertex) e1.getFromVertex();
         StreetVertex e1v2 = (StreetVertex) e1.getToVertex();
         LineString forwardGeometry = e1.getGeometry();

@@ -19,6 +19,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * An edge that costs nothing to traverse. Used for connecting intersection vertices to the main
@@ -57,8 +58,13 @@ public class FreeEdge extends Edge {
     public String getName() {
         return null;
     }
+    
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
+    }
 
     public String toString() {
         return "FreeEdge(" + fromv + " -> " + tov + ")";
-    }
+    }    
 }

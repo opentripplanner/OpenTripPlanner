@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph. Includes things like
@@ -200,8 +201,9 @@ public class RoutingContext implements Cloneable {
         double lengthRatio = myGeom.getLength() / parentGeom.getLength();
         double length = e.getLength() * lengthRatio;
 
+        //TODO: localize this
         String name = first.getLabel() + " to " + second.getLabel();
-        return new PartialPlainStreetEdge(e, first, second, myGeom, name, length);
+        return new PartialPlainStreetEdge(e, first, second, myGeom, new NonLocalizedString(name), length);
     }
 
     /**

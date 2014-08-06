@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.util.I18NString;
 
 public class BikeRentalStation implements Serializable {
     private static final long serialVersionUID = 8311460609708089384L;
@@ -27,6 +28,9 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public String id;
+    @XmlTransient
+    @JsonIgnore
+    public I18NString raw_name;
     @XmlAttribute
     @JsonSerialize
     public String name;
@@ -39,12 +43,6 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public int spacesAvailable = Integer.MAX_VALUE;
-    @XmlTransient
-    @JsonIgnore
-    public String pattern;
-    @XmlTransient
-    @JsonIgnore
-    public String station_name;
     
     /**
      * Whether this station is static (usually coming from OSM data) or a real-time source. If no real-time data, users should take

@@ -32,6 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import java.util.Locale;
+import net.sf.cglib.core.Local;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A vertex in the graph. Each vertex has a longitude/latitude location, as well as a set of
@@ -52,7 +56,7 @@ public abstract class Vertex implements Serializable, Cloneable {
     private final String label;
     
     /* Longer human-readable name for the client */
-    private String name;
+    private I18NString name;
 
     private final double x;
 
@@ -75,10 +79,10 @@ public abstract class Vertex implements Serializable, Cloneable {
         // null graph means temporary vertex
         if (g != null)
             g.addVertex(this);
-        this.name = "(no name provided)";
+        this.name = new NonLocalizedString("(no name provided)");
     }
 
-    protected Vertex(Graph g, String label, double x, double y, String name) {
+    protected Vertex(Graph g, String label, double x, double y, I18NString name) {
         this(g, label, x, y);
         this.name = name;
     }
@@ -202,10 +206,14 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     /** If this vertex is located on only one street, get that street's name. */
     public String getName() {
-        return this.name;
+        return this.name.toString();
+    }
+    
+    public String getName(Locale locale) {
+        return this.name.toString(locale);
     }
 
-    public void setStreetName(String name) {
+    public void setStreetName(I18NString name) {
         this.name = name;
     }
 

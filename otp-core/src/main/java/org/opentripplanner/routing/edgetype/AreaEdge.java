@@ -16,13 +16,14 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.I18NString;
 
 public class AreaEdge extends PlainStreetEdge {
     private static final long serialVersionUID = 6761687673982054612L;
     private AreaEdgeList area;
 
     public AreaEdge(IntersectionVertex startEndpoint,
-            IntersectionVertex endEndpoint, LineString geometry, String name,
+            IntersectionVertex endEndpoint, LineString geometry, I18NString name,
             double length, StreetTraversalPermission permissions, boolean back,
             float carSpeed, AreaEdgeList area) {
         super(startEndpoint, endEndpoint, geometry, name, length, permissions, back, carSpeed);

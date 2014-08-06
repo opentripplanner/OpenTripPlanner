@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 public class FrequencyAlight extends Edge {
     private static final long serialVersionUID = 3388162982920747289L;
@@ -71,6 +72,12 @@ public class FrequencyAlight extends Edge {
 
     public String getName() {
         return "leave street network for transit network";
+    }
+    
+    @Override
+    public String getName(Locale locale) {
+        //TODO: localize
+        return this.getName();
     }
 
     public State traverse(State state0) {
@@ -268,4 +275,6 @@ public class FrequencyAlight extends Edge {
     public String toString() {
         return "FrequencyAlight(" + getFromVertex() + ", " + getToVertex() + ")";
     }
+
+
 }

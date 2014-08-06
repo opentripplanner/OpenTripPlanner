@@ -21,6 +21,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Represents a sub-segment of a StreetEdge.
@@ -39,7 +40,7 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     private StreetEdge parentEdge;
 
     public PartialPlainStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-            LineString geometry, String name, double length, StreetTraversalPermission permission,
+            LineString geometry, I18NString name, double length, StreetTraversalPermission permission,
             boolean back) {
         super(v1, v2, geometry, name, length, permission, back, parentEdge.getCarSpeed());
 
@@ -50,7 +51,7 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
      * Simplifies construction by copying some stuff from the parentEdge.
      */
     public PartialPlainStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-            LineString geometry, String name, double length) {
+            LineString geometry, I18NString name, double length) {
         this(parentEdge, v1, v2, geometry, name, length, parentEdge.getPermission(), false);
     }
     

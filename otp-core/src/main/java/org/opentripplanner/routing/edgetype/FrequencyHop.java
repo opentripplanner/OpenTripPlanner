@@ -27,6 +27,7 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 public class FrequencyHop extends Edge implements OnboardEdge, HopEdge {
 
@@ -60,6 +61,11 @@ public class FrequencyHop extends Edge implements OnboardEdge, HopEdge {
 
     public String getName() {
         return GtfsLibrary.getRouteName(pattern.getTrip().getRoute());
+    }
+    
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
     }
 
     @Override

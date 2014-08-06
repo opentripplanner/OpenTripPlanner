@@ -29,6 +29,7 @@ import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.Data;
+import org.opentripplanner.util.I18NString;
 
 @Data
 public class WayPropertySet {
@@ -167,7 +168,7 @@ public class WayPropertySet {
         result.setSafetyFeatures(new P2<Double>(first, second));
     }
 
-    public String getCreativeNameForWay(OSMWithTags way) {
+    public I18NString getCreativeNameForWay(OSMWithTags way) {
         CreativeNamer bestNamer = null;
         int bestScore = 0;
         for (CreativeNamerPicker picker : creativeNamers) {
@@ -182,7 +183,7 @@ public class WayPropertySet {
         if (bestNamer == null) {
             return null;
         }
-        return bestNamer.generateCreativeName(way).intern();
+        return bestNamer.generateCreativeName(way);
     }
     
     /**

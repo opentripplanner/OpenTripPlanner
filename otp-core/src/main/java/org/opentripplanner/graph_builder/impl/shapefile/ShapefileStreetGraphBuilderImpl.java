@@ -51,6 +51,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Loads a shapefile into an edge-based graph.
@@ -180,14 +181,14 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 IntersectionVertex startIntersection = intersectionsByLocation.get(startCoordinate);
                 if (startIntersection == null) {
                     startIntersection = new IntersectionVertex(graph, startIntersectionName, startCoordinate.x,
-                            startCoordinate.y, startIntersectionName);
+                            startCoordinate.y, new NonLocalizedString(startIntersectionName));
                     intersectionsByLocation.put(startCoordinate, startIntersection);
                 }
 
                 IntersectionVertex endIntersection = intersectionsByLocation.get(endCoordinate);
                 if (endIntersection == null) {
                     endIntersection = new IntersectionVertex(graph, endIntersectionName, endCoordinate.x,
-                            endCoordinate.y, endIntersectionName);
+                            endCoordinate.y, new NonLocalizedString(endIntersectionName));
                     intersectionsByLocation.put(endCoordinate, endIntersection);
                 }
 
@@ -199,10 +200,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
 
                 PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection,
-                        geom, name, length, permissions.getFirst(), false);
+                        geom, new NonLocalizedString(name), length, permissions.getFirst(), false);
                 LineString reversed = (LineString) geom.reverse();
                 PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection,
-                        startIntersection, reversed, name, length, permissions.getSecond(), true);
+                        startIntersection, reversed, new NonLocalizedString(name), length, permissions.getSecond(), true);
 
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
@@ -284,6 +285,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             return "null";
         }
 
+        //TODO: localize this and return localized string
         String intersection = streets.first() + " at " + streets.last();
 
         HashMap<Coordinate, Integer> possibleIntersections = intersectionNameToId.get(intersection);

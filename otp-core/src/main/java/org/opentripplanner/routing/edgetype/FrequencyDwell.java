@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 
 /**
@@ -50,6 +51,11 @@ public class FrequencyDwell extends Edge implements OnboardEdge, DwellEdge {
 
     public String getName() {
         return GtfsLibrary.getRouteName(pattern.getTrip().getRoute());
+    }
+    
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
     }
 
     public State traverse(State state0) {

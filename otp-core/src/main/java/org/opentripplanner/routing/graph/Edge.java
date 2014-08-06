@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.graph;
 
+import com.vividsolutions.jts.geom.LineString;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,11 +21,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import java.util.Locale;
 import javax.xml.bind.annotation.XmlTransient;
-
 import lombok.Getter;
-
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -33,8 +32,6 @@ import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
-
-import com.vividsolutions.jts.geom.LineString;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances; all standard OTP edges are subclasses of this.
@@ -259,6 +256,8 @@ public abstract class Edge implements Serializable {
     }
 
     public abstract String getName();
+    
+    public abstract String getName(Locale locale);
 
     public boolean hasBogusName() {
         return false;

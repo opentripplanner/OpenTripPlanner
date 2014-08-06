@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 public class PatternInterlineDwell extends Edge implements OnboardEdge {
     private static final Logger LOG = LoggerFactory.getLogger(PatternInterlineDwell.class);
@@ -80,6 +81,11 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
 
     public String getName() {
         return GtfsLibrary.getRouteName(targetTrip.getRoute());
+    }
+    
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
     }
 
     public State optimisticTraverse(State s0) {
