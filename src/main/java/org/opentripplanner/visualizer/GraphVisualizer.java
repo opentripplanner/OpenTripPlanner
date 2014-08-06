@@ -85,7 +85,9 @@ import org.opentripplanner.routing.impl.ParetoPathService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.DefaultShortestPathTreeFactory;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -337,6 +339,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private JCheckBox showHighlightedCheckbox;
 	
 	private JCheckBox showSPTCheckbox;
+	
+	private ShortestPathTree spt;
 
     public GraphVisualizer(GraphService graphService) {
         super();
@@ -1229,13 +1233,19 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         	sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
         }
         
-        showGraph.resetSPT();
+        // set up a visitor to the path service so we can get the SPT as it's generated
+        ParetoPathService.SPTVisitor vis = pathservice.new SPTVisitor();
+        pathservice.setSPTVisitor(vis);
         
         long t0 = System.currentTimeMillis();
         // TODO: check options properly intialized (AMB)
         List<GraphPath> paths = pathservice.getPaths(options);
         long dt = System.currentTimeMillis() - t0;
         searchTimeElapsedLabel.setText( "search time elapsed: "+dt+"ms" );
+        
+        // grab the spt from the visitor
+        spt = vis.spt;
+        System.out.println( "got spt:"+spt );
         
         if (paths == null) {
             System.out.println("no path");
@@ -1246,17 +1256,21 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // now's a convenient time to set graphical SPT weights
         showGraph.simpleSPT.setWeights();
                         
-        // show paths in a list panel
-        DefaultListModel data = new DefaultListModel();
-        for(GraphPath gp : paths ){
-        	data.addElement( new PathPrinter(gp) );
-        }
-        pathsList.setModel(data);
+        showPathsInPanel(paths);
         
         showGraph.redraw();
         
         options.cleanup();
     }
+    
+	private void showPathsInPanel(List<GraphPath> paths) {
+		// show paths in a list panel
+		DefaultListModel data = new DefaultListModel();
+		for(GraphPath gp : paths ){
+			data.addElement( new PathPrinter(gp) );
+		}
+		pathsList.setModel(data);
+	}
 
     protected void findAnnotation() {
         Set<Class<? extends GraphBuilderAnnotation>> gbaClasses = Sets.newHashSet();
@@ -1303,6 +1317,20 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         });
         ListModel data = new VertexList(selected);
         nearbyVertices.setModel(data);
+
+        // pick out an intersection vertex and find the path
+        // if the spt is already available
+        Vertex target=null;
+        for(Vertex vv : selected){
+        	if( vv instanceof IntersectionVertex ){
+        		target = vv;
+        		break;
+        	}
+        }
+        if(target!=null && spt!=null){
+        	List<GraphPath> paths = spt.getPaths(target,true);
+        	showPathsInPanel( paths );
+        }
     }
 
     public Graph getGraph() {
