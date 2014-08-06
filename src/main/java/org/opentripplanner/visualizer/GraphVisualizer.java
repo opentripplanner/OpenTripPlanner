@@ -503,10 +503,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         softWalkOverageRate = new JTextField("5.0");
         pane.add(softWalkOverageRate);
         
-        // radio buttons: optimize type
-        JLabel optimizeTypeLabel = new JLabel("Optimize type:");
-        pane.add(optimizeTypeLabel);
-        
         // row: nPaths
         JLabel nPathsLabel = new JLabel("nPaths:");
         pane.add(nPathsLabel);
@@ -553,6 +549,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     	sptThickness = new JTextField("0.1");
     	pane.add(sptThickness);
         
+        // radio buttons: optimize type
+        JLabel optimizeTypeLabel = new JLabel("Optimize type:");
+        pane.add(optimizeTypeLabel);
+    	
         opQuick = new JRadioButton("Quick");
         opQuick.setSelected(true);
         opSafe = new JRadioButton("Safe");
