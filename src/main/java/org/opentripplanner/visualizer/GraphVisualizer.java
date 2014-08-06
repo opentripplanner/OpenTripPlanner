@@ -341,6 +341,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private JCheckBox showSPTCheckbox;
 	
 	private ShortestPathTree spt;
+	
+	private JTextField sptFlattening;
+	
+	private JTextField sptThickness;
 
     public GraphVisualizer(GraphService graphService) {
         super();
@@ -520,6 +524,18 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     	showSPTCheckbox.setSelected(true);
     	showSPTCheckbox.addItemListener( onChangeVizPrefs );
     	pane.add(showSPTCheckbox);
+    	
+    	// row: SPT flattening
+    	JLabel sptFlatteningLabel = new JLabel("SPT flattening:");
+    	pane.add(sptFlatteningLabel);
+    	sptFlattening = new JTextField("0.3");
+    	pane.add(sptFlattening);
+
+    	// row: SPT thickness
+    	JLabel sptThicknessLabel = new JLabel("SPT thickness:");
+    	pane.add(sptThicknessLabel);
+    	sptThickness = new JTextField("0.1");
+    	pane.add(sptThickness);
         
         opQuick = new JRadioButton("Quick");
         opQuick.setSelected(true);
@@ -1258,6 +1274,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                         
         showPathsInPanel(paths);
         
+        // now's a good time to set showGraph's SPT drawing weights
+        showGraph.setSPTFlattening( Float.parseFloat(sptFlattening.getText()) );
+        showGraph.setSPTThickness( Float.parseFloat(sptThickness.getText()) );
         showGraph.redraw();
         
         options.cleanup();
