@@ -366,7 +366,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     public void init() {
         JTabbedPane tabbedPane = new JTabbedPane();
          
-        tabbedPane.addTab("Main", null, initMainTab(),
+        tabbedPane.addTab("Main", null, makeMainTab(),
                 "Pretty much everything");
          
         tabbedPane.addTab("Prefs", null, makePrefsPanel(),
@@ -384,7 +384,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pack();
     }
 
-	private Container initMainTab() {
+	private Container makeMainTab() {
 		Container pane = new JPanel();
     	pane.setLayout(new BorderLayout());
     	
