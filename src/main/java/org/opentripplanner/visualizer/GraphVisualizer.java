@@ -81,7 +81,7 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
+import org.opentripplanner.routing.impl.ParetoPathService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.DefaultShortestPathTreeFactory;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -272,7 +272,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JLabel serviceIdLabel;
     
-    private RetryingPathServiceImpl pathservice;
+    private ParetoPathService pathservice;
     
     private ShortestPathTreeFactory sptFactory = new DefaultShortestPathTreeFactory();
     
@@ -345,7 +345,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         this.graphService = graphService;
         this.graph = graphService.getGraph();
         sptService.setShortestPathTreeFactory(sptFactory);
-        this.pathservice = new RetryingPathServiceImpl(graphService, sptService);
+        this.pathservice = new ParetoPathService(graphService, sptService);
         setTitle("GraphVisualizer");
         
         init();
