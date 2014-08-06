@@ -607,18 +607,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         } else if (drawLevel == DRAW_VERTICES) {
             drawVertices();
         } else if (drawLevel == DRAW_SPT){
-        	if(sptEdgeQueue==null){
-        		sptEdgeQueue = simpleSPT.getEdgeQueue();
+        	boolean success = drawSPT(startMillis);
+        	if(!success){
+        		return;
         	}
-        	int i=0;
-        	while(!sptEdgeQueue.isEmpty()){
-        		SPTNode node = sptEdgeQueue.poll();
-        		i++;
-        		node.draw();
-        		if ((i%BLOCK_SIZE==0) && (millis() - startMillis > FRAME_TIME))
-        			return;
-        	}
-        	sptEdgeQueue=null;
         } else if (drawLevel == DRAW_MINIMAL) {
         	if (!newHighlightedEdges.isEmpty())
         		handleNewHighlights();
@@ -629,6 +621,22 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         if (drawLevel > DRAW_MINIMAL)
             drawLevel -= 1; // move to next layer
     }
+    
+	private boolean drawSPT(int startMillis) {
+		if(sptEdgeQueue==null){
+			sptEdgeQueue = simpleSPT.getEdgeQueue();
+		}
+		int i=0;
+		while(!sptEdgeQueue.isEmpty()){
+			SPTNode node = sptEdgeQueue.poll();
+			i++;
+			node.draw();
+    		if ((i%BLOCK_SIZE==0) && (millis() - startMillis > FRAME_TIME))
+    			return false;
+    	}
+    	sptEdgeQueue=null;
+    	return true;
+	}
     
     private void drawNewEdges() {
     	if( drawEdges  ){
