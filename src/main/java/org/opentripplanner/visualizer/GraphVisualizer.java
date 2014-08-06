@@ -90,6 +90,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.visualizer.GraphVisualizer.PathPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +129,7 @@ class DisplayVertex {
 /**
  * This is a ListModel that holds Edges. It gets its edges from a PatternBoard/PatternAlight, hence the iterable.
  */
-class EdgeListModel extends AbstractListModel {
+class EdgeListModel extends AbstractListModel<Edge> {
 
     private static final long serialVersionUID = 1L;
 
@@ -153,26 +154,26 @@ class EdgeListModel extends AbstractListModel {
 /**
  * This is a ListModel that shows a TripPattern's departure times from a particular stop
  */
-class TripPatternListModel extends AbstractListModel {
+class TripPatternListModel extends AbstractListModel<String> {
 
     private static final long serialVersionUID = 1L;
 
     ArrayList<String> departureTimes = new ArrayList<String>();
 
     public TripPatternListModel(TripPattern pattern, int stopIndex) {
-        Iterator<Integer> departureTimeIterator = null; // TODO pattern.getDepartureTimes(stopIndex);
-        while (departureTimeIterator.hasNext()) {
-            int dt = departureTimeIterator.next();
-
-            Calendar c = new GregorianCalendar();
-            c.setTimeInMillis(dt * 1000);
-            Date date = c.getTime();
-            // adjust the time for the system's timezone. This is kind of a hack.
-            int tzAdjust = TimeZone.getDefault().getOffset(date.getTime());
-            c.setTimeInMillis(dt * 1000 - tzAdjust);
-            date = c.getTime();
-            departureTimes.add(DateFormat.getTimeInstance().format(date));
-        }
+//        Iterator<Integer> departureTimeIterator = null; // TODO pattern.getDepartureTimes(stopIndex);
+//        while (departureTimeIterator.hasNext()) {
+//            int dt = departureTimeIterator.next();
+//
+//            Calendar c = new GregorianCalendar();
+//            c.setTimeInMillis(dt * 1000);
+//            Date date = c.getTime();
+//            // adjust the time for the system's timezone. This is kind of a hack.
+//            int tzAdjust = TimeZone.getDefault().getOffset(date.getTime());
+//            c.setTimeInMillis(dt * 1000 - tzAdjust);
+//            date = c.getTime();
+//            departureTimes.add(DateFormat.getTimeInstance().format(date));
+//        }
     }
 
     public String getElementAt(int index) {
@@ -188,7 +189,7 @@ class TripPatternListModel extends AbstractListModel {
 /**
  * A list of vertices where the internal container is exposed.
  */
-class VertexList extends AbstractListModel {
+class VertexList extends AbstractListModel<DisplayVertex> {
 
     private static final long serialVersionUID = 1L;
 
@@ -236,11 +237,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private ShowGraph showGraph;
 
-    public JList nearbyVertices;
+    public JList<DisplayVertex> nearbyVertices;
 
-    private JList outgoingEdges;
+    private JList<Edge> outgoingEdges;
 
-    private JList incomingEdges;
+    private JList<Edge> incomingEdges;
 
     private JTextField sourceVertex;
 
@@ -268,11 +269,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JTextField boardingPenaltyField;
 
-    private JList departurePattern;
+    private JList<String> departurePattern;
 
-    private DefaultListModel annotationMatchesModel;
+    private DefaultListModel<GraphBuilderAnnotation> annotationMatchesModel;
 
-    private JList annotationMatches;
+    private JList<GraphBuilderAnnotation> annotationMatches;
 
     private JLabel serviceIdLabel;
     
@@ -282,7 +283,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     
     private GenericAStar sptService = new GenericAStar();
 
-    private DefaultListModel metadataModel;
+    private DefaultListModel<String> metadataModel;
 
     private HashSet<Vertex> closed;
 
@@ -292,7 +293,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private HashSet<Vertex> seen;
 
-    private JList metadataList;
+    private JList<String> metadataList;
 
     private final GraphService graphService;
     
@@ -330,9 +331,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	private JTextField nPaths;
 	
-	private JList pathsList;
+	private JList<PathPrinter> pathsList;
 	
-	private JList pathStates;
+	private JList<State> pathStates;
 	
 	private JCheckBox showTransitCheckbox;
 
@@ -614,12 +615,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         serviceIdLabel = new JLabel("[service id]");
         rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
 
-        departurePattern = new JList();
+        departurePattern = new JList<String>();
         JScrollPane dpScrollPane = new JScrollPane(departurePattern);
         rightPanelTabs.addTab("trip pattern", dpScrollPane);
         
         // a place to print out the details of a path
-        pathStates = new JList();
+        pathStates = new JList<State>();
         JScrollPane stScrollPane = new JScrollPane(pathStates);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("path states", stScrollPane);
@@ -631,7 +632,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	        	outgoingEdges.clearSelection();
 	        	incomingEdges.clearSelection();
 		
-	        	JList theList = (JList)e.getSource();
+	        	@SuppressWarnings("unchecked")
+				JList<State> theList = (JList<State>)e.getSource();
 	        	State st = (State)theList.getSelectedValue();
 	        	Edge edge = st.getBackEdge();
 	        	reactToEdgeSelection( edge, false );
@@ -639,26 +641,28 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         });
          
 
-        metadataList = new JList();
-        metadataModel = new DefaultListModel();
+        metadataList = new JList<String>();
+        metadataModel = new DefaultListModel<String>();
         metadataList.setModel(metadataModel);
         JScrollPane mdScrollPane = new JScrollPane(metadataList);
         mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("metadata", mdScrollPane);
 
         // This is where matched annotations from an annotation search go
-        annotationMatches = new JList();
+        annotationMatches = new JList<GraphBuilderAnnotation>();
         annotationMatches.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                JList theList = (JList) e.getSource();
-                GraphBuilderAnnotation anno = (GraphBuilderAnnotation) theList.getSelectedValue();
+                @SuppressWarnings("unchecked")
+				JList<GraphBuilderAnnotation> theList = (JList<GraphBuilderAnnotation>) e.getSource();
+                
+                GraphBuilderAnnotation anno = theList.getSelectedValue();
                 if (anno == null)
                     return;
                 showGraph.drawAnotation(anno);
             }
         });
 
-        annotationMatchesModel = new DefaultListModel();
+        annotationMatchesModel = new DefaultListModel<GraphBuilderAnnotation>();
         annotationMatches.setModel(annotationMatchesModel);
         JScrollPane amScrollPane = new JScrollPane(annotationMatches);
         amScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -965,7 +969,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
         JLabel nvLabel = new JLabel("Vertices");
         vertexDataPanel.add(nvLabel);
-        nearbyVertices = new JList();
+        nearbyVertices = new JList<DisplayVertex>();
         // nearbyVertices.setPrototypeCellValue("Bite the wax tadpole right on the nose");
         nearbyVertices.setVisibleRowCount(4);
         JScrollPane nvScrollPane = new JScrollPane(nearbyVertices);
@@ -973,14 +977,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
         JLabel ogeLabel = new JLabel("Outgoing edges");
         vertexDataPanel.add(ogeLabel);
-        outgoingEdges = new JList();
+        outgoingEdges = new JList<Edge>();
         outgoingEdges.setVisibleRowCount(4);
         JScrollPane ogeScrollPane = new JScrollPane(outgoingEdges);
         vertexDataPanel.add(ogeScrollPane);
 
         JLabel iceLabel = new JLabel("Incoming edges");
         vertexDataPanel.add(iceLabel);
-        incomingEdges = new JList();
+        incomingEdges = new JList<Edge>();
         JScrollPane iceScrollPane = new JScrollPane(incomingEdges);
         vertexDataPanel.add(iceScrollPane);
         /*
@@ -989,7 +993,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         ListSelectionListener edgeChanged = new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
 
-                JList edgeList = (JList) e.getSource();
+                @SuppressWarnings("unchecked")
+				JList<Edge> edgeList = (JList<Edge>) e.getSource();
+                
                 Edge selected = (Edge) edgeList.getSelectedValue();
                 
                 boolean outgoing = (edgeList==outgoingEdges);
@@ -1017,7 +1023,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         JLabel pathsLabel = new JLabel("Paths");
         vertexDataPanel.add(pathsLabel);
-        pathsList = new JList();
+        pathsList = new JList<PathPrinter>();
         pathsList.addListSelectionListener(new ListSelectionListener(){
 			@Override
 			public void valueChanged(ListSelectionEvent ev) {
@@ -1027,9 +1033,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				}
 				GraphPath path = pp.gp;
 				
-				DefaultListModel pathModel = new DefaultListModel();
+				DefaultListModel<State> pathModel = new DefaultListModel<State>();
 				for( State st : path.states ){
-					pathModel.addElement( st.toString() );
+					pathModel.addElement( st );
 				}
 				pathStates.setModel( pathModel );
 				
@@ -1300,7 +1306,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     
 	private void showPathsInPanel(List<GraphPath> paths) {
 		// show paths in a list panel
-		DefaultListModel data = new DefaultListModel();
+		DefaultListModel<PathPrinter> data = new DefaultListModel<PathPrinter>();
 		for(GraphPath gp : paths ){
 			data.addElement( new PathPrinter(gp) );
 		}
@@ -1350,7 +1356,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
 
         });
-        ListModel data = new VertexList(selected);
+        ListModel<DisplayVertex> data = new VertexList(selected);
         nearbyVertices.setModel(data);
 
         // pick out an intersection vertex and find the path
