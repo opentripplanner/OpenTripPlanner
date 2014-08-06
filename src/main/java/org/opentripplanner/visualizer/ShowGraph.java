@@ -762,8 +762,6 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	}
 
 	private boolean drawAll(int startMillis) {
-		// } else if (drawLevel == DRAW_STREETS) {
-		// smooth();
 		if (drawOffset == 0) {
 		    findVisibleElements();
 		    background(15);
@@ -772,11 +770,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		    stroke(30, 128, 30); // dark green
 		    strokeWeight(1);
 		    noFill();
-		    // for (Edge e : visibleStreetEdges) drawEdge(e);
 		    while (drawOffset < visibleStreetEdges.size()) {
 		        drawEdge(visibleStreetEdges.get(drawOffset));
 		        drawOffset += 1;
-		        // if (drawOffset % FRAME_SIZE == 0) return;
 		        if (drawOffset % BLOCK_SIZE == 0) {
 		            if (millis() - startMillis > FRAME_TIME)
 		                return false;
