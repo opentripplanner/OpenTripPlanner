@@ -21,7 +21,8 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * @author mabu
  */
 public class LocalizedString implements I18NString, Serializable {
-    private static final Matcher matcher = Pattern.compile("\\{(.*?)\\}").matcher("");
+    private static final Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+    private static final Matcher matcher = pattern.matcher("");
     private transient static Map<String, String> key_params;
     
     static {
@@ -36,6 +37,7 @@ public class LocalizedString implements I18NString, Serializable {
         this.params = params;
     }
     
+    //Gets params from translated key
     public LocalizedString(String key, OSMWithTags way) {
         this.key = key;
         List<String> lparams = new ArrayList<String>(1);
@@ -49,8 +51,6 @@ public class LocalizedString implements I18NString, Serializable {
                 this.params = lparams.toArray(new String[lparams.size()]);
             }
         }
-       
-
     }
     
     /**
@@ -85,8 +85,13 @@ public class LocalizedString implements I18NString, Serializable {
         if (this.key == null) {
             return null;
         }
-        //TODO: problem is that translations has {name} when 0,1,2,n is expected
-        return String.format(ResourceBundleSingleton.INSTANCE.localize(this.key, locale), (Object[]) params);
+        //replaces {name}, {ref} etc with %s to be used as parameters
+        //in string formatting with values from way tags values
+        String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
+        if (this.params != null) {
+            translation = pattern.matcher(translation).replaceFirst("%s");
+        }
+        return String.format(translation, (Object[]) params);
     }
 
 }
