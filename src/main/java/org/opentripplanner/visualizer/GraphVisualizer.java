@@ -62,7 +62,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
@@ -73,8 +72,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -143,41 +140,6 @@ class EdgeListModel extends AbstractListModel<Edge> {
     public Edge getElementAt(int index) {
         return edges.get(index);
     }
-}
-
-/**
- * This is a ListModel that shows a TripPattern's departure times from a particular stop
- */
-class TripPatternListModel extends AbstractListModel<String> {
-
-    private static final long serialVersionUID = 1L;
-
-    ArrayList<String> departureTimes = new ArrayList<String>();
-
-    public TripPatternListModel(TripPattern pattern, int stopIndex) {
-//        Iterator<Integer> departureTimeIterator = null; // TODO pattern.getDepartureTimes(stopIndex);
-//        while (departureTimeIterator.hasNext()) {
-//            int dt = departureTimeIterator.next();
-//
-//            Calendar c = new GregorianCalendar();
-//            c.setTimeInMillis(dt * 1000);
-//            Date date = c.getTime();
-//            // adjust the time for the system's timezone. This is kind of a hack.
-//            int tzAdjust = TimeZone.getDefault().getOffset(date.getTime());
-//            c.setTimeInMillis(dt * 1000 - tzAdjust);
-//            date = c.getTime();
-//            departureTimes.add(DateFormat.getTimeInstance().format(date));
-//        }
-    }
-
-    public String getElementAt(int index) {
-        return departureTimes.get(index);
-    }
-
-    public int getSize() {
-        return departureTimes.size();
-    }
-
 }
 
 /**
@@ -263,13 +225,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JTextField boardingPenaltyField;
 
-    private JList<String> departurePattern;
-
     private DefaultListModel<GraphBuilderAnnotation> annotationMatchesModel;
 
     private JList<GraphBuilderAnnotation> annotationMatches;
-
-    private JLabel serviceIdLabel;
     
     private ParetoPathService pathservice;
     
@@ -380,6 +338,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         addWindowListener(new ExitListener());
         pack();
         
+        // make sure the showGraph quits drawing when we switch tabs
         tabbedPane.addChangeListener(new ChangeListener(){
         	@Override
         	public void stateChanged(ChangeEvent e) {
@@ -603,12 +562,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JTabbedPane rightPanelTabs = new JTabbedPane();
 
         rightPanel.add(rightPanelTabs, BorderLayout.LINE_END);
-        serviceIdLabel = new JLabel("[service id]");
-        rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
-
-        departurePattern = new JList<String>();
-        JScrollPane dpScrollPane = new JScrollPane(departurePattern);
-        rightPanelTabs.addTab("trip pattern", dpScrollPane);
         
         // a place to print out the details of a path
         pathStates = new JList<State>();
@@ -867,7 +820,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		
 		private void reactToEdgeSelection(Edge selected, boolean outgoing){
 	        if (selected == null) {
-	            departurePattern.removeAll();
 	            return;
 	        }
 	        showGraph.highlightEdge(selected);
@@ -925,28 +877,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	        }
 	        metadataList.revalidate();
 	
-	        // figure out the pattern, if any
-	        TripPattern pattern = null;
-	        int stopIndex = 0;
-	        if (selected instanceof TransitBoardAlight
-	                && ((TransitBoardAlight) selected).isBoarding()) {
-	            TransitBoardAlight boardEdge = (TransitBoardAlight) selected;
-	            pattern = boardEdge.getPattern();
-	            stopIndex = boardEdge.getStopIndex();
-	        } else if (selected instanceof TransitBoardAlight
-	                && !((TransitBoardAlight) selected).isBoarding()) {
-	            TransitBoardAlight alightEdge = (TransitBoardAlight) selected;
-	            pattern = alightEdge.getPattern();
-	            stopIndex = alightEdge.getStopIndex();
-	        } else {
-	            departurePattern.removeAll();
-	            return;
-	        }
-	        ListModel<String> model = new TripPatternListModel(pattern, stopIndex);
-	        departurePattern.setModel(model);
-	
-	        Trip trip = pattern.getExemplar();
-	        serviceIdLabel.setText(trip.getServiceId().toString());
 		}
 
 	private void initVertexInfoSubpanel() {
