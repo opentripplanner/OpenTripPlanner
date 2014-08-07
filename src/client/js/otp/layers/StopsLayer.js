@@ -59,6 +59,14 @@ otp.layers.StopsLayer =
     updateStops : function(stops) {
         var stops = _.values(this.stopsLookup);
         var this_ = this;
+        var stop_viewer_trans = _tr('Stop Viewer');
+        //TRANSLATORS: Plan Trip [From Stop| To Stop] Used in stoplayer popup
+        var plan_trip_trans = _tr('Plan Trip');
+        //TRANSLATORS: Plan Trip [From Stop| To Stop] Used in stoplayer popup
+        var from_stop_trans = _tr('From Stop');
+        //TRANSLATORS: Plan Trip [From Stop| To Stop] Used in stoplayer popup
+        var to_stop_trans = _tr('To Stop');
+        var routes_stop_trans = _tr('Routes Serving Stop');
         
         for(var i=0; i<stops.length; i++) {
 
@@ -76,6 +84,11 @@ otp.layers.StopsLayer =
             
             var context = _.clone(stop);
             context.agencyStopLinkText = otp.config.agencyStopLinkText || "Agency Stop URL";
+            context.stop_viewer = stop_viewer_trans;
+            context.routes_on_stop = routes_stop_trans;
+            context.plan_trip = plan_trip_trans;
+            context.from_stop = from_stop_trans;
+            context.to_stop = to_stop_trans;
             var popupContent = ich['otp-stopsLayer-popup'](context);
 
             popupContent.find('.stopViewerLink').data('stop', stop).click(function() {

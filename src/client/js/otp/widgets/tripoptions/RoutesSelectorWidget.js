@@ -42,9 +42,14 @@ otp.widgets.RoutesSelectorWidget =
         ich['otp-tripOptions-routesSelector']({
             widgetId : this.id,
             name : this.name,
-            allRoutes : otp.config.locale.instructions.allRoutes,
-            save : otp.config.locale.instructions.save,
-            close : otp.config.locale.instructions.close
+            //TRANSLATORS: All public transport routes. Shown in
+            //Preffered/Banned routes widget
+            allRoutes : _tr("All Routes"),
+            //TRANSLATORS: save preffered/banned public transport routes
+            save : _tr("Save"),
+            //TRANSLATORS: Close preffered/banned public transport routes
+            //widget
+            close : _tr("Close")
         }).appendTo(this.$());
         
         this.selectedList = $('#'+this_.id+'-selectedList');

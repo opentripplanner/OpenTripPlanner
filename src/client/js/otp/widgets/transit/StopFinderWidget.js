@@ -27,7 +27,8 @@ otp.widgets.transit.StopFinderWidget =
     initialize : function(id, module, stopViewer) {
     
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
-            title : 'Stop Finder',
+            //TRANSLATORS: Widget title
+            title : _tr('Stop Finder'),
             cssClass : 'otp-stopFinder',
             closeable : true,
             resizable : true,
@@ -41,8 +42,19 @@ otp.widgets.transit.StopFinderWidget =
         var this_ = this;
 
         this.activeTime = moment();
+
+        var translated_template = {
+            //TRANSLATORS: [Public transport] Agency: Selector for Public transport agencies
+            agency: _tr('Agency'),
+            //TRANSLATORS: Search for Stops by ID
+            by_id: _tr('By ID'),
+            //TRANSLATORS: Search for Stops by Name
+            by_name: _tr('By Name'),
+            //TRANSLATORS: Search for Stops by ID/by Name
+            search: _tr('Search')
+        }
           
-        ich['otp-stopFinder']({}).appendTo(this.mainDiv);
+        ich['otp-stopFinder'](translated_template).appendTo(this.mainDiv);
 
         this.agencySelect = this.mainDiv.find('.otp-stopFinder-agencySelect');
         this.module.webapp.transitIndex.loadAgencies(this, function() {
@@ -80,7 +92,7 @@ otp.widgets.transit.StopFinderWidget =
         var this_ = this;
 
         if(!stops || stops.length === 0) {
-            this.stopList.html("No Stops Found");
+            this.stopList.html(_tr("No Stops Found"));
             return;
         }
 

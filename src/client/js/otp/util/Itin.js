@@ -105,7 +105,66 @@ otp.util.Itin = {
         return false;
     },
 
-    directionString : function(dir) { // placeholder until localization is addressed
+    absoluteDirectionStrings : {
+        // note: keep these lower case (and uppercase via template / code if needed)
+        //TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation 
+        'NORTH': _tr('north'),
+        'NORTHEAST': _tr('northeast'),
+        'EAST': _tr('east'),
+        'SOUTHEAST': _tr('southeast'),
+        'SOUTH': _tr('south'),
+        'SOUTHWEST': _tr('southwest'),
+        'WEST': _tr('west'),
+        'NORTHWEST': _tr('northwest'),
+    },
+    
+    /** 
+     * Returns localized absolute direction string
+     *
+     * @param {string} dir a absolute direction string from a server
+     * @return {string} localized absolute direction string
+     */
+
+    getLocalizedAbsoluteDirectionString : function(dir) { 
+        if (dir in this.absoluteDirectionStrings) return this.absoluteDirectionStrings[dir];
+        // This is used if dir isn't found in directionStrings
+        // This shouldn't happen
+        return dir.toLowerCase();
+    },
+
+    relativeDirectionStrings : {
+        // note: keep these lower case (and uppercase via template / code if needed)
+        //TRANSLATORS: depart at street name/corner of x y etc. (First instruction in
+        //itinerary)
+        'DEPART': pgettext("itinerary", "depart"),
+        //TRANSLATORS: [Relative direction (Hard/Slightly Left/Right...)] to continue
+        //on /on to [streetname]
+        'HARD_LEFT': _tr("hard left"),
+        'LEFT': _tr("left"),
+        'SLIGHTLY_LEFT': _tr("slight left"), 
+        'CONTINUE': _tr("continue"),
+        'SLIGHTLY_RIGHT': _tr("slight right"),
+        'RIGHT': _tr("right"),
+        'HARD_RIGHT': _tr("hard right"),
+        // rather than just being a direction, this should be
+        // full-fledged to take just the exit name at the end
+        'ELEVATOR': _tr("elevator"),
+        'UTURN_LEFT': _tr("U-turn left"),
+        'UTURN_RIGHT': _tr("U-turn right")
+    },
+
+
+    /** 
+     * Returns localized relative direction string
+     *
+     * @param {string} dir a relative direction string from a server
+     * @return {string} localized direction string
+     */
+
+    getLocalizedRelativeDirectionString : function(dir) { 
+        if (dir in this.relativeDirectionStrings) return this.relativeDirectionStrings[dir];
+        // This is used if dir isn't found in directionStrings
+        // This shouldn't happen
         return dir.toLowerCase().replace('_',' ').replace('ly','');
     },
     
@@ -114,10 +173,29 @@ otp.util.Itin = {
     },
     
     modeStrings : {
-        'BUS' : 'Bus',
-        'SUBWAY' : 'Subway',
-        'TRAM' : 'Light Rail',
-        'GONDOLA' : 'Aerial Tram',
+        //TRANSLATORS: Walk distance to place (itinerary header)
+        'WALK': _tr('Walk'),
+        //TRANSLATORS: Cycle distance to place (itinerary header)
+        'BICYCLE': _tr('Cycle'),
+        //TRANSLATORS: Car distance to place (itinerary header)
+        'CAR': _tr('Car'),
+        //TRANSLATORS: Bus: (route number) Start station to end station (itinerary header)
+        'BUS' : _tr('Bus'),
+        'SUBWAY' : _tr('Subway'),
+        //TRANSLATORS: Used for intercity or long-distance travel.
+        'RAIL' : _tr('Train'),
+        'FERRY' : _tr('Ferry'),
+        //TRANSLATORS: Tram, Streetcar, Light rail. Any light rail or street
+        //level system within a metropolitan area.
+        'TRAM' : _tr('Light Rail'),
+        //TRANSLATORS: Used for street-level cable cars where the cable runs
+        //beneath the car.
+        'CABLE_CAR': _tr('Cable Car'),
+        //TRANSLATORS: Any rail system designed for steep inclines.
+        'FUNICULAR': _tr('Funicular'),
+        //TRANSLATORS: Gondola, Suspended cable car. Typically used for aerial
+        //cable cars where the car is suspended from the cable.
+        'GONDOLA' : _tr('Aerial Tram'),
     },
     
     modeString : function(mode) {
@@ -129,15 +207,35 @@ otp.util.Itin = {
         asHtml = (typeof asHtml === "undefined") ? true : asHtml;
         var text = '';
         if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
-            text += 'Take roundabout ' +
-                (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" ? 'counter' : '')+'clockwise to ' +
-                otp.util.Text.ordinal(step.exit)+' exit on '+step.streetName;
+            var sprintf_values = {
+                'ordinal_exit_number': otp.util.Text.ordinal(step.exit),
+                'street_name': step.streetName
+            };
+            if (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE") {
+                if (asHtml) {
+                    text +=  _tr('Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b> exit on <b>%(street_name)s</b>', sprintf_values);
+                } else {
+                    text +=  _tr('Take roundabout counterclockwise to %(ordinal_exit_number)s exit on %(street_name)s', sprintf_values);
+                }
+            } else {
+                if (asHtml) {
+                    text +=  _tr('Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit on <b>%(street_name)s</b>', sprintf_values);
+                } else {
+                    text +=  _tr('Take roundabout clockwise to %(ordinal_exit_number)s exit on %(street_name)s', sprintf_values);
+                }
+            }
+
         }
         else {
-            if(!step.relativeDirection) text += "Start on" + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + " heading " + step.absoluteDirection.toLowerCase();
+            //TODO: Absolute direction translation
+            //TRANSLATORS: Start on [stret name] heading [compas direction]
+            if(!step.relativeDirection) text += _tr("Start on") + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + _tr(" heading ") + (asHtml ? "<b>" : "") + this.getLocalizedAbsoluteDirectionString(step.absoluteDirection) + (asHtml ? "</b>" : "");
             else {
-                text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection)) +
-                            (asHtml ? "</b>" : "") + ' ' + (step.stayOn ? "to continue on" : "on to")  + (asHtml ? " <b>" : " ") +
+                text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.getLocalizedRelativeDirectionString(step.relativeDirection)) +
+                            (asHtml ? "</b>" : "") + ' ' +
+                            //TRANSLATORS: [Relative direction (Left/Right...)] to continue
+                            //on /on to [streetname]
+                            (step.stayOn ? _tr("to continue on") : _tr("on to"))  + (asHtml ? " <b>" : " ") +
                             step.streetName + (asHtml ? "</b>" : "");
             }
         }
