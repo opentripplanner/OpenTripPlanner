@@ -24,6 +24,8 @@ class PatternRide {
     Ride previous;
     ProfileTransfer xfer; // how did we get here
     Stats stats = null;
+    int earliest = Integer.MAX_VALUE;
+    int latest = Integer.MIN_VALUE;
     
     /** Construct an unfinished PatternRide, lacking a toIndex and stats. */
     public PatternRide (TripPattern pattern, int fromIndex, Ride previous, ProfileTransfer xfer) {

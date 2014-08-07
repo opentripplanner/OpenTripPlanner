@@ -42,17 +42,19 @@ public class Segment {
     }
 
     // Use AgencyAndId instead of String to get both since we are now multi-feed
-    @Getter AgencyAndId from;
-    @Getter AgencyAndId to;
-    @Getter int walkTime;
-    @Getter int walkDistance;
-    @Getter Stats waitStats;
-    @Getter TraverseMode mode;
-    @Getter String fromName;
-    @Getter String toName;
-    @Getter Stats rideStats;
-    @Getter List<RouteShort> routes;
-    @Getter List<SegmentPattern> segmentPatterns = Lists.newArrayList();
+    public AgencyAndId from;
+    public AgencyAndId to;
+    public int walkTime;
+    public int walkDistance;
+    public Stats waitStats;
+    public TraverseMode mode;
+    public String fromName;
+    public String toName;
+    public Stats rideStats;
+    public List<RouteShort> routes;
+    public List<SegmentPattern> segmentPatterns = Lists.newArrayList();
+    public String startTime;
+    public String endTime;
 
     public Segment (Ride ride) {
         Route route = ride.patternRides.get(0).pattern.getRoute();
