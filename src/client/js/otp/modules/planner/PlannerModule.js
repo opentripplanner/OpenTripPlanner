@@ -20,6 +20,7 @@ otp.modules.planner.defaultQueryParams = {
     time                            : moment().format(otp.config.locale.time.time_format),
     date                            : moment().format(otp.config.locale.time.date_format),
     arriveBy                        : false,
+    wheelchair                      : false,
     mode                            : "TRANSIT,WALK",
     maxWalkDistance                 : 804.672, // 1/2 mi.
     metricDefaultMaxWalkDistance    : 750, // meters
@@ -335,6 +336,7 @@ otp.modules.planner.PlannerModule =
                 maxWalkDistance: this.maxWalkDistance
             };
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
+            if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });
             if(this.preferredRoutes !== null) {
                 queryParams.preferredRoutes = this.preferredRoutes;
                 if(this.otherThanPreferredRoutesPenalty !== null) 
