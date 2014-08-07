@@ -78,9 +78,9 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     Set<String> agencyIdsSeen = Sets.newHashSet();
 
-    int nAgencies = 0;
+    int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
-    /** 
+    /**
      * Construct and set bundles all at once. 
      * TODO why is there a wrapper class around a list of GTFS files?
      * TODO why is there a wrapper around GTFS files at all?
@@ -201,15 +201,19 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             // set the agencyId here. Each feed ("bundle") is loaded by a separate reader, so there is no risk of
             // agency mappings accumulating.
             if (entityClass == Agency.class) {
-                nAgencies++;
                 String defaultAgencyId = null;
                 for (Agency agency : reader.getAgencies()) {
                     String agencyId = agency.getId();
                     LOG.info("This Agency has the ID {}", agencyId);
-                    // TODO Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
-                    // Figure out how and why this is happening.
-                    if (agencyId == null || agencyIdsSeen.contains(agencyId) || agencyId.length() == 1) {
-                        String generatedAgencyId = "AGENCY#" + nAgencies;
+                    // Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
+                    // TODO Figure out how and why this is happening.
+                    if (agencyId == null || agencyIdsSeen.contains(agencyId)) {
+                        // Loop in case generated name is already in use.
+                        String generatedAgencyId = null;
+                        while (generatedAgencyId == null || agencyIdsSeen.contains(generatedAgencyId)) {
+                            generatedAgencyId = "F" + nextAgencyId;
+                            nextAgencyId++;
+                        }
                         LOG.warn("The agency ID '{}' was already seen, or I think it's bad. Replacing with '{}'.", agencyId, generatedAgencyId);
                         reader.addAgencyIdMapping(agencyId, generatedAgencyId); // NULL key should work
                         agency.setId(generatedAgencyId);
