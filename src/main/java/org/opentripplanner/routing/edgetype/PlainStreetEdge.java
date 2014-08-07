@@ -644,13 +644,15 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     protected boolean detachFrom() {
-        for (Edge e : fromv.getIncoming()) {
-            if (!(e instanceof PlainStreetEdge)) continue;
-            PlainStreetEdge pse = (PlainStreetEdge) e;
-            ArrayList<TurnRestriction> restrictions = new ArrayList<TurnRestriction>(pse.turnRestrictions);
-            for (TurnRestriction restriction : restrictions) {
-                if (restriction.to == this) {
-                    pse.turnRestrictions.remove(restriction);
+        if (fromv != null) {
+            for (Edge e : fromv.getIncoming()) {
+                if (!(e instanceof PlainStreetEdge)) continue;
+                PlainStreetEdge pse = (PlainStreetEdge) e;
+                ArrayList<TurnRestriction> restrictions = new ArrayList<TurnRestriction>(pse.turnRestrictions);
+                for (TurnRestriction restriction : restrictions) {
+                    if (restriction.to == this) {
+                        pse.turnRestrictions.remove(restriction);
+                    }
                 }
             }
         }

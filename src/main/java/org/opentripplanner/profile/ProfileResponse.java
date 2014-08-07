@@ -24,10 +24,12 @@ public class ProfileResponse {
      */
     public ProfileResponse (Collection<Option> options, Option.SortOrder orderBy, int limit) {
         List<Option> transitOptions = Lists.newArrayList();
+        // Always include non-transit options
         for (Option option : options) {
-            if (option.segments.isEmpty()) this.options.add(option);
+            if (option.transit == null || option.transit.isEmpty()) this.options.add(option);
             else transitOptions.add(option);
         }
+        // Then choose the top N transit options
         Comparator<Option> c;
         switch (orderBy) {
             case MAX:

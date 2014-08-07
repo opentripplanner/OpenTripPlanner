@@ -18,15 +18,16 @@ public class DCFareCalculator {
     private static final String[] metroExpress = { "J7", "J9", "P17", "P19", "W13", "W19", "11Y", "17A", "17B", "17G",
         "17H", "17K", "17L", "17M", "18E", "18G", "18H", "18P", "29E", "29G", "29H", "29X" };
 
-    private static RideType classify (Ride ride) {
+    private static RideType classify (Route route) {
         // NOTE the agencyId string of the route's agencyAndId is not the same as the one given by route.getAgency.
         // The former is the same for all routes in the feed. The latter is the true agency of the feed.
-        String agency = ride.route.getAgency().getId();
-        String agency_url = ride.route.getAgency().getUrl(); // this is used in single-agency feeds so it should work
-        String short_name = ride.route.getShortName();
-        String long_name = ride.route.getLongName();
+
+        String agency = route.getAgency().getId();
+        String agency_url = route.getAgency().getUrl(); // this is used in single-agency feeds so it should work
+        String short_name = route.getShortName();
+        String long_name = route.getLongName();
         if ("MET".equals(agency)) {
-            if (ride.route.getType() == 1) return RideType.METRO_RAIL;
+            if (route.getType() == 1) return RideType.METRO_RAIL;
             if ("5A".equals(short_name) || "B30".equals(short_name)) return RideType.METRO_BUS_AIRPORT;
             for (String sn : metroExpress) if (sn.equals(short_name)) return RideType.METRO_BUS_EXPRESS;
             return RideType.METRO_BUS_LOCAL;
@@ -49,7 +50,7 @@ public class DCFareCalculator {
                 return RideType.VRE_BUS;
             }
             if (agency_url.contains("mtamaryland.com")) {
-                if (ride.route.getType() == 2) return RideType.MARC_RAIL;
+                if (route.getType() == 2) return RideType.MARC_RAIL;
                 else return RideType.DASH_BUS; // FIXME this is probably wrong
             }
         }
@@ -90,8 +91,10 @@ public class DCFareCalculator {
         public FareRide (Ride ride, FareRide prevRide) {
             from = ride.from;
             to = ride.to;
-            route = ride.route;
-            type = classify(ride);
+            // Problem: Rides no longer have a single fare because they may be on multiple routes.
+            // TODO: make sure Patterns in Rides are all the same mode and operator.
+            route = ride.patternRides.get(0).pattern.route;
+            type = classify(route);
             prev = prevRide;
             calcFare();
         }
