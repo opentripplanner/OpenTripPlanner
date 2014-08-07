@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 
@@ -43,36 +44,28 @@ public class Option {
         }
         // Really should be one per segment, with transfers to the same operator having a price of 0.
         // TODO fares = DCFareCalculator.calculateFares(rides);
-        // TODO summary = generateSegmentSummary();
+        summary = generateSummary();
     }
 
-
-    /** A constructor for an option that includes only a street mode, not transit. */
-    /*
-    public Option (State state) {
-        stats = new Stats();
-        int time = (int) state.getElapsedTimeSeconds();
-        stats.add(time);
-        // this might not work if there is a transition to another mode
-        TraverseMode mode = state.getNonTransitMode();
-        summary = mode.toString();
-        access = Lists.newArrayList(new StreetSegment(state));
-    }
-    */
-
-    public String generateSegmentSummary() {
+    /** Make a human readable text summary of this option. */
+    public String generateSummary() {
+        if (transit == null || transit.isEmpty()) {
+            return "Non-transit options";
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("routes ");
-        List<String> routeShortNames = Lists.newArrayList();
         List<String> vias = Lists.newArrayList();
         for (Segment segment : transit) {
-            String routeName = segment.routeShortName == null 
-                    ? segment.routeLongName : segment.routeShortName;
-            routeShortNames.add(routeName);
+            List<String> routeShortNames = Lists.newArrayList();
+            for (RouteShort rs : segment.routes) {
+                String routeName = rs.shortName == null ? rs.longName : rs.shortName;
+                routeShortNames.add(routeName);
+            }
+            sb.append(Joiner.on("/").join(routeShortNames));
+            sb.append(", ");
             vias.add(segment.toName);
         }
         if (!vias.isEmpty()) vias.remove(vias.size() - 1);
-        sb.append(Joiner.on(", ").join(routeShortNames));
         if (!vias.isEmpty()) {
             sb.append(" via ");
             sb.append(Joiner.on(", ").join(vias));
