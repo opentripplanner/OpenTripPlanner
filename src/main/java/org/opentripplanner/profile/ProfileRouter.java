@@ -242,7 +242,7 @@ public class ProfileRouter {
                         // only transfer to patterns that pass near the destination.
                         if ( ! request.analyst && penultimateRide && ! toStops.containsKey(tr.tp2)) continue;
                         // Scan through stops looking for transfer target: stop might appear more than once in a pattern.
-                        for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
+                        TARGET_STOP : for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
                             if (tr.tp2.getStops().get(i) == tr.s2) {
                                 if (request.modes.contains(tr.tp2.mode)) {
                                     // Save transfer result for later exploration.
@@ -250,6 +250,12 @@ public class ProfileRouter {
                                     if (r2 == null) {
                                         r2 = new Ride(tr.s2, r1);
                                         xferRides.put(tr.s2, r2);
+                                    }
+                                    for (PatternRide pr : r2.patternRides) {
+                                        // Multiple patterns can have transfers to the same target pattern,
+                                        // but Rides should not have duplicate PatternRides.
+                                        // TODO refactor with equals function and contains().
+                                        if (pr.pattern == tr.tp2 && pr.fromIndex == i) continue TARGET_STOP;
                                     }
                                     r2.patternRides.add(new PatternRide(tr.tp2, i, r1, tr));
                                 }
