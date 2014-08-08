@@ -25,7 +25,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 
 /**
  * Find the shortest path between graph vertices using Dijkstra's algorithm.
@@ -33,8 +32,6 @@ import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 public class GenericDijkstra {
 
     private RoutingRequest options;
-
-    private ShortestPathTreeFactory shortestPathTreeFactory;
 
     private SearchTerminationStrategy searchTerminationStrategy;
 
@@ -48,10 +45,6 @@ public class GenericDijkstra {
 
     public GenericDijkstra(RoutingRequest options) {
         this.options = options;
-    }
-
-    public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
-        this.shortestPathTreeFactory = shortestPathTreeFactory;
     }
 
     public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
@@ -71,7 +64,7 @@ public class GenericDijkstra {
         if (options.rctx != null) {
             target = initialState.getOptions().rctx.target;
         }
-        ShortestPathTree spt = createShortestPathTree(options);
+        ShortestPathTree spt = new BasicShortestPathTree(options);
         BinHeap<State> queue = new BinHeap<State>(1000);
 
         spt.add(initialState);
@@ -128,12 +121,6 @@ public class GenericDijkstra {
             spt.postVisit(u);
         }
         return spt;
-    }
-
-    protected ShortestPathTree createShortestPathTree(RoutingRequest options) {
-        if (shortestPathTreeFactory != null)
-            return shortestPathTreeFactory.create(options);
-        return new BasicShortestPathTree(options);
     }
 
     public void setHeuristic(RemainingWeightHeuristic heuristic) {

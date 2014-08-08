@@ -37,7 +37,6 @@ import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 
 public class TriangleInequalityTest {
     
@@ -84,14 +83,10 @@ public class TriangleInequalityTest {
     }
     
     private void checkTriangleInequality() {
-        checkTriangleInequality(null, null); 
+        checkTriangleInequality(null); 
     }
     
     private void checkTriangleInequality(TraverseModeSet traverseModes) {
-        checkTriangleInequality(traverseModes, null); 
-    }
-    
-    private void checkTriangleInequality(TraverseModeSet traverseModes, ShortestPathTreeFactory sptFactory) {
         assertNotNull(start);
         assertNotNull(end);
         
@@ -199,63 +194,63 @@ public class TriangleInequalityTest {
     
     @Test
     public void testTriangleInequalityDefaultModesBasicSPT() {
-        checkTriangleInequality(null, new BasicShortestPathTree.FactoryImpl());
+        checkTriangleInequality(null);
     }
     
     @Test
     public void testTriangleInequalityWalkingOnlyBasicSPT() {
         TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
-        checkTriangleInequality(modes, new BasicShortestPathTree.FactoryImpl());
+        checkTriangleInequality(modes);
     }
 
     @Test
     public void testTriangleInequalityDrivingOnlyBasicSPT() {
         TraverseModeSet modes = new TraverseModeSet(TraverseMode.CAR);
-        checkTriangleInequality(modes, new BasicShortestPathTree.FactoryImpl());
+        checkTriangleInequality(modes);
     }
     
     @Test
     public void testTriangleInequalityWalkTransitBasicSPT() {
         TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK,
                 TraverseMode.TRANSIT);
-        checkTriangleInequality(modes, new BasicShortestPathTree.FactoryImpl());
+        checkTriangleInequality(modes);
     }
     
     @Test
     public void testTriangleInequalityWalkBikeBasicSPT() {
         TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK,
                 TraverseMode.BICYCLE);
-        checkTriangleInequality(modes, new BasicShortestPathTree.FactoryImpl());
+        checkTriangleInequality(modes);
     }
     
     @Test
     public void testTriangleInequalityDefaultModesMultiSPT() {
-        checkTriangleInequality(null, MultiShortestPathTree.FACTORY);
+        checkTriangleInequality(null);
     }
     
     @Test
     public void testTriangleInequalityWalkingOnlyMultiSPT() {
         TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
-        checkTriangleInequality(modes, MultiShortestPathTree.FACTORY);
+        checkTriangleInequality(modes);
     }
 
     @Test
     public void testTriangleInequalityDrivingOnlyMultiSPT() {
         TraverseModeSet modes = new TraverseModeSet(TraverseMode.CAR);
-        checkTriangleInequality(modes, MultiShortestPathTree.FACTORY);
+        checkTriangleInequality(modes);
     }
     
     @Test
     public void testTriangleInequalityWalkTransitMultiSPT() {
         TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK,
                 TraverseMode.TRANSIT);
-        checkTriangleInequality(modes, MultiShortestPathTree.FACTORY);
+        checkTriangleInequality(modes);
     }
     
     @Test
     public void testTriangleInequalityWalkBikeMultiSPT() {
         TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK,
                 TraverseMode.BICYCLE);
-        checkTriangleInequality(modes, MultiShortestPathTree.FACTORY);
+        checkTriangleInequality(modes);
     }
 }

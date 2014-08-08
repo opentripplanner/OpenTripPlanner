@@ -30,8 +30,6 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    public static final ShortestPathTreeFactory FACTORY = new FactoryImpl();
-
     private Map<Vertex, List<State>> stateSets;
 
     public MultiShortestPathTree(RoutingRequest options) {
@@ -122,13 +120,6 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 
     public String toString() {
         return "MultiSPT(" + this.stateSets.size() + " vertices)";
-    }
-
-    private static final class FactoryImpl implements ShortestPathTreeFactory {
-        @Override
-        public ShortestPathTree create(RoutingRequest options) {
-            return new MultiShortestPathTree(options);
-        }
     }
 
     @Override
