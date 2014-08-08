@@ -25,7 +25,7 @@ public class StopNameNormalizer {
         {"TE", "TERRACE"},
         {"PL", "PLACE"},
         {"LN", "LA", "LANE"},
-        {"PI", "PIKE"},
+        {"PK", "PI", "PIKE"},
         {"PW", "PKWY", "PARKWAY"},
         {"RN", "RUN"},
         {"HW", "HWY", "HIGHWAY"}
@@ -53,7 +53,6 @@ public class StopNameNormalizer {
     };
 
     public static String normalize (String name) {
-        System.out.println(name);
         // Separate the two halves of an intersection. "AT" sometimes appears too.
         String[] parts = name.toUpperCase().split("[&@]", 2);
         List<String> normalizedParts = Lists.newArrayList();
@@ -62,6 +61,10 @@ public class StopNameNormalizer {
             String streetType = null;
             // We want to keep slashes since they appear within some abbreviations
             String[] words = part.split("[ ,.]");
+            // Remove junk whitespace
+            for (int i = 0; i < words.length; i++) {
+                words[i] = words[i].trim();
+            }
 
             // 1. Strip out quadrant
             QD: for (int i = 0; i < words.length; i++) {
@@ -131,12 +134,11 @@ public class StopNameNormalizer {
                 sb.append(' ');
             }
             if (quadrant != null) sb.append(quadrant);
-            normalizedParts.add(sb.toString());
+            normalizedParts.add(sb.toString().trim());
         }
         // Make sure the two streets of an intersection always appear in the same order
         Collections.sort(normalizedParts); // overkill for a swap operation
         String result = Joiner.on(" & ").join(normalizedParts);
-        System.out.println(result);
         return result;
     }
 
