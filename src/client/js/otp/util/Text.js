@@ -25,13 +25,43 @@ otp.util.Text = {
     },
     
     ordinal : function(n) {
-        if(n > 10 && n < 14) return n+"th";
-        switch(n % 10) {
-            case 1: return n+"st";
-            case 2: return n+"nd";
-            case 3: return n+"rd";
+        var ordinals = {
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            1: _tr('first'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            2: _tr('second'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            3: _tr('third'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            4: _tr('fourth'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            5: _tr('fifth'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            6: _tr('sixth'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            7: _tr('seventh'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            8: _tr('eight'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            9: _tr('ninth'),
+            //TRANSLATORS: Take roundabout to [nth] exit on [streetname] used
+            //as ordinal_exit number parameter for roundabouts
+            10: _tr('tenth')
+        };
+        if (n in ordinals) {
+            return ordinals[n];
+        } else {
+            return n;
         }
-        return n+"th";
     },
     
     isNumber : function(str) {

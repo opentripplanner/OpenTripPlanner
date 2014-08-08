@@ -29,10 +29,10 @@ class PatternRide {
     public PatternRide (TripPattern pattern, int fromIndex, Ride previous, ProfileTransfer xfer) {
         this.pattern   = pattern;
         this.fromIndex = fromIndex;
-        this.previous  = previous;
-        this.xfer      = xfer;
+        this.previous  = previous; // TODO REMOVE not used anywhere
+        this.xfer      = xfer;     // TODO move up to Ride level
     }
-    
+
     /** Construct an unfinished PatternRide (lacking toIndex and stats) from another PatternRide. */
     public PatternRide (PatternRide other) {
         this.pattern   = other.pattern;
@@ -54,13 +54,16 @@ class PatternRide {
     }
     
     public String toString () {
-        return String.format("%s from %d, prev is %s", pattern.getCode(), fromIndex, previous);
+        return String.format("%s %d to %d, prev is %s", pattern.getCode(), fromIndex, toIndex, previous);
     }
     
     /** Complete an unfinished ride as a new object. */
     // Perhaps we should check in advance whether a pattern is running at all, but results will vary
     // depending on the fromIndex and toIndex. Some indexes can be reached within the window, others
     // not. But that's an optimization.
+    // It's actually advantageous to do this sequentially for each to-stop instead of incrementally along a pattern.
+    // This is because we store the absolute times of arrivals and departures, and by subtracting those we get
+    // accurate min and max ride times rather than looser lower and upper bounds on travel time.
     public PatternRide extendToIndex(int toIndex, TimeWindow window) {
         Stats stats = Stats.create (pattern, fromIndex, toIndex, window);
         /* There might not be any trips within the time window. */ 

@@ -20,6 +20,7 @@ otp.modules.planner.defaultQueryParams = {
     time                            : moment().format(otp.config.locale.time.time_format),
     date                            : moment().format(otp.config.locale.time.date_format),
     arriveBy                        : false,
+    wheelchair                      : false,
     mode                            : "TRANSIT,WALK",
     maxWalkDistance                 : 804.672, // 1/2 mi.
     metricDefaultMaxWalkDistance    : 750, // meters
@@ -91,6 +92,35 @@ otp.modules.planner.PlannerModule =
     
     icons       : null,
 
+    // this messages are used in noTripFound localization. Values are copied
+    // from Java source and Message properties.
+    error_messages : {
+        500 : _tr("We're sorry. The trip planner is temporarily unavailable. Please try again later."),
+        503 : _tr("We're sorry. The trip planner is temporarily unavailable. Please try again later."),
+        400 : _tr("Trip is not possible.  You might be trying to plan a trip outside the map data boundary."),
+        404 : _tr("Trip is not possible.  Your start or end point might not be safely accessible (for instance), you might be starting on a residential street connected only to a highway)."),
+        406 : _tr("No transit times available. The date may be past or too far in the future or there may not be transit service for your trip at the time you chose."),
+        408 : _tr("The trip planner is taking way too long to process your request. Please try again later."),
+        413 : _tr("The request has errors that the server is not willing or able to process."),
+        440 : _tr("Origin is unknown. Can you be a bit more descriptive?"),
+        450 : _tr("Destination is unknown.  Can you be a bit more descriptive?"),
+        460 : _tr("Both origin and destination are unknown. Can you be a bit more descriptive?"),
+        470 : _tr("Both origin and destination are not wheelchair accessible"),
+        409 : _tr("Origin is within a trivial distance of the destination."),
+
+        340 : _tr("The trip planner is unsure of the location you want to start from. Please select from the following options, or be more specific."),
+        350 : _tr("The trip planner is unsure of the destination you want to go to. Please select from the following options, or be more specific."),
+        360 : _tr("Both origin and destination are ambiguous. Please select from the following options, or be more specific."),
+
+        370 : _tr("All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must be set if any are"),
+        371 : _tr("The values of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must sum to 1"),
+        372 : _tr("If triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor are provided, OptimizeType must be TRIANGLE"),
+        373 : _tr("If OptimizeType is TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must be set"),
+    },
+
+
+
+
     //templateFile : 'otp/modules/planner/planner-templates.html',
 
     initialize : function(webapp, id, options) {
@@ -160,10 +190,12 @@ otp.modules.planner.PlannerModule =
     
     addMapContextMenuItems : function() {
         var this_ = this;
-        this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
+        //TRANSLATORS: Context menu
+        this.webapp.map.addContextMenuItem(_tr("Set as Start Location"), function(latlng) {
             this_.setStartPoint(latlng, true);
         });
-        this.webapp.map.addContextMenuItem("Set as End Location", function(latlng) {
+        //TRANSLATORS: Context menu
+        this.webapp.map.addContextMenuItem(_tr("Set as End Location"), function(latlng) {
             this_.setEndPoint(latlng, true);
         });
     },
@@ -183,7 +215,8 @@ otp.modules.planner.PlannerModule =
         this.startLatLng = latlng;
         if(this.startMarker == null) {
             this.startMarker = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true});
-            this.startMarker.bindPopup('<strong>Start</strong>');
+            //TRANSLATORS: Shown in a popup on first point of a path in a map
+            this.startMarker.bindPopup('<strong>' + pgettext('popup', 'Start') + '</strong>');
             this.startMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.startLatLng = this.startMarker.getLatLng();
@@ -213,7 +246,8 @@ otp.modules.planner.PlannerModule =
         this.endLatLng = latlng;    	 
         if(this.endMarker == null) {
             this.endMarker = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
-            this.endMarker.bindPopup('<strong>Destination</strong>');
+            //TRANSLATORS: shown in a popup on last point of a path in a map
+            this.endMarker.bindPopup('<strong>' + _tr('Destination') + '</strong>');
             this.endMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.endLatLng = this.endMarker.getLatLng();
@@ -302,6 +336,7 @@ otp.modules.planner.PlannerModule =
                 maxWalkDistance: this.maxWalkDistance
             };
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
+            if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });
             if(this.preferredRoutes !== null) {
                 queryParams.preferredRoutes = this.preferredRoutes;
                 if(this.otherThanPreferredRoutesPenalty !== null) 
@@ -413,8 +448,13 @@ otp.modules.planner.PlannerModule =
     
     noTripFound : function(error) {
         var msg = error.msg;
-        if(error.id) msg += ' (Error ' + error.id + ')';
-        otp.widgets.Dialogs.showOkDialog(msg, 'No Trip Found');
+        if (error.id in this.error_messages) {
+            msg = this.error_messages[error.id];
+        }
+        //TRANSLATORS: Used in showing why trip wasn't found
+        if(error.id) msg += ' (' + _tr('Error %(error_id)d', {'error_id': error.id}) + ')';
+        //TRANSLATORS: Title of no trip dialog
+        otp.widgets.Dialogs.showOkDialog(msg, _tr('No Trip Found'));
     },
     
     drawItinerary : function(itin) {
@@ -469,28 +509,36 @@ otp.modules.planner.PlannerModule =
             }
             else if(leg.mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
-                	polyline.bindPopup('Your '+otp.config.bikeshareName+' route');
+                        //TRANSLATORS: shown when clicked on route on map
+                	polyline.bindPopup(_tr('Your %(bike_share_name)s route', {'bike_share_name': otp.config.bikeshareName}));
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
                 }
                 else { // regular bike trip
-                	polyline.bindPopup('Your bike route');
+                        //TRANSLATORS: Text which is shown when clicking bike route
+                        //in a map
+                	polyline.bindPopup(_tr('Your bike route'));
                 	//this.resetStationMarkers();
                 }	
             }
             else if(leg.mode === 'WALK') {
                 if(queryParams.mode === 'WALK,BICYCLE') { 
                     if(i == 0) {
-                    	polyline.bindPopup('Walk to the '+otp.config.bikeshareName+' dock.');
+                        //TRANSLATORS:Shown in map when clicking on a route 
+                    	polyline.bindPopup(_tr('Walk to the %(bike_share_name)s dock.', {'bike_share_name': otp.config.bikeshareName}));
                     }
                     if(i == 2) {
-                    	polyline.bindPopup('Walk from the '+otp.config.bikeshareName+' dock to your destination.');
+                        //TRANSLATORS: Shown in map when clicking on a route 
+                    	polyline.bindPopup(_tr('Walk from the %(bike_share_name)s dock to your destination.', {'bike_share_name': otp.config.bikeshareName}));
                     }
                 }
                 else { // regular walking trip
-                	polyline.bindPopup('Your walk route');
+                    //TRANSLATORS: Text which is shown when clicking walking
+                    //route in a map
+                	polyline.bindPopup(_tr('Your walk route'));
                 	//this.resetStationMarkers();
                 }
             }
+            //FIXME: CAR is missing
         }
         if (otp.config.zoomToFitResults) this.webapp.map.lmap.fitBounds(itin.getBoundsArray());
     },

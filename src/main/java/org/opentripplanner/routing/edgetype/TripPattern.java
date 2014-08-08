@@ -36,6 +36,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.gtfs.model.Agency;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -614,9 +615,11 @@ public class TripPattern implements Serializable {
     public static void generateUniqueIds(Collection<TripPattern> tripPatterns) {
         Multimap<Route, TripPattern> patternsForRoute = HashMultimap.create();
         for (TripPattern pattern : tripPatterns) {
+            AgencyAndId routeId = pattern.route.getId();
             patternsForRoute.put(pattern.route, pattern);
             int count = patternsForRoute.get(pattern.route).size();
-            String id = String.format("%s_%02d", pattern.route.getId(), count);
+            // OBA library uses underscore as separator, we're moving toward colon.
+            String id = String.format("%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), count);
             pattern.setCode(id);
         }
     }

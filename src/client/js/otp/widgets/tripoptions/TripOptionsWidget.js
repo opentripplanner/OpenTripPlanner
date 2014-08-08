@@ -28,7 +28,8 @@ otp.widgets.tripoptions.TripOptionsWidget =
     initialize : function(id, module, options) {
     
         options = options || {};
-        if(!_.has(options, 'title')) options['title'] = otp.config.locale.widgets.TripOptionsWidget.title;
+        //TRANSLATORS: Widget title
+        if(!_.has(options, 'title')) options['title'] = _tr("Travel Options");
         if(!_.has(options, 'cssClass')) options['cssClass'] = 'otp-defaultTripWidget';
         otp.widgets.Widget.prototype.initialize.call(this, id, module, options);
 
@@ -179,9 +180,10 @@ otp.widgets.tripoptions.LocationsSelector =
             widgetId : this.id,
             showGeocoders : (this.geocoders && this.geocoders.length > 1),
             geocoders : this.geocoders,
-            start: otp.config.locale.instructions.start,
-            end: otp.config.locale.instructions.end,
-            geocoder: otp.config.locale.instructions.geocoder
+            //TODO: Maybe change to Start and Destination
+            start: pgettext('template', "Start"),
+            end: _tr("End"),
+            geocoder: _tr("Geocoder")
         }).appendTo(this.$());
         
         this.tripWidget.module.on("startChanged", $.proxy(function(latlng, name) {
@@ -232,6 +234,7 @@ otp.widgets.tripoptions.LocationsSelector =
     initInput : function(input, setterFunction) {
         var this_ = this;
         input.autocomplete({
+            delay: 500, // 500ms between requests.
             source: function(request, response) {
                 this_.geocoders[this_.activeIndex].geocode(request.term, function(results) {
                     console.log("got results "+results.length);
@@ -305,9 +308,14 @@ otp.widgets.tripoptions.TimeSelector =
 
         ich['otp-tripOptions-timeSelector']({
             widgetId : this.id,
-            depart   : otp.config.locale.instructions.depart,
-            arrive   : otp.config.locale.instructions.arrive,
-            now      : otp.config.locale.instructions.now
+            //TRANSLATORS: Depart [time dropdown] [date dropdown]. Used in
+            //dropdown as a label to choose wanted time/date of departure
+            depart   : pgettext("tripoptions", "Depart"),
+            //TRANSLATORS: Arrive [time dropdown] [date dropdown]. Used in
+            //dropdown as a label to choose wanted time/date of arrival.
+            arrive   : _tr("Arrive"),
+            //TRANSLATORS: on button that sets time and date of arrival/departure to now
+            now      : _tr("Now")
         }).appendTo(this.$());
     
         this.epoch = moment().unix();    
@@ -399,6 +407,51 @@ otp.widgets.tripoptions.TimeSelector =
 });
 
 
+//** WheelChairSelector **//
+
+otp.widgets.tripoptions.WheelChairSelector =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+
+    id           :  null,
+    //TODO: add localization when localization branch is merged
+    label        : "Wheelchair accesible trip:",
+
+    initialize : function(tripWidget) {
+
+        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+
+        this.id = tripWidget.id;
+
+
+        ich['otp-tripOptions-wheelchair']({
+            widgetId : this.id,
+            label : this.label,
+        }).appendTo(this.$());
+
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+
+        $("#"+this.id+"-wheelchair-input").change(function() {
+            this_.tripWidget.module.wheelchair = this.checked;
+        });
+    },
+
+    restorePlan : function(data) {
+        if(data.queryParams.wheelchair) {
+            $("#"+this.id+"-wheelchair-input").prop("checked", data.queryParams.wheelchair);
+        }
+    },
+
+    isApplicableForMode : function(mode) {
+        //wheelchair mode is shown on transit and walk trips that
+        //doesn't include a bicycle
+        return (otp.util.Itin.includesTransit(mode)  || mode == "WALK") && !otp.util.Itin.includesBicycle(mode);
+    }
+});
+
+
 //** ModeSelector **//
 
 otp.widgets.tripoptions.ModeSelector = 
@@ -406,8 +459,8 @@ otp.widgets.tripoptions.ModeSelector =
     
     id           :  null,
 
-    modes        : otp.config.locale.tripPlanner.modes,
-
+    modes        : otp.config.modes,
+    
     optionLookup : null,
     modeControls : null,
            
@@ -416,8 +469,9 @@ otp.widgets.tripoptions.ModeSelector =
         this.id = tripWidget.id+"-modeSelector";
         this.modeControls = [];
         this.optionLookup = {};
-        
-        var html = "<div class='notDraggable'>" + otp.config.locale.tripPlanner.labels.mode + ": ";
+
+        //TRANSLATORS: Label for dropdown Travel by: [mode of transport]
+        var html = "<div class='notDraggable'>" + _tr("Travel by") + ": ";
         html += '<select id="'+this.id+'">';
         _.each(this.modes, function(text, key) {
             html += '<option>'+text+'</option>';            
@@ -521,7 +575,9 @@ otp.widgets.tripoptions.MaxDistanceSelector =
             widgetId : this.id,
             presets : presets,
             label : this.label,
-            presets_label : otp.config.locale.instructions.presets_label,
+            //TRANSLATORS: default value for preset values of maximum walk
+            //distances in Trip Options
+            presets_label : _tr("Presets"),
             distSuffix: this.distSuffix,
             currentMaxDistance: parseFloat(currentMaxDistance)
         }).appendTo(this.$());
@@ -583,7 +639,8 @@ otp.widgets.tripoptions.MaxWalkSelector =
     // meters
     metricPresets      : [100, 200, 300, 400, 500, 750, 1000, 1500, 2000, 2500, 5000, 7500, 10000],
 
-    label       : otp.config.locale.tripPlanner.labels.maxWalkDistance+":",
+    //TRANSLATORS: label for choosing how much should person's trip on foot be 
+    label       : _tr("Maximum walk")+":",
 
     initialize : function(tripWidget) {
         this.id = tripWidget.id+"-maxWalkSelector";
@@ -605,7 +662,8 @@ otp.widgets.tripoptions.MaxBikeSelector =
     // meters
     metricPresets      : [100, 300, 750, 1000, 1500, 2500, 5000, 7500, 10000],
 
-    label       : otp.config.locale.tripPlanner.labels.maxBikeDistance+":",
+    //TRANSLATORS: label for choosing how much should person's trip on bicycle be 
+    label       : _tr("Maximum bike")+":",
 
     initialize : function(tripWidget) {
         this.id = tripWidget.id+"-maxBikeSelector";
@@ -636,13 +694,19 @@ otp.widgets.tripoptions.PreferredRoutes =
         
         ich['otp-tripOptions-preferredRoutes']({
             widgetId : this.id,
-            preferredRoutes_label: otp.config.locale.instructions.preferredRoutes_label,
-            edit: otp.config.locale.instructions.edit,
-            none : otp.config.locale.instructions.none,
-            weight: otp.config.locale.instructions.weight
+            //TRANSLATORS: label Preferred Routes: (routes/None)
+            preferredRoutes_label: _tr("Preferred Routes"),
+            //TRANSLATORS: button to edit Preffered public transport Routes
+            edit: _tr("Edit"),
+            //TRANSLATORS: Words in brackets when no Preffered public transport route is set
+            none : _tr("None"),
+            //TRANSLATORS: Label for Weight slider  to set to preffered public
+            //transport routes
+            weight: _tr("Weight")
         }).appendTo(this.$());
         
-        this.selectorWidget = new otp.widgets.RoutesSelectorWidget(this.id+"-selectorWidget", this, otp.config.locale.instructions.preferredRoutes_label);
+        //TRANSLATORS: widget title
+        this.selectorWidget = new otp.widgets.RoutesSelectorWidget(this.id+"-selectorWidget", this, _tr("Preferred Routes"));
     },
 
     doAfterLayout : function() {
@@ -710,7 +774,7 @@ otp.widgets.tripoptions.PreferredRoutes =
         else { // none specified
             this.selectorWidget.clearSelected();
             this.selectorWidget.restoredRouteIds = [];
-            $('#'+this.id+'-list').html('('+otp.config.locale.instructions.none+')');
+            $('#'+this.id+'-list').html('('+_tr("None")+')');
             this.tripWidget.module.preferredRoutes = null;
         }
         if(planData.queryParams.otherThanPreferredRoutesPenalty) {
@@ -741,13 +805,17 @@ otp.widgets.tripoptions.BannedRoutes =
         this.id = tripWidget.id+"-bannedRoutes";
         
         var html = '<div class="notDraggable">';
-        var html = '<div style="float:right; font-size: 12px;"><button id="'+this.id+'-button">' + otp.config.locale.instructions.edit + '…</button></div>';
-        html += otp.config.locale.tripPlanner.labels.bannedRoutes + ': <span id="'+this.id+'-list">('+otp.config.locale.instructions.none+')</span>';
+        //TRANSLATORS: buton edit Banned public transport routes
+        var html = '<div style="float:right; font-size: 12px;"><button id="'+this.id+'-button">' + _tr("Edit") + '…</button></div>';
+        //TRANSLATORS: label Banned public transport Routes: (routes/None)
+        //(Routes you don't want to take)
+        html += _tr("Banned routes") + ': <span id="'+this.id+'-list">('+_tr("None")+')</span>';
         html += '<div style="clear:both;"></div></div>';
         
         $(html).appendTo(this.$());
 
-        this.selectorWidget = new otp.widgets.RoutesSelectorWidget(this.id+"-selectorWidget", this, otp.config.locale.tripPlanner.labels.bannedRoutes);
+        //TRANSLATORS: Widget title
+        this.selectorWidget = new otp.widgets.RoutesSelectorWidget(this.id+"-selectorWidget", this, _tr("Banned routes"));
     },
 
     doAfterLayout : function() {
@@ -801,7 +869,7 @@ otp.widgets.tripoptions.BannedRoutes =
         else { // none specified
             this.selectorWidget.clearSelected();
             this.selectorWidget.restoredRouteIds = [];
-            $('#'+this.id+'-list').html('('+otp.config.locale.instructions.none+')');
+            $('#'+this.id+'-list').html('('+_tr("None")+')');
             this.tripWidget.module.bannedRoutes = null;
         }
     },
@@ -875,9 +943,12 @@ otp.widgets.tripoptions.BikeType =
         this.$().addClass('notDraggable');
 
         var content = '';        
-        content += 'Use: ';
-        content += '<input id="'+this.id+'-myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked> My Own Bike&nbsp;&nbsp;';
-        content += '<input id="'+this.id+'-sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"> A Shared Bike';
+        //TRANSLATORS: In Bike share planner radio button: <Use>: My Own Bike A shared bike
+        content += _tr('Use') + ': ';
+        //TRANSLATORS: In Bike share planner radio button: Use: <My Own Bike> A shared bike
+        content += '<input id="'+this.id+'-myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked> ' + _tr("My Own Bike") + '&nbsp;&nbsp;';
+        //TRANSLATORS: In Bike share planner radio button: Use: My Own Bike <A Shared bike>
+        content += '<input id="'+this.id+'-sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"> ' + _tr("A Shared Bike");
         
         this.setContent(content);
     },
@@ -1016,8 +1087,9 @@ otp.widgets.tripoptions.Submit =
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-submit";
-
-        $('<div class="notDraggable" style="text-align:center;"><button id="'+this.id+'-button">' + otp.config.locale.tripPlanner.labels.planTrip + '</button></div>').appendTo(this.$());
+        
+        //TRANSLATORS: button to send query for trip planning
+        $('<div class="notDraggable" style="text-align:center;"><button id="'+this.id+'-button">' + _tr("Plan Your Trip") + '</button></div>').appendTo(this.$());
         //console.log(this.id+'-button')
         
     },

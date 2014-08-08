@@ -21,5 +21,6 @@ public class ProfileRequest {
     public Option.SortOrder orderBy;
     public int limit;
     public TraverseModeSet modes;
+    public boolean analyst = false; // if true, propagate travel times out to street network
 
 }

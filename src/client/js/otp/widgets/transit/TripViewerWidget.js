@@ -32,7 +32,7 @@ otp.widgets.transit.TripViewerWidget =
     initialize : function(id, module) {
     
         otp.widgets.transit.RouteBasedWidget.prototype.initialize.call(this, id, module, {
-            title : 'Trip Viewer',
+            title : _tr('Trip Viewer'),
             cssClass : 'otp-tripViewer',
             closeable : true,
             openInitially : false,
@@ -109,14 +109,18 @@ otp.widgets.transit.TripViewerWidget =
             if(stop.url) idHtml += '</a>';
             idHtml += '</i></span>'
             $(idHtml).appendTo(idLine);
-            
-            $('<span>&nbsp;[<a href="#">Recenter</a>]</span>').appendTo(idLine)
+           
+            //TRANSLATORS: Recenter map on this stop (Shown at each stop in
+            //Trip viewer 
+            $('<span>&nbsp;[<a href="#">' + _tr('Recenter') + '</a>]</span>').appendTo(idLine)
             .data("stop", stop)
             .click(function(evt) {
                 var stop = $(this).data("stop");
                 this_.module.webapp.map.lmap.panTo(new L.LatLng(stop.lat, stop.lon));
             });
-            $('<span>&nbsp;[<a href="#">Viewer</a>]</span>').appendTo(idLine)
+            //TRANSLATORS: Link to Stop viewer (Shown at each stop in Trip
+            //viewer)
+            $('<span>&nbsp;[<a href="#">' + _tr('Viewer') + '</a>]</span>').appendTo(idLine)
             .data("stop", stop)
             .click(function(evt) {
                 var stop = $(this).data("stop");

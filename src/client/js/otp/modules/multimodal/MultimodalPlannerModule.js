@@ -18,7 +18,8 @@ otp.namespace("otp.modules.multimodal");
 otp.modules.multimodal.MultimodalPlannerModule = 
     otp.Class(otp.modules.planner.PlannerModule, {
 
-    moduleName  : otp.config.locale.modules.multimodal.MultimodalPlannerModule.name,
+    //TRANSLATORS: module name
+    moduleName  : _tr("Multimodal Trip Planner"),
     
     itinWidget  : null,
     
@@ -39,7 +40,8 @@ otp.modules.multimodal.MultimodalPlannerModule =
         // set up options widget
         
         var optionsWidgetConfig = {
-                title : otp.config.locale.widgets.MultimodalPlannerModule.title,
+                //TRANSLATORS: widget name
+                title : _tr("Trip Options"),
                 closeable : true,
                 persistOnClose: true,
         };
@@ -69,6 +71,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
         modeSelector.addModeControl(new otp.widgets.tripoptions.BikeTriangle(this.optionsWidget));
         modeSelector.addModeControl(new otp.widgets.tripoptions.PreferredRoutes(this.optionsWidget));
         modeSelector.addModeControl(new otp.widgets.tripoptions.BannedRoutes(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.tripoptions.WheelChairSelector(this.optionsWidget));
 
         modeSelector.refreshModeControls();
 
@@ -125,7 +128,8 @@ otp.modules.multimodal.MultimodalPlannerModule =
         if(this.itinWidget !== null) {
             this.itinWidget.close();
             this.itinWidget.clear();
-            this.itinWidget.setTitle(otp.config.locale.widgets.ItinerariesWidget.title);
+            //TRANSLATORS: Widget title
+            this.itinWidget.setTitle(_tr("Itineraries"));
         }
  },
         

@@ -30,10 +30,12 @@ otp.core.Geocoder = otp.Class({
         var params = { }; 
         params[this.addressParam] = address;
         
-        $.ajax(this.url, {
+        // Avoid out-of-order responses from the geocoding service. see #1419
+        lastXhr = $.ajax(this.url, {
             data : params,
             
             success: function(data) {
+              if (xhr === lastXhr){
                 if((typeof data) == "string") data = jQuery.parseXML(data);
                 var results = [];
                 $(data).find("geocoderResults").find("results").find("result").each(function () {
@@ -49,6 +51,7 @@ otp.core.Geocoder = otp.Class({
                 });
                 
                 setResultsCallback.call(this, results);
+              }
             }
         });        
     } 

@@ -18,7 +18,8 @@ otp.namespace("otp.modules.analyst");
 otp.modules.analyst.AnalystModule = 
     otp.Class(otp.modules.planner.PlannerModule, {
     
-    moduleName  : otp.config.locale.modules.analyst.AnalystModule.name,
+    //TRANSLATORS: module name
+    moduleName  : _tr("Analyst"),
 
     analystLayer : null,
 
@@ -59,8 +60,8 @@ otp.modules.analyst.AnalystModule =
 
         var buttonRow = $('<div style="text-align: center; margin-top: 6px;"></div>')
         .appendTo(this.optionsWidget.$());
-        
-        $('<button>' + otp.config.locale.modules.analyst.AnalystModule.refresh + '</button>').button().click(function() {
+        //TRANSLATORS: Button to update analyst information 
+        $('<button>' + _tr("Refresh") + '</button>').button().click(function() {
             this_.runAnalystQuery();            
         }).appendTo(buttonRow);
 
@@ -88,7 +89,8 @@ otp.modules.analyst.AnalystModule =
 
     addMapContextMenuItems : function() {
         var this_ = this;
-        this.webapp.map.addContextMenuItem(otp.config.locale.contextMenu.analysisLocation, function(latlng) {
+        //TRANSLATORS: Context menu set this point as analysis location
+        this.webapp.map.addContextMenuItem(_tr("Set as Analysis Location"), function(latlng) {
             this_.locMarker.setLatLng(latlng);
             this_.startLatLng = this_.locMarker.getLatLng();
             this_.runAnalystQuery();

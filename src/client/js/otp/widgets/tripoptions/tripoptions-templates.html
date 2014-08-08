@@ -7,7 +7,7 @@
         <div>{{end}}:</div>
     </div>
         
-    <div class="notDraggable" style="position: relative; margin-left: 3em; height: 3.6em; overflow: hidden;">
+    <div class="notDraggable" style="position: relative; margin-left: 4em; height: 3.6em; overflow: hidden;">
         <div style="position: absolute; left:0px; right: 30px; height: 20px;">
             <div style="position: absolute; left:0px; right: 16px; top:1px; bottom: 0px;">
                 <input id="{{widgetId}}-start" class="borderBox otp-tripOptions-loc-input">
@@ -63,6 +63,16 @@
 
 </script>
 
+<!-- WheelchairSelector -->
+
+<script id="otp-tripOptions-wheelchair" type="text/html">
+
+    <div class="notDraggable">
+        {{label}} &nbsp;
+		<input type="checkbox" id="{{widgetId}}-wheelchair-input" />
+    </div>
+
+</script>
 
 <!-- MaxDistanceSelector -->
 
