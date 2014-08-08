@@ -49,12 +49,17 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
     public boolean add(State newState) {
         Vertex vertex = newState.getVertex();
         List<State> states = stateSets.get(vertex);
+        
+        // if the vertex has no states, add one and return
         if (states == null) {
             states = new ArrayList<State>();
             stateSets.put(vertex, states);
             states.add(newState);
             return true;
         }
+        
+        // if the vertex has any states that dominate the new state, don't add the state
+        // if the new state dominates any old states, remove them
         Iterator<State> it = states.iterator();
         while (it.hasNext()) {
             State oldState = it.next();
@@ -65,6 +70,8 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
             if (newState.dominates(oldState))
                 it.remove();
         }
+        
+        // any states remaining are codominent with the new state
         states.add(newState);
         return true;
     }

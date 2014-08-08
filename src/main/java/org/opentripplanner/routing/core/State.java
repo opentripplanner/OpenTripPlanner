@@ -332,10 +332,12 @@ public class State implements Cloneable {
         // If returning more than one result from GenericAStar, the search can be very slow
         // unless you replace the following code with:
         // return false;
-        double weightDiff = this.weight / other.weight;
-        return walkDistance <= other.getWalkDistance() * 1.05
-                && (weightDiff < 1.02 && this.weight - other.weight < 30)
-                && this.getElapsedTimeSeconds() - other.getElapsedTimeSeconds() <= 30;
+        boolean walkDistanceBetter = walkDistance <= other.getWalkDistance() * 1.05;
+        double weightRatio = this.weight / other.weight;
+        boolean weightBetter = (weightRatio < 1.02 && this.weight - other.weight < 30);
+        boolean timeBetter = this.getElapsedTimeSeconds() - other.getElapsedTimeSeconds() <= 30;
+        
+        return walkDistanceBetter && weightBetter && timeBetter;
     }
 
     /**
