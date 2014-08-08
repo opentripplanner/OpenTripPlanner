@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
  * @author bdferris
  * 
  */
+@Deprecated
 public interface ShortestPathTreeFactory {
     public ShortestPathTree create(RoutingRequest options);
 }

@@ -230,9 +230,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     private JList<GraphBuilderAnnotation> annotationMatches;
     
     private ParetoPathService pathservice;
-    
-    private ShortestPathTreeFactory sptFactory = new DefaultShortestPathTreeFactory();
-    
+        
     private GenericAStar sptService = new GenericAStar();
 
     private DefaultListModel<String> metadataModel;
@@ -304,7 +302,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         LOG.info("Starting up graph visualizer...");
         
         this.graph = graphService.getGraph();
-        sptService.setShortestPathTreeFactory(sptFactory);
         this.pathservice = new ParetoPathService(graphService, sptService);
         setTitle("GraphVisualizer");
         

@@ -10,6 +10,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
  * 
  * @author avi
  */
+@Deprecated // brandon here: too much java
 public class DefaultShortestPathTreeFactory implements ShortestPathTreeFactory {
 
     @Override

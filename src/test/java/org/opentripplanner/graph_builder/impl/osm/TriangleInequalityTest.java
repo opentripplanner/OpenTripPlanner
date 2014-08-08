@@ -114,9 +114,6 @@ public class TriangleInequalityTest {
         options.setRoutingContext(_graph, start, end);
         
         GenericAStar aStar = new GenericAStar(); 
-        if (sptFactory != null) {
-            aStar.setShortestPathTreeFactory(sptFactory);
-        }
         
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(end, false);
