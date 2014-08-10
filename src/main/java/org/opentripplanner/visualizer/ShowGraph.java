@@ -692,7 +692,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		for (Vertex v : visibleVertices) {
 			if (drawTransitStopVertices && closeEnough && v instanceof TransitStationStop) {
 		        drawVertex(v, 5);
-			} else if (drawStreetVertices && v instanceof IntersectionVertex) {
+			}
+			if (drawStreetVertices && v instanceof IntersectionVertex) {
 		        IntersectionVertex iv = (IntersectionVertex) v;
 		        if (iv.isTrafficLight()) {
 		            drawVertex(v, 7);
