@@ -284,6 +284,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private JCheckBox showTransitCheckbox;
 
 	private JCheckBox showStreetsCheckbox;
+	
+	private JCheckBox showMultistateVerticesCheckbox;
 
 	private JCheckBox showHighlightedCheckbox;
 	
@@ -461,6 +463,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         	public void itemStateChanged(ItemEvent e) {
         		showGraph.setShowTransit( showTransitCheckbox.isSelected() );
         		showGraph.setShowStreets( showStreetsCheckbox.isSelected() );
+        		showGraph.setShowMultistateVertices( showMultistateVerticesCheckbox.isSelected() );
         		showGraph.setShowHightlights( showHighlightedCheckbox.isSelected() );
         		showGraph.setShowSPT( showSPTCheckbox.isSelected() );
         		showGraph.redraw();
@@ -482,6 +485,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     	showSPTCheckbox.setSelected(true);
     	showSPTCheckbox.addItemListener( onChangeVizPrefs );
     	pane.add(showSPTCheckbox);
+    	showMultistateVerticesCheckbox = new JCheckBox("show multistate vertices");
+    	showMultistateVerticesCheckbox.setSelected(true);
+    	showMultistateVerticesCheckbox.addItemListener( onChangeVizPrefs );
+    	pane.add(showMultistateVerticesCheckbox);
     	
     	// row: SPT flattening
     	JLabel sptFlatteningLabel = new JLabel("SPT flattening:");
@@ -1197,6 +1204,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         // grab the spt from the visitor
         spt = vis.spt;
+        showGraph.setSPT(spt);
         System.out.println( "got spt:"+spt );
         
         if (paths == null) {

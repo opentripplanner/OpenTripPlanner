@@ -44,6 +44,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 
@@ -167,6 +168,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	private boolean sptVisible = true;
 	private float sptFlattening = 0.3f;
 	private float sptThickness = 0.1f;
+	private boolean drawMultistateVertices=true;
+	private ShortestPathTree spt;
 
 	class Trunk{
 		public Edge edge;
@@ -306,6 +309,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     public ShowGraph(VertexSelectionListener selector, Graph graph) {
         super();
         this.graph = graph;
+        this.spt = null;
         this.selector = selector;
         this.selectors = new ArrayList<VertexSelectionListener>();
     }
@@ -699,6 +703,12 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		            drawVertex(v, 7);
 		        }
 		    }
+			if (drawMultistateVertices && spt!=null){
+				List<? extends State> states = spt.getStates(v);
+				if(states != null){
+					drawVertex( v, states.size()*2 );
+				}
+			}
 		}
 	}
 
@@ -1084,5 +1094,13 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
 	public void setSPTThickness(float sptThickness) {
 		this.sptThickness  = sptThickness;
+	}
+
+	public void setShowMultistateVertices(boolean selected) {
+		this.drawMultistateVertices = selected;
+	}
+
+	public void setSPT(ShortestPathTree spt) {
+		this.spt = spt;
 	}
 }
