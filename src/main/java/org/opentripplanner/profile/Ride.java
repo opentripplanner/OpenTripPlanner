@@ -44,16 +44,19 @@ public class Ride {
     final List<PatternRide> patternRides = Lists.newArrayList();
     Stats rideStats; // filled in only once the ride is complete (has all PatternRides).
     Stats waitStats; // filled in only once the ride is complete (has all PatternRides).
+    ProfileTransfer xfer; // note that this transfer is an exemplar, typical of all transfers used to reach all patterns
 
-    public Ride (Stop from, Ride previous) {
+    public Ride (Stop from, Ride previous, ProfileTransfer xfer) {
         this.from = from;
         this.to = null; // this is a "partial ride" waiting to be completed.
         this.previous = previous;
+        this.xfer = xfer;
     }
 
-    /** Construct a "copy" with no PatternRides and the given to Stop. */
+    /** Construct a partial copy with no PatternRides or Stats and the given to-Stop. */
     public Ride (Ride other, Stop to) {
         this.from = other.from;
+        this.xfer = other.xfer;
         this.previous = other.previous;
         this.to = to;
     }
@@ -157,7 +160,6 @@ public class Ride {
      * @return the distance walked from the end of the previous ride to the beginning of this ride.
      */
     public double getTransferDistance() {
-        ProfileTransfer xfer = patternRides.get(0).xfer;
         return xfer == null ? 0 : xfer.distance;
     }
 

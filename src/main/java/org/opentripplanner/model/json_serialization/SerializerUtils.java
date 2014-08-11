@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
-
 public class SerializerUtils {
 
     public static SimpleModule getSerializerModule() {

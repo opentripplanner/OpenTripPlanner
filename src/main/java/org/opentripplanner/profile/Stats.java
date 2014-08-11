@@ -15,11 +15,11 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  */
 class Stats implements Cloneable {
     
-    @Getter int min = 0;
-    @Getter int avg = 0;
-    @Getter int max = 0;
-    @Getter int num = 0;
-    
+    public int min = 0;
+    public int avg = 0;
+    public int max = 0;
+    public int num = 0;
+
     public Stats () { }
 
     /** Copy constructor. */
@@ -36,7 +36,7 @@ class Stats implements Cloneable {
      * It is not really correct for the average, but min and max values hold and avg is still a useful indicator.
      * @return void to avoid thinking that a new object is created.
      */
-    public void add(Stats s) {
+    public void add(Stats s) { // TODO maybe should be called 'chain' rather than add
         min += s.min;
         max += s.max;
         avg += s.avg; // This only makes sense when adding successive legs TODO think through in depth

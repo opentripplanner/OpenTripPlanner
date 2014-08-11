@@ -142,10 +142,10 @@ public class ProfileRouter {
                     if (request.modes.contains(pattern.mode)) {
                         Ride ride = initialRides.get(sd.stop);
                         if (ride == null) {
-                            ride = new Ride(sd.stop, null);
+                            ride = new Ride(sd.stop, null, null); // no previous ride, no transfer object
                             initialRides.put(sd.stop, ride);
                         }
-                        ride.patternRides.add(new PatternRide(pattern, i, null, null));
+                        ride.patternRides.add(new PatternRide(pattern, i));
                     }
                 }
             }
@@ -240,7 +240,7 @@ public class ProfileRouter {
                                     // Save transfer result for later exploration.
                                     Ride r2 = xferRides.get(tr.s2);
                                     if (r2 == null) {
-                                        r2 = new Ride(tr.s2, r1);
+                                        r2 = new Ride(tr.s2, r1, tr);
                                         xferRides.put(tr.s2, r2);
                                     }
                                     for (PatternRide pr : r2.patternRides) {
@@ -249,7 +249,7 @@ public class ProfileRouter {
                                         // TODO refactor with equals function and contains().
                                         if (pr.pattern == tr.tp2 && pr.fromIndex == i) continue TARGET_STOP;
                                     }
-                                    r2.patternRides.add(new PatternRide(tr.tp2, i, r1, tr));
+                                    r2.patternRides.add(new PatternRide(tr.tp2, i));
                                 }
                             }
                         }
