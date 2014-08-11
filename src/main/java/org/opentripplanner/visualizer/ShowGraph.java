@@ -25,6 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -170,7 +172,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	private float sptThickness = 0.1f;
 	private boolean drawMultistateVertices=true;
 	private ShortestPathTree spt;
-
+	
 	class Trunk{
 		public Edge edge;
 		public Double trunkiness;
@@ -213,8 +215,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			if(root==null){
 				return;
 			}
-			stroke(255,255,0);
-			root.draw();
+			
+			HashMap<Vertex,Integer> vertexHeight = new HashMap<Vertex,Integer>();
+			
+			root.drawRecursive(0, vertexHeight);
 		}
 		
 		public LinkedBlockingQueue<SPTNode> getEdgeQueue() {
@@ -235,9 +239,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		SPTNode parent;
 		List<SPTNode> children;
 		double weight=0.0;
+		public Integer height;
 
 		SPTNode(State state){
 			this.state = state;
+			this.height = null;
 			this.children = new ArrayList<SPTNode>();
 		}
 		
@@ -248,28 +254,48 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			}
 		}
 
-		public void drawRecursive() {
+		public void drawRecursive(int height, HashMap<Vertex, Integer> vertexStatesEncountered) {
 			colorMode(HSB);
 			
+			// get the number of states we've already drawn from this vertex
+			Integer vertexHeight = vertexStatesEncountered.get(this.state.getVertex());
+			if( vertexHeight == null ){
+				vertexHeight = 0;
+			}
+			
+			// if it's larger than the 'height' of the state we're about to draw, bump the state's visual height
+			// up to the number of states it has to climb over
+			if(vertexHeight>height){
+				height = vertexHeight;
+			}
+			
+			// increment the counter of the number of times we've encountered this vertex
+			vertexStatesEncountered.put(this.state.getVertex(), vertexHeight+1);
+			
 			if(state.getBackEdge() != null){
-				stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
+				//stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
+				stroke( color((height*10)%255, 255, 255) );
+				
 				strokeWeight( (float) (sptThickness*Math.pow(weight,sptFlattening)) );
 				drawEdge( state.getBackEdge() );
 			}
 	
 			for( SPTNode child : children ){
-				child.drawRecursive();
+				child.drawRecursive(height, vertexStatesEncountered);
 			}
 
 			colorMode(RGB);
 		}
 
-		public void draw() {
+		public void draw(List<Integer> colors) {
 			colorMode(HSB);
 
 			if(state.getBackEdge() != null){
-				stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
+				//stroke( colorRamp( (int)(state.getWeight()/10.0) ) );
 				strokeWeight( (float) (sptThickness*Math.pow(weight,sptFlattening)) );
+				
+				stroke( colors.get(this.height) );
+				
 				drawEdge( state.getBackEdge() );
 			}
 			
@@ -301,6 +327,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		void addChild(SPTNode child){
 			this.children.add( child );
 		}
+
+		public void setHeight(Integer height) {
+			this.height = height;
+		}
 	}
 
     /*
@@ -311,7 +341,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         this.graph = graph;
         this.spt = null;
         this.selector = selector;
-        this.selectors = new ArrayList<VertexSelectionListener>();
+        this.selectors = new ArrayList<VertexSelectionListener>();        
     }
 
     /*
@@ -638,22 +668,47 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		}
 		
 		noFill();
-		if(sptEdgeQueue==null){
-			sptEdgeQueue = simpleSPT.getEdgeQueue();
-		}
-		int i=0;
-		while(!sptEdgeQueue.isEmpty()){
-			SPTNode node = sptEdgeQueue.poll();
-			i++;
-			node.draw();
-    		if ((i%BLOCK_SIZE==0) && (millis() - startMillis > FRAME_TIME))
-    			return false;
-    	}
-    	sptEdgeQueue=null;
+//		if(sptEdgeQueue==null){
+//			sptEdgeQueue = simpleSPT.getEdgeQueue();
+//		}
+		
+//		colorOverlappingBranches(sptEdgeQueue);
+//		
+//		int i=0;
+//		while(!sptEdgeQueue.isEmpty()){
+//			SPTNode node = sptEdgeQueue.poll();
+//			i++;
+//			node.draw(sptBranchColors);
+//    		if ((i%BLOCK_SIZE==0) && (millis() - startMillis > FRAME_TIME))
+//    			return false;
+//    	}
+//    	sptEdgeQueue=null;
+		
+		simpleSPT.draw();
+		
     	return true;
 	}
-    
-    private void drawNewEdges() {
+
+	private void colorOverlappingBranches(LinkedBlockingQueue<SPTNode> queue) {
+    	HashMap<Vertex,Integer> stateHeight = new HashMap<Vertex,Integer>();
+    	
+		Iterator<SPTNode> nodes = queue.iterator();
+		while(nodes.hasNext()){
+			SPTNode node = nodes.next();
+			
+			Integer height = stateHeight.get(node.state.getVertex());
+			if(height==null){
+				height = 0;
+			} else{
+				height += 1;
+			}
+			stateHeight.put(node.state.getVertex(),height);
+			
+			node.setHeight(height);
+		}
+	}
+
+	private void drawNewEdges() {
     	if( drawEdges  ){
     		strokeWeight(1);
 			stroke(255,255,255); //white	

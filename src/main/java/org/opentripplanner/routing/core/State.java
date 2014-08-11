@@ -338,6 +338,7 @@ public class State implements Cloneable {
         boolean timeBetter = this.getElapsedTimeSeconds() - other.getElapsedTimeSeconds() <= 30;
         
         return walkDistanceBetter && weightBetter && timeBetter;
+//    	return this.weight < other.weight;
     }
 
     /**
