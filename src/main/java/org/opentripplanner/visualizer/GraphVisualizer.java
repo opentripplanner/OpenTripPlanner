@@ -14,6 +14,8 @@
 package org.opentripplanner.visualizer;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -44,6 +46,7 @@ import javassist.Modifier;
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -59,6 +62,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
@@ -175,6 +179,71 @@ class VertexList extends AbstractListModel<DisplayVertex> {
  */
 public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
+	private final class OnPopupMenuClickListener implements ActionListener {
+		private final class DiffListCellRenderer extends DefaultListCellRenderer {
+			private final int diverge;
+			private final int converge;
+
+			private DiffListCellRenderer(int diverge, int converge) {
+				this.diverge = diverge;
+				this.converge = converge;
+			}
+
+			@Override
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+					boolean isSelected, boolean cellHasFocus) {
+				Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				if(isSelected){
+					return c;
+				}
+				
+				if(index <= diverge){
+					c.setBackground(new Color(196,201,255));
+				}
+				if(index >= converge){
+					c.setBackground(new Color(255,196,196));
+				}
+				
+				return c;
+			}
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			PathPrinter pp = ((PathPrinter) pathsList.getSelectedValue());
+			if(pp==null){
+				return;
+			}
+			GraphPath path = pp.gp;
+			
+			firstComparePath = secondComparePath;
+			secondComparePath = path;
+			
+			if(firstComparePath != null) {
+				DefaultListModel<State> pathModel = new DefaultListModel<State>();
+				for( State st : firstComparePath.states ){
+					pathModel.addElement( st );
+				}
+				firstComparePathStates.setModel( pathModel );
+			}
+			if(secondComparePath != null){
+				DefaultListModel<State> pathModel = new DefaultListModel<State>();
+				for( State st : secondComparePath.states ){
+					pathModel.addElement( st );
+				}
+				secondComparePathStates.setModel( pathModel );
+			}
+			
+			int[] diff = diffPaths();
+			final int diverge = diff[0];
+			final int converge = diff[1];
+			if(diff[0]>=0){
+				firstComparePathStates.setCellRenderer(new DiffListCellRenderer(diverge,firstComparePath.states.size()-converge-1));
+				secondComparePathStates.setCellRenderer(new DiffListCellRenderer(diverge,secondComparePath.states.size()-converge-1));
+			}
+		}
+	}
+
 	class PathPrinter{
 		GraphPath gp;
 		PathPrinter(GraphPath gp){
@@ -307,6 +376,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private GraphPath firstComparePath;
 	private GraphPath secondComparePath;
 
+	private JList<State> firstComparePathStates;
+	private JList<State> secondComparePathStates;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
@@ -327,12 +399,15 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     	
     	final Container mainTab = makeMainTab();
     	Container prefsPanel = makePrefsPanel();
+    	Container diffTab = makeDiffTab();
          
     	tabbedPane.addTab("Main", null, mainTab,
                 "Pretty much everything");
          
     	tabbedPane.addTab("Prefs", null, prefsPanel,
                 "Routing preferences");
+    	
+    	tabbedPane.addTab("Diff", null, diffTab, "multistate path diffs");
          
         //Add the tabbed pane to this panel.
         add(tabbedPane);
@@ -357,6 +432,23 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         	}
         });
     }
+
+	private Container makeDiffTab() {
+        JPanel pane = new JPanel();
+        pane.setLayout(new GridLayout(0, 2));
+        
+        firstComparePathStates = new JList<State>();        
+        JScrollPane stScrollPane = new JScrollPane(firstComparePathStates);
+        stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        pane.add(stScrollPane);
+        
+        secondComparePathStates = new JList<State>();
+        stScrollPane = new JScrollPane(secondComparePathStates);
+        stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        pane.add(stScrollPane);
+        
+        return pane;
+	}
 
 	private Container makeMainTab() {
 		Container pane = new JPanel();
@@ -383,7 +475,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	}
 	
 	private JComponent makePrefsPanel(){
-		/* ROUTING SUBPANEL */
         JPanel pane = new JPanel();
         pane.setLayout(new GridLayout(0, 2));
         
@@ -958,21 +1049,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         popup = new JPopupMenu();
         JMenuItem compareMenuItem = new JMenuItem("compare");
-        compareMenuItem.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				PathPrinter pp = ((PathPrinter) pathsList.getSelectedValue());
-				if(pp==null){
-					return;
-				}
-				GraphPath path = pp.gp;
-				
-				firstComparePath = secondComparePath;
-				secondComparePath = path;
-				
-				comparePaths();
-			}
-        });
+        compareMenuItem.addActionListener(new OnPopupMenuClickListener());
         popup.add(compareMenuItem);
         
         // make paths list right-clickable
@@ -1025,9 +1102,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         vertexDataPanel.add(pathsScrollPane);
 	}
 
-	private void comparePaths() {
-		if(firstComparePath == null || secondComparePath == null)
-			return;
+	private int[] diffPaths() {
+		if(firstComparePath == null || secondComparePath == null) {
+			int[] failboat = {-2,-2};
+			return failboat;
+		}
 		
 		int l1 = firstComparePath.states.size();
 		int l2 = secondComparePath.states.size();
@@ -1060,6 +1139,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		System.out.println( "paths converge at vertex: "+firstComparePath.states.get(l1-convergence-1).getVertex() );
 		System.out.println( "first state: "+firstComparePath.states.get(l1-convergence-1));
 		System.out.println( "second state: "+secondComparePath.states.get(l2-convergence-1));
+		
+		int[] ret = {divergence,convergence};
+		return ret;
 	}
 
 	private void initRoutingSubpanel() {
