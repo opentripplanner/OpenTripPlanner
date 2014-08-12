@@ -207,6 +207,43 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				return c;
 			}
 		}
+		
+		private int[] diffPaths() {
+			if(firstComparePath == null || secondComparePath == null) {
+				int[] failboat = {-2,-2};
+				return failboat;
+			}
+			
+			int l1 = firstComparePath.states.size();
+			int l2 = secondComparePath.states.size();
+			int minlen = l1 < l2 ? l1 : l2;
+			
+			int divergence=-1;
+			int convergence=-1;
+			
+			// find divergence
+			for(int i=0; i<minlen; i++){
+				Vertex v1 = firstComparePath.states.get(i).getVertex();
+				Vertex v2 = secondComparePath.states.get(i).getVertex();
+				if(!v1.equals(v2)){
+					divergence = i-1;
+					break;
+				}
+			}
+			
+			// find convergence
+			for(int i=0; i<minlen; i++){
+				Vertex v1 = firstComparePath.states.get(l1-i-1).getVertex();
+				Vertex v2 = secondComparePath.states.get(l2-i-1).getVertex();
+				if(!v1.equals(v2)){
+					convergence = i-1;
+					break;
+				}
+			}
+			
+			int[] ret = {divergence,convergence};
+			return ret;
+		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -379,6 +416,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private JList<State> firstComparePathStates;
 	private JList<State> secondComparePathStates;
 
+	private JList<String> secondStateData;
+
+	private JList<String> firstStateData;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
@@ -441,9 +482,39 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JScrollPane stScrollPane = new JScrollPane(firstComparePathStates);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
+        firstComparePathStates.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				JList<State> theList = (JList<State>)e.getSource();
+	        	State st = (State)theList.getSelectedValue();
+	        	
+	        	System.out.println("got state "+st);
+			}
+        });
         
         secondComparePathStates = new JList<State>();
         stScrollPane = new JScrollPane(secondComparePathStates);
+        stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        pane.add(stScrollPane);
+        secondComparePathStates.addListSelectionListener(new ListSelectionListener(){
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				JList<State> theList = (JList<State>)e.getSource();
+	        	State st = (State)theList.getSelectedValue();
+	        	
+//				DefaultListModel<String> stateListModel = new DefaultListModel<String>();
+//				stateListModel.addElement( st.);
+//				secondComparePathStates.setModel( pathModel );
+			}
+        });
+        
+        firstStateData = new JList<String>();
+        stScrollPane = new JScrollPane(firstStateData);
+        stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        pane.add(stScrollPane);
+        
+        secondStateData = new JList<String>();
+        stScrollPane = new JScrollPane(secondStateData);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
         
@@ -1100,48 +1171,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         });
         JScrollPane pathsScrollPane = new JScrollPane(pathsList);
         vertexDataPanel.add(pathsScrollPane);
-	}
-
-	private int[] diffPaths() {
-		if(firstComparePath == null || secondComparePath == null) {
-			int[] failboat = {-2,-2};
-			return failboat;
-		}
-		
-		int l1 = firstComparePath.states.size();
-		int l2 = secondComparePath.states.size();
-		int minlen = l1 < l2 ? l1 : l2;
-		
-		int divergence=-1;
-		int convergence=-1;
-		
-		// find divergence
-		for(int i=0; i<minlen; i++){
-			Vertex v1 = firstComparePath.states.get(i).getVertex();
-			Vertex v2 = secondComparePath.states.get(i).getVertex();
-			if(!v1.equals(v2)){
-				divergence = i-1;
-				break;
-			}
-		}
-		
-		// find convergence
-		for(int i=0; i<minlen; i++){
-			Vertex v1 = firstComparePath.states.get(l1-i-1).getVertex();
-			Vertex v2 = secondComparePath.states.get(l2-i-1).getVertex();
-			if(!v1.equals(v2)){
-				convergence = i-1;
-				break;
-			}
-		}
-		
-		System.out.println( "paths diverge at vertex: "+firstComparePath.states.get(divergence).getVertex() );
-		System.out.println( "paths converge at vertex: "+firstComparePath.states.get(l1-convergence-1).getVertex() );
-		System.out.println( "first state: "+firstComparePath.states.get(l1-convergence-1));
-		System.out.println( "second state: "+secondComparePath.states.get(l2-convergence-1));
-		
-		int[] ret = {divergence,convergence};
-		return ret;
 	}
 
 	private void initRoutingSubpanel() {
