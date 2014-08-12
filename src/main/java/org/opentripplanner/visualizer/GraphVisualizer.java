@@ -21,6 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
@@ -49,14 +51,17 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -296,6 +301,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	private JTextField sptFlattening;
 	
 	private JTextField sptThickness;
+	
+	private JPopupMenu popup;
+
+	private GraphPath firstComparePath;
+	private GraphPath secondComparePath;
 
     public GraphVisualizer(GraphService graphService) {
         super();
@@ -882,52 +892,18 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		}
 
 	private void initVertexInfoSubpanel() {
-		/* VERTEX INFO SUBPANEL */
         JPanel vertexDataPanel = new JPanel();
         vertexDataPanel.setLayout(new BoxLayout(vertexDataPanel, BoxLayout.PAGE_AXIS));
         vertexDataPanel.setPreferredSize(new Dimension(300, 600));
         leftPanel.add(vertexDataPanel, BorderLayout.CENTER);
 
+        // nearby vertices
         JLabel nvLabel = new JLabel("Vertices");
         vertexDataPanel.add(nvLabel);
         nearbyVertices = new JList<DisplayVertex>();
-        // nearbyVertices.setPrototypeCellValue("Bite the wax tadpole right on the nose");
         nearbyVertices.setVisibleRowCount(4);
         JScrollPane nvScrollPane = new JScrollPane(nearbyVertices);
         vertexDataPanel.add(nvScrollPane);
-
-        JLabel ogeLabel = new JLabel("Outgoing edges");
-        vertexDataPanel.add(ogeLabel);
-        outgoingEdges = new JList<Edge>();
-        outgoingEdges.setVisibleRowCount(4);
-        JScrollPane ogeScrollPane = new JScrollPane(outgoingEdges);
-        vertexDataPanel.add(ogeScrollPane);
-
-        JLabel iceLabel = new JLabel("Incoming edges");
-        vertexDataPanel.add(iceLabel);
-        incomingEdges = new JList<Edge>();
-        JScrollPane iceScrollPane = new JScrollPane(incomingEdges);
-        vertexDataPanel.add(iceScrollPane);
-        /*
-         * when a different edge is selected, change up the pattern pane and list of nearby nodes
-         */
-        ListSelectionListener edgeChanged = new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-
-                @SuppressWarnings("unchecked")
-				JList<Edge> edgeList = (JList<Edge>) e.getSource();
-                
-                Edge selected = (Edge) edgeList.getSelectedValue();
-                
-                boolean outgoing = (edgeList==outgoingEdges);
-                reactToEdgeSelection( selected, outgoing );
-            }
-
-        };
-
-        outgoingEdges.addListSelectionListener(edgeChanged);
-        incomingEdges.addListSelectionListener(edgeChanged);
-
         nearbyVertices.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 outgoingEdges.removeAll();
@@ -942,12 +918,93 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
         });
         
+        // listener useful for both incoming and outgoing edge list panes
+        // when a different edge is selected, change up the pattern pane and list of nearby nodes
+        ListSelectionListener edgeChanged = new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+
+                @SuppressWarnings("unchecked")
+				JList<Edge> edgeList = (JList<Edge>) e.getSource();
+                
+                Edge selected = (Edge) edgeList.getSelectedValue();
+                
+                boolean outgoing = (edgeList==outgoingEdges);
+                reactToEdgeSelection( selected, outgoing );
+            }
+
+        };
+
+        // outgoing edges
+        JLabel ogeLabel = new JLabel("Outgoing edges");
+        vertexDataPanel.add(ogeLabel);
+        outgoingEdges = new JList<Edge>();
+        outgoingEdges.setVisibleRowCount(4);
+        JScrollPane ogeScrollPane = new JScrollPane(outgoingEdges);
+        vertexDataPanel.add(ogeScrollPane);
+        outgoingEdges.addListSelectionListener(edgeChanged);
+
+        // incoming edges
+        JLabel iceLabel = new JLabel("Incoming edges");
+        vertexDataPanel.add(iceLabel);
+        incomingEdges = new JList<Edge>();
+        JScrollPane iceScrollPane = new JScrollPane(incomingEdges);
+        vertexDataPanel.add(iceScrollPane);
+        incomingEdges.addListSelectionListener(edgeChanged);
+
+        // paths list
         JLabel pathsLabel = new JLabel("Paths");
         vertexDataPanel.add(pathsLabel);
         pathsList = new JList<PathPrinter>();
+        
+        popup = new JPopupMenu();
+        JMenuItem compareMenuItem = new JMenuItem("compare");
+        compareMenuItem.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PathPrinter pp = ((PathPrinter) pathsList.getSelectedValue());
+				if(pp==null){
+					return;
+				}
+				GraphPath path = pp.gp;
+				
+				firstComparePath = secondComparePath;
+				secondComparePath = path;
+				
+				comparePaths();
+			}
+        });
+        popup.add(compareMenuItem);
+        
+        // make paths list right-clickable
+        pathsList.addMouseListener(new MouseListener(){
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if( SwingUtilities.isRightMouseButton(e) ){
+					@SuppressWarnings("unchecked")
+					JList<PathPrinter> list = (JList<PathPrinter>)e.getSource();
+		            int row = list.locationToIndex(e.getPoint());
+		            list.setSelectedIndex(row);
+		            
+		            popup.show(list, e.getX(), e.getY());
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
+        });
         pathsList.addListSelectionListener(new ListSelectionListener(){
 			@Override
 			public void valueChanged(ListSelectionEvent ev) {
+				
 				PathPrinter pp = ((PathPrinter) pathsList.getSelectedValue());
 				if(pp==null){
 					return;
@@ -966,6 +1023,43 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         });
         JScrollPane pathsScrollPane = new JScrollPane(pathsList);
         vertexDataPanel.add(pathsScrollPane);
+	}
+
+	private void comparePaths() {
+		if(firstComparePath == null || secondComparePath == null)
+			return;
+		
+		int l1 = firstComparePath.states.size();
+		int l2 = secondComparePath.states.size();
+		int minlen = l1 < l2 ? l1 : l2;
+		
+		int divergence=-1;
+		int convergence=-1;
+		
+		// find divergence
+		for(int i=0; i<minlen; i++){
+			Vertex v1 = firstComparePath.states.get(i).getVertex();
+			Vertex v2 = secondComparePath.states.get(i).getVertex();
+			if(!v1.equals(v2)){
+				divergence = i-1;
+				break;
+			}
+		}
+		
+		// find convergence
+		for(int i=0; i<minlen; i++){
+			Vertex v1 = firstComparePath.states.get(l1-i-1).getVertex();
+			Vertex v2 = secondComparePath.states.get(l2-i-1).getVertex();
+			if(!v1.equals(v2)){
+				convergence = i-1;
+				break;
+			}
+		}
+		
+		System.out.println( "paths diverge at vertex: "+firstComparePath.states.get(divergence).getVertex() );
+		System.out.println( "paths converge at vertex: "+firstComparePath.states.get(l1-convergence-1).getVertex() );
+		System.out.println( "first state: "+firstComparePath.states.get(l1-convergence-1));
+		System.out.println( "second state: "+secondComparePath.states.get(l2-convergence-1));
 	}
 
 	private void initRoutingSubpanel() {
