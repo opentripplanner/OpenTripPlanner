@@ -396,10 +396,8 @@ public class ProfileRouter {
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         GenericAStar astar = new GenericAStar();
         astar.setNPaths(1);
-//        /*
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode);
         astar.setTraverseVisitor(visitor);
-//        */
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
         rr.rctx.destroy();
         return visitor.stopsFound;
