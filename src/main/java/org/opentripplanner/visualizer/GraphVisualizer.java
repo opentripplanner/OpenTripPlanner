@@ -488,7 +488,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				JList<State> theList = (JList<State>)e.getSource();
 	        	State st = (State)theList.getSelectedValue();
 	        	
-	        	System.out.println("got state "+st);
+				DefaultListModel<String> stateListModel = new DefaultListModel<String>();
+				stateListModel.addElement( "weight:"+st.getWeight() );
+				stateListModel.addElement( "bikeRenting:"+st.isBikeRenting() );
+				stateListModel.addElement( "carParked:"+st.isCarParked() );
+				stateListModel.addElement( "walkDistance:"+st.getWalkDistance() );
+				stateListModel.addElement( "elapsedTime:"+st.getElapsedTimeSeconds() );
+				stateListModel.addElement( "numBoardings:"+st.getNumBoardings() );
+				firstStateData.setModel( stateListModel );
 			}
         });
         
@@ -502,9 +509,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				JList<State> theList = (JList<State>)e.getSource();
 	        	State st = (State)theList.getSelectedValue();
 	        	
-//				DefaultListModel<String> stateListModel = new DefaultListModel<String>();
-//				stateListModel.addElement( st.);
-//				secondComparePathStates.setModel( pathModel );
+				DefaultListModel<String> stateListModel = new DefaultListModel<String>();
+				stateListModel.addElement( "weight:"+st.getWeight() );
+				stateListModel.addElement( "bikeRenting:"+st.isBikeRenting() );
+				stateListModel.addElement( "carParked:"+st.isCarParked() );
+				stateListModel.addElement( "walkDistance:"+st.getWalkDistance() );
+				stateListModel.addElement( "elapsedTime:"+st.getElapsedTimeSeconds() );
+				stateListModel.addElement( "numBoardings:"+st.getNumBoardings() );
+				secondStateData.setModel( stateListModel );
 			}
         });
         
@@ -517,6 +529,18 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         stScrollPane = new JScrollPane(secondStateData);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
+        
+        JButton compareButton = new JButton();
+        compareButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				State s1 = firstComparePathStates.getSelectedValue();
+				State s2 = secondComparePathStates.getSelectedValue();
+				
+				System.out.println("s1 dominates s2:"+s1.dominates(s2));
+			}
+        });
+        pane.add(compareButton);
         
         return pane;
 	}
