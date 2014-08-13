@@ -43,7 +43,7 @@ public class Option {
             }
         }
         // Really should be one per segment, with transfers to the same operator having a price of 0.
-        // TODO fares = DCFareCalculator.calculateFares(rides);
+        fares = DCFareCalculator.calculateFares(rides);
         summary = generateSummary();
     }
 
