@@ -372,17 +372,17 @@ public class IndexAPI {
        }
    }
 
+    /** List basic information about all service IDs. */
     @GET
     @Path("/services")
-    /** List basic information about all service IDs. */
     public Response getServices() {
         index.serviceForId.values(); // TODO complete
         return Response.status(Status.OK).entity("NONE").build();
     }
 
+    /** List details about a specific service ID including which dates it runs on. Replaces the old /calendar. */
     @GET
     @Path("/services/{serviceId}")
-    /** List details about a specific service ID including which dates it runs on. Replaces the old /calendar. */
     public Response getServices(@PathParam("serviceId") String serviceId) {
         index.serviceForId.get(serviceId); // TODO complete
         return Response.status(Status.OK).entity("NONE").build();
@@ -392,7 +392,8 @@ public class IndexAPI {
     @GET
     @Path("/stopClusters")
     public Response getAllStopClusters () {
-        List<StopClusterDetail> scl = StopClusterDetail.list(index.stopClusterForId.values(), false);
+        // use 'detail' field common to all API methods in this class
+        List<StopClusterDetail> scl = StopClusterDetail.list(index.stopClusterForId.values(), detail);
         return Response.status(Status.OK).entity(scl).build();
     }
 
