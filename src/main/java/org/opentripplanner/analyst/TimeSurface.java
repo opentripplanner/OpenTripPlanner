@@ -10,6 +10,8 @@ import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.profile.ProfileRequest;
+import org.opentripplanner.profile.ProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
@@ -84,6 +86,18 @@ public class TimeSurface implements Serializable{
         long t1 = System.currentTimeMillis();
         LOG.info("Made TimeSurface from SPT in {} msec.", (int) (t1 - t0));
         makeSampleGrid(spt);
+    }
+
+    /** Make a max or min timesurface from propagated times in a ProfileRouter. */
+    public TimeSurface (ProfileRouter profileRouter, boolean maxNotMin) {
+        ProfileRequest req = profileRouter.request;
+        lon = req.from.lon;
+        lat = req.from.lat;
+        id = makeUniqueId();
+        dateTime = req.fromTime; // FIXME
+        routerId = profileRouter.graph.getRouterId();
+        cutoffMinutes = profileRouter.MAX_DURATION / 60;
+        times = maxNotMin ? profileRouter.maxs : profileRouter.mins;
     }
 
     public int getTime(Vertex v) {

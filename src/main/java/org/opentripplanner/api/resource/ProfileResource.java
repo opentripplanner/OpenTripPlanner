@@ -14,16 +14,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.google.common.collect.Lists;
+import org.opentripplanner.analyst.TimeSurface;
+import org.opentripplanner.api.model.TimeSurfaceShort;
 import org.opentripplanner.api.param.HourMinuteSecond;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.QueryParameter;
 import org.opentripplanner.api.param.YearMonthDay;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.Option;
 import org.opentripplanner.profile.ProfileRequest;
 import org.opentripplanner.profile.ProfileResponse;
 import org.opentripplanner.profile.ProfileRouter;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.OTPServer;
 
@@ -45,6 +50,7 @@ public class ProfileResource {
     public Response profileRoute (
             @QueryParam("from")  LatLon from,
             @QueryParam("to")    LatLon to,
+            @QueryParam("analyst")    @DefaultValue("false") boolean analyst,
             @QueryParam("date")       @DefaultValue("today") YearMonthDay date,
             @QueryParam("startTime")  @DefaultValue("07:00") HourMinuteSecond fromTime,
             @QueryParam("endTime")    @DefaultValue("09:00") HourMinuteSecond toTime,
@@ -75,11 +81,19 @@ public class ProfileResource {
         req.orderBy    = orderBy;
         req.limit      = limit;
         req.modes      = modes;
+        req.analyst    = analyst;
 
         ProfileRouter router = new ProfileRouter(graph, req);
         try {
             ProfileResponse response = router.route();
-            return Response.status(Status.OK).entity(response).build();
+            if (req.analyst) {
+                List<TimeSurfaceShort> surfaceShorts = Lists.newArrayList();
+                surfaceShorts.add(new TimeSurfaceShort(router.minSurface));
+                surfaceShorts.add(new TimeSurfaceShort(router.maxSurface));
+                return Response.status(Status.OK).entity(surfaceShorts).build();
+            } else {
+                return Response.status(Status.OK).entity(response).build();
+            }
         } finally {
             router.cleanup(); // destroy routing contexts even when an exception happens
         }

@@ -45,7 +45,7 @@ public class ProfileRouter {
     /* Search configuration constants */
     public static final int SLACK = 60; // in seconds, time required to catch a transit vehicle
     private static final int TIMEOUT = 10; // in seconds, maximum computation time
-    private static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
+    public static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
     private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
     private static final int MIN_DRIVE_TIME = 10 * 60; // in seconds
     private static final List<TraverseMode> ACCESS_MODES =
@@ -53,8 +53,8 @@ public class ProfileRouter {
     private static final List<TraverseMode> EGRESS_MODES =
             Lists.newArrayList(TraverseMode.WALK);
 
-    private final Graph graph;
-    private final ProfileRequest request;
+    public final Graph graph;
+    public final ProfileRequest request;
 
     public ProfileRouter(Graph graph, ProfileRequest request) {
         this.graph = graph;
@@ -66,7 +66,8 @@ public class ProfileRouter {
     List<RoutingContext> routingContexts = Lists.newArrayList();
 
     /* Analyst: time bounds for each vertex */
-    int[] mins, maxs;
+    public int[] mins, maxs;
+    public TimeSurface minSurface, maxSurface;
 
     // while finding direct paths:
     // if dist < M meters OR we don't yet have N stations: record station
@@ -99,8 +100,8 @@ public class ProfileRouter {
         if (request.analyst) {
             mins = new int[Vertex.getMaxIndex()];
             maxs = new int[Vertex.getMaxIndex()];
-            Arrays.fill(mins, Integer.MAX_VALUE);
-            Arrays.fill(maxs, Integer.MAX_VALUE);
+            Arrays.fill(mins, TimeSurface.UNREACHABLE);
+            Arrays.fill(maxs, TimeSurface.UNREACHABLE);
         }
         LOG.info("modes: {}", request.modes);
 
@@ -214,9 +215,9 @@ public class ProfileRouter {
                     int tsidx = tstop.getIndex();
                     int lb = r1.durationLowerBound();
                     int ub = r1.durationUpperBound();
-                    if (mins[tsidx] > lb)
+                    if (mins[tsidx] == TimeSurface.UNREACHABLE || mins[tsidx] > lb)
                         mins[tsidx] = lb;
-                    if (maxs[tsidx] > ub)
+                    if (maxs[tsidx] == TimeSurface.UNREACHABLE || maxs[tsidx] > ub) // Yes, we want the _minimum_ upper bound.
                         maxs[tsidx] = ub;
 
                 }
@@ -382,6 +383,7 @@ public class ProfileRouter {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
+        // FIXME requires destination to be set, not necesary for analyst
         rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
         rr.setArriveBy(dest);
         rr.setMode(mode);
@@ -454,7 +456,7 @@ public class ProfileRouter {
     // Major change: This needs to include all stops, not just those where transfers occur or those near the destination.
     /** Make two time surfaces, one for the minimum and one for the maximum. */
     public P2<TimeSurface> makeSurfaces() {
-        LOG.info("propagating profile router result to street vertices");
+        LOG.info("Propagating profile router result to street vertices.");
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.setMode(TraverseMode.WALK);
@@ -467,15 +469,17 @@ public class ProfileRouter {
         astar.setNPaths(1);
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             int index = tstop.getIndex();
-            if (mins[index] == Integer.MAX_VALUE || maxs[index] == Integer.MAX_VALUE) continue;
-            // Both origin and dest vertices will be found in check?
-            rr.setRoutingContext(graph, tstop, null); // Set origin vertex directly instead of generating links
+            // Generate a tree outward from all stops that have been touched in the basic profile search
+            if (mins[index] == TimeSurface.UNREACHABLE || maxs[index] == TimeSurface.UNREACHABLE) continue;
+            rr.setRoutingContext(graph, tstop, null); // Set origin vertex directly instead of generating link edges
             astar.setTraverseVisitor(new ExtremaPropagationTraverseVisitor(mins[index], maxs[index]));
-            ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
+            ShortestPathTree spt = astar.getShortestPathTree(rr, 5);
             rr.rctx.destroy();
         }
-        LOG.info("done {} {}.", mins[0], maxs[0]); // thwart optimization
-        return null;
+        minSurface = new TimeSurface(this, false);
+        maxSurface = new TimeSurface(this, true);
+        LOG.info("done making timesurfaces.");
+        return new P2<TimeSurface>(minSurface, maxSurface);
     }
 
     /** Given a minimum and maximum at a starting vertex, build an on-street SPT and propagate those values outward. */
@@ -493,9 +497,10 @@ public class ProfileRouter {
             int max = max0 + (int) state.getElapsedTimeSeconds();
             Vertex vertex = state.getVertex();
             int index = vertex.getIndex();
-            if (mins[index] > min)
+            if (index >= mins.length) return; // New temp vertices may have been created since the array was dimensioned.
+            if (mins[index] == TimeSurface.UNREACHABLE || mins[index] > min)
                 mins[index] = min;
-            if (maxs[index] < max)
+            if (maxs[index] == TimeSurface.UNREACHABLE || maxs[index] > max) // Yes we want the minimum upper bound (minimum maximum)
                 maxs[index] = max;
         }
     }
