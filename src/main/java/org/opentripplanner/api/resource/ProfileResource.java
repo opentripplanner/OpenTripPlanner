@@ -77,10 +77,13 @@ public class ProfileResource {
         req.modes      = modes;
 
         ProfileRouter router = new ProfileRouter(graph, req);
-        ProfileResponse response = router.route();
-        // catch exceptions and tear down rctx here?
-        return Response.status(Status.OK).entity(response).build();
-    
+        try {
+            ProfileResponse response = router.route();
+            return Response.status(Status.OK).entity(response).build();
+        } finally {
+            router.cleanup(); // destroy routing contexts even when an exception happens
+        }
+
     }
     
 }

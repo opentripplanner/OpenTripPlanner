@@ -24,26 +24,12 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     public Stop stop;
     public TraverseMode mode;
     public int etime;
-    public int distance; // deprecate?
-    //public State state;
-    // FIXME we are calculating these paths as the stops are first encountered. ideally we want to save all rctx and tear them down later.
-    public List<WalkStep> walkSteps;
-    public EncodedPolylineBean geometry;
+    public State state;
 
     /** @param state a state at a TransitStop */
     public StopAtDistance (State state) {
-        //this.state = state;
-        // This is rather slow. We are finding paths for every stop we encounter, not just those in the result.
-        // TODO Retain the routing contexts and destroy them all at request's end, so we can generate walksteps only as needed.
-        // TODO profile why generating the path or the walksteps is slow
-        GraphPath path = new GraphPath(state, false);
-        PlanGenerator pgen = new PlanGenerator(null, null);
-        Itinerary itin = pgen.generateItinerary(path, false);
-        Leg leg = itin.legs.get(0);
-        walkSteps = leg.walkSteps;
-        geometry = leg.legGeometry;
+        this.state = state;
         etime = (int) state.getElapsedTimeSeconds();
-        distance = (int) state.getWalkDistance(); // TODO includes driving? Is this really needed?
         mode = state.getNonTransitMode(); // not sure if this is reliable, reset in caller.
         if (state.getVertex() instanceof TransitStop) {
             TransitStop tstop = (TransitStop) state.getVertex();

@@ -17,6 +17,7 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -62,7 +63,7 @@ public class ProfileRouter {
 
     /* Search state */
     Multimap<Stop, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop
-
+    List<RoutingContext> routingContexts = Lists.newArrayList();
 
     /* Analyst: time bounds for each vertex */
     int[] mins, maxs;
@@ -142,7 +143,7 @@ public class ProfileRouter {
                         if (ride == null) {
                             ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
                             ride.accessTime = sd.etime;
-                            ride.accessDist = sd.distance;
+                            ride.accessDist = 0; // FIXME
                             initialRides.put(sd.stop, ride);
                         }
                         ride.patternRides.add(new PatternRide(pattern, i));
@@ -401,7 +402,8 @@ public class ProfileRouter {
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode);
         astar.setTraverseVisitor(visitor);
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
-        rr.rctx.destroy();
+        // Save the routing context for later cleanup. We need its temporary edges to render street segments at the end.
+        routingContexts.add(rr.rctx);
         return visitor.stopsFound;
     }
 
@@ -446,7 +448,7 @@ public class ProfileRouter {
             LOG.info("Found non-transit option for mode {}", mode);
             directPaths.add(new StopAtDistance(state));
         }
-        rr.rctx.destroy(); // after making StopAtDistance which includes walksteps and needs temporary edges
+        routingContexts.add(rr.rctx); // save context for later cleanup so temp edges remain available
     }
 
     // Major change: This needs to include all stops, not just those where transfers occur or those near the destination.
@@ -496,6 +498,18 @@ public class ProfileRouter {
             if (maxs[index] < max)
                 maxs[index] = max;
         }
+    }
+
+    /** Destroy all routing contexts created during this search. */
+    public int cleanup() {
+        int n = 0;
+        for (RoutingContext rctx : routingContexts) {
+            rctx.destroy();
+            n += 1;
+        }
+        routingContexts.clear();
+        LOG.info("destroyed {} routing contexts.", n);
+        return n;
     }
 
 }

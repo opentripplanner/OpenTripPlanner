@@ -32,17 +32,13 @@ public class StreetSegment {
         Leg leg = itin.legs.get(0);
         walkSteps = leg.walkSteps;
         geometry = leg.legGeometry;
+        time = (int) (state.getElapsedTimeSeconds());
     }
 
     /** A StreetSegment is very similar to a StopAtDistance but it's a response object so the State has to be rendered into walksteps. */
     public StreetSegment (StopAtDistance sd) {
-        //this(sd.state);
-        // FIXME NPEs due to routing contexts being torn down (temp edges are disconnected)
-        // FIXME currently copying over from StopAtDistance
-        walkSteps = sd.walkSteps;
-        geometry = sd.geometry;
-        mode = sd.mode;
-        time = sd.etime;
+        this(sd.state);
+        mode = sd.mode; // Intended mode is known more reliably in a StopAtDistance than from a State.
     }
 
     /** Make a collections of StreetSegments from a collection of StopAtDistance. */
