@@ -346,7 +346,7 @@ public class TripPattern implements Serializable {
     }
     
     private static String stopNameAndId (Stop stop) {
-        return stop.getName() + " (" + stop.getId() + ")";
+        return stop.getName() + " (" + GtfsLibrary.convertIdToString(stop.getId()) + ")";
     }
 
     /**
