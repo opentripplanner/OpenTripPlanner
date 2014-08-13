@@ -130,6 +130,7 @@ public class GraphIndex {
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
         }
+        // FIXME This will overwrite any parent station information
         for (StopCluster cluster : StopCluster.clusterStops(this)) {
             stopClusterForId.put(cluster.id, cluster);
         }
@@ -138,7 +139,6 @@ public class GraphIndex {
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
         LOG.info("Done indexing graph.");
-        StopCluster.clusterStops(this);
     }
 
     private void analyzeServices() {
