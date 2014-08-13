@@ -52,14 +52,9 @@ public class ProfileRouter {
     private static final List<TraverseMode> EGRESS_MODES =
             Lists.newArrayList(TraverseMode.WALK);
 
-    /* A stop which represents the destination */
-    private static final Stop fakeTargetStop = new Stop();
-    static {
-        fakeTargetStop.setId(new AgencyAndId("FAKE", "TARGET"));
-    }
-
     private final Graph graph;
     private final ProfileRequest request;
+
     public ProfileRouter(Graph graph, ProfileRequest request) {
         this.graph = graph;
         this.request = request;
@@ -67,6 +62,7 @@ public class ProfileRouter {
 
     /* Search state */
     Multimap<Stop, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop
+    
 
     /* Analyst: time bounds for each vertex */
     int[] mins = new int[Vertex.getMaxIndex()];
