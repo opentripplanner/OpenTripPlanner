@@ -11,14 +11,14 @@ import com.beust.jcommander.internal.Lists;
 
 public class RouteShort {
 
-    public AgencyAndId routeId;
+    public AgencyAndId id;
     public String shortName;
     public String longName;
     public String mode;
     public String color;
     
     public RouteShort (Route route) {
-        routeId = route.getId();
+        id = route.getId();
         shortName = route.getShortName();
         longName = route.getLongName();
         mode = GtfsLibrary.getTraverseMode(route).toString();
