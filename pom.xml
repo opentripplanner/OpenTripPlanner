@@ -352,7 +352,7 @@
             <version>0.9.10</version>
         </dependency>
 
-	<!-- Logging library -->
+        <!-- Logging library -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

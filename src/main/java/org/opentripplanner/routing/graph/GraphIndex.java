@@ -29,6 +29,7 @@ import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileRouter;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopAtDistance;
+import org.opentripplanner.profile.StopClusterer;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -136,6 +137,7 @@ public class GraphIndex {
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
         LOG.info("Done indexing graph.");
+        new StopClusterer().clusterStops(this);
     }
 
     private void analyzeServices() {
