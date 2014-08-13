@@ -23,13 +23,10 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.profile.ProfileRouter;
 import org.opentripplanner.profile.ProfileTransfer;
-import org.opentripplanner.profile.StopAtDistance;
-import org.opentripplanner.profile.StopClusterer;
+import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -69,6 +66,7 @@ public class GraphIndex {
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
+    public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -132,12 +130,15 @@ public class GraphIndex {
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
         }
+        for (StopCluster cluster : StopCluster.clusterStops(this)) {
+            stopClusterForId.put(cluster.id, cluster);
+        }
         // Copy these two service indexes from the graph until we have better ones.
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
         LOG.info("Done indexing graph.");
-        new StopClusterer().clusterStops(this);
+        StopCluster.clusterStops(this);
     }
 
     private void analyzeServices() {

@@ -40,9 +40,11 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.PatternDetail;
 import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.RouteShort;
+import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -384,6 +386,26 @@ public class IndexAPI {
     public Response getServices(@PathParam("serviceId") String serviceId) {
         index.serviceForId.get(serviceId); // TODO complete
         return Response.status(Status.OK).entity("NONE").build();
+    }
+
+    /** Return all clusters of stops. */
+    @GET
+    @Path("/stopClusters")
+    public Response getAllStopClusters () {
+        List<StopClusterDetail> scl = StopClusterDetail.list(index.stopClusterForId.values(), false);
+        return Response.status(Status.OK).entity(scl).build();
+    }
+
+    /** Return a cluster of stops by its ID. */
+    @GET
+    @Path("/stopClusters/{clusterId}")
+    public Response getStopCluster (@PathParam("clusterId") String clusterIdString) {
+        StopCluster cluster = index.stopClusterForId.get(clusterIdString);
+        if (cluster != null) {
+            return Response.status(Status.OK).entity(new StopClusterDetail(cluster, true)).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
     }
 
 }
