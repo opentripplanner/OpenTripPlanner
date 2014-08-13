@@ -62,11 +62,10 @@ public class ProfileRouter {
 
     /* Search state */
     Multimap<Stop, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop
-    
+
 
     /* Analyst: time bounds for each vertex */
-    int[] mins = new int[Vertex.getMaxIndex()];
-    int[] maxs = new int[Vertex.getMaxIndex()];
+    int[] mins, maxs;
 
     // while finding direct paths:
     // if dist < M meters OR we don't yet have N stations: record station
@@ -96,9 +95,12 @@ public class ProfileRouter {
             graph.index.initializeProfileTransfers();
         }
         // Analyst
-        Arrays.fill(mins, Integer.MAX_VALUE);
-        Arrays.fill(maxs, Integer.MAX_VALUE);
-
+        if (request.analyst) {
+            mins = new int[Vertex.getMaxIndex()];
+            maxs = new int[Vertex.getMaxIndex()];
+            Arrays.fill(mins, Integer.MAX_VALUE);
+            Arrays.fill(maxs, Integer.MAX_VALUE);
+        }
         LOG.info("modes: {}", request.modes);
 
         // Establish search timeouts
