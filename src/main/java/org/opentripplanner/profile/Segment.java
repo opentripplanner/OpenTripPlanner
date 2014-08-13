@@ -76,8 +76,8 @@ public class Segment {
         for (PatternRide pr : ride.patternRides) {
             if (pr.pattern.mode != mode) LOG.warn("Segment contains patterns using more than one mode.");
         }
-        walkDistance = (int) ride.getTransferDistance();
-        walkTime = (int) (ride.getTransferDistance()); // TODO / walkSpeed);
+        walkTime = ride.accessTime;
+        walkDistance = ride.accessDist;
         waitStats = ride.waitStats;
         this.routes = RouteShort.list(routes);
     }

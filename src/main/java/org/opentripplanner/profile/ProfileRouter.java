@@ -119,7 +119,7 @@ public class ProfileRouter {
         // and that some stops may be accessible by one mode but not another
         fromStopPaths = findClosestStops(false);
         fromStops = findClosestPatterns(fromStopPaths);
-        if ( !request.analyst) {
+        if ( ! request.analyst) {
             toStopPaths = findClosestStops(true);
             toStops = findClosestPatterns(toStopPaths);
             // Also look for options connecting origin to destination with no transit.
@@ -142,7 +142,9 @@ public class ProfileRouter {
                     if (request.modes.contains(pattern.mode)) {
                         Ride ride = initialRides.get(sd.stop);
                         if (ride == null) {
-                            ride = new Ride(sd.stop, null, null); // no previous ride, no transfer object
+                            ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
+                            ride.accessTime = sd.etime;
+                            ride.accessDist = sd.distance;
                             initialRides.put(sd.stop, ride);
                         }
                         ride.patternRides.add(new PatternRide(pattern, i));
@@ -240,7 +242,9 @@ public class ProfileRouter {
                                     // Save transfer result for later exploration.
                                     Ride r2 = xferRides.get(tr.s2);
                                     if (r2 == null) {
-                                        r2 = new Ride(tr.s2, r1, tr);
+                                        r2 = new Ride(tr.s2, r1);
+                                        r2.accessDist = tr.distance;
+                                        r2.accessTime = (int) (tr.distance / request.walkSpeed);
                                         xferRides.put(tr.s2, r2);
                                     }
                                     for (PatternRide pr : r2.patternRides) {
