@@ -2,12 +2,15 @@ package org.opentripplanner.profile;
 
 import lombok.AllArgsConstructor;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.List;
 
@@ -23,7 +26,9 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     public int etime;
     public int distance; // deprecate?
     //public State state;
+    // FIXME we are calculating these paths as the stops are first encountered. ideally we want to save all rctx and tear them down later.
     public List<WalkStep> walkSteps;
+    public EncodedPolylineBean geometry;
 
     /** @param state a state at a TransitStop */
     public StopAtDistance (State state) {
@@ -32,7 +37,11 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
         // TODO Retain the routing contexts and destroy them all at request's end, so we can generate walksteps only as needed.
         // TODO profile why generating the path or the walksteps is slow
         GraphPath path = new GraphPath(state, false);
-        walkSteps = PlanGenerator.generateWalkSteps(path.states.toArray(new State[0]), null);
+        PlanGenerator pgen = new PlanGenerator(null, null);
+        Itinerary itin = pgen.generateItinerary(path, false);
+        Leg leg = itin.legs.get(0);
+        walkSteps = leg.walkSteps;
+        geometry = leg.legGeometry;
         etime = (int) state.getElapsedTimeSeconds();
         distance = (int) state.getWalkDistance(); // TODO includes driving? Is this really needed?
         mode = state.getNonTransitMode(); // not sure if this is reliable, reset in caller.

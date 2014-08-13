@@ -93,6 +93,7 @@ public class DCFareCalculator {
             to = ride.to;
             // Problem: Rides no longer have a single fare because they may be on multiple routes.
             // TODO: make sure Patterns in Rides are all the same mode and operator.
+            // This seems to happen naturally because different operators generally do not share stops.
             route = ride.patternRides.get(0).pattern.route;
             type = classify(route);
             prev = prevRide;
