@@ -390,7 +390,7 @@ public class IndexAPI {
 
     /** Return all clusters of stops. */
     @GET
-    @Path("/stopClusters")
+    @Path("/clusters")
     public Response getAllStopClusters () {
         // use 'detail' field common to all API methods in this class
         List<StopClusterDetail> scl = StopClusterDetail.list(index.stopClusterForId.values(), detail);
@@ -399,7 +399,7 @@ public class IndexAPI {
 
     /** Return a cluster of stops by its ID. */
     @GET
-    @Path("/stopClusters/{clusterId}")
+    @Path("/clusters/{clusterId}")
     public Response getStopCluster (@PathParam("clusterId") String clusterIdString) {
         StopCluster cluster = index.stopClusterForId.get(clusterIdString);
         if (cluster != null) {
