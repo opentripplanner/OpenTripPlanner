@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class StopAtDistance implements Comparable<StopAtDistance> {
 
-    public Stop stop;
+    public StopCluster stop; // TODO rename to stopCluster
     public TraverseMode mode;
     public int etime;
     public int distance; // deprecate?
@@ -48,7 +48,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     }
 
     public String toString() {
-        return String.format("stop %s via mode %s at %d min", stop.getCode(), mode, etime / 60);
+        return String.format("stop cluster %s via mode %s at %d min", stop.id, mode, etime / 60);
     }
 
 }

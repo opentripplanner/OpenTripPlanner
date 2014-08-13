@@ -38,23 +38,23 @@ public class Ride {
 
     /* Here we store stop objects rather than indexes. The start and end indexes in the Ride's 
      * constituent PatternRides should correspond to these same stops. */
-    final Stop from;
-    final Stop to;
+    final StopCluster from;
+    final StopCluster to;
     final Ride previous;
     final List<PatternRide> patternRides = Lists.newArrayList();
     Stats rideStats; // filled in only once the ride is complete (has all PatternRides).
     Stats waitStats; // filled in only once the ride is complete (has all PatternRides).
     ProfileTransfer xfer; // note that this transfer is an exemplar, typical of all transfers used to reach all patterns
 
-    public Ride (Stop from, Ride previous, ProfileTransfer xfer) {
+    public Ride (StopCluster from, Ride previous, ProfileTransfer xfer) {
         this.from = from;
         this.to = null; // this is a "partial ride" waiting to be completed.
         this.previous = previous;
         this.xfer = xfer;
     }
 
-    /** Construct a partial copy with no PatternRides or Stats and the given to-Stop. */
-    public Ride (Ride other, Stop to) {
+    /** Construct a partial copy with no PatternRides or Stats and the given arrival StopCluster. */
+    public Ride (Ride other, StopCluster to) {
         this.from = other.from;
         this.xfer = other.xfer;
         this.previous = other.previous;
@@ -62,8 +62,8 @@ public class Ride {
     }
 
     /** Extend this incomplete ride to the given stop, creating a container for PatternRides. */
-    public Ride extendTo(Stop toStop) {
-        return new Ride(this, toStop);
+    public Ride extendTo(StopCluster toStopCluster) {
+        return new Ride(this, toStopCluster);
     }
 
     public String toString() {
@@ -122,10 +122,10 @@ public class Ride {
         return false;
     }
 
-    public boolean pathContainsStop(Stop stop) {
+    public boolean pathContainsStop(StopCluster stopCluster) {
         Ride ride = this;
         while (ride != null) {
-            if (ride.from == stop || ride.to == stop) return true;
+            if (ride.from == stopCluster || ride.to == stopCluster) return true;
             ride = ride.previous;
         }
         return false;
@@ -254,7 +254,7 @@ public class Ride {
     }
 
     /**  @return the stop at which the rider would board the chain of Rides this Ride belongs to. */
-    public Stop getAccessStop() {
+    public StopCluster getAccessStopCluster() {
         Ride ride = this;
         while (ride.previous != null) {
             ride = ride.previous;
@@ -264,7 +264,7 @@ public class Ride {
 
 
     /** @return the stop from which the rider will walk to the final destination, assuming this is the final Ride in a chain. */
-    public Stop getEgressStop() {
+    public StopCluster getEgressStopCluster() {
         return this.to;
     }
 
