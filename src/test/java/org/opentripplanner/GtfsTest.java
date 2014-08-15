@@ -127,10 +127,10 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setArriveBy(dateTime < 0);
         routingRequest.dateTime = Math.abs(dateTime);
         if (fromVertex != null && !fromVertex.isEmpty()) {
-            routingRequest.setFrom(new GenericLocation(null, agencyId + "_" + fromVertex));
+            routingRequest.setFrom(new GenericLocation(null, agencyId + ":" + fromVertex));
         }
         if (toVertex != null && !toVertex.isEmpty()) {
-            routingRequest.setTo(new GenericLocation(null, agencyId + "_" + toVertex));
+            routingRequest.setTo(new GenericLocation(null, agencyId + ":" + toVertex));
         }
         if (onTripId != null && !onTripId.isEmpty()) {
             routingRequest.setStartingTransitTripId(new AgencyAndId(agencyId, onTripId));
@@ -139,11 +139,12 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWheelchairAccessible(wheelchairAccessible);
         routingRequest.setTransferPenalty(preferLeastTransfers ? 300 : 0);
         routingRequest.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
+        // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {
             routingRequest.setBannedRoutes(agencyId + "__" + excludedRoute);
         }
         if (excludedStop != null && !excludedStop.isEmpty()) {
-            routingRequest.setBannedStopsHard(agencyId + "_" + excludedStop);
+            routingRequest.setBannedStopsHard(agencyId + ":" + excludedStop);
         }
         routingRequest.setOtherThanPreferredRoutesPenalty(0);
         // The walk board cost is set low because it interferes with test 2c1.

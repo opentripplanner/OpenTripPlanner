@@ -81,7 +81,7 @@ public class GtfsLibrary {
     public static AgencyAndId convertIdFromString(String value) {
         int index = value.indexOf(ID_SEPARATOR);
         if (index == -1) {
-            throw new IllegalStateException("invalid agency-and-id: " + value);
+            throw new IllegalArgumentException("invalid agency-and-id: " + value);
         } else {
             return new AgencyAndId(value.substring(0, index), value.substring(index + 1));
         }

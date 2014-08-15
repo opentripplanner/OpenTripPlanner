@@ -98,8 +98,8 @@ public class TimetableTest {
 
         int trip_1_1_index = timetable.getTripIndex(new AgencyAndId("agency", "1.1"));
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_a = graph.getVertex("agency:A");
+        Vertex stop_c = graph.getVertex("agency:C");
         RoutingRequest options = new RoutingRequest();
 
         ShortestPathTree spt;

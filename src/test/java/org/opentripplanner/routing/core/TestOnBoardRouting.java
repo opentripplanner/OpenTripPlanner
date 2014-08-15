@@ -86,8 +86,8 @@ public class TestOnBoardRouting extends TestCase {
             Vertex origin, destination;
             do {
                 /* See FAKE_GTFS for available locations */
-                origin = graph.getVertex("agency_" + (char) (65 + rand.nextInt(20)));
-                destination = graph.getVertex("agency_" + (char) (65 + rand.nextInt(20)));
+                origin = graph.getVertex("agency:" + (char) (65 + rand.nextInt(20)));
+                destination = graph.getVertex("agency:" + (char) (65 + rand.nextInt(20)));
             } while (origin.equals(destination));
 
             /* ...at a random date/time */

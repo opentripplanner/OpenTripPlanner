@@ -60,6 +60,8 @@ public class RouteMatcher implements Cloneable, Serializable {
      *        was kept for backward-compatibility purposes. If the original routeName contains some
      *        "_" each *must* be replaced by a space. If the agency or route ID contains a "_" they
      *        must be escaped using a backslash.
+     *        TODO why do we want to accept route name strings when we have IDs? Break backward compatibility.
+     *        FIXME this is the only place we are still using underscores as scope separators. Rethink this from scratch.
      * @return A RouteMatcher
      * @throws IllegalArgumentException If the string representation is invalid.
      */
@@ -72,6 +74,7 @@ public class RouteMatcher implements Cloneable, Serializable {
             if (element.length() == 0)
                 continue;
             n++;
+            // FIXME regexes with no comments
             String[] routeSpec = element.split("(?<!\\\\)_", 3);
             if (routeSpec.length != 2 && routeSpec.length != 3) {
                 throw new IllegalArgumentException("Wrong route spec format: " + element);

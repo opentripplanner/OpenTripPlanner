@@ -53,8 +53,8 @@ public class TestHopFactory extends TestCase {
 
     public void testBoardAlight() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A_depart");
-        Vertex stop_b_depart = graph.getVertex("agency_B_depart");
+        Vertex stop_a = graph.getVertex("agency:A_depart");
+        Vertex stop_b_depart = graph.getVertex("agency:B_depart");
 
         assertEquals(1, stop_a.getDegreeOut());
         assertEquals(3, stop_b_depart.getDegreeOut());
@@ -81,8 +81,8 @@ public class TestHopFactory extends TestCase {
     }
 
     public void testDwell() throws Exception {
-        Vertex stop_a = graph.getVertex("agency_A_depart");
-        Vertex stop_c = graph.getVertex("agency_C_arrive");
+        Vertex stop_a = graph.getVertex("agency:A_depart");
+        Vertex stop_c = graph.getVertex("agency:C_arrive");
 
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
@@ -98,11 +98,11 @@ public class TestHopFactory extends TestCase {
 
     public void testRouting() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_b = graph.getVertex("agency_B");
-        Vertex stop_c = graph.getVertex("agency_C");
-        Vertex stop_d = graph.getVertex("agency_D");
-        Vertex stop_e = graph.getVertex("agency_E");
+        Vertex stop_a = graph.getVertex("agency:A");
+        Vertex stop_b = graph.getVertex("agency:B");
+        Vertex stop_c = graph.getVertex("agency:C");
+        Vertex stop_d = graph.getVertex("agency:D");
+        Vertex stop_e = graph.getVertex("agency:E");
 
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 

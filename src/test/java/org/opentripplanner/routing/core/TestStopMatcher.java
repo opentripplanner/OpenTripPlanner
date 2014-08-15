@@ -33,15 +33,15 @@ public class TestStopMatcher extends TestCase {
         assertFalse(emptyMatcher.matches(s1));
         assertFalse(emptyMatcher.matches(s2));
 
-        StopMatcher matcherS1 = StopMatcher.parse("A1_42");
+        StopMatcher matcherS1 = StopMatcher.parse("A1:42");
         assertTrue(matcherS1.matches(s1));
         assertFalse(matcherS1.matches(s2));
 
-        StopMatcher matcherS2 = StopMatcher.parse("A1_43");
+        StopMatcher matcherS2 = StopMatcher.parse("A1:43");
         assertFalse(matcherS2.matches(s1));
         assertTrue(matcherS2.matches(s2));
 
-        StopMatcher matcherS1S2 = StopMatcher.parse("A1_42,A1_43");
+        StopMatcher matcherS1S2 = StopMatcher.parse("A1:42,A1:43");
         assertTrue(matcherS1S2.matches(s1));
         assertTrue(matcherS1S2.matches(s2));
 
@@ -77,22 +77,22 @@ public class TestStopMatcher extends TestCase {
         s2.setId(new AgencyAndId("A1", "43"));
         s2.setParentStation("10");
         
-        StopMatcher matcherParent = StopMatcher.parse("A1_10");
+        StopMatcher matcherParent = StopMatcher.parse("A1:10");
         assertTrue(matcherParent.matches(parent));
         assertTrue(matcherParent.matches(s1));
         assertTrue(matcherParent.matches(s2));
         
-        StopMatcher matcherS1 = StopMatcher.parse("A1_42");
+        StopMatcher matcherS1 = StopMatcher.parse("A1:42");
         assertFalse(matcherS1.matches(parent));
         assertTrue(matcherS1.matches(s1));
         assertFalse(matcherS1.matches(s2));
         
-        StopMatcher matcherS2 = StopMatcher.parse("A1_43");
+        StopMatcher matcherS2 = StopMatcher.parse("A1:43");
         assertFalse(matcherS2.matches(parent));
         assertFalse(matcherS2.matches(s1));
         assertTrue(matcherS2.matches(s2));
         
-        StopMatcher matcherS1S2 = StopMatcher.parse("A1_42,A1_43");
+        StopMatcher matcherS1S2 = StopMatcher.parse("A1:42,A1:43");
         assertFalse(matcherS1S2.matches(parent));
         assertTrue(matcherS1S2.matches(s1));
         assertTrue(matcherS1S2.matches(s2));
