@@ -502,6 +502,10 @@ public abstract class RoutingResource {
         return request;
     }
 
+    /**
+     * Take a string in the format agency:id or agency:id:1:2:3:4.
+     * Convert to a Map from trip --> set of int.
+     */
     private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
@@ -510,15 +514,18 @@ public abstract class RoutingResource {
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = new HashMap<AgencyAndId, BannedStopSet>();
         String[] tripStrings = banned.split(",");
         for (String tripString : tripStrings) {
+            // TODO this apparently allows banning stops within a trip with integers. Why?
             String[] parts = tripString.split(":");
-            String tripIdString = parts[0];
-            AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
+            if (parts.length < 2) continue; // throw exception?
+            String agencyIdString = parts[0];
+            String tripIdString = parts[1];
+            AgencyAndId tripId = new AgencyAndId(agencyIdString, tripIdString);
             BannedStopSet bannedStops;
-            if (parts.length == 1) {
+            if (parts.length == 2) {
                 bannedStops = BannedStopSet.ALL;
             } else {
                 bannedStops = new BannedStopSet();
-                for (int i = 1; i < parts.length; ++i) {
+                for (int i = 2; i < parts.length; ++i) {
                     bannedStops.add(Integer.parseInt(parts[i]));
                 }
             }

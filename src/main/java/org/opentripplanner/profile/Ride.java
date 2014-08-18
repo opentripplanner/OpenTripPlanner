@@ -44,21 +44,22 @@ public class Ride {
     final List<PatternRide> patternRides = Lists.newArrayList();
     Stats rideStats; // filled in only once the ride is complete (has all PatternRides).
     Stats waitStats; // filled in only once the ride is complete (has all PatternRides).
-    ProfileTransfer xfer; // note that this transfer is an exemplar, typical of all transfers used to reach all patterns
+    int accessTime;  // minimum time to reach this ride from the previous one, or from the origin point on the first ride
+    int accessDist;  // meters from the previous ride, or from the origin point on the first ride
 
-    public Ride (Stop from, Ride previous, ProfileTransfer xfer) {
+    public Ride (Stop from, Ride previous) {
         this.from = from;
         this.to = null; // this is a "partial ride" waiting to be completed.
         this.previous = previous;
-        this.xfer = xfer;
     }
 
     /** Construct a partial copy with no PatternRides or Stats and the given to-Stop. */
     public Ride (Ride other, Stop to) {
         this.from = other.from;
-        this.xfer = other.xfer;
-        this.previous = other.previous;
         this.to = to;
+        this.previous = other.previous;
+        this.accessTime = other.accessTime;
+        this.accessDist = other.accessDist;
     }
 
     /** Extend this incomplete ride to the given stop, creating a container for PatternRides. */
@@ -137,7 +138,8 @@ public class Ride {
         Ride ride = this;
         while (ride != null) {
             ret += ride.rideStats.min;
-            ret += ride.waitStats.min; // does not include walk time!
+            ret += ride.waitStats.min;
+            ret += ride.accessTime; // minimum access time to first ride, or transfer walking time on subsequent ones.
             ride = ride.previous;
         }
         return ret;
@@ -149,18 +151,11 @@ public class Ride {
         Ride ride = this;
         while (ride != null) {
             ret += ride.rideStats.max;
-            ret += ride.waitStats.max; // TODO does not include walk time!
+            ret += ride.waitStats.max;
+            ret += ride.accessTime; // FIXME using fastest access mode when calculating upper bound time... is this OK?
             ride = ride.previous;
         }
         return ret;
-    }
-
-    /**
-     * All transfers are between the same stops, so of the same length.
-     * @return the distance walked from the end of the previous ride to the beginning of this ride.
-     */
-    public double getTransferDistance() {
-        return xfer == null ? 0 : xfer.distance;
     }
 
     /**
@@ -236,12 +231,11 @@ public class Ride {
         if (previous == null) return this.statsForBoarding (window); 
         List<Integer> arrivals = previous.getSortedStoptimes(window, true);
         List<Integer> departures = this.getSortedStoptimes(window, false);
-        int walkTime = (int) (getTransferDistance() / walkSpeed);
-        List<Integer> waits = Lists.newArrayList();        
+        List<Integer> waits = Lists.newArrayList();
         Iterator<Integer> departureIterator = departures.iterator(); 
         int departure = departureIterator.next();
         ARRIVAL : for (int arrival : arrivals) {
-            int boardTime = arrival + walkTime + ProfileRouter.SLACK;
+            int boardTime = arrival + accessTime + ProfileRouter.SLACK;
             while (departure <= boardTime) {
                 if (!departureIterator.hasNext()) break ARRIVAL;
                 departure = departureIterator.next();

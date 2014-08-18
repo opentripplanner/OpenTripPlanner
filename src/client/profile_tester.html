@@ -31,7 +31,7 @@
     function profileRoute() {
         var req = new XMLHttpRequest();
         req.overrideMimeType("application/json");
-        var url = "http://localhost:8080/otp/routers/dc/profile";
+        var url = "http://localhost:8080/otp/routers/default/profile";
         var fromPos = fromMarker.getLatLng();
         var toPos = toMarker.getLatLng();
         var qstring = '?from=' + fromPos.lat + ',' + fromPos.lng;

@@ -18,18 +18,19 @@ import java.util.HashSet;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.gtfs.GtfsLibrary;
 
 /**
  * A StopMatcher is a collection of stops based on IDs and agency IDs.
  * 
- * We currently only support full stop IDs (agency ID + stop ID).
+ * We currently only support full stop IDs (agencyId:stopId).
  * Support for other matching expression (or other types of stop banning) can be easily added later on.
  */
 public class StopMatcher implements Cloneable, Serializable {
     private static final long serialVersionUID = 1274704742132971135L;
 
     /**
-     * Set of full matching stop ids (agency ID + stop ID)
+     * Set of full matching stop ids (agency ID: + stop ID)
      */
     private HashSet<AgencyAndId> agencyAndStopIds = new HashSet<AgencyAndId>();
 
@@ -54,7 +55,7 @@ public class StopMatcher implements Cloneable, Serializable {
     /**
      * Build a new StopMatcher from a string representation.
      * 
-     * @param stopList is a comma-separated list of stops, each of the format [agencyId]_[stopId]
+     * @param stopList is a comma-separated list of stops, each of the format [agencyId]:[stopId]
      * @return A StopMatcher
      * @throws IllegalArgumentException if the string representation is invalid.
      */
@@ -70,7 +71,7 @@ public class StopMatcher implements Cloneable, Serializable {
             n++;
 
             try {
-                AgencyAndId stopId = AgencyAndId.convertFromString(stopString);
+                AgencyAndId stopId = GtfsLibrary.convertIdFromString(stopString);
                 retval.agencyAndStopIds.add(stopId);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("Wrong stop spec format: " + stopString);

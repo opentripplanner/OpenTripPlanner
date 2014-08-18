@@ -22,6 +22,8 @@ public class Option {
     public Stats stats = new Stats();
     public String summary;
     public List<DCFareCalculator.Fare> fares;
+    // The fares are outside the transit segments because a fare can apply to multiple segments so there is no one-to-one
+    // correspondance. For example, when you transfer from one subway to another and pay one fare for the two segments.
 
     public Option (Ride tail, Collection<StopAtDistance> accessPaths, Collection<StopAtDistance> egressPaths) {
         access = StreetSegment.list(accessPaths);
@@ -43,7 +45,7 @@ public class Option {
             }
         }
         // Really should be one per segment, with transfers to the same operator having a price of 0.
-        // TODO fares = DCFareCalculator.calculateFares(rides);
+        fares = DCFareCalculator.calculateFares(rides);
         summary = generateSummary();
     }
 

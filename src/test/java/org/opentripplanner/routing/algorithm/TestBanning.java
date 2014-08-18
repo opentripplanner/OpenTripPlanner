@@ -45,8 +45,8 @@ public class TestBanning extends TestCase {
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
 
         RoutingRequest options = new RoutingRequest();
-        Vertex start = graph.getVertex("TriMet_8371");
-        Vertex end = graph.getVertex("TriMet_8374");
+        Vertex start = graph.getVertex("TriMet:8371");
+        Vertex end = graph.getVertex("TriMet:8374");
         options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
         // must set routing context _after_ options is fully configured (time)
         options.setRoutingContext(graph, start, end);
@@ -63,7 +63,7 @@ public class TestBanning extends TestCase {
             String lineId = maxLines[i][1];
             String routeSpecStr = "TriMet_" + (lineName != null ? lineName : "")
                     + (lineId != null ? "_" + lineId : "");
-            options.setBannedRoutes(routeSpecStr);
+                options.setBannedRoutes(routeSpecStr);
             spt = aStar.getShortestPathTree(options);
             GraphPath path = spt.getPath(end, true);
             for (State s : path.states) {
@@ -117,9 +117,9 @@ public class TestBanning extends TestCase {
             Vertex start = null;
             Vertex end = null;
             while (start == null)
-                start = graph.getVertex("TriMet_" + rand.nextInt(10000));
+                start = graph.getVertex("TriMet:" + rand.nextInt(10000));
             while (end == null)
-                end = graph.getVertex("TriMet_" + rand.nextInt(10000));
+                end = graph.getVertex("TriMet:" + rand.nextInt(10000));
             options.setRoutingContext(graph, start, end);
             ShortestPathTree spt = null;
 

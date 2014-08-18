@@ -48,9 +48,9 @@ public class TestAStar extends TestCase {
         GraphPath path = null;
 
         options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
-        options.setRoutingContext(gg, "Caltrain_Millbrae Caltrain", "Caltrain_Mountain View Caltrain");
+        options.setRoutingContext(gg, "Caltrain:Millbrae Caltrain", "Caltrain:Mountain View Caltrain");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"), true);
+        path = spt.getPath(gg.getVertex("Caltrain:Mountain View Caltrain"), true);
 
         long endTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 13, 29, 0);
 
@@ -59,9 +59,9 @@ public class TestAStar extends TestCase {
         /* test backwards traversal */
         options.setArriveBy(true);
         options.dateTime = endTime;
-        options.setRoutingContext(gg, "Caltrain_Millbrae Caltrain", "Caltrain_Mountain View Caltrain");
+        options.setRoutingContext(gg, "Caltrain:Millbrae Caltrain", "Caltrain:Mountain View Caltrain");
         spt = aStar.getShortestPathTree(options);
-        path = spt.getPath(gg.getVertex("Caltrain_Millbrae Caltrain"), true);
+        path = spt.getPath(gg.getVertex("Caltrain:Millbrae Caltrain"), true);
 
         long expectedStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 39, 0);
 
@@ -72,8 +72,8 @@ public class TestAStar extends TestCase {
     public void testMaxTime() {
 
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
-        Vertex start = graph.getVertex("TriMet_8371");
-        Vertex end = graph.getVertex("TriMet_8374");
+        Vertex start = graph.getVertex("TriMet:8371");
+        Vertex end = graph.getVertex("TriMet:8374");
 
         RoutingRequest options = new RoutingRequest();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);

@@ -40,9 +40,11 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.PatternDetail;
 import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.RouteShort;
+import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -370,20 +372,41 @@ public class IndexAPI {
        }
    }
 
+    /** List basic information about all service IDs. */
     @GET
     @Path("/services")
-    /** List basic information about all service IDs. */
     public Response getServices() {
         index.serviceForId.values(); // TODO complete
         return Response.status(Status.OK).entity("NONE").build();
     }
 
+    /** List details about a specific service ID including which dates it runs on. Replaces the old /calendar. */
     @GET
     @Path("/services/{serviceId}")
-    /** List details about a specific service ID including which dates it runs on. Replaces the old /calendar. */
     public Response getServices(@PathParam("serviceId") String serviceId) {
         index.serviceForId.get(serviceId); // TODO complete
         return Response.status(Status.OK).entity("NONE").build();
+    }
+
+    /** Return all clusters of stops. */
+    @GET
+    @Path("/clusters")
+    public Response getAllStopClusters () {
+        // use 'detail' field common to all API methods in this class
+        List<StopClusterDetail> scl = StopClusterDetail.list(index.stopClusterForId.values(), detail);
+        return Response.status(Status.OK).entity(scl).build();
+    }
+
+    /** Return a cluster of stops by its ID. */
+    @GET
+    @Path("/clusters/{clusterId}")
+    public Response getStopCluster (@PathParam("clusterId") String clusterIdString) {
+        StopCluster cluster = index.stopClusterForId.get(clusterIdString);
+        if (cluster != null) {
+            return Response.status(Status.OK).entity(new StopClusterDetail(cluster, true)).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
     }
 
 }

@@ -513,7 +513,7 @@ public class TestRequest extends TestCase {
         TestPlanner planner = new TestPlanner(
                 "portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
         // Ban trips with ids 190W1280 and 190W1260 from agency with id TriMet
-        planner.setBannedTrips(Arrays.asList("TriMet_190W1280,TriMet_190W1260"));
+        planner.setBannedTrips(Arrays.asList("TriMet:190W1280,TriMet:190W1260"));
         // Do the planning
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -530,7 +530,7 @@ public class TestRequest extends TestCase {
                 "portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
         // Ban stops with ids 2106 and 2107 from agency with id TriMet
         // These are the two stops near NE 30TH AVE at NE GLISAN ST
-        planner.setBannedStops(Arrays.asList("TriMet_2106,TriMet_2107"));
+        planner.setBannedStops(Arrays.asList("TriMet:2106,TriMet:2107"));
         // Do the planning
         Response response = planner.getItineraries();
         // First check the request
@@ -544,30 +544,30 @@ public class TestRequest extends TestCase {
 
     public void testBannedStopGroup() throws ParameterException {
         // Create StopMatcher instance
-        StopMatcher stopMatcher = StopMatcher.parse("TriMet_2106,TriMet_65-tc");
+        StopMatcher stopMatcher = StopMatcher.parse("TriMet:2106,TriMet:65-tc");
         // Find stops in graph
         Graph graph = Context.getInstance().graph;
 
-        Stop stop65_tc = ((TransitStationStop) graph.getVertex("TriMet_65-tc")).getStop();
+        Stop stop65_tc = ((TransitStationStop) graph.getVertex("TriMet:65-tc")).getStop();
         assertNotNull(stop65_tc);
 
-        Stop stop12921 = ((TransitStationStop) graph.getVertex("TriMet_12921")).getStop();
+        Stop stop12921 = ((TransitStationStop) graph.getVertex("TriMet:12921")).getStop();
         assertNotNull(stop12921);
 
-        Stop stop13132 = ((TransitStationStop) graph.getVertex("TriMet_13132")).getStop();
+        Stop stop13132 = ((TransitStationStop) graph.getVertex("TriMet:13132")).getStop();
         assertNotNull(stop13132);
 
-        Stop stop2106 = ((TransitStationStop) graph.getVertex("TriMet_2106")).getStop();
+        Stop stop2106 = ((TransitStationStop) graph.getVertex("TriMet:2106")).getStop();
         assertNotNull(stop2106);
 
-        Stop stop2107 = ((TransitStationStop) graph.getVertex("TriMet_2107")).getStop();
+        Stop stop2107 = ((TransitStationStop) graph.getVertex("TriMet:2107")).getStop();
         assertNotNull(stop2107);
 
         // Match stop with id 65-tc
         assertTrue(stopMatcher.matches(stop65_tc));
-        // Match stop with id 12921 that has TriMet_65-tc as a parent
+        // Match stop with id 12921 that has TriMet:65-tc as a parent
         assertTrue(stopMatcher.matches(stop12921));
-        // Match stop with id 13132 that has TriMet_65-tc as a parent
+        // Match stop with id 13132 that has TriMet:65-tc as a parent
         assertTrue(stopMatcher.matches(stop13132));
         // Match stop with id 2106
         assertTrue(stopMatcher.matches(stop2106));
@@ -590,7 +590,7 @@ public class TestRequest extends TestCase {
 
         // Ban stop hard with id 2009 from agency with id TriMet
         // This is a stop that will be passed when using trip 190W1280
-        planner.setBannedStopsHard(Arrays.asList("TriMet_2009"));
+        planner.setBannedStopsHard(Arrays.asList("TriMet:2009"));
 
         // Do the planning again
         response = planner.getItineraries();
@@ -804,8 +804,8 @@ public class TestRequest extends TestCase {
         addTripToTripTransferTimeToTable(table, "7528", "9756", "75", "12", "750W1300", "120W1320"
                 , StopTransfer.TIMED_TRANSFER);
         // Don't forget to also add a TimedTransferEdge
-        Vertex fromVertex = graph.getVertex("TriMet_7528_arrive");
-        Vertex toVertex = graph.getVertex("TriMet_9756_depart");
+        Vertex fromVertex = graph.getVertex("TriMet:7528_arrive");
+        Vertex toVertex = graph.getVertex("TriMet:9756_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
 
         // Do the planning again
@@ -860,8 +860,8 @@ public class TestRequest extends TestCase {
         // Now add a timed transfer between two other busses
         addStopToStopTransferTimeToTable(table, "7528", "9756", StopTransfer.TIMED_TRANSFER);
         // Don't forget to also add a TimedTransferEdge
-        Vertex fromVertex = graph.getVertex("TriMet_7528_arrive");
-        Vertex toVertex = graph.getVertex("TriMet_9756_depart");
+        Vertex fromVertex = graph.getVertex("TriMet:7528_arrive");
+        Vertex toVertex = graph.getVertex("TriMet:9756_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
 
         // Do the planning again

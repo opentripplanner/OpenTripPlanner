@@ -212,7 +212,7 @@ public class PlanGenerator {
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
      * @return The generated itinerary
      */
-    Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
+    public Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
         if (path.states.size() < 2) {
             throw new TrivialPathException();
         }
