@@ -413,8 +413,8 @@ otp.widgets.tripoptions.WheelChairSelector =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
 
     id           :  null,
-    //TODO: add localization when localization branch is merged
-    label        : "Wheelchair accesible trip:",
+    //TRANSLATORS: label for checkbox
+    label        : _tr("Wheelchair accesible trip:"),
 
     initialize : function(tripWidget) {
 
