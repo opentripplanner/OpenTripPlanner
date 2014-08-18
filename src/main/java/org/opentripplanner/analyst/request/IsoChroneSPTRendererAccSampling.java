@@ -60,9 +60,9 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
 
         // 1. Create a sample grid from the SPT, using the TimeGridRenderer
         SampleGridRequest tgRequest = new SampleGridRequest();
-        tgRequest.setMaxTimeSec(isoChroneRequest.maxTimeSec);
-        tgRequest.setPrecisionMeters(isoChroneRequest.precisionMeters);
-        tgRequest.setCoordinateOrigin(isoChroneRequest.coordinateOrigin);
+        tgRequest.maxTimeSec = isoChroneRequest.maxTimeSec;
+        tgRequest.precisionMeters = isoChroneRequest.precisionMeters;
+        tgRequest.coordinateOrigin = isoChroneRequest.coordinateOrigin;
         ZSampleGrid<WTWD> sampleGrid = sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
 
         // 2. Compute isolines

@@ -68,25 +68,24 @@ public class SampleGridRenderer {
      */
     public ZSampleGrid<WTWD> getSampleGrid(SampleGridRequest spgRequest, RoutingRequest sptRequest) {
 
-        final double D0 = getOffRoadDistanceMeters(spgRequest.getPrecisionMeters());
+        final double D0 = getOffRoadDistanceMeters(spgRequest.precisionMeters);
         final double V0 = 1.00; // m/s, off-road walk speed
 
         // 1. Compute the Shortest Path Tree.
         long t0 = System.currentTimeMillis();
         long tOvershot = (long) (2 * D0 / V0);
         sptRequest.setWorstTime(sptRequest.dateTime
-                + (sptRequest.arriveBy ? -spgRequest.getMaxTimeSec() - tOvershot : spgRequest
-                        .getMaxTimeSec() + tOvershot));
+                + (sptRequest.arriveBy ? -spgRequest.maxTimeSec - tOvershot : spgRequest.maxTimeSec + tOvershot));
         sptRequest.setBatch(true);
         sptRequest.setRoutingContext(graphService.getGraph(sptRequest.getRouterId()));
         final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
 
         // 3. Create a sample grid based on the SPT.
         long t1 = System.currentTimeMillis();
-        Coordinate coordinateOrigin = spgRequest.getCoordinateOrigin();
+        Coordinate coordinateOrigin = spgRequest.coordinateOrigin;
         if (coordinateOrigin == null)
             coordinateOrigin = sptRequest.getFrom().getCoordinate();
-        final double gridSizeMeters = spgRequest.getPrecisionMeters();
+        final double gridSizeMeters = spgRequest.precisionMeters;
         final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
