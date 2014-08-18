@@ -992,7 +992,7 @@ msgstr[3] "%d min."
 msgid "%d sec"
 msgid_plural "%d secs"
 msgstr[0] "%d sek."
-msgstr[1] "%sek."
+msgstr[1] "%d sek."
 msgstr[2] "%d sek."
 msgstr[3] "%d sek."
 
@@ -1167,6 +1167,11 @@ msgstr "Prihod do"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:318
 msgid "Now"
 msgstr "Zdaj"
+
+#. label for checkbox
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:417
+msgid "Wheelchair accesible trip:"
+msgstr "Primerno za invalidske vozičke:"
 
 #. Label for dropdown Travel by: [mode of transport]
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474

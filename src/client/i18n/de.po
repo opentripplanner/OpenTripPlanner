@@ -2,16 +2,15 @@
 # Copyright (C) 2014 ORGANIZATION
 # This file is distributed under the same license as the OpenTripPlanner
 # project.
-# Stefan Diewald <stfn@dwld.info>, 2014.
 #
+# Stefan Diewald <stfn@dwld.info>, 2014.
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-08-26 14:23+0200\n"
 "PO-Revision-Date: 2014-06-24 10:25+0100\n"
-"Last-Translator: \n"
-"Language-Team: de <LL@li.org>\n"
+"Last-Translator: Stefan Diewald\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -1147,6 +1146,12 @@ msgstr "Ankunft"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:318
 msgid "Now"
 msgstr "Jetzt"
+
+#. label for checkbox
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:417
+#, fuzzy
+msgid "Wheelchair accesible trip:"
+msgstr "barrierefreie Route:"
 
 #. Label for dropdown Travel by: [mode of transport]
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474

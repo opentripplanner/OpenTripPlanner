@@ -1119,6 +1119,11 @@ msgstr ""
 msgid "Now"
 msgstr ""
 
+#. label for checkbox
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:417
+msgid "Wheelchair accesible trip:"
+msgstr ""
+
 #. Label for dropdown Travel by: [mode of transport]
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474
 msgid "Travel by"

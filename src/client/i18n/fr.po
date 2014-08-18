@@ -665,6 +665,7 @@ msgstr "Définir comme point d'arrivée"
 
 #. Shown in a popup on first point of a path in a map
 #: src/client/js/otp/modules/planner/PlannerModule.js:219
+#, fuzzy
 msgctxt "popup"
 msgid "Start"
 msgstr "Départ"
@@ -1151,6 +1152,7 @@ msgstr "Géocodeur"
 #. Depart [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of departure
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:313
+#, fuzzy
 msgctxt "tripoptions"
 msgid "Depart"
 msgstr "Départ"
@@ -1158,32 +1160,44 @@ msgstr "Départ"
 #. Arrive [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of arrival.
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:316
+#, fuzzy
 msgid "Arrive"
 msgstr "Arrivée"
 
 #. on button that sets time and date of arrival/departure to now
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:318
+#, fuzzy
 msgid "Now"
 msgstr "Maintenant"
 
+#. label for checkbox
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:417
+#, fuzzy
+msgid "Wheelchair accesible trip:"
+msgstr "Accessible aux fauteuils roulants:"
+
 #. Label for dropdown Travel by: [mode of transport]
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474
+#, fuzzy
 msgid "Travel by"
 msgstr "Voyager par"
 
 #. default value for preset values of maximum walk
 #. distances in Trip Options
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:580
+#, fuzzy
 msgid "Presets"
 msgstr "Val. pré-définies"
 
 #. label for choosing how much should person's trip on foot be
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:643
+#, fuzzy
 msgid "Maximum walk"
 msgstr "Marcher au maximum"
 
 #. label for choosing how much should person's trip on bicycle be
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:666
+#, fuzzy
 msgid "Maximum bike"
 msgstr "Parcours à vélo maximum"
 
@@ -1191,6 +1205,7 @@ msgstr "Parcours à vélo maximum"
 #. widget title
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:698
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:709
+#, fuzzy
 msgid "Preferred Routes"
 msgstr "Itinéraires préférés"
 
@@ -1198,6 +1213,7 @@ msgstr "Itinéraires préférés"
 #. buton edit Banned public transport routes
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:700
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:809
+#, fuzzy
 msgid "Edit"
 msgstr "Modifier"
 
@@ -1206,12 +1222,14 @@ msgstr "Modifier"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:777
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:812
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:872
+#, fuzzy
 msgid "None"
 msgstr "Aucune"
 
 #. Label for Weight slider  to set to preffered public
 #. transport routes
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:705
+#, fuzzy
 msgid "Weight"
 msgstr "Pondération"
 
@@ -1220,6 +1238,7 @@ msgstr "Pondération"
 #. Widget title
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:812
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:818
+#, fuzzy
 msgid "Banned routes"
 msgstr "Itinéraires à éviter"
 
@@ -1240,6 +1259,6 @@ msgstr "un Vélo Libre Service"
 
 #. button to send query for trip planning
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1092
+#, fuzzy
 msgid "Plan Your Trip"
 msgstr "Calculer votre itinéraire"
-

@@ -2,8 +2,8 @@
 # Copyright (C) 2014 ORGANIZATION
 # This file is distributed under the same license as the OpenTripPlanner
 # project.
-# pataquets, 2014.
 #
+# pataquets, 2014.
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
@@ -1158,6 +1158,12 @@ msgstr "Arribada a"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:318
 msgid "Now"
 msgstr ""
+
+#. label for checkbox
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:417
+#, fuzzy
+msgid "Wheelchair accesible trip:"
+msgstr "Viatge amb accessibilitat:"
 
 #. Label for dropdown Travel by: [mode of transport]
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474
