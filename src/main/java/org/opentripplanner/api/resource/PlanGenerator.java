@@ -175,8 +175,8 @@ public class PlanGenerator {
         Place from = new Place(tripStartVertex.getX(), tripStartVertex.getY(), startName);
         Place to = new Place(tripEndVertex.getX(), tripEndVertex.getY(), endName);
 
-        from.orig = request.getFrom().getName();
-        to.orig = request.getTo().getName();
+        from.orig = request.getFrom().name;
+        to.orig = request.getTo().name;
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 

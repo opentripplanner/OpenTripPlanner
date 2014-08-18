@@ -130,7 +130,7 @@ public class CandidateEdge {
 
         // Calculates the direction differently depending on whether a heading
         // is supplied.
-        heading = loc.getHeading();
+        heading = loc.heading;
         if (heading != null) {
             double absDiff = Math.abs(heading - directionOfEdge);
             directionDifference = Math.min(MAX_ABS_DIRECTION_DIFFERENCE - absDiff, absDiff);

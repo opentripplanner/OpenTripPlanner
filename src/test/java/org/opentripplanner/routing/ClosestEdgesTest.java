@@ -187,13 +187,13 @@ public class ClosestEdgesTest {
             // Location along the top edge, traveling with the forward edge
             // exactly.
             GenericLocation loc = new GenericLocation(c);
-            loc.setHeading(top.getAzimuth() + degreeOff);
+            loc.heading = top.getAzimuth() + degreeOff;
 
             // The top edge should be returned in all cases.
             checkBest(reqs, loc, top, 2);
 
             // Try when we're off in the opposite direction
-            loc.setHeading(top.getAzimuth() - degreeOff);
+            loc.heading = top.getAzimuth() - degreeOff;
             checkBest(reqs, loc, top, 2);
         }
     }
@@ -211,7 +211,7 @@ public class ClosestEdgesTest {
         // Location along the top edge, traveling with the forward edge
         // exactly.
         GenericLocation loc = new GenericLocation(c);
-        loc.setHeading(top.getAzimuth());
+        loc.heading = top.getAzimuth();
         
         CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
         Collections.sort(candidates, new CandidateEdge.CandidateEdgeScoreComparator());

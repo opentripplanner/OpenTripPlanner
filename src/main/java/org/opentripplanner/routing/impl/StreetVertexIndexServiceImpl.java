@@ -183,7 +183,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
         StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
-        String calculatedName = location.getName();
+        String calculatedName = location.name;
         if (intersection != null) {
             // We have an intersection vertex. Check that this vertex has edges we can traverse.
             boolean canEscape = false; 
@@ -498,7 +498,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
 
         // No Coordinate available.
-        String place = loc.getPlace();
+        String place = loc.place;
         if (place == null) {
             return null;
         }

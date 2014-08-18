@@ -246,7 +246,7 @@ public class RoutingContext implements Cloneable {
                 // non-batch mode, or arriveBy batch mode: we need a to vertex
                 toVertex = graph.streetIndex.getVertexForLocation(opt.getTo(), opt);
                 if (opt.getTo().hasEdgeId()) {
-                    toBackEdge = graph.getEdgeById(opt.getTo().getEdgeId());
+                    toBackEdge = graph.getEdgeById(opt.getTo().edgeId);
                 }
             } else {
                 toVertex = null;
@@ -261,7 +261,7 @@ public class RoutingContext implements Cloneable {
                 // non-batch mode, or depart-after batch mode: we need a from vertex
                 fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);
                 if (opt.getFrom().hasEdgeId()) {
-                    fromBackEdge = graph.getEdgeById(opt.getFrom().getEdgeId());
+                    fromBackEdge = graph.getEdgeById(opt.getFrom().edgeId);
                 }
             } else {
                 fromVertex = null;
