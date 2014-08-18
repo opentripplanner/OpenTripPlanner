@@ -23,8 +23,6 @@ import java.util.concurrent.Executors;
 
 import javax.annotation.Resource;
 
-import lombok.Setter;
-
 import org.opentripplanner.analyst.batch.aggregator.Aggregator;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
@@ -46,14 +44,14 @@ public class BatchProcessor {
     private SPTService sptService;
     private SampleFactory sampleFactory;
 
-    @Setter private Population origins;
-    @Setter private Population destinations;
-    @Setter private RoutingRequest prototypeRoutingRequest;
+    private Population origins;
+    private Population destinations;
+    private RoutingRequest prototypeRoutingRequest;
 
-    @Setter private Aggregator aggregator;
-    @Setter private Accumulator accumulator;
-    @Setter private int logThrottleSeconds = 4;    
-    @Setter private int searchCutoffSeconds = -1;
+    private Aggregator aggregator;
+    private Accumulator accumulator;
+    private int logThrottleSeconds = 4;    
+    private int searchCutoffSeconds = -1;
     
     /**
      * Empirical results for a 4-core processor (with 8 fake hyperthreading cores):
@@ -62,13 +60,13 @@ public class BatchProcessor {
      * The default value includes the hyperthreading cores, so you may want to set nThreads 
      * manually in your IoC XML. 
      */
-    @Setter private int nThreads = Runtime.getRuntime().availableProcessors(); 
+    private int nThreads = Runtime.getRuntime().availableProcessors(); 
 
-    @Setter private String date = "2011-02-04";
-    @Setter private String time = "08:00 AM";
-    @Setter private TimeZone timeZone = TimeZone.getDefault();
-    @Setter private String outputPath = "/tmp/analystOutput";
-    @Setter private float checkpointIntervalMinutes = -1;
+    private String date = "2011-02-04";
+    private String time = "08:00 AM";
+    private TimeZone timeZone = TimeZone.getDefault();
+    private String outputPath = "/tmp/analystOutput";
+    private float checkpointIntervalMinutes = -1;
     
     enum Mode { BASIC, AGGREGATE, ACCUMULATE };
     private Mode mode;

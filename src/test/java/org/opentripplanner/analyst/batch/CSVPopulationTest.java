@@ -39,7 +39,7 @@ public class CSVPopulationTest {
                 csvFile, Charset.forName("utf-8"));
 
         CSVPopulation pop = new CSVPopulation();
-        pop.setSourceFilename(csvFile.getAbsolutePath());
+        pop.sourceFilename = csvFile.getAbsolutePath();
         pop.setSkipHeaders(false);
         pop.setXCol(2);
         pop.setYCol(3);
@@ -49,7 +49,7 @@ public class CSVPopulationTest {
 
         pop.createIndividuals();
 
-        Individual sbbg = pop.getIndividuals().get(0);
+        Individual sbbg = pop.individuals.get(0);
         assertEquals(sbbg.lat, 34.45659, 0.00001);
         assertEquals(sbbg.lon, -119.70843, 0.00001);
     }
@@ -63,7 +63,7 @@ public class CSVPopulationTest {
                 csvFile, Charset.forName("utf-8"));
 
         CSVPopulation pop = new CSVPopulation();
-        pop.setSourceFilename(csvFile.getAbsolutePath());
+        pop.sourceFilename = csvFile.getAbsolutePath();
         pop.setSkipHeaders(false);
         pop.setLonCol(2);
         pop.setLatCol(3);
@@ -72,12 +72,12 @@ public class CSVPopulationTest {
 
         pop.createIndividuals();
 
-        Individual marsci = pop.getIndividuals().get(0);
+        Individual marsci = pop.individuals.get(0);
         assertEquals(marsci.lat, 34.40783, 0.00001);
         assertEquals(marsci.lon, -119.84330, 0.00001);
 
         pop = new CSVPopulation();
-        pop.setSourceFilename(csvFile.getAbsolutePath());
+        pop.sourceFilename = csvFile.getAbsolutePath();
         pop.setSkipHeaders(false);
         pop.setLonCol(2);
         pop.setLatCol(3);
@@ -87,7 +87,7 @@ public class CSVPopulationTest {
 
         pop.createIndividuals();
 
-        marsci = pop.getIndividuals().get(0);
+        marsci = pop.individuals.get(0);
         assertEquals(marsci.lat, 34.40783, 0.00001);
         assertEquals(marsci.lon, -119.84330, 0.00001);
     }
