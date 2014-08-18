@@ -173,17 +173,17 @@ public class LIsochrone extends RoutingResource {
             throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
 
         IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
-        isoChroneRequest.setIncludeDebugGeometry(debug);
-        isoChroneRequest.setPrecisionMeters(precisionMeters);
+        isoChroneRequest.includeDebugGeometry = debug;
+        isoChroneRequest.precisionMeters = precisionMeters;
         if (coordinateOrigin != null)
-            isoChroneRequest.setCoordinateOrigin(new GenericLocation(null, coordinateOrigin)
-                    .getCoordinate());
+            isoChroneRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin)
+                    .getCoordinate();
         RoutingRequest sptRequest = buildRequest(0);
 
         if (maxTimeSec != null) {
-            isoChroneRequest.setMaxTimeSec(maxTimeSec);
+            isoChroneRequest.maxTimeSec = maxTimeSec;
         } else {
-            isoChroneRequest.setMaxTimeSec(isoChroneRequest.getMaxCutoffSec());
+            isoChroneRequest.maxTimeSec = isoChroneRequest.maxCutoffSec;
         }
 
         List<IsochroneData> isochrones;
