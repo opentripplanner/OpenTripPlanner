@@ -40,12 +40,12 @@ public class CSVPopulationTest {
 
         CSVPopulation pop = new CSVPopulation();
         pop.sourceFilename = csvFile.getAbsolutePath();
-        pop.setSkipHeaders(false);
-        pop.setXCol(2);
-        pop.setYCol(3);
-        pop.setInputCol(1);
-        pop.setLabelCol(0);
-        pop.setCrs("EPSG:2229"); // State Plane CA Zone 5, US Survey Feet
+        pop.skipHeaders = false;
+        pop.xCol = 2;
+        pop.yCol = 3;
+        pop.inputCol = 1;
+        pop.labelCol = 0;
+        pop.crs = "EPSG:2229"; // State Plane CA Zone 5, US Survey Feet
 
         pop.createIndividuals();
 
@@ -64,11 +64,11 @@ public class CSVPopulationTest {
 
         CSVPopulation pop = new CSVPopulation();
         pop.sourceFilename = csvFile.getAbsolutePath();
-        pop.setSkipHeaders(false);
+        pop.skipHeaders = false;
         pop.setLonCol(2);
         pop.setLatCol(3);
-        pop.setInputCol(1);
-        pop.setLabelCol(0);
+        pop.inputCol = 1;
+        pop.labelCol = 0;
 
         pop.createIndividuals();
 
@@ -78,12 +78,12 @@ public class CSVPopulationTest {
 
         pop = new CSVPopulation();
         pop.sourceFilename = csvFile.getAbsolutePath();
-        pop.setSkipHeaders(false);
+        pop.skipHeaders = false;
         pop.setLonCol(2);
         pop.setLatCol(3);
-        pop.setInputCol(1);
-        pop.setLabelCol(0);
-        pop.setCrs("EPSG:4326");
+        pop.inputCol = 1;
+        pop.labelCol = 0;
+        pop.crs = "EPSG:4326";
 
         pop.createIndividuals();
 
