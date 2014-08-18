@@ -227,9 +227,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     }
                     List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
                     
-                    ResourceBundle resources = ResourceBundle.getBundle("internals", locale);
-
-                    ResourceBundle resources_names = ResourceBundle.getBundle("WayProperties", locale);
                     String fmt = ResourceBundleSingleton.INSTANCE.localize("corner", locale);
                     if (uniqueNames.size() > 1) {
                         calculatedName = String.format(fmt, uniqueNames.get(0),
