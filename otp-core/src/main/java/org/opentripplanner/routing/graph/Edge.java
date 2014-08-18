@@ -255,8 +255,17 @@ public abstract class Edge implements Serializable {
         }
     }
 
+    /**
+     * Gets english localized name
+     * @return english localized name
+     */
     public abstract String getName();
     
+    /**
+     * Gets wanted localization
+     * @param locale wanted locale
+     * @return Localized in specified locale name
+     */
     public abstract String getName(Locale locale);
 
     public boolean hasBogusName() {

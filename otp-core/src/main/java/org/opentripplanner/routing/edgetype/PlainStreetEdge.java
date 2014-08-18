@@ -137,7 +137,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return this.name.toString();
     }
     
-    public I18NString getRawName() {
+    /**
+     * Gets non-localized I18NString (Used when splitting edges)
+     * @return non-localized Name
+     */
+        public I18NString getRawName() {
         return this.name;
     }
     
