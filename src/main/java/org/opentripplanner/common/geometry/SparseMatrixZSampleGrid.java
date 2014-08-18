@@ -250,22 +250,22 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
 
     @Override
     public int getXMin() {
-        return allSamples.getXMin();
+        return allSamples.xMin;
     }
 
     @Override
     public int getXMax() {
-        return allSamples.getXMax();
+        return allSamples.xMax;
     }
 
     @Override
     public int getYMin() {
-        return allSamples.getYMin();
+        return allSamples.yMin;
     }
 
     @Override
     public int getYMax() {
-        return allSamples.getYMax();
+        return allSamples.yMax;
     }
     
     @Override
