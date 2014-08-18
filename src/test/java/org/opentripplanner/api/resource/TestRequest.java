@@ -447,7 +447,7 @@ public class TestRequest extends TestCase {
 
     public void testBikeRental() {
         BikeRental bikeRental = new BikeRental();
-        bikeRental.setGraphService(Context.getInstance().graphService);
+        bikeRental.graphService = Context.getInstance().graphService;
         // no stations in graph
         BikeRentalStationList stations = bikeRental.getBikeRentalStations(null, null, null);
         assertEquals(0, stations.stations.size());
