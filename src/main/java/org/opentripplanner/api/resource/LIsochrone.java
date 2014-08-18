@@ -33,8 +33,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import lombok.AllArgsConstructor;
-
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -208,9 +206,12 @@ public class LIsochrone extends RoutingResource {
     }
 
     // TODO Extract this to utility package?
-    @AllArgsConstructor
     private static class DirectoryZipper implements StreamingOutput {
         private File directory;
+        
+        DirectoryZipper(File directory){
+        	this.directory = directory;
+        }
 
         @Override
         public void write(OutputStream outStream) throws IOException {

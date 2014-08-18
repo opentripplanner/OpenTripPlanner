@@ -36,8 +36,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import lombok.AllArgsConstructor;
-
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -323,9 +321,13 @@ public class SimpleIsochrone extends RoutingResource {
         }
     }   
     
-    @AllArgsConstructor
     private static class DirectoryZipper implements StreamingOutput {
         private File directory;
+        
+        DirectoryZipper(File directory){
+        	this.directory = directory;
+        }
+        
         @Override
         public void write(OutputStream outStream) throws IOException {
             ZipOutputStream zip = new ZipOutputStream(outStream);
