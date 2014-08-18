@@ -109,7 +109,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
             IsochroneData isochrone = new IsochroneData(cutoffSec,
                     isolineBuilder.computeIsoline(cutoffSec));
             if (isoChroneRequest.isIncludeDebugGeometry())
-                isochrone.setDebugGeometry(isolineBuilder.getDebugGeometry());
+                isochrone.debugGeometry = isolineBuilder.getDebugGeometry();
             isochrones.add(isochrone);
         }
         long t2 = System.currentTimeMillis();

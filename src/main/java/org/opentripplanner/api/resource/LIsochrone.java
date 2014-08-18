@@ -151,8 +151,8 @@ public class LIsochrone extends RoutingResource {
                 contourSchema);
         SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(contourSchema);
         for (IsochroneData isochrone : isochrones) {
-            fbuilder.add(isochrone.getGeometry());
-            fbuilder.add(isochrone.getCutoffSec());
+            fbuilder.add(isochrone.geometry);
+            fbuilder.add(isochrone.cutoffSec);
             featureCollection.add(fbuilder.buildFeature(null));
         }
         return featureCollection;

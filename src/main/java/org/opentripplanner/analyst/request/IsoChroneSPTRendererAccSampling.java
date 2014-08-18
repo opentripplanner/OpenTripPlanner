@@ -112,7 +112,7 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
             IsochroneData isochrone = new IsochroneData(cutoffSec,
                     isolineBuilder.computeIsoline(z0));
             if (isoChroneRequest.isIncludeDebugGeometry())
-                isochrone.setDebugGeometry(isolineBuilder.getDebugGeometry());
+                isochrone.debugGeometry = isolineBuilder.getDebugGeometry();
             isochrones.add(isochrone);
         }
 
