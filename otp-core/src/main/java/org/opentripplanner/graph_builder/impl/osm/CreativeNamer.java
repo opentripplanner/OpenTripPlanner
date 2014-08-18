@@ -34,17 +34,7 @@ public class CreativeNamer {
 
     public CreativeNamer() {
     }
-
-    /*
-    /**
-     * 
-     * @deprecated
-     * There is now translation API
-     *
-    public String generateCreativeName(OSMWithTags way) {
-        return TemplateLibrary.generate(creativeNamePattern, way);
-    }*/
-    
+   
     public I18NString generateCreativeName(OSMWithTags way) {
         return new LocalizedString(creativeNamePattern, way);
     }
