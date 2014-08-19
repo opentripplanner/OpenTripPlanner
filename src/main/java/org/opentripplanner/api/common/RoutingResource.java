@@ -401,8 +401,8 @@ public abstract class RoutingResource {
             request.setIntermediatePlacesFromStrings(intermediatePlaces);
         }
         if (intermediatePlacesOrdered == null)
-            intermediatePlacesOrdered = request.isIntermediatePlacesOrdered();
-        request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
+            intermediatePlacesOrdered = request.intermediatePlacesOrdered;
+        request.intermediatePlacesOrdered = intermediatePlacesOrdered;
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
         request.setOtherThanPreferredRoutesPenalty(get(otherThanPreferredRoutesPenalty, n, request.getOtherThanPreferredRoutesPenalty()));
         request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
@@ -452,7 +452,7 @@ public abstract class RoutingResource {
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;
         request.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
-        if (request.getIntermediatePlaces() != null
+        if (request.intermediatePlaces != null
                 && (request.getModes().isTransit() || 
                         (request.getModes().getWalk() && 
                          request.getModes().getBicycle())))

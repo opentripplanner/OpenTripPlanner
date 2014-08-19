@@ -83,13 +83,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public GenericLocation to;
 
     /** An unordered list of intermediate locations to be visited. */
-    @Getter @Setter
     public List<GenericLocation> intermediatePlaces;
 
-    @Getter @Setter public boolean intermediatePlacesOrdered;
+    public boolean intermediatePlacesOrdered;
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
-    @Getter @Setter public double maxWalkDistance = Double.MAX_VALUE;
+    public double maxWalkDistance = Double.MAX_VALUE;
 
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
