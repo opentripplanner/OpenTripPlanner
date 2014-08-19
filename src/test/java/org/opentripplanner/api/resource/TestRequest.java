@@ -311,21 +311,21 @@ public class TestRequest extends TestCase {
         RoutingRequest request = new RoutingRequest();
 
         request.addMode(TraverseMode.CAR);
-        assertTrue(request.getModes().getCar());
+        assertTrue(request.modes.getCar());
         request.removeMode(TraverseMode.CAR);
-        assertFalse(request.getModes().getCar());
+        assertFalse(request.modes.getCar());
 
         request.addMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.getModes().getCar());
-        assertTrue(request.getModes().getDriving());
+        assertFalse(request.modes.getCar());
+        assertTrue(request.modes.getDriving());
         request.removeMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.getModes().getCar());
-        assertFalse(request.getModes().getDriving());
+        assertFalse(request.modes.getCar());
+        assertFalse(request.modes.getDriving());
 
         request.setModes(new TraverseModeSet("BICYCLE,WALK"));
-        assertFalse(request.getModes().getCar());
-        assertTrue(request.getModes().getBicycle());
-        assertTrue(request.getModes().getWalk());
+        assertFalse(request.modes.getCar());
+        assertTrue(request.modes.getBicycle());
+        assertTrue(request.modes.getWalk());
     }
 
     public void testBuildRequest() throws Exception {

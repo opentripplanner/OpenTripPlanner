@@ -94,19 +94,19 @@ public class RoutingRequest implements Cloneable, Serializable {
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
      */
-    @Getter @Setter public int maxPreTransitTime = Integer.MAX_VALUE;
+    public int maxPreTransitTime = Integer.MAX_VALUE;
 
     /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
-    @Getter @Setter public long worstTime = Long.MAX_VALUE;
+    public long worstTime = Long.MAX_VALUE;
 
     /** The worst possible weight that we will accept when planning a trip. */
-    @Getter @Setter public double maxWeight = Double.MAX_VALUE;
+    public double maxWeight = Double.MAX_VALUE;
 
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
-    @Getter @Setter public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
+    public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
 
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
-    @Getter @Setter public OptimizeType optimize = OptimizeType.QUICK;
+    public OptimizeType optimize = OptimizeType.QUICK;
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     @Getter @Setter public long dateTime = new Date().getTime() / 1000;
@@ -534,7 +534,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** @return the (soft) maximum walk distance */
     // If transit is not to be used, disable walk limit.
     public double getMaxWalkDistance() {
-        if (!getModes().isTransit()) {
+        if (!modes.isTransit()) {
             return Double.MAX_VALUE;
         } else {
             return maxWalkDistance;
@@ -625,7 +625,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
         // TODO Check this: perfect equality between non-transit modes.
         // For partial equality, should we return a smaller similarity score?
-        if (getModes().getNonTransitSet().equals(options.getModes().getNonTransitSet())) {
+        if (modes.getNonTransitSet().equals(options.modes.getNonTransitSet())) {
             s += 1000;
         }
         if (optimize == options.optimize) {
@@ -683,7 +683,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public int getNumItineraries() { 
-        if (getModes().isTransit()) {
+        if (modes.isTransit()) {
             return numItineraries;
         } else {
             // If transit is not to be used, only search for one itinerary.
@@ -710,7 +710,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String toString(String sep) {
         return from + sep + to + sep + getMaxWalkDistance() + sep + getDateTime() + sep
-                + isArriveBy() + sep + getOptimize() + sep + modes.getAsStr() + sep
+                + isArriveBy() + sep + optimize + sep + modes.getAsStr() + sep
                 + getNumItineraries();
     }
 
@@ -900,7 +900,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && maxWeight == other.maxWeight
                 && worstTime == other.worstTime
                 && maxTransfers == other.maxTransfers
-                && getModes().equals(other.getModes())
+                && modes.equals(other.modes)
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
@@ -953,7 +953,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int hashCode() {
         int hashCode = new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
                 + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
-                + (int) (worstTime & 0xffffffff) + getModes().hashCode()
+                + (int) (worstTime & 0xffffffff) + modes.hashCode()
                 + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()

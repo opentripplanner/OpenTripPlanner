@@ -353,7 +353,7 @@ public class RoutingContext implements Cloneable {
         if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);
         }
-        if (opt.getModes().isTransit() && !graph.transitFeedCovers(opt.dateTime)) {
+        if (opt.modes.isTransit() && !graph.transitFeedCovers(opt.dateTime)) {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
@@ -373,7 +373,7 @@ public class RoutingContext implements Cloneable {
         final ServiceDate serviceDate = new ServiceDate(c);
         this.serviceDays = new ArrayList<ServiceDay>(3);
         if (calendarService == null && graph.getCalendarService() != null
-                && (opt.getModes() == null || opt.getModes().contains(TraverseMode.TRANSIT))) {
+                && (opt.modes == null || opt.modes.contains(TraverseMode.TRANSIT))) {
             LOG.warn("RoutingContext has no CalendarService. Transit will never be boarded.");
             return;
         }

@@ -48,7 +48,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     @Override
     public void initialize(State s, Vertex target, long abortTime) {
         this.options = s.getOptions();
-        this.useTransit = options.getModes().isTransit();
+        this.useTransit = options.modes.isTransit();
         this.maxSpeed = getMaxSpeed(options);
 
         Graph graph = options.rctx.graph;
@@ -133,7 +133,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
      * RoutingRequest. 
      */
     public static double getMaxSpeed(RoutingRequest options) {
-        if (options.getModes().contains(TraverseMode.TRANSIT)) {
+        if (options.modes.contains(TraverseMode.TRANSIT)) {
             // assume that the max average transit speed over a hop is 10 m/s, which is roughly
             // true in Portland and NYC, but *not* true on highways
             // FIXME this is extremely wrong if you include rail

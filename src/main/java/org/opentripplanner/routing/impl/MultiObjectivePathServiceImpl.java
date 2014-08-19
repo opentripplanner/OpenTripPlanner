@@ -117,7 +117,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
         }
 
         RemainingWeightHeuristic heuristic;
-        if (options.getModes().isTransit()) {
+        if (options.modes.isTransit()) {
             LOG.debug("Transit itinerary requested.");
             // always use the bidirectional heuristic because the others are not precise enough
             heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
@@ -203,7 +203,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                 if (u.equals(targetVertex)) {
 //                    boundingStates.add(su);
                     returnStates.add(su);
-                    if ( ! options.getModes().isTransit())
+                    if ( ! options.modes.isTransit())
                         break QUEUE;
                     // options should contain max itineraries
                     if (returnStates.size() >= _maxPaths)

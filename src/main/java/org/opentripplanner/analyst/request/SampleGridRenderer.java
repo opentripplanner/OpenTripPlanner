@@ -74,7 +74,7 @@ public class SampleGridRenderer {
         // 1. Compute the Shortest Path Tree.
         long t0 = System.currentTimeMillis();
         long tOvershot = (long) (2 * D0 / V0);
-        sptRequest.setWorstTime(sptRequest.dateTime
+        sptRequest.worstTime = (sptRequest.dateTime
                 + (sptRequest.arriveBy ? -spgRequest.maxTimeSec - tOvershot : spgRequest.maxTimeSec + tOvershot));
         sptRequest.setBatch(true);
         sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));

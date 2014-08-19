@@ -103,7 +103,7 @@ public class StateData implements Cloneable {
     public Set<String> bikeRentalNetworks;
 
     public StateData(RoutingRequest options) {
-        TraverseModeSet modes = options.getModes();
+        TraverseModeSet modes = options.modes;
         if (modes.getCar())
             nonTransitMode = TraverseMode.CAR;
         else if (modes.getCustomMotorVehicle())

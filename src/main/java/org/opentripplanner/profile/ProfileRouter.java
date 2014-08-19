@@ -396,7 +396,7 @@ public class ProfileRouter {
         // If elapsed time is not capped, searches are very slow.
         long worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
         if (dest) worstElapsedTime *= -1;
-        rr.setWorstTime(rr.dateTime + worstElapsedTime);
+        rr.worstTime = (rr.dateTime + worstElapsedTime);
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         GenericAStar astar = new GenericAStar();
@@ -439,7 +439,7 @@ public class ProfileRouter {
         // This is not a batch search, it is a point-to-point search with goal direction.
         // Impose a max time to protect against very slow searches.
         int worstElapsedTime = request.streetTime * 60;
-        rr.setWorstTime(rr.dateTime + worstElapsedTime);
+        rr.worstTime = (rr.dateTime + worstElapsedTime);
         rr.setWalkSpeed(request.walkSpeed);
         rr.setBikeSpeed(request.bikeSpeed);
         GenericAStar astar = new GenericAStar();
@@ -463,7 +463,7 @@ public class ProfileRouter {
         rr.setWalkSpeed(request.walkSpeed);
         // If max trip duration is not limited, searches are of course much slower.
         int worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
-        rr.setWorstTime(rr.dateTime + worstElapsedTime);
+        rr.worstTime = (rr.dateTime + worstElapsedTime);
         rr.setBatch(true);
         GenericAStar astar = new GenericAStar();
         astar.setNPaths(1);

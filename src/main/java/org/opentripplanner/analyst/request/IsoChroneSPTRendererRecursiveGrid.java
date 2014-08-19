@@ -69,7 +69,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
 
         // 1. Compute the Shortest Path Tree.
         long t0 = System.currentTimeMillis();
-        sptRequest.setWorstTime(sptRequest.dateTime
+        sptRequest.worstTime = (sptRequest.dateTime
                 + (sptRequest.arriveBy ? -isoChroneRequest.maxCutoffSec : isoChroneRequest.maxCutoffSec));
         sptRequest.setBatch(true);
         sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));

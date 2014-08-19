@@ -71,7 +71,7 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
             // Do not pre-board if transit modes are not selected.
             // Return null here rather than in StreetTransitLink so that walk-only
             // options can be used to find transit stops without boarding vehicles.
-            if (!options.getModes().isTransit())
+            if (!options.modes.isTransit())
                 return null;
 
             // If we've hit our transfer limit, don't go any further

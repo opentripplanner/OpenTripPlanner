@@ -157,7 +157,7 @@ public class StateEditor {
 
     public boolean weHaveWalkedTooFar(RoutingRequest options) {
         // Only apply limit in transit-only case
-        if (!options.getModes().isTransit())
+        if (!options.modes.isTransit())
             return false;
 
         return child.walkDistance >= options.maxWalkDistance;

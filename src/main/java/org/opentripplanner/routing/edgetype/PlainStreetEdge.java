@@ -191,7 +191,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             }
         }
         
-        return canTraverse(options.getModes());
+        return canTraverse(options.modes);
     }
     
     @Override
@@ -456,7 +456,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             if (s1.isMaxPreTransitTimeExceeded(options)) {
                 if (options.isSoftPreTransitLimiting()) {
                     weight += calculateOverageWeight(s0.getPreTransitTime(), s1.getPreTransitTime(),
-                            options.getMaxPreTransitTime(), options.getPreTransitPenalty(),
+                            options.maxPreTransitTime, options.getPreTransitPenalty(),
                                     options.getPreTransitOverageRate());
                 } else return null;
             }

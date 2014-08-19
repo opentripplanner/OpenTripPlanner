@@ -61,7 +61,7 @@ public class GraphPath {
      */
     public GraphPath(State s, boolean optimize) {
         // Only optimize transit trips
-        optimize &= s.getOptions().getModes().isTransit();
+        optimize &= s.getOptions().modes.isTransit();
         this.rctx = s.getContext();
         this.back = s.getOptions().isArriveBy();
         // optimize = false; // DEBUG

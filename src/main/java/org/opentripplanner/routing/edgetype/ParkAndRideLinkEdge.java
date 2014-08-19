@@ -135,7 +135,7 @@ public class ParkAndRideLinkEdge extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest options) {
-        boolean parkAndRide = options.getModes().getWalk() && options.getModes().getCar();
+        boolean parkAndRide = options.modes.getWalk() && options.modes.getCar();
         return parkAndRide ? 0 : Double.POSITIVE_INFINITY;
     }
 

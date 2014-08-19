@@ -244,7 +244,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Vertex closestStop = null;
         // elsewhere options=null means no restrictions, find anything.
         // here we skip examining stops, as they are really only relevant when transit is being used
-        if (options != null && options.getModes().isTransit()) {
+        if (options != null && options.modes.isTransit()) {
             for (TransitStop v : getLocalTransitStops(coord, 1000)) {
                 if (!v.isStreetLinkable()) continue;
 

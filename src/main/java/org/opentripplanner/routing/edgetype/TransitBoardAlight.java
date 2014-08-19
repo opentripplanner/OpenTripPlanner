@@ -212,7 +212,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
             
             /* Check this pattern's mode against those allowed in the request. */
-            if (!options.getModes().get(modeMask)) {
+            if (!options.modes.get(modeMask)) {
                 return null;
             }
 
@@ -353,7 +353,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     /* See weightLowerBound comment. */
     public double timeLowerBound(RoutingRequest options) {
         if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding)) {
-            if (!options.getModes().get(modeMask)) {
+            if (!options.modes.get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
             BitSet services = getPattern().services;

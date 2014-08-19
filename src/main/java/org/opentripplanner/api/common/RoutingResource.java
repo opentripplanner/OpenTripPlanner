@@ -358,7 +358,7 @@ public abstract class RoutingResource {
         request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
-        request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.getMaxPreTransitTime()));
+        request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.maxPreTransitTime));
         request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
         request.setWaitReluctance(get(waitReluctance, n, request.getWaitReluctance()));
         request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.getWaitAtBeginningFactor()));
@@ -369,7 +369,7 @@ public abstract class RoutingResource {
         request.setBikeSwitchTime(bikeSwitchTimeParam);
         int bikeSwitchCostParam = get(bikeSwitchCost, n, request.getBikeSwitchCost());
         request.setBikeSwitchCost(bikeSwitchCostParam);
-        OptimizeType opt = get(optimize, n, request.getOptimize());
+        OptimizeType opt = get(optimize, n, request.optimize);
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);
             Double tslope = get(triangleSlopeFactor,  n, null);
@@ -453,9 +453,9 @@ public abstract class RoutingResource {
                 < NOW_THRESHOLD_MILLIS;
         request.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
         if (request.intermediatePlaces != null
-                && (request.getModes().isTransit() || 
-                        (request.getModes().getWalk() && 
-                         request.getModes().getBicycle())))
+                && (request.modes.isTransit() || 
+                        (request.modes.getWalk() && 
+                         request.modes.getBicycle())))
             throw new UnsupportedOperationException("TSP is not supported for transit or bike share trips");
 
         String startTransitStopId = get(this.startTransitStopId, n,

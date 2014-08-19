@@ -307,7 +307,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     public static class Factory implements RemainingWeightHeuristicFactory {
         @Override
         public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
-            if (opt.getModes().isTransit()) {
+            if (opt.modes.isTransit()) {
                 LOG.debug("Transit itinerary requested.");
                 return new InterleavedBidirectionalHeuristic (opt.rctx.graph);
             } else {
