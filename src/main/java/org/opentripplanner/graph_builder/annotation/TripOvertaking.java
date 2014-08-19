@@ -15,9 +15,6 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.onebusaway.gtfs.model.Trip;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class TripOvertaking extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -29,6 +26,12 @@ public class TripOvertaking extends GraphBuilderAnnotation {
     final Trip overtaker;
     final Trip overtaken;
     int index;
+    
+    public TripOvertaking(Trip overtaker, Trip overtaken, int index){
+    	this.overtaker = overtaker;
+    	this.overtaken = overtaken;
+    	this.index = index;
+    }
     
     @Override
     public String getMessage() {

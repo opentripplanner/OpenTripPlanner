@@ -13,11 +13,8 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.onebusaway.gtfs.model.Trip;
 
-@AllArgsConstructor
 public class HopSpeedFast extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -32,6 +29,13 @@ public class HopSpeedFast extends GraphBuilderAnnotation {
     final Trip trip;
     
     final int seq;
+    
+    public HopSpeedFast(float speed, float distance, Trip trip, int seq){
+    	this.speed = speed;
+    	this.distance = distance;
+    	this.trip = trip;
+    	this.seq = seq;
+    }
     
     @Override
     public String getMessage() {

@@ -15,9 +15,6 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Edge;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class VertexShapeError extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -27,6 +24,10 @@ public class VertexShapeError extends GraphBuilderAnnotation {
     		"use of defaultAgencyId.";
     
     final Edge edge;
+    
+    public VertexShapeError(Edge edge){
+    	this.edge = edge;
+    }
     
     @Override
     public String getMessage() {

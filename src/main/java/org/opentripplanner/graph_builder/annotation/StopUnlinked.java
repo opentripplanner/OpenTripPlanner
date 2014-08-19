@@ -13,12 +13,9 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-@AllArgsConstructor
 public class StopUnlinked extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -26,6 +23,10 @@ public class StopUnlinked extends GraphBuilderAnnotation {
     public static final String FMT = "Stop %s not near any streets; it will not be usable.";
     
     final TransitStop stop;
+    
+    public StopUnlinked(TransitStop stop){
+    	this.stop = stop;
+    }
     
     @Override
     public String getMessage() {

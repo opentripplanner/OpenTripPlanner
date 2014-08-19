@@ -15,9 +15,6 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Edge;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class BogusEdgeGeometry extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -26,6 +23,10 @@ public class BogusEdgeGeometry extends GraphBuilderAnnotation {
     		"or geometry has fewer than two points)";
     
     final Edge edge;
+    
+    public BogusEdgeGeometry(Edge edge){
+    	this.edge = edge;
+    }
     
     @Override
     public String getMessage() {

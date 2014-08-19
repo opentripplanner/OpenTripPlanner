@@ -15,9 +15,6 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.onebusaway.gtfs.model.Trip;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class TripDuplicate extends GraphBuilderAnnotation {
 
    private static final long serialVersionUID = 1L;
@@ -26,8 +23,12 @@ public class TripDuplicate extends GraphBuilderAnnotation {
    		"New: %s Existing: %s";
    
    final Trip newTrip;
-   
    final Trip existingTrip;
+   
+   public TripDuplicate(Trip newTrip, Trip existingTrip){
+	   this.newTrip = newTrip;
+	   this.existingTrip = existingTrip;
+   }
 
    @Override
    public String getMessage() {

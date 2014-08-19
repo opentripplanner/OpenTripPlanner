@@ -13,9 +13,6 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class TurnRestrictionException extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -23,6 +20,11 @@ public class TurnRestrictionException extends GraphBuilderAnnotation {
     public static final String FMT = "Turn restriction with bicycle exception at node %s from %s";
     
     final long node, way;
+    
+    public TurnRestrictionException(long node, long way){
+    	this.node = node;
+    	this.way = way;
+    }
     
     @Override
     public String getMessage() {

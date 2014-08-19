@@ -13,11 +13,9 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-@AllArgsConstructor
 public class NonStationParentStation extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -25,6 +23,10 @@ public class NonStationParentStation extends GraphBuilderAnnotation {
     public static final String FMT = "Stop %s contains a parentStation (%s) with a location_type != 1.";
     
     final TransitStop stop;
+    
+    public NonStationParentStation(TransitStop stop){
+    	this.stop = stop;
+    }
     
     @Override
     public String getMessage() {
