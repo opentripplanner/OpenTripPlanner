@@ -99,7 +99,7 @@ public class TriangleInequalityTest {
         prototypeOptions.setCarSpeed(1.0);
         prototypeOptions.setWalkSpeed(1.0);
         prototypeOptions.setBikeSpeed(1.0);
-        prototypeOptions.setTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+        prototypeOptions.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
         
         if (traverseModes != null) {
             prototypeOptions.setModes(traverseModes);

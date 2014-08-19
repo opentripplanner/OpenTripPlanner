@@ -65,8 +65,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * TODO(flamholz): this is a weird place to inject this model. We do it here because, for historical reasons, this is 
      * the most reasonable place to inject it.
      */
-    @Setter
-    private IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
+    public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
