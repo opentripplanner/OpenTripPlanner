@@ -181,8 +181,8 @@ public class WayPropertySet {
         CreativeNamer bestNamer = null;
         int bestScore = 0;
         for (CreativeNamerPicker picker : creativeNamers) {
-            OSMSpecifier specifier = picker.getSpecifier();
-            CreativeNamer namer = picker.getNamer();
+            OSMSpecifier specifier = picker.specifier;
+            CreativeNamer namer = picker.namer;
             int score = specifier.matchScore(way);
             if (score > bestScore) {
                 bestNamer = namer;
@@ -261,8 +261,8 @@ public class WayPropertySet {
     public Set<Alert> getNoteForWay(OSMWithTags way) {
         HashSet<Alert> out = new HashSet<Alert>();
         for (NotePicker picker : notes) {
-            OSMSpecifier specifier = picker.getSpecifier();
-            NoteProperties noteProperties = picker.getNoteProperties();
+            OSMSpecifier specifier = picker.specifier;
+            NoteProperties noteProperties = picker.noteProperties;
             if (specifier.matchScore(way) > 0) {
                 out.add(Alert.createSimpleAlerts(noteProperties.generateNote(way).intern()));
             }
