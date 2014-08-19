@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import lombok.Getter;
 
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;

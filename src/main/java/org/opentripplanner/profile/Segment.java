@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import lombok.Getter;
 
 import com.beust.jcommander.internal.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;

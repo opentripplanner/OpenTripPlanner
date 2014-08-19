@@ -5,14 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import lombok.Getter;
-
 import com.google.common.collect.Lists;
 
 // Jackson will serialize fields with getters, or @JsonProperty annotations.
 public class ProfileResponse {
     
-    @Getter
     List<Option> options = Lists.newArrayList();
 
     /**
