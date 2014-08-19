@@ -212,7 +212,7 @@ public class OTPConfigurator {
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
         }
-        graphBuilder.setSerializeGraph( ( ! params.inMemory ) || params.preFlight );
+        graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
 

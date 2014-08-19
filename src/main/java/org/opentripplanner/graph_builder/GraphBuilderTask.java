@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.Setter;
-
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -47,8 +45,7 @@ public class GraphBuilderTask implements Runnable {
     private Graph graph = new Graph();
 
     /** Should the graph be serialized to disk after being created or not? */
-    @Setter
-    private boolean serializeGraph = true;
+    public boolean serializeGraph = true;
 
     public void addGraphBuilder(GraphBuilder loader) {
         _graphBuilders.add(loader);

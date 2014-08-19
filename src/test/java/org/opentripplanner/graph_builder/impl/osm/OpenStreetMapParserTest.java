@@ -98,16 +98,16 @@ public class OpenStreetMapParserTest {
 
         OSMNode nodeA = map.getNodeForId(27308461);
         assertEquals(27308461, nodeA.getId());
-        assertEquals(52.3887673, nodeA.getLat(), 0.0000001);
-        assertEquals(16.8506243, nodeA.getLon(), 0.0000001);
+        assertEquals(52.3887673, nodeA.lat, 0.0000001);
+        assertEquals(16.8506243, nodeA.lon, 0.0000001);
         Map<String, String> tags = nodeA.getTags();
         assertEquals("JOSM", tags.get("created_by"));
         assertEquals("survey", tags.get("source"));
 
         OSMNode nodeB = map.getNodeForId(27308457);
         assertEquals(27308457, nodeB.getId());
-        assertEquals(52.3850672, nodeB.getLat(), 0.0000001);
-        assertEquals(16.8396962, nodeB.getLon(), 0.0000001);
+        assertEquals(52.3850672, nodeB.lat, 0.0000001);
+        assertEquals(16.8396962, nodeB.lon, 0.0000001);
         tags = nodeB.getTags();
         assertEquals("Wieruszowska", tags.get("name"));
         assertEquals("tram_stop", tags.get("railway"));

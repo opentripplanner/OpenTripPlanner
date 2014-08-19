@@ -328,7 +328,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
                 nodes = osmNodes;
                 for (OSMNode node : osmNodes) {
-                    VLPoint point = new VLPoint(node.getLon(), node.getLat());
+                    VLPoint point = new VLPoint(node.lon, node.lat);
                     vertices.add(point);
                 }
                 geometry = new VLPolygon(vertices);
@@ -344,7 +344,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         // close polygons
                         continue;
                     }
-                    VLPoint point = new VLPoint(node.getLon(), node.getLat());
+                    VLPoint point = new VLPoint(node.lon, node.lat);
                     nodes.add(node);
                     vertices.add(point);
                 }
@@ -651,11 +651,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     for (Ring ring : area.outermostRings) {
                         allRings.add(ring.toJtsPolygon());
                         for (OSMNode node : ring.nodes) {
-                            nodeMap.put(new Coordinate(node.getLon(), node.getLat()), node);
+                            nodeMap.put(new Coordinate(node.lon, node.lat), node);
                         }
                         for (Ring inner : ring.holes) {
                             for (OSMNode node : inner.nodes) {
-                                nodeMap.put(new Coordinate(node.getLon(), node.getLat()), node);
+                                nodeMap.put(new Coordinate(node.lon, node.lat), node);
                             }
                         }
                     }
@@ -877,8 +877,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 BikeRentalStation station = new BikeRentalStation();
                 station.id = "" + node.getId();
                 station.name = creativeName;
-                station.x = node.getLon();
-                station.y = node.getLat();
+                station.x = node.lon;
+                station.y = node.lat;
                 // The following make sure that spaces+bikes=capacity, always.
                 // Also, for the degenerate case of capacity=1, we should have 1
                 // bike available, not 0.
@@ -1064,9 +1064,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         // We need to lazy create the envelope as the default
                         // constructor include (0,0) in the bounds...
                         if (envelope == null)
-                            envelope = new Envelope2D(null, node.getLon(), node.getLat(), 0, 0);
+                            envelope = new Envelope2D(null, node.lon, node.lat, 0, 0);
                         else
-                            envelope.add(node.getLon(), node.getLat());
+                            envelope.add(node.lon, node.lat);
                         IntersectionVertex accessVertex = getVertexForOsmNode(node, area.parent);
                         if (accessVertex.getIncoming().isEmpty()
                                 || accessVertex.getOutgoing().isEmpty())
@@ -1133,7 +1133,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (_nodesWithNeighbors.contains(node.getId()) || multipleAreasContain(node.getId())) {
 
                 startingNodes.add(node);
-                VLPoint point = new VLPoint(node.getLon(), node.getLat());
+                VLPoint point = new VLPoint(node.lon, node.lat);
                 if (!visibilityPoints.contains(point)) {
                     visibilityPoints.add(point);
                     visibilityNodes.add(node);
@@ -1329,7 +1329,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     // close polygons
                     continue;
                 }
-                VLPoint point = new VLPoint(node.getLon(), node.getLat());
+                VLPoint point = new VLPoint(node.lon, node.lat);
                 nodes.add(node);
                 vertices.add(point);
             }
@@ -1568,11 +1568,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         }
                     }
                     if (nodeId != last
-                            && (node.getLat() != lastLat || node.getLon() != lastLon || levelsDiffer))
+                            && (node.lat != lastLat || node.lon != lastLon || levelsDiffer))
                         nodes.add(nodeId);
                     last = nodeId;
-                    lastLon = node.getLon();
-                    lastLat = node.getLat();
+                    lastLon = node.lon;
+                    lastLat = node.lat;
                     lastLevel = level;
                 }
 
@@ -1950,7 +1950,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private Coordinate getCoordinate(OSMNode osmNode) {
-            return new Coordinate(osmNode.getLon(), osmNode.getLat());
+            return new Coordinate(osmNode.lon, osmNode.lat);
         }
 
         public void addNode(OSMNode node) {

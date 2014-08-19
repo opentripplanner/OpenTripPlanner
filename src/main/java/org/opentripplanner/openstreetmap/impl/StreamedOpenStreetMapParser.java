@@ -88,8 +88,8 @@ public class StreamedOpenStreetMapParser {
                 if (phase == 3 && element.getName().equals(qNode)) {
                     osmNode = new OSMNode();
                     osmNode.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
-                    osmNode.setLat(Double.parseDouble(element.getAttributeByName(qLat).getValue()));
-                    osmNode.setLon(Double.parseDouble(element.getAttributeByName(qLon).getValue()));
+                    osmNode.lat = Double.parseDouble(element.getAttributeByName(qLat).getValue());
+                    osmNode.lon = Double.parseDouble(element.getAttributeByName(qLon).getValue());
 
                 } else if (phase == 2 && element.getName().equals(qWay)) {
                     osmWay = new OSMWay();
