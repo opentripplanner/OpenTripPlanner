@@ -110,7 +110,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
     public List<GraphPath> getPaths(RoutingRequest options) {
 
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.getRouterId()));
+            options.setRoutingContext(graphService.getGraph(options.routerId));
             // move into setRoutingContext ?
             options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
                     new NoThruTrafficPathParser() };

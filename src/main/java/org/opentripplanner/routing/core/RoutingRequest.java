@@ -74,7 +74,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public final HashMap<String, String> parameters = new HashMap<String, String>();
 
     /** The router ID -- internal ID to switch between router implementation (or graphs) */
-    @Getter @Setter public String routerId = "";
+    public String routerId = "";
 
     /** The start location */
     @Getter @Setter

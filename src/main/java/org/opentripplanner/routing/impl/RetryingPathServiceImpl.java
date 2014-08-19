@@ -89,7 +89,7 @@ public class RetryingPathServiceImpl implements PathService {
         // make sure the options has a routing context *before* cloning it (otherwise you get
         // orphan RoutingContexts leaving temporary edges in the graph until GC)
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.getRouterId()));
+            options.setRoutingContext(graphService.getGraph(options.routerId));
             options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
                     new NoThruTrafficPathParser() };
         }

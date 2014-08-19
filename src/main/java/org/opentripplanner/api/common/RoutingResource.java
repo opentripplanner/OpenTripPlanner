@@ -331,7 +331,7 @@ public abstract class RoutingResource {
         RoutingRequest request = otpServer.routingRequest.clone();
         request.setFromString(get(fromPlace, n, request.getFromPlace().getRepresentation()));
         request.setToString(get(toPlace, n, request.getToPlace().getRepresentation()));
-        request.setRouterId(routerId);
+        request.routerId = routerId;
         {
             //FIXME: get defaults for these from request
             String d = get(date, n, null);

@@ -63,7 +63,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
     public List<IsochroneData> getIsochrones(IsoChroneRequest isoChroneRequest,
             RoutingRequest sptRequest) {
 
-        if (sptRequest.getRouterId() != null && !sptRequest.getRouterId().isEmpty())
+        if (sptRequest.routerId != null && !sptRequest.routerId.isEmpty())
             throw new IllegalArgumentException(
                     "TODO: SampleSource is not multi-router compatible (yet).");
 
@@ -72,7 +72,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
         sptRequest.setWorstTime(sptRequest.dateTime
                 + (sptRequest.arriveBy ? -isoChroneRequest.maxCutoffSec : isoChroneRequest.maxCutoffSec));
         sptRequest.setBatch(true);
-        sptRequest.setRoutingContext(graphService.getGraph(sptRequest.getRouterId()));
+        sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));
         final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
         sptRequest.cleanup();
 

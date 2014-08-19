@@ -84,7 +84,7 @@ public class LongDistancePathService implements PathService {
         }
 
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.getRouterId()));
+            options.setRoutingContext(graphService.getGraph(options.routerId));
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 

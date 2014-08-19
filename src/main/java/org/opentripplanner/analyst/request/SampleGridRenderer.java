@@ -77,7 +77,7 @@ public class SampleGridRenderer {
         sptRequest.setWorstTime(sptRequest.dateTime
                 + (sptRequest.arriveBy ? -spgRequest.maxTimeSec - tOvershot : spgRequest.maxTimeSec + tOvershot));
         sptRequest.setBatch(true);
-        sptRequest.setRoutingContext(graphService.getGraph(sptRequest.getRouterId()));
+        sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));
         final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
 
         // 3. Create a sample grid based on the SPT.

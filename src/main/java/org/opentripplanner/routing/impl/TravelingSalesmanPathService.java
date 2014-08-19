@@ -61,7 +61,7 @@ public class TravelingSalesmanPathService implements PathService {
         }
 
         /* intermediate places present, intercept request */
-        Graph graph = graphService.getGraph(options.getRouterId());
+        Graph graph = graphService.getGraph(options.routerId);
         long time = options.dateTime;
         options.setRoutingContext(graph);
         options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
