@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
  * The Lombok Getter/Setter annotations serve to create getter and setter methods on all fields,
  * so defaults can be supplied in a PrototypeRoutingRequest bean via Spring.
  */
-@Getter @Setter 
 public class RoutingRequest implements Cloneable, Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
@@ -76,7 +75,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public final HashMap<String, String> parameters = new HashMap<String, String>();
 
     /** The router ID -- internal ID to switch between router implementation (or graphs) */
-    public String routerId = "";
+    @Getter @Setter public String routerId = "";
 
     /** The start location */
     @Getter @Setter
@@ -90,55 +89,55 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Getter @Setter
     public List<GenericLocation> intermediatePlaces;
 
-    public boolean intermediatePlacesOrdered;
+    @Getter @Setter public boolean intermediatePlacesOrdered;
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
-    public double maxWalkDistance = Double.MAX_VALUE;
+    @Getter @Setter public double maxWalkDistance = Double.MAX_VALUE;
 
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
      */
-    public int maxPreTransitTime = Integer.MAX_VALUE;
+    @Getter @Setter public int maxPreTransitTime = Integer.MAX_VALUE;
 
     /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
-    public long worstTime = Long.MAX_VALUE;
+    @Getter @Setter public long worstTime = Long.MAX_VALUE;
 
     /** The worst possible weight that we will accept when planning a trip. */
-    public double maxWeight = Double.MAX_VALUE;
+    @Getter @Setter public double maxWeight = Double.MAX_VALUE;
 
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
-    public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
+    @Getter @Setter public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
 
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
-    public OptimizeType optimize = OptimizeType.QUICK;
+    @Getter @Setter public OptimizeType optimize = OptimizeType.QUICK;
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
-    public long dateTime = new Date().getTime() / 1000;
+    @Getter @Setter public long dateTime = new Date().getTime() / 1000;
 
     /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
-    public boolean arriveBy = false;
+    @Getter @Setter public boolean arriveBy = false;
 
     /** Whether the trip must be wheelchair accessible. */
-    public boolean wheelchairAccessible = false;
+    @Getter @Setter public boolean wheelchairAccessible = false;
 
     /** The maximum number of possible itineraries to return. */
-    public int numItineraries = 3;
+    @Getter @Setter public int numItineraries = 3;
 
     /** The maximum slope of streets for wheelchair trips. */
-    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+    @Getter @Setter public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
-    public boolean showIntermediateStops = false;
+    @Getter @Setter public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */
-    private double walkSpeed;
+    @Getter @Setter private double walkSpeed;
 
-    private double bikeSpeed;
+    @Getter @Setter private double bikeSpeed;
 
-    private double carSpeed;
+    @Getter @Setter private double carSpeed;
 
-    private Locale locale = new Locale("en", "US");
+    @Getter @Setter private Locale locale = new Locale("en", "US");
 
     /**
      * An extra penalty added on transfers (i.e. all boardings except the first one).
@@ -154,16 +153,16 @@ public class RoutingRequest implements Cloneable, Serializable {
      * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. 
      * If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.
      */
-    public int transferPenalty = 0;
+    @Getter @Setter public int transferPenalty = 0;
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
      *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
      *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
-    public double walkReluctance = 2.0;
+    @Getter @Setter public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
-    public double stairsReluctance = 2.0;
+    @Getter @Setter public double stairsReluctance = 2.0;
     
     /** Multiplicative factor on expected turning time. */
     @Setter
@@ -174,44 +173,44 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Setting it to "seems like forever," while accurate, will probably prevent OTP from working correctly.
      */
     // TODO: how long does it /really/ take to get an elevator?
-    public int elevatorBoardTime = 90;
+    @Getter @Setter public int elevatorBoardTime = 90;
 
     /** What is the cost of boarding an elevator? */
-    public int elevatorBoardCost = 90;
+    @Getter @Setter public int elevatorBoardCost = 90;
 
     /** How long does it take to advance one floor on an elevator? */
-    public int elevatorHopTime = 20;
+    @Getter @Setter public int elevatorHopTime = 20;
 
     /** What is the cost of travelling one floor on an elevator? */
-    public int elevatorHopCost = 20;
+    @Getter @Setter public int elevatorHopCost = 20;
 
     // it is assumed that getting off an elevator is completely free
 
     /** Time to get on and off your own bike */
-    public int bikeSwitchTime;
+    @Getter @Setter public int bikeSwitchTime;
 
     /** Cost of getting on and off your own bike */
-    public int bikeSwitchCost;
+    @Getter @Setter public int bikeSwitchCost;
 
     /** Time to rent a bike */
-    public int bikeRentalPickupTime = 60;
+    @Getter @Setter public int bikeRentalPickupTime = 60;
 
     /**
      * Cost of renting a bike. The cost is a bit more than actual time to model the associated cost and trouble.
      */
-    public int bikeRentalPickupCost = 120;
+    @Getter @Setter public int bikeRentalPickupCost = 120;
 
     /** Time to drop-off a rented bike */
-    public int bikeRentalDropoffTime = 30;
+    @Getter @Setter public int bikeRentalDropoffTime = 30;
 
     /** Cost of dropping-off a rented bike */
-    public int bikeRentalDropoffCost = 30;
+    @Getter @Setter public int bikeRentalDropoffCost = 30;
 
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)
      */
-    public int carDropoffTime = 120;
+    @Getter @Setter public int carDropoffTime = 120;
 
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle
@@ -224,31 +223,31 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this problem could disappear.
      */
-    public double waitReluctance = 1.0;
+    @Getter @Setter public double waitReluctance = 1.0;
 
     /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
-    public double waitAtBeginningFactor = 0.2;
+    @Getter @Setter public double waitAtBeginningFactor = 0.2;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
-    protected int walkBoardCost = 60 * 10;
+    @Getter @Setter protected int walkBoardCost = 60 * 10;
 
     /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. */
-    protected int bikeBoardCost = 60 * 10;
+    @Getter @Setter protected int bikeBoardCost = 60 * 10;
 
     /** Do not use certain named routes */
-    public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
+    @Getter @Setter public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
     /** Do not use certain named agencies */
-    public HashSet<String> bannedAgencies = new HashSet<String>();
+    @Getter @Setter public HashSet<String> bannedAgencies = new HashSet<String>();
 
     /** Do not use certain trips */
-    public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
+    @Getter @Setter public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
-    private StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
+    @Getter private StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
     
     /** Do not use certain stops. See for more information the bannedStopsHard property in the RoutingResource class. */
-    private StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
+    @Getter private StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
     
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
@@ -260,7 +259,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
      */
-    public int otherThanPreferredRoutesPenalty = 300;
+    @Getter @Setter public int otherThanPreferredRoutesPenalty = 300;
 
     /** Set of unpreferred routes for given user. */
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
@@ -279,89 +278,89 @@ public class RoutingRequest implements Cloneable, Serializable {
      * transfer timing information in transfers.txt
      */
     // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
-    private int transferSlack = 0;
+    @Getter @Setter private int transferSlack = 0;
 
     /** Invariant: boardSlack + alightSlack <= transferSlack. */
-    private int boardSlack = 0;
+    @Getter @Setter private int boardSlack = 0;
 
-    private int alightSlack = 0;
+    @Getter @Setter private int alightSlack = 0;
 
-    public int maxTransfers = 2;
+    @Getter @Setter public int maxTransfers = 2;
 
     /**
      * Extensions to the trip planner will require additional traversal options beyond the default 
      * set. We provide an extension point for adding arbitrary parameters with an 
      * extension-specific key.
      */
-    public Map<Object, Object> extensions = new HashMap<Object, Object>();
+    @Getter @Setter public Map<Object, Object> extensions = new HashMap<Object, Object>();
 
     /** Penalty for using a non-preferred transfer */
-    public int nonpreferredTransferPenalty = 180;
+    @Getter @Setter public int nonpreferredTransferPenalty = 180;
 
     /**
      * For the bike triangle, how important time is. 
      * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
      */
-    public double triangleTimeFactor;
+    @Getter @Setter public double triangleTimeFactor;
 
     /** For the bike triangle, how important slope is */
-    public double triangleSlopeFactor;
+    @Getter @Setter public double triangleSlopeFactor;
 
     /** For the bike triangle, how important safety is */
-    public double triangleSafetyFactor;
+    @Getter @Setter public double triangleSafetyFactor;
 
     /** Options specifically for the case that you are walking a bicycle. */
-    public RoutingRequest bikeWalkingOptions;
+    @Getter @Setter public RoutingRequest bikeWalkingOptions;
 
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
-    public boolean reverseOptimizing = false;
+    @Getter @Setter public boolean reverseOptimizing = false;
 
     /** when true, do not use goal direction or stop at the target, build a full SPT */
-    public boolean batch = false;
+    @Getter @Setter public boolean batch = false;
 
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
-    private boolean useBikeRentalAvailabilityInformation = false;
+    @Getter @Setter private boolean useBikeRentalAvailabilityInformation = false;
 
     /**
      * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.
      */
-    public long clampInitialWait;
+    @Getter @Setter public long clampInitialWait;
 
     /**
      * When true, reverse optimize this search on the fly whenever needed, rather than reverse-optimizing the entire path when it's done.
      */
-    public boolean reverseOptimizeOnTheFly = false;
+    @Getter @Setter public boolean reverseOptimizeOnTheFly = false;
 
     /**
      * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
      * driving occurs on the left.
      */
-    public boolean driveOnRight = true;
+    @Getter @Setter public boolean driveOnRight = true;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.
      */
     // 2.9 m/s/s: 65 mph - 0 mph in 10 seconds
-    public double carDecelerationSpeed = 2.9;
+    @Getter @Setter public double carDecelerationSpeed = 2.9;
 
     /**
      * The acceleration speed of an automobile, in meters per second per second.
      */
     // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
-    public double carAccelerationSpeed = 2.9;
+    @Getter @Setter public double carAccelerationSpeed = 2.9;
     
     /**
      * When true, realtime updates are ignored during this search.
      */
-    public boolean ignoreRealtimeUpdates = false;
+    @Getter @Setter public boolean ignoreRealtimeUpdates = false;
 
     /**
      * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
      * distance path service.
      */
-    public boolean disableRemainingWeightHeuristic = false;
+    @Getter @Setter public boolean disableRemainingWeightHeuristic = false;
 
     /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions rather than RoutingContexts,
@@ -374,26 +373,26 @@ public class RoutingRequest implements Cloneable, Serializable {
      * the request scope is torn down -- the routing context becomes irrelevant at that point, since temporary graph elements have been removed and
      * the graph may have been reloaded.
      */
-    public RoutingContext rctx;
+    @Getter @Setter public RoutingContext rctx;
 
     /** A transit stop that this trip must start from */
-    private AgencyAndId startingTransitStopId;
+    @Getter @Setter private AgencyAndId startingTransitStopId;
     
     /** A trip where this trip must start from (depart-onboard routing) */
-    private AgencyAndId startingTransitTripId;
+    @Getter @Setter private AgencyAndId startingTransitTripId;
 
-    private boolean walkingBike;
+    @Getter @Setter private boolean walkingBike;
 
-    private double heuristicWeight = 1.0;
+    @Getter @Setter private double heuristicWeight = 1.0;
 
-    private boolean softWalkLimiting = true;
-    private boolean softPreTransitLimiting = true;
+    @Getter @Setter private boolean softWalkLimiting = true;
+    @Getter @Setter private boolean softPreTransitLimiting = true;
 
-    private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
-    private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
+    @Getter @Setter private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
+    @Getter @Setter private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
 
-    private double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
-    private double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
+    @Getter @Setter private double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
+    @Getter @Setter private double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
 
     /* Additional flags affecting mode transitions. This is a temporary solution, as it only covers parking and rental at the beginning of the trip. */
     public boolean allowBikeRental = false;
