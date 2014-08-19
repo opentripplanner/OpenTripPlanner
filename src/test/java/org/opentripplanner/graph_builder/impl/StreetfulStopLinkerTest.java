@@ -118,12 +118,12 @@ public class StreetfulStopLinkerTest {
         assertEquals(9, graph.countEdges());
 
         // The duration of the shortest path (A => E) is 2 seconds
-        streetfulStopLinker.setMaxDuration(1);
+        streetfulStopLinker.maxDuration = 1;
         streetfulStopLinker.buildGraph(graph, null);
         assertEquals(9, graph.countEdges());
 
         // The duration of the longest path (A => D) is 16 seconds
-        streetfulStopLinker.setMaxDuration(16);
+        streetfulStopLinker.maxDuration = 16;
         streetfulStopLinker.buildGraph(graph, null);
         assertEquals(13, graph.countEdges());
         assertEquals(9, graph.countVertices());
