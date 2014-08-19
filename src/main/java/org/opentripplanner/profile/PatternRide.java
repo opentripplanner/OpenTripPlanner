@@ -1,7 +1,5 @@
 package org.opentripplanner.profile;
 
-import lombok.EqualsAndHashCode;
-
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
@@ -12,13 +10,24 @@ import org.opentripplanner.routing.edgetype.TripPattern;
  * appear more than once in a pattern. When a ride is unfinished (waiting in the queue for
  * exploration in the next round) its toIndex is -1 and its stats field is null.
  */
-@EqualsAndHashCode // allows adding the same PatternRide to a set multiple times
 class PatternRide {
     
     final TripPattern pattern; // TripPatterns use identity equality
     final int fromIndex;       // Always set, even on unfinished PatternRides
     final int toIndex;  // set when PatternRide is finished by extending it to a specific stop
     final Stats stats;  // set when PatternRide is finished by extending it to a specific stop
+    
+    @Override
+    public boolean equals(Object o){
+    	if(o==this) return true;
+    	if (!(o instanceof PatternRide)) return false;
+    	PatternRide other = (PatternRide) o;
+    	if(!other.pattern.equals(this.pattern)) return false;
+    	if(other.fromIndex != fromIndex) return false;
+    	if(other.toIndex != toIndex) return false;
+    	if(!other.stats.equals(this.stats)) return false;
+    	return true;
+    }
 
     /** Construct an unfinished PatternRide, lacking a toIndex and stats. */
     public PatternRide (TripPattern pattern, int fromIndex) {
