@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.Setter;
-
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
@@ -71,10 +69,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     private FareServiceFactory _fareServiceFactory;
 
     /** will be applied to all bundles which do not have the cacheDirectory property set */
-    @Setter private File cacheDirectory; 
+    private File cacheDirectory; 
     
     /** will be applied to all bundles which do not have the useCached property set */
-    @Setter private Boolean useCached; 
+    private Boolean useCached; 
 
     Set<String> agencyIdsSeen = Sets.newHashSet();
 

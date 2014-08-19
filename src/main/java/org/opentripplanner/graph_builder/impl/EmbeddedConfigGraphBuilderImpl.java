@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
-import lombok.Setter;
-
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -34,8 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EmbeddedConfigGraphBuilderImpl implements GraphBuilder {
 
-    @Setter
-    private File propertiesFile;
+    public File propertiesFile;
 
     private static final Logger LOG = LoggerFactory.getLogger(EmbeddedConfigGraphBuilderImpl.class);
 

@@ -203,7 +203,7 @@ public class OTPConfigurator {
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
-            embeddedConfigBuilder.setPropertiesFile(configFile);
+            embeddedConfigBuilder.propertiesFile = configFile;
             graphBuilder.addGraphBuilder(embeddedConfigBuilder);
         }
         if (params.elevation) {

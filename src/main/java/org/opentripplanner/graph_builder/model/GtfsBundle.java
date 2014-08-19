@@ -111,7 +111,7 @@ public class GtfsBundle {
                 if (cacheDirectory != null)
                     isrc.setCacheDirectory(cacheDirectory);
                 if (useCached != null)
-                    isrc.setUseCached(useCached);
+                    isrc.useCached = useCached;
                 csvInputSource = isrc;
             }
         }

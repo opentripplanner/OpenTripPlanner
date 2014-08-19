@@ -23,8 +23,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.zip.ZipFile;
 
-import lombok.Setter;
-
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
 import org.slf4j.Logger;
@@ -40,7 +38,7 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
 
     private String _defaultAgencyId;
     
-    @Setter private boolean useCached = true;
+    public boolean useCached = true;
 
     // Pattern: Decorator
     private ZipFileCsvInputSource _zip;
