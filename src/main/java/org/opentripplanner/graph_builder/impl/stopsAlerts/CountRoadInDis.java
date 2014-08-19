@@ -17,7 +17,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
-import lombok.Setter;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -38,14 +37,11 @@ public class CountRoadInDis extends AbstractStopTester {
 
     Logger LOG = LoggerFactory.getLogger(CountRoadInDis.class);
 
-    @Setter
-    double distance; //distance in meters
+    public double distance; //distance in meters
 
-    @Setter
-    int numberOfStreets;
+    public int numberOfStreets;
 
-    @Setter
-    StreetTraversalPermission allowedPermission;
+    public StreetTraversalPermission allowedPermission;
 
     GeometryFactory geometryFactory = new GeometryFactory();
 
