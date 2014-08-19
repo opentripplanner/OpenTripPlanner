@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.Setter;
-
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
@@ -170,8 +168,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     /**
      * WayPropertySet computes edge properties from OSM way data.
      */
-    @Setter
-    private WayPropertySet wayPropertySet = new WayPropertySet();
+    public WayPropertySet wayPropertySet = new WayPropertySet();
 
     /**
      * Providers of OSM data.
@@ -181,40 +178,34 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     /**
      * Allows for arbitrary custom naming of edges.
      */
-    @Setter
-    private CustomNamer customNamer;
+    public CustomNamer customNamer;
     
     /**
      * Ignore wheelchair accessibility information.
      */
-    @Setter
-    private boolean ignoreWheelchairAccessibility = false;
+    public boolean ignoreWheelchairAccessibility = false;
 
     /**
      * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
      * around.
      */
-    @Setter
-    private OSMPlainStreetEdgeFactory edgeFactory = new DefaultOSMPlainStreetEdgeFactory();
+    public OSMPlainStreetEdgeFactory edgeFactory = new DefaultOSMPlainStreetEdgeFactory();
 
     /**
      * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in the United States. This does not affect floor
      * names from level maps.
      */
-    @Setter
-    private boolean noZeroLevels = true;
+    public boolean noZeroLevels = true;
 
     /**
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
      */
-    @Setter
-    private boolean staticBikeRental = false;
+    public boolean staticBikeRental = false;
     
     /**
      * Whether we should create P+R stations from OSM data. 
      */
-    @Setter
-    private boolean staticParkAndRide = true;
+    public boolean staticParkAndRide = true;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");

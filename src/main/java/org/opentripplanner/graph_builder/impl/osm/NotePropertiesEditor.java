@@ -23,7 +23,7 @@ public class NotePropertiesEditor extends PropertyEditorSupport {
     }
 
     public String getAsText() {
-        return value.getNotePattern();
+        return value.notePattern;
     }
 
     public Object getValue() {

@@ -573,7 +573,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     private void createNotes(WayPropertySet propset, String spec, String patternKey) {
         NoteProperties properties = new NoteProperties();
         String pattern = localize(patternKey);
-        properties.setNotePattern(pattern);
+        properties.notePattern = pattern;
         propset.addNote(new OSMSpecifier(spec), properties);
     }
 
