@@ -130,7 +130,7 @@ public abstract class GtfsTest extends TestCase {
             routingRequest.from = (new GenericLocation(null, agencyId + ":" + fromVertex));
         }
         if (toVertex != null && !toVertex.isEmpty()) {
-            routingRequest.setTo(new GenericLocation(null, agencyId + ":" + toVertex));
+            routingRequest.to = new GenericLocation(null, agencyId + ":" + toVertex);
         }
         if (onTripId != null && !onTripId.isEmpty()) {
             routingRequest.setStartingTransitTripId(new AgencyAndId(agencyId, onTripId));

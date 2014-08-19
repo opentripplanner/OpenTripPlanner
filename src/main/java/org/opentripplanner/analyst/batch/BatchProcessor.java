@@ -198,7 +198,7 @@ public class BatchProcessor {
         GenericLocation latLon = new GenericLocation(i.lat, i.lon);
         req.batch = true;
         if (req.arriveBy)
-            req.setTo(latLon);
+            req.to = latLon;
         else
             req.from = latLon;
         try {

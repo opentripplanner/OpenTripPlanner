@@ -244,9 +244,9 @@ public class RoutingContext implements Cloneable {
             // normal mode, search for vertices based RoutingRequest
             if (!opt.batch || opt.arriveBy) {
                 // non-batch mode, or arriveBy batch mode: we need a to vertex
-                toVertex = graph.streetIndex.getVertexForLocation(opt.getTo(), opt);
-                if (opt.getTo().hasEdgeId()) {
-                    toBackEdge = graph.getEdgeById(opt.getTo().edgeId);
+                toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt);
+                if (opt.to.hasEdgeId()) {
+                    toBackEdge = graph.getEdgeById(opt.to.edgeId);
                 }
             } else {
                 toVertex = null;

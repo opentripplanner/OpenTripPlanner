@@ -80,7 +80,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public GenericLocation from;
 
     /** The end location */
-    @Getter @Setter
     public GenericLocation to;
 
     /** An unordered list of intermediate locations to be visited. */
@@ -711,7 +710,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public String toString(String sep) {
-        return from + sep + getTo() + sep + getMaxWalkDistance() + sep + getDateTime() + sep
+        return from + sep + to + sep + getMaxWalkDistance() + sep + getDateTime() + sep
                 + isArriveBy() + sep + getOptimize() + sep + modes.getAsStr() + sep
                 + getNumItineraries();
     }

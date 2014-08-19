@@ -384,7 +384,7 @@ public class ProfileRouter {
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.from = (new GenericLocation(request.from.lat, request.from.lon));
         // FIXME requires destination to be set, not necesary for analyst
-        rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
+        rr.to = new GenericLocation(request.to.lat, request.to.lon);
         rr.setArriveBy(dest);
         rr.setMode(mode);
         // TODO CAR does not seem to work. rr.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
@@ -433,7 +433,7 @@ public class ProfileRouter {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(mode);
         rr.from = (new GenericLocation(request.from.lat, request.from.lon));
-        rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
+        rr.to = new GenericLocation(request.to.lat, request.to.lon);
         rr.setArriveBy(false);
         rr.setRoutingContext(graph);
         // This is not a batch search, it is a point-to-point search with goal direction.
