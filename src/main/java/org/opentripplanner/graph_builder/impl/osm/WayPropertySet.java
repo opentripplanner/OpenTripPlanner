@@ -28,7 +28,6 @@ import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import lombok.Data;
 
 /**
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc. to edges based on OSM tags.
@@ -38,7 +37,6 @@ import lombok.Data;
  * their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will win out over all the others based on the
  * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
  */
-@Data
 public class WayPropertySet {
     private static Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
@@ -53,7 +51,7 @@ public class WayPropertySet {
     private List<SpeedPicker> speedPickers;
     
     /** The automobile speed for street segments that do not match any SpeedPicker. */
-    private Float defaultSpeed;
+    public Float defaultSpeed;
 
     private List<NotePicker> notes;
     
@@ -62,7 +60,7 @@ public class WayPropertySet {
     /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
     public WayProperties defaultProperties;
 
-    private WayPropertySetSource base;
+    public WayPropertySetSource base;
 
     public WayPropertySet() {
         /* sensible defaults */
@@ -83,7 +81,7 @@ public class WayPropertySet {
     public void setBase(WayPropertySetSource base) {
        this.base = base;
        WayPropertySet props = base.getWayPropertySet();
-       creativeNamers = props.getCreativeNamers();
+       creativeNamers = props.creativeNamers;
        defaultProperties = props.defaultProperties;
        notes = props.notes;
        slopeOverrides = props.slopeOverrides;
@@ -101,7 +99,7 @@ public class WayPropertySet {
         int bestRightScore = 0;
         List<WayProperties> leftMixins = new ArrayList<WayProperties>();
         List<WayProperties> rightMixins = new ArrayList<WayProperties>();
-        for (WayPropertyPicker picker : getWayProperties()) {
+        for (WayPropertyPicker picker : wayProperties) {
             OSMSpecifier specifier = picker.getSpecifier();
             WayProperties wayProperties = picker.getProperties();
             P2<Integer> score = specifier.matchScores(way);
@@ -244,11 +242,11 @@ public class WayPropertySet {
         // SpeedPickers are constructed in DefaultWayPropertySetSource with an OSM specifier
         // (e.g. highway=motorway) and a default speed for that segment.
         for (SpeedPicker picker : speedPickers) {
-            OSMSpecifier specifier = picker.getSpecifier();
+            OSMSpecifier specifier = picker.specifier;
             score = specifier.matchScore(way);
             if (score > bestScore) {
                 bestScore = score;
-                bestSpeed = picker.getSpeed();
+                bestSpeed = picker.speed;
             }
         }
         
@@ -288,15 +286,15 @@ public class WayPropertySet {
     }
 
     public void addProperties(OSMSpecifier spec, WayProperties properties, boolean mixin) {
-        getWayProperties().add(new WayPropertyPicker(spec, properties, mixin));
+        wayProperties.add(new WayPropertyPicker(spec, properties, mixin));
     }
 
     public void addProperties(OSMSpecifier spec, WayProperties properties) {
-        getWayProperties().add(new WayPropertyPicker(spec, properties, false));
+        wayProperties.add(new WayPropertyPicker(spec, properties, false));
     }
 
     public void addCreativeNamer(OSMSpecifier spec, CreativeNamer namer) {
-        getCreativeNamers().add(new CreativeNamerPicker(spec, namer));
+        creativeNamers.add(new CreativeNamerPicker(spec, namer));
     }
 
     public void addNote(OSMSpecifier osmSpecifier, NoteProperties properties) {
