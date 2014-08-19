@@ -127,10 +127,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         try {
             for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
                 // apply global defaults to individual GTFSBundles (if globals have been set) 
-                if (cacheDirectory != null && gtfsBundle.getCacheDirectory() == null)
-                    gtfsBundle.setCacheDirectory(cacheDirectory);
-                if (useCached != null && gtfsBundle.getUseCached() == null)
-                    gtfsBundle.setUseCached(useCached);
+                if (cacheDirectory != null && gtfsBundle.cacheDirectory == null)
+                    gtfsBundle.cacheDirectory = cacheDirectory;
+                if (useCached != null && gtfsBundle.useCached == null)
+                    gtfsBundle.useCached = useCached;
                 GtfsMutableRelationalDao dao = new GtfsRelationalDaoImpl();
                 GtfsContext context = GtfsLibrary.createContext(dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
@@ -151,10 +151,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {
                     hf.createTransfersTxtTransfers();
                 }
-                if (gtfsBundle.isLinkStopsToParentStations()) {
+                if (gtfsBundle.linkStopsToParentStations) {
                     hf.linkStopsToParentStations(graph);
                 } 
-                if (gtfsBundle.isParentStationTransfers()) {
+                if (gtfsBundle.parentStationTransfers) {
                     hf.createParentStationTransfers();
                 }
             }

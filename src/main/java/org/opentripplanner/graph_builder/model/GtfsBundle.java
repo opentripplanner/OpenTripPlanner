@@ -20,9 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipFile;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.apache.http.client.ClientProtocolException;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.FileCsvInputSource;
@@ -52,15 +49,13 @@ public class GtfsBundle {
      * Create direct transfers between the constituent stops of each parent station.
      * This is different from "linking stops to parent stations" below.
      */
-    @Getter @Setter
-    private boolean parentStationTransfers = false;
+    public boolean parentStationTransfers = false;
 
     /** 
      * Connect parent station vertices to their constituent stops to allow beginning and 
      * ending paths (itineraries) at them. 
      */
-    @Getter @Setter
-    private boolean linkStopsToParentStations = false;
+    public boolean linkStopsToParentStations = false;
 
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
 
@@ -68,11 +63,9 @@ public class GtfsBundle {
 
     private double maxStopToShapeSnapDistance = 150;
 
-    @Getter @Setter 
-    private Boolean useCached = null; // null means use global default from GtfsGB || true
+    public Boolean useCached = null; // null means use global default from GtfsGB || true
 
-    @Getter @Setter 
-    private File cacheDirectory = null; // null means use default from GtfsGB || system temp dir 
+    public File cacheDirectory = null; // null means use default from GtfsGB || system temp dir 
 
     public GtfsBundle() {
     }
