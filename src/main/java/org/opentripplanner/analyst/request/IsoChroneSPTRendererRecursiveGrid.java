@@ -94,7 +94,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
             }
         };
         // TODO Snap the center as XYZ tile grid for better sample-reuse (if using sample cache).
-        Coordinate center = sptRequest.getFrom().getCoordinate();
+        Coordinate center = sptRequest.from.getCoordinate();
         double gridSizeMeters = isoChroneRequest.precisionMeters;
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / Math.cos(Math.toRadians(center.x));

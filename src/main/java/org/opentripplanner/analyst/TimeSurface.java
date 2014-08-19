@@ -78,7 +78,7 @@ public class TimeSurface implements Serializable{
         }
         
         // TODO make this work as either to or from query
-        GenericLocation from = spt.getOptions().getFrom();
+        GenericLocation from = spt.getOptions().from;
         this.lon = from.lng;
         this.lat = from.lat;
         this.id = makeUniqueId();

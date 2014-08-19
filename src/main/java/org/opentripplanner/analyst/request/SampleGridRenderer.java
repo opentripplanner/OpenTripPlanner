@@ -84,7 +84,7 @@ public class SampleGridRenderer {
         long t1 = System.currentTimeMillis();
         Coordinate coordinateOrigin = spgRequest.coordinateOrigin;
         if (coordinateOrigin == null)
-            coordinateOrigin = sptRequest.getFrom().getCoordinate();
+            coordinateOrigin = sptRequest.from.getCoordinate();
         final double gridSizeMeters = spgRequest.precisionMeters;
         final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);

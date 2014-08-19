@@ -259,9 +259,9 @@ public class RoutingContext implements Cloneable {
                 fromVertex = onBoardDepartService.setupDepartOnBoard(this);
             } else if (!opt.batch || !opt.arriveBy) {
                 // non-batch mode, or depart-after batch mode: we need a from vertex
-                fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);
-                if (opt.getFrom().hasEdgeId()) {
-                    fromBackEdge = graph.getEdgeById(opt.getFrom().edgeId);
+                fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, toVertex);
+                if (opt.from.hasEdgeId()) {
+                    fromBackEdge = graph.getEdgeById(opt.from.edgeId);
                 }
             } else {
                 fromVertex = null;

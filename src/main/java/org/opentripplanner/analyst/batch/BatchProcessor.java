@@ -200,7 +200,7 @@ public class BatchProcessor {
         if (req.arriveBy)
             req.setTo(latLon);
         else
-            req.setFrom(latLon);
+            req.from = latLon;
         try {
             req.setRoutingContext(graphService.getGraph(req.routerId));
             return req;

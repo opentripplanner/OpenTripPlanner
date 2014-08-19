@@ -153,7 +153,7 @@ public class SIsochrone extends RoutingResource {
         this.tooFastTraversedEdgeGeoms = new ArrayList();
 
         RoutingRequest sptRequestA = buildRequest(0);
-        String from = sptRequestA.getFrom().toString();
+        String from = sptRequestA.from.toString();
         int pos = 1;
         float lat = 0;
         float lon = 0;

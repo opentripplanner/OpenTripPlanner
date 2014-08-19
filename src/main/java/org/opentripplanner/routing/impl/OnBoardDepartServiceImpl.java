@@ -75,8 +75,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         }
         List<PatternHop> hops = tripPattern.getPatternHops();
 
-        Double lon = opt.getFrom().lng; // Origin point, optional
-        Double lat = opt.getFrom().lat;
+        Double lon = opt.from.lng; // Origin point, optional
+        Double lat = opt.from.lat;
         PatternStopVertex nextStop;
         TripTimes bestTripTimes = null;
         ServiceDay bestServiceDay = null;

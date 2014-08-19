@@ -113,13 +113,13 @@ public class PlanGenerator {
                 tooSloped = true;
             }
         } catch (VertexNotFoundException e) {
-            LOG.info("Vertex not found: " + options.getFrom() + " : " + options.getTo(), e);
+            LOG.info("Vertex not found: " + options.from + " : " + options.getTo(), e);
             throw e;
         }
         options.rctx.debugOutput.finishedCalculating();
 
         if (paths == null || paths.size() == 0) {
-            LOG.info("Path not found: " + options.getFrom() + " : " + options.getTo());
+            LOG.info("Path not found: " + options.from + " : " + options.getTo());
             throw new PathNotFoundException();
         }
 
@@ -175,7 +175,7 @@ public class PlanGenerator {
         Place from = new Place(tripStartVertex.getX(), tripStartVertex.getY(), startName);
         Place to = new Place(tripEndVertex.getX(), tripEndVertex.getY(), endName);
 
-        from.orig = request.getFrom().name;
+        from.orig = request.from.name;
         to.orig = request.getTo().name;
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());

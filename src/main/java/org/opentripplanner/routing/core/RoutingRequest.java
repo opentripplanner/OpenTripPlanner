@@ -77,7 +77,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String routerId = "";
 
     /** The start location */
-    @Getter @Setter
     public GenericLocation from;
 
     /** The end location */
@@ -712,7 +711,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public String toString(String sep) {
-        return getFrom() + sep + getTo() + sep + getMaxWalkDistance() + sep + getDateTime() + sep
+        return from + sep + getTo() + sep + getMaxWalkDistance() + sep + getDateTime() + sep
                 + isArriveBy() + sep + getOptimize() + sep + modes.getAsStr() + sep
                 + getNumItineraries();
     }

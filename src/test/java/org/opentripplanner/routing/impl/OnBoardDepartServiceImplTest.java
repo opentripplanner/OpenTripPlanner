@@ -134,7 +134,7 @@ public class OnBoardDepartServiceImplTest {
         when(depart.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(dwell.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
-        when(routingRequest.getFrom()).thenReturn(new GenericLocation());
+        routingRequest.from = new GenericLocation();
         when(routingRequest.getStartingTransitTripId()).thenReturn(agencyAndId);
         when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(9);
 
@@ -216,7 +216,7 @@ public class OnBoardDepartServiceImplTest {
         when(graph.getEdges()).thenReturn(Collections.<Edge>singletonList(patternHop));
         when(depart.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
-        when(routingRequest.getFrom()).thenReturn(new GenericLocation());
+        routingRequest.from = new GenericLocation();
         when(routingRequest.getStartingTransitTripId()).thenReturn(agencyAndId);
         when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(10);
         when(graph.getVertex("Station_0")).thenReturn(station0);
@@ -293,7 +293,7 @@ public class OnBoardDepartServiceImplTest {
         when(depart.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(dwell.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
-        when(routingRequest.getFrom()).thenReturn(new GenericLocation());
+        routingRequest.from = new GenericLocation();
         when(routingRequest.getStartingTransitTripId()).thenReturn(agencyAndId);
         when(graph.getVertex("Station_0")).thenReturn(station0);
         when(graph.getVertex("Station_1")).thenReturn(station1);

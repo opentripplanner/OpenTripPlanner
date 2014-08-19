@@ -127,7 +127,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setArriveBy(dateTime < 0);
         routingRequest.dateTime = Math.abs(dateTime);
         if (fromVertex != null && !fromVertex.isEmpty()) {
-            routingRequest.setFrom(new GenericLocation(null, agencyId + ":" + fromVertex));
+            routingRequest.from = (new GenericLocation(null, agencyId + ":" + fromVertex));
         }
         if (toVertex != null && !toVertex.isEmpty()) {
             routingRequest.setTo(new GenericLocation(null, agencyId + ":" + toVertex));

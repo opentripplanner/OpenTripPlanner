@@ -382,7 +382,7 @@ public class ProfileRouter {
     private List<StopAtDistance> findClosestStops(final TraverseMode mode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
+        rr.from = (new GenericLocation(request.from.lat, request.from.lon));
         // FIXME requires destination to be set, not necesary for analyst
         rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
         rr.setArriveBy(dest);
@@ -432,7 +432,7 @@ public class ProfileRouter {
     private void findStreetOption(TraverseMode mode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(mode);
-        rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
+        rr.from = (new GenericLocation(request.from.lat, request.from.lon));
         rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
         rr.setArriveBy(false);
         rr.setRoutingContext(graph);

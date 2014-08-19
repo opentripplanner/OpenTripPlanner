@@ -161,7 +161,7 @@ public class SimpleIsochrone extends RoutingResource {
         request = buildRequest(0);
         Graph graph = otpServer.graphService.getGraph();
         //double speed = request.getWalkSpeed();
-        Coordinate originCoord = request.getFrom().getCoordinate();
+        Coordinate originCoord = request.from.getCoordinate();
         if (originCoord == null) return null;
         List<TransitStop> stops = graph.streetIndex.getNearbyTransitStops(originCoord, radiusMeters);
         if (stops.isEmpty()) {
