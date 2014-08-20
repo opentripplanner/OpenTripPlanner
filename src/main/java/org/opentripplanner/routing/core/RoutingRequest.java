@@ -188,24 +188,24 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int bikeSwitchCost;
 
     /** Time to rent a bike */
-    @Getter @Setter public int bikeRentalPickupTime = 60;
+    public int bikeRentalPickupTime = 60;
 
     /**
      * Cost of renting a bike. The cost is a bit more than actual time to model the associated cost and trouble.
      */
-    @Getter @Setter public int bikeRentalPickupCost = 120;
+    public int bikeRentalPickupCost = 120;
 
     /** Time to drop-off a rented bike */
-    @Getter @Setter public int bikeRentalDropoffTime = 30;
+    public int bikeRentalDropoffTime = 30;
 
     /** Cost of dropping-off a rented bike */
-    @Getter @Setter public int bikeRentalDropoffCost = 30;
+    public int bikeRentalDropoffCost = 30;
 
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)
      */
-    @Getter @Setter public int carDropoffTime = 120;
+    public int carDropoffTime = 120;
 
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle
@@ -218,31 +218,31 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this problem could disappear.
      */
-    @Getter @Setter public double waitReluctance = 1.0;
+    public double waitReluctance = 1.0;
 
     /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
-    @Getter @Setter public double waitAtBeginningFactor = 0.2;
+    public double waitAtBeginningFactor = 0.2;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
-    @Getter @Setter protected int walkBoardCost = 60 * 10;
+    public int walkBoardCost = 60 * 10;
 
     /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. */
-    @Getter @Setter protected int bikeBoardCost = 60 * 10;
+    public int bikeBoardCost = 60 * 10;
 
     /** Do not use certain named routes */
-    @Getter @Setter public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
+    public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
     /** Do not use certain named agencies */
-    @Getter @Setter public HashSet<String> bannedAgencies = new HashSet<String>();
+    public HashSet<String> bannedAgencies = new HashSet<String>();
 
     /** Do not use certain trips */
-    @Getter @Setter public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
+    public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
-    @Getter private StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
+    public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
     
     /** Do not use certain stops. See for more information the bannedStopsHard property in the RoutingResource class. */
-    @Getter private StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
+    public StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
     
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();

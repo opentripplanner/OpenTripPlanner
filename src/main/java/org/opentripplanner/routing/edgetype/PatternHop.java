@@ -65,9 +65,9 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         RoutingRequest options = state0.getOptions();
         
         // Ignore this edge if either of its stop is banned hard
-        if (!options.getBannedStopsHard().isEmpty()) {
-            if (options.getBannedStopsHard().matches(((PatternStopVertex) fromv).getStop())
-                    || options.getBannedStopsHard().matches(((PatternStopVertex) tov).getStop())) {
+        if (!options.bannedStopsHard.isEmpty()) {
+            if (options.bannedStopsHard.matches(((PatternStopVertex) fromv).getStop())
+                    || options.bannedStopsHard.matches(((PatternStopVertex) tov).getStop())) {
                 return null;
             }
         }
@@ -94,9 +94,9 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         RoutingRequest options = s0.getOptions();
         
         // Ignore this edge if either of its stop is banned hard
-        if (!options.getBannedStopsHard().isEmpty()) {
-            if (options.getBannedStopsHard().matches(((PatternStopVertex) fromv).getStop())
-                    || options.getBannedStopsHard().matches(((PatternStopVertex) tov).getStop())) {
+        if (!options.bannedStopsHard.isEmpty()) {
+            if (options.bannedStopsHard.matches(((PatternStopVertex) fromv).getStop())
+                    || options.bannedStopsHard.matches(((PatternStopVertex) tov).getStop())) {
                 return null;
             }
         }

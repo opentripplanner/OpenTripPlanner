@@ -360,8 +360,8 @@ public abstract class RoutingResource {
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
         request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.maxPreTransitTime));
         request.setWalkReluctance(get(walkReluctance, n, request.walkReluctance));
-        request.setWaitReluctance(get(waitReluctance, n, request.getWaitReluctance()));
-        request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.getWaitAtBeginningFactor()));
+        request.setWaitReluctance(get(waitReluctance, n, request.waitReluctance));
+        request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.waitAtBeginningFactor));
         request.walkSpeed = get(walkSpeed, n, request.walkSpeed);
         double bikeSpeedParam = get(bikeSpeed, n, request.bikeSpeed);
         request.bikeSpeed = bikeSpeedParam;
@@ -408,13 +408,13 @@ public abstract class RoutingResource {
         request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setUnpreferredAgencies(get(unpreferredAgencies, n, request.getUnpreferredAgenciesStr()));
-        request.setWalkBoardCost(get(walkBoardCost, n, request.getWalkBoardCost()));
-        request.setBikeBoardCost(get(bikeBoardCost, n, request.getBikeBoardCost()));
+        request.setWalkBoardCost(get(walkBoardCost, n, request.walkBoardCost));
+        request.setBikeBoardCost(get(bikeBoardCost, n, request.bikeBoardCost));
         request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
         request.setBannedAgencies(get(bannedAgencies, n, request.getBannedAgenciesStr()));
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(get(bannedTrips, n, null));
         if (bannedTripMap != null) {
-            request.setBannedTrips(bannedTripMap);
+            request.bannedTrips = bannedTripMap;
         }
         request.setBannedStops(get(bannedStops, n, request.getBannedStopsStr()));
         request.setBannedStopsHard(get(bannedStopsHard, n, request.getBannedStopsHardStr()));
