@@ -102,10 +102,8 @@ public class Graph implements Serializable {
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
 
     // transit feed validity information in seconds since epoch
-    @Getter
     private long transitServiceStarts = Long.MAX_VALUE;
 
-    @Getter
     private long transitServiceEnds = 0;
 
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
@@ -142,9 +140,7 @@ public class Graph implements Serializable {
      */
     public final Map<AgencyAndId,Integer> serviceCodes = Maps.newHashMap();
     
-    @Getter
-    @Setter
-    private transient TimetableSnapshotSource timetableSnapshotSource = null;
+    public transient TimetableSnapshotSource timetableSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 

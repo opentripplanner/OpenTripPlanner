@@ -241,7 +241,7 @@ class Context {
 
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
     }
 
     private void initTransit() {
@@ -960,7 +960,7 @@ public class TestRequest extends TestCase {
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
         Graph graph = Context.getInstance().graph;
-        TimetableResolver snapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
+        TimetableResolver snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         Timetable timetable = snapshot.resolve(pattern, serviceDate);
         TimeZone timeZone = new SimpleTimeZone(-7, "PST");
         long today = serviceDate.getAsDate(timeZone).getTime() / 1000;

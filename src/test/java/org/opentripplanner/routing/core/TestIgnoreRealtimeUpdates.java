@@ -55,7 +55,7 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         // Mock TimetableSnapshotSource to return dummy TimetableResolver
         TimetableSnapshotSource source = mock(TimetableSnapshotSource.class);
         when(source.getTimetableSnapshot()).thenReturn(resolver);
-        graph.setTimetableSnapshotSource(source);
+        graph.timetableSnapshotSource = (source);
         
         // Create routing context
         RoutingContext rctx = new RoutingContext(options, graph, from, to);

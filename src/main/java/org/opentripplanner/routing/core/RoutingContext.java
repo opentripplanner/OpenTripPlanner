@@ -227,7 +227,7 @@ public class RoutingContext implements Cloneable {
         if (routingRequest.ignoreRealtimeUpdates) {
             timetableSnapshot = null;
         } else {
-            TimetableSnapshotSource timetableSnapshotSource = graph.getTimetableSnapshotSource();
+            TimetableSnapshotSource timetableSnapshotSource = graph.timetableSnapshotSource;
 
             if (timetableSnapshotSource == null) {
                 timetableSnapshot = null;

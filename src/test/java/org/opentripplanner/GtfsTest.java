@@ -84,7 +84,7 @@ public abstract class GtfsTest extends TestCase {
         graph.index(new DefaultStreetVertexIndexFactory());
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.setPurgeExpiredData(false);
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
         alertPatchServiceImpl = new AlertPatchServiceImpl(graph);
         alertsUpdateHandler.setAlertPatchService(alertPatchServiceImpl);
         alertsUpdateHandler.setDefaultAgencyId("MMRI");

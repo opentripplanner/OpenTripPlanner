@@ -39,7 +39,7 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     @Override
     public void run(Graph graph) {
         // Apply updates to graph using realtime snapshot source
-        TimetableSnapshotSource snapshotSource = graph.getTimetableSnapshotSource();
+        TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
         if (snapshotSource != null) {
             snapshotSource.applyTripUpdates(updates, agencyId);
         } else {

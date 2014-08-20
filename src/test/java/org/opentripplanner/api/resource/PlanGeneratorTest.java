@@ -658,7 +658,7 @@ public class PlanGeneratorTest {
         graph.putService(FareService.class, fareServiceStub);
         graph.addAgency(trainAgency);
         graph.addAgency(ferryAgency);
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
         graph.addAlertPatch(e29, alertPatch);
 
         // Routing context creation and initialization

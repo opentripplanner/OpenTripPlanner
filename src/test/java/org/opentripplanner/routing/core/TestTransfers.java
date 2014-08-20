@@ -106,7 +106,7 @@ class Context {
 
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
     }
 
     /**
@@ -184,7 +184,7 @@ public class TestTransfers extends TestCase {
     private void applyUpdateToTripPattern(TripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
-        TimetableResolver snapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
+        TimetableResolver snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         Timetable timetable = snapshot.resolve(pattern, serviceDate);
         TimeZone timeZone = new SimpleTimeZone(-7, "PST");
         long today = serviceDate.getAsDate(timeZone).getTime() / 1000;

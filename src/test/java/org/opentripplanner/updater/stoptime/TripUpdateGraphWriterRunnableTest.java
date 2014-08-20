@@ -37,7 +37,7 @@ public class TripUpdateGraphWriterRunnableTest {
         Graph graph = mock(Graph.class);
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
 
-        when(graph.getTimetableSnapshotSource()).thenReturn(timetableSnapshotSource);
+        graph.timetableSnapshotSource = timetableSnapshotSource;
 
         tripUpdateGraphWriterRunnable.run(graph);
 
