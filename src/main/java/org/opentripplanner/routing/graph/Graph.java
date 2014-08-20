@@ -172,12 +172,9 @@ public class Graph implements Serializable {
      * 
      * @see GraphUpdaterConfigurator
      */
-    @Getter
-    @Setter
-    private transient GraphUpdaterManager updaterManager = null;
+    public transient GraphUpdaterManager updaterManager = null;
 
-    @Getter
-    private final Date buildTime = new Date();
+    public final Date buildTime = new Date();
 
     public Graph(Graph basedOn) {
         this();
