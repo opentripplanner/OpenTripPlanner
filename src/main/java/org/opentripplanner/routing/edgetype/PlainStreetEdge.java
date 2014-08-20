@@ -84,27 +84,22 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     private Set<Alert> notes;
 
-    @Setter
     private boolean hasBogusName;
 
-    @Getter @Setter
     private boolean noThruTraffic;
 
     /**
      * This street is a staircase
      */
-    @Getter @Setter
     private boolean stairs;
     
     /**
      * The speed (meters / sec) at which an automobile can traverse
      * this street segment.
      */
-    @Getter @Setter
     private float carSpeed;
     
     /** This street has a toll */
-    @Getter @Setter
     private boolean toll;
 
     @Getter
@@ -147,7 +142,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         this.name = name;
         this.setPermission(permission);
         this.setBack(back);
-        this.carSpeed = carSpeed;
+        this.setCarSpeed(carSpeed);
         if (geometry != null) {
             try {
                 for (Coordinate c : geometry.getCoordinates()) {
@@ -503,7 +498,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
      * the RoutingRequest, and return it in meters per second.
      */
     private double calculateCarSpeed(RoutingRequest options) {
-        return carSpeed;
+        return getCarSpeed();
     }
     
     /**
@@ -578,7 +573,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     public boolean hasBogusName() {
-        return hasBogusName;
+        return this.hasBogusName;
     }
 
     /** Returns true if there are any turn restrictions defined. */
@@ -721,6 +716,42 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
 	public Set<Alert> getNotes() {
 		return notes;
+	}
+
+	public void setHasBogusName(boolean hasBogusName) {
+		this.hasBogusName = hasBogusName;
+	}
+
+	public boolean isNoThruTraffic() {
+		return noThruTraffic;
+	}
+
+	public void setNoThruTraffic(boolean noThruTraffic) {
+		this.noThruTraffic = noThruTraffic;
+	}
+
+	public boolean isStairs() {
+		return stairs;
+	}
+
+	public void setStairs(boolean stairs) {
+		this.stairs = stairs;
+	}
+
+	public float getCarSpeed() {
+		return carSpeed;
+	}
+
+	public void setCarSpeed(float carSpeed) {
+		this.carSpeed = carSpeed;
+	}
+
+	public boolean isToll() {
+		return toll;
+	}
+
+	public void setToll(boolean toll) {
+		this.toll = toll;
 	}
 
 }
