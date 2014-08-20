@@ -25,9 +25,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
-import lombok.AllArgsConstructor;
-import lombok.Setter;
-
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
@@ -75,7 +72,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private BikeRentalStationService service;
 
-    @Setter
     private String network = "default";
 
     @Override
@@ -114,7 +110,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up bike rental updater.");
         this.graph = graph;
         this.source = source;
-        setNetwork(preferences.get("networks", DEFAULT_NETWORK_LIST));
+        this.network = (preferences.get("networks", DEFAULT_NETWORK_LIST));
         LOG.info("Creating bike-rental updater running every {} seconds : {}", getFrequencySec(),
                 source);
     }
@@ -156,12 +152,15 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     public void teardown() {
     }
 
-    @AllArgsConstructor
     private class BikeRentalGraphWriterRunnable implements GraphWriterRunnable {
 
         private List<BikeRentalStation> stations;
 
-        @Override
+        public BikeRentalGraphWriterRunnable(List<BikeRentalStation> stations) {
+			this.stations = stations;
+		}
+
+		@Override
         public void run(Graph graph) {
             // Apply stations to graph
             Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
