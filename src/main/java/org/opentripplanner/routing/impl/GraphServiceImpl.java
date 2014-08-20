@@ -56,14 +56,14 @@ public class GraphServiceImpl implements GraphService {
      * @param indexFactory
      */
     public void setIndexFactory(StreetVertexIndexFactory indexFactory) {
-        decorated.setIndexFactory(indexFactory);
+        decorated.indexFactory = (indexFactory);
     }
 
     /**
      * @param defaultRouterId
      */
     public void setDefaultRouterId(String defaultRouterId) {
-        decorated.setDefaultRouterId(defaultRouterId);
+        decorated.defaultRouterId = (defaultRouterId);
     }
 
     /**
@@ -73,7 +73,7 @@ public class GraphServiceImpl implements GraphService {
      * the parameter is interpreted as a file path.
      */
     public void setPath(String path) {
-        decorated.setBasePath(path);
+        decorated.basePath = (path);
     }
 
     /**
@@ -85,7 +85,7 @@ public class GraphServiceImpl implements GraphService {
         if (autoRegister != null && !autoRegister.isEmpty()) {
             LOG.info("attempting to automatically register routerIds {}", autoRegister);
             LOG.info("graph files will be sought in paths relative to {}",
-                    decorated.getBasePath());
+                    decorated.basePath);
             for (String routerId : autoRegister) {
                 registerGraph(routerId, true);
             }
@@ -93,10 +93,10 @@ public class GraphServiceImpl implements GraphService {
             LOG.info("no list of routerIds was provided for automatic registration.");
         }
         if (attemptRegisterDefault
-                && !decorated.getRouterIds().contains(decorated.getDefaultRouterId())) {
+                && !decorated.getRouterIds().contains(decorated.defaultRouterId)) {
             LOG.info("Attempting to load graph for default routerId '{}'.",
-                    decorated.getDefaultRouterId());
-            registerGraph(decorated.getDefaultRouterId(), true);
+                    decorated.defaultRouterId);
+            registerGraph(decorated.defaultRouterId, true);
         }
         if (this.getRouterIds().isEmpty()) {
             LOG.warn("No graphs have been loaded/registered. "

@@ -27,9 +27,6 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.routing.error.GraphNotFoundException;
@@ -62,9 +59,7 @@ public class GraphServiceFileImpl implements GraphService {
 
     public static final String CONFIG_FILENAME = "Graph.properties";
 
-    @Getter
-    @Setter
-    private String basePath = "/var/otp/graphs";
+    public String basePath = "/var/otp/graphs";
 
     private Map<String, Graph> graphs = new HashMap<String, Graph>();
 
@@ -74,12 +69,9 @@ public class GraphServiceFileImpl implements GraphService {
 
     private GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
 
-    @Setter
-    private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
+    public StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
 
-    @Setter
-    @Getter
-    private String defaultRouterId = "";
+    public String defaultRouterId = "";
 
     /**
      * Router IDs may contain alphanumeric characters, underscores, and dashes only. This prevents
