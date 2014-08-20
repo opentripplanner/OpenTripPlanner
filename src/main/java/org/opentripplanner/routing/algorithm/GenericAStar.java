@@ -175,7 +175,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         runState.nVisited += 1;
         
-        Collection<Edge> edges = runState.options.isArriveBy() ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
+        Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
@@ -325,7 +325,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             Vertex target, RoutingRequest options) {
         // actually, the heuristic could figure this out from the TraverseOptions.
         // set private member back=options.isArriveBy() on initial weight computation.
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             return heuristic.computeReverseWeight(v, target);
         } else {
             return heuristic.computeForwardWeight(v, target);
@@ -333,7 +333,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
 
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
-        if (opt.isArriveBy())
+        if (opt.arriveBy)
             return v.getTimeSeconds() < opt.worstTime;
         else
             return v.getTimeSeconds() > opt.worstTime;

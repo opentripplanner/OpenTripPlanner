@@ -395,7 +395,7 @@ public class RoutingContext implements Cloneable {
 
     /** check if the start and end locations are accessible */
     public boolean isAccessible() {
-        if (opt.isWheelchairAccessible()) {
+        if (opt.wheelchairAccessible) {
             return isWheelchairAccessible(fromVertex) && isWheelchairAccessible(toVertex);
         }
         return true;

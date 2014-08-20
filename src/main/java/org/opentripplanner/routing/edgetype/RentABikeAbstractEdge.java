@@ -62,9 +62,9 @@ public abstract class RentABikeAbstractEdge extends Edge {
         }
 
         StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(options.isArriveBy() ? options.bikeRentalDropoffCost
+        s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost
                 : options.bikeRentalPickupCost);
-        s1.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalDropoffTime
+        s1.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalDropoffTime
                 : options.bikeRentalPickupTime);
         s1.setBikeRenting(true);
         s1.setBikeRentalNetwork(networks);
@@ -86,9 +86,9 @@ public abstract class RentABikeAbstractEdge extends Edge {
         }
 
         StateEditor s1e = s0.edit(this);
-        s1e.incrementWeight(options.isArriveBy() ? options.bikeRentalPickupCost
+        s1e.incrementWeight(options.arriveBy ? options.bikeRentalPickupCost
                 : options.bikeRentalDropoffCost);
-        s1e.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalPickupTime
+        s1e.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalPickupTime
                 : options.bikeRentalDropoffTime);
         s1e.setBikeRenting(false);
         s1e.setBackMode(TraverseMode.WALK);

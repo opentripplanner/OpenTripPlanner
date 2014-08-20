@@ -58,7 +58,7 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
             }
         }
         
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             /* Backward traversal: apply stop(pair)-specific costs */
             // Do not pre-board if transit modes are not selected.
             // Return null here rather than in StreetTransitLink so that walk-only

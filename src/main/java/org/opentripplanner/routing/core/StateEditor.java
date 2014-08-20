@@ -84,7 +84,7 @@ public class StateEditor {
                 // TODO LG: We disable this test: the assumption that
                 // the from and to vertex of an edge are not the same
                 // is not true anymore: bike rental on/off edges.
-                traversingBackward = parent.getOptions().isArriveBy();
+                traversingBackward = parent.getOptions().arriveBy;
                 child.vertex = e.getToVertex();
             } else if (parent.vertex.equals(e.getFromVertex())) {
                 traversingBackward = false;
@@ -100,7 +100,7 @@ public class StateEditor {
                 LOG.warn("   parent vertex: {}", parent.vertex);
                 defectiveTraversal = true;
             }
-            if (traversingBackward != parent.getOptions().isArriveBy()) {
+            if (traversingBackward != parent.getOptions().arriveBy) {
                 LOG.error("Actual traversal direction does not match traversal direction in TraverseOptions.");
                 defectiveTraversal = true;
             }

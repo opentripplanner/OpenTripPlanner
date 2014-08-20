@@ -55,7 +55,7 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
             }
         }
         
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             /* Traverse backward: not much to do */
             StateEditor s1 = s0.edit(this);
             TransitStop fromVertex = (TransitStop) getFromVertex();

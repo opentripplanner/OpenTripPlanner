@@ -217,7 +217,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                     continue QUEUE;
                 }
                 
-                for (Edge e : options.isArriveBy() ? u.getIncoming() : u.getOutgoing()) {
+                for (Edge e : options.arriveBy ? u.getIncoming() : u.getOutgoing()) {
                     STATE: for (State new_sv = e.traverse(su); new_sv != null; new_sv = new_sv.getNextResult()) {
                         if (traverseVisitor != null) {
                             traverseVisitor.visitEdge(e, new_sv);

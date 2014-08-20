@@ -83,7 +83,7 @@ public class EarliestArrivalSPTService implements SPTService {
             Vertex u_vertex = u.getVertex();
             if (!spt.visit(u))
                 continue;
-            Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
+            Collection<Edge> edges = options.arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
             for (Edge edge : edges) {
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                     if (isWorstTimeExceeded(v, options)) {
@@ -100,7 +100,7 @@ public class EarliestArrivalSPTService implements SPTService {
 
     // Move this into State
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
-        if (opt.isArriveBy())
+        if (opt.arriveBy)
             return v.getTimeSeconds() < opt.worstTime;
         else
             return v.getTimeSeconds() > opt.worstTime;

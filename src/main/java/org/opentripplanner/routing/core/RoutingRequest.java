@@ -109,13 +109,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     public OptimizeType optimize = OptimizeType.QUICK;
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
-    @Getter @Setter public long dateTime = new Date().getTime() / 1000;
+    public long dateTime = new Date().getTime() / 1000;
 
     /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
-    @Getter @Setter public boolean arriveBy = false;
+    public boolean arriveBy = false;
 
     /** Whether the trip must be wheelchair accessible. */
-    @Getter @Setter public boolean wheelchairAccessible = false;
+    public boolean wheelchairAccessible = false;
 
     /** The maximum number of possible itineraries to return. */
     @Getter @Setter public int numItineraries = 3;
@@ -468,7 +468,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.modes = modes;
         if (modes.getBicycle()) {
             bikeWalkingOptions = new RoutingRequest();
-            bikeWalkingOptions.setArriveBy(this.isArriveBy());
+            bikeWalkingOptions.setArriveBy(this.arriveBy);
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
@@ -482,7 +482,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.bikeSwitchCost = bikeSwitchCost;
         } else if (modes.getDriving()) {
             bikeWalkingOptions = new RoutingRequest();
-            bikeWalkingOptions.setArriveBy(this.isArriveBy());
+            bikeWalkingOptions.setArriveBy(this.arriveBy);
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.modes = modes.clone();
@@ -710,7 +710,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String toString(String sep) {
         return from + sep + to + sep + getMaxWalkDistance() + sep + getDateTime() + sep
-                + isArriveBy() + sep + optimize + sep + modes.getAsStr() + sep
+                + arriveBy + sep + optimize + sep + modes.getAsStr() + sep
                 + getNumItineraries();
     }
 
@@ -814,7 +814,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
-        ret.setArriveBy(!ret.isArriveBy());
+        ret.setArriveBy(!ret.arriveBy);
         ret.reverseOptimizing = !ret.reverseOptimizing; // this is not strictly correct
         ret.useBikeRentalAvailabilityInformation = false;
         return ret;
@@ -892,7 +892,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         return endpointsMatch
                 && dateTime == other.dateTime
-                && isArriveBy() == other.isArriveBy()
+                && arriveBy == other.arriveBy
                 && numItineraries == other.numItineraries // should only apply in non-batch?
                 && walkSpeed == other.walkSpeed
                 && bikeSpeed == other.bikeSpeed
@@ -954,7 +954,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         int hashCode = new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
                 + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
                 + (int) (worstTime & 0xffffffff) + modes.hashCode()
-                + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
+                + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()

@@ -48,7 +48,7 @@ public class ParkAndRideEdge extends Edge {
         if (!request.parkAndRide) {
             return null;
         }
-        if (request.isArriveBy()) {
+        if (request.arriveBy) {
             /*
              * To get back a car, we need to walk and have car mode enabled.
              */

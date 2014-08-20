@@ -104,7 +104,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
         }
         
         /* Can't be traversed backwards. */
-        if (options.isArriveBy())
+        if (options.arriveBy)
             return null;
 
         StateEditor s1 = state0.edit(this);

@@ -355,7 +355,7 @@ public abstract class RoutingResource {
                 request.setDateTime(d, t, tz);
             }
         }
-        request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
+        request.setWheelchairAccessible(get(wheelchair, n, request.wheelchairAccessible));
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
         request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.maxPreTransitTime));

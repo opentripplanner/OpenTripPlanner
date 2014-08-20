@@ -143,8 +143,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
          * transit when traversing an alight edge backward.
          */
         boolean leavingTransit = 
-                ( boarding &&  options.isArriveBy()) || 
-                (!boarding && !options.isArriveBy()); 
+                ( boarding &&  options.arriveBy) || 
+                (!boarding && !options.arriveBy); 
 
         /* TODO pull on/off transit out into two functions. */
         if (leavingTransit) { 
@@ -352,7 +352,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     /* See weightLowerBound comment. */
     public double timeLowerBound(RoutingRequest options) {
-        if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding)) {
+        if ((options.arriveBy && boarding) || (!options.arriveBy && !boarding)) {
             if (!options.modes.get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
@@ -373,7 +373,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
      * pattern was already deemed useful. */
     public double weightLowerBound(RoutingRequest options) {
         // return 0; // for testing/comparison, since 0 is always a valid heuristic value
-        if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding))
+        if ((options.arriveBy && boarding) || (!options.arriveBy && !boarding))
             return timeLowerBound(options);
         else
             return options.getBoardCostLowerBound();

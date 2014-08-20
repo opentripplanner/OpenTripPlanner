@@ -98,7 +98,7 @@ public class ParkAndRideLinkEdge extends Edge {
             return null;
         }
         Edge backEdge = s0.getBackEdge();
-        boolean back = s0.getOptions().isArriveBy();
+        boolean back = s0.getOptions().arriveBy;
         // If we are exiting (or entering-backward), check if we
         // really parked a car: this will prevent using P+R as
         // shortcut.

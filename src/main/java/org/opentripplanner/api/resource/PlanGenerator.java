@@ -104,7 +104,7 @@ public class PlanGenerator {
         boolean tooSloped = false;
         try {
             paths = pathService.getPaths(options);
-            if (paths == null && options.isWheelchairAccessible()) {
+            if (paths == null && options.wheelchairAccessible) {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions (and warn user).
                 options.maxSlope = Double.MAX_VALUE;
@@ -124,7 +124,7 @@ public class PlanGenerator {
         }
 
         for (GraphPath graphPath : paths) {
-            if (originalOptions.isArriveBy()) {
+            if (originalOptions.arriveBy) {
                 if (graphPath.states.getLast().getTimeSeconds() > originalOptions.dateTime) {
                     LOG.error("A graph path arrives after the requested time. This implies a bug.");
                 }

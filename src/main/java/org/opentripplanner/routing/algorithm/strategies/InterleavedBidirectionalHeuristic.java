@@ -156,10 +156,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 //                    Double.isInfinite(uw) ? -1.0 : uw);
 
             // OUTgoing for heuristic search when main search is arriveBy 
-            for (Edge e : options.isArriveBy() ? u.getOutgoing() : u.getIncoming()) {
+            for (Edge e : options.arriveBy ? u.getOutgoing() : u.getIncoming()) {
                 // Do not enter streets in this phase.
                 if (e instanceof StreetTransitLink) continue;
-                Vertex v = options.isArriveBy() ? e.getToVertex() : e.getFromVertex();
+                Vertex v = options.arriveBy ? e.getToVertex() : e.getFromVertex();
                 double ew = e.weightLowerBound(options);
                 // INF heuristic value indicates unreachable (e.g. non-running transit service)
                 // this saves time by not reverse-exploring those routes and avoids maxFound of INF.
@@ -252,7 +252,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     private List<State> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
         rr = rr.clone();
         if (fromTarget)
-            rr.setArriveBy( ! rr.isArriveBy());
+            rr.setArriveBy( ! rr.arriveBy);
         List<State> stopStates = Lists.newArrayList();
         ShortestPathTree spt = new BasicShortestPathTree(rr);
         BinHeap<State> pq = new BinHeap<State>();
