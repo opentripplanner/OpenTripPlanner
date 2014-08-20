@@ -62,10 +62,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private double length;
 
-    @Getter
     private LineString geometry;
     
-    @Getter @Setter
     private String name;
 
     @Getter @Setter
@@ -150,7 +148,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             String name, double length,
             StreetTraversalPermission permission, boolean back, float carSpeed) {
         super(v1, v2);
-        this.geometry = geometry;
+        this.setGeometry(geometry);
         this.length = length;
         this.elevationProfileSegment = new ElevationProfileSegment(length);
         this.name = name;
@@ -661,6 +659,23 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 	@Override
 	public double getLength() {
 		return this.length;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public LineString getGeometry() {
+		return geometry;
+	}
+
+	public void setGeometry(LineString geometry) {
+		this.geometry = geometry;
 	}
 
 }
