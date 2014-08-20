@@ -79,9 +79,9 @@ public class ProfileRouter {
     Set<Ride> targetRides = Sets.newHashSet(); // transit rides that reach the destination
     TimeWindow window; // filters trips used by time of day and service schedule
 
-    /** @return true if the given stop has at least one transfer coming from the given pattern. */
-    private boolean hasTransfers(Stop stop, TripPattern pattern) {
-        for (ProfileTransfer tr : graph.index.transfersForStop.get(stop)) {
+    /** @return true if the given stop cluster has at least one transfer coming from the given pattern. */
+    private boolean hasTransfers(StopCluster stopCluster, TripPattern pattern) {
+        for (ProfileTransfer tr : graph.index.transfersFromStopCluster.get(stopCluster)) {
             if (tr.tp1 == pattern) return true;
         }
         return false;
@@ -93,7 +93,7 @@ public class ProfileRouter {
     public ProfileResponse route () {
 
         // Lazy-initialize profile transfers (before setting timeouts, since this is slow)
-        if (graph.index.transfersForStop == null) {
+        if (graph.index.transfersFromStopCluster == null) {
             graph.index.initializeProfileTransfers();
         }
         // Analyst
@@ -132,13 +132,13 @@ public class ProfileRouter {
         LOG.info("To patterns/stops: {}", toStops);
 
         /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
-        Map<Stop, Ride> initialRides = Maps.newHashMap();
+        Map<StopCluster, Ride> initialRides = Maps.newHashMap();
         for (Entry<TripPattern, StopAtDistance> entry : fromStops.entrySet()) {
             TripPattern pattern = entry.getKey();
             StopAtDistance sd = entry.getValue();
             /* Loop over stops in case stop appears more than once in the same pattern. */
             for (int i = 0; i < pattern.getStops().size(); ++i) {
-                if (pattern.getStops().get(i) == sd.stop) {
+                if (pattern.getStops().get(i).getParentStation() == sd.stop.id) { // FIXME using String identity equality on purpose
                     if (request.modes.contains(pattern.mode)) {
                         Ride ride = initialRides.get(sd.stop);
                         if (ride == null) {
@@ -164,7 +164,7 @@ public class ProfileRouter {
             // maybe when ride is complete, then find transfers here, but that makes for more queue operations.
             if (ride.to != null) throw new AssertionError("Ride should be unfinished.");
             /* Track finished rides by their destination stop, so we can add PatternRides to them. */
-            Map<Stop, Ride> rides = Maps.newHashMap();
+            Map<StopCluster, Ride> rides = Maps.newHashMap();
             /* Complete partial PatternRides (with only a pattern and a beginning stop) which were enqueued in this
              * partial ride. This is done by scanning through the Pattern, creating rides to all downstream stops that
              * are near the destination or have relevant transfers. */

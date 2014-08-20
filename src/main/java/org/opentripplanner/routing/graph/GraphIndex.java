@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.Coordinate;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -21,6 +22,7 @@ import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGrid;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.index.model.StopTimesInPattern;
@@ -76,7 +78,8 @@ public class GraphIndex {
     public LuceneIndex luceneIndex;
 
     /* Separate transfers for profile routing */
-    public Multimap<Stop, ProfileTransfer> transfersForStop;
+    public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
+    public HashGrid<StopCluster> stopClusterSpatialIndex;
 
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
@@ -131,8 +134,11 @@ public class GraphIndex {
             routeForId.put(route.getId(), route);
         }
         // FIXME This will overwrite any parent station information
+        // Maybe do this in initializeProfileTransfers lazy init method.
+        stopClusterSpatialIndex = new HashGrid<StopCluster>();
         for (StopCluster cluster : StopCluster.clusterStops(this)) {
             stopClusterForId.put(cluster.id, cluster);
+            stopClusterSpatialIndex.put(new Coordinate(cluster.lon, cluster.lat), cluster);
         }
         // Copy these two service indexes from the graph until we have better ones.
         calendarService = graph.getCalendarService();
@@ -151,31 +157,39 @@ public class GraphIndex {
 
     private static DistanceLibrary distlib = new SphericalDistanceLibrary();
 
+    /** Get all trip patterns running through any stop in the given stop cluster. */
+    private Set<TripPattern> patternsForStopCluster(StopCluster sc) {
+        Set<TripPattern> tripPatterns = Sets.newHashSet();
+        for (Stop stop : sc.children) tripPatterns.addAll(patternsForStop.get(stop));
+        return tripPatterns;
+    }
+
     /**
      * Initialize transfer data needed for profile routing.
      * Find the best transfers between each pair of routes that pass near one another.
      */
     public void initializeProfileTransfers() {
-        transfersForStop = HashMultimap.create();
+        transfersFromStopCluster = HashMultimap.create();
         final double TRANSFER_RADIUS = 500.0; // meters
         SimpleIsochrone.MinMap<P2<TripPattern>, ProfileTransfer> bestTransfers = new SimpleIsochrone.MinMap<P2<TripPattern>, ProfileTransfer>();
         LOG.info("Finding transfers...");
-        for (Stop s0 : stopForId.values()) {
-            Collection<TripPattern> ps0 = patternsForStop.get(s0);
-            Map<Stop, Double> stops = findTransitStops(s0.getLon(), s0.getLat(), TRANSFER_RADIUS);
-            for (Stop s1 : stops.keySet()) {
-                double distance = stops.get(s1);
-                Collection<TripPattern> ps1 = patternsForStop.get(s1);
-                for (TripPattern p0 : ps0) {
-                    for (TripPattern p1 : ps1) {
-                        if (p0 == p1) continue;
-                        bestTransfers.putMin(new P2<TripPattern>(p0, p1), new ProfileTransfer(p0, p1, s0, s1, (int)distance));
+        for (StopCluster sc0 : stopClusterForId.values()) {
+            Set<TripPattern> tripPatterns0 = patternsForStopCluster(sc0);
+            // Accounts for area-like (rather than point-like) nature of clusters
+            Map<StopCluster, Double> nearbyStopClusters = findNearbyStopClusters(sc0, TRANSFER_RADIUS);
+            for (StopCluster sc1 : nearbyStopClusters.keySet()) {
+                double distance = nearbyStopClusters.get(sc1);
+                Set<TripPattern> tripPatterns1 = patternsForStopCluster(sc1);
+                for (TripPattern tp0 : tripPatterns0) {
+                    for (TripPattern tp1 : tripPatterns1) {
+                        if (tp0 == tp1) continue;
+                        bestTransfers.putMin(new P2<TripPattern>(tp0, tp1), new ProfileTransfer(tp0, tp1, sc0, sc1, (int)distance));
                     }
                 }
             }
         }
         for (ProfileTransfer tr : bestTransfers.values()) {
-            transfersForStop.put(tr.s1, tr);
+            transfersFromStopCluster.put(tr.sc1, tr);
         }
         /*
          * for (Stop stop : transfersForStop.keys()) { System.out.println("STOP " + stop); for
@@ -185,14 +199,16 @@ public class GraphIndex {
         LOG.info("Done finding transfers.");
     }
 
-    /** Find transfers for profile routing. TODO replace with an on-street search using the existing profile router functions. */
-    public Map<Stop, Double> findTransitStops(double lon, double lat, double radius) {
-        Map<Stop, Double> ret = Maps.newHashMap();
-        for (TransitStop tstop : stopSpatialIndex.query(lon, lat, radius)) {
-            Stop stop = tstop.getStop();
-            double distance = distlib.distance(lat, lon, stop.getLat(), stop.getLon());
-            if (distance < radius)
-                ret.put(stop, distance);
+    /**
+     * Find transfer candidates for profile routing.
+     * TODO replace with an on-street search using the existing profile router functions.
+     */
+    public Map<StopCluster, Double> findNearbyStopClusters (StopCluster sc, double radius) {
+        Map<StopCluster, Double> ret = Maps.newHashMap();
+        for (StopCluster cluster : stopClusterSpatialIndex.query(sc.lon, sc.lat, radius)) {
+            // TODO this should account for area-like nature of clusters. Use size of bounding boxes.
+            double distance = distlib.distance(sc.lat, sc.lon, cluster.lat, cluster.lon);
+            if (distance < radius) ret.put(cluster, distance);
         }
         return ret;
     }
