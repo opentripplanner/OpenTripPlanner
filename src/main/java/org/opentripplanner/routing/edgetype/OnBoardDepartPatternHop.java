@@ -98,7 +98,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
     public State traverse(State state0) {
         RoutingRequest options = state0.getOptions();
 
-        if (options.isReverseOptimizing() || options.isReverseOptimizeOnTheFly()) {
+        if (options.reverseOptimizing || options.reverseOptimizeOnTheFly) {
             throw new UnsupportedOperationException(
                     "Cannot (yet) reverse-optimize depart-on-board mode.");
         }

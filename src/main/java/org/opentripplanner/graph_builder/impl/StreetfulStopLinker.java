@@ -99,7 +99,7 @@ public class StreetfulStopLinker implements GraphBuilder {
 
             int n = 0;
             RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-            routingRequest.setClampInitialWait(0L);
+            routingRequest.clampInitialWait = (0L);
             routingRequest.setRoutingContext(graph, ts, null);
             routingRequest.rctx.pathParsers = parser;
             ShortestPathTree spt = earliestArrivalSPTService.getShortestPathTree(routingRequest);

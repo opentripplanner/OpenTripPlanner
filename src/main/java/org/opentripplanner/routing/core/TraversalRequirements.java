@@ -64,7 +64,7 @@ public class TraversalRequirements {
         initFromRoutingRequest(this, options);
 
         // Initialize walking requirements if any given.
-        RoutingRequest bikeWalkOptions = options.getBikeWalkingOptions();
+        RoutingRequest bikeWalkOptions = options.bikeWalkingOptions;
         if (bikeWalkOptions != null) {
             bikeWalkingRequirements = new TraversalRequirements();
             initFromRoutingRequest(bikeWalkingRequirements, bikeWalkOptions);

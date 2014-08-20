@@ -57,7 +57,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
             return null;
 
         BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
-        if (options.isUseBikeRentalAvailabilityInformation() && dropoff.getBikesAvailable() == 0) {
+        if (options.useBikeRentalAvailabilityInformation && dropoff.getBikesAvailable() == 0) {
             return null;
         }
 
@@ -81,7 +81,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         if (!s0.isBikeRenting() || !hasCompatibleNetworks(networks, s0.getBikeRentalNetworks()))
             return null;
         BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
-        if (options.isUseBikeRentalAvailabilityInformation() && pickup.getSpacesAvailable() == 0) {
+        if (options.useBikeRentalAvailabilityInformation && pickup.getSpacesAvailable() == 0) {
             return null;
         }
 

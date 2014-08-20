@@ -62,11 +62,11 @@ public class EarliestArrivalSPTService implements SPTService {
         // disable any resource limiting, which is algorithmically invalid here
         options.setMaxTransfers(Integer.MAX_VALUE);
         options.setMaxWalkDistance(Double.MAX_VALUE);
-        if (options.getClampInitialWait() < 0)
-            options.setClampInitialWait(60 * 30);
+        if (options.clampInitialWait < 0)
+            options.clampInitialWait = (60 * 30);
         
         // impose search cutoff
-        final long maxt = maxDuration + options.getClampInitialWait();
+        final long maxt = maxDuration + options.clampInitialWait;
         options.worstTime = options.dateTime + (options.arriveBy ? -maxt : maxt);
             
         // SPT cache does not look at routing request in SPT to perform lookup, 

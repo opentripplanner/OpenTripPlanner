@@ -227,7 +227,7 @@ public class AStarTest {
     public void testMultipleTargets() {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
-        options.setBatch(true);
+        options.batch = true;
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
                 _graph.getVertex("leary_20th"));
 

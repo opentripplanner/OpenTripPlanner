@@ -305,46 +305,46 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double triangleSafetyFactor;
 
     /** Options specifically for the case that you are walking a bicycle. */
-    @Getter @Setter public RoutingRequest bikeWalkingOptions;
+    public RoutingRequest bikeWalkingOptions;
 
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
-    @Getter @Setter public boolean reverseOptimizing = false;
+    public boolean reverseOptimizing = false;
 
     /** when true, do not use goal direction or stop at the target, build a full SPT */
-    @Getter @Setter public boolean batch = false;
+    public boolean batch = false;
 
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
-    @Getter @Setter private boolean useBikeRentalAvailabilityInformation = false;
+    public boolean useBikeRentalAvailabilityInformation = false;
 
     /**
      * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.
      */
-    @Getter @Setter public long clampInitialWait;
+    public long clampInitialWait;
 
     /**
      * When true, reverse optimize this search on the fly whenever needed, rather than reverse-optimizing the entire path when it's done.
      */
-    @Getter @Setter public boolean reverseOptimizeOnTheFly = false;
+    public boolean reverseOptimizeOnTheFly = false;
 
     /**
      * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
      * driving occurs on the left.
      */
-    @Getter @Setter public boolean driveOnRight = true;
+    public boolean driveOnRight = true;
 
     /**
      * The deceleration speed of an automobile, in meters per second per second.
      */
     // 2.9 m/s/s: 65 mph - 0 mph in 10 seconds
-    @Getter @Setter public double carDecelerationSpeed = 2.9;
+    public double carDecelerationSpeed = 2.9;
 
     /**
      * The acceleration speed of an automobile, in meters per second per second.
      */
     // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
-    @Getter @Setter public double carAccelerationSpeed = 2.9;
+    public double carAccelerationSpeed = 2.9;
     
     /**
      * When true, realtime updates are ignored during this search.

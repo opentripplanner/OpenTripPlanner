@@ -390,7 +390,7 @@ public class ProfileRouter {
         // TODO CAR does not seem to work. rr.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
-        rr.setBatch(true);
+        rr.batch = (true);
         rr.walkSpeed = request.walkSpeed;
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
@@ -464,7 +464,7 @@ public class ProfileRouter {
         // If max trip duration is not limited, searches are of course much slower.
         int worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
         rr.worstTime = (rr.dateTime + worstElapsedTime);
-        rr.setBatch(true);
+        rr.batch = (true);
         GenericAStar astar = new GenericAStar();
         astar.setNPaths(1);
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {

@@ -427,7 +427,7 @@ public abstract class RoutingResource {
         } else {
             request.transferPenalty = (get(transferPenalty, n, request.transferPenalty));
         }
-        request.setBatch(get(batch, n, new Boolean(request.isBatch())));
+        request.batch = (get(batch, n, new Boolean(request.batch)));
         request.setOptimize(opt);
         /* Temporary code to get bike/car parking and renting working. */
         modes.get(0).applyToRequest(request);
@@ -451,7 +451,7 @@ public abstract class RoutingResource {
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;
-        request.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
+        request.useBikeRentalAvailabilityInformation = (tripPlannedForNow);
         if (request.intermediatePlaces != null
                 && (request.modes.isTransit() || 
                         (request.modes.getWalk() && 
@@ -469,10 +469,10 @@ public abstract class RoutingResource {
             request.setStartingTransitTripId(AgencyAndId.convertFromString(startTransitTripId));
         }
         
-        request.setClampInitialWait(get(clampInitialWait, n, request.getClampInitialWait()));
+        request.clampInitialWait = (get(clampInitialWait, n, request.clampInitialWait));
 
-        request.setReverseOptimizeOnTheFly(get(reverseOptimizeOnTheFly, n, 
-                                               request.isReverseOptimizeOnTheFly()));
+        request.reverseOptimizeOnTheFly = (get(reverseOptimizeOnTheFly, n, 
+                                               request.reverseOptimizeOnTheFly));
 
         request.setIgnoreRealtimeUpdates(get(ignoreRealtimeUpdates, n, 
                 request.isIgnoreRealtimeUpdates()));

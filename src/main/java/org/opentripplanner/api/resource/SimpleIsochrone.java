@@ -179,7 +179,7 @@ public class SimpleIsochrone extends RoutingResource {
         
         /* Make one request every M minutes over H hours */
         int nRequests = (requestTimespanHours * 60) / requestSpacingMinutes;
-        request.setClampInitialWait(requestSpacingMinutes * 60);
+        request.clampInitialWait = (requestSpacingMinutes * 60);
         Date date = request.getDateTime();
         MinMap<Vertex, Double> points = new MinMap<Vertex, Double>();
         for (int r = 0; r < nRequests; r++) {

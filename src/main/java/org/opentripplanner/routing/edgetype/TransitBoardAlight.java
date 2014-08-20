@@ -179,10 +179,10 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             
             // during reverse optimization, board costs should be applied to PatternBoards
             // so that comparable trip plans result (comparable to non-optimized plans)
-            if (options.isReverseOptimizing())
+            if (options.reverseOptimizing)
                 s1.incrementWeight(options.getBoardCost(s0.getNonTransitMode()));
 
-            if (options.isReverseOptimizeOnTheFly()) {
+            if (options.reverseOptimizeOnTheFly) {
                 TripPattern pattern = getPattern();
                 int thisDeparture = s0.getTripTimes().getDepartureTime(stopIndex);
                 int numTrips = getPattern().getNumScheduledTrips(); 
@@ -299,7 +299,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             double wait_cost = bestWait;
 
-            if (!s0.isEverBoarded() && !options.isReverseOptimizing()) {
+            if (!s0.isEverBoarded() && !options.reverseOptimizing) {
                 wait_cost *= options.waitAtBeginningFactor;
                 s1.setInitialWaitTimeSeconds(bestWait);
             } else {
@@ -311,7 +311,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             // when reverse optimizing, the board cost needs to be applied on
             // alight to prevent state domination due to free alights
-            if (options.isReverseOptimizing()) {
+            if (options.reverseOptimizing) {
                 s1.incrementWeight(wait_cost);
             } else {
                 s1.incrementWeight(wait_cost + options.getBoardCost(s0.getNonTransitMode()));
@@ -321,8 +321,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // determine if this needs to be reverse-optimized.
             // The last alight can be moved forward by bestWait (but no further) without
             // impacting the possibility of this trip
-            if (options.isReverseOptimizeOnTheFly() && 
-               !options.isReverseOptimizing() && 
+            if (options.reverseOptimizeOnTheFly && 
+               !options.reverseOptimizing && 
                 s0.isEverBoarded() && 
                 s0.getLastNextArrivalDelta() <= bestWait &&
                 s0.getLastNextArrivalDelta() > -1) {

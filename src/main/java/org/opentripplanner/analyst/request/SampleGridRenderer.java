@@ -76,7 +76,7 @@ public class SampleGridRenderer {
         long tOvershot = (long) (2 * D0 / V0);
         sptRequest.worstTime = (sptRequest.dateTime
                 + (sptRequest.arriveBy ? -spgRequest.maxTimeSec - tOvershot : spgRequest.maxTimeSec + tOvershot));
-        sptRequest.setBatch(true);
+        sptRequest.batch = (true);
         sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));
         final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
 
