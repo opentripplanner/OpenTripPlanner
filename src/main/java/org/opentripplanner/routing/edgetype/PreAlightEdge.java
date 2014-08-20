@@ -79,9 +79,9 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
             long t0 = s0.getTimeSeconds();
             long slack;
             if (s0.isEverBoarded()) {
-                slack = options.getTransferSlack() - options.getBoardSlack();
+                slack = options.transferSlack - options.boardSlack;
             } else {
-                slack = options.getAlightSlack();
+                slack = options.alightSlack;
             }
             long alight_before = t0 - slack;
             int transfer_penalty = 0;
@@ -104,7 +104,7 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
             StateEditor s1 = s0.edit(this);
             TransitStop toVertex = (TransitStop) getToVertex();
             s1.alightTransit();
-            s1.incrementTimeInSeconds(options.getAlightSlack());
+            s1.incrementTimeInSeconds(options.alightSlack);
             s1.setBackMode(getMode());
             return s1.makeState();
         }

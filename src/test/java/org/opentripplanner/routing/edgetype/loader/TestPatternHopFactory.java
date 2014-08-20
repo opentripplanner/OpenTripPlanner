@@ -173,7 +173,7 @@ public class TestPatternHopFactory extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
         // test feed is designed for instantaneous transfers
-        options.setTransferSlack(0);
+        options.transferSlack = (0);
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         options.dateTime = startTime;
@@ -499,7 +499,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex destination = graph.getVertex("agency:T");
         RoutingRequest options = new RoutingRequest();
         // test is designed such that transfers must be instantaneous
-        options.setTransferSlack(0);
+        options.transferSlack = (0);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
         startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         options.dateTime = TestUtils.toSeconds(startTime);

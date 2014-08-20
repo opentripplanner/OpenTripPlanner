@@ -331,9 +331,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 double quick = elevationProfileSegment.getSlopeSpeedEffectiveLength();
                 double safety = elevationProfileSegment.getBicycleSafetyEffectiveLength();
                 double slope = elevationProfileSegment.getSlopeWorkCost();
-                weight = quick * options.getTriangleTimeFactor() + slope
-                        * options.getTriangleSlopeFactor() + safety
-                        * options.getTriangleSafetyFactor();
+                weight = quick * options.triangleTimeFactor + slope
+                        * options.triangleSlopeFactor + safety
+                        * options.triangleSafetyFactor;
                 weight /= speed;
                 break;
             default:

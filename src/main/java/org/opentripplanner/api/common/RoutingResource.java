@@ -404,7 +404,7 @@ public abstract class RoutingResource {
             intermediatePlacesOrdered = request.intermediatePlacesOrdered;
         request.intermediatePlacesOrdered = intermediatePlacesOrdered;
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
-        request.setOtherThanPreferredRoutesPenalty(get(otherThanPreferredRoutesPenalty, n, request.getOtherThanPreferredRoutesPenalty()));
+        request.setOtherThanPreferredRoutesPenalty(get(otherThanPreferredRoutesPenalty, n, request.otherThanPreferredRoutesPenalty));
         request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setUnpreferredAgencies(get(unpreferredAgencies, n, request.getUnpreferredAgenciesStr()));
@@ -437,17 +437,17 @@ public abstract class RoutingResource {
             request.bikeSpeed = 4.3;
         }
 
-        request.setBoardSlack(get(boardSlack, n, request.getBoardSlack()));
-        request.setAlightSlack(get(alightSlack, n, request.getAlightSlack()));
-        request.setTransferSlack(get(minTransferTime, n, request.getTransferSlack()));
-        request.setNonpreferredTransferPenalty(get(nonpreferredTransferPenalty, n, request.getNonpreferredTransferPenalty()));
+        request.boardSlack = (get(boardSlack, n, request.boardSlack));
+        request.alightSlack = (get(alightSlack, n, request.alightSlack));
+        request.transferSlack = (get(minTransferTime, n, request.transferSlack));
+        request.nonpreferredTransferPenalty = get(nonpreferredTransferPenalty, n, request.nonpreferredTransferPenalty);
 
-        if (request.getBoardSlack() + request.getAlightSlack() > request.getTransferSlack()) {
+        if (request.boardSlack + request.alightSlack > request.transferSlack) {
             throw new RuntimeException("Invalid parameters: transfer slack must "
                     + "be greater than or equal to board slack plus alight slack");
         }
 
-        request.setMaxTransfers(get(maxTransfers, n, request.getMaxTransfers()));
+        request.setMaxTransfers(get(maxTransfers, n, request.maxTransfers));
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;

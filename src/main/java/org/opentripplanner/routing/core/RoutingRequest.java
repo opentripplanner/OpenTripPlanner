@@ -254,7 +254,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
      */
-    @Getter @Setter public int otherThanPreferredRoutesPenalty = 300;
+    public int otherThanPreferredRoutesPenalty = 300;
 
     /** Set of unpreferred routes for given user. */
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
@@ -273,36 +273,36 @@ public class RoutingRequest implements Cloneable, Serializable {
      * transfer timing information in transfers.txt
      */
     // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
-    @Getter @Setter private int transferSlack = 0;
+    public int transferSlack = 0;
 
     /** Invariant: boardSlack + alightSlack <= transferSlack. */
-    @Getter @Setter private int boardSlack = 0;
+    public int boardSlack = 0;
 
-    @Getter @Setter private int alightSlack = 0;
+    public int alightSlack = 0;
 
-    @Getter @Setter public int maxTransfers = 2;
+    public int maxTransfers = 2;
 
     /**
      * Extensions to the trip planner will require additional traversal options beyond the default 
      * set. We provide an extension point for adding arbitrary parameters with an 
      * extension-specific key.
      */
-    @Getter @Setter public Map<Object, Object> extensions = new HashMap<Object, Object>();
+    public Map<Object, Object> extensions = new HashMap<Object, Object>();
 
     /** Penalty for using a non-preferred transfer */
-    @Getter @Setter public int nonpreferredTransferPenalty = 180;
+    public int nonpreferredTransferPenalty = 180;
 
     /**
      * For the bike triangle, how important time is. 
      * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
      */
-    @Getter @Setter public double triangleTimeFactor;
+    public double triangleTimeFactor;
 
     /** For the bike triangle, how important slope is */
-    @Getter @Setter public double triangleSlopeFactor;
+    public double triangleSlopeFactor;
 
     /** For the bike triangle, how important safety is */
-    @Getter @Setter public double triangleSafetyFactor;
+    public double triangleSafetyFactor;
 
     /** Options specifically for the case that you are walking a bicycle. */
     @Getter @Setter public RoutingRequest bikeWalkingOptions;
