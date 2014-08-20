@@ -359,7 +359,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     preferrence = 3.0;
                 }
 
-                TraverseModeSet modes = reqs.getModes();
+                TraverseModeSet modes = reqs.modes;
                 CandidateEdge ce = new CandidateEdge(e, location, preferrence, modes);
 
                 // Even if an edge is outside the query envelope, bounding boxes can

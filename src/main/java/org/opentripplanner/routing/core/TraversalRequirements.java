@@ -3,20 +3,17 @@ package org.opentripplanner.routing.core;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
-import lombok.Data;
-
 /**
  * Preferences for how to traverse the graph.
  * 
  * @author avi
  */
-@Data
 public class TraversalRequirements {
 
     /**
      * Modes allowed in graph traversal. Defaults to allowing all.
      */
-    private TraverseModeSet modes = TraverseModeSet.allModes();
+    public TraverseModeSet modes = TraverseModeSet.allModes();
 
     /**
      * The maximum distance (meters) the user is willing to walk. Defaults to 1/2 mile.

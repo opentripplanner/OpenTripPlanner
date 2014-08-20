@@ -117,7 +117,7 @@ public class ClosestEdgesTest {
         // Only allow walking
         TraverseModeSet modes = new TraverseModeSet();
         modes.setWalk(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
 
         // There's only one walkable edge.
         checkClosestEdgeModes(loc, reqs, 1);
@@ -125,20 +125,20 @@ public class ClosestEdgesTest {
         // Only allow biking: there are 5 bikeable edges.
         modes = new TraverseModeSet();
         modes.setBicycle(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         checkClosestEdgeModes(loc, reqs, 2);
 
         // Only allow driving: there are 7 driveable edges.
         modes = new TraverseModeSet();
         modes.setCar(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         checkClosestEdgeModes(loc, reqs, 2);
 
         // Allow driving and biking: all 8 edges can be traversed.
         modes = new TraverseModeSet();
         modes.setCar(true);
         modes.setBicycle(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         checkClosestEdgeModes(loc, reqs, 2);
     }
 
@@ -181,7 +181,7 @@ public class ClosestEdgesTest {
         TraversalRequirements reqs = new TraversalRequirements();
         TraverseModeSet modes = new TraverseModeSet();
         modes.setCar(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         
         for (double degreeOff = 0.0; degreeOff < 30.0; degreeOff += 3.0) {
             // Location along the top edge, traveling with the forward edge
@@ -206,7 +206,7 @@ public class ClosestEdgesTest {
         TraversalRequirements reqs = new TraversalRequirements();
         TraverseModeSet modes = new TraverseModeSet();
         modes.setCar(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         
         // Location along the top edge, traveling with the forward edge
         // exactly.
