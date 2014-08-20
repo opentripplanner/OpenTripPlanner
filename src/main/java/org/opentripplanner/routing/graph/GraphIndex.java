@@ -99,7 +99,7 @@ public class GraphIndex {
             if (edge instanceof TablePatternEdge) {
                 TablePatternEdge patternEdge = (TablePatternEdge) edge;
                 TripPattern pattern = patternEdge.getPattern();
-                patternForId.put(pattern.getCode(), pattern);
+                patternForId.put(pattern.code, pattern);
             }
         }
         for (Vertex vertex : vertices) {

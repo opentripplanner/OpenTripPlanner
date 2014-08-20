@@ -58,7 +58,7 @@ class PatternRide {
     }
     
     public String toString () {
-        return String.format("%s %d to %d", pattern.getCode(), fromIndex, toIndex);
+        return String.format("%s %d to %d", pattern.code, fromIndex, toIndex);
     }
 
     /**

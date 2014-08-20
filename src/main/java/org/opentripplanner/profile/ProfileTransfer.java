@@ -31,8 +31,8 @@ public class ProfileTransfer implements Comparable<ProfileTransfer> {
 
     @Override
     public String toString() {
-        return String.format("Transfer %s %s %s %s %d", tp1.getCode(), s1.getId(),
-                tp2.getCode(), s2.getId(), distance);
+        return String.format("Transfer %s %s %s %s %d", tp1.code, s1.getId(),
+                tp2.code, s2.getId(), distance);
     }
 
 }

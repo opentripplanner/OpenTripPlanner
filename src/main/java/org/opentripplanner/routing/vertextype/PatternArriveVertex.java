@@ -29,7 +29,7 @@ public class PatternArriveVertex extends PatternStopVertex {
     // it is possible to have both a freq and non-freq pattern with the same stop pattern
 
     private static String makeLabel(TripPattern pattern, int stop) {
-        return String.format("%s_%02d_A", pattern.getCode(), stop);
+        return String.format("%s_%02d_A", pattern.code, stop);
     }
 
 

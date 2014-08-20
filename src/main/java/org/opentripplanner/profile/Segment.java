@@ -29,7 +29,7 @@ public class Segment {
         public int toIndex;
         public int nTrips;
         public SegmentPattern (PatternRide patternRide) {
-            this.patternId = patternRide.pattern.getCode();
+            this.patternId = patternRide.pattern.code;
             this.fromIndex = patternRide.fromIndex;
             this.toIndex   = patternRide.toIndex;
             this.nTrips    = patternRide.stats.num; // this stats has time window applied
