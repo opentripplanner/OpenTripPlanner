@@ -380,14 +380,14 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public double heuristicWeight = 1.0;
 
-    @Getter @Setter private boolean softWalkLimiting = true;
-    @Getter @Setter private boolean softPreTransitLimiting = true;
+    public boolean softWalkLimiting = true;
+    public boolean softPreTransitLimiting = true;
 
-    @Getter @Setter private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
-    @Getter @Setter private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
+    public double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
+    public double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
 
-    @Getter @Setter private double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
-    @Getter @Setter private double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
+    public double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
+    public double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
 
     /* Additional flags affecting mode transitions. This is a temporary solution, as it only covers parking and rental at the beginning of the trip. */
     public boolean allowBikeRental = false;

@@ -454,10 +454,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);
             }
             if (s1.isMaxPreTransitTimeExceeded(options)) {
-                if (options.isSoftPreTransitLimiting()) {
+                if (options.softPreTransitLimiting) {
                     weight += calculateOverageWeight(s0.getPreTransitTime(), s1.getPreTransitTime(),
-                            options.maxPreTransitTime, options.getPreTransitPenalty(),
-                                    options.getPreTransitOverageRate());
+                            options.maxPreTransitTime, options.preTransitPenalty,
+                                    options.preTransitOverageRate);
                 } else return null;
             }
         }
@@ -466,11 +466,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (s1.weHaveWalkedTooFar(options)) {
 
             // if we're using a soft walk-limit
-            if( options.isSoftWalkLimiting() ){
+            if( options.softWalkLimiting ){
                 // just slap a penalty for the overage onto s1
                 weight += calculateOverageWeight(s0.getWalkDistance(), s1.getWalkDistance(),
-                        options.getMaxWalkDistance(), options.getSoftWalkPenalty(),
-                                options.getSoftWalkOverageRate());
+                        options.getMaxWalkDistance(), options.softWalkPenalty,
+                                options.softWalkOverageRate);
             } else {
                 // else, it's a hard limit; bail
                 LOG.debug("Too much walking. Bailing.");

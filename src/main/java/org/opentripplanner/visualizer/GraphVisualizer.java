@@ -1432,9 +1432,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.walkSpeed = Float.parseFloat(walkSpeed.getText());
         options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
         options.heuristicWeight = (Float.parseFloat(heuristicWeight.getText()));
-        options.setSoftWalkLimiting( softWalkLimiting.isSelected() );
-        options.setSoftWalkPenalty(Float.parseFloat(softWalkPenalty.getText()));
-        options.setSoftWalkOverageRate(Float.parseFloat(this.softWalkOverageRate.getText()));
+        options.softWalkLimiting = ( softWalkLimiting.isSelected() );
+        options.softWalkPenalty = (Float.parseFloat(softWalkPenalty.getText()));
+        options.softWalkOverageRate = (Float.parseFloat(this.softWalkOverageRate.getText()));
         options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);

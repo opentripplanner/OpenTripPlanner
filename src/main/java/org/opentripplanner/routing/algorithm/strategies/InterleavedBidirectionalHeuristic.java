@@ -108,8 +108,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         this.options = s.getOptions();
         this.origin = s.getVertex();
         // do not use soft limiting in long-distance mode
-        options.setSoftWalkLimiting(false);
-        options.setSoftPreTransitLimiting(false);
+        options.softWalkLimiting = false;
+        options.softPreTransitLimiting = false;
         // make sure distance table is initialized before starting thread
         LOG.debug("initializing heuristic computation thread");
         // forward street search first, sets values around origin to 0
