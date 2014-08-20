@@ -115,7 +115,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         }
 
         LOG.info("Creating stop time updater running every {} seconds : {}",
-                getFrequencySec(), updateSource);
+                frequencySec, updateSource);
     }
 
     @Override
