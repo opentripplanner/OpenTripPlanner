@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import lombok.Getter;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -30,10 +28,8 @@ import com.vividsolutions.jts.geom.LineString;
 public class SimpleTransfer extends Edge {
     private static final long serialVersionUID = 20140408L;
 
-    @Getter
     private double distance;
-
-    @Getter
+    
     private LineString geometry;
 
     public SimpleTransfer(TransitStop from, TransitStop to, double distance, LineString geometry) {
@@ -65,4 +61,15 @@ public class SimpleTransfer extends Edge {
         int time = (int) (distance / rr.walkSpeed); 
         return (time * rr.walkReluctance);
     }
+    
+    @Override
+    public double getDistance(){
+    	return this.distance;
+    }
+    
+    
+   @Override
+   public LineString getGeometry(){
+	   return this.geometry;
+   }
 }
