@@ -359,16 +359,16 @@ public abstract class RoutingResource {
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
         request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.maxPreTransitTime));
-        request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
+        request.setWalkReluctance(get(walkReluctance, n, request.walkReluctance));
         request.setWaitReluctance(get(waitReluctance, n, request.getWaitReluctance()));
         request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.getWaitAtBeginningFactor()));
         request.walkSpeed = get(walkSpeed, n, request.walkSpeed);
         double bikeSpeedParam = get(bikeSpeed, n, request.bikeSpeed);
         request.bikeSpeed = bikeSpeedParam;
-        int bikeSwitchTimeParam = get(bikeSwitchTime, n, request.getBikeSwitchTime());
-        request.setBikeSwitchTime(bikeSwitchTimeParam);
-        int bikeSwitchCostParam = get(bikeSwitchCost, n, request.getBikeSwitchCost());
-        request.setBikeSwitchCost(bikeSwitchCostParam);
+        int bikeSwitchTimeParam = get(bikeSwitchTime, n, request.bikeSwitchTime);
+        request.bikeSwitchTime = bikeSwitchTimeParam;
+        int bikeSwitchCostParam = get(bikeSwitchCost, n, request.bikeSwitchCost);
+        request.bikeSwitchCost = bikeSwitchCostParam;
         OptimizeType opt = get(optimize, n, request.optimize);
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);
@@ -423,9 +423,9 @@ public abstract class RoutingResource {
         // See comment on RoutingRequest.transferPentalty.
         if (opt == OptimizeType.TRANSFERS) {
             opt = OptimizeType.QUICK;
-            request.setTransferPenalty(get(transferPenalty, n, 0) + 1800);
+            request.transferPenalty = get(transferPenalty, n, 0) + 1800;
         } else {
-            request.setTransferPenalty(get(transferPenalty, n, request.getTransferPenalty()));
+            request.transferPenalty = (get(transferPenalty, n, request.transferPenalty));
         }
         request.setBatch(get(batch, n, new Boolean(request.isBatch())));
         request.setOptimize(opt);

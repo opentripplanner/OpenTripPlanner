@@ -106,9 +106,9 @@ public class TurnCostTest {
         proto.carSpeed = 1.0;
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 1.0;
-        proto.setTurnReluctance(1.0);
+        proto.turnReluctance = (1.0);
         proto.setWalkReluctance(1.0);
-        proto.setStairsReluctance(1.0);
+        proto.stairsReluctance = (1.0);
         
         // Turn costs are all 0 by default.
         proto.traversalCostModel = (new ConstantIntersectionTraversalCostModel(0.0));

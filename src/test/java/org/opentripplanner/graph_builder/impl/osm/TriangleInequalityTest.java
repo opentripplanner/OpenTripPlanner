@@ -93,9 +93,9 @@ public class TriangleInequalityTest {
         RoutingRequest prototypeOptions = new RoutingRequest();
         
         // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-        prototypeOptions.setStairsReluctance(1.0);
+        prototypeOptions.stairsReluctance = (1.0);
         prototypeOptions.setWalkReluctance(1.0);
-        prototypeOptions.setTurnReluctance(1.0);
+        prototypeOptions.turnReluctance = (1.0);
         prototypeOptions.carSpeed = 1.0;
         prototypeOptions.walkSpeed = 1.0;
         prototypeOptions.bikeSpeed = 1.0;

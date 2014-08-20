@@ -49,8 +49,8 @@ public class PlainStreetEdgeTest {
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 5.0f;
         proto.setWalkReluctance(1.0);
-        proto.setStairsReluctance(1.0);
-        proto.setTurnReluctance(1.0);
+        proto.stairsReluctance = (1.0);
+        proto.turnReluctance = (1.0);
         proto.setModes(TraverseModeSet.allModes());
     }
     
@@ -242,8 +242,8 @@ public class PlainStreetEdgeTest {
         State s3 = e2.traverse(s2);
 
         RoutingRequest withPenalty = proto.clone();
-        withPenalty.setBikeSwitchTime(42);
-        withPenalty.setBikeSwitchCost(23);
+        withPenalty.bikeSwitchTime = (42);
+        withPenalty.bikeSwitchCost = (23);
         withPenalty.setMode(TraverseMode.BICYCLE);
         withPenalty.setRoutingContext(_graph, v0, v0);
 

@@ -143,7 +143,7 @@ public class PartialPlainStreetEdgeTest {
         // All intersections take 10 minutes - we'll notice if one isn't counted.
         double turnDurationSecs = 10.0 * 60.0;  
         options.traversalCostModel = (new DummyCostModel(turnDurationSecs));
-        options.setTurnReluctance(1.0);
+        options.turnReluctance = (1.0);
         
         State s0 = new State(options);
         State s1 = e1.traverse(s0);

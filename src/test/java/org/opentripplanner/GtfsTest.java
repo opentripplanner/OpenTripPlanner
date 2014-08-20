@@ -137,7 +137,7 @@ public abstract class GtfsTest extends TestCase {
         }
         routingRequest.setRoutingContext(graph);
         routingRequest.setWheelchairAccessible(wheelchairAccessible);
-        routingRequest.setTransferPenalty(preferLeastTransfers ? 300 : 0);
+        routingRequest.transferPenalty = (preferLeastTransfers ? 300 : 0);
         routingRequest.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {

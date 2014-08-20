@@ -334,7 +334,7 @@ public class TestRequest extends TestCase {
 
         assertEquals(new Date(1254420671000L), options.getDateTime());
         assertEquals(1600.0, options.getMaxWalkDistance());
-        assertEquals(8.0, options.getWalkReluctance());
+        assertEquals(8.0, options.walkReluctance);
         assertEquals(1, options.getNumItineraries());
     }
 

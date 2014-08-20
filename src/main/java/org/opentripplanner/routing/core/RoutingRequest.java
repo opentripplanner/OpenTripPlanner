@@ -149,19 +149,18 @@ public class RoutingRequest implements Cloneable, Serializable {
      * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. 
      * If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.
      */
-    @Getter @Setter public int transferPenalty = 0;
+    public int transferPenalty = 0;
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
      *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
      *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
-    @Getter @Setter public double walkReluctance = 2.0;
+    public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
-    @Getter @Setter public double stairsReluctance = 2.0;
+    public double stairsReluctance = 2.0;
     
     /** Multiplicative factor on expected turning time. */
-    @Setter
     public double turnReluctance = 1.0;
 
     /**
@@ -169,24 +168,24 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Setting it to "seems like forever," while accurate, will probably prevent OTP from working correctly.
      */
     // TODO: how long does it /really/ take to get an elevator?
-    @Getter @Setter public int elevatorBoardTime = 90;
+    public int elevatorBoardTime = 90;
 
     /** What is the cost of boarding an elevator? */
-    @Getter @Setter public int elevatorBoardCost = 90;
+    public int elevatorBoardCost = 90;
 
     /** How long does it take to advance one floor on an elevator? */
-    @Getter @Setter public int elevatorHopTime = 20;
+    public int elevatorHopTime = 20;
 
     /** What is the cost of travelling one floor on an elevator? */
-    @Getter @Setter public int elevatorHopCost = 20;
+    public int elevatorHopCost = 20;
 
     // it is assumed that getting off an elevator is completely free
 
     /** Time to get on and off your own bike */
-    @Getter @Setter public int bikeSwitchTime;
+    public int bikeSwitchTime;
 
     /** Cost of getting on and off your own bike */
-    @Getter @Setter public int bikeSwitchCost;
+    public int bikeSwitchCost;
 
     /** Time to rent a bike */
     @Getter @Setter public int bikeRentalPickupTime = 60;
