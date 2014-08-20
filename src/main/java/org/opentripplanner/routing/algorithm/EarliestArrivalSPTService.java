@@ -15,8 +15,6 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
 
-import lombok.Setter;
-
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -39,8 +37,7 @@ public class EarliestArrivalSPTService implements SPTService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EarliestArrivalSPTService.class);
 
-    @Setter
-    private int maxDuration = 60 * 60 * 2;
+    public int maxDuration = 60 * 60 * 2;
 
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {

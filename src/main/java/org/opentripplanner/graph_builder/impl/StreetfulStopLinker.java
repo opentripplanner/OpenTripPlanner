@@ -78,7 +78,7 @@ public class StreetfulStopLinker implements GraphBuilder {
         final Parser parser[] = new Parser[] {new Parser()};
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
         EarliestArrivalSPTService earliestArrivalSPTService = new EarliestArrivalSPTService();
-        earliestArrivalSPTService.setMaxDuration(maxDuration);
+        earliestArrivalSPTService.maxDuration = (maxDuration);
 
         for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
             // Only link street linkable stops

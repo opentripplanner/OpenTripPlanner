@@ -1441,7 +1441,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
         
-        sptService.setNPaths( Integer.parseInt( this.nPaths.getText() ) );
+        sptService.nPaths = ( Integer.parseInt( this.nPaths.getText() ) );
         
         // apply callback if the options call for it
         if( dontUseGraphicalCallbackCheckBox.isSelected() ){

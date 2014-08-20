@@ -16,8 +16,6 @@ package org.opentripplanner.routing.algorithm;
 import java.util.Collection;
 import java.util.List;
 
-import lombok.Setter;
-
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
@@ -52,7 +50,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private TraverseVisitor traverseVisitor;
     
     /** The number of paths to attempt to find */
-    @Setter private int nPaths = 3; // TODO this should really be set based on the routing request
+    public int nPaths = 3; // TODO this should really be set based on the routing request
     
     enum RunStatus {
         RUNNING, STOPPED

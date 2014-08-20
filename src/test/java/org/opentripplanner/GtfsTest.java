@@ -106,7 +106,7 @@ public abstract class GtfsTest extends TestCase {
             pathService = new LongDistancePathService(null, genericAStar);
         } else {
             pathService = new RetryingPathServiceImpl(null, genericAStar);
-            genericAStar.setNPaths(1);
+            genericAStar.nPaths = (1);
         }
         planGenerator = new PlanGenerator(null, pathService);
     }
