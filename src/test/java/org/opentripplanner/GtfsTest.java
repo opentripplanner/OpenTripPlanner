@@ -133,7 +133,7 @@ public abstract class GtfsTest extends TestCase {
             routingRequest.to = new GenericLocation(null, agencyId + ":" + toVertex);
         }
         if (onTripId != null && !onTripId.isEmpty()) {
-            routingRequest.setStartingTransitTripId(new AgencyAndId(agencyId, onTripId));
+            routingRequest.startingTransitTripId = (new AgencyAndId(agencyId, onTripId));
         }
         routingRequest.setRoutingContext(graph);
         routingRequest.setWheelchairAccessible(wheelchairAccessible);

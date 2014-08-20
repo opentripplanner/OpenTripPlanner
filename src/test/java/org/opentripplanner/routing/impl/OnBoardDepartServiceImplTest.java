@@ -135,7 +135,7 @@ public class OnBoardDepartServiceImplTest {
         when(dwell.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
         routingRequest.from = new GenericLocation();
-        when(routingRequest.getStartingTransitTripId()).thenReturn(agencyAndId);
+        routingRequest.startingTransitTripId = agencyAndId;
         when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(9);
 
         patternHop0.setGeometry(geometry);
@@ -217,7 +217,7 @@ public class OnBoardDepartServiceImplTest {
         when(depart.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
         routingRequest.from = new GenericLocation();
-        when(routingRequest.getStartingTransitTripId()).thenReturn(agencyAndId);
+        routingRequest.startingTransitTripId = agencyAndId;
         when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(10);
         when(graph.getVertex("Station_0")).thenReturn(station0);
         when(graph.getVertex("Station_1")).thenReturn(station1);
@@ -294,7 +294,7 @@ public class OnBoardDepartServiceImplTest {
         when(dwell.getCoordinate()).thenReturn(new Coordinate(0, 0));
         when(arrive.getCoordinate()).thenReturn(new Coordinate(0, 0));
         routingRequest.from = new GenericLocation();
-        when(routingRequest.getStartingTransitTripId()).thenReturn(agencyAndId);
+        routingRequest.startingTransitTripId = agencyAndId;
         when(graph.getVertex("Station_0")).thenReturn(station0);
         when(graph.getVertex("Station_1")).thenReturn(station1);
         when(graph.getVertex("Station_2")).thenReturn(station2);

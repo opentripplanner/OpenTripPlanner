@@ -65,7 +65,7 @@ public class GraphPath {
         this.rctx = s.getContext();
         this.back = s.getOptions().arriveBy;
         // optimize = false; // DEBUG
-        if (s.getOptions().getStartingTransitTripId() != null) {
+        if (s.getOptions().startingTransitTripId != null) {
             LOG.debug("Disable reverse-optimize for on-board depart");
             optimize = false;
         }

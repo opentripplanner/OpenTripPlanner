@@ -459,14 +459,14 @@ public abstract class RoutingResource {
             throw new UnsupportedOperationException("TSP is not supported for transit or bike share trips");
 
         String startTransitStopId = get(this.startTransitStopId, n,
-                AgencyAndId.convertToString(request.getStartingTransitStopId()));
+                AgencyAndId.convertToString(request.startingTransitStopId));
         if (startTransitStopId != null && !"".equals(startTransitStopId)) {
-            request.setStartingTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
+            request.startingTransitStopId = (AgencyAndId.convertFromString(startTransitStopId));
         }
         String startTransitTripId = get(this.startTransitTripId, n,
-                AgencyAndId.convertToString(request.getStartingTransitTripId()));
+                AgencyAndId.convertToString(request.startingTransitTripId));
         if (startTransitTripId != null && !"".equals(startTransitTripId)) {
-            request.setStartingTransitTripId(AgencyAndId.convertFromString(startTransitTripId));
+            request.startingTransitTripId = (AgencyAndId.convertFromString(startTransitTripId));
         }
         
         request.clampInitialWait = (get(clampInitialWait, n, request.clampInitialWait));
@@ -474,11 +474,11 @@ public abstract class RoutingResource {
         request.reverseOptimizeOnTheFly = (get(reverseOptimizeOnTheFly, n, 
                                                request.reverseOptimizeOnTheFly));
 
-        request.setIgnoreRealtimeUpdates(get(ignoreRealtimeUpdates, n, 
-                request.isIgnoreRealtimeUpdates()));
+        request.ignoreRealtimeUpdates = (get(ignoreRealtimeUpdates, n, 
+                request.ignoreRealtimeUpdates));
 
-        request.setDisableRemainingWeightHeuristic(get(disableRemainingWeightHeuristic, n,
-                request.isDisableRemainingWeightHeuristic()));
+        request.disableRemainingWeightHeuristic = (get(disableRemainingWeightHeuristic, n,
+                request.disableRemainingWeightHeuristic));
         
         String localeSpec = get(locale, n, "en");
         String[] localeSpecParts = localeSpec.split("_");

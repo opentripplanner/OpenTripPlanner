@@ -91,7 +91,7 @@ public class LongDistancePathService implements PathService {
         LOG.debug("rreq={}", options);
         
         RemainingWeightHeuristic heuristic;
-        if (options.isDisableRemainingWeightHeuristic()) {
+        if (options.disableRemainingWeightHeuristic) {
             heuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
             // Only use the BiDi heuristic for transit.

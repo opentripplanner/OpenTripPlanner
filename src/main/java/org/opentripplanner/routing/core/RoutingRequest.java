@@ -349,13 +349,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * When true, realtime updates are ignored during this search.
      */
-    @Getter @Setter public boolean ignoreRealtimeUpdates = false;
+    public boolean ignoreRealtimeUpdates = false;
 
     /**
      * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
      * distance path service.
      */
-    @Getter @Setter public boolean disableRemainingWeightHeuristic = false;
+    public boolean disableRemainingWeightHeuristic = false;
 
     /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions rather than RoutingContexts,
@@ -368,17 +368,17 @@ public class RoutingRequest implements Cloneable, Serializable {
      * the request scope is torn down -- the routing context becomes irrelevant at that point, since temporary graph elements have been removed and
      * the graph may have been reloaded.
      */
-    @Getter @Setter public RoutingContext rctx;
+    public RoutingContext rctx;
 
     /** A transit stop that this trip must start from */
-    @Getter @Setter private AgencyAndId startingTransitStopId;
+    public AgencyAndId startingTransitStopId;
     
     /** A trip where this trip must start from (depart-onboard routing) */
-    @Getter @Setter private AgencyAndId startingTransitTripId;
+    public AgencyAndId startingTransitTripId;
 
-    @Getter @Setter private boolean walkingBike;
+    public boolean walkingBike;
 
-    @Getter @Setter private double heuristicWeight = 1.0;
+    public double heuristicWeight = 1.0;
 
     @Getter @Setter private boolean softWalkLimiting = true;
     @Getter @Setter private boolean softPreTransitLimiting = true;

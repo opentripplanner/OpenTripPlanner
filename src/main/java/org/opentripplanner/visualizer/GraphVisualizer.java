@@ -1431,7 +1431,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.setToString(to);
         options.walkSpeed = Float.parseFloat(walkSpeed.getText());
         options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
-        options.setHeuristicWeight(Float.parseFloat(heuristicWeight.getText()));
+        options.heuristicWeight = (Float.parseFloat(heuristicWeight.getText()));
         options.setSoftWalkLimiting( softWalkLimiting.isSelected() );
         options.setSoftWalkPenalty(Float.parseFloat(softWalkPenalty.getText()));
         options.setSoftWalkOverageRate(Float.parseFloat(this.softWalkOverageRate.getText()));

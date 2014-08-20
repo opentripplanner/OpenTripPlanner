@@ -199,7 +199,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
-                double estimate = v.getWeight() + remaining_w*runState.options.getHeuristicWeight();
+                double estimate = v.getWeight() + remaining_w*runState.options.heuristicWeight;
 
                 if (verbose) {
                     System.out.println("      edge " + edge);

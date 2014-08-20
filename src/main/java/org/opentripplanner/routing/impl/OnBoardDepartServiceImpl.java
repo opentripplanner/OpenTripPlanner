@@ -66,7 +66,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         opt.rctx = ctx;
 
         /* 1. Get the list of PatternHop for the given trip ID. */
-        AgencyAndId tripId = opt.getStartingTransitTripId();
+        AgencyAndId tripId = opt.startingTransitTripId;
         Trip trip = ctx.graph.index.tripForId.get(tripId);
         TripPattern tripPattern = ctx.graph.index.patternForTrip.get(trip);
         if (tripPattern == null) {

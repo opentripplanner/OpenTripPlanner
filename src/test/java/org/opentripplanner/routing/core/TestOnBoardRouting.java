@@ -171,7 +171,7 @@ public class TestOnBoardRouting extends TestCase {
             OnboardDepartVertex onboardOrigin = new OnboardDepartVertex("OnBoard_Origin", lat, lon);
             @SuppressWarnings("unused")
             OnBoardDepartPatternHop currentHop = new OnBoardDepartPatternHop(onboardOrigin, nextV,
-                    tripTimes, options.getRctx().serviceDays.get(1), stopIndex, k);
+                    tripTimes, options.rctx.serviceDays.get(1), stopIndex, k);
 
             options.dateTime = newStart;
             options.setRoutingContext(graph, onboardOrigin, destination);

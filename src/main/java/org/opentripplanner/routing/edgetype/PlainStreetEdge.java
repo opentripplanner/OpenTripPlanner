@@ -271,7 +271,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     /** return a StateEditor rather than a State so that we can make parking/mode switch modifications for kiss-and-ride. */
     private StateEditor doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
-        boolean walkingBike = options.isWalkingBike();
+        boolean walkingBike = options.walkingBike;
         boolean backWalkingBike = s0.isBackWalkingBike();
         TraverseMode backMode = s0.getBackMode();
         Edge backEdge = s0.getBackEdge();
