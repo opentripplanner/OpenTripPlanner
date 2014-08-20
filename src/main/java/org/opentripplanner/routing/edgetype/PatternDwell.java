@@ -49,11 +49,11 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
     }
         
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(getPattern().getRoute());
+        return GtfsLibrary.getTraverseMode(getPattern().route);
     }
 
     public String getName() {
-        return GtfsLibrary.getRouteName(getPattern().getRoute());
+        return GtfsLibrary.getRouteName(getPattern().route);
     }
 
     public State traverse(State state0) {

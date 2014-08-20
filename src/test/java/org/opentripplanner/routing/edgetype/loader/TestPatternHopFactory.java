@@ -260,7 +260,7 @@ public class TestPatternHopFactory extends TestCase {
         for (Edge edge : stopDepartVertex.getOutgoing()) {
             if (edge instanceof TransitBoardAlight) {
                 TransitBoardAlight tba = ((TransitBoardAlight) edge);
-                if (tba.boarding && tba.getPattern().getRoute().getId().getId().equals(routeId)) {
+                if (tba.boarding && tba.getPattern().route.getId().getId().equals(routeId)) {
                     for (Edge edge2: tba.getToVertex().getOutgoing()) {
                         if (edge2 instanceof PatternHop) {
                             return (PatternHop) edge2;

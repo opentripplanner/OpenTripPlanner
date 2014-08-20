@@ -91,7 +91,6 @@ public class TripPattern implements Serializable {
      * same Route.
      * TODO: consider the case where there is a replacement bus that makes the same stops as a train. We may need to split out multiple patterns for multiple routes.
      */
-    @Getter
     public final Route route;
 
     /**
@@ -316,7 +315,7 @@ public class TripPattern implements Serializable {
         // Check that all trips added to this pattern are on the initially declared route.
         // Identity equality is valid on GTFS entity objects.
         if (this.route != tt.trip.getRoute()) {
-            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(), this.getRoute());
+            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(), this.route);
         }
     }
 

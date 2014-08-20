@@ -54,11 +54,11 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
 
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(getPattern().getRoute());
+        return GtfsLibrary.getTraverseMode(getPattern().route);
     }
     
     public String getName() {
-        return GtfsLibrary.getRouteName(getPattern().getRoute());
+        return GtfsLibrary.getRouteName(getPattern().route);
     }
     
     public State optimisticTraverse(State state0) {
@@ -109,7 +109,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
             s1.setZone(getBeginStop().getZoneId());
         else
             s1.setZone(getEndStop().getZoneId());
-        //s1.setRoute(pattern.getExemplar().getRoute().getId());
+        //s1.setRoute(pattern.getExemplar().route.getId());
         s1.incrementWeight(runningTime);
         s1.setBackMode(getMode());
         return s1.makeState();

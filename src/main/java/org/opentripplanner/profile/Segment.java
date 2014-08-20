@@ -56,7 +56,7 @@ public class Segment {
     public String endTime;
 
     public Segment (Ride ride) {
-        Route route = ride.patternRides.get(0).pattern.getRoute();
+        Route route = ride.patternRides.get(0).pattern.route;
         from = ride.from.getId();
         to = ride.to.getId();
         fromName = ride.from.getName();

@@ -225,7 +225,7 @@ public class GraphStats {
                         TripPattern ttp = ph.getPattern();
                         List<Trip> trips = ttp.getTrips();
                         int hop = ph.stopIndex;
-                        String route = ttp.getRoute().getId().toString();
+                        String route = ttp.route.getId().toString();
                         for (int trip = 0; trip < trips.size(); trip++){
                             int time = ttp.getScheduledTimetable().getTripTimes(trip).getRunningTime(hop);
                             double speed = distance / time;
