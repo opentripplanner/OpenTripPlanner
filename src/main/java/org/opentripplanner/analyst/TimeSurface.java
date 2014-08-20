@@ -95,7 +95,7 @@ public class TimeSurface implements Serializable{
         lat = req.from.lat;
         id = makeUniqueId();
         dateTime = req.fromTime; // FIXME
-        routerId = profileRouter.graph.getRouterId();
+        routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
         times = maxNotMin ? profileRouter.maxs : profileRouter.mins;
     }

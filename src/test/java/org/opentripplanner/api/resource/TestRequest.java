@@ -133,7 +133,7 @@ class SimpleGraphServiceImpl implements GraphService {
 
     public void putGraph(String graphId, Graph graph) {
         graphs.put(graphId, graph);
-        graph.setRouterId(graphId);
+        graph.routerId = (graphId);
     }
 
     @Override
