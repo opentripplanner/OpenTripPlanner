@@ -59,7 +59,7 @@ public class EmbeddedConfigGraphBuilderImpl implements GraphBuilder {
             LOG.info("Bundling config '" + propertiesFile.getPath() + "' into graph.");
             Properties props = new Properties();
             props.load(new FileInputStream(propertiesFile));
-            graph.setEmbeddedPreferences(props);
+            graph.embeddedPreferences = props;
         } catch (IOException e) {
             LOG.error("Can't load properties from '" + propertiesFile.getAbsolutePath() + "'", e);
         }

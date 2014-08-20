@@ -164,9 +164,7 @@ public class Graph implements Serializable {
     /**
      * Makes it possible to embed a default configuration inside a graph.
      */
-    @Getter
-    @Setter
-    private Properties embeddedPreferences = null;
+    public Properties embeddedPreferences = null;
 
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are

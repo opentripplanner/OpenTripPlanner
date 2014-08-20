@@ -61,7 +61,7 @@ public class GraphUpdaterConfigurator {
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
 
         // Look for embedded config if it exists
-        Properties embeddedGraphPreferences = graph.getEmbeddedPreferences();
+        Properties embeddedGraphPreferences = graph.embeddedPreferences;
         Preferences embeddedConfig = null;
         if (embeddedGraphPreferences != null) {
             embeddedConfig = new PropertiesPreferences(embeddedGraphPreferences);
