@@ -58,7 +58,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         double turnCost = 0;
 
         int turnAngle = calculateTurnAngle(from, to, options);
-        if (v.isTrafficLight()) {
+        if (v.trafficLight) {
             // Use constants that apply when there are stop lights.
             if (isRightTurn(turnAngle)) {
                 turnCost = expectedRightAtLightTimeSec;

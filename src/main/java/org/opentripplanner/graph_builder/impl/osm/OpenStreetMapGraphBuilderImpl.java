@@ -2793,7 +2793,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (iv == null) {
                     iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
                     if (node.hasTrafficLight()) {
-                        iv.setTrafficLight(true);
+                        iv.trafficLight = (true);
                     }
                 }
 

@@ -82,7 +82,7 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
             TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
 
             // Only use stop codes for linking TODO: find better method to connect stops without stop code
-            if (tsv.getStopCode() != null && tsv.getStopCode().equals(stopCode)) {
+            if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
                 new StreetTransitLink(ts, tsv, wheelchairAccessible);
                 new StreetTransitLink(tsv, ts, wheelchairAccessible);
                 LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());

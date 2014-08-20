@@ -123,20 +123,20 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex("osm:node:42442273");
         IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex("osm:node:1919595927");
         IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex("osm:node:42452026");
-        assertTrue(iv1.isTrafficLight());
-        assertTrue(iv2.isTrafficLight());
-        assertTrue(iv3.isTrafficLight());
-        assertTrue(iv4.isTrafficLight());
+        assertTrue(iv1.trafficLight);
+        assertTrue(iv2.trafficLight);
+        assertTrue(iv3.trafficLight);
+        assertTrue(iv4.trafficLight);
         
         // These are not.
         IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex("osm:node:42435485");
         IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex("osm:node:42439335");
         IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex("osm:node:42436761");
         IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex("osm:node:42442291");
-        assertFalse(iv5.isTrafficLight());
-        assertFalse(iv6.isTrafficLight());
-        assertFalse(iv7.isTrafficLight());
-        assertFalse(iv8.isTrafficLight());
+        assertFalse(iv5.trafficLight);
+        assertFalse(iv6.trafficLight);
+        assertFalse(iv7.trafficLight);
+        assertFalse(iv8.trafficLight);
         
         Set<P2<Integer>> edgeEndpoints = new HashSet<P2<Integer>>();
         for (StreetEdge se : gg.getStreetEdges()) {

@@ -754,7 +754,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			}
 			if (drawStreetVertices && v instanceof IntersectionVertex) {
 		        IntersectionVertex iv = (IntersectionVertex) v;
-		        if (iv.isTrafficLight()) {
+		        if (iv.trafficLight) {
 		            drawVertex(v, 7);
 		        }
 		    }

@@ -75,10 +75,10 @@ public class StreetfulStopLinkerTest {
         IntersectionVertex intersectionC = new IntersectionVertex(graph, "Intersection C", 2, 2);
         IntersectionVertex intersectionD = new IntersectionVertex(graph, "Intersection D", 2, 1);
 
-        intersectionA.setFreeFlowing(true);
-        intersectionB.setFreeFlowing(true);
-        intersectionC.setFreeFlowing(true);
-        intersectionD.setFreeFlowing(true);
+        intersectionA.freeFlowing = (true);
+        intersectionB.freeFlowing = (true);
+        intersectionC.freeFlowing = (true);
+        intersectionD.freeFlowing = (true);
 
         new StreetTransitLink(transitStopA, intersectionA, true);
         new StreetTransitLink(intersectionB, transitStopB, true);

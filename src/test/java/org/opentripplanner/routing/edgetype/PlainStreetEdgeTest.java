@@ -163,7 +163,7 @@ public class PlainStreetEdgeTest {
         PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
         PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
-        v1.setTrafficLight(true);
+        v1.trafficLight = (true);
 
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
@@ -200,7 +200,7 @@ public class PlainStreetEdgeTest {
         PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
         PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
-        v1.setTrafficLight(true);
+        v1.trafficLight = (true);
 
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
