@@ -17,8 +17,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.TimeZone;
 
-import lombok.Setter;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -40,8 +38,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 public class TimetableSnapshotSource {
     private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
 
-    @Setter
-    private int logFrequency = 2000;
+    public int logFrequency = 2000;
 
     private int appliedBlockCount = 0;
 
@@ -50,7 +47,7 @@ public class TimetableSnapshotSource {
      * snapshot, just return the same one. Throttles the potentially resource-consuming task of
      * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
      */
-    @Setter private int maxSnapshotFrequency = 1000; // msec
+    public int maxSnapshotFrequency = 1000; // msec
 
     /**
      * The last committed snapshot that was handed off to a routing thread. This snapshot may be
@@ -62,7 +59,7 @@ public class TimetableSnapshotSource {
     private TimetableResolver buffer = new TimetableResolver();
 
     /** Should expired realtime data be purged from the graph. */
-    @Setter private boolean purgeExpiredData = true;
+    public boolean purgeExpiredData = true;
 
     protected ServiceDate lastPurgeDate = null;
 

@@ -134,13 +134,13 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
                 // Set properties of realtime data snapshot source
                 if (logFrequency != null) {
-                    snapshotSource.setLogFrequency(logFrequency);
+                    snapshotSource.logFrequency = (logFrequency);
                 }
                 if (maxSnapshotFrequency != null) {
-                    snapshotSource.setMaxSnapshotFrequency(maxSnapshotFrequency);
+                    snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
                 }
                 if (purgeExpiredData != null) {
-                    snapshotSource.setPurgeExpiredData(purgeExpiredData);
+                    snapshotSource.purgeExpiredData = (purgeExpiredData);
                 }
             }
         });

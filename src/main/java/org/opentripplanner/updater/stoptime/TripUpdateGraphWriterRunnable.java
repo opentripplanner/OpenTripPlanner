@@ -15,8 +15,6 @@ package org.opentripplanner.updater.stoptime;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -25,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
-@AllArgsConstructor
 public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     private static Logger LOG = LoggerFactory.getLogger(TripUpdateGraphWriterRunnable.class);
 
@@ -36,7 +33,12 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
     private String agencyId;
 
-    @Override
+    public TripUpdateGraphWriterRunnable(List<TripUpdate> updates, String agencyId) {
+		this.updates = updates;
+		this.agencyId = agencyId;
+	}
+
+	@Override
     public void run(Graph graph) {
         // Apply updates to graph using realtime snapshot source
         TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;

@@ -83,7 +83,7 @@ public abstract class GtfsTest extends TestCase {
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
         graph.index(new DefaultStreetVertexIndexFactory());
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
-        timetableSnapshotSource.setPurgeExpiredData(false);
+        timetableSnapshotSource.purgeExpiredData = (false);
         graph.timetableSnapshotSource = (timetableSnapshotSource);
         alertPatchServiceImpl = new AlertPatchServiceImpl(graph);
         alertsUpdateHandler.setAlertPatchService(alertPatchServiceImpl);
