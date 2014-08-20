@@ -60,7 +60,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private ElevationProfileSegment elevationProfileSegment;
 
-    @Getter
     private double length;
 
     @Getter
@@ -658,5 +657,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         }
         return super.detachFrom();
     }
+
+	@Override
+	public double getLength() {
+		return this.length;
+	}
 
 }
