@@ -2,8 +2,6 @@ package org.opentripplanner.routing.impl;
 
 import java.util.Comparator;
 
-import lombok.Getter;
-
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -31,8 +29,7 @@ public class CandidateEdge {
     private static final double MAX_ABS_DIRECTION_DIFFERENCE = 360.0;
 
     /** The edge being considered for linking. */
-    @Getter
-    protected final StreetEdge edge;
+    public final StreetEdge edge;
 
     /** Pointer to the geometry (coordinate sequence) of the edge. */
     private final CoordinateSequence edgeCoords;
@@ -56,43 +53,35 @@ public class CandidateEdge {
      * Set when to the closest endpoint of the edge when the input location is really sitting on 
      * that endpoint (within some tolerance).
      */
-    @Getter
     protected StreetVertex endwiseVertex;
 
     /** The coordinate of the nearest point on the edge to the linking location. */
-    @Getter
-    protected Coordinate nearestPointOnEdge;
+    public Coordinate nearestPointOnEdge;
 
     /** Heading if given. */
-    @Getter
     protected Double heading;
 
     /** Azimuth between input point and closest point on edge. */
-    @Getter
     protected double directionToEdge;
 
     /** Azimuth of the subsegment of the edge to which the input point is closest. */
-    @Getter
     protected double directionOfEdge;
 
     /** Difference in direction between heading and nearest subsegment of edge. Null if no heading given. */
-    @Getter
     protected Double directionDifference;
 
     /** Distance from edge to linking point. */
-    @Getter
-    protected double distance;
+    public double distance;
 
     /** Score of the match. Lower is better. */
-    @Getter
-    protected double score;
+    public double score;
 
     /** Sorts CandidateEdges by best score first (lower = better). */
     public static class CandidateEdgeScoreComparator implements Comparator<CandidateEdge> {
         @Override
         public int compare(CandidateEdge arg0, CandidateEdge arg1) {
-            double score1 = arg0.getScore();
-            double score2 = arg1.getScore();
+            double score1 = arg0.score;
+            double score2 = arg1.score;
             if (score1 == score2) {
                 return 0;
             } else if (score1 < score2) {

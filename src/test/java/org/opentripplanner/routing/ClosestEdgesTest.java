@@ -100,7 +100,7 @@ public class ClosestEdgesTest {
 
         // Double check that all the edges returned can be traversed.
         for (CandidateEdge e : edges) {
-            assertTrue(reqs.canBeTraversed(e.getEdge()));
+            assertTrue(reqs.canBeTraversed(e.edge));
         }
     }
 
@@ -169,7 +169,7 @@ public class ClosestEdgesTest {
         // Should give me the top edge as the best edge.
         // topBack is worse because of the heading.
         CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
-        assertEquals(expectedBest, candidates.best.getEdge());
+        assertEquals(expectedBest, candidates.best.edge);
         assertEquals(expectedCandidates, candidates.size());
     }
 
@@ -217,12 +217,12 @@ public class ClosestEdgesTest {
         Collections.sort(candidates, new CandidateEdge.CandidateEdgeScoreComparator());
         
         // Check that scores are in ascending order.
-        double lastScore = candidates.best.getScore();
+        double lastScore = candidates.best.score;
         for (CandidateEdge ce : candidates) {
-            assertTrue(ce.getScore() >= lastScore);
-            lastScore = ce.getScore();
+            assertTrue(ce.score >= lastScore);
+            lastScore = ce.score;
         }
         
-        assertEquals(candidates.best.getScore(), candidates.get(0).getScore(), 0.0);
+        assertEquals(candidates.best.score, candidates.get(0).score, 0.0);
     }    
 }

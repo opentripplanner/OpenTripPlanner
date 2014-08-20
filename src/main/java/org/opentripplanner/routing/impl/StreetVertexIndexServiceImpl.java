@@ -365,7 +365,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
-                if (ce.getDistance() < radius) {
+                if (ce.distance < radius) {
                     candidateEdges.add(ce);
                 }
             }
