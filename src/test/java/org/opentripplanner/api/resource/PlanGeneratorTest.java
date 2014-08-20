@@ -667,7 +667,7 @@ public class PlanGeneratorTest {
         // Temporary graph objects for onboard depart tests
         OnboardDepartVertex onboardDepartVertex = new OnboardDepartVertex("Onboard", 23.0, 12.0);
         OnBoardDepartPatternHop onBoardDepartPatternHop = new OnBoardDepartPatternHop(
-                onboardDepartVertex, v12, firstTripPattern.getScheduledTimetable().getTripTimes(0), serviceDay, 0, 0.5);
+                onboardDepartVertex, v12, firstTripPattern.scheduledTimetable.getTripTimes(0), serviceDay, 0, 0.5);
 
         // Traverse the path forward first
         RoutingRequest forwardOptions = options.clone();

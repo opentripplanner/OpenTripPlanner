@@ -96,14 +96,12 @@ public class TripPattern implements Serializable {
     /**
      * As for the route field, this depends on there being a single GFTFS route per journey pattern. That is not always true.
      */
-    @Getter
     public final TraverseMode mode;
 
     /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS
      * pick-up and drop-off types.
      */
-    @Getter
     public final StopPattern stopPattern;
     
     /** 
@@ -111,8 +109,7 @@ public class TripPattern implements Serializable {
      * realtime updates applied. If realtime stoptime updates are applied, next/previous departure
      * searches will be conducted using a different, updated timetable in a snapshot.
      */
-    @Getter
-    protected final Timetable scheduledTimetable = new Timetable(this);
+    public final Timetable scheduledTimetable = new Timetable(this);
 
     /** The human-readable, unique name for this trip pattern. */
     @Getter @Setter

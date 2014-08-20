@@ -589,7 +589,7 @@ public class Graph implements Serializable {
             tableTripPatterns.add(pav.getTripPattern());
         }
         for (TripPattern ttp : tableTripPatterns) {
-            if (ttp != null) ttp.getScheduledTimetable().finish(); // skip frequency-based patterns with no table (null)
+            if (ttp != null) ttp.scheduledTimetable.finish(); // skip frequency-based patterns with no table (null)
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
