@@ -48,8 +48,8 @@ public class SimpleTraversalCostModelTest {
         
         // Initialize the routing request.
         options = new RoutingRequest();
-        options.setCarSpeed(1.0);
-        options.setWalkSpeed(1.0);
+        options.carSpeed = 1.0;
+        options.walkSpeed = 1.0;
         options.setCarDecelerationSpeed(2.0);
         options.setCarAccelerationSpeed(2.0);
         options.setModes(TraverseModeSet.allModes());

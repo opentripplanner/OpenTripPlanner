@@ -220,7 +220,7 @@ public class SimpleIsochrone extends RoutingResource {
             for (Map.Entry<Vertex, Double> vertexSeconds : points.entrySet()) {
                 double remainingSeconds = thresholdSeconds - vertexSeconds.getValue();
                 if (remainingSeconds > 60) { // avoid degenerate geometries
-                    double remainingMeters = remainingSeconds * request.getWalkSpeed();
+                    double remainingMeters = remainingSeconds * request.walkSpeed;
                     Geometry point = geomf.createPoint(vertexSeconds.getKey().getCoordinate());
                     point = JTS.transform(point, toMeters);
                     Geometry buffer = point.buffer(remainingMeters);

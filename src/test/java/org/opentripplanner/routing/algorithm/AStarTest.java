@@ -95,7 +95,7 @@ public class AStarTest {
     @Test
     public void testForward() {
         RoutingRequest options = new RoutingRequest();
-        options.setWalkSpeed(1.0);
+        options.walkSpeed = 1.0;
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
                 _graph.getVertex("leary_20th"));
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -119,7 +119,7 @@ public class AStarTest {
     public void testBack() {
 
         RoutingRequest options = new RoutingRequest();
-        options.setWalkSpeed(1.0);
+        options.walkSpeed = 1.0;
         options.setArriveBy(true);
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
                 _graph.getVertex("leary_20th"));
@@ -154,7 +154,7 @@ public class AStarTest {
     public void testForwardExtraEdges() {
 
         RoutingRequest options = new RoutingRequest();
-        options.setWalkSpeed(1.0);
+        options.walkSpeed = 1.0;
 
         StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd",
                 new Coordinate(-122.385050, 47.666620), "near_shilshole_22nd");
@@ -190,7 +190,7 @@ public class AStarTest {
     public void testBackExtraEdges() {
 
         RoutingRequest options = new RoutingRequest();
-        options.setWalkSpeed(1.0);
+        options.walkSpeed = 1.0;
         options.setArriveBy(true);
 
         StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd",
@@ -226,7 +226,7 @@ public class AStarTest {
     @Test
     public void testMultipleTargets() {
         RoutingRequest options = new RoutingRequest();
-        options.setWalkSpeed(1.0);
+        options.walkSpeed = 1.0;
         options.setBatch(true);
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
                 _graph.getVertex("leary_20th"));

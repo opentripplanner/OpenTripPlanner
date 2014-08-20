@@ -45,7 +45,7 @@ public class SimpleTransfer extends Edge {
     @Override
     public State traverse(State s0) {
         RoutingRequest rr = s0.getOptions();
-        double walkspeed = rr.getWalkSpeed();
+        double walkspeed = rr.walkSpeed;
         StateEditor se = s0.edit(this);
         se.setBackMode(TraverseMode.WALK);
         int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
@@ -62,7 +62,7 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest rr) {
-        int time = (int) (distance / rr.getWalkSpeed()); 
+        int time = (int) (distance / rr.walkSpeed); 
         return (time * rr.walkReluctance);
     }
 }

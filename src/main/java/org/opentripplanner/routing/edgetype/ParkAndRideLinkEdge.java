@@ -110,7 +110,7 @@ public class ParkAndRideLinkEdge extends Edge {
         if (mode == TraverseMode.WALK) {
             // Walking
             double walkTime = linkDistance * WALK_OBSTRUCTION_FACTOR
-                    / s0.getOptions().getWalkSpeed();
+                    / s0.getOptions().walkSpeed;
             s1.incrementTimeInSeconds((int) Math.round(walkTime));
             s1.incrementWeight(walkTime);
             s1.incrementWalkDistance(linkDistance);

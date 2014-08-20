@@ -118,20 +118,20 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean wheelchairAccessible = false;
 
     /** The maximum number of possible itineraries to return. */
-    @Getter @Setter public int numItineraries = 3;
+    public int numItineraries = 3;
 
     /** The maximum slope of streets for wheelchair trips. */
-    @Getter @Setter public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
-    @Getter @Setter public boolean showIntermediateStops = false;
+    public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */
-    @Getter @Setter private double walkSpeed;
+    public double walkSpeed;
 
-    @Getter @Setter private double bikeSpeed;
+    public double bikeSpeed;
 
-    @Getter @Setter private double carSpeed;
+    @Getter @Setter public double carSpeed;
 
     @Getter @Setter private Locale locale = new Locale("en", "US");
 

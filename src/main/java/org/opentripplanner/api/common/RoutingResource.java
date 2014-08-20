@@ -362,9 +362,9 @@ public abstract class RoutingResource {
         request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
         request.setWaitReluctance(get(waitReluctance, n, request.getWaitReluctance()));
         request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.getWaitAtBeginningFactor()));
-        request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
-        double bikeSpeedParam = get(bikeSpeed, n, request.getBikeSpeed());
-        request.setBikeSpeed(bikeSpeedParam);
+        request.walkSpeed = get(walkSpeed, n, request.walkSpeed);
+        double bikeSpeedParam = get(bikeSpeed, n, request.bikeSpeed);
+        request.bikeSpeed = bikeSpeedParam;
         int bikeSwitchTimeParam = get(bikeSwitchTime, n, request.getBikeSwitchTime());
         request.setBikeSwitchTime(bikeSwitchTimeParam);
         int bikeSwitchCostParam = get(bikeSwitchCost, n, request.getBikeSwitchCost());
@@ -394,7 +394,7 @@ public abstract class RoutingResource {
             }
         }
         request.setArriveBy(get(arriveBy, n, false));
-        request.setShowIntermediateStops(get(showIntermediateStops, n, request.isShowIntermediateStops()));
+        request.showIntermediateStops = get(showIntermediateStops, n, request.showIntermediateStops);
         /* intermediate places and their ordering are shared because they are themselves a list */
         if (intermediatePlaces != null && intermediatePlaces.size() > 0 
             && ! intermediatePlaces.get(0).equals("")) {
@@ -434,7 +434,7 @@ public abstract class RoutingResource {
 
         if (request.allowBikeRental && bikeSpeedParam == -1) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
-            request.setBikeSpeed(4.3);
+            request.bikeSpeed = 4.3;
         }
 
         request.setBoardSlack(get(boardSlack, n, request.getBoardSlack()));

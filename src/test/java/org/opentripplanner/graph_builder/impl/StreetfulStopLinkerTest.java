@@ -38,7 +38,7 @@ public class StreetfulStopLinkerTest {
     @Test
     public final void testStreetfulStopLinker() {
         final Boolean results[] = new Boolean[4];
-        final double speed = new RoutingRequest().getWalkSpeed();
+        final double speed = new RoutingRequest().walkSpeed;
 
         Graph graph = new Graph();
 

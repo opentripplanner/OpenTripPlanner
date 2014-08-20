@@ -215,9 +215,9 @@ public class SIsochrone extends RoutingResource {
         int numberOfModes = modes.getModes().size();
         if (numberOfModes == 1) {
             if (modes.getWalk()) {
-                this.maxUserSpeed = sptRequestA.getWalkSpeed();
+                this.maxUserSpeed = sptRequestA.walkSpeed;
             } else if (modes.getBicycle()) {
-                this.maxUserSpeed = sptRequestA.getBikeSpeed();
+                this.maxUserSpeed = sptRequestA.bikeSpeed;
             } else if (modes.getDriving()) {
                 this.maxUserSpeed = sptRequestA.getCarSpeed();
                 this.usesCar = true;
@@ -226,7 +226,7 @@ public class SIsochrone extends RoutingResource {
                 // sstein: I thought I may set it to 36.111 m/sec = 130 km/h,
                 // but maybe it is better to assume walk speed for transit, i.e. treat it like if the
                 // person gets off the bus on the last crossing and walks the "last mile".
-            this.maxUserSpeed = sptRequestA.getWalkSpeed();
+            this.maxUserSpeed = sptRequestA.walkSpeed;
         }
 
         if (doSpeedTest) {

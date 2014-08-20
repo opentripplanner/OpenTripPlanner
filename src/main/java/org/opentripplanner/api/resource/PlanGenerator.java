@@ -181,7 +181,7 @@ public class PlanGenerator {
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.isShowIntermediateStops());
+            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops);
             itinerary = adjustItinerary(request, itinerary);
             plan.addItinerary(itinerary);
         }

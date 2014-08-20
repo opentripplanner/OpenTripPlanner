@@ -391,7 +391,7 @@ public class ProfileRouter {
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
         rr.setBatch(true);
-        rr.setWalkSpeed(request.walkSpeed);
+        rr.walkSpeed = request.walkSpeed;
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
         long worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
@@ -440,8 +440,8 @@ public class ProfileRouter {
         // Impose a max time to protect against very slow searches.
         int worstElapsedTime = request.streetTime * 60;
         rr.worstTime = (rr.dateTime + worstElapsedTime);
-        rr.setWalkSpeed(request.walkSpeed);
-        rr.setBikeSpeed(request.bikeSpeed);
+        rr.walkSpeed = request.walkSpeed;
+        rr.bikeSpeed = request.bikeSpeed;
         GenericAStar astar = new GenericAStar();
         astar.setNPaths(1);
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
@@ -460,7 +460,7 @@ public class ProfileRouter {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.setMode(TraverseMode.WALK);
-        rr.setWalkSpeed(request.walkSpeed);
+        rr.walkSpeed = request.walkSpeed;
         // If max trip duration is not limited, searches are of course much slower.
         int worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
         rr.worstTime = (rr.dateTime + worstElapsedTime);

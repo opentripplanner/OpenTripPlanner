@@ -46,8 +46,8 @@ public class PlainStreetEdgeTest {
         
         proto = new RoutingRequest();
         proto.setCarSpeed(15.0f);
-        proto.setWalkSpeed(1.0);
-        proto.setBikeSpeed(5.0f);
+        proto.walkSpeed = 1.0;
+        proto.bikeSpeed = 5.0f;
         proto.setWalkReluctance(1.0);
         proto.setStairsReluctance(1.0);
         proto.setTurnReluctance(1.0);
@@ -90,7 +90,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getLength() / options.getWalkSpeed();
+        double expectedWeight = e1.getLength() / options.walkSpeed;
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -167,7 +167,7 @@ public class PlainStreetEdgeTest {
 
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
-        forward.setBikeSpeed(3.0f);
+        forward.bikeSpeed = 3.0f;
         forward.setRoutingContext(_graph, v0, v2);
 
         State s0 = new State(forward);
@@ -177,7 +177,7 @@ public class PlainStreetEdgeTest {
         RoutingRequest reverse = proto.clone();
         reverse.setMode(TraverseMode.BICYCLE);
         reverse.setArriveBy(true);
-        reverse.setBikeSpeed(3.0f);
+        reverse.bikeSpeed = 3.0f;
         reverse.setRoutingContext(_graph, v0, v2);
 
         State s3 = new State(reverse);

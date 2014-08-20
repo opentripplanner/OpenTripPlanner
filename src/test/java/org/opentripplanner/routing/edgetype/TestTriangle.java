@@ -62,7 +62,7 @@ public class TestTriangle extends TestCase {
         
         RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);
         options.optimize = OptimizeType.TRIANGLE;
-        options.setBikeSpeed(6.0);
+        options.bikeSpeed = 6.0;
         options.walkReluctance = 1;
 
         options.setTriangleSafetyFactor(0);
