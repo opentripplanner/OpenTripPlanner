@@ -66,16 +66,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     private String name;
 
-    @Getter @Setter
     private String label;
     
-    @Getter @Setter
     private boolean wheelchairAccessible = true;
 
-    @Getter @Setter
     private StreetTraversalPermission permission;
 
-    @Getter @Setter
     private int streetClass = CLASS_OTHERPATH;
     
     /**
@@ -152,7 +148,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         this.length = length;
         this.elevationProfileSegment = new ElevationProfileSegment(length);
         this.name = name;
-        this.permission = permission;
+        this.setPermission(permission);
         this.back = back;
         this.carSpeed = carSpeed;
         if (geometry != null) {
@@ -180,7 +176,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Override
     public boolean canTraverse(RoutingRequest options) {
         if (options.wheelchairAccessible) {
-            if (!wheelchairAccessible) {
+            if (!isWheelchairAccessible()) {
                 return false;
             }
             if (elevationProfileSegment.getMaxSlope() > options.maxSlope) {
@@ -193,19 +189,19 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     @Override
     public boolean canTraverse(TraverseModeSet modes) {
-        return permission.allows(modes);
+        return getPermission().allows(modes);
     }
     
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
-            if (!wheelchairAccessible) {
+            if (!isWheelchairAccessible()) {
                 return false;
             }
             if (elevationProfileSegment.getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
-        return permission.allows(mode);
+        return getPermission().allows(mode);
     }
 
     @Override
@@ -215,7 +211,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     @Override
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        return elevationProfileSegment.setElevationProfile(elev, computed, permission.allows(StreetTraversalPermission.CAR));
+        return elevationProfileSegment.setElevationProfile(elev, computed, getPermission().allows(StreetTraversalPermission.CAR));
     }
 
     @Override
@@ -253,7 +249,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             } else { /* departAfter */
                 // Irrevocable transition from driving to walking. "Parking" means being dropped off in this case.
                 // Final CAR check needed to prevent infinite recursion.
-                if ( ! s0.isCarParked() && ! permission.allows(TraverseMode.CAR) && currMode == TraverseMode.CAR) {
+                if ( ! s0.isCarParked() && ! getPermission().allows(TraverseMode.CAR) && currMode == TraverseMode.CAR) {
                     editor = doTraverse(s0, options, TraverseMode.WALK);
                     if (editor != null) {
                         editor.setCarParked(true); // has the effect of switching to WALK and preventing further car use
@@ -676,6 +672,38 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
 	public void setGeometry(LineString geometry) {
 		this.geometry = geometry;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public boolean isWheelchairAccessible() {
+		return wheelchairAccessible;
+	}
+
+	public void setWheelchairAccessible(boolean wheelchairAccessible) {
+		this.wheelchairAccessible = wheelchairAccessible;
+	}
+
+	public StreetTraversalPermission getPermission() {
+		return permission;
+	}
+
+	public void setPermission(StreetTraversalPermission permission) {
+		this.permission = permission;
+	}
+
+	public int getStreetClass() {
+		return streetClass;
+	}
+
+	public void setStreetClass(int streetClass) {
+		this.streetClass = streetClass;
 	}
 
 }
