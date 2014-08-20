@@ -719,10 +719,10 @@ public class State implements Cloneable {
                         orig.getNumBoardings() == 1 &&
                         (
                                 // boarding in a forward main search
-                                (((TransitBoardAlight) edge).isBoarding() &&                         
+                                (((TransitBoardAlight) edge).boarding &&                         
                                         !stateData.opt.arriveBy) ||
                                 // alighting in a reverse main search
-                                (!((TransitBoardAlight) edge).isBoarding() &&
+                                (!((TransitBoardAlight) edge).boarding &&
                                         stateData.opt.arriveBy)
                          )
                     ) {

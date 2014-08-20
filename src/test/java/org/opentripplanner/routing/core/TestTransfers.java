@@ -323,7 +323,7 @@ public class TestTransfers extends TestCase {
         // Find state with FrequencyBoard back edge and save time of that state
         long time = -1;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof TransitBoardAlight && ((TransitBoardAlight)s.getBackEdge()).isBoarding())  {
+            if (s.getBackEdge() instanceof TransitBoardAlight && ((TransitBoardAlight)s.getBackEdge()).boarding)  {
                 time = s.getTimeSeconds(); // find the final board edge, don't break
             }
         }
@@ -346,7 +346,7 @@ public class TestTransfers extends TestCase {
         // Find state with FrequencyBoard back edge and save time of that state
         long newTime = -1;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof TransitBoardAlight && ((TransitBoardAlight)s.getBackEdge()).isBoarding())  {
+            if (s.getBackEdge() instanceof TransitBoardAlight && ((TransitBoardAlight)s.getBackEdge()).boarding)  {
                 newTime = s.getTimeSeconds(); // find the final board edge, don't break
             }
         }

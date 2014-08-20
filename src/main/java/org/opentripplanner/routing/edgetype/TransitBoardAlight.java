@@ -15,8 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
 
-import lombok.Getter;
-
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -61,7 +59,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     private int modeMask; // TODO: via TablePatternEdge it should be possible to grab this from the pattern
    
     /** True if this edge represents boarding a vehicle, false if it represents alighting. */
-    @Getter private boolean boarding;
+    public boolean boarding;
 
     /** Boarding constructor (TransitStopDepart --> PatternStopVertex) */
     public TransitBoardAlight (TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
