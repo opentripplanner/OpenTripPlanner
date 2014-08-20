@@ -20,9 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -102,18 +99,14 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     /** This street has a toll */
     private boolean toll;
 
-    @Getter
     private Set<Alert> wheelchairNotes;
 
-    @Getter
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
     /** 0 -> 360 degree angle - the angle at the start of the edge geometry */
-    @Getter
     public int inAngle;
 
     /** 0 -> 360 degree angle - the angle at the end of the edge geometry */
-    @Getter
     public int outAngle;
 
     /**
@@ -360,8 +353,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
 
-        if (wheelchairNotes != null && options.wheelchairAccessible) {
-            s1.addAlerts(wheelchairNotes);
+        if (getWheelchairNotes() != null && options.wheelchairAccessible) {
+            s1.addAlerts(getWheelchairNotes());
         }
 
         /* Compute turn cost. */
@@ -752,6 +745,25 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
 	public void setToll(boolean toll) {
 		this.toll = toll;
+	}
+
+	public Set<Alert> getWheelchairNotes() {
+		return wheelchairNotes;
+	}
+
+	@Override
+	public List<TurnRestriction> getTurnRestrictions() {
+		return this.turnRestrictions;
+	}
+
+	@Override
+	public int getInAngle() {
+		return this.inAngle;
+	}
+
+	@Override
+	public int getOutAngle() {
+		return this.outAngle;
 	}
 
 }
