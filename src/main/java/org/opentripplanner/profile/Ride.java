@@ -182,7 +182,7 @@ public class Ride {
         // Using Lists because we don't know the length in advance
         List<Integer> times = Lists.newArrayList();
         for (PatternRide patternRide : patternRides) {
-            for (TripTimes tt : patternRide.pattern.getScheduledTimetable().getTripTimes()) {
+            for (TripTimes tt : patternRide.pattern.getScheduledTimetable().tripTimes) {
                 if (window.servicesRunning.get(tt.serviceCode)) {
                     int t = arrivals ? tt.getArrivalTime(patternRide.toIndex)
                                      : tt.getDepartureTime(patternRide.fromIndex);

@@ -245,7 +245,7 @@ public class GraphIndex {
             Timetable table = pattern.getScheduledTimetable();
             // A Stop may occur more than once in a pattern, so iterate over all Stops.
             int sidx = 0;
-            for (Stop currStop : table.getPattern().getStopPattern().stops) {
+            for (Stop currStop : table.pattern.getStopPattern().stops) {
                 if (currStop != stop) continue;
                 for (ServiceDay sd : req.rctx.serviceDays) {
                     TripTimes tt = table.getNextTrip(state, sd, sidx, true);

@@ -466,7 +466,7 @@ public class GTFSPatternHopFactory {
         for (TripPattern pattern : tripPatterns) {
             Timetable timetable = pattern.getScheduledTimetable();
             /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
-            for (TripTimes tripTimes : timetable.getTripTimes()) {
+            for (TripTimes tripTimes : timetable.tripTimes) {
                 Trip trip = tripTimes.trip;
                 if ( ! Strings.isNullOrEmpty(trip.getBlockId())) {
                     tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);

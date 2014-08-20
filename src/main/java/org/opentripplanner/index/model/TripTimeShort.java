@@ -44,7 +44,7 @@ public class TripTimeShort {
         List<TripTimeShort> out = Lists.newArrayList();
         // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeShort(times, i, table.getPattern().getStop(i)));
+            out.add(new TripTimeShort(times, i, table.pattern.getStop(i)));
         }
         return out;
     }
