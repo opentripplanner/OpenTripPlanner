@@ -45,7 +45,7 @@ public class PlainStreetEdgeTest {
         v2 = vertex("maple_2nd", 1.0, 2.0);
         
         proto = new RoutingRequest();
-        proto.setCarSpeed(15.0f);
+        proto.carSpeed = 15.0f;
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 5.0f;
         proto.setWalkReluctance(1.0);

@@ -216,7 +216,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     if (options == null) {
                         locale = new Locale("en");
                     } else {
-                        locale = options.getLocale();
+                        locale = options.locale;
                     }
                     ResourceBundle resources = ResourceBundle.getBundle("internals", locale);
                     String fmt = resources.getString("corner");

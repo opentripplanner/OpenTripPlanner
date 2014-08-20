@@ -498,7 +498,7 @@ public abstract class RoutingResource {
                 locale = new Locale("en");
         }
 
-        request.setLocale(locale);
+        request.locale = locale;
         return request;
     }
 

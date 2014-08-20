@@ -96,7 +96,7 @@ public class TriangleInequalityTest {
         prototypeOptions.setStairsReluctance(1.0);
         prototypeOptions.setWalkReluctance(1.0);
         prototypeOptions.setTurnReluctance(1.0);
-        prototypeOptions.setCarSpeed(1.0);
+        prototypeOptions.carSpeed = 1.0;
         prototypeOptions.walkSpeed = 1.0;
         prototypeOptions.bikeSpeed = 1.0;
         prototypeOptions.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));

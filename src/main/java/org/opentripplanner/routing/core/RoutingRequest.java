@@ -131,9 +131,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public double bikeSpeed;
 
-    @Getter @Setter public double carSpeed;
+    public double carSpeed;
 
-    @Getter @Setter private Locale locale = new Locale("en", "US");
+    public Locale locale = new Locale("en", "US");
 
     /**
      * An extra penalty added on transfers (i.e. all boardings except the first one).
