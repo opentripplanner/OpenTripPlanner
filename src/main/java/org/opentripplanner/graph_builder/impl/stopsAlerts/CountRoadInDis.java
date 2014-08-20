@@ -60,7 +60,7 @@ public class CountRoadInDis extends AbstractStopTester {
         StreetVertexIndexService streetIndexService = graph.streetIndex;
         DistanceLibrary distanceLibrary;
         if(streetIndexService instanceof  StreetVertexIndexServiceImpl) {
-            distanceLibrary = ((StreetVertexIndexServiceImpl)streetIndexService).getDistanceLibrary();
+            distanceLibrary = ((StreetVertexIndexServiceImpl)streetIndexService).distanceLibrary;
         }else{
             distanceLibrary = SphericalDistanceLibrary.getInstance();
         }

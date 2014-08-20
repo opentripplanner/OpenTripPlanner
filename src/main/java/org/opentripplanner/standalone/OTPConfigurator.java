@@ -96,7 +96,7 @@ public class OTPConfigurator {
             }
             if (params.routerIds.size() > 0) {
                 graphService.setDefaultRouterId(params.routerIds.get(0));
-                graphService.setAutoRegister(params.routerIds);
+                graphService.autoRegister = params.routerIds;
             }
             graphService.startup();
             this.graphService = graphService;

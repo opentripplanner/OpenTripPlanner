@@ -23,9 +23,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -74,9 +71,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     protected STRtree intersectionTree;
 
-    @Getter
-    @Setter
-    protected DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    public DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     // private static final double SEARCH_RADIUS_M = 100; // meters
     // private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);

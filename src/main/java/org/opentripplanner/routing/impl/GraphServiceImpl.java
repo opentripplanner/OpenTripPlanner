@@ -20,8 +20,6 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import lombok.Setter;
-
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
@@ -45,11 +43,9 @@ public class GraphServiceImpl implements GraphService {
     private GraphServiceFileImpl decorated = new GraphServiceFileImpl();
 
     /** A list of routerIds to automatically register and load at startup */
-    @Setter
-    private List<String> autoRegister;
+    public List<String> autoRegister;
 
     /** If true, on startup register the graph in the location defaultRouterId. */
-    @Setter
     private boolean attemptRegisterDefault = true;
 
     /**

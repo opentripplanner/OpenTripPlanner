@@ -22,8 +22,6 @@ import static org.opentripplanner.routing.automata.Nonterminal.star;
 import java.util.Collections;
 import java.util.List;
 
-import lombok.Setter;
-
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -72,8 +70,7 @@ public class LongDistancePathService implements PathService {
         this.sptService = sptService;
     }
 
-    @Setter
-    private double timeout = 0; // seconds
+    public double timeout = 0; // seconds
     
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
