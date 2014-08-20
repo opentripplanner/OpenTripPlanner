@@ -78,13 +78,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
      * Marks that this edge is the reverse of the one defined in the source
      * data. Does NOT mean fromv/tov are reversed.
      */
-    @Getter @Setter
-    public boolean back;
+    private boolean back;
     
-    @Getter @Setter
     private boolean roundabout = false;
     
-    @Getter
     private Set<Alert> notes;
 
     @Setter
@@ -149,7 +146,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         this.elevationProfileSegment = new ElevationProfileSegment(length);
         this.name = name;
         this.setPermission(permission);
-        this.back = back;
+        this.setBack(back);
         this.carSpeed = carSpeed;
         if (geometry != null) {
             try {
@@ -475,7 +472,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         
         s1.incrementWeight(weight);
         
-        s1.addAlerts(notes);
+        s1.addAlerts(getNotes());
         
         if (this.isToll() && traverseMode.isDriving()) {
             s1.addAlert(Alert.createSimpleAlerts("Toll road"));
@@ -704,6 +701,26 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
 	public void setStreetClass(int streetClass) {
 		this.streetClass = streetClass;
+	}
+
+	public boolean isBack() {
+		return back;
+	}
+
+	public void setBack(boolean back) {
+		this.back = back;
+	}
+
+	public boolean isRoundabout() {
+		return roundabout;
+	}
+
+	public void setRoundabout(boolean roundabout) {
+		this.roundabout = roundabout;
+	}
+
+	public Set<Alert> getNotes() {
+		return notes;
 	}
 
 }
