@@ -76,7 +76,6 @@ public class ProfileRouter {
     BinHeap<Ride> queue = new BinHeap<Ride>(); // rides to be explored, prioritized by minumum travel time
     // TODO rename fromStopsByPattern
     Map<TripPattern, StopAtDistance> fromStops, toStops;
-    Set<Ride> targetRides = Sets.newHashSet(); // transit rides that reach the destination
     TimeWindow window; // filters trips used by time of day and service schedule
 
     /** @return true if the given stop cluster has at least one transfer coming from the given pattern. */
@@ -171,14 +170,8 @@ public class ProfileRouter {
             PR: for (PatternRide pr : ride.patternRides) {
                 // LOG.info(" {}", pr);
                 List<Stop> stops = pr.pattern.getStops();
-                StopCluster targetCluster = null;
-                if (toStops != null && toStops.containsKey(pr.pattern)) {
-                    /* This pattern has a stop near the destination. Retrieve it. */
-                    targetCluster = toStops.get(pr.pattern).stop;
-                }
                 for (int s = pr.fromIndex + 1; s < stops.size(); ++s) {
                     StopCluster cluster = graph.index.stopClusterForStop.get(stops.get(s));
-                    boolean isTarget = (targetCluster != null && targetCluster == cluster);
                     /* Originally we only extended rides to destination stops considered useful in the search, i.e.
                      * those that had transfers leading out of them or were known to be near the destination.
                      * However, analyst needs to know the times we can reach every stop, and pruning is more effective
@@ -195,8 +188,6 @@ public class ProfileRouter {
                     }
                     // Add the completed PatternRide to the completed Ride.
                     ride2.patternRides.add(pr2);
-                    // Record this ride as a way to reach the destination ((re)add it to the targetRides set).
-                    if (isTarget) targetRides.add(ride2);
                 }
             }
             /* Build new downstream Rides by transferring from patterns in current Rides. */
@@ -207,7 +198,6 @@ public class ProfileRouter {
                     // This is a sign of a questionable algorithm: we're only seeing if it was possible
                     // to board these trips after the fact, and removing the ride late.
                     // It might make more sense to keep bags of arrival times per ride+stop.
-                    targetRides.remove(r1);
                     continue;
                 }
                 if ( ! addIfNondominated(r1)) continue; // abandon this ride if it is dominated by some existing ride at the same location
@@ -275,9 +265,22 @@ public class ProfileRouter {
             makeSurfaces();
             return null;
         }
+        /* Determine which rides are good ways to reach the destination. */
+        Set<Ride> targetRides = Sets.newHashSet(); // use set since we are getting repeated rides for some reason
+        for (StopCluster cluster : toStopPaths.keySet()) {
+            for (Ride ride : retainedRides.get(cluster)) {
+                PATTERN: for (PatternRide pr : ride.patternRides) {
+                    StopAtDistance clusterForPattern = toStops.get(pr.pattern);
+                    if (clusterForPattern != null && clusterForPattern.stop == cluster) {
+                        targetRides.add(ride);
+                        break PATTERN;
+                    }
+                }
+            }
+        }
+        LOG.info("{} nondominated rides stop near the destination.", targetRides.size());
         /* Non-analyst. Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
-        // for (Ride ride : targetRides) ride.dump();
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
             int dist = toStops.get(ride.patternRides.get(0).pattern).etime; // TODO time vs dist
@@ -311,13 +314,21 @@ public class ProfileRouter {
             cluster = newRide.from;
             newRide = newRide.previous;
         }
-        int ndlb = newRide.durationLowerBound();
-        if (ndlb > MAX_DURATION) return false;
+        if (newRide.durationLowerBound() > MAX_DURATION) return false;
         // Check whether any existing rides at the same location (stop cluster) dominate the new one
         for (Ride oldRide : retainedRides.get(cluster)) {
             if (oldRide.to == null) oldRide = oldRide.previous; // rides may be unfinished
-            if (ndlb > oldRide.durationUpperBound()) { // TODO re-verify logic
-                return false; // minimum duration of new ride is longer than maximum duration of some existing ride
+            // new ride must be strictly better (min and max) than any existing one with less transfers.
+            // this avoids inserting extra rides "just for fun".
+            if (oldRide.pathLength() < newRide.pathLength() &&
+                oldRide.durationLowerBound() < newRide.durationLowerBound() &&
+                oldRide.durationUpperBound() < newRide.durationUpperBound()) {
+                return false;
+            }
+            // State is not strictly dominated. Perhaps it has the same number of transfers.
+            // In this case we want to keep it as long as it's sometimes better than all the others (time ranged overlap).
+            if (newRide.durationLowerBound() > oldRide.durationUpperBound()) {
+                return false;
             }
         }
         retainedRides.put(cluster, newRide);
