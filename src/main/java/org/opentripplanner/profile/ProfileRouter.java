@@ -179,24 +179,24 @@ public class ProfileRouter {
                 for (int s = pr.fromIndex + 1; s < stops.size(); ++s) {
                     StopCluster cluster = graph.index.stopClusterForStop.get(stops.get(s));
                     boolean isTarget = (targetCluster != null && targetCluster == cluster);
-                    /* If this destination stop is useful in the search, extend the PatternRide to it. */
-                    if (isTarget || hasTransfers(cluster, pr.pattern)) {
-// FIXME this was commented out for analyst, which needs every stop ^
-                        PatternRide pr2 = pr.extendToIndex(s, window);
-                        // PatternRide may be empty because there are no trips in time window.
-                        if (pr2 == null) continue PR;
-                        // LOG.info("   {}", pr2);
-                        // Get or create the completed Ride to this destination stop.
-                        Ride ride2 = rides.get(cluster);
-                        if (ride2 == null) {
-                            ride2 = ride.extendTo(cluster);
-                            rides.put(cluster, ride2);
-                        }
-                        // Add the completed PatternRide to the completed Ride.
-                        ride2.patternRides.add(pr2);
-                        // Record this ride as a way to reach the destination.
-                        if (isTarget) targetRides.add(ride2);
+                    /* Originally we only extended rides to destination stops considered useful in the search, i.e.
+                     * those that had transfers leading out of them or were known to be near the destination.
+                     * However, analyst needs to know the times we can reach every stop, and pruning is more effective
+                     * if we know when rides pass through all stops.*/
+                    PatternRide pr2 = pr.extendToIndex(s, window);
+                    // PatternRide may be empty because there are no trips in time window.
+                    if (pr2 == null) continue PR;
+                    // LOG.info("   {}", pr2);
+                    // Get or create the completed Ride to this destination stop.
+                    Ride ride2 = rides.get(cluster);
+                    if (ride2 == null) {
+                        ride2 = ride.extendTo(cluster);
+                        rides.put(cluster, ride2);
                     }
+                    // Add the completed PatternRide to the completed Ride.
+                    ride2.patternRides.add(pr2);
+                    // Record this ride as a way to reach the destination ((re)add it to the targetRides set).
+                    if (isTarget) targetRides.add(ride2);
                 }
             }
             /* Build new downstream Rides by transferring from patterns in current Rides. */
@@ -210,8 +210,10 @@ public class ProfileRouter {
                     targetRides.remove(r1);
                     continue;
                 }
-                // We now have a new completed ride. Record its lower and upper bounds at the arrival stop.
+                if ( ! addIfNondominated(r1)) continue; // abandon this ride if it is dominated by some existing ride at the same location
+                // We have a new, nondominated, completed ride. Record its lower and upper bounds at the arrival stop.
                 if (request.analyst) {
+                    // This could be done at the end now that we are retaining all rides.
                     TransitStop tstop = graph.index.stopVertexForStop.get(r1.to);
                     int tsidx = tstop.getIndex();
                     int lb = r1.durationLowerBound();
@@ -220,13 +222,13 @@ public class ProfileRouter {
                         mins[tsidx] = lb;
                     if (maxs[tsidx] == TimeSurface.UNREACHABLE || maxs[tsidx] > ub) // Yes, we want the _minimum_ upper bound.
                         maxs[tsidx] = ub;
-
                 }
-                // Do not transfer too many times. Continue after calculating stats since they are still needed!
+                /* Find transfers out of this new ride. */
+                // Do not transfer too many times. Check after calculating stats since stats are needed in any case.
                 int nRides = r1.pathLength();
                 if (nRides >= MAX_RIDES) continue;
                 boolean penultimateRide = (nRides == MAX_RIDES - 1);
-                // r1.to should be the same as r1's key in rides
+                // Invariant: r1.to should be the same as r1's key in rides
                 // TODO benchmark, this is so not efficient
                 for (ProfileTransfer tr : graph.index.transfersFromStopCluster.get(r1.to)) {
                     if ( ! request.modes.contains(tr.tp2.mode)) continue;
@@ -241,7 +243,7 @@ public class ProfileRouter {
                         TARGET_STOP : for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
                             StopCluster cluster = graph.index.stopClusterForStop.get(tr.tp2.getStops().get(i));
                             if (cluster == tr.sc2) {
-                                // Save transfer result for later exploration.
+                                // Save transfer result in an unfinished ride for later exploration.
                                 Ride r2 = xferRides.get(tr.sc2);
                                 if (r2 == null) {
                                     r2 = new Ride(tr.sc2, r1);
@@ -262,8 +264,10 @@ public class ProfileRouter {
                 }
             }
             /* Enqueue new incomplete Rides with non-excessive durations. */
-            // TODO maybe check excessive time before transferring (above, where we prune loopy paths)
-            for (Ride r : xferRides.values()) maybeAddRide(r);
+            for (Ride r : xferRides.values()) {
+                // ride is unfinished, use previous ride's time as key
+                if (addIfNondominated(r)) queue.insert(r, r.previous.durationLowerBound());
+            }
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
         }
         LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
@@ -300,19 +304,24 @@ public class ProfileRouter {
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
-    public boolean maybeAddRide(Ride newRide) {
-        int dlb = newRide.previous.durationLowerBound(); // this ride is unfinished so it has no times yet
-        if (dlb > MAX_DURATION) return false;
-        // Check whether any existing rides at the same location (stop) dominate the new one
-        for (Ride oldRide : retainedRides.get(newRide.from)) { // fromv because this is an unfinished ride
-            if (dlb > oldRide.previous.durationUpperBound()) { // TODO re-verify logic
+    /** Check whether a new ride has too long a duration relative to existing rides at the same location or global time limit. */
+    public boolean addIfNondominated(Ride newRide) {
+        StopCluster cluster = newRide.to;
+        if (cluster == null) { // if ride is unfinished, calculate time to its from cluster based on previous ride
+            cluster = newRide.from;
+            newRide = newRide.previous;
+        }
+        int ndlb = newRide.durationLowerBound();
+        if (ndlb > MAX_DURATION) return false;
+        // Check whether any existing rides at the same location (stop cluster) dominate the new one
+        for (Ride oldRide : retainedRides.get(cluster)) {
+            if (oldRide.to == null) oldRide = oldRide.previous; // rides may be unfinished
+            if (ndlb > oldRide.durationUpperBound()) { // TODO re-verify logic
                 return false; // minimum duration of new ride is longer than maximum duration of some existing ride
             }
         }
-        // No existing ride is strictly better than the new ride.
-        retainedRides.put(newRide.from, newRide);
-        queue.insert(newRide, dlb);
-        return true;
+        retainedRides.put(cluster, newRide);
+        return true; // No existing ride is strictly better than the new ride.
     }
 
     /**
