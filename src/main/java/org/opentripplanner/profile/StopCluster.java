@@ -68,6 +68,9 @@ public class StopCluster {
         // Each stop without a parent station will greedily claim other stops without a parent station.
         Map<String, String> descriptionForStationId = Maps.newHashMap();
         for (Stop s0 : gidx.stopForId.values()) {
+            s0.setParentStation(null); // FIXME some trimet stops have "landmark" parent stations, clear them
+        }
+        for (Stop s0 : gidx.stopForId.values()) {
             if (s0.getParentStation() != null) continue; // skip stops that have already been claimed
             String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
             StopCluster cluster = new StopCluster(String.format("C%03d", psIdx++), s0normalizedName);

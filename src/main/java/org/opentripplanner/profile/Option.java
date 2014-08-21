@@ -7,6 +7,8 @@ import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Option {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Option.class);
 
     public List<Segment> transit;
     public List<StreetSegment> access;
@@ -47,6 +51,7 @@ public class Option {
         // Really should be one per segment, with transfers to the same operator having a price of 0.
         fares = DCFareCalculator.calculateFares(rides);
         summary = generateSummary();
+        LOG.info("{}", summary);
     }
 
     /** Make a human readable text summary of this option. */

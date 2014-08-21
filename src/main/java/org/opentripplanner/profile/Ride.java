@@ -123,6 +123,7 @@ public class Ride {
         return false;
     }
 
+    // TODO rename _cluster_
     public boolean pathContainsStop(StopCluster stopCluster) {
         Ride ride = this;
         while (ride != null) {

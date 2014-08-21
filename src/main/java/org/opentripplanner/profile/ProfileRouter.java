@@ -62,7 +62,7 @@ public class ProfileRouter {
     }
 
     /* Search state */
-    Multimap<Stop, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop
+    Multimap<StopCluster, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop cluster
     List<RoutingContext> routingContexts = Lists.newArrayList();
 
     /* Analyst: time bounds for each vertex */
@@ -72,7 +72,7 @@ public class ProfileRouter {
     // while finding direct paths:
     // if dist < M meters OR we don't yet have N stations: record station
     Collection<StopAtDistance> directPaths = Lists.newArrayList(); // ways to reach the destination without transit
-    Multimap<Stop, Ride> retainedRides = ArrayListMultimap.create(); // the rides arriving at each stop that are worth continuing to explore.
+    Multimap<StopCluster, Ride> retainedRides = ArrayListMultimap.create(); // the rides arriving at each stop that are worth continuing to explore.
     BinHeap<Ride> queue = new BinHeap<Ride>(); // rides to be explored, prioritized by minumum travel time
     // TODO rename fromStopsByPattern
     Map<TripPattern, StopAtDistance> fromStops, toStops;
@@ -132,23 +132,23 @@ public class ProfileRouter {
         LOG.info("To patterns/stops: {}", toStops);
 
         /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
-        Map<StopCluster, Ride> initialRides = Maps.newHashMap();
+        Map<StopCluster, Ride> initialRides = Maps.newHashMap(); // One ride per stop cluster
         for (Entry<TripPattern, StopAtDistance> entry : fromStops.entrySet()) {
             TripPattern pattern = entry.getKey();
             StopAtDistance sd = entry.getValue();
-            /* Loop over stops in case stop appears more than once in the same pattern. */
+            if ( ! request.modes.contains(pattern.mode)) continue; // FIXME why are we even storing these patterns?
+            /* Loop over stop clusters in case stop cluster appears more than once in the same pattern. */
             for (int i = 0; i < pattern.getStops().size(); ++i) {
-                if (pattern.getStops().get(i).getParentStation() == sd.stop.id) { // FIXME using String identity equality on purpose
-                    if (request.modes.contains(pattern.mode)) {
-                        Ride ride = initialRides.get(sd.stop);
-                        if (ride == null) {
-                            ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
-                            ride.accessTime = sd.etime;
-                            ride.accessDist = 0; // FIXME
-                            initialRides.put(sd.stop, ride);
-                        }
-                        ride.patternRides.add(new PatternRide(pattern, i));
+                // FIXME using String identity equality for stop clusters on purpose
+                if (sd.stop == graph.index.clusterForStop(pattern.getStops().get(i))) {
+                    Ride ride = initialRides.get(sd.stop);
+                    if (ride == null) {
+                        ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
+                        ride.accessTime = sd.etime;
+                        ride.accessDist = 0; // FIXME
+                        initialRides.put(sd.stop, ride);
                     }
+                    ride.patternRides.add(new PatternRide(pattern, i));
                 }
             }
         }
@@ -171,35 +171,36 @@ public class ProfileRouter {
             PR: for (PatternRide pr : ride.patternRides) {
                 // LOG.info(" {}", pr);
                 List<Stop> stops = pr.pattern.getStops();
-                Stop targetStop = null;
+                StopCluster targetCluster = null;
                 if (toStops != null && toStops.containsKey(pr.pattern)) {
                     /* This pattern has a stop near the destination. Retrieve it. */
-                    targetStop = toStops.get(pr.pattern).stop;
+                    targetCluster = toStops.get(pr.pattern).stop;
                 }
                 for (int s = pr.fromIndex + 1; s < stops.size(); ++s) {
-                    Stop stop = stops.get(s);
-                    boolean isTarget = (targetStop != null && targetStop == stop);
+                    StopCluster cluster = graph.index.clusterForStop(stops.get(s));
+                    boolean isTarget = (targetCluster != null && targetCluster == cluster);
                     /* If this destination stop is useful in the search, extend the PatternRide to it. */
-//                    if (isTarget || hasTransfers(stop, pr.pattern)){
+                    if (isTarget || hasTransfers(cluster, pr.pattern)) {
+// FIXME this was commented out for analyst, which needs every stop ^
                         PatternRide pr2 = pr.extendToIndex(s, window);
                         // PatternRide may be empty because there are no trips in time window.
                         if (pr2 == null) continue PR;
                         // LOG.info("   {}", pr2);
                         // Get or create the completed Ride to this destination stop.
-                        Ride ride2 = rides.get(stop);
+                        Ride ride2 = rides.get(cluster);
                         if (ride2 == null) {
-                            ride2 = ride.extendTo(stop);
-                            rides.put(stop, ride2);
+                            ride2 = ride.extendTo(cluster);
+                            rides.put(cluster, ride2);
                         }
                         // Add the completed PatternRide to the completed Ride.
                         ride2.patternRides.add(pr2);
                         // Record this ride as a way to reach the destination.
                         if (isTarget) targetRides.add(ride2);
-//                    }
+                    }
                 }
             }
             /* Build new downstream Rides by transferring from patterns in current Rides. */
-            Map<Stop, Ride> xferRides = Maps.newHashMap(); // A map of incomplete rides after transfers, one for each stop.
+            Map<StopCluster, Ride> xferRides = Maps.newHashMap(); // A map of incomplete rides after transfers, one for each stop.
             for (Ride r1 : rides.values()) {
                 r1.calcStats(window, request.walkSpeed);
                 if (r1.waitStats == null) {
@@ -227,34 +228,34 @@ public class ProfileRouter {
                 boolean penultimateRide = (nRides == MAX_RIDES - 1);
                 // r1.to should be the same as r1's key in rides
                 // TODO benchmark, this is so not efficient
-                for (ProfileTransfer tr : graph.index.transfersForStop.get(r1.to)) {
+                for (ProfileTransfer tr : graph.index.transfersFromStopCluster.get(r1.to)) {
+                    if ( ! request.modes.contains(tr.tp2.mode)) continue;
                     if (r1.containsPattern(tr.tp1)) {
                         // Prune loopy or repetitive paths.
                         if (r1.pathContainsRoute(tr.tp2.route)) continue;
-                        if (tr.s1 != tr.s2 && r1.pathContainsStop(tr.s2)) continue;
+                        if (tr.sc1 != tr.sc2 && r1.pathContainsStop(tr.sc2)) continue;
                         // Optimization: on the last ride of point-to-point searches,
                         // only transfer to patterns that pass near the destination.
                         if ( ! request.analyst && penultimateRide && ! toStops.containsKey(tr.tp2)) continue;
                         // Scan through stops looking for transfer target: stop might appear more than once in a pattern.
                         TARGET_STOP : for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
-                            if (tr.tp2.getStops().get(i) == tr.s2) {
-                                if (request.modes.contains(tr.tp2.mode)) {
-                                    // Save transfer result for later exploration.
-                                    Ride r2 = xferRides.get(tr.s2);
-                                    if (r2 == null) {
-                                        r2 = new Ride(tr.s2, r1);
-                                        r2.accessDist = tr.distance;
-                                        r2.accessTime = (int) (tr.distance / request.walkSpeed);
-                                        xferRides.put(tr.s2, r2);
-                                    }
-                                    for (PatternRide pr : r2.patternRides) {
-                                        // Multiple patterns can have transfers to the same target pattern,
-                                        // but Rides should not have duplicate PatternRides.
-                                        // TODO refactor with equals function and contains().
-                                        if (pr.pattern == tr.tp2 && pr.fromIndex == i) continue TARGET_STOP;
-                                    }
-                                    r2.patternRides.add(new PatternRide(tr.tp2, i));
+                            StopCluster cluster = graph.index.clusterForStop(tr.tp2.getStops().get(i));
+                            if (cluster == tr.sc2) {
+                                // Save transfer result for later exploration.
+                                Ride r2 = xferRides.get(tr.sc2);
+                                if (r2 == null) {
+                                    r2 = new Ride(tr.sc2, r1);
+                                    r2.accessDist = tr.distance;
+                                    r2.accessTime = (int) (tr.distance / request.walkSpeed);
+                                    xferRides.put(tr.sc2, r2);
                                 }
+                                for (PatternRide pr : r2.patternRides) {
+                                    // Multiple patterns can have transfers to the same target pattern,
+                                    // but Rides should not have duplicate PatternRides.
+                                    // TODO refactor with equals function and contains().
+                                    if (pr.pattern == tr.tp2 && pr.fromIndex == i) continue TARGET_STOP;
+                                }
+                                r2.patternRides.add(new PatternRide(tr.tp2, i));
                             }
                         }
                     }
@@ -276,11 +277,11 @@ public class ProfileRouter {
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
             int dist = toStops.get(ride.patternRides.get(0).pattern).etime; // TODO time vs dist
-            Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStop());
-            Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStop());
+            Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStopCluster());
+            Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStopCluster());
             Option option = new Option(ride, accessPaths, egressPaths);
-            Stop s0 = ride.getAccessStop();
-            Stop s1 = ride.getEgressStop();
+            StopCluster s0 = ride.getAccessStopCluster();
+            StopCluster s1 = ride.getEgressStopCluster();
             if ( ! option.hasEmptyRides()) options.add(option);
         }
         /* Include the direct (no-transit) biking, driving, and walking options. */
@@ -315,17 +316,24 @@ public class ProfileRouter {
     }
 
     /**
-     * Find all patterns that pass through the given stops, and pick the closest stop on each pattern
-     * based on the distances provided for each stop and mode.
-     * We want stop objects rather than indexes within the patterns because when stops that appear more than
-     * once in a pattern, we want to consider boarding or alighting from them at every index where they occur.
+     * @param stopClusters a multimap from stop clusters to one or more StopAtDistance objects at the corresponding cluster.
+     * @return for each TripPattern that passes through any of the supplied stop clusters, the stop cluster that is
+     * closest to the origin or destination point according to the distances in the StopAtDistance objects.
+     *
+     * In short, take a bunch of stop clusters near the origin or destination and return the quickest way to reach each
+     * pattern that passes through them.
+     * We want stop cluster references rather than indexes within the patterns because when a stop cluster appears more
+     * than once in a pattern, we want to consider boarding or alighting from that pattern at every index where the
+     * cluster occurs.
      */
-    public Map<TripPattern, StopAtDistance> findClosestPatterns(Multimap<Stop, StopAtDistance> stops) {
+    public Map<TripPattern, StopAtDistance> findClosestPatterns(Multimap<StopCluster, StopAtDistance> stopClusters) {
         SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closest = new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
         // Iterate over all StopAtDistance for all Stops. The fastest mode will win at each stop.
-        for (StopAtDistance stopDist : stops.values()) {
-            for (TripPattern pattern : graph.index.patternsForStop.get(stopDist.stop)) {
-                closest.putMin(pattern, stopDist);
+        for (StopAtDistance stopDist : stopClusters.values()) {
+            for (Stop stop : stopDist.stop.children) {
+                for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
+                    closest.putMin(pattern, stopDist);
+                }
             }
         }
         // Truncate long lists to include a mix of nearby bus and train patterns
@@ -361,13 +369,12 @@ public class ProfileRouter {
      * Perform an on-street search around a point with each of several modes to find nearby stops.
      * @return one or more paths to each reachable stop using the various modes.
      */
-    private Multimap<Stop, StopAtDistance> findClosestStops(boolean dest) {
-        Multimap<Stop, StopAtDistance> pathsByStop = ArrayListMultimap.create();
+    private Multimap<StopCluster, StopAtDistance> findClosestStops(boolean dest) {
+        Multimap<StopCluster, StopAtDistance> pathsByStop = ArrayListMultimap.create();
         for (TraverseMode mode: (dest ? EGRESS_MODES : ACCESS_MODES)) {
             if (request.modes.contains(mode)) {
                 LOG.info("{} mode {}", dest ? "egress" : "access", mode);
-                List<StopAtDistance> stops = findClosestStops(mode, dest);
-                for (StopAtDistance sd : stops) {
+                for (StopAtDistance sd : findClosestStops(mode, dest)) {
                     pathsByStop.put(sd.stop, sd);
                 }
             }
@@ -379,7 +386,7 @@ public class ProfileRouter {
      * Perform an on-street search around a point with a specific mode to find nearby stops.
      * @param dest : whether to search at the destination instead of the origin.
      */
-    private List<StopAtDistance> findClosestStops(final TraverseMode mode, boolean dest) {
+    private Collection<StopAtDistance> findClosestStops(final TraverseMode mode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
@@ -406,12 +413,12 @@ public class ProfileRouter {
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
         // Save the routing context for later cleanup. We need its temporary edges to render street segments at the end.
         routingContexts.add(rr.rctx);
-        return visitor.stopsFound;
+        return visitor.stopClustersFound.values();
     }
 
     static class StopFinderTraverseVisitor implements TraverseVisitor {
         TraverseMode mode;
-        List<StopAtDistance> stopsFound = Lists.newArrayList();
+        Map<StopCluster, StopAtDistance> stopClustersFound = Maps.newHashMap();
         public StopFinderTraverseVisitor(TraverseMode mode) { this.mode = mode; }
         @Override public void visitEdge(Edge edge, State state) { }
         @Override public void visitEnqueue(State state) { }
@@ -422,8 +429,9 @@ public class ProfileRouter {
                 StopAtDistance sd = new StopAtDistance(state);
                 sd.mode = mode;
                 if (sd.mode == TraverseMode.CAR && sd.etime < MIN_DRIVE_TIME) return;
-                LOG.debug("found stop: {}", sd);
-                stopsFound.add(sd);
+                if (stopClustersFound.containsKey(sd.stop)) return; // record only the closest stop in each cluster
+                LOG.debug("found stop cluster: {}", sd);
+                stopClustersFound.put(sd.stop, sd);
             }
         }
     }

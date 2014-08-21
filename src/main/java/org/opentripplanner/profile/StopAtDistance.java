@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class StopAtDistance implements Comparable<StopAtDistance> {
 
-    public StopCluster stop; // TODO rename to stopCluster
+    public StopCluster stop; // TODO rename to stopCluster, use StopCluster objects not strings?
     public TraverseMode mode;
     public int etime;
     public State state;
@@ -33,7 +33,8 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
         mode = state.getNonTransitMode(); // not sure if this is reliable, reset in caller.
         if (state.getVertex() instanceof TransitStop) {
             TransitStop tstop = (TransitStop) state.getVertex();
-            stop = tstop.getStop();
+            StopCluster cluster = state.getOptions().rctx.graph.index.clusterForStop(tstop.getStop());
+            stop = cluster;
         }
     }
 
@@ -43,7 +44,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     }
 
     public String toString() {
-        return String.format("stop cluster %s via mode %s at %d min", stop.id, mode, etime / 60);
+        return String.format("stop cluster %s via mode %s at %d min", stop, mode, etime / 60);
     }
 
 }
