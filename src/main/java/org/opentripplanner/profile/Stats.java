@@ -128,5 +128,9 @@ class Stats implements Cloneable {
         /* There are no running trips within the time range, on the given serviceIds. */
         return null;
     }
-    
+
+    @Override
+    public String toString() {
+        return String.format("min=%d max=%d avg=%d", min/60, max/60, avg/60);
+    }
 }
