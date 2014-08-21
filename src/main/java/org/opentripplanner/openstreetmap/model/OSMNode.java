@@ -16,18 +16,10 @@
 
 package org.opentripplanner.openstreetmap.model;
 
-import lombok.Setter;
-import lombok.Getter;
-
 public class OSMNode extends OSMWithTags {
 
-    @Setter
-    @Getter
-    private double lat;
-
-    @Setter
-    @Getter
-    private double lon;
+    public double lat;
+    public double lon;
 
     public String toString() {
         return "osm node " + id;

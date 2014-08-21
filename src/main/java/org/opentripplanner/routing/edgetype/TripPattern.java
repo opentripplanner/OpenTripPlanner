@@ -27,9 +27,6 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -91,20 +88,17 @@ public class TripPattern implements Serializable {
      * same Route.
      * TODO: consider the case where there is a replacement bus that makes the same stops as a train. We may need to split out multiple patterns for multiple routes.
      */
-    @Getter
     public final Route route;
 
     /**
      * As for the route field, this depends on there being a single GFTFS route per journey pattern. That is not always true.
      */
-    @Getter
     public final TraverseMode mode;
 
     /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS
      * pick-up and drop-off types.
      */
-    @Getter
     public final StopPattern stopPattern;
     
     /** 
@@ -112,16 +106,13 @@ public class TripPattern implements Serializable {
      * realtime updates applied. If realtime stoptime updates are applied, next/previous departure
      * searches will be conducted using a different, updated timetable in a snapshot.
      */
-    @Getter
-    protected final Timetable scheduledTimetable = new Timetable(this);
+    public final Timetable scheduledTimetable = new Timetable(this);
 
     /** The human-readable, unique name for this trip pattern. */
-    @Getter @Setter
-    private String name;
+    public String name;
     
     /** The short unique identifier for this trip pattern. */
-    @Getter @Setter
-    private String code;
+    public String code;
     
     /* The vertices in the Graph that correspond to each Stop in this pattern. */
     public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. are they even used?
@@ -316,7 +307,7 @@ public class TripPattern implements Serializable {
         // Check that all trips added to this pattern are on the initially declared route.
         // Identity equality is valid on GTFS entity objects.
         if (this.route != tt.trip.getRoute()) {
-            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(), this.getRoute());
+            LOG.warn("The trip {} is on route {} but its stop pattern is on route {}.", tt.trip, tt.trip.getRoute(), this.route);
         }
     }
 
@@ -418,7 +409,7 @@ public class TripPattern implements Serializable {
 
             /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
             if (routeTripPatterns.size() == 1) {
-                routeTripPatterns.iterator().next().setName(routeName);
+                routeTripPatterns.iterator().next().name = routeName;
                 continue;
             }
 
@@ -443,7 +434,7 @@ public class TripPattern implements Serializable {
                 Stop end = stops.get(stops.size() - 1);
                 sb.append(" to " + stopNameAndId(end));
                 if (ends.get(end).size() == 1) {
-                    pattern.setName(sb.toString());
+                    pattern.name = sb.toString();
                     continue PATTERN; // only pattern with this last stop
                 }
 
@@ -451,7 +442,7 @@ public class TripPattern implements Serializable {
                 Stop start = stops.get(0);
                 sb.append(" from " + stopNameAndId(start));
                 if (starts.get(start).size() == 1) {
-                    pattern.setName(sb.toString());
+                    pattern.name = (sb.toString());
                     continue PATTERN; // only pattern with this first stop
                 }
 
@@ -460,7 +451,7 @@ public class TripPattern implements Serializable {
                 remainingPatterns.addAll(starts.get(start));
                 remainingPatterns.retainAll(ends.get(end)); // set intersection
                 if (remainingPatterns.size() == 1) {
-                    pattern.setName(sb.toString());
+                    pattern.name = (sb.toString());
                     continue PATTERN;
                 }
 
@@ -472,7 +463,7 @@ public class TripPattern implements Serializable {
                     intersection.retainAll(vias.get(via));
                     if (intersection.size() == 1) {
                         sb.append(" via " + stopNameAndId(via));
-                        pattern.setName(sb.toString());
+                        pattern.name = (sb.toString());
                         continue PATTERN;
                     }
                 }
@@ -487,7 +478,7 @@ public class TripPattern implements Serializable {
                     // The final fallback: reference a specific trip ID.
                     sb.append(" like trip " + pattern.getTrips().get(0).getId());
                 }
-                pattern.setName(sb.toString());
+                pattern.name = (sb.toString());
             } // END foreach PATTERN
         } // END foreach ROUTE
 
@@ -497,7 +488,7 @@ public class TripPattern implements Serializable {
                 Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
                 LOG.debug("Named {} patterns in route {}", routeTripPatterns.size(), uniqueRouteNames.get(route));
                 for (TripPattern pattern : routeTripPatterns) {
-                    LOG.debug("    {} ({} stops)", pattern.getName(), pattern.stopPattern.size);
+                    LOG.debug("    {} ({} stops)", pattern.name, pattern.stopPattern.size);
                 }
             }
         }
@@ -584,7 +575,7 @@ public class TripPattern implements Serializable {
         for (int i = 0; i < this.stopPattern.size; ++i) {
             Vertex arrive = arriveVertices[i];
             Vertex depart = departVertices[i];
-            System.out.format("%s %02d %s %s\n", this.getCode(), i, 
+            System.out.format("%s %02d %s %s\n", this.code, i, 
                     arrive == null ? "NULL" : arrive.getLabel(),
                     depart == null ? "NULL" : depart.getLabel());
         }
@@ -620,7 +611,7 @@ public class TripPattern implements Serializable {
             int count = patternsForRoute.get(pattern.route).size();
             // OBA library uses underscore as separator, we're moving toward colon.
             String id = String.format("%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), count);
-            pattern.setCode(id);
+            pattern.code = (id);
         }
     }
 

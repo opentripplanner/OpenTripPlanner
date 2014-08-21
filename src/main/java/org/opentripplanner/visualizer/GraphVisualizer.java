@@ -1429,19 +1429,19 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.setDateTime(when);
         options.setFromString(from);
         options.setToString(to);
-        options.setWalkSpeed(Float.parseFloat(walkSpeed.getText()));
-        options.setBikeSpeed(Float.parseFloat(bikeSpeed.getText()));
-        options.setHeuristicWeight(Float.parseFloat(heuristicWeight.getText()));
-        options.setSoftWalkLimiting( softWalkLimiting.isSelected() );
-        options.setSoftWalkPenalty(Float.parseFloat(softWalkPenalty.getText()));
-        options.setSoftWalkOverageRate(Float.parseFloat(this.softWalkOverageRate.getText()));
+        options.walkSpeed = Float.parseFloat(walkSpeed.getText());
+        options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
+        options.heuristicWeight = (Float.parseFloat(heuristicWeight.getText()));
+        options.softWalkLimiting = ( softWalkLimiting.isSelected() );
+        options.softWalkPenalty = (Float.parseFloat(softWalkPenalty.getText()));
+        options.softWalkOverageRate = (Float.parseFloat(this.softWalkOverageRate.getText()));
         options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
         
-        sptService.setNPaths( Integer.parseInt( this.nPaths.getText() ) );
+        sptService.nPaths = ( Integer.parseInt( this.nPaths.getText() ) );
         
         // apply callback if the options call for it
         if( dontUseGraphicalCallbackCheckBox.isSelected() ){

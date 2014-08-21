@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.Setter;
-
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.graph_builder.impl.stopsAlerts.IStopTester;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
@@ -40,10 +38,8 @@ public class StopsAlerts implements GraphBuilder {
 
     private static org.slf4j.Logger LOG = LoggerFactory.getLogger(StopsAlerts.class);
 
-    @Setter
     List<IStopTester> stopTesters = new ArrayList<IStopTester>();
 
-    @Setter
     String logFile = "";
 
     @Override

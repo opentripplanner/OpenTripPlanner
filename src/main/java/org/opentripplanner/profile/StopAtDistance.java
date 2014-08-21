@@ -1,6 +1,5 @@
 package org.opentripplanner.profile;
 
-import lombok.AllArgsConstructor;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;

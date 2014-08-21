@@ -409,25 +409,25 @@ public class ProfileRouter {
     private Collection<StopAtDistance> findClosestStops(final TraverseMode mode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
+        rr.from = (new GenericLocation(request.from.lat, request.from.lon));
         // FIXME requires destination to be set, not necesary for analyst
-        rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
+        rr.to = new GenericLocation(request.to.lat, request.to.lon);
         rr.setArriveBy(dest);
         rr.setMode(mode);
         // TODO CAR does not seem to work. rr.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
-        rr.setBatch(true);
-        rr.setWalkSpeed(request.walkSpeed);
+        rr.batch = (true);
+        rr.walkSpeed = request.walkSpeed;
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
         long worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
         if (dest) worstElapsedTime *= -1;
-        rr.setWorstTime(rr.dateTime + worstElapsedTime);
+        rr.worstTime = (rr.dateTime + worstElapsedTime);
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         GenericAStar astar = new GenericAStar();
-        astar.setNPaths(1);
+        astar.nPaths = (1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode);
         astar.setTraverseVisitor(visitor);
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
@@ -460,18 +460,18 @@ public class ProfileRouter {
     private void findStreetOption(TraverseMode mode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(mode);
-        rr.setFrom(new GenericLocation(request.from.lat, request.from.lon));
-        rr.setTo(new GenericLocation(request.to.lat, request.to.lon));
+        rr.from = (new GenericLocation(request.from.lat, request.from.lon));
+        rr.to = new GenericLocation(request.to.lat, request.to.lon);
         rr.setArriveBy(false);
         rr.setRoutingContext(graph);
         // This is not a batch search, it is a point-to-point search with goal direction.
         // Impose a max time to protect against very slow searches.
         int worstElapsedTime = request.streetTime * 60;
-        rr.setWorstTime(rr.dateTime + worstElapsedTime);
-        rr.setWalkSpeed(request.walkSpeed);
-        rr.setBikeSpeed(request.bikeSpeed);
+        rr.worstTime = (rr.dateTime + worstElapsedTime);
+        rr.walkSpeed = request.walkSpeed;
+        rr.bikeSpeed = request.bikeSpeed;
         GenericAStar astar = new GenericAStar();
-        astar.setNPaths(1);
+        astar.nPaths = (1);
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
         State state = spt.getState(rr.rctx.target);
         if (state != null) {
@@ -488,13 +488,13 @@ public class ProfileRouter {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.setMode(TraverseMode.WALK);
-        rr.setWalkSpeed(request.walkSpeed);
+        rr.walkSpeed = request.walkSpeed;
         // If max trip duration is not limited, searches are of course much slower.
         int worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
-        rr.setWorstTime(rr.dateTime + worstElapsedTime);
-        rr.setBatch(true);
+        rr.worstTime = (rr.dateTime + worstElapsedTime);
+        rr.batch = (true);
         GenericAStar astar = new GenericAStar();
-        astar.setNPaths(1);
+        astar.nPaths = (1);
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             int index = tstop.getIndex();
             // Generate a tree outward from all stops that have been touched in the basic profile search

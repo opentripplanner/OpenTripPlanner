@@ -13,9 +13,6 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class ConflictingBikeTags extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -24,6 +21,10 @@ public class ConflictingBikeTags extends GraphBuilderAnnotation {
     		"dismount on way %s, assuming dismount";
     
     final long wayId;
+    
+    public ConflictingBikeTags(long wayId){
+    	this.wayId = wayId;
+    }
     
     @Override
     public String getMessage() {

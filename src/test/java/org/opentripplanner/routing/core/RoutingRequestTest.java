@@ -52,7 +52,7 @@ public class RoutingRequestTest {
         assertTrue(req.hasIntermediatePlaces());
         assertFalse(req.intermediatesEffectivelyOrdered());
         
-        req.setIntermediatePlacesOrdered(true);
+        req.intermediatePlacesOrdered = true;
         assertTrue(req.intermediatesEffectivelyOrdered());        
     }
 

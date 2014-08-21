@@ -13,7 +13,6 @@
 
 package org.opentripplanner.updater;
 
-import lombok.Getter;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +51,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     /**
      * The number of seconds between two polls
      */
-    @Getter
-    private Integer frequencySec;
+    protected Integer frequencySec;
 
     /**
      * The type name in the preferences

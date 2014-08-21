@@ -13,9 +13,6 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class TurnRestrictionBad extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -24,6 +21,10 @@ public class TurnRestrictionBad extends GraphBuilderAnnotation {
     public static final String HTMLFMT = "Bad turn restriction at relation <a href='http://www.openstreetmap.org/relation/%s'>%s</a>";
     
     final long id;
+    
+    public TurnRestrictionBad(long id){
+    	this.id = id;
+    }
     
     @Override
     public String getMessage() {

@@ -133,7 +133,7 @@ class SimpleGraphServiceImpl implements GraphService {
 
     public void putGraph(String graphId, Graph graph) {
         graphs.put(graphId, graph);
-        graph.setRouterId(graphId);
+        graph.routerId = (graphId);
     }
 
     @Override
@@ -231,7 +231,7 @@ class Context {
             }
         }
         // to make test results more deterministic, only find the single best path
-        ((GenericAStar) otpServer.sptService).setNPaths(1);
+        ((GenericAStar) otpServer.sptService).nPaths = (1);
 
         // Create dummy TimetableResolver
         TimetableResolver resolver = new TimetableResolver();
@@ -241,7 +241,7 @@ class Context {
 
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
     }
 
     private void initTransit() {
@@ -311,21 +311,21 @@ public class TestRequest extends TestCase {
         RoutingRequest request = new RoutingRequest();
 
         request.addMode(TraverseMode.CAR);
-        assertTrue(request.getModes().getCar());
+        assertTrue(request.modes.getCar());
         request.removeMode(TraverseMode.CAR);
-        assertFalse(request.getModes().getCar());
+        assertFalse(request.modes.getCar());
 
         request.addMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.getModes().getCar());
-        assertTrue(request.getModes().getDriving());
+        assertFalse(request.modes.getCar());
+        assertTrue(request.modes.getDriving());
         request.removeMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.getModes().getCar());
-        assertFalse(request.getModes().getDriving());
+        assertFalse(request.modes.getCar());
+        assertFalse(request.modes.getDriving());
 
         request.setModes(new TraverseModeSet("BICYCLE,WALK"));
-        assertFalse(request.getModes().getCar());
-        assertTrue(request.getModes().getBicycle());
-        assertTrue(request.getModes().getWalk());
+        assertFalse(request.modes.getCar());
+        assertTrue(request.modes.getBicycle());
+        assertTrue(request.modes.getWalk());
     }
 
     public void testBuildRequest() throws Exception {
@@ -334,7 +334,7 @@ public class TestRequest extends TestCase {
 
         assertEquals(new Date(1254420671000L), options.getDateTime());
         assertEquals(1600.0, options.getMaxWalkDistance());
-        assertEquals(8.0, options.getWalkReluctance());
+        assertEquals(8.0, options.walkReluctance);
         assertEquals(1, options.getNumItineraries());
     }
 
@@ -447,7 +447,7 @@ public class TestRequest extends TestCase {
 
     public void testBikeRental() {
         BikeRental bikeRental = new BikeRental();
-        bikeRental.setGraphService(Context.getInstance().graphService);
+        bikeRental.graphService = Context.getInstance().graphService;
         // no stations in graph
         BikeRentalStationList stations = bikeRental.getBikeRentalStations(null, null, null);
         assertEquals(0, stations.stations.size());
@@ -960,7 +960,7 @@ public class TestRequest extends TestCase {
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
         Graph graph = Context.getInstance().graph;
-        TimetableResolver snapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
+        TimetableResolver snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         Timetable timetable = snapshot.resolve(pattern, serviceDate);
         TimeZone timeZone = new SimpleTimeZone(-7, "PST");
         long today = serviceDate.getAsDate(timeZone).getTime() / 1000;

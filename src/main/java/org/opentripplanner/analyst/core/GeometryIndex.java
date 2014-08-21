@@ -18,8 +18,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Setter;
-
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.BoundingBox;

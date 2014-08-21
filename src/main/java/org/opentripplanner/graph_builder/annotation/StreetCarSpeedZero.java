@@ -13,9 +13,6 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class StreetCarSpeedZero extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 6872784791854835184L;
@@ -23,6 +20,10 @@ public class StreetCarSpeedZero extends GraphBuilderAnnotation {
     public static final String FMT = "Way %s has car speed zero";
     
     final long way;
+    
+    public StreetCarSpeedZero(long way){
+    	this.way = way;
+    }
     
     @Override
     public String getMessage() {

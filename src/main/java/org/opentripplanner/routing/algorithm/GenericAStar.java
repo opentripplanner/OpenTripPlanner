@@ -16,8 +16,6 @@ package org.opentripplanner.routing.algorithm;
 import java.util.Collection;
 import java.util.List;
 
-import lombok.Setter;
-
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
@@ -52,7 +50,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private TraverseVisitor traverseVisitor;
     
     /** The number of paths to attempt to find */
-    @Setter private int nPaths = 3; // TODO this should really be set based on the routing request
+    public int nPaths = 3; // TODO this should really be set based on the routing request
     
     enum RunStatus {
         RUNNING, STOPPED
@@ -175,7 +173,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         runState.nVisited += 1;
         
-        Collection<Edge> edges = runState.options.isArriveBy() ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
+        Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
@@ -199,7 +197,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
-                double estimate = v.getWeight() + remaining_w*runState.options.getHeuristicWeight();
+                double estimate = v.getWeight() + remaining_w*runState.options.heuristicWeight;
 
                 if (verbose) {
                     System.out.println("      edge " + edge);
@@ -325,7 +323,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             Vertex target, RoutingRequest options) {
         // actually, the heuristic could figure this out from the TraverseOptions.
         // set private member back=options.isArriveBy() on initial weight computation.
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             return heuristic.computeReverseWeight(v, target);
         } else {
             return heuristic.computeForwardWeight(v, target);
@@ -333,7 +331,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
 
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
-        if (opt.isArriveBy())
+        if (opt.arriveBy)
             return v.getTimeSeconds() < opt.worstTime;
         else
             return v.getTimeSeconds() > opt.worstTime;

@@ -66,7 +66,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         opt.rctx = ctx;
 
         /* 1. Get the list of PatternHop for the given trip ID. */
-        AgencyAndId tripId = opt.getStartingTransitTripId();
+        AgencyAndId tripId = opt.startingTransitTripId;
         Trip trip = ctx.graph.index.tripForId.get(tripId);
         TripPattern tripPattern = ctx.graph.index.patternForTrip.get(trip);
         if (tripPattern == null) {
@@ -75,8 +75,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         }
         List<PatternHop> hops = tripPattern.getPatternHops();
 
-        Double lon = opt.getFrom().getLng(); // Origin point, optional
-        Double lat = opt.getFrom().getLat();
+        Double lon = opt.from.lng; // Origin point, optional
+        Double lat = opt.from.lat;
         PatternStopVertex nextStop;
         TripTimes bestTripTimes = null;
         ServiceDay bestServiceDay = null;

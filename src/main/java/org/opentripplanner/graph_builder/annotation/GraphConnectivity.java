@@ -13,11 +13,8 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.opentripplanner.routing.graph.Vertex;
 
-@AllArgsConstructor
 public class GraphConnectivity extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -27,6 +24,11 @@ public class GraphConnectivity extends GraphBuilderAnnotation {
 
     final Vertex vertex;
     final int size;
+    
+    public GraphConnectivity(Vertex vertex, int size){
+    	this.vertex = vertex;
+    	this.size = size;
+    }
 
     @Override
     public String getMessage() {

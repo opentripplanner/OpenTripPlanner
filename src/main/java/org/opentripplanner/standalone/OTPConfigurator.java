@@ -96,7 +96,7 @@ public class OTPConfigurator {
             }
             if (params.routerIds.size() > 0) {
                 graphService.setDefaultRouterId(params.routerIds.get(0));
-                graphService.setAutoRegister(params.routerIds);
+                graphService.autoRegister = params.routerIds;
             }
             graphService.startup();
             this.graphService = graphService;
@@ -174,9 +174,9 @@ public class OTPConfigurator {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
                 gtfsBundle.setTransfersTxtDefinesStationPaths(params.useTransfersTxt);
                 if (!params.noParentStopLinking) {
-                    gtfsBundle.setLinkStopsToParentStations(true);
+                    gtfsBundle.linkStopsToParentStations = true;
                 }
-                gtfsBundle.setParentStationTransfers(params.parentStationTransfers);
+                gtfsBundle.parentStationTransfers = params.parentStationTransfers;
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
@@ -203,7 +203,7 @@ public class OTPConfigurator {
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
-            embeddedConfigBuilder.setPropertiesFile(configFile);
+            embeddedConfigBuilder.propertiesFile = configFile;
             graphBuilder.addGraphBuilder(embeddedConfigBuilder);
         }
         if (params.elevation) {
@@ -212,7 +212,7 @@ public class OTPConfigurator {
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
         }
-        graphBuilder.setSerializeGraph( ( ! params.inMemory ) || params.preFlight );
+        graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
 

@@ -28,7 +28,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import lombok.Setter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,8 +40,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class BikeRental {
 
     @Context // FIXME inject Application context
-    @Setter
-    private GraphService graphService;
+    public GraphService graphService;
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })

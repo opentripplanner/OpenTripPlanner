@@ -26,12 +26,6 @@ import java.util.List;
  */
 public interface Population extends Iterable<Individual> {
 
-    /** 
-     * @return a list of all Individuals in this Population, including those that have been 
-     * marked as rejected by the filter chain.
-     */
-    public List<Individual> getIndividuals();
-
     public void addIndividual(Individual individual);
 
     public void clearIndividuals(List<Individual> individuals);

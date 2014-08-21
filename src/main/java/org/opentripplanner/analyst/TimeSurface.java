@@ -78,9 +78,9 @@ public class TimeSurface implements Serializable{
         }
         
         // TODO make this work as either to or from query
-        GenericLocation from = spt.getOptions().getFrom();
-        this.lon = from.getLng();
-        this.lat = from.getLat();
+        GenericLocation from = spt.getOptions().from;
+        this.lon = from.lng;
+        this.lat = from.lat;
         this.id = makeUniqueId();
         this.dateTime = spt.getOptions().dateTime;
         long t1 = System.currentTimeMillis();
@@ -95,7 +95,7 @@ public class TimeSurface implements Serializable{
         lat = req.from.lat;
         id = makeUniqueId();
         dateTime = req.fromTime; // FIXME
-        routerId = profileRouter.graph.getRouterId();
+        routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
         times = maxNotMin ? profileRouter.maxs : profileRouter.mins;
     }

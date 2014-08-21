@@ -16,8 +16,6 @@ package org.opentripplanner.analyst.batch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Setter;
-
 /**
  * A simple exponential decay (gravity) model, as defined in, for example
  * Geurs, Karst T, and Bert van Wee. "Accessibility Evaluation of Land-use and Transport
@@ -37,7 +35,7 @@ public class DecayAccumulator implements Accumulator {
      * See Geurs and Wee 2004, 133. (Note that Geurs and Wee 2004 call it beta, but it's the same
      * variable)
      */
-    @Setter double lambda; 
+    public double lambda; 
 
     /**
      * This is a convenience function to set the cost sensitivity with more real-world values.

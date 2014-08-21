@@ -13,11 +13,8 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.onebusaway.gtfs.model.Trip;
 
-@AllArgsConstructor
 public class RepeatedStops extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -25,6 +22,10 @@ public class RepeatedStops extends GraphBuilderAnnotation {
     public static final String FMT = "Trip %s visits stops repeatedly. Removed duplicates.";
     
     public final Trip trip;
+    
+    public RepeatedStops(Trip trip){
+    	this.trip = trip;
+    }
     
     @Override
     public String getMessage() {

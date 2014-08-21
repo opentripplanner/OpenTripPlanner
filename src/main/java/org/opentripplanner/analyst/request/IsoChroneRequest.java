@@ -16,9 +16,6 @@ package org.opentripplanner.analyst.request;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
@@ -28,30 +25,19 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class IsoChroneRequest {
 
-    @Getter
-    private final List<Integer> cutoffSecList;
+    public final List<Integer> cutoffSecList;
 
-    @Getter
-    @Setter
-    private boolean includeDebugGeometry;
+    public boolean includeDebugGeometry;
 
-    @Getter
-    @Setter
-    private int precisionMeters = 200;
+    public int precisionMeters = 200;
 
-    @Getter
-    @Setter
-    private int maxTimeSec = 0;
+    public int maxTimeSec = 0;
 
-    @Getter
-    @Setter
-    private Coordinate coordinateOrigin;
+    public Coordinate coordinateOrigin;
 
-    @Getter
-    private int minCutoffSec = Integer.MAX_VALUE;
+    public int minCutoffSec = Integer.MAX_VALUE;
 
-    @Getter
-    private int maxCutoffSec = 0;
+    public int maxCutoffSec = 0;
 
     public IsoChroneRequest(List<Integer> cutoffSecList) {
         this.cutoffSecList = cutoffSecList;

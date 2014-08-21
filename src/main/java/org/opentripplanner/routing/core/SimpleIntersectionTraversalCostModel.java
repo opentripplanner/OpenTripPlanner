@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.core;
 
-import lombok.Setter;
-
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
@@ -24,29 +22,23 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     // Constants for when there is a traffic light.
 
     /** Expected time it takes to make a right at a light. */
-    @Setter
     private Double expectedRightAtLightTimeSec = 15.0;
 
     /** Expected time it takes to continue straight at a light. */
-    @Setter
     private Double expectedStraightAtLightTimeSec = 15.0;
 
     /** Expected time it takes to turn left at a light. */
-    @Setter
     private Double expectedLeftAtLightTimeSec = 15.0;
 
     // Constants for when there is no traffic light
 
     /** Expected time it takes to make a right without a stop light. */
-    @Setter
     private Double expectedRightNoLightTimeSec = 8.0;
 
     /** Expected time it takes to continue straight without a stop light. */
-    @Setter
     private Double expectedStraightNoLightTimeSec = 5.0;
 
     /** Expected time it takes to turn left without a stop light. */
-    @Setter
     private Double expectedLeftNoLightTimeSec = 8.0;
 
     @Override
@@ -66,7 +58,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         double turnCost = 0;
 
         int turnAngle = calculateTurnAngle(from, to, options);
-        if (v.isTrafficLight()) {
+        if (v.trafficLight) {
             // Use constants that apply when there are stop lights.
             if (isRightTurn(turnAngle)) {
                 turnCost = expectedRightAtLightTimeSec;

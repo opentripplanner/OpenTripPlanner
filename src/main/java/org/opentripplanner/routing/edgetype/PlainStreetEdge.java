@@ -20,9 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -60,75 +57,56 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private ElevationProfileSegment elevationProfileSegment;
 
-    @Getter
     private double length;
 
-    @Getter
     private LineString geometry;
     
-    @Getter @Setter
     private String name;
 
-    @Getter @Setter
     private String label;
     
-    @Getter @Setter
     private boolean wheelchairAccessible = true;
 
-    @Getter @Setter
     private StreetTraversalPermission permission;
 
-    @Getter @Setter
     private int streetClass = CLASS_OTHERPATH;
     
     /**
      * Marks that this edge is the reverse of the one defined in the source
      * data. Does NOT mean fromv/tov are reversed.
      */
-    @Getter @Setter
-    public boolean back;
+    private boolean back;
     
-    @Getter @Setter
     private boolean roundabout = false;
     
-    @Getter
     private Set<Alert> notes;
 
-    @Setter
     private boolean hasBogusName;
 
-    @Getter @Setter
     private boolean noThruTraffic;
 
     /**
      * This street is a staircase
      */
-    @Getter @Setter
     private boolean stairs;
     
     /**
      * The speed (meters / sec) at which an automobile can traverse
      * this street segment.
      */
-    @Getter @Setter
     private float carSpeed;
     
     /** This street has a toll */
-    @Getter @Setter
     private boolean toll;
 
-    @Getter
     private Set<Alert> wheelchairNotes;
 
-    @Getter
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
     /** 0 -> 360 degree angle - the angle at the start of the edge geometry */
-    @Getter
     public int inAngle;
 
     /** 0 -> 360 degree angle - the angle at the end of the edge geometry */
-    @Getter
     public int outAngle;
 
     /**
@@ -151,13 +129,13 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             String name, double length,
             StreetTraversalPermission permission, boolean back, float carSpeed) {
         super(v1, v2);
-        this.geometry = geometry;
+        this.setGeometry(geometry);
         this.length = length;
         this.elevationProfileSegment = new ElevationProfileSegment(length);
         this.name = name;
-        this.permission = permission;
-        this.back = back;
-        this.carSpeed = carSpeed;
+        this.setPermission(permission);
+        this.setBack(back);
+        this.setCarSpeed(carSpeed);
         if (geometry != null) {
             try {
                 for (Coordinate c : geometry.getCoordinates()) {
@@ -183,7 +161,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Override
     public boolean canTraverse(RoutingRequest options) {
         if (options.wheelchairAccessible) {
-            if (!wheelchairAccessible) {
+            if (!isWheelchairAccessible()) {
                 return false;
             }
             if (elevationProfileSegment.getMaxSlope() > options.maxSlope) {
@@ -191,24 +169,24 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             }
         }
         
-        return canTraverse(options.getModes());
+        return canTraverse(options.modes);
     }
     
     @Override
     public boolean canTraverse(TraverseModeSet modes) {
-        return permission.allows(modes);
+        return getPermission().allows(modes);
     }
     
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
-            if (!wheelchairAccessible) {
+            if (!isWheelchairAccessible()) {
                 return false;
             }
             if (elevationProfileSegment.getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
-        return permission.allows(mode);
+        return getPermission().allows(mode);
     }
 
     @Override
@@ -218,7 +196,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     @Override
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        return elevationProfileSegment.setElevationProfile(elev, computed, permission.allows(StreetTraversalPermission.CAR));
+        return elevationProfileSegment.setElevationProfile(elev, computed, getPermission().allows(StreetTraversalPermission.CAR));
     }
 
     @Override
@@ -256,7 +234,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             } else { /* departAfter */
                 // Irrevocable transition from driving to walking. "Parking" means being dropped off in this case.
                 // Final CAR check needed to prevent infinite recursion.
-                if ( ! s0.isCarParked() && ! permission.allows(TraverseMode.CAR) && currMode == TraverseMode.CAR) {
+                if ( ! s0.isCarParked() && ! getPermission().allows(TraverseMode.CAR) && currMode == TraverseMode.CAR) {
                     editor = doTraverse(s0, options, TraverseMode.WALK);
                     if (editor != null) {
                         editor.setCarParked(true); // has the effect of switching to WALK and preventing further car use
@@ -271,7 +249,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     /** return a StateEditor rather than a State so that we can make parking/mode switch modifications for kiss-and-ride. */
     private StateEditor doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
-        boolean walkingBike = options.isWalkingBike();
+        boolean walkingBike = options.walkingBike;
         boolean backWalkingBike = s0.isBackWalkingBike();
         TraverseMode backMode = s0.getBackMode();
         Edge backEdge = s0.getBackEdge();
@@ -294,7 +272,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike. */
         if (!canTraverse(options, traverseMode)) {
             if (traverseMode == TraverseMode.BICYCLE) {
-                return doTraverse(s0, options.getBikeWalkingOptions(), TraverseMode.WALK);
+                return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
             }
             return null;
         }
@@ -331,9 +309,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 double quick = elevationProfileSegment.getSlopeSpeedEffectiveLength();
                 double safety = elevationProfileSegment.getBicycleSafetyEffectiveLength();
                 double slope = elevationProfileSegment.getSlopeWorkCost();
-                weight = quick * options.getTriangleTimeFactor() + slope
-                        * options.getTriangleSlopeFactor() + safety
-                        * options.getTriangleSafetyFactor();
+                weight = quick * options.triangleTimeFactor + slope
+                        * options.triangleSlopeFactor + safety
+                        * options.triangleSafetyFactor;
                 weight /= speed;
                 break;
             default:
@@ -375,8 +353,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
 
-        if (wheelchairNotes != null && options.wheelchairAccessible) {
-            s1.addAlerts(wheelchairNotes);
+        if (getWheelchairNotes() != null && options.wheelchairAccessible) {
+            s1.addAlerts(getWheelchairNotes());
         }
 
         /* Compute turn cost. */
@@ -454,10 +432,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);
             }
             if (s1.isMaxPreTransitTimeExceeded(options)) {
-                if (options.isSoftPreTransitLimiting()) {
+                if (options.softPreTransitLimiting) {
                     weight += calculateOverageWeight(s0.getPreTransitTime(), s1.getPreTransitTime(),
-                            options.getMaxPreTransitTime(), options.getPreTransitPenalty(),
-                                    options.getPreTransitOverageRate());
+                            options.maxPreTransitTime, options.preTransitPenalty,
+                                    options.preTransitOverageRate);
                 } else return null;
             }
         }
@@ -466,11 +444,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (s1.weHaveWalkedTooFar(options)) {
 
             // if we're using a soft walk-limit
-            if( options.isSoftWalkLimiting() ){
+            if( options.softWalkLimiting ){
                 // just slap a penalty for the overage onto s1
                 weight += calculateOverageWeight(s0.getWalkDistance(), s1.getWalkDistance(),
-                        options.getMaxWalkDistance(), options.getSoftWalkPenalty(),
-                                options.getSoftWalkOverageRate());
+                        options.getMaxWalkDistance(), options.softWalkPenalty,
+                                options.softWalkOverageRate);
             } else {
                 // else, it's a hard limit; bail
                 LOG.debug("Too much walking. Bailing.");
@@ -482,7 +460,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         
         s1.incrementWeight(weight);
         
-        s1.addAlerts(notes);
+        s1.addAlerts(getNotes());
         
         if (this.isToll() && traverseMode.isDriving()) {
             s1.addAlert(Alert.createSimpleAlerts("Toll road"));
@@ -513,7 +491,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
      * the RoutingRequest, and return it in meters per second.
      */
     private double calculateCarSpeed(RoutingRequest options) {
-        return carSpeed;
+        return getCarSpeed();
     }
     
     /**
@@ -588,7 +566,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     public boolean hasBogusName() {
-        return hasBogusName;
+        return this.hasBogusName;
     }
 
     /** Returns true if there are any turn restrictions defined. */
@@ -658,5 +636,134 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         }
         return super.detachFrom();
     }
+
+	@Override
+	public double getLength() {
+		return this.length;
+	}
+
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public LineString getGeometry() {
+		return geometry;
+	}
+
+	public void setGeometry(LineString geometry) {
+		this.geometry = geometry;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public boolean isWheelchairAccessible() {
+		return wheelchairAccessible;
+	}
+
+	public void setWheelchairAccessible(boolean wheelchairAccessible) {
+		this.wheelchairAccessible = wheelchairAccessible;
+	}
+
+	public StreetTraversalPermission getPermission() {
+		return permission;
+	}
+
+	public void setPermission(StreetTraversalPermission permission) {
+		this.permission = permission;
+	}
+
+	public int getStreetClass() {
+		return streetClass;
+	}
+
+	public void setStreetClass(int streetClass) {
+		this.streetClass = streetClass;
+	}
+
+	public boolean isBack() {
+		return back;
+	}
+
+	public void setBack(boolean back) {
+		this.back = back;
+	}
+
+	public boolean isRoundabout() {
+		return roundabout;
+	}
+
+	public void setRoundabout(boolean roundabout) {
+		this.roundabout = roundabout;
+	}
+
+	public Set<Alert> getNotes() {
+		return notes;
+	}
+
+	public void setHasBogusName(boolean hasBogusName) {
+		this.hasBogusName = hasBogusName;
+	}
+
+	public boolean isNoThruTraffic() {
+		return noThruTraffic;
+	}
+
+	public void setNoThruTraffic(boolean noThruTraffic) {
+		this.noThruTraffic = noThruTraffic;
+	}
+
+	public boolean isStairs() {
+		return stairs;
+	}
+
+	public void setStairs(boolean stairs) {
+		this.stairs = stairs;
+	}
+
+	public float getCarSpeed() {
+		return carSpeed;
+	}
+
+	public void setCarSpeed(float carSpeed) {
+		this.carSpeed = carSpeed;
+	}
+
+	public boolean isToll() {
+		return toll;
+	}
+
+	public void setToll(boolean toll) {
+		this.toll = toll;
+	}
+
+	public Set<Alert> getWheelchairNotes() {
+		return wheelchairNotes;
+	}
+
+	@Override
+	public List<TurnRestriction> getTurnRestrictions() {
+		return this.turnRestrictions;
+	}
+
+	@Override
+	public int getInAngle() {
+		return this.inAngle;
+	}
+
+	@Override
+	public int getOutAngle() {
+		return this.outAngle;
+	}
 
 }

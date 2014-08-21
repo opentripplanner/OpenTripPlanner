@@ -15,9 +15,6 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.onebusaway.gtfs.model.Trip;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class TripDegenerate extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -26,6 +23,10 @@ public class TripDegenerate extends GraphBuilderAnnotation {
     		"We will not use it for routing. This is probably an error in your data";
     
     final Trip trip;
+    
+    public TripDegenerate(Trip trip){
+    	this.trip = trip;
+    }
     
     @Override
     public String getMessage() {

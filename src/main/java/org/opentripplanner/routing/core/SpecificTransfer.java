@@ -2,8 +2,6 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 
-import lombok.Getter;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -32,33 +30,28 @@ public class SpecificTransfer implements Serializable {
     /**
      * Route id of arriving trip. Is allowed to be null. Is ignored when fromTripId is not null.
      */
-    @Getter
     final private AgencyAndId fromRouteId;
         
     /**
      * Route id of departing trip. Is allowed to be null. Is ignored when toTripId is not null.
      */
-    @Getter
     final private AgencyAndId toRouteId;
     
     /**
      * Trip id of arriving trip. Is allowed to be null.
      */
-    @Getter
     final private AgencyAndId fromTripId;
     
     /**
      * Trip id of departing trip. Is allowed to be null.
      */
-    @Getter
     final private AgencyAndId toTripId;
     
     /**
      * Value indicating the minimum transfer time in seconds. May contain special (negative) values which meaning
      * can be found in the Transfer.*_TRANSFER constants.
      */
-    @Getter
-    final private int transferTime;
+    final int transferTime;
     
     public SpecificTransfer(AgencyAndId fromRouteId, AgencyAndId toRouteId, AgencyAndId fromTripId, AgencyAndId toTripId, int transferTime) {
         this.fromRouteId = fromRouteId;

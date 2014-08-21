@@ -61,7 +61,7 @@ public class TestHopFactory extends TestCase {
 
         for (Edge e : stop_a.getOutgoing()) {
             assertEquals(TransitBoardAlight.class, e.getClass());
-            assertTrue(((TransitBoardAlight) e).isBoarding());
+            assertTrue(((TransitBoardAlight) e).boarding);
         }
 
         // TODO: could this ever be a PatternAlight? I think not.
@@ -73,7 +73,7 @@ public class TestHopFactory extends TestCase {
         for (Edge e : journey_a_1.getOutgoing()) {
             if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(TransitBoardAlight.class, e.getClass());
-                assertTrue(((TransitBoardAlight) e).isBoarding());
+                assertTrue(((TransitBoardAlight) e).boarding);
             } else {
                 assertEquals(PatternHop.class, e.getClass());
             }

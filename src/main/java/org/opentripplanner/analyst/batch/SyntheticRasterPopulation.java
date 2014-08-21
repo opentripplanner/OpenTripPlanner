@@ -13,8 +13,6 @@
 
 package org.opentripplanner.analyst.batch;
 
-import lombok.Setter;
-
 import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -26,10 +24,10 @@ public class SyntheticRasterPopulation extends RasterPopulation {
 
     private static Logger LOG = LoggerFactory.getLogger(SyntheticRasterPopulation.class); 
 
-    @Setter String name = "synthetic grid coverage";
-    @Setter double resolutionMeters = 250; // deprecated
-    @Setter String crsCode = "EPSG:4326";
-    @Setter boolean boundsFromGraph = false; // use graph envelope, overriding any specified bounds
+    public String name = "synthetic grid coverage";
+    public double resolutionMeters = 250; // deprecated
+    public String crsCode = "EPSG:4326";
+    public boolean boundsFromGraph = false; // use graph envelope, overriding any specified bounds
     
     @Override
     public void createIndividuals() {

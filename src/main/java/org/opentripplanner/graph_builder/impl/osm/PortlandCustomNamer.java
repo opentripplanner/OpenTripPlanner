@@ -114,14 +114,14 @@ public class PortlandCustomNamer implements CustomNamer {
         }
         String highway = way.getTag("highway");
         if ("motorway_link".equals(highway) || "trunk_link".equals(highway)) {
-            if (edge.back) {
+            if (edge.isBack()) {
                 nameByDestination.add(edge);
             } else {
                 nameByOrigin.add(edge);
             }
         } else if ("secondary_link".equals(highway) || "primary_link".equals(highway)
                 || "tertiary_link".equals(highway)) {
-            if (edge.back) {
+            if (edge.isBack()) {
                 nameByOrigin.add(edge);
             } else {
                 nameByDestination.add(edge);

@@ -118,7 +118,7 @@ public class TestPatternHopFactory extends TestCase {
 
         for (Edge e : stop_a_depart.getOutgoing()) {
             assertEquals(TransitBoardAlight.class, e.getClass());
-            assertTrue(((TransitBoardAlight) e).isBoarding());
+            assertTrue(((TransitBoardAlight) e).boarding);
         }
         
         TransitBoardAlight pb = (TransitBoardAlight) stop_a_depart.getOutgoing().iterator().next();
@@ -173,7 +173,7 @@ public class TestPatternHopFactory extends TestCase {
 
         RoutingRequest options = new RoutingRequest();
         // test feed is designed for instantaneous transfers
-        options.setTransferSlack(0);
+        options.transferSlack = (0);
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         options.dateTime = startTime;
@@ -260,7 +260,7 @@ public class TestPatternHopFactory extends TestCase {
         for (Edge edge : stopDepartVertex.getOutgoing()) {
             if (edge instanceof TransitBoardAlight) {
                 TransitBoardAlight tba = ((TransitBoardAlight) edge);
-                if (tba.isBoarding() && tba.getPattern().getRoute().getId().getId().equals(routeId)) {
+                if (tba.boarding && tba.getPattern().route.getId().getId().equals(routeId)) {
                     for (Edge edge2: tba.getToVertex().getOutgoing()) {
                         if (edge2 instanceof PatternHop) {
                             return (PatternHop) edge2;
@@ -412,9 +412,9 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency:D");
 
         RoutingRequest options = new RoutingRequest();
-        options.getModes().setWalk(false);
-        options.getModes().setBicycle(true);
-        options.getModes().setTransit(true);
+        options.modes.setWalk(false);
+        options.modes.setBicycle(true);
+        options.modes.setTransit(true);
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_b);
 
@@ -499,7 +499,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex destination = graph.getVertex("agency:T");
         RoutingRequest options = new RoutingRequest();
         // test is designed such that transfers must be instantaneous
-        options.setTransferSlack(0);
+        options.transferSlack = (0);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
         startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         options.dateTime = TestUtils.toSeconds(startTime);

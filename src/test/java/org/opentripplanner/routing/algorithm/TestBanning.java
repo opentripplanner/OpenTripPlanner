@@ -69,7 +69,7 @@ public class TestBanning extends TestCase {
             for (State s : path.states) {
                 if (s.getBackEdge() instanceof PatternHop) {
                     PatternHop e = (PatternHop) s.getBackEdge();
-                    Route route = e.getPattern().getRoute();
+                    Route route = e.getPattern().route;
                     assertFalse(options.bannedRoutes.matches(route));
                     boolean foundMaxLine = false;
                     for (int j = 0; j < maxLines.length; ++j) {

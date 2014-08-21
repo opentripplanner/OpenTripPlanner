@@ -102,11 +102,11 @@ public class TimeGridWs extends RoutingResource {
         // Build the request
         RoutingRequest sptRequest = buildRequest(0);
         SampleGridRequest tgRequest = new SampleGridRequest();
-        tgRequest.setMaxTimeSec(maxTimeSec);
-        tgRequest.setPrecisionMeters(precisionMeters);
+        tgRequest.maxTimeSec = maxTimeSec;
+        tgRequest.precisionMeters = precisionMeters;
         if (coordinateOrigin != null)
-            tgRequest.setCoordinateOrigin(new GenericLocation(null, coordinateOrigin)
-                    .getCoordinate());
+            tgRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin)
+                    .getCoordinate();
 
         // Get a sample grid
         ZSampleGrid<WTWD> sampleGrid = sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);

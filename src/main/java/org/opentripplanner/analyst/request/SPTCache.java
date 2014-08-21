@@ -15,8 +15,6 @@ package org.opentripplanner.analyst.request;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Setter;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
@@ -47,8 +45,8 @@ public class SPTCache extends CacheLoader<RoutingRequest, ShortestPathTree> {
 
     private LoadingCache<RoutingRequest, ShortestPathTree> sptCache;
 
-    @Setter private int size = 200;
-    @Setter private int concurrency = 16;
+    public int size = 200;
+    public int concurrency = 16;
 
     @Override /** completes the abstract CacheLoader superclass */
     public ShortestPathTree load(RoutingRequest req) throws Exception {

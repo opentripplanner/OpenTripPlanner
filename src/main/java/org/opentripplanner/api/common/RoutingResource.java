@@ -331,7 +331,7 @@ public abstract class RoutingResource {
         RoutingRequest request = otpServer.routingRequest.clone();
         request.setFromString(get(fromPlace, n, request.getFromPlace().getRepresentation()));
         request.setToString(get(toPlace, n, request.getToPlace().getRepresentation()));
-        request.setRouterId(routerId);
+        request.routerId = routerId;
         {
             //FIXME: get defaults for these from request
             String d = get(date, n, null);
@@ -355,21 +355,21 @@ public abstract class RoutingResource {
                 request.setDateTime(d, t, tz);
             }
         }
-        request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
+        request.setWheelchairAccessible(get(wheelchair, n, request.wheelchairAccessible));
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
-        request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.getMaxPreTransitTime()));
-        request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
-        request.setWaitReluctance(get(waitReluctance, n, request.getWaitReluctance()));
-        request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.getWaitAtBeginningFactor()));
-        request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
-        double bikeSpeedParam = get(bikeSpeed, n, request.getBikeSpeed());
-        request.setBikeSpeed(bikeSpeedParam);
-        int bikeSwitchTimeParam = get(bikeSwitchTime, n, request.getBikeSwitchTime());
-        request.setBikeSwitchTime(bikeSwitchTimeParam);
-        int bikeSwitchCostParam = get(bikeSwitchCost, n, request.getBikeSwitchCost());
-        request.setBikeSwitchCost(bikeSwitchCostParam);
-        OptimizeType opt = get(optimize, n, request.getOptimize());
+        request.setMaxPreTransitTime(get(maxPreTransitTime, n, request.maxPreTransitTime));
+        request.setWalkReluctance(get(walkReluctance, n, request.walkReluctance));
+        request.setWaitReluctance(get(waitReluctance, n, request.waitReluctance));
+        request.setWaitAtBeginningFactor(get(waitAtBeginningFactor, n, request.waitAtBeginningFactor));
+        request.walkSpeed = get(walkSpeed, n, request.walkSpeed);
+        double bikeSpeedParam = get(bikeSpeed, n, request.bikeSpeed);
+        request.bikeSpeed = bikeSpeedParam;
+        int bikeSwitchTimeParam = get(bikeSwitchTime, n, request.bikeSwitchTime);
+        request.bikeSwitchTime = bikeSwitchTimeParam;
+        int bikeSwitchCostParam = get(bikeSwitchCost, n, request.bikeSwitchCost);
+        request.bikeSwitchCost = bikeSwitchCostParam;
+        OptimizeType opt = get(optimize, n, request.optimize);
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);
             Double tslope = get(triangleSlopeFactor,  n, null);
@@ -394,27 +394,27 @@ public abstract class RoutingResource {
             }
         }
         request.setArriveBy(get(arriveBy, n, false));
-        request.setShowIntermediateStops(get(showIntermediateStops, n, request.isShowIntermediateStops()));
+        request.showIntermediateStops = get(showIntermediateStops, n, request.showIntermediateStops);
         /* intermediate places and their ordering are shared because they are themselves a list */
         if (intermediatePlaces != null && intermediatePlaces.size() > 0 
             && ! intermediatePlaces.get(0).equals("")) {
             request.setIntermediatePlacesFromStrings(intermediatePlaces);
         }
         if (intermediatePlacesOrdered == null)
-            intermediatePlacesOrdered = request.isIntermediatePlacesOrdered();
-        request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
+            intermediatePlacesOrdered = request.intermediatePlacesOrdered;
+        request.intermediatePlacesOrdered = intermediatePlacesOrdered;
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
-        request.setOtherThanPreferredRoutesPenalty(get(otherThanPreferredRoutesPenalty, n, request.getOtherThanPreferredRoutesPenalty()));
+        request.setOtherThanPreferredRoutesPenalty(get(otherThanPreferredRoutesPenalty, n, request.otherThanPreferredRoutesPenalty));
         request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setUnpreferredAgencies(get(unpreferredAgencies, n, request.getUnpreferredAgenciesStr()));
-        request.setWalkBoardCost(get(walkBoardCost, n, request.getWalkBoardCost()));
-        request.setBikeBoardCost(get(bikeBoardCost, n, request.getBikeBoardCost()));
+        request.setWalkBoardCost(get(walkBoardCost, n, request.walkBoardCost));
+        request.setBikeBoardCost(get(bikeBoardCost, n, request.bikeBoardCost));
         request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
         request.setBannedAgencies(get(bannedAgencies, n, request.getBannedAgenciesStr()));
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(get(bannedTrips, n, null));
         if (bannedTripMap != null) {
-            request.setBannedTrips(bannedTripMap);
+            request.bannedTrips = bannedTripMap;
         }
         request.setBannedStops(get(bannedStops, n, request.getBannedStopsStr()));
         request.setBannedStopsHard(get(bannedStopsHard, n, request.getBannedStopsHardStr()));
@@ -423,62 +423,62 @@ public abstract class RoutingResource {
         // See comment on RoutingRequest.transferPentalty.
         if (opt == OptimizeType.TRANSFERS) {
             opt = OptimizeType.QUICK;
-            request.setTransferPenalty(get(transferPenalty, n, 0) + 1800);
+            request.transferPenalty = get(transferPenalty, n, 0) + 1800;
         } else {
-            request.setTransferPenalty(get(transferPenalty, n, request.getTransferPenalty()));
+            request.transferPenalty = (get(transferPenalty, n, request.transferPenalty));
         }
-        request.setBatch(get(batch, n, new Boolean(request.isBatch())));
+        request.batch = (get(batch, n, new Boolean(request.batch)));
         request.setOptimize(opt);
         /* Temporary code to get bike/car parking and renting working. */
         modes.get(0).applyToRequest(request);
 
         if (request.allowBikeRental && bikeSpeedParam == -1) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
-            request.setBikeSpeed(4.3);
+            request.bikeSpeed = 4.3;
         }
 
-        request.setBoardSlack(get(boardSlack, n, request.getBoardSlack()));
-        request.setAlightSlack(get(alightSlack, n, request.getAlightSlack()));
-        request.setTransferSlack(get(minTransferTime, n, request.getTransferSlack()));
-        request.setNonpreferredTransferPenalty(get(nonpreferredTransferPenalty, n, request.getNonpreferredTransferPenalty()));
+        request.boardSlack = (get(boardSlack, n, request.boardSlack));
+        request.alightSlack = (get(alightSlack, n, request.alightSlack));
+        request.transferSlack = (get(minTransferTime, n, request.transferSlack));
+        request.nonpreferredTransferPenalty = get(nonpreferredTransferPenalty, n, request.nonpreferredTransferPenalty);
 
-        if (request.getBoardSlack() + request.getAlightSlack() > request.getTransferSlack()) {
+        if (request.boardSlack + request.alightSlack > request.transferSlack) {
             throw new RuntimeException("Invalid parameters: transfer slack must "
                     + "be greater than or equal to board slack plus alight slack");
         }
 
-        request.setMaxTransfers(get(maxTransfers, n, request.getMaxTransfers()));
+        request.setMaxTransfers(get(maxTransfers, n, request.maxTransfers));
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;
-        request.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
-        if (request.getIntermediatePlaces() != null
-                && (request.getModes().isTransit() || 
-                        (request.getModes().getWalk() && 
-                         request.getModes().getBicycle())))
+        request.useBikeRentalAvailabilityInformation = (tripPlannedForNow);
+        if (request.intermediatePlaces != null
+                && (request.modes.isTransit() || 
+                        (request.modes.getWalk() && 
+                         request.modes.getBicycle())))
             throw new UnsupportedOperationException("TSP is not supported for transit or bike share trips");
 
         String startTransitStopId = get(this.startTransitStopId, n,
-                AgencyAndId.convertToString(request.getStartingTransitStopId()));
+                AgencyAndId.convertToString(request.startingTransitStopId));
         if (startTransitStopId != null && !"".equals(startTransitStopId)) {
-            request.setStartingTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
+            request.startingTransitStopId = (AgencyAndId.convertFromString(startTransitStopId));
         }
         String startTransitTripId = get(this.startTransitTripId, n,
-                AgencyAndId.convertToString(request.getStartingTransitTripId()));
+                AgencyAndId.convertToString(request.startingTransitTripId));
         if (startTransitTripId != null && !"".equals(startTransitTripId)) {
-            request.setStartingTransitTripId(AgencyAndId.convertFromString(startTransitTripId));
+            request.startingTransitTripId = (AgencyAndId.convertFromString(startTransitTripId));
         }
         
-        request.setClampInitialWait(get(clampInitialWait, n, request.getClampInitialWait()));
+        request.clampInitialWait = (get(clampInitialWait, n, request.clampInitialWait));
 
-        request.setReverseOptimizeOnTheFly(get(reverseOptimizeOnTheFly, n, 
-                                               request.isReverseOptimizeOnTheFly()));
+        request.reverseOptimizeOnTheFly = (get(reverseOptimizeOnTheFly, n, 
+                                               request.reverseOptimizeOnTheFly));
 
-        request.setIgnoreRealtimeUpdates(get(ignoreRealtimeUpdates, n, 
-                request.isIgnoreRealtimeUpdates()));
+        request.ignoreRealtimeUpdates = (get(ignoreRealtimeUpdates, n, 
+                request.ignoreRealtimeUpdates));
 
-        request.setDisableRemainingWeightHeuristic(get(disableRemainingWeightHeuristic, n,
-                request.isDisableRemainingWeightHeuristic()));
+        request.disableRemainingWeightHeuristic = (get(disableRemainingWeightHeuristic, n,
+                request.disableRemainingWeightHeuristic));
         
         String localeSpec = get(locale, n, "en");
         String[] localeSpecParts = localeSpec.split("_");
@@ -498,7 +498,7 @@ public abstract class RoutingResource {
                 locale = new Locale("en");
         }
 
-        request.setLocale(locale);
+        request.locale = locale;
         return request;
     }
 

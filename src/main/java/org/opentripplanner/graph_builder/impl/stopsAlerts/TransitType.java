@@ -13,7 +13,6 @@
 
 package org.opentripplanner.graph_builder.impl.stopsAlerts;
 
-import lombok.Setter;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -22,7 +21,6 @@ import java.util.Set;
 
 public class TransitType extends AbstractStopTester {
 
-    @Setter
     TraverseMode transitType;
 
 

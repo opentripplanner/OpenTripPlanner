@@ -23,9 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -64,8 +61,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class StreetfulStopLinker implements GraphBuilder {
     private static Logger LOG = LoggerFactory.getLogger(StreetfulStopLinker.class);
 
-    @Setter
-    private int maxDuration = 60 * 10;
+    int maxDuration = 60 * 10;
 
     DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -82,7 +78,7 @@ public class StreetfulStopLinker implements GraphBuilder {
         final Parser parser[] = new Parser[] {new Parser()};
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
         EarliestArrivalSPTService earliestArrivalSPTService = new EarliestArrivalSPTService();
-        earliestArrivalSPTService.setMaxDuration(maxDuration);
+        earliestArrivalSPTService.maxDuration = (maxDuration);
 
         for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
             // Only link street linkable stops
@@ -103,7 +99,7 @@ public class StreetfulStopLinker implements GraphBuilder {
 
             int n = 0;
             RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-            routingRequest.setClampInitialWait(0L);
+            routingRequest.clampInitialWait = (0L);
             routingRequest.setRoutingContext(graph, ts, null);
             routingRequest.rctx.pathParsers = parser;
             ShortestPathTree spt = earliestArrivalSPTService.getShortestPathTree(routingRequest);
@@ -176,7 +172,6 @@ public class StreetfulStopLinker implements GraphBuilder {
         private static final int STREET = 1;
         private static final int LINK   = 2;
 
-        @Getter
         private final DFA DFA;
 
         Parser() {
@@ -195,6 +190,12 @@ public class StreetfulStopLinker implements GraphBuilder {
             if (edge instanceof StreetTransitLink) return LINK;
 
             return OTHER;
+        }
+        
+        @Override
+		protected
+        DFA getDFA() {
+        	return this.DFA;
         }
     }
 }

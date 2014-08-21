@@ -24,7 +24,7 @@ public class StreetTraversalPermissionTest {
     @Test
     public void testGetCode() {
         StreetTraversalPermission perm1 = StreetTraversalPermission.ALL_DRIVING;
-        StreetTraversalPermission perm2 = StreetTraversalPermission.get(perm1.getCode());
+        StreetTraversalPermission perm2 = StreetTraversalPermission.get(perm1.code);
         assertEquals(perm1, perm2);
 
         StreetTraversalPermission perm3 = StreetTraversalPermission.BICYCLE;

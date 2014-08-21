@@ -103,15 +103,15 @@ public class TurnCostTest {
         
         // Make a prototype routing request.
         proto = new RoutingRequest();
-        proto.setCarSpeed(1.0);
-        proto.setWalkSpeed(1.0);
-        proto.setBikeSpeed(1.0);
-        proto.setTurnReluctance(1.0);
+        proto.carSpeed = 1.0;
+        proto.walkSpeed = 1.0;
+        proto.bikeSpeed = 1.0;
+        proto.turnReluctance = (1.0);
         proto.setWalkReluctance(1.0);
-        proto.setStairsReluctance(1.0);
+        proto.stairsReluctance = (1.0);
         
         // Turn costs are all 0 by default.
-        proto.setTraversalCostModel(new ConstantIntersectionTraversalCostModel(0.0));
+        proto.traversalCostModel = (new ConstantIntersectionTraversalCostModel(0.0));
     }
     
     private GraphPath checkForwardRouteDuration(RoutingRequest options, int expectedDuration) {
@@ -144,7 +144,7 @@ public class TurnCostTest {
     @Test
     public void testForwardDefaultConstTurnCosts() {
         RoutingRequest options = proto.clone();
-        options.setTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+        options.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
         options.setRoutingContext(_graph, topRight, bottomLeft);
         
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
@@ -191,7 +191,7 @@ public class TurnCostTest {
     @Test
     public void testForwardCarConstTurnCosts() {
         RoutingRequest options = proto.clone();
-        options.setTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+        options.traversalCostModel = (new ConstantIntersectionTraversalCostModel(10.0));
         options.setMode(TraverseMode.CAR);
         options.setRoutingContext(_graph, topRight, bottomLeft);
         

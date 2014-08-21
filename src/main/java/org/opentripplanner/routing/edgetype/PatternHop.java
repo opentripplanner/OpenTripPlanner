@@ -54,20 +54,20 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
 
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(getPattern().getRoute());
+        return GtfsLibrary.getTraverseMode(getPattern().route);
     }
     
     public String getName() {
-        return GtfsLibrary.getRouteName(getPattern().getRoute());
+        return GtfsLibrary.getRouteName(getPattern().route);
     }
     
     public State optimisticTraverse(State state0) {
         RoutingRequest options = state0.getOptions();
         
         // Ignore this edge if either of its stop is banned hard
-        if (!options.getBannedStopsHard().isEmpty()) {
-            if (options.getBannedStopsHard().matches(((PatternStopVertex) fromv).getStop())
-                    || options.getBannedStopsHard().matches(((PatternStopVertex) tov).getStop())) {
+        if (!options.bannedStopsHard.isEmpty()) {
+            if (options.bannedStopsHard.matches(((PatternStopVertex) fromv).getStop())
+                    || options.bannedStopsHard.matches(((PatternStopVertex) tov).getStop())) {
                 return null;
             }
         }
@@ -94,9 +94,9 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         RoutingRequest options = s0.getOptions();
         
         // Ignore this edge if either of its stop is banned hard
-        if (!options.getBannedStopsHard().isEmpty()) {
-            if (options.getBannedStopsHard().matches(((PatternStopVertex) fromv).getStop())
-                    || options.getBannedStopsHard().matches(((PatternStopVertex) tov).getStop())) {
+        if (!options.bannedStopsHard.isEmpty()) {
+            if (options.bannedStopsHard.matches(((PatternStopVertex) fromv).getStop())
+                    || options.bannedStopsHard.matches(((PatternStopVertex) tov).getStop())) {
                 return null;
             }
         }
@@ -105,11 +105,11 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         int runningTime = tripTimes.getRunningTime(stopIndex);
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(runningTime);
-        if (s0.getOptions().isArriveBy())
+        if (s0.getOptions().arriveBy)
             s1.setZone(getBeginStop().getZoneId());
         else
             s1.setZone(getEndStop().getZoneId());
-        //s1.setRoute(pattern.getExemplar().getRoute().getId());
+        //s1.setRoute(pattern.getExemplar().route.getId());
         s1.incrementWeight(runningTime);
         s1.setBackMode(getMode());
         return s1.makeState();

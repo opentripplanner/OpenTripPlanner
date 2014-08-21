@@ -13,17 +13,22 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
 /**
  * Describes how unnamed OSM ways are to be named based on the tags they possess.
  * The CreativeNamer will be applied to ways that match the OSMSpecifier.
  * @author novalis
  */
-@Data @NoArgsConstructor @AllArgsConstructor
 public class CreativeNamerPicker {
-    private OSMSpecifier specifier;
-    private CreativeNamer namer;
+    public OSMSpecifier specifier;
+    public CreativeNamer namer;
+    
+    public CreativeNamerPicker(){
+    	specifier=null;
+    	namer=null;
+    }
+    
+    public CreativeNamerPicker(OSMSpecifier specifier, CreativeNamer namer){
+    	this.specifier = specifier;
+    	this.namer = namer;
+    }
 }

@@ -53,18 +53,18 @@ public abstract class RentABikeAbstractEdge extends Edge {
         /*
          * To rent a bike, we need to have BICYCLE in allowed modes.
          */
-        if (!options.getModes().contains(TraverseMode.BICYCLE))
+        if (!options.modes.contains(TraverseMode.BICYCLE))
             return null;
 
         BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
-        if (options.isUseBikeRentalAvailabilityInformation() && dropoff.getBikesAvailable() == 0) {
+        if (options.useBikeRentalAvailabilityInformation && dropoff.getBikesAvailable() == 0) {
             return null;
         }
 
         StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(options.isArriveBy() ? options.bikeRentalDropoffCost
+        s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost
                 : options.bikeRentalPickupCost);
-        s1.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalDropoffTime
+        s1.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalDropoffTime
                 : options.bikeRentalPickupTime);
         s1.setBikeRenting(true);
         s1.setBikeRentalNetwork(networks);
@@ -81,14 +81,14 @@ public abstract class RentABikeAbstractEdge extends Edge {
         if (!s0.isBikeRenting() || !hasCompatibleNetworks(networks, s0.getBikeRentalNetworks()))
             return null;
         BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
-        if (options.isUseBikeRentalAvailabilityInformation() && pickup.getSpacesAvailable() == 0) {
+        if (options.useBikeRentalAvailabilityInformation && pickup.getSpacesAvailable() == 0) {
             return null;
         }
 
         StateEditor s1e = s0.edit(this);
-        s1e.incrementWeight(options.isArriveBy() ? options.bikeRentalPickupCost
+        s1e.incrementWeight(options.arriveBy ? options.bikeRentalPickupCost
                 : options.bikeRentalDropoffCost);
-        s1e.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalPickupTime
+        s1e.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalPickupTime
                 : options.bikeRentalDropoffTime);
         s1e.setBikeRenting(false);
         s1e.setBackMode(TraverseMode.WALK);

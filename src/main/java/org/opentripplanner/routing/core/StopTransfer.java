@@ -82,7 +82,7 @@ public class StopTransfer implements Serializable {
             if (specificity > maxFoundSpecificity) {
                 if (specificTransfer.matches(fromTrip, toTrip)) {
                     // Set the found transfer time
-                    transferTime = specificTransfer.getTransferTime();
+                    transferTime = specificTransfer.transferTime;
                     maxFoundSpecificity = specificity;
                     
                     // Break when highest specificity is found
@@ -110,7 +110,7 @@ public class StopTransfer implements Serializable {
         // Pick the first specific transfer
         for (SpecificTransfer specificTransfer : specificTransfers) {
             // Set the found transfer time
-            transferTime = specificTransfer.getTransferTime();
+            transferTime = specificTransfer.transferTime;
             break;
         }
         

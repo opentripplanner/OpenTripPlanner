@@ -115,7 +115,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         }
 
         LOG.info("Creating stop time updater running every {} seconds : {}",
-                getFrequencySec(), updateSource);
+                frequencySec, updateSource);
     }
 
     @Override
@@ -125,22 +125,22 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
             @Override
             public void run(Graph graph) {
                 // Only create a realtime data snapshot source if none exists already
-                TimetableSnapshotSource snapshotSource = graph.getTimetableSnapshotSource();
+                TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
                 if (snapshotSource == null) {
                     snapshotSource = new TimetableSnapshotSource(graph);
                     // Add snapshot source to graph
-                    graph.setTimetableSnapshotSource(snapshotSource);
+                    graph.timetableSnapshotSource = (snapshotSource);
                 }
 
                 // Set properties of realtime data snapshot source
                 if (logFrequency != null) {
-                    snapshotSource.setLogFrequency(logFrequency);
+                    snapshotSource.logFrequency = (logFrequency);
                 }
                 if (maxSnapshotFrequency != null) {
-                    snapshotSource.setMaxSnapshotFrequency(maxSnapshotFrequency);
+                    snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
                 }
                 if (purgeExpiredData != null) {
-                    snapshotSource.setPurgeExpiredData(purgeExpiredData);
+                    snapshotSource.purgeExpiredData = (purgeExpiredData);
                 }
             }
         });

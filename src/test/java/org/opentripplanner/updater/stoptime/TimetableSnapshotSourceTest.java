@@ -90,7 +90,7 @@ public class TimetableSnapshotSourceTest {
         updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
         assertSame(resolver, updater.getTimetableSnapshot());
 
-        updater.setMaxSnapshotFrequency(-1);
+        updater.maxSnapshotFrequency = (-1);
         TimetableResolver newResolver = updater.getTimetableSnapshot();
         assertNotNull(newResolver);
         assertNotSame(resolver, newResolver);
@@ -102,8 +102,8 @@ public class TimetableSnapshotSourceTest {
         AgencyAndId tripId2 = new AgencyAndId("agency", "1.2");
         Trip trip = graph.index.tripForId.get(tripId);
         TripPattern pattern = graph.index.patternForTrip.get(trip);
-        int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
-        int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
+        int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
+        int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
         updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
 
@@ -127,8 +127,8 @@ public class TimetableSnapshotSourceTest {
         AgencyAndId tripId2 = new AgencyAndId("agency", "1.2");
         Trip trip = graph.index.tripForId.get(tripId);
         TripPattern pattern = graph.index.patternForTrip.get(trip);
-        int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
-        int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
+        int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
+        int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
@@ -173,13 +173,13 @@ public class TimetableSnapshotSourceTest {
         Trip trip = graph.index.tripForId.get(tripId);
         TripPattern pattern = graph.index.patternForTrip.get(trip);
 
-        updater.setMaxSnapshotFrequency(0);
-        updater.setPurgeExpiredData(false);
+        updater.maxSnapshotFrequency = (0);
+        updater.purgeExpiredData = (false);
 
         updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
         TimetableResolver resolverA = updater.getTimetableSnapshot();
 
-        updater.setPurgeExpiredData(true);
+        updater.purgeExpiredData = (true);
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

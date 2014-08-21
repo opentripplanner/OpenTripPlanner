@@ -48,7 +48,7 @@ public class ParkAndRideEdge extends Edge {
         if (!request.parkAndRide) {
             return null;
         }
-        if (request.isArriveBy()) {
+        if (request.arriveBy) {
             /*
              * To get back a car, we need to walk and have car mode enabled.
              */
@@ -59,7 +59,7 @@ public class ParkAndRideEdge extends Edge {
                 throw new IllegalStateException("Stolen car?");
             }
             StateEditor s1 = s0.edit(this);
-            int time = request.getCarDropoffTime();
+            int time = request.carDropoffTime;
             s1.incrementWeight(time);
             s1.incrementTimeInSeconds(time);
             s1.setCarParked(false);
@@ -76,7 +76,7 @@ public class ParkAndRideEdge extends Edge {
                 throw new IllegalStateException("Can't drive 2 cars");
             }
             StateEditor s1 = s0.edit(this);
-            int time = request.getCarDropoffTime();
+            int time = request.carDropoffTime;
             s1.incrementWeight(time);
             s1.incrementTimeInSeconds(time);
             s1.setCarParked(true);

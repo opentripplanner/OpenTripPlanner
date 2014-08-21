@@ -2,8 +2,6 @@ package org.opentripplanner.analyst.batch;
 
 import java.io.File;
 
-import lombok.Setter;
-
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -33,10 +31,10 @@ public class RasterPopulation extends BasicPopulation {
     private static final Logger LOG = LoggerFactory.getLogger(RasterPopulation.class);
 
     /* configuration fields */
-    @Setter int rows = 200, cols = 200; // these are the raster (gridEnvelope) dimensions
-    @Setter double left, right, top, bottom; // bounding box values in CRS
-    @Setter int band = 0; // raster band to read
-    @Setter double unitySeconds = 0; // scale output values so unity=1. 0 to turn off. 
+    public int rows = 200, cols = 200; // these are the raster (gridEnvelope) dimensions
+    public double left, right, top, bottom; // bounding box values in CRS
+    public int band = 0; // raster band to read
+    public double unitySeconds = 0; // scale output values so unity=1. 0 to turn off. 
     
     /* derived fields */
     protected CoordinateReferenceSystem coverageCRS; // from input raster or config string

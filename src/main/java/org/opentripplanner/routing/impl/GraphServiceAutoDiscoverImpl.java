@@ -24,8 +24,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import lombok.Setter;
-
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
@@ -47,7 +45,6 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
     private long lastAutoScan = 0L;
 
     /** The autoscan period in seconds */
-    @Setter
     private int autoScanPeriodSec = 60;
 
     private ScheduledExecutorService scanExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -57,21 +54,20 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
      * least this amount of time in the past. This in order to give some time for non-atomic graph
      * copy.
      */
-    @Setter
     private int loadDelaySec = 10;
 
     /**
      * @param indexFactory
      */
     public void setIndexFactory(StreetVertexIndexFactory indexFactory) {
-        decorated.setIndexFactory(indexFactory);
+        decorated.indexFactory = (indexFactory);
     }
 
     /**
      * @param defaultRouterId
      */
     public void setDefaultRouterId(String defaultRouterId) {
-        decorated.setDefaultRouterId(defaultRouterId);
+        decorated.defaultRouterId = (defaultRouterId);
     }
 
     /**
@@ -81,7 +77,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
      * the parameter is interpreted as a file path.
      */
     public void setPath(String path) {
-        decorated.setBasePath(path);
+        decorated.basePath = (path);
     }
 
     @Override
@@ -182,12 +178,12 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
     }
 
     private synchronized void autoDiscoverGraphs() {
-        LOG.debug("Auto discovering graphs under {}", decorated.getBasePath());
+        LOG.debug("Auto discovering graphs under {}", decorated.basePath);
         Collection<String> graphOnDisk = new HashSet<String>();
         Collection<String> graphToLoad = new HashSet<String>();
         // Only reload graph modified more than 1 mn ago.
         long validEndTime = System.currentTimeMillis() - loadDelaySec * 1000;
-        File baseFile = new File(decorated.getBasePath());
+        File baseFile = new File(decorated.basePath);
         // First check for a root graph
         File rootGraphFile = new File(baseFile, GraphServiceFileImpl.GRAPH_FILENAME);
         if (rootGraphFile.exists() && rootGraphFile.canRead()) {
@@ -242,8 +238,8 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
         /*
          * If the defaultRouterId is not present, print a warning and set it to some default.
          */
-        if (!getRouterIds().contains(decorated.getDefaultRouterId())) {
-            LOG.warn("Default routerId '{}' not available!", decorated.getDefaultRouterId());
+        if (!getRouterIds().contains(decorated.defaultRouterId)) {
+            LOG.warn("Default routerId '{}' not available!", decorated.defaultRouterId);
             if (!getRouterIds().isEmpty()) {
                 // Let's see which one we want to take by default
                 String defRouterId = null;
@@ -259,7 +255,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
                     else
                         LOG.info("Setting default routerId to '{}'", defRouterId);
                 }
-                decorated.setDefaultRouterId(defRouterId);
+                decorated.defaultRouterId = (defRouterId);
             }
         }
         if (this.getRouterIds().isEmpty()) {

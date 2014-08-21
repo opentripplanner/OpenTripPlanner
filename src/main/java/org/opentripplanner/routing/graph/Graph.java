@@ -41,9 +41,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -96,16 +93,13 @@ public class Graph implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
     
-    @Setter @Getter
-    private String routerId;
+    public String routerId;
 
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
 
     // transit feed validity information in seconds since epoch
-    @Getter
     private long transitServiceStarts = Long.MAX_VALUE;
 
-    @Getter
     private long transitServiceEnds = 0;
 
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
@@ -142,9 +136,7 @@ public class Graph implements Serializable {
      */
     public final Map<AgencyAndId,Integer> serviceCodes = Maps.newHashMap();
     
-    @Getter
-    @Setter
-    private transient TimetableSnapshotSource timetableSnapshotSource = null;
+    public transient TimetableSnapshotSource timetableSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
@@ -168,9 +160,7 @@ public class Graph implements Serializable {
     /**
      * Makes it possible to embed a default configuration inside a graph.
      */
-    @Getter
-    @Setter
-    private Properties embeddedPreferences = null;
+    public Properties embeddedPreferences = null;
 
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
@@ -178,12 +168,9 @@ public class Graph implements Serializable {
      * 
      * @see GraphUpdaterConfigurator
      */
-    @Getter
-    @Setter
-    private transient GraphUpdaterManager updaterManager = null;
+    public transient GraphUpdaterManager updaterManager = null;
 
-    @Getter
-    private final Date buildTime = new Date();
+    public final Date buildTime = new Date();
 
     public Graph(Graph basedOn) {
         this();
@@ -589,7 +576,7 @@ public class Graph implements Serializable {
             tableTripPatterns.add(pav.getTripPattern());
         }
         for (TripPattern ttp : tableTripPatterns) {
-            if (ttp != null) ttp.getScheduledTimetable().finish(); // skip frequency-based patterns with no table (null)
+            if (ttp != null) ttp.scheduledTimetable.finish(); // skip frequency-based patterns with no table (null)
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);

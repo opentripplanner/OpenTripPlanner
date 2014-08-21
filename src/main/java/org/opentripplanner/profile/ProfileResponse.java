@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import lombok.Getter;
-
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +14,6 @@ public class ProfileResponse {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileResponse.class);
 
-    @Getter
     List<Option> options = Lists.newArrayList();
 
     /**

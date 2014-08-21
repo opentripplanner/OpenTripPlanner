@@ -13,9 +13,6 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class NoFutureDates extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -24,6 +21,10 @@ public class NoFutureDates extends GraphBuilderAnnotation {
     		"no trips will be plannable on this agency";
     
     final String agency;
+    
+    public NoFutureDates(String agency){
+    	this.agency = agency;
+    }
     
     @Override
     public String getMessage() {

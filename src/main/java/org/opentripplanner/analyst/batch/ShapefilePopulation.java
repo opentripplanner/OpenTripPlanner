@@ -15,8 +15,6 @@ package org.opentripplanner.analyst.batch;
 
 import java.io.File;
 
-import lombok.Setter;
-
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.Query;
@@ -38,9 +36,9 @@ public class ShapefilePopulation extends BasicPopulation {
 
     private static final Logger LOG = LoggerFactory.getLogger(ShapefilePopulation.class);
 
-    @Setter String labelAttribute;
+    public String labelAttribute;
 
-    @Setter String inputAttribute;
+    public String inputAttribute;
     
     @Override
     public void createIndividuals() {

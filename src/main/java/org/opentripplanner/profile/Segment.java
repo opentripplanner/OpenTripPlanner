@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import lombok.Getter;
 
 import com.beust.jcommander.internal.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -30,7 +29,7 @@ public class Segment {
         public int toIndex;
         public int nTrips;
         public SegmentPattern (PatternRide patternRide) {
-            this.patternId = patternRide.pattern.getCode();
+            this.patternId = patternRide.pattern.code;
             this.fromIndex = patternRide.fromIndex;
             this.toIndex   = patternRide.toIndex;
             this.nTrips    = patternRide.stats.num; // this stats has time window applied
@@ -57,7 +56,7 @@ public class Segment {
     public String endTime;
 
     public Segment (Ride ride) {
-        Route route = ride.patternRides.get(0).pattern.getRoute();
+        Route route = ride.patternRides.get(0).pattern.route;
         from = ride.from.id;
         to = ride.to.id;
         fromName = ride.from.name;

@@ -410,7 +410,7 @@ public class PointSet implements Serializable{
 		if (g == null)
 			return null;
 		SampleSet sampleSet = new SampleSet(this, g.getSampleFactory());
-		this.samples.put(g.getRouterId(), sampleSet);
+		this.samples.put(g.routerId, sampleSet);
 		return sampleSet;
 	}
 	

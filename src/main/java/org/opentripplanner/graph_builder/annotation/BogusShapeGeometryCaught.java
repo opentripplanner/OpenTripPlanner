@@ -13,12 +13,9 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.StopTime;
 
-@AllArgsConstructor
 public class BogusShapeGeometryCaught extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -29,6 +26,12 @@ public class BogusShapeGeometryCaught extends GraphBuilderAnnotation {
     final AgencyAndId shapeId;
     final StopTime stA;
     final StopTime stB;
+    
+    public BogusShapeGeometryCaught(AgencyAndId shapeId, StopTime stA, StopTime stB){
+    	this.shapeId = shapeId;
+    	this.stA = stA;
+    	this.stB = stB;
+    }
     
     @Override
     public String getMessage() {

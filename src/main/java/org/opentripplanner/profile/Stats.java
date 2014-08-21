@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import lombok.Getter;
 
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -108,7 +107,7 @@ class Stats implements Cloneable {
         s.min = Integer.MAX_VALUE;
         s.num = 0;
         // TODO maybe we should prefilter the triptimes so we aren't constantly iterating over the trips whose service is not running
-        for (TripTimes tripTimes : pattern.getScheduledTimetable().getTripTimes()) {
+        for (TripTimes tripTimes : pattern.scheduledTimetable.tripTimes) {
             int depart = tripTimes.getDepartureTime(stop0);
             int arrive = tripTimes.getArrivalTime(stop1);
             if (window.includes (depart) && 

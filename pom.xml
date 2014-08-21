@@ -364,12 +364,6 @@
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.6</version>
         </dependency>
-        <!-- Lombok provides annotation-driven field accessor methods. -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.12.6</version>
-        </dependency>
         <!-- Guava provides improved collections, among other things. -->
         <dependency>
             <groupId>com.google.guava</groupId>

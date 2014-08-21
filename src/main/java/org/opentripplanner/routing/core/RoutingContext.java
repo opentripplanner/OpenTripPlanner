@@ -224,10 +224,10 @@ public class RoutingContext implements Cloneable {
 
         // the graph's snapshot may be frequently updated.
         // Grab a reference to ensure a coherent view of the timetables throughout this search.
-        if (routingRequest.isIgnoreRealtimeUpdates()) {
+        if (routingRequest.ignoreRealtimeUpdates) {
             timetableSnapshot = null;
         } else {
-            TimetableSnapshotSource timetableSnapshotSource = graph.getTimetableSnapshotSource();
+            TimetableSnapshotSource timetableSnapshotSource = graph.timetableSnapshotSource;
 
             if (timetableSnapshotSource == null) {
                 timetableSnapshot = null;
@@ -244,14 +244,14 @@ public class RoutingContext implements Cloneable {
             // normal mode, search for vertices based RoutingRequest
             if (!opt.batch || opt.arriveBy) {
                 // non-batch mode, or arriveBy batch mode: we need a to vertex
-                toVertex = graph.streetIndex.getVertexForLocation(opt.getTo(), opt);
-                if (opt.getTo().hasEdgeId()) {
-                    toBackEdge = graph.getEdgeById(opt.getTo().getEdgeId());
+                toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt);
+                if (opt.to.hasEdgeId()) {
+                    toBackEdge = graph.getEdgeById(opt.to.edgeId);
                 }
             } else {
                 toVertex = null;
             }
-            if (opt.getStartingTransitTripId() != null && !opt.arriveBy) {
+            if (opt.startingTransitTripId != null && !opt.arriveBy) {
                 // Depart on-board mode: set the from vertex to "on-board" state
                 OnBoardDepartService onBoardDepartService = graph.getService(OnBoardDepartService.class);
                 if (onBoardDepartService == null)
@@ -259,9 +259,9 @@ public class RoutingContext implements Cloneable {
                 fromVertex = onBoardDepartService.setupDepartOnBoard(this);
             } else if (!opt.batch || !opt.arriveBy) {
                 // non-batch mode, or depart-after batch mode: we need a from vertex
-                fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);
-                if (opt.getFrom().hasEdgeId()) {
-                    fromBackEdge = graph.getEdgeById(opt.getFrom().getEdgeId());
+                fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, toVertex);
+                if (opt.from.hasEdgeId()) {
+                    fromBackEdge = graph.getEdgeById(opt.from.edgeId);
                 }
             } else {
                 fromVertex = null;
@@ -296,8 +296,8 @@ public class RoutingContext implements Cloneable {
             }
         }
         
-        if (opt.getStartingTransitStopId() != null) {
-            Stop stop = graph.index.stopForId.get(opt.getStartingTransitStopId());
+        if (opt.startingTransitStopId != null) {
+            Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
             startingStop = tstop.departVertex;
         }
@@ -353,7 +353,7 @@ public class RoutingContext implements Cloneable {
         if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);
         }
-        if (opt.getModes().isTransit() && !graph.transitFeedCovers(opt.dateTime)) {
+        if (opt.modes.isTransit() && !graph.transitFeedCovers(opt.dateTime)) {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
@@ -373,7 +373,7 @@ public class RoutingContext implements Cloneable {
         final ServiceDate serviceDate = new ServiceDate(c);
         this.serviceDays = new ArrayList<ServiceDay>(3);
         if (calendarService == null && graph.getCalendarService() != null
-                && (opt.getModes() == null || opt.getModes().contains(TraverseMode.TRANSIT))) {
+                && (opt.modes == null || opt.modes.contains(TraverseMode.TRANSIT))) {
             LOG.warn("RoutingContext has no CalendarService. Transit will never be boarded.");
             return;
         }
@@ -395,7 +395,7 @@ public class RoutingContext implements Cloneable {
 
     /** check if the start and end locations are accessible */
     public boolean isAccessible() {
-        if (opt.isWheelchairAccessible()) {
+        if (opt.wheelchairAccessible) {
             return isWheelchairAccessible(fromVertex) && isWheelchairAccessible(toVertex);
         }
         return true;
