@@ -325,7 +325,7 @@ public class State implements Cloneable {
         if (this.routeSequenceSubset(other)) {
             // TODO subset is not really the right idea
             return this.weight <= other.weight &&
-                    other.getElapsedTimeSeconds() >= this.getElapsedTimeSeconds();
+            		this.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds();
             // && this.getNumBoardings() <= other.getNumBoardings();
         }
 

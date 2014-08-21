@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class TemplateLibrary {
-    private static final Matcher matcher = Pattern.compile("\\{(.*?)\\}").matcher("");
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
 
     public static String generate(String pattern, OSMWithTags way) {
 
@@ -28,7 +28,8 @@ public class TemplateLibrary {
         }
         StringBuffer gen_name = new StringBuffer();
 
-        matcher.reset(pattern);
+        Matcher matcher = patternMatcher.matcher(pattern);
+        
         int lastEnd = 0;
         while (matcher.find()) {
             // add the stuff before the match

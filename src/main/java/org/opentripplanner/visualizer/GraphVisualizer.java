@@ -179,6 +179,36 @@ class VertexList extends AbstractListModel<DisplayVertex> {
  */
 public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
+	private final class ComparePathStatesClickListener implements ListSelectionListener {
+		private JList<String> outputList;
+
+		ComparePathStatesClickListener(JList<String> outputList){
+			this.outputList = outputList;
+		}
+		
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			@SuppressWarnings("unchecked")
+			JList<State> theList = (JList<State>)e.getSource();
+			State st = (State)theList.getSelectedValue();
+			if(st==null){
+				return;
+			}
+			
+			DefaultListModel<String> stateListModel = new DefaultListModel<String>();
+			stateListModel.addElement( "weight:"+st.getWeight() );
+			stateListModel.addElement( "weightdelta:"+st.getWeightDelta() );
+			stateListModel.addElement( "bikeRenting:"+st.isBikeRenting() );
+			stateListModel.addElement( "carParked:"+st.isCarParked() );
+			stateListModel.addElement( "walkDistance:"+st.getWalkDistance() );
+			stateListModel.addElement( "elapsedTime:"+st.getElapsedTimeSeconds() );
+			stateListModel.addElement( "numBoardings:"+st.getNumBoardings() );
+			outputList.setModel( stateListModel );
+			
+			lastStateClicked = st;
+		}
+	}
+
 	private final class OnPopupMenuClickListener implements ActionListener {
 		private final class DiffListCellRenderer extends DefaultListCellRenderer {
 			private final int diverge;
@@ -420,6 +450,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	private JList<String> firstStateData;
 
+	protected State lastStateClicked=null;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
@@ -478,45 +510,66 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JPanel pane = new JPanel();
         pane.setLayout(new GridLayout(0, 2));
         
+        firstStateData = new JList<String>();
+        secondStateData = new JList<String>();
+        
+        // a place to list the states of the first path
         firstComparePathStates = new JList<State>();        
         JScrollPane stScrollPane = new JScrollPane(firstComparePathStates);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
-        firstComparePathStates.addListSelectionListener(new ListSelectionListener(){
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				JList<State> theList = (JList<State>)e.getSource();
-	        	State st = (State)theList.getSelectedValue();
-	        	
-	        	System.out.println("got state "+st);
-			}
-        });
+        firstComparePathStates.addListSelectionListener(new ComparePathStatesClickListener(firstStateData));
         
+        // a place to list the states of the second path
         secondComparePathStates = new JList<State>();
         stScrollPane = new JScrollPane(secondComparePathStates);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
-        secondComparePathStates.addListSelectionListener(new ListSelectionListener(){
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				JList<State> theList = (JList<State>)e.getSource();
-	        	State st = (State)theList.getSelectedValue();
-	        	
-//				DefaultListModel<String> stateListModel = new DefaultListModel<String>();
-//				stateListModel.addElement( st.);
-//				secondComparePathStates.setModel( pathModel );
-			}
-        });
+        secondComparePathStates.addListSelectionListener(new ComparePathStatesClickListener(secondStateData));
         
-        firstStateData = new JList<String>();
+        // a place to list details of a state selected from the first path
         stScrollPane = new JScrollPane(firstStateData);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
         
-        secondStateData = new JList<String>();
+        // a place to list details of a state selected from the second path
         stScrollPane = new JScrollPane(secondStateData);
         stScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         pane.add(stScrollPane);
+        
+        // A button that executes the 'dominates' function between the two states
+        // this is useful only if you have a breakpoint set up
+        JButton dominateButton = new JButton();
+        dominateButton.setText("dominates");
+        dominateButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				State s1 = firstComparePathStates.getSelectedValue();
+				State s2 = secondComparePathStates.getSelectedValue();
+				
+				System.out.println("s1 dominates s2:"+s1.dominates(s2));
+			}
+        });
+        pane.add(dominateButton);
+        
+        // A button that executes the 'traverse' function leading to the last clicked state
+        // in either window. Also only useful if you set a breakpoint.
+        JButton traverseButton = new JButton();
+        traverseButton.setText("traverse");
+        traverseButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(lastStateClicked==null){
+					return;
+				}
+				
+				Edge backEdge = lastStateClicked.getBackEdge();
+				State backState = lastStateClicked.getBackState();
+				
+				backEdge.traverse(backState);
+			}
+        });
+        pane.add(traverseButton);
         
         return pane;
 	}
