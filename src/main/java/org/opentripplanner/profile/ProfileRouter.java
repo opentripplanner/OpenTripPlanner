@@ -305,8 +305,8 @@ public class ProfileRouter {
         if (dlb > MAX_DURATION) return false;
         // Check whether any existing rides at the same location (stop) dominate the new one
         for (Ride oldRide : retainedRides.get(newRide.from)) { // fromv because this is an unfinished ride
-            if (dlb < oldRide.previous.durationUpperBound()) {
-                return false;
+            if (dlb > oldRide.previous.durationUpperBound()) { // TODO re-verify logic
+                return false; // minimum duration of new ride is longer than maximum duration of some existing ride
             }
         }
         // No existing ride is strictly better than the new ride.
