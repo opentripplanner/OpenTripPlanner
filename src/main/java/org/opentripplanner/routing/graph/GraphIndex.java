@@ -276,4 +276,10 @@ public class GraphIndex {
         return ret;
     }
 
+    /** @return the StopCluster object containing the given stop, or null if none. */
+    public StopCluster clusterForStop(Stop stop) {
+        return stopClusterForId.get(stop.getParentStation());
+    }
+
+
 }
