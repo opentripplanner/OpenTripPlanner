@@ -8,10 +8,14 @@ import java.util.List;
 import lombok.Getter;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // Jackson will serialize fields with getters, or @JsonProperty annotations.
 public class ProfileResponse {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProfileResponse.class);
+
     @Getter
     List<Option> options = Lists.newArrayList();
 
@@ -47,6 +51,9 @@ public class ProfileResponse {
             transitOptions = transitOptions.subList(0, limit);
         }
         this.options.addAll(transitOptions);
+        for (Option option : this.options) {
+            LOG.info("{} {}", option.stats, option.summary);
+        }
     }
     
 }

@@ -178,6 +178,7 @@ public class Ride {
     /**
      * @param arrivals find arrival times rather than departure times for this Ride.
      * @return a list of sorted departure or arrival times within the window.
+     * FIXME this is a hot spot in execution, about 50 percent of runtime.
      */
     public List<Integer> getSortedStoptimes (TimeWindow window, boolean arrivals) {
         // Using Lists because we don't know the length in advance

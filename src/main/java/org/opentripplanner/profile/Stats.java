@@ -131,6 +131,6 @@ class Stats implements Cloneable {
 
     @Override
     public String toString() {
-        return String.format("min=%d max=%d avg=%d", min/60, max/60, avg/60);
+        return String.format("avg=%.1f min=%.1f max=%.1f", avg/60.0, min/60.0, max/60.0);
     }
 }

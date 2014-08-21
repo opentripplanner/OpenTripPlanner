@@ -51,7 +51,6 @@ public class Option {
         // Really should be one per segment, with transfers to the same operator having a price of 0.
         fares = DCFareCalculator.calculateFares(rides);
         summary = generateSummary();
-        LOG.info("{} {}", stats, summary);
     }
 
     /** Make a human readable text summary of this option. */
