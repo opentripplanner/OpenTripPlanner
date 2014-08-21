@@ -16,48 +16,60 @@
 otp.namespace("otp.core");
 
 otp.core.SOLRGeocoder = otp.Class({
-    
+
     url : null,
     addressParam : null,
-    
+
     initialize : function(url, addressParam) {
         this.url = url;
         this.addressParam = addressParam;
     },
-    
+
     geocode : function(address, setResultsCallback) {
-        console.log('solr geocode');
         var params = {
             start : 0,
             limit : 10,
-            wt : 'json', 
+            wt : 'json',
             qt : 'dismax',
             rows: 10
-        }; 
+        };
         params[this.addressParam] = address;
-        
+
+        var this_ = this;
         $.ajax(this.url, {
             data : params,
-            
+
             success: function(data) {
                 if(!data.response) data = jQuery.parseJSON(data);
 
-                console.log(data);
                 var results = [];
                 var resultData = data.response.docs;
+
+                var resultLookup = {};
                 for(var i=0; i<resultData.length; i++) {
+                    var desc = this_.getResultDescription(resultData[i]);
+                    if(!(desc in resultLookup)) resultLookup[desc] = [];
+                    resultLookup[desc].push(resultData[i]);
+                }
+                for(i=0; i<resultData.length; i++) {
                     if(!otp.util.Text.isNumber(resultData[i].lat) || !otp.util.Text.isNumber(resultData[i].lon)) continue;
+                    var desc = this_.getResultDescription(resultData[i]);
+                    if(resultLookup[desc] && resultLookup[desc].length > 1) desc = this_.getResultDescription(resultData[i], true);
                     var resultObj = {
-                        description : resultData[i].name + (resultData[i].city ? ', ' + resultData[i].city : ''),
+                        description : desc,
                         lat : resultData[i].lat,
                         lng : resultData[i].lon
                     };
-                    results.push(resultObj);                    
+                    results.push(resultObj);
                 }
 
                 setResultsCallback.call(this, results);
             }
-        });        
-    } 
-    
+        });
+    },
+
+    getResultDescription : function(result, addAddress) {
+        return result.name + (result.city ? ', ' + result.city : '') +
+            (addAddress ? ' (' + result.address + ')' : '');
+    }
 });
