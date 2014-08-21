@@ -69,7 +69,13 @@ otp.core.SOLRGeocoder = otp.Class({
     },
 
     getResultDescription : function(result, addAddress) {
-        return result.name + (result.city ? ', ' + result.city : '') +
-            (addAddress ? ' (' + result.address + ')' : '');
+        var desc = result.name + (result.city ? ', ' + result.city : '');
+        if(addAddress && result.address) {
+            desc += ' (' + result.address + ')';
+        } else if(addAddress && result.id.lastIndexOf('stops-') === 0) {
+            var splitId = result.id.split('-');
+            if(splitId.length > 1) desc += ' (Stop ' + splitId[1] + ')';
+        }
+        return desc;
     }
 });
