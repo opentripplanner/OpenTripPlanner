@@ -285,6 +285,8 @@ public class GraphIndex {
      * But the DC regional graph has no parent stations pre-defined, so no use dealing with them for now.
      * However Trimet stops have "landmark" or Transit Center parent stations, so we don't use the parent stop field.
      *
+     * Ideally in the future stop clusters will replicate and/or share implementation with GTFS parent stations.
+     *
      * We can't use a similarity comparison, we need exact matches. This is because many street names differ by only
      * one letter or number, e.g. 34th and 35th or Avenue A and Avenue B.
      * Therefore normalizing the names before the comparison is essential.
@@ -293,7 +295,7 @@ public class GraphIndex {
      */
     public void clusterStops() {
         int psIdx = 0; // unique index for next parent stop
-        LOG.info("Clustering stops by geographic and name proximity...");
+        LOG.info("Clustering stops by geographic proximity and name...");
         // Each stop without a cluster will greedily claim other stops without clusters.
         Map<String, String> descriptionForStationId = Maps.newHashMap();
         for (Stop s0 : stopForId.values()) {
