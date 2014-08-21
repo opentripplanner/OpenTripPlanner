@@ -33,8 +33,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
         mode = state.getNonTransitMode(); // not sure if this is reliable, reset in caller.
         if (state.getVertex() instanceof TransitStop) {
             TransitStop tstop = (TransitStop) state.getVertex();
-            StopCluster cluster = state.getOptions().rctx.graph.index.clusterForStop(tstop.getStop());
-            stop = cluster;
+            stop = state.getOptions().rctx.graph.index.stopClusterForStop.get(tstop.getStop());
         }
     }
 

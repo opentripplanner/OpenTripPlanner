@@ -140,7 +140,7 @@ public class ProfileRouter {
             /* Loop over stop clusters in case stop cluster appears more than once in the same pattern. */
             for (int i = 0; i < pattern.getStops().size(); ++i) {
                 // FIXME using String identity equality for stop clusters on purpose
-                if (sd.stop == graph.index.clusterForStop(pattern.getStops().get(i))) {
+                if (sd.stop == graph.index.stopClusterForStop.get(pattern.getStops().get(i))) {
                     Ride ride = initialRides.get(sd.stop);
                     if (ride == null) {
                         ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
@@ -177,7 +177,7 @@ public class ProfileRouter {
                     targetCluster = toStops.get(pr.pattern).stop;
                 }
                 for (int s = pr.fromIndex + 1; s < stops.size(); ++s) {
-                    StopCluster cluster = graph.index.clusterForStop(stops.get(s));
+                    StopCluster cluster = graph.index.stopClusterForStop.get(stops.get(s));
                     boolean isTarget = (targetCluster != null && targetCluster == cluster);
                     /* If this destination stop is useful in the search, extend the PatternRide to it. */
                     if (isTarget || hasTransfers(cluster, pr.pattern)) {
@@ -239,7 +239,7 @@ public class ProfileRouter {
                         if ( ! request.analyst && penultimateRide && ! toStops.containsKey(tr.tp2)) continue;
                         // Scan through stops looking for transfer target: stop might appear more than once in a pattern.
                         TARGET_STOP : for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
-                            StopCluster cluster = graph.index.clusterForStop(tr.tp2.getStops().get(i));
+                            StopCluster cluster = graph.index.stopClusterForStop.get(tr.tp2.getStops().get(i));
                             if (cluster == tr.sc2) {
                                 // Save transfer result for later exploration.
                                 Ride r2 = xferRides.get(tr.sc2);

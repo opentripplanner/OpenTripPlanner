@@ -29,6 +29,7 @@ import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
+import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -52,6 +53,7 @@ import com.google.common.collect.Sets;
 public class GraphIndex {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
+    private static final int CLUSTER_RADIUS = 400; // meters
 
     // TODO: consistently key on model object or id string
     public final Map<String, Vertex> vertexForId = Maps.newHashMap();
@@ -68,6 +70,7 @@ public class GraphIndex {
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
+    public final Map<Stop, StopCluster> stopClusterForStop = Maps.newHashMap();
     public final Map<String, StopCluster> stopClusterForId = Maps.newHashMap();
 
     /* Should eventually be replaced with new serviceId indexes. */
@@ -133,13 +136,14 @@ public class GraphIndex {
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
         }
-        // FIXME This will overwrite any parent station information
-        // Maybe do this in initializeProfileTransfers lazy init method.
+
+        clusterStops();
+        LOG.info("Creating a spatial index for stop clusters.");
         stopClusterSpatialIndex = new HashGrid<StopCluster>();
-        for (StopCluster cluster : StopCluster.clusterStops(this)) {
-            stopClusterForId.put(cluster.id, cluster);
+        for (StopCluster cluster : stopClusterForId.values()) {
             stopClusterSpatialIndex.put(new Coordinate(cluster.lon, cluster.lat), cluster);
         }
+
         // Copy these two service indexes from the graph until we have better ones.
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
@@ -166,7 +170,7 @@ public class GraphIndex {
 
     /**
      * Initialize transfer data needed for profile routing.
-     * Find the best transfers between each pair of routes that pass near one another.
+     * Find the best transfers between each pair of patterns that pass near one another.
      */
     public void initializeProfileTransfers() {
         transfersFromStopCluster = HashMultimap.create();
@@ -276,10 +280,52 @@ public class GraphIndex {
         return ret;
     }
 
-    /** @return the StopCluster object containing the given stop, or null if none. */
-    public StopCluster clusterForStop(Stop stop) {
-        return stopClusterForId.get(stop.getParentStation());
+    /**
+     * FIXME OBA parentStation field is a string, not an AgencyAndId, so it has no agency/feed scope
+     * But the DC regional graph has no parent stations pre-defined, so no use dealing with them for now.
+     * However Trimet stops have "landmark" or Transit Center parent stations, so we don't use the parent stop field.
+     *
+     * We can't use a similarity comparison, we need exact matches. This is because many street names differ by only
+     * one letter or number, e.g. 34th and 35th or Avenue A and Avenue B.
+     * Therefore normalizing the names before the comparison is essential.
+     * The agency must provide either parent station information or a well thought out stop naming scheme to cluster
+     * stops -- no guessing is reasonable without that information.
+     */
+    public void clusterStops() {
+        int psIdx = 0; // unique index for next parent stop
+        LOG.info("Clustering stops by geographic and name proximity...");
+        // Each stop without a cluster will greedily claim other stops without clusters.
+        Map<String, String> descriptionForStationId = Maps.newHashMap();
+        for (Stop s0 : stopForId.values()) {
+            if (stopClusterForStop.containsKey(s0)) continue; // skip stops that have already been claimed by a cluster
+            String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
+            StopCluster cluster = new StopCluster(String.format("C%03d", psIdx++), s0normalizedName);
+            // LOG.info("stop {}", s0normalizedName);
+            // No need to explicitly add s0 to the cluster. It will be found in the spatial index query below.
+            for (TransitStop ts1 : stopSpatialIndex.query(s0.getLon(), s0.getLat(), CLUSTER_RADIUS)) {
+                Stop s1 = ts1.getStop();
+                double geoDistance = SphericalDistanceLibrary.getInstance().fastDistance(s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
+                if (geoDistance < CLUSTER_RADIUS) {
+                    String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
+                    // LOG.info("   --> {}", s1normalizedName);
+                    // LOG.info("       geodist {} stringdist {}", geoDistance, stringDistance);
+                    if (s1normalizedName.equals(s0normalizedName)) {
+                        // Create a bidirectional relationship between the stop and its cluster
+                        cluster.children.add(s1);
+                        stopClusterForStop.put(s1, cluster);
+                    }
+                }
+            }
+            cluster.computeCenter();
+            stopClusterForId.put(cluster.id, cluster);
+        }
+//        LOG.info("Done clustering stops.");
+//        for (StopCluster cluster : clusters) {
+//            LOG.info("{} at {} {}", cluster.name, cluster.lat, cluster.lon);
+//            for (Stop stop : cluster.children) {
+//                LOG.info("   {}", stop.getName());
+//            }
+//        }
     }
-
 
 }
