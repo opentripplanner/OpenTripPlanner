@@ -64,11 +64,11 @@ public class Segment {
         toName = ride.to.name;
         rideStats = ride.rideStats;
         Set<Route> routes = Sets.newHashSet();
-        LOG.info(" Ride fom {} to {}", ride.from.id, ride.to.id);
+        //LOG.info(" Ride fom {} to {}", ride.from.id, ride.to.id);
         for (PatternRide patternRide : ride.patternRides) {
             segmentPatterns.add(new SegmentPattern(patternRide));
             routes.add(patternRide.pattern.route);
-            LOG.info("   pattern {} {} from {} to {}", patternRide.pattern.mode, patternRide.pattern.getCode(), patternRide.getFromStop(), patternRide.getToStop());
+            //LOG.info("   pattern {} {} from {} to {}", patternRide.pattern.mode, patternRide.pattern.getCode(), patternRide.getFromStop(), patternRide.getToStop());
         }
         Collections.sort(segmentPatterns);
         // Note that despite the fact that multiple patterns from different routes will appear in the same ride,
