@@ -266,7 +266,7 @@ public class ProfileRouter {
             return null;
         }
         /* Determine which rides are good ways to reach the destination. */
-        Set<Ride> targetRides = Sets.newHashSet(); // use set since we are getting repeated rides for some reason
+        Set<Ride> targetRides = Sets.newHashSet(); // FIXME determine why there are multiple copies of the same ride then maybe use a list
         for (StopCluster cluster : toStopPaths.keySet()) {
             for (Ride ride : retainedRides.get(cluster)) {
                 PATTERN: for (PatternRide pr : ride.patternRides) {

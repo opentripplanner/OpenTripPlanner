@@ -14,7 +14,7 @@ public class ProfileResponse {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileResponse.class);
 
-    List<Option> options = Lists.newArrayList();
+    public List<Option> options = Lists.newArrayList();
 
     /**
      * The constructed response will include all the options that do not use transit,
