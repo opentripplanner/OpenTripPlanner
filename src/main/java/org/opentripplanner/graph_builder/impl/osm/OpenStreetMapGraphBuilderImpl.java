@@ -2008,14 +2008,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Determine whether any mode can ever traverse the given way.
-         * If not, we can safely leave the way out of the OTP graph without affecting routing.
-         * Potentially routable ways are those that have the tags :
+         * Determine whether any mode can or should ever traverse the given way. If not, we leave the way out of the
+         * OTP graph. Potentially routable ways are those that have the tags :
          * highway=*
          * public_transport=platform
          * railway=platform
-         * But not conveyers, proposed highways/roads, and raceways (as well as ways where all
-         * access is specifically forbidden to the public).
+         *
+         * But not conveyers, proposed highways/roads or those still under construction, and raceways
+         * (as well as ways where all access is specifically forbidden to the public).
+         * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dproposed
          */
         private boolean isWayRoutable(OSMWithTags way) {
             if (!isOsmEntityRoutable(way))
@@ -2023,7 +2024,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             String highway = way.getTag("highway");
             if (highway != null && (highway.equals("conveyer") || highway.equals("proposed") ||
-                    highway.equals("raceway") || highway.equals("unbuilt")))
+                highway.equals("construction") || highway.equals("raceway") || highway.equals("unbuilt")))
                 return false;
 
             if (way.isGeneralAccessDenied()) {
