@@ -24,6 +24,7 @@ import java.util.Set;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
@@ -65,9 +66,9 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
             State oldState = it.next();
             // order is important, because in the case of a tie
             // we want to reject the new state
-            if (oldState.dominates(newState))
+            if (dominates( oldState, newState) )
                 return false;
-            if (newState.dominates(oldState))
+            if (dominates( newState, oldState) )
                 it.remove();
         }
         
@@ -76,7 +77,40 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
         return true;
     }
 
-    @Override
+    public static boolean dominates(State thisState, State other) {
+        if (other.weight == 0) {
+            return false;
+        }
+        // Multi-state (bike rental, P+R) - no domination for different states
+        if (thisState.isBikeRenting() != other.isBikeRenting())
+            return false;
+        if (thisState.isCarParked() != other.isCarParked())
+            return false;
+
+        if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof PlainStreetEdge)
+                && (!((PlainStreetEdge) thisState.backEdge).getTurnRestrictions().isEmpty())))
+            return false;
+
+        if (thisState.routeSequenceSubset(other)) {
+            // TODO subset is not really the right idea
+            return thisState.weight <= other.weight &&
+            		thisState.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds();
+            // && this.getNumBoardings() <= other.getNumBoardings();
+        }
+
+        // If returning more than one result from GenericAStar, the search can be very slow
+        // unless you replace the following code with:
+        // return false;
+        boolean walkDistanceBetter = thisState.walkDistance <= other.getWalkDistance() * 1.05;
+        double weightRatio = thisState.weight / other.weight;
+        boolean weightBetter = (weightRatio < 1.02 && thisState.weight - other.weight < 30);
+        boolean timeBetter = thisState.getElapsedTimeSeconds() - other.getElapsedTimeSeconds() <= 30;
+        
+        return walkDistanceBetter && weightBetter && timeBetter;
+//    	return this.weight < other.weight;
+	}
+
+	@Override
     public State getState(Vertex dest) {
         Collection<State> states = stateSets.get(dest);
         if (states == null)

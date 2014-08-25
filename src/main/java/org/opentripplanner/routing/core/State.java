@@ -43,7 +43,7 @@ public class State implements Cloneable {
     protected long time;
 
     // accumulated weight up to this state
-    protected double weight;
+    public double weight;
 
     // associate this state with a vertex in the graph
     protected Vertex vertex;
@@ -51,7 +51,7 @@ public class State implements Cloneable {
     // allow path reconstruction from states
     protected State backState;
 
-    protected Edge backEdge;
+    public Edge backEdge;
 
     // allow traverse result chaining (multiple results)
     protected State next;
@@ -62,7 +62,7 @@ public class State implements Cloneable {
     // how far have we walked
     // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
     // we should DEFINITELY rename this variable and the associated methods.
-    protected double walkDistance;
+    public double walkDistance;
 
     // The time traveled pre-transit, for park and ride or kiss and ride searches
     int preTransitTime;
@@ -301,44 +301,6 @@ public class State implements Cloneable {
 
     public int getLastNextArrivalDelta () {
         return stateData.lastNextArrivalDelta;
-    }
-
-   /**
-     * Multicriteria comparison of states. 
-     * @return True if this state is better than the other one (or equal) 
-     * both in terms of time and weight.
-     */
-    public boolean dominates(State other) {
-        if (other.weight == 0) {
-            return false;
-        }
-        // Multi-state (bike rental, P+R) - no domination for different states
-        if (isBikeRenting() != other.isBikeRenting())
-            return false;
-        if (isCarParked() != other.isCarParked())
-            return false;
-
-        if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
-                && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
-            return false;
-
-        if (this.routeSequenceSubset(other)) {
-            // TODO subset is not really the right idea
-            return this.weight <= other.weight &&
-            		this.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds();
-            // && this.getNumBoardings() <= other.getNumBoardings();
-        }
-
-        // If returning more than one result from GenericAStar, the search can be very slow
-        // unless you replace the following code with:
-        // return false;
-        boolean walkDistanceBetter = walkDistance <= other.getWalkDistance() * 1.05;
-        double weightRatio = this.weight / other.weight;
-        boolean weightBetter = (weightRatio < 1.02 && this.weight - other.weight < 30);
-        boolean timeBetter = this.getElapsedTimeSeconds() - other.getElapsedTimeSeconds() <= 30;
-        
-        return walkDistanceBetter && weightBetter && timeBetter;
-//    	return this.weight < other.weight;
     }
 
     /**

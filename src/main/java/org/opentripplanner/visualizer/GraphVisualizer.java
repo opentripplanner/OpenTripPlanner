@@ -87,6 +87,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.ParetoPathService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
@@ -547,7 +548,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				State s1 = firstComparePathStates.getSelectedValue();
 				State s2 = secondComparePathStates.getSelectedValue();
 				
-				System.out.println("s1 dominates s2:"+s1.dominates(s2));
+				System.out.println("s1 dominates s2:"+MultiShortestPathTree.dominates(s1,s2));
 			}
         });
         pane.add(dominateButton);
