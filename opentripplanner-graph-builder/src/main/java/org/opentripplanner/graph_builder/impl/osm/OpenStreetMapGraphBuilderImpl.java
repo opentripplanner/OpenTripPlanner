@@ -1874,8 +1874,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return false;
             
             String highway = way.getTag("highway");
-            if (highway != null && (highway.equals("conveyer") || highway.equals("proposed") || 
-                highway.equals("raceway")))
+            if (highway != null && (highway.equals("conveyer") || highway.equals("proposed") ||
+                highway.equals("construction") || highway.equals("raceway") || highway.equals("unbuilt")))
                 return false;
             
             if (way.isGeneralAccessDenied()) {
