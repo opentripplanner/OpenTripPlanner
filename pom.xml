@@ -417,8 +417,8 @@
         <!-- Lombok provides annotation-driven field accessor methods -->
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>0.11.8</version>
-        <scope>provided</scope>
+        <version>1.14.4</version>
+        <scope>compile</scope>
       </dependency>
       <dependency>
         <!-- Guava provides improved collections -->  
