@@ -1,30 +1,51 @@
 package org.opentripplanner.osm;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.Envelope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-import com.vividsolutions.jts.geom.Envelope;
-
-// Compressed DB is about 1/3 smaller than uncompressed.
-// Compact operation only reduces uncompressed DB size by about 1/6.
-// Compact operation does not reduce compressed DB size at all.
-
+/**
+ * A proof of concept for loading OSM data from PBF into MapDB, then finding intersections and generating edges from
+ * the disk-backed data. The intent is to allow working with very large OSM files without consuming too much memory
+ * during the graph build process -- it is part of the same set of experiments that loads GTFS into MapDB.
+ *
+ * Loading the ways into a MapDB may not even be necessary. It should be possible to generate the edges on the fly, one
+ * way at a time. The same is true of the nodes: we could just scan through them and only track which are within the
+ * bounding geometry, then which are intersections, then immediately create vertices rather than ever saving the node
+ * objects (as long as these intersection vertices are indexed by OSM ID).
+ *
+ * Some observations:
+ * The Netherlands PBF is 900MB, and a MapDB using Treemaps is 2.1GB.
+ * Loading the PBF into MapDB takes 6 minutes for nodes, 1 minute for ways, and 35 seconds to find intersections.
+ * However, this is loading
+ * During tests, the JVM ran out of memory when making edges because currently we keeps all edges in memory.
+ * Note that these maps contain only routable ways, not all ways (see org.opentripplanner.osm.Parser#retainKeys).
+ *
+ * A "compressed" DB is about 1/3 smaller than an uncompressed one.
+ * The "compact" operation only reduces an uncompressed DB's size by about 1/6.
+ * The "compact" operation does not reduce the size of the compressed DB at all.
+ *
+ * @author abyrd
+ */
 public class OSMMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSMMain.class);
-    static final String INPUT = "/var/otp/graphs/nl2/netherlands-latest.osm.pbf";
+    //static final String INPUT = "/var/otp/graphs/nl/netherlands-latest.osm.pbf";
+    static final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
     static final Envelope ENV = new Envelope(4.4, 5.5, 52.2, 53.3);
 
     public static void main(String[] args) {
         /* Load OSM PBF with spatial filtering. */
-        OSM osm = OSM.fromPBF(INPUT, ENV);
+        OSM osm = OSM.fromPBF(INPUT);//, ENV);
         List<Edge> edges = makeEdges(osm);
         PrintStream ps;
         try {
@@ -37,6 +58,18 @@ public class OSMMain {
         } catch (FileNotFoundException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
+        }
+    }
+
+    public static void analyzeTags(OSM osm) {
+        Multimap<String, String> kv = HashMultimap.create();
+        for (Way way : osm.ways.values()) {
+            for (Tagged.Tag tag : way.getTags()) {
+                kv.put(tag.key, tag.value);
+            }
+        }
+        for (String k : kv.keySet()) {
+            LOG.info("{} = {}", k, kv.get(k));
         }
     }
 
