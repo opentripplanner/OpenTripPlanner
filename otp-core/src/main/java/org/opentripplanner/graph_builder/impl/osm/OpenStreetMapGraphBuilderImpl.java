@@ -2475,10 +2475,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             // Check bike direction restrictions.
-            if (way.isOneWayForwardBicycle()) {
+            if (way.isOneWayForwardBicycle() || way.isReverseDirectionSidepath()) {
                 permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
             }
-            if (way.isOneWayReverseBicycle()) {
+            if (way.isOneWayReverseBicycle() || way.isForwardDirectionSidepath()) {
                 permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
             }
 
@@ -2634,6 +2634,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
             }
 
+            //bicycle is denied if bicycle:no, bicycle:license or bicycle:use_sidepath
             if (entity.isBicycleExplicitlyDenied()) {
                 permission = permission.remove(StreetTraversalPermission.BICYCLE);
             } else if (entity.hasTag("bicycle")) {
