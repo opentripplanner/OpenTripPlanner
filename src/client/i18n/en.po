@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-07-10 12:11+0200\n"
+"POT-Creation-Date: 2014-08-26 14:23+0200\n"
 "PO-Revision-Date: 2014-06-25 11:38+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -249,7 +249,7 @@ msgid "Multimodal Trip Planner"
 msgstr "Multimodal Trip Planner"
 
 #. Widget title
-#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:131
+#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:132
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:42
 msgid "Itineraries"
 msgstr "Itineraries"
@@ -520,62 +520,62 @@ msgstr ""
 "View itinerary online:\n"
 "%(itinerary_link)s\n"
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:97
 #: src/client/js/otp/modules/planner/PlannerModule.js:98
-msgid ""
-"We're sorry. The trip planner is temporarily unavailable. Please try "
-"again later."
-msgstr ""
-"We're sorry. The trip planner is temporarily unavailable. Please try "
-"again later."
-
 #: src/client/js/otp/modules/planner/PlannerModule.js:99
 msgid ""
-"Trip is not possible.  You might be trying to plan a trip outside the map"
-" data boundary."
+"We're sorry. The trip planner is temporarily unavailable. Please try "
+"again later."
 msgstr ""
-"Trip is not possible.  You might be trying to plan a trip outside the map"
-" data boundary."
+"We're sorry. The trip planner is temporarily unavailable. Please try "
+"again later."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:100
 msgid ""
-"Trip is not possible.  Your start or end point might not be safely "
-"accessible (for instance), you might be starting on a residential street "
-"connected only to a highway)."
+"Trip is not possible.  You might be trying to plan a trip outside the map"
+" data boundary."
 msgstr ""
-"Trip is not possible.  Your start or end point might not be safely "
-"accessible (for instance), you might be starting on a residential street "
-"connected only to a highway)."
+"Trip is not possible.  You might be trying to plan a trip outside the map"
+" data boundary."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:101
 msgid ""
-"No transit times available. The date may be past or too far in the future"
-" or there may not be transit service for your trip at the time you chose."
+"Trip is not possible.  Your start or end point might not be safely "
+"accessible (for instance), you might be starting on a residential street "
+"connected only to a highway)."
 msgstr ""
-"No transit times available. The date may be past or too far in the future"
-" or there may not be transit service for your trip at the time you chose."
+"Trip is not possible.  Your start or end point might not be safely "
+"accessible (for instance), you might be starting on a residential street "
+"connected only to a highway)."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:102
 msgid ""
+"No transit times available. The date may be past or too far in the future"
+" or there may not be transit service for your trip at the time you chose."
+msgstr ""
+"No transit times available. The date may be past or too far in the future"
+" or there may not be transit service for your trip at the time you chose."
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:103
+msgid ""
 "The trip planner is taking way too long to process your request. Please "
 "try again later."
 msgstr ""
 "The trip planner is taking way too long to process your request. Please "
 "try again later."
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:103
+#: src/client/js/otp/modules/planner/PlannerModule.js:104
 msgid "The request has errors that the server is not willing or able to process."
 msgstr "The request has errors that the server is not willing or able to process."
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:104
+#: src/client/js/otp/modules/planner/PlannerModule.js:105
 msgid "Origin is unknown. Can you be a bit more descriptive?"
 msgstr "Origin is unknown. Can you be a bit more descriptive?"
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:105
+#: src/client/js/otp/modules/planner/PlannerModule.js:106
 msgid "Destination is unknown.  Can you be a bit more descriptive?"
 msgstr "Destination is unknown.  Can you be a bit more descriptive?"
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:106
+#: src/client/js/otp/modules/planner/PlannerModule.js:107
 msgid ""
 "Both origin and destination are unknown. Can you be a bit more "
 "descriptive?"
@@ -583,55 +583,55 @@ msgstr ""
 "Both origin and destination are unknown. Can you be a bit more "
 "descriptive?"
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:107
+#: src/client/js/otp/modules/planner/PlannerModule.js:108
 msgid "Both origin and destination are not wheelchair accessible"
 msgstr "Both origin and destination are not wheelchair accessible"
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:108
+#: src/client/js/otp/modules/planner/PlannerModule.js:109
 msgid "Origin is within a trivial distance of the destination."
 msgstr "Origin is within a trivial distance of the destination."
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:110
-msgid ""
-"The trip planner is unsure of the location you want to start from. Please"
-" select from the following options, or be more specific."
-msgstr ""
-"The trip planner is unsure of the location you want to start from. Please"
-" select from the following options, or be more specific."
-
 #: src/client/js/otp/modules/planner/PlannerModule.js:111
 msgid ""
-"The trip planner is unsure of the destination you want to go to. Please "
-"select from the following options, or be more specific."
+"The trip planner is unsure of the location you want to start from. Please"
+" select from the following options, or be more specific."
 msgstr ""
-"The trip planner is unsure of the destination you want to go to. Please "
-"select from the following options, or be more specific."
+"The trip planner is unsure of the location you want to start from. Please"
+" select from the following options, or be more specific."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:112
 msgid ""
-"Both origin and destination are ambiguous. Please select from the "
-"following options, or be more specific."
+"The trip planner is unsure of the destination you want to go to. Please "
+"select from the following options, or be more specific."
 msgstr ""
-"Both origin and destination are ambiguous. Please select from the "
-"following options, or be more specific."
+"The trip planner is unsure of the destination you want to go to. Please "
+"select from the following options, or be more specific."
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:114
+#: src/client/js/otp/modules/planner/PlannerModule.js:113
 msgid ""
-"All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor "
-"must be set if any are"
+"Both origin and destination are ambiguous. Please select from the "
+"following options, or be more specific."
 msgstr ""
-"All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor "
-"must be set if any are"
+"Both origin and destination are ambiguous. Please select from the "
+"following options, or be more specific."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:115
 msgid ""
+"All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor "
+"must be set if any are"
+msgstr ""
+"All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor "
+"must be set if any are"
+
+#: src/client/js/otp/modules/planner/PlannerModule.js:116
+msgid ""
 "The values of triangleSafetyFactor, triangleSlopeFactor, and "
 "triangleTimeFactor must sum to 1"
 msgstr ""
 "The values of triangleSafetyFactor, triangleSlopeFactor, and "
 "triangleTimeFactor must sum to 1"
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:116
+#: src/client/js/otp/modules/planner/PlannerModule.js:117
 msgid ""
 "If triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor are "
 "provided, OptimizeType must be TRIANGLE"
@@ -639,7 +639,7 @@ msgstr ""
 "If triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor are "
 "provided, OptimizeType must be TRIANGLE"
 
-#: src/client/js/otp/modules/planner/PlannerModule.js:117
+#: src/client/js/otp/modules/planner/PlannerModule.js:118
 msgid ""
 "If OptimizeType is TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, "
 "and triangleTimeFactor must be set"
@@ -648,64 +648,64 @@ msgstr ""
 "and triangleTimeFactor must be set"
 
 #. Context menu
-#: src/client/js/otp/modules/planner/PlannerModule.js:193
+#: src/client/js/otp/modules/planner/PlannerModule.js:194
 msgid "Set as Start Location"
 msgstr "Set as Start Location"
 
 #. Context menu
-#: src/client/js/otp/modules/planner/PlannerModule.js:197
+#: src/client/js/otp/modules/planner/PlannerModule.js:198
 msgid "Set as End Location"
 msgstr "Set as End Location"
 
 #. Shown in a popup on first point of a path in a map
-#: src/client/js/otp/modules/planner/PlannerModule.js:218
+#: src/client/js/otp/modules/planner/PlannerModule.js:219
 msgctxt "popup"
 msgid "Start"
 msgstr "Start"
 
 #. shown in a popup on last point of a path in a map
-#: src/client/js/otp/modules/planner/PlannerModule.js:249
+#: src/client/js/otp/modules/planner/PlannerModule.js:250
 msgid "Destination"
 msgstr "Destination"
 
 #. Used in showing why trip wasn't found
-#: src/client/js/otp/modules/planner/PlannerModule.js:453
+#: src/client/js/otp/modules/planner/PlannerModule.js:455
 #, python-format
 msgid "Error %(error_id)d"
 msgstr "Error %(error_id)d"
 
 #. Title of no trip dialog
-#: src/client/js/otp/modules/planner/PlannerModule.js:455
+#: src/client/js/otp/modules/planner/PlannerModule.js:457
 msgid "No Trip Found"
 msgstr "No Trip Found"
 
 #. shown when clicked on route on map
-#: src/client/js/otp/modules/planner/PlannerModule.js:511
+#: src/client/js/otp/modules/planner/PlannerModule.js:513
 #, python-format
 msgid "Your %(bike_share_name)s route"
 msgstr "Your %(bike_share_name)s route"
 
 #. Text which is shown when clicking bike route
 #. in a map
-#: src/client/js/otp/modules/planner/PlannerModule.js:517
+#: src/client/js/otp/modules/planner/PlannerModule.js:519
 msgid "Your bike route"
 msgstr "Your bike route"
 
 #. Shown in map when clicking on a route
-#: src/client/js/otp/modules/planner/PlannerModule.js:525
+#: src/client/js/otp/modules/planner/PlannerModule.js:527
 #, python-format
 msgid "Walk to the %(bike_share_name)s dock."
 msgstr "Walk to the %(bike_share_name)s dock."
 
 #. Shown in map when clicking on a route
-#: src/client/js/otp/modules/planner/PlannerModule.js:529
+#: src/client/js/otp/modules/planner/PlannerModule.js:531
 #, python-format
 msgid "Walk from the %(bike_share_name)s dock to your destination."
 msgstr "Walk from the %(bike_share_name)s dock to your destination."
 
 #. Text which is shown when clicking walking
 #. route in a map
-#: src/client/js/otp/modules/planner/PlannerModule.js:535
+#: src/client/js/otp/modules/planner/PlannerModule.js:537
 msgid "Your walk route"
 msgstr "Your walk route"
 
@@ -1142,96 +1142,96 @@ msgstr "Geocoder"
 
 #. Depart [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of departure
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:312
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:313
 msgctxt "tripoptions"
 msgid "Depart"
 msgstr "Depart"
 
 #. Arrive [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of arrival.
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:315
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:316
 msgid "Arrive"
 msgstr "Arrive"
 
 #. on button that sets time and date of arrival/departure to now
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:317
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:318
 msgid "Now"
 msgstr "Now"
 
 #. Label for dropdown Travel by: [mode of transport]
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:428
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474
 msgid "Travel by"
 msgstr "Travel by"
 
 #. default value for preset values of maximum walk
 #. distances in Trip Options
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:534
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:580
 msgid "Presets"
 msgstr "Presets"
 
 #. label for choosing how much should person's trip on foot be
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:597
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:643
 msgid "Maximum walk"
 msgstr "Maximum walk"
 
 #. label for choosing how much should person's trip on bicycle be
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:620
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:666
 msgid "Maximum bike"
 msgstr "Maximum bike"
 
 #. label Preferred Routes: (routes/None)
 #. widget title
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:652
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:663
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:698
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:709
 msgid "Preferred Routes"
 msgstr "Preferred Routes"
 
 #. button to edit Preffered public transport Routes
 #. buton edit Banned public transport routes
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:654
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:763
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:700
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:809
 msgid "Edit"
 msgstr "Edit"
 
 #. Words in brackets when no Preffered public transport route is set
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:656
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:731
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:766
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:826
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:702
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:777
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:812
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:872
 msgid "None"
 msgstr "None"
 
 #. Label for Weight slider  to set to preffered public
 #. transport routes
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:659
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:705
 msgid "Weight"
 msgstr "Weight"
 
 #. label Banned public transport Routes: (routes/None)
 #. (Routes you don't want to take)
 #. Widget title
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:766
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:772
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:812
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:818
 msgid "Banned routes"
 msgstr "Banned routes"
 
 #. In Bike share planner radio button: <Use>: My Own Bike A shared bike
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:901
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:947
 msgid "Use"
 msgstr "Use"
 
 #. In Bike share planner radio button: Use: <My Own Bike> A shared bike
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:903
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:949
 msgid "My Own Bike"
 msgstr "My Own Bike"
 
 #. In Bike share planner radio button: Use: My Own Bike <A Shared bike>
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:905
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:951
 msgid "A Shared Bike"
 msgstr "A Shared Bike"
 
 #. button to send query for trip planning
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1046
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1092
 msgid "Plan Your Trip"
 msgstr "Plan Your Trip"
 
