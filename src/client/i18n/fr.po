@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-07-10 12:11+0200\n"
-"PO-Revision-Date: 2014-08-21 15:19+0100\n"
+"PO-Revision-Date: 2014-08-26 13:02+0100\n"
 "Last-Translator: Nicolas Derive <kalon33@ubuntu.com>\n"
 "Language-Team: fr <LL@li.org>\n"
 "Language: fr\n"
@@ -465,7 +465,7 @@ msgstr "rester à bord"
 #: src/client/js/otp/modules/planner/Itinerary.js:265
 #: src/client/js/otp/modules/planner/Itinerary.js:348
 msgid "Alight"
-msgstr ""
+msgstr "Descendre"
 
 #. [Stay on board/Alight] at [stop name]
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:645
@@ -490,9 +490,8 @@ msgstr "Départ : %(location)s à %(time_date)s"
 #. Stop ID ) start time
 #: src/client/js/otp/modules/planner/Itinerary.js:261
 #: src/client/js/otp/modules/planner/Itinerary.js:344
-#, fuzzy
 msgid "Board"
-msgstr "Monter dans"
+msgstr "Monter"
 
 #: src/client/js/otp/modules/planner/Itinerary.js:261
 #: src/client/js/otp/modules/planner/Itinerary.js:265
@@ -1239,4 +1238,4 @@ msgstr "un Vélo Libre Service"
 #. button to send query for trip planning
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1046
 msgid "Plan Your Trip"
-msgstr "Calculer un itinéraire"
+msgstr "Calculer votre itinéraire"
