@@ -124,7 +124,7 @@ public class OTPApplication extends Application {
      * Disable auto-discovery of features because it's extremely obnoxious to debug and interacts
      * in confusing ways with manually registered features.
      */
-    @Override
+    // @Override
     public Map<String, Object> getProperties() {
         Map props = Maps.newHashMap();
         props.put(ServerProperties.TRACING, Boolean.TRUE);
