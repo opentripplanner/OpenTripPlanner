@@ -1,12 +1,6 @@
 package org.opentripplanner.standalone;
 
-import org.glassfish.jersey.server.ContainerResponse;
-import org.glassfish.jersey.server.spi.ContainerResponseWriter;
-
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;

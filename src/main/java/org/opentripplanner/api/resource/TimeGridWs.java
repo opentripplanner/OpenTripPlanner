@@ -26,7 +26,7 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.glassfish.jersey.internal.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 import org.opentripplanner.analyst.request.SampleGridRequest;
@@ -215,7 +215,7 @@ public class TimeGridWs extends RoutingResource {
         // Also put the meta-data in the HTML header (easier to read from JS)
         byte[] data = baos.toByteArray();
         if (base64) {
-            data = Base64.encode(data);
+            data = Base64.encodeBase64(data);
         }
         return Response.ok().cacheControl(cc).entity(data).header(OTPA_GRID_CORNER, gridCornerStr)
                 .header(OTPA_GRID_CELL_SIZE, gridCellSzStr)
