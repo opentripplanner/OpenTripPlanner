@@ -2,6 +2,7 @@ package org.opentripplanner.standalone;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
@@ -22,13 +23,16 @@ import org.opentripplanner.api.resource.Raster;
 import org.opentripplanner.api.resource.SIsochrone;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.api.resource.SurfaceResource;
+import org.opentripplanner.api.resource.TiledInspector;
 import org.opentripplanner.api.resource.TileService;
 import org.opentripplanner.api.resource.TimeGridWs;
 import org.opentripplanner.index.GeocoderResource;
 import org.opentripplanner.index.IndexAPI;
+import org.opentripplanner.inspector.TileRenderer;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -93,6 +97,7 @@ public class OTPApplication extends Application {
             ServerInfo.class,
             SurfaceResource.class,
             PointSetResource.class,
+            TiledInspector.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             AuthFilter.class,
             CorsFilter.class,
