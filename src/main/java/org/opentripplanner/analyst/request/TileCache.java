@@ -15,8 +15,6 @@ package org.opentripplanner.analyst.request;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Setter;
-
 import org.opentripplanner.analyst.core.TemplateTile;
 import org.opentripplanner.analyst.core.Tile;
 import org.opentripplanner.routing.services.GraphService;
@@ -44,8 +42,8 @@ public class TileCache extends CacheLoader<TileRequest, Tile>
     }
 
     private LoadingCache<TileRequest, Tile> tileCache;
-    @Setter private int size = 200;
-    @Setter private int concurrency = 16;
+    public int size = 200;
+    public int concurrency = 16;
 
     @Override
     /** completes the abstract CacheLoader superclass */

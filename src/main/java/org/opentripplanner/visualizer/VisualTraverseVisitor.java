@@ -24,6 +24,7 @@ public class VisualTraverseVisitor implements TraverseVisitor {
     private ShowGraph gui;
 
     private final int SLEEP_AFTER = 50;
+    private final int SLEEP_LEN = 1;
     
     private int sleepAfter = SLEEP_AFTER;
     
@@ -39,17 +40,17 @@ public class VisualTraverseVisitor implements TraverseVisitor {
 
     @Override
     public void visitVertex(State state) {
+    	// every SLEEP_AFTER visits of the vertex, sleep for SLEEP_LEN
+    	// this slows down the search so it animates prettily
         if (--sleepAfter <= 0) {
             sleepAfter = SLEEP_AFTER;
             try {
-                Thread.sleep(1);
+                Thread.sleep(SLEEP_LEN);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-//        seen.add(state.getVertex());
-//        gui.setHighlightedVertices(seen);
-//        gui.highlightVertex(state.getVertex());
+        gui.addNewSPTEdge( state );
     }
 
     @Override

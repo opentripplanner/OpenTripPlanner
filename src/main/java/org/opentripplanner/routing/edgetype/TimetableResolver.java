@@ -47,7 +47,7 @@ public class TimetableResolver {
     protected static class SortedTimetableComparator implements Comparator<Timetable> {
         @Override
         public int compare(Timetable t1, Timetable t2) {
-            return t1.getServiceDate().compareTo(t2.getServiceDate());
+            return t1.serviceDate.compareTo(t2.serviceDate);
         }
     }
 
@@ -106,7 +106,7 @@ public class TimetableResolver {
                     temp.addAll(sortedTimetables);
                     sortedTimetables = temp;
                 }
-                if(old.getServiceDate() != null)
+                if(old.serviceDate != null)
                     sortedTimetables.remove(old);
                 sortedTimetables.add(tt);
                 timetables.put(pattern, sortedTimetables);
@@ -166,7 +166,7 @@ public class TimetableResolver {
                 SortedSet<Timetable> toKeepTimetables =
                         new TreeSet<Timetable>(new SortedTimetableComparator());
                 for(Timetable timetable : sortedTimetables) {
-                    if(serviceDate.compareTo(timetable.getServiceDate()) < 0) {
+                    if(serviceDate.compareTo(timetable.serviceDate) < 0) {
                         toKeepTimetables.add(timetable);
                     } else {
                         modified = true;

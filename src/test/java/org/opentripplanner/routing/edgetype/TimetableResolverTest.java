@@ -63,7 +63,7 @@ public class TimetableResolverTest {
         patternIndex = new HashMap<AgencyAndId, TripPattern>();
         for (TransitStopDepart tsd : filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
-                if (!tba.isBoarding()) continue;
+                if (!tba.boarding) continue;
                 TripPattern pattern = tba.getPattern();
                 for (Trip trip : pattern.getTrips()) {
                     patternIndex.put(trip.getId(), pattern);

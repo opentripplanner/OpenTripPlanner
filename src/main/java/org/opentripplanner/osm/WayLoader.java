@@ -8,7 +8,11 @@ public class WayLoader extends Parser {
 
     public final OSM osm;
     NodeTracker nodesInGeom, nodesInWays;
-    
+
+    /**
+     * Load all ways that include at least one node whose ID is marked in the specified NodeTracker.
+     * Supply a NodeTracker.acceptEverything() to load all ways. TODO optimization: use null to mean "accept everything"
+     */
     public WayLoader(OSM osm, NodeTracker nodesInGeom) {
         this.osm = osm;
         this.nodesInGeom = nodesInGeom;

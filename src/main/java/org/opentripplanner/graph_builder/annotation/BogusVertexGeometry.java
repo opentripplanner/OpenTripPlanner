@@ -15,9 +15,6 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Vertex;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class BogusVertexGeometry extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -27,6 +24,10 @@ public class BogusVertexGeometry extends GraphBuilderAnnotation {
     		"conceivably happen with extremely bad GTFS or OSM data.";
     
     final Vertex vertex;
+    
+    public BogusVertexGeometry(Vertex vertex){
+    	this.vertex = vertex;
+    }
     
     @Override
     public String getMessage() {

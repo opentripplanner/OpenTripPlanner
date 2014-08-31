@@ -13,11 +13,8 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.onebusaway.gtfs.model.Agency;
 
-@AllArgsConstructor
 public class AgencyNameCollision extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -27,6 +24,11 @@ public class AgencyNameCollision extends GraphBuilderAnnotation {
     
     final Agency agency;
     final String prevFeed;
+    
+    AgencyNameCollision(Agency agency, String prevFeed){
+    	this.agency = agency;
+    	this.prevFeed = prevFeed;
+    }
     
     @Override
     public String getMessage() {

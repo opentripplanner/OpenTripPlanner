@@ -110,14 +110,14 @@ public class MultiObjectivePathServiceImpl implements PathService {
     public List<GraphPath> getPaths(RoutingRequest options) {
 
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.getRouterId()));
+            options.setRoutingContext(graphService.getGraph(options.routerId));
             // move into setRoutingContext ?
             options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
                     new NoThruTrafficPathParser() };
         }
 
         RemainingWeightHeuristic heuristic;
-        if (options.getModes().isTransit()) {
+        if (options.modes.isTransit()) {
             LOG.debug("Transit itinerary requested.");
             // always use the bidirectional heuristic because the others are not precise enough
             heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
@@ -203,7 +203,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                 if (u.equals(targetVertex)) {
 //                    boundingStates.add(su);
                     returnStates.add(su);
-                    if ( ! options.getModes().isTransit())
+                    if ( ! options.modes.isTransit())
                         break QUEUE;
                     // options should contain max itineraries
                     if (returnStates.size() >= _maxPaths)
@@ -217,7 +217,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                     continue QUEUE;
                 }
                 
-                for (Edge e : options.isArriveBy() ? u.getIncoming() : u.getOutgoing()) {
+                for (Edge e : options.arriveBy ? u.getIncoming() : u.getOutgoing()) {
                     STATE: for (State new_sv = e.traverse(su); new_sv != null; new_sv = new_sv.getNextResult()) {
                         if (traverseVisitor != null) {
                             traverseVisitor.visitEdge(e, new_sv);

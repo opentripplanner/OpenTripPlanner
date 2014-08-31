@@ -13,9 +13,6 @@
 
 package org.opentripplanner.analyst.batch;
 
-import lombok.Data;
-
-@Data
 public class InputClampFilter implements IndividualFilter {
 
     public double rejectMin = 0;

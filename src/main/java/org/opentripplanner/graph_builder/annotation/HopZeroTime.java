@@ -13,11 +13,8 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.onebusaway.gtfs.model.Trip;
 
-@AllArgsConstructor
 public class HopZeroTime extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -29,6 +26,12 @@ public class HopZeroTime extends GraphBuilderAnnotation {
     final Trip trip;
 
     final int seq;
+    
+    public HopZeroTime(float dist, Trip trip, int seq){
+    	this.dist = dist;
+    	this.trip = trip;
+    	this.seq = seq;
+    }
     
     @Override
     public String getMessage() {

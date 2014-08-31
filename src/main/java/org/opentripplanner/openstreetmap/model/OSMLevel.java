@@ -179,4 +179,18 @@ public class OSMLevel implements Comparable<OSMLevel> {
         return this.floorNumber - other.floorNumber;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (other == null)
+            return false;
+        if (!(other instanceof OSMLevel))
+            return false;
+        return this.floorNumber == ((OSMLevel)other).floorNumber;
+    }
+
+    @Override
+    public int hashCode(){
+        return this.floorNumber;
+    }
+
 }

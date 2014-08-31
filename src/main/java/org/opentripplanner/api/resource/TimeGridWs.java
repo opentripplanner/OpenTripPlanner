@@ -26,7 +26,7 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
-import org.glassfish.jersey.internal.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 import org.opentripplanner.analyst.request.SampleGridRequest;
@@ -102,11 +102,11 @@ public class TimeGridWs extends RoutingResource {
         // Build the request
         RoutingRequest sptRequest = buildRequest(0);
         SampleGridRequest tgRequest = new SampleGridRequest();
-        tgRequest.setMaxTimeSec(maxTimeSec);
-        tgRequest.setPrecisionMeters(precisionMeters);
+        tgRequest.maxTimeSec = maxTimeSec;
+        tgRequest.precisionMeters = precisionMeters;
         if (coordinateOrigin != null)
-            tgRequest.setCoordinateOrigin(new GenericLocation(null, coordinateOrigin)
-                    .getCoordinate());
+            tgRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin)
+                    .getCoordinate();
 
         // Get a sample grid
         ZSampleGrid<WTWD> sampleGrid = sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
@@ -215,7 +215,7 @@ public class TimeGridWs extends RoutingResource {
         // Also put the meta-data in the HTML header (easier to read from JS)
         byte[] data = baos.toByteArray();
         if (base64) {
-            data = Base64.encode(data);
+            data = Base64.encodeBase64(data);
         }
         return Response.ok().cacheControl(cc).entity(data).header(OTPA_GRID_CORNER, gridCornerStr)
                 .header(OTPA_GRID_CELL_SIZE, gridCellSzStr)

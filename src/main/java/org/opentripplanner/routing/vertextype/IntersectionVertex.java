@@ -13,9 +13,6 @@
 
 package org.opentripplanner.routing.vertextype;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.opentripplanner.routing.graph.Graph;
 
 /**
@@ -28,16 +25,12 @@ public class IntersectionVertex extends StreetVertex {
     /**
      * Does this intersection have a traffic light?
      */
-    @Getter
-    @Setter
-    private boolean trafficLight;
+    public boolean trafficLight;
 
     /**
      * Is this a free-flowing intersection, i.e. should it have no delay at all? e.g., freeway ramps, &c.
      */
-    @Getter
-    @Setter
-    private boolean freeFlowing;
+    public boolean freeFlowing;
 
     /** Returns true if this.freeFlowing or if it appears that this vertex is free-flowing */
     public boolean inferredFreeFlowing() {

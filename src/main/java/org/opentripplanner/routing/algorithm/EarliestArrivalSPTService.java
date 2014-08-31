@@ -15,8 +15,6 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
 
-import lombok.Setter;
-
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -39,8 +37,7 @@ public class EarliestArrivalSPTService implements SPTService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EarliestArrivalSPTService.class);
 
-    @Setter
-    private int maxDuration = 60 * 60 * 2;
+    public int maxDuration = 60 * 60 * 2;
 
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
@@ -62,11 +59,11 @@ public class EarliestArrivalSPTService implements SPTService {
         // disable any resource limiting, which is algorithmically invalid here
         options.setMaxTransfers(Integer.MAX_VALUE);
         options.setMaxWalkDistance(Double.MAX_VALUE);
-        if (options.getClampInitialWait() < 0)
-            options.setClampInitialWait(60 * 30);
+        if (options.clampInitialWait < 0)
+            options.clampInitialWait = (60 * 30);
         
         // impose search cutoff
-        final long maxt = maxDuration + options.getClampInitialWait();
+        final long maxt = maxDuration + options.clampInitialWait;
         options.worstTime = options.dateTime + (options.arriveBy ? -maxt : maxt);
             
         // SPT cache does not look at routing request in SPT to perform lookup, 
@@ -83,7 +80,7 @@ public class EarliestArrivalSPTService implements SPTService {
             Vertex u_vertex = u.getVertex();
             if (!spt.visit(u))
                 continue;
-            Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
+            Collection<Edge> edges = options.arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
             for (Edge edge : edges) {
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                     if (isWorstTimeExceeded(v, options)) {
@@ -100,7 +97,7 @@ public class EarliestArrivalSPTService implements SPTService {
 
     // Move this into State
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
-        if (opt.isArriveBy())
+        if (opt.arriveBy)
             return v.getTimeSeconds() < opt.worstTime;
         else
             return v.getTimeSeconds() > opt.worstTime;

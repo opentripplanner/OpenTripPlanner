@@ -65,8 +65,8 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
         for (Osmformat.Node i : nodes) {
             OSMNode tmp = new OSMNode();
             tmp.setId(i.getId());
-            tmp.setLat(parseLat(i.getLat()));
-            tmp.setLon(parseLon(i.getLon()));
+            tmp.lat = parseLat(i.getLat());
+            tmp.lon = parseLon(i.getLon());
 
             for (int j = 0; j < i.getKeysCount(); j++) {
                 String key = internalize(getStringById(i.getKeys(j)));
@@ -103,8 +103,8 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
             double latf = parseLat(lat), lonf = parseLon(lon);
 
             tmp.setId(id);
-            tmp.setLat(latf);
-            tmp.setLon(lonf);
+            tmp.lat = latf;
+            tmp.lon = lonf;
 
             // If empty, assume that nothing here has keys or vals.
             if (nodes.getKeysValsCount() > 0) {

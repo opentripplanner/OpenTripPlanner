@@ -23,9 +23,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -74,9 +71,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     protected STRtree intersectionTree;
 
-    @Getter
-    @Setter
-    protected DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    public DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     // private static final double SEARCH_RADIUS_M = 100; // meters
     // private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
@@ -183,7 +178,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
         StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
-        String calculatedName = location.getName();
+        String calculatedName = location.name;
         if (intersection != null) {
             // We have an intersection vertex. Check that this vertex has edges we can traverse.
             boolean canEscape = false; 
@@ -216,7 +211,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     if (options == null) {
                         locale = new Locale("en");
                     } else {
-                        locale = options.getLocale();
+                        locale = options.locale;
                     }
                     ResourceBundle resources = ResourceBundle.getBundle("internals", locale);
                     String fmt = resources.getString("corner");
@@ -244,7 +239,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Vertex closestStop = null;
         // elsewhere options=null means no restrictions, find anything.
         // here we skip examining stops, as they are really only relevant when transit is being used
-        if (options != null && options.getModes().isTransit()) {
+        if (options != null && options.modes.isTransit()) {
             for (TransitStop v : getLocalTransitStops(coord, 1000)) {
                 if (!v.isStreetLinkable()) continue;
 
@@ -359,13 +354,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     preferrence = 3.0;
                 }
 
-                TraverseModeSet modes = reqs.getModes();
+                TraverseModeSet modes = reqs.modes;
                 CandidateEdge ce = new CandidateEdge(e, location, preferrence, modes);
 
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
-                if (ce.getDistance() < radius) {
+                if (ce.distance < radius) {
                     candidateEdges.add(ce);
                 }
             }
@@ -498,7 +493,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
 
         // No Coordinate available.
-        String place = loc.getPlace();
+        String place = loc.place;
         if (place == null) {
             return null;
         }

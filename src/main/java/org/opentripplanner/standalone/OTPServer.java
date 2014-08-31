@@ -72,7 +72,7 @@ public class OTPServer {
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
         if (params.longDistance) {
             LongDistancePathService pathService = new LongDistancePathService(graphService, sptService);
-            pathService.setTimeout(10);
+            pathService.timeout = 10;
             this.pathService = pathService;
         } else {
             RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(graphService, sptService);
@@ -93,7 +93,7 @@ public class OTPServer {
             sampleGridRenderer = new SampleGridRenderer(graphService, sptService);
             isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(graphService, sptService, sampleGridRenderer);
             surfaceCache = new SurfaceCache(30);
-            pointSetCache = new DiskBackedPointSetCache(100, new File(params.pointSetDirectory), graphService);
+            pointSetCache = new DiskBackedPointSetCache(100, new File(params.pointSetDirectory));
         }
 
     }

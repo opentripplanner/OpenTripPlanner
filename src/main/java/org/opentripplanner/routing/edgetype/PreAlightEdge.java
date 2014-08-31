@@ -47,23 +47,23 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
         // used.
 
         // Ignore this edge if its stop is banned
-        if (!options.getBannedStops().isEmpty()) {
-            if (options.getBannedStops().matches(((TransitStop) tov).getStop())) {
+        if (!options.bannedStops.isEmpty()) {
+            if (options.bannedStops.matches(((TransitStop) tov).getStop())) {
                 return null;
             }
         }
-        if (!options.getBannedStopsHard().isEmpty()) {
-            if (options.getBannedStopsHard().matches(((TransitStop) tov).getStop())) {
+        if (!options.bannedStopsHard.isEmpty()) {
+            if (options.bannedStopsHard.matches(((TransitStop) tov).getStop())) {
                 return null;
             }
         }
         
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             /* Backward traversal: apply stop(pair)-specific costs */
             // Do not pre-board if transit modes are not selected.
             // Return null here rather than in StreetTransitLink so that walk-only
             // options can be used to find transit stops without boarding vehicles.
-            if (!options.getModes().isTransit())
+            if (!options.modes.isTransit())
                 return null;
 
             TransitStop toVertex = (TransitStop) getToVertex();
@@ -79,9 +79,9 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
             long t0 = s0.getTimeSeconds();
             long slack;
             if (s0.isEverBoarded()) {
-                slack = options.getTransferSlack() - options.getBoardSlack();
+                slack = options.transferSlack - options.boardSlack;
             } else {
-                slack = options.getAlightSlack();
+                slack = options.alightSlack;
             }
             long alight_before = t0 - slack;
             int transfer_penalty = 0;
@@ -104,7 +104,7 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
             StateEditor s1 = s0.edit(this);
             TransitStop toVertex = (TransitStop) getToVertex();
             s1.alightTransit();
-            s1.incrementTimeInSeconds(options.getAlightSlack());
+            s1.incrementTimeInSeconds(options.alightSlack);
             s1.setBackMode(getMode());
             return s1.makeState();
         }

@@ -20,8 +20,6 @@ import java.util.EnumSet;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
-import lombok.Getter;
-
 /**
  * Who can traverse a street in a single direction.
  * 
@@ -51,11 +49,10 @@ public enum StreetTraversalPermission {
 
     static {
         for (StreetTraversalPermission s : EnumSet.allOf(StreetTraversalPermission.class))
-            lookup.put(s.getCode(), s);
+            lookup.put(s.code, s);
     }
 
-    @Getter
-    private int code;
+    public int code;
 
     private StreetTraversalPermission(int code) {
         this.code = code;
@@ -66,11 +63,11 @@ public enum StreetTraversalPermission {
     }
 
     public StreetTraversalPermission add(StreetTraversalPermission perm) {
-        return get(this.getCode() | perm.getCode());
+        return get(this.code | perm.code);
     }
 
     public StreetTraversalPermission remove(StreetTraversalPermission perm) {
-        return get(this.getCode() & ~perm.getCode());
+        return get(this.code & ~perm.code);
     }
 
     public StreetTraversalPermission modify(boolean permissive, StreetTraversalPermission perm) {

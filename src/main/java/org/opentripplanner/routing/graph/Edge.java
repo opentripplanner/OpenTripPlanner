@@ -20,8 +20,6 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlTransient;
 
-import lombok.Getter;
-
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -47,7 +45,6 @@ public abstract class Edge implements Serializable {
     /**
      * Identifier of the edge. Negative means not set.
      */
-    @Getter
     private int id;
 
     protected Vertex fromv;
@@ -324,6 +321,10 @@ public abstract class Edge implements Serializable {
             }
             return false;
         }
+    }
+    
+    public int getId(){
+    	return this.id;
     }
 
 }

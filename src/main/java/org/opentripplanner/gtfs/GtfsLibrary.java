@@ -30,7 +30,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 public class GtfsLibrary {
 
-    public static final char ID_SEPARATOR = '_';
+    public static final char ID_SEPARATOR = ':'; // note this is different than what OBA GTFS uses to match our 1.0 API
 
     public static GtfsContext createContext(GtfsRelationalDao dao) {
         CalendarService calendarService = createCalendarService(dao);
@@ -77,10 +77,11 @@ public class GtfsLibrary {
         return data;
     }
 
+    /* Using in index since we can't modify OBA libs and the colon in the expected separator in the 1.0 API. */
     public static AgencyAndId convertIdFromString(String value) {
         int index = value.indexOf(ID_SEPARATOR);
         if (index == -1) {
-            throw new IllegalStateException("invalid agency-and-id: " + value);
+            throw new IllegalArgumentException("invalid agency-and-id: " + value);
         } else {
             return new AgencyAndId(value.substring(0, index), value.substring(index + 1));
         }

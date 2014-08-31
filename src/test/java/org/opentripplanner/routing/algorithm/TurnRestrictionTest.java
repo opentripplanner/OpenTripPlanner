@@ -107,8 +107,8 @@ public class TurnRestrictionTest {
     @Test
     public void testForwardDefault() {
         RoutingRequest options = new RoutingRequest();
-        options.setCarSpeed(1.0);
-        options.setWalkSpeed(1.0);
+        options.carSpeed = 1.0;
+        options.walkSpeed = 1.0;
 
         options.setRoutingContext(_graph, topRight, bottomLeft);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -133,7 +133,7 @@ public class TurnRestrictionTest {
     @Test
     public void testForwardAsPedestrian() {
         RoutingRequest options = new RoutingRequest(TraverseMode.WALK);
-        options.setWalkSpeed(1.0);
+        options.walkSpeed = 1.0;
         
         options.setRoutingContext(_graph, topRight, bottomLeft);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -158,7 +158,7 @@ public class TurnRestrictionTest {
     @Test
     public void testForwardAsCar() {
         RoutingRequest options = new RoutingRequest(TraverseMode.CAR);
-        options.setCarSpeed(1.0);
+        options.carSpeed = 1.0;
 
         options.setRoutingContext(_graph, topRight, bottomLeft);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -184,7 +184,7 @@ public class TurnRestrictionTest {
     @Test
     public void testForwardAsCustomMotorVehicle() {
         RoutingRequest options = new RoutingRequest(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        options.setCarSpeed(1.0);
+        options.carSpeed = 1.0;
 
         options.setRoutingContext(_graph, topRight, bottomLeft);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);

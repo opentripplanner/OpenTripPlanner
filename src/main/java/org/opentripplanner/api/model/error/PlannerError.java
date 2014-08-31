@@ -17,8 +17,6 @@ package org.opentripplanner.api.model.error;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
 
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.LocationNotAccessible;
@@ -46,12 +44,9 @@ public class PlannerError {
         messages.put(IllegalArgumentException.class, Message.BOGUS_PARAMETER);
     }
     
-    @Getter @Setter
-    private int    id;
-    @Getter @Setter
-    private String msg;
-    @Getter
-    private Message message;
+    public int    id;
+    public String msg;
+    public Message message;
     private List<String> missing = null;
     private boolean noPath = false;
 

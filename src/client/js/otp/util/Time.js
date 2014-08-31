@@ -21,22 +21,30 @@ otp.namespace("otp.util");
 otp.util.Time = {
 
     secsToHrMin : function(secs) {
+        //TODO: momentjs.duration could be used
         var hrs = Math.floor(secs / 3600);
         var mins = Math.floor(secs / 60) % 60;
-        
-        // TODO: localization
-        var str = (hrs > 0 ? (hrs +" hr, ") : "") + mins + " min";
+       
+        //TRANSLATORS: n hour/hours use short form  
+        var str = (hrs > 0 ? (" " + ngettext("%d hr", "%d hrs", hrs) ) : "");
+        if (mins > 0) {
+            str += ", "
+            //TRANSLATORS: n minute/minutes use short form
+            str += ngettext("%d min", "%d mins", mins);
+        }
     
         return str;
     },
     
     secsToHrMinSec : function(secs) {
+        //TODO: momentjs.duration could be used
         var hrs = Math.floor(secs / 3600);
         var mins = Math.floor(secs / 60) % 60;
         var secs = secs % 60;
         
-        // TODO: localization
-        var str = (hrs > 0 ? (hrs +" hr, ") : "") + (mins > 0 ? (mins +" min, ") : "") + secs + " sec";
+        var str = (hrs > 0 ? (" " + ngettext("%d hr", "%d hrs", hrs) + ", ") : "") + (mins > 0 ? (ngettext("%d min", "%d mins", mins) + ", ") : "");
+        //TRANSLATORS: n second/seconds use short form
+        str += ngettext("%d sec", "%d secs", secs);
     
         return str;
     },
@@ -48,7 +56,11 @@ otp.util.Time = {
 
     correctAmPmTimeString : function(time, format) {
         // step 0: leave if we don't have what we need...
-        if(otp.config.timeFormat && otp.config.timeFormat.slice(-1) !== 'a') return time;
+        if(otp.config.locale.time.time_format && otp.config.locale.time.time_format.slice(-1) !== 'a') {
+            //It should always return 12 hour am/pm time because that is what
+            //server expects
+            return moment(time, otp.config.locale.time.time_format).format("h:mma");
+        }
         if(time == null || time.length < 1) return time;
 
 

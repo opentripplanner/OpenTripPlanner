@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import com.google.common.base.Objects;
-import lombok.Getter;
-import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -51,7 +49,6 @@ import org.slf4j.LoggerFactory;
  * The Lombok Getter/Setter annotations serve to create getter and setter methods on all fields,
  * so defaults can be supplied in a PrototypeRoutingRequest bean via Spring.
  */
-@Getter @Setter 
 public class RoutingRequest implements Cloneable, Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
@@ -66,8 +63,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * TODO(flamholz): this is a weird place to inject this model. We do it here because, for historical reasons, this is 
      * the most reasonable place to inject it.
      */
-    @Setter
-    private IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
+    public IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -79,15 +75,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String routerId = "";
 
     /** The start location */
-    @Getter @Setter
     public GenericLocation from;
 
     /** The end location */
-    @Getter @Setter
     public GenericLocation to;
 
     /** An unordered list of intermediate locations to be visited. */
-    @Getter @Setter
     public List<GenericLocation> intermediatePlaces;
 
     public boolean intermediatePlacesOrdered;
@@ -132,13 +125,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */
-    private double walkSpeed;
+    public double walkSpeed;
 
-    private double bikeSpeed;
+    public double bikeSpeed;
 
-    private double carSpeed;
+    public double carSpeed;
 
-    private Locale locale = new Locale("en", "US");
+    public Locale locale = new Locale("en", "US");
 
     /**
      * An extra penalty added on transfers (i.e. all boardings except the first one).
@@ -166,7 +159,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double stairsReluctance = 2.0;
     
     /** Multiplicative factor on expected turning time. */
-    @Setter
     public double turnReluctance = 1.0;
 
     /**
@@ -230,10 +222,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double waitAtBeginningFactor = 0.2;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
-    protected int walkBoardCost = 60 * 10;
+    public int walkBoardCost = 60 * 10;
 
     /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. */
-    protected int bikeBoardCost = 60 * 10;
+    public int bikeBoardCost = 60 * 10;
 
     /** Do not use certain named routes */
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
@@ -245,10 +237,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
-    private StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
+    public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
     
     /** Do not use certain stops. See for more information the bannedStopsHard property in the RoutingResource class. */
-    private StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
+    public StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
     
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
@@ -279,12 +271,12 @@ public class RoutingRequest implements Cloneable, Serializable {
      * transfer timing information in transfers.txt
      */
     // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
-    private int transferSlack = 0;
+    public int transferSlack = 0;
 
     /** Invariant: boardSlack + alightSlack <= transferSlack. */
-    private int boardSlack = 0;
+    public int boardSlack = 0;
 
-    private int alightSlack = 0;
+    public int alightSlack = 0;
 
     public int maxTransfers = 2;
 
@@ -322,7 +314,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
-    private boolean useBikeRentalAvailabilityInformation = false;
+    public boolean useBikeRentalAvailabilityInformation = false;
 
     /**
      * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.
@@ -377,23 +369,23 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingContext rctx;
 
     /** A transit stop that this trip must start from */
-    private AgencyAndId startingTransitStopId;
+    public AgencyAndId startingTransitStopId;
     
     /** A trip where this trip must start from (depart-onboard routing) */
-    private AgencyAndId startingTransitTripId;
+    public AgencyAndId startingTransitTripId;
 
-    private boolean walkingBike;
+    public boolean walkingBike;
 
-    private double heuristicWeight = 1.0;
+    public double heuristicWeight = 1.0;
 
-    private boolean softWalkLimiting = true;
-    private boolean softPreTransitLimiting = true;
+    public boolean softWalkLimiting = true;
+    public boolean softPreTransitLimiting = true;
 
-    private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
-    private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
+    public double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
+    public double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
 
-    private double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
-    private double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
+    public double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
+    public double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
 
     /* Additional flags affecting mode transitions. This is a temporary solution, as it only covers parking and rental at the beginning of the trip. */
     public boolean allowBikeRental = false;
@@ -473,7 +465,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.modes = modes;
         if (modes.getBicycle()) {
             bikeWalkingOptions = new RoutingRequest();
-            bikeWalkingOptions.setArriveBy(this.isArriveBy());
+            bikeWalkingOptions.setArriveBy(this.arriveBy);
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
@@ -487,7 +479,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.bikeSwitchCost = bikeSwitchCost;
         } else if (modes.getDriving()) {
             bikeWalkingOptions = new RoutingRequest();
-            bikeWalkingOptions.setArriveBy(this.isArriveBy());
+            bikeWalkingOptions.setArriveBy(this.arriveBy);
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.modes = modes.clone();
@@ -539,7 +531,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** @return the (soft) maximum walk distance */
     // If transit is not to be used, disable walk limit.
     public double getMaxWalkDistance() {
-        if (!getModes().isTransit()) {
+        if (!modes.isTransit()) {
             return Double.MAX_VALUE;
         } else {
             return maxWalkDistance;
@@ -630,7 +622,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
         // TODO Check this: perfect equality between non-transit modes.
         // For partial equality, should we return a smaller similarity score?
-        if (getModes().getNonTransitSet().equals(options.getModes().getNonTransitSet())) {
+        if (modes.getNonTransitSet().equals(options.modes.getNonTransitSet())) {
             s += 1000;
         }
         if (optimize == options.optimize) {
@@ -688,7 +680,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public int getNumItineraries() { 
-        if (getModes().isTransit()) {
+        if (modes.isTransit()) {
             return numItineraries;
         } else {
             // If transit is not to be used, only search for one itinerary.
@@ -714,8 +706,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public String toString(String sep) {
-        return getFrom() + sep + getTo() + sep + getMaxWalkDistance() + sep + getDateTime() + sep
-                + isArriveBy() + sep + getOptimize() + sep + modes.getAsStr() + sep
+        return from + sep + to + sep + getMaxWalkDistance() + sep + getDateTime() + sep
+                + arriveBy + sep + optimize + sep + modes.getAsStr() + sep
                 + getNumItineraries();
     }
 
@@ -819,7 +811,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
-        ret.setArriveBy(!ret.isArriveBy());
+        ret.setArriveBy(!ret.arriveBy);
         ret.reverseOptimizing = !ret.reverseOptimizing; // this is not strictly correct
         ret.useBikeRentalAvailabilityInformation = false;
         return ret;
@@ -897,7 +889,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         return endpointsMatch
                 && dateTime == other.dateTime
-                && isArriveBy() == other.isArriveBy()
+                && arriveBy == other.arriveBy
                 && numItineraries == other.numItineraries // should only apply in non-batch?
                 && walkSpeed == other.walkSpeed
                 && bikeSpeed == other.bikeSpeed
@@ -905,7 +897,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && maxWeight == other.maxWeight
                 && worstTime == other.worstTime
                 && maxTransfers == other.maxTransfers
-                && getModes().equals(other.getModes())
+                && modes.equals(other.modes)
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
@@ -958,8 +950,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int hashCode() {
         int hashCode = new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
                 + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
-                + (int) (worstTime & 0xffffffff) + getModes().hashCode()
-                + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
+                + (int) (worstTime & 0xffffffff) + modes.hashCode()
+                + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()

@@ -100,10 +100,10 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
             @Override
             public void run(Graph graph) {
                 // Only create a realtime data snapshot source if none exists already
-                if (graph.getTimetableSnapshotSource() == null) {
+                if (graph.timetableSnapshotSource == null) {
                     TimetableSnapshotSource snapshotSource = new TimetableSnapshotSource(graph);
                     // Add snapshot source to graph
-                    graph.setTimetableSnapshotSource(snapshotSource);
+                    graph.timetableSnapshotSource = (snapshotSource);
                 }
             }
         });

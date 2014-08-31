@@ -19,10 +19,9 @@ import static org.opentripplanner.routing.automata.Nonterminal.star;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Set;
 
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.IterableLibrary;
@@ -38,6 +37,7 @@ import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -61,8 +61,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class StreetfulStopLinker implements GraphBuilder {
     private static Logger LOG = LoggerFactory.getLogger(StreetfulStopLinker.class);
 
-    @Setter
-    private int maxDuration = 60 * 10;
+    int maxDuration = 60 * 10;
 
     DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -79,14 +78,28 @@ public class StreetfulStopLinker implements GraphBuilder {
         final Parser parser[] = new Parser[] {new Parser()};
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
         EarliestArrivalSPTService earliestArrivalSPTService = new EarliestArrivalSPTService();
-        earliestArrivalSPTService.setMaxDuration(maxDuration);
+        earliestArrivalSPTService.maxDuration = (maxDuration);
 
         for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
-            LOG.trace("linking stop {}", ts);
+            // Only link street linkable stops
+            if (!ts.isStreetLinkable())
+                continue;
+            LOG.trace("linking stop '{}' {}", ts.getStop(), ts);
+
+            // Determine the set of pathway/transfer destinations
+            Set<TransitStop> pathwayDestinations = new HashSet<TransitStop>();
+            for (Edge e : ts.getOutgoing()) {
+                if (e instanceof PathwayEdge || e instanceof SimpleTransfer) {
+                    if (e.getToVertex() instanceof TransitStop) {
+                        TransitStop to = (TransitStop) e.getToVertex();
+                        pathwayDestinations.add(to);
+                    }
+                }
+            }
 
             int n = 0;
             RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-            routingRequest.setClampInitialWait(0L);
+            routingRequest.clampInitialWait = (0L);
             routingRequest.setRoutingContext(graph, ts, null);
             routingRequest.rctx.pathParsers = parser;
             ShortestPathTree spt = earliestArrivalSPTService.getShortestPathTree(routingRequest);
@@ -98,6 +111,13 @@ public class StreetfulStopLinker implements GraphBuilder {
 
                     if (vertex instanceof TransitStop) {
                         TransitStop other = (TransitStop) vertex;
+                        if (!other.isStreetLinkable())
+                            continue;
+                        if (pathwayDestinations.contains(other)) {
+                            LOG.trace("Skipping '{}', {}, already connected.", other.getStop(),
+                                    other);
+                            continue;
+                        }
                         double distance = 0.0;
                         GraphPath graphPath = new GraphPath(state, false);
                         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -128,7 +148,7 @@ public class StreetfulStopLinker implements GraphBuilder {
 
                         LineString geometry = geometryFactory.createLineString(new
                                 PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
-                        LOG.trace("  to stop: {} ({}m) [{}]", other, distance, geometry);
+                        LOG.trace("  to stop: '{}' {} ({}m) [{}]", other.getStop(), other, distance, geometry);
                         new SimpleTransfer(ts, other, distance, geometry);
                         n++;
                     }
@@ -152,7 +172,6 @@ public class StreetfulStopLinker implements GraphBuilder {
         private static final int STREET = 1;
         private static final int LINK   = 2;
 
-        @Getter
         private final DFA DFA;
 
         Parser() {
@@ -171,6 +190,12 @@ public class StreetfulStopLinker implements GraphBuilder {
             if (edge instanceof StreetTransitLink) return LINK;
 
             return OTHER;
+        }
+        
+        @Override
+		protected
+        DFA getDFA() {
+        	return this.DFA;
         }
     }
 }

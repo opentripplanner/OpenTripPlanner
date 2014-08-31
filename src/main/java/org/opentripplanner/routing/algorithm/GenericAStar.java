@@ -16,8 +16,6 @@ package org.opentripplanner.routing.algorithm;
 import java.util.Collection;
 import java.util.List;
 
-import lombok.Setter;
-
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
@@ -28,9 +26,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.SPTService;
-import org.opentripplanner.routing.spt.DefaultShortestPathTreeFactory;
+import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
@@ -49,8 +46,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private static final double OVERSEARCH_MULTIPLIER = 4.0;
 
     private boolean verbose = false;
-
-    private ShortestPathTreeFactory shortestPathTreeFactory = new DefaultShortestPathTreeFactory();
 
     private TraverseVisitor traverseVisitor;
 
@@ -78,10 +73,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         }
 
     }
-
-    public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
-        this.shortestPathTreeFactory = shortestPathTreeFactory;
-    }
+    
+    private RunState runState;
     
     /**
      * Compute SPT using default timeout and termination strategy.
@@ -99,16 +92,16 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         return this.getShortestPathTree(req, timeoutSeconds, null);
     }
     
-    public RunState startSearch(RoutingRequest options,
+    public void startSearch(RoutingRequest options,
             SearchTerminationStrategy terminationStrategy, long abortTime) {
-        RunState runState = new RunState( options, terminationStrategy );
+        runState = new RunState( options, terminationStrategy );
 
         runState.rctx = options.getRoutingContext();
 
         // null checks on origin and destination vertices are already performed in setRoutingContext
         // options.rctx.check();
         
-        runState.spt = shortestPathTreeFactory.create(options);
+        runState.spt = new MultiShortestPathTree(runState.options);
 
         runState.heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
@@ -119,7 +112,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of interleaved bidirectional heuristic.");
             options.rctx.debugOutput.timedOut = true;
-            return null; // Search timed out
+            runState = null; // Search timed out
+            return;
         }
         runState.spt.add(initialState);
 
@@ -141,11 +135,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         runState.nVisited = 0;
         runState.targetAcceptedStates = Lists.newArrayList();
-        
-        return runState;
+
     }
 
-    boolean iterate(RunState runState){
+    boolean iterate(){
         // print debug info
         if (verbose) {
             double w = runState.pq.peek_min_key();
@@ -177,7 +170,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         runState.nVisited += 1;
         
-        Collection<Edge> edges = runState.options.isArriveBy() ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
+        Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
 
             // Iterate over traversal results. When an edge leads nowhere (as indicated by
@@ -201,7 +194,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
-                double estimate = v.getWeight() + remaining_w*runState.options.getHeuristicWeight();
+                double estimate = v.getWeight() + remaining_w*runState.options.heuristicWeight;
 
                 if (verbose) {
                     System.out.println("      edge " + edge);
@@ -238,7 +231,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         return true;
     }
     
-    void runSearch(RunState runState, long abortTime){
+    void runSearch(long abortTime){
         /* the core of the A* algorithm */
         while (!runState.pq.empty()) { // Until the priority queue is empty:
             /*
@@ -264,7 +257,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
              * of this is that the algorithm is always left in a restartable state, which is useful for debugging or
              * potential future variations.
              */
-            if(!iterate(runState)){
+            if(!iterate()){
                 continue;
             }
             
@@ -303,10 +296,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         ShortestPathTree spt = null;
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
 
-        RunState runState = startSearch (options, terminationStrategy, abortTime);
+        startSearch (options, terminationStrategy, abortTime);
 
         if (runState != null) {
-            runSearch(runState, abortTime);
+            runSearch(abortTime);
             spt = runState.spt;
         }
         
@@ -327,7 +320,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             Vertex target, RoutingRequest options) {
         // actually, the heuristic could figure this out from the TraverseOptions.
         // set private member back=options.isArriveBy() on initial weight computation.
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             return heuristic.computeReverseWeight(v, target);
         } else {
             return heuristic.computeForwardWeight(v, target);
@@ -335,7 +328,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
 
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
-        if (opt.isArriveBy())
+        if (opt.arriveBy)
             return v.getTimeSeconds() < opt.worstTime;
         else
             return v.getTimeSeconds() > opt.worstTime;

@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import lombok.Getter;
-
 /**
  * A fast sparse 2D matrix holding elements of type T.
  * The x and y indexes into the sparse matrix are _signed_ 32-bit integers (negative indexes are allowed).
@@ -43,8 +41,7 @@ public class SparseMatrix<T> implements Iterable<T> {
 
     int chunkSize; // The dimension of a single chunk in each of two dimensions TODO rename
 
-    @Getter
-    int xMin, xMax, yMin, yMax; // The maximum and minimum indices where an element is stored.
+    public int xMin, xMax, yMin, yMax; // The maximum and minimum indices where an element is stored.
 
     /**
      * @param chunkSize Must be a power of two so chunk indexes can be determined by shifting off low order bits.
@@ -176,7 +173,6 @@ public class SparseMatrix<T> implements Iterable<T> {
      */
     public class SparseMatrixChunk {
 
-        @Getter
         public int x0, y0; // the coordinates of the minimum corner of this chunk (i.e. with the low bits)
 
         public T[] ts;

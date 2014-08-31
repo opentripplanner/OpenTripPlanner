@@ -33,8 +33,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import lombok.AllArgsConstructor;
-
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -142,13 +140,17 @@ public class LIsochrone extends RoutingResource {
         }
     }
 
+    /**
+     * Create a geotools feature collection from a list of isochrones in the OTPA internal format.
+     * Once in a FeatureCollection, they can for example be exported as GeoJSON.
+     */
     public static SimpleFeatureCollection makeContourFeatures(List<IsochroneData> isochrones) {
         DefaultFeatureCollection featureCollection = new DefaultFeatureCollection(null,
                 contourSchema);
         SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(contourSchema);
         for (IsochroneData isochrone : isochrones) {
-            fbuilder.add(isochrone.getGeometry());
-            fbuilder.add(isochrone.getCutoffSec());
+            fbuilder.add(isochrone.geometry);
+            fbuilder.add(isochrone.cutoffSec);
             featureCollection.add(fbuilder.buildFeature(null));
         }
         return featureCollection;
@@ -169,17 +171,17 @@ public class LIsochrone extends RoutingResource {
             throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
 
         IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
-        isoChroneRequest.setIncludeDebugGeometry(debug);
-        isoChroneRequest.setPrecisionMeters(precisionMeters);
+        isoChroneRequest.includeDebugGeometry = debug;
+        isoChroneRequest.precisionMeters = precisionMeters;
         if (coordinateOrigin != null)
-            isoChroneRequest.setCoordinateOrigin(new GenericLocation(null, coordinateOrigin)
-                    .getCoordinate());
+            isoChroneRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin)
+                    .getCoordinate();
         RoutingRequest sptRequest = buildRequest(0);
 
         if (maxTimeSec != null) {
-            isoChroneRequest.setMaxTimeSec(maxTimeSec);
+            isoChroneRequest.maxTimeSec = maxTimeSec;
         } else {
-            isoChroneRequest.setMaxTimeSec(isoChroneRequest.getMaxCutoffSec());
+            isoChroneRequest.maxTimeSec = isoChroneRequest.maxCutoffSec;
         }
 
         List<IsochroneData> isochrones;
@@ -204,9 +206,12 @@ public class LIsochrone extends RoutingResource {
     }
 
     // TODO Extract this to utility package?
-    @AllArgsConstructor
     private static class DirectoryZipper implements StreamingOutput {
         private File directory;
+        
+        DirectoryZipper(File directory){
+        	this.directory = directory;
+        }
 
         @Override
         public void write(OutputStream outStream) throws IOException {

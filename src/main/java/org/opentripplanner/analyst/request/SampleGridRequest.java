@@ -15,9 +15,6 @@ package org.opentripplanner.analyst.request;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * A request for a sample grid (of a SPT).
  * 
@@ -25,17 +22,11 @@ import lombok.Setter;
  */
 public class SampleGridRequest {
 
-    @Getter
-    @Setter
-    private int precisionMeters = 200;
+    public int precisionMeters = 200;
 
-    @Getter
-    @Setter
-    private int maxTimeSec = 0;
+    public int maxTimeSec = 0;
 
-    @Getter
-    @Setter
-    private Coordinate coordinateOrigin;
+    public Coordinate coordinateOrigin;
 
     public SampleGridRequest() {
     }

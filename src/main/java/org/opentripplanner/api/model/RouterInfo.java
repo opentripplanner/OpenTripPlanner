@@ -13,6 +13,8 @@
 
 package org.opentripplanner.api.model;
 
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -33,4 +35,7 @@ public class RouterInfo {
     @JsonDeserialize(using=GeoJSONDeserializer.class)
     @XmlJavaTypeAdapter(value=GeometryAdapter.class,type=Geometry.class)
     public Geometry polygon;
+
+    @XmlElement
+    public Date buildTime;
 }

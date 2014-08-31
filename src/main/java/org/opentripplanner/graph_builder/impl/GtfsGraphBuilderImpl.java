@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.Setter;
-
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
@@ -71,16 +69,16 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     private FareServiceFactory _fareServiceFactory;
 
     /** will be applied to all bundles which do not have the cacheDirectory property set */
-    @Setter private File cacheDirectory; 
+    private File cacheDirectory; 
     
     /** will be applied to all bundles which do not have the useCached property set */
-    @Setter private Boolean useCached; 
+    private Boolean useCached; 
 
     Set<String> agencyIdsSeen = Sets.newHashSet();
 
-    int nAgencies = 0;
+    int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
-    /** 
+    /**
      * Construct and set bundles all at once. 
      * TODO why is there a wrapper class around a list of GTFS files?
      * TODO why is there a wrapper around GTFS files at all?
@@ -129,10 +127,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         try {
             for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
                 // apply global defaults to individual GTFSBundles (if globals have been set) 
-                if (cacheDirectory != null && gtfsBundle.getCacheDirectory() == null)
-                    gtfsBundle.setCacheDirectory(cacheDirectory);
-                if (useCached != null && gtfsBundle.getUseCached() == null)
-                    gtfsBundle.setUseCached(useCached);
+                if (cacheDirectory != null && gtfsBundle.cacheDirectory == null)
+                    gtfsBundle.cacheDirectory = cacheDirectory;
+                if (useCached != null && gtfsBundle.useCached == null)
+                    gtfsBundle.useCached = useCached;
                 GtfsMutableRelationalDao dao = new GtfsRelationalDaoImpl();
                 GtfsContext context = GtfsLibrary.createContext(dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
@@ -153,10 +151,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {
                     hf.createTransfersTxtTransfers();
                 }
-                if (gtfsBundle.isLinkStopsToParentStations()) {
+                if (gtfsBundle.linkStopsToParentStations) {
                     hf.linkStopsToParentStations(graph);
                 } 
-                if (gtfsBundle.isParentStationTransfers()) {
+                if (gtfsBundle.parentStationTransfers) {
                     hf.createParentStationTransfers();
                 }
             }
@@ -201,15 +199,19 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             // set the agencyId here. Each feed ("bundle") is loaded by a separate reader, so there is no risk of
             // agency mappings accumulating.
             if (entityClass == Agency.class) {
-                nAgencies++;
                 String defaultAgencyId = null;
                 for (Agency agency : reader.getAgencies()) {
                     String agencyId = agency.getId();
                     LOG.info("This Agency has the ID {}", agencyId);
-                    // TODO Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
-                    // Figure out how and why this is happening.
-                    if (agencyId == null || agencyIdsSeen.contains(agencyId) || agencyId.length() == 1) {
-                        String generatedAgencyId = "AGENCY#" + nAgencies;
+                    // Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
+                    // TODO Figure out how and why this is happening.
+                    if (agencyId == null || agencyIdsSeen.contains(agencyId)) {
+                        // Loop in case generated name is already in use.
+                        String generatedAgencyId = null;
+                        while (generatedAgencyId == null || agencyIdsSeen.contains(generatedAgencyId)) {
+                            generatedAgencyId = "F" + nextAgencyId;
+                            nextAgencyId++;
+                        }
                         LOG.warn("The agency ID '{}' was already seen, or I think it's bad. Replacing with '{}'.", agencyId, generatedAgencyId);
                         reader.addAgencyIdMapping(agencyId, generatedAgencyId); // NULL key should work
                         agency.setId(generatedAgencyId);

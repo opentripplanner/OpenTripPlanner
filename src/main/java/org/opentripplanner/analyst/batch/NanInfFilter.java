@@ -13,9 +13,6 @@
 
 package org.opentripplanner.analyst.batch;
 
-import lombok.Data;
-
-@Data
 public class NanInfFilter implements IndividualFilter {
 
     private boolean rejectInfinite = true;

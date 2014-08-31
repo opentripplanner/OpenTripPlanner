@@ -31,7 +31,7 @@ otp.core.WidgetManagerMenu =
 
         
         var this_ = this;
-        this.addItem(otp.config.locale.widgets.managerMenu.minimizeAll, function() {
+        this.addItem(_tr("Minimize all"), function() {
             var widgets = this_.webapp.activeModule.widgets;
             for(infoWidgetId in this_.webapp.infoWidgets) widgets.push(this_.webapp.infoWidgets[infoWidgetId]);
             for(var i = 0; i < widgets.length; i++) {
@@ -39,7 +39,7 @@ otp.core.WidgetManagerMenu =
                 if(widget.isOpen && widget.minimizable) widget.minimize();
             }
         });
-        this.addItem(otp.config.locale.widgets.managerMenu.unminimizeAll, function() {
+        this.addItem(_tr("Unminimize all"), function() {
             var widgets = this_.webapp.activeModule.widgets;
             for(infoWidgetId in this_.webapp.infoWidgets) widgets.push(this_.webapp.infoWidgets[infoWidgetId]);
             for(var i = 0; i < widgets.length; i++) {

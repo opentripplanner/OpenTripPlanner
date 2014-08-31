@@ -13,11 +13,9 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
 
 import org.onebusaway.gtfs.model.StopTime;
 
-@AllArgsConstructor
 public class BogusShapeDistanceTraveled extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -27,6 +25,10 @@ public class BogusShapeDistanceTraveled extends GraphBuilderAnnotation {
     		"than the max shape_dist_traveled for the shape in shapes.txt";
     
     final StopTime st;
+    
+    public BogusShapeDistanceTraveled(StopTime st){
+    	this.st = st;
+    }
     
     @Override
     public String getMessage() {

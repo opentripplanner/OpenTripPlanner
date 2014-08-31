@@ -13,11 +13,8 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.onebusaway.gtfs.model.StopTime;
 
-@AllArgsConstructor
 public class StopAtEntrance extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -26,6 +23,11 @@ public class StopAtEntrance extends GraphBuilderAnnotation {
     
     final StopTime st;
     final boolean repaired;
+    
+    public StopAtEntrance(StopTime st, boolean repaired){
+    	this.st = st;
+    	this.repaired = repaired;
+    }
     
     @Override
     public String getMessage() {

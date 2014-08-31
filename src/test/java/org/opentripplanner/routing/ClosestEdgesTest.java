@@ -100,7 +100,7 @@ public class ClosestEdgesTest {
 
         // Double check that all the edges returned can be traversed.
         for (CandidateEdge e : edges) {
-            assertTrue(reqs.canBeTraversed(e.getEdge()));
+            assertTrue(reqs.canBeTraversed(e.edge));
         }
     }
 
@@ -117,7 +117,7 @@ public class ClosestEdgesTest {
         // Only allow walking
         TraverseModeSet modes = new TraverseModeSet();
         modes.setWalk(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
 
         // There's only one walkable edge.
         checkClosestEdgeModes(loc, reqs, 1);
@@ -125,20 +125,20 @@ public class ClosestEdgesTest {
         // Only allow biking: there are 5 bikeable edges.
         modes = new TraverseModeSet();
         modes.setBicycle(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         checkClosestEdgeModes(loc, reqs, 2);
 
         // Only allow driving: there are 7 driveable edges.
         modes = new TraverseModeSet();
         modes.setCar(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         checkClosestEdgeModes(loc, reqs, 2);
 
         // Allow driving and biking: all 8 edges can be traversed.
         modes = new TraverseModeSet();
         modes.setCar(true);
         modes.setBicycle(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         checkClosestEdgeModes(loc, reqs, 2);
     }
 
@@ -169,7 +169,7 @@ public class ClosestEdgesTest {
         // Should give me the top edge as the best edge.
         // topBack is worse because of the heading.
         CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
-        assertEquals(expectedBest, candidates.best.getEdge());
+        assertEquals(expectedBest, candidates.best.edge);
         assertEquals(expectedCandidates, candidates.size());
     }
 
@@ -181,19 +181,19 @@ public class ClosestEdgesTest {
         TraversalRequirements reqs = new TraversalRequirements();
         TraverseModeSet modes = new TraverseModeSet();
         modes.setCar(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         
         for (double degreeOff = 0.0; degreeOff < 30.0; degreeOff += 3.0) {
             // Location along the top edge, traveling with the forward edge
             // exactly.
             GenericLocation loc = new GenericLocation(c);
-            loc.setHeading(top.getAzimuth() + degreeOff);
+            loc.heading = top.getAzimuth() + degreeOff;
 
             // The top edge should be returned in all cases.
             checkBest(reqs, loc, top, 2);
 
             // Try when we're off in the opposite direction
-            loc.setHeading(top.getAzimuth() - degreeOff);
+            loc.heading = top.getAzimuth() - degreeOff;
             checkBest(reqs, loc, top, 2);
         }
     }
@@ -206,23 +206,23 @@ public class ClosestEdgesTest {
         TraversalRequirements reqs = new TraversalRequirements();
         TraverseModeSet modes = new TraverseModeSet();
         modes.setCar(true);
-        reqs.setModes(modes);
+        reqs.modes = modes;
         
         // Location along the top edge, traveling with the forward edge
         // exactly.
         GenericLocation loc = new GenericLocation(c);
-        loc.setHeading(top.getAzimuth());
+        loc.heading = top.getAzimuth();
         
         CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
         Collections.sort(candidates, new CandidateEdge.CandidateEdgeScoreComparator());
         
         // Check that scores are in ascending order.
-        double lastScore = candidates.best.getScore();
+        double lastScore = candidates.best.score;
         for (CandidateEdge ce : candidates) {
-            assertTrue(ce.getScore() >= lastScore);
-            lastScore = ce.getScore();
+            assertTrue(ce.score >= lastScore);
+            lastScore = ce.score;
         }
         
-        assertEquals(candidates.best.getScore(), candidates.get(0).getScore(), 0.0);
+        assertEquals(candidates.best.score, candidates.get(0).score, 0.0);
     }    
 }

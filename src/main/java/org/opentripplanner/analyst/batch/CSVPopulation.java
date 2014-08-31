@@ -24,36 +24,28 @@ import org.slf4j.LoggerFactory;
 
 import com.csvreader.CsvReader;
 
-import lombok.Setter;
-
 public class CSVPopulation extends BasicPopulation {
 
     private static final Logger LOG = LoggerFactory.getLogger(CSVPopulation.class);
 
-    @Setter
     public int yCol = 0;
     
     public void setLatCol(int latCol) {
     	yCol = latCol;
     }
 
-    @Setter
     public int xCol = 1;
 
     public void setLonCol(int lonCol) {
     	xCol = lonCol;
     }
     
-    @Setter
     public int labelCol = 2;
 
-    @Setter
     public int inputCol = 3;
     
-    @Setter
     public String crs = null;
 
-    @Setter
     public boolean skipHeaders = true;
 
     @Override

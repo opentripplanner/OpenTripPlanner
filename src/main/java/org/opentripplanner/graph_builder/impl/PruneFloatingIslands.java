@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.Setter;
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -38,14 +37,12 @@ public class PruneFloatingIslands implements GraphBuilder {
      * this field indicate the maximum size for island without stops
      * island under this size will be pruned.
      */
-    @Setter
     private int islandWithoutStopsMaxSize = 40;
 
     /**
      * this field indicate the maximum size for island with stops
      * island under this size will be pruned.
      */
-    @Setter
     private int islandWithStopsMaxSize = 5;
 
     /**
@@ -53,10 +50,8 @@ public class PruneFloatingIslands implements GraphBuilder {
      * that were found and whether they were pruned. If the value is an empty string or null there 
      * will be no output file.
      */
-    @Setter
     private String islandLogFile;
 
-    @Setter
     private TransitToStreetNetworkGraphBuilderImpl transitToStreetNetwork;
 
     public List<String> provides() {

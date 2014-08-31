@@ -28,6 +28,7 @@ import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
 import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.TransitToTaggedStopsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.ElevationGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
@@ -78,7 +79,7 @@ public class OTPConfigurator {
     /** Create a cached GraphService that will be shared between all OTP components. */
     public void makeGraphService(Graph graph) {
         /* Hand off graph in memory to server in a single-graph in-memory GraphServiceImpl. */
-        if (graph != null && params.inMemory) {
+        if (graph != null && ( params.inMemory || params.preFlight) ) {
             try {
                 FileInputStream graphConfiguration = new FileInputStream(params.graphConfigFile);
                 Preferences config = new PropertiesPreferences(graphConfiguration);
@@ -95,7 +96,7 @@ public class OTPConfigurator {
             }
             if (params.routerIds.size() > 0) {
                 graphService.setDefaultRouterId(params.routerIds.get(0));
-                graphService.setAutoRegister(params.routerIds);
+                graphService.autoRegister = params.routerIds;
             }
             graphService.startup();
             this.graphService = graphService;
@@ -173,9 +174,9 @@ public class OTPConfigurator {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
                 gtfsBundle.setTransfersTxtDefinesStationPaths(params.useTransfersTxt);
                 if (!params.noParentStopLinking) {
-                    gtfsBundle.setLinkStopsToParentStations(true);
+                    gtfsBundle.linkStopsToParentStations = true;
                 }
-                gtfsBundle.setParentStationTransfers(params.parentStationTransfers);
+                gtfsBundle.parentStationTransfers = params.parentStationTransfers;
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
@@ -191,6 +192,7 @@ public class OTPConfigurator {
                 }
             } 
             if ( hasOSM ) {
+                graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
                 // The stops can be linked to each other once they have links to the street network.
                 if (params.longDistance && params.useStreetsForLinking && !params.useTransfersTxt) {
@@ -201,7 +203,7 @@ public class OTPConfigurator {
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
-            embeddedConfigBuilder.setPropertiesFile(configFile);
+            embeddedConfigBuilder.propertiesFile = configFile;
             graphBuilder.addGraphBuilder(embeddedConfigBuilder);
         }
         if (params.elevation) {
@@ -210,7 +212,7 @@ public class OTPConfigurator {
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
         }
-        graphBuilder.setSerializeGraph( ! params.inMemory);
+        graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
 

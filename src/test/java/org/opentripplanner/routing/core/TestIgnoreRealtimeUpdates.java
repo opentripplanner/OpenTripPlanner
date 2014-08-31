@@ -36,7 +36,7 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         RoutingRequest options = new RoutingRequest();
         
         // Check that realtime updates are not ignored
-        assertFalse(options.isIgnoreRealtimeUpdates());
+        assertFalse(options.ignoreRealtimeUpdates);
         
         // Create (very simple) new graph
         Graph graph = new Graph();
@@ -55,7 +55,7 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         // Mock TimetableSnapshotSource to return dummy TimetableResolver
         TimetableSnapshotSource source = mock(TimetableSnapshotSource.class);
         when(source.getTimetableSnapshot()).thenReturn(resolver);
-        graph.setTimetableSnapshotSource(source);
+        graph.timetableSnapshotSource = (source);
         
         // Create routing context
         RoutingContext rctx = new RoutingContext(options, graph, from, to);
@@ -64,10 +64,10 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         assertNotNull(rctx.timetableSnapshot);
         
         // Now set routing request to ignore realtime updates
-        options.setIgnoreRealtimeUpdates(true);
+        options.ignoreRealtimeUpdates = (true);
         
         // Check that realtime updates are ignored
-        assertTrue(options.isIgnoreRealtimeUpdates());
+        assertTrue(options.ignoreRealtimeUpdates);
         
         // Create new routing context
         rctx = new RoutingContext(options, graph, from, to);

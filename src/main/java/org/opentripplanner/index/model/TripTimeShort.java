@@ -2,6 +2,7 @@ package org.opentripplanner.index.model;
 
 import java.util.List;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -12,7 +13,7 @@ import com.beust.jcommander.internal.Lists;
 public class TripTimeShort {
 
     public static final int UNDEFINED = -1;
-    public String stopId;
+    public AgencyAndId stopId;
     public int scheduledArrival = UNDEFINED ;
     public int scheduledDeparture = UNDEFINED ;
     public int realtimeArrival = UNDEFINED ;
@@ -25,7 +26,7 @@ public class TripTimeShort {
      * This is stop-specific, so the index i is a stop index, not a hop index.
      */
     public TripTimeShort(TripTimes tt, int i, Stop stop) {
-        stopId = stop.getId().getId();
+        stopId = stop.getId();
         scheduledArrival   = tt.getScheduledArrivalTime(i);
         realtimeArrival    = tt.getArrivalTime(i);
         arrivalDelay       = tt.getArrivalDelay(i);
@@ -43,7 +44,7 @@ public class TripTimeShort {
         List<TripTimeShort> out = Lists.newArrayList();
         // one per stop, not one per hop, thus the <= operator
         for (int i = 0; i < times.getNumStops(); ++i) {
-            out.add(new TripTimeShort(times, i, table.getPattern().getStop(i)));
+            out.add(new TripTimeShort(times, i, table.pattern.getStop(i)));
         }
         return out;
     }

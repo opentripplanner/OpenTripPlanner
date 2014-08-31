@@ -13,11 +13,8 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 
-@AllArgsConstructor
 public class BogusShapeGeometry extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -25,6 +22,10 @@ public class BogusShapeGeometry extends GraphBuilderAnnotation {
     public static final String FMT = "Shape geometry for shape_id %s does not have two distinct points.";
     
     final AgencyAndId shapeId;
+    
+    public BogusShapeGeometry(AgencyAndId shapeId){
+    	this.shapeId = shapeId;
+    }
     
     @Override
     public String getMessage() {

@@ -396,7 +396,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setCarSpeed(props, "highway=road", 11.2f); // ~= 25 mph
 
         // default ~= 25 mph
-        props.setDefaultSpeed(11.2f);
+        props.defaultSpeed = 11.2f;
 
         /*** special situations ****/
 
@@ -573,7 +573,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     private void createNotes(WayPropertySet propset, String spec, String patternKey) {
         NoteProperties properties = new NoteProperties();
         String pattern = localize(patternKey);
-        properties.setNotePattern(pattern);
+        properties.notePattern = pattern;
         propset.addNote(new OSMSpecifier(spec), properties);
     }
 
@@ -600,8 +600,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     private void setCarSpeed(WayPropertySet propset, String spec, float speed) {
         SpeedPicker picker = new SpeedPicker();
-        picker.setSpecifier(new OSMSpecifier(spec));
-        picker.setSpeed(speed);
+        picker.specifier = new OSMSpecifier(spec);
+        picker.speed = speed;
         propset.addSpeedPicker(picker);
     }
 

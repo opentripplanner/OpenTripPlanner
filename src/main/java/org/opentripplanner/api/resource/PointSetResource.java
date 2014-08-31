@@ -1,6 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.analyst.Indicator;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.model.PointSetShort;
@@ -55,6 +54,10 @@ public class PointSetResource {
         final PointSet pset = server.pointSetCache.get(pointSetId);
         if (pset == null) {
             return Response.status(Status.NOT_FOUND).entity("Invalid PointSet ID.").build();
+        }
+        if (pset.capacity > 200) {
+            // too big, just give a summary
+            return Response.ok().entity(new PointSetShort(pointSetId, pset)).build();
         }
         return Response.ok().entity(new StreamingOutput() {
             @Override

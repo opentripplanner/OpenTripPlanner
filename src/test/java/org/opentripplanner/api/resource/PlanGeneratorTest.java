@@ -452,15 +452,15 @@ public class PlanGeneratorTest {
 
         // Vertex initialization that can't be done using the constructor
         v0.setExitName("Ausfahrt");
-        v2.setFreeFlowing(true);
-        v4.setFreeFlowing(true);
-        v38.setFreeFlowing(true);
-        v40.setFreeFlowing(true);
-        v42.setFreeFlowing(true);
-        v48.setFreeFlowing(true);
-        v50.setFreeFlowing(true);
-        v52.setFreeFlowing(true);
-        v54.setFreeFlowing(true);
+        v2.freeFlowing = (true);
+        v4.freeFlowing = (true);
+        v38.freeFlowing = (true);
+        v40.freeFlowing = (true);
+        v42.freeFlowing = (true);
+        v48.freeFlowing = (true);
+        v50.freeFlowing = (true);
+        v52.freeFlowing = (true);
+        v54.freeFlowing = (true);
 
         // Elevation profiles for the street edges that will be created later
         PackedCoordinateSequence elevation3 = new PackedCoordinateSequence.Double(
@@ -658,7 +658,7 @@ public class PlanGeneratorTest {
         graph.putService(FareService.class, fareServiceStub);
         graph.addAgency(trainAgency);
         graph.addAgency(ferryAgency);
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
         graph.addAlertPatch(e29, alertPatch);
 
         // Routing context creation and initialization
@@ -667,7 +667,7 @@ public class PlanGeneratorTest {
         // Temporary graph objects for onboard depart tests
         OnboardDepartVertex onboardDepartVertex = new OnboardDepartVertex("Onboard", 23.0, 12.0);
         OnBoardDepartPatternHop onBoardDepartPatternHop = new OnBoardDepartPatternHop(
-                onboardDepartVertex, v12, firstTripPattern.getScheduledTimetable().getTripTimes(0), serviceDay, 0, 0.5);
+                onboardDepartVertex, v12, firstTripPattern.scheduledTimetable.getTripTimes(0), serviceDay, 0, 0.5);
 
         // Traverse the path forward first
         RoutingRequest forwardOptions = options.clone();

@@ -3,6 +3,7 @@ package org.opentripplanner.standalone;
 import java.io.IOException;
 import java.net.BindException;
 
+import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -54,27 +55,35 @@ public class GrizzlyServer {
         sslConfig.setKeyStoreFile("/var/otp/ssh/keystore_server");
         sslConfig.setKeyStorePass("opentrip");
 
-        /* HTTP (non-encrypted) listener */
-        NetworkListener httpListener = new NetworkListener("otp_insecure", params.bindAddress, params.port);
-        // OTP is CPU-bound, we don't want more threads than cores. TODO: We should switch to async handling.
+        /* OTP is CPU-bound, so we want only as many worker threads as we have cores. */
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
             .setCorePoolSize(1)
             .setMaxPoolSize(Runtime.getRuntime().availableProcessors());
-        httpListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+
+        /* HTTP (non-encrypted) listener */
+        NetworkListener httpListener = new NetworkListener("otp_insecure", params.bindAddress, params.port);
+        // OTP is CPU-bound, we don't want more threads than cores. TODO: We should switch to async handling.
         httpListener.setSecure(false);
-        httpServer.addListener(httpListener);
 
         /* HTTPS listener */
         NetworkListener httpsListener = new NetworkListener("otp_secure", params.bindAddress, params.securePort);
         // Ideally we'd share the threads between HTTP and HTTPS.
-        httpsListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
         httpsListener.setSecure(true);
         httpsListener.setSSLEngineConfig(
                 new SSLEngineConfigurator(sslConfig)
                         .setClientMode(false)
                         .setNeedClientAuth(false)
         );
-        httpServer.addListener(httpsListener);
+
+        // For both HTTP and HTTPS listeners: enable gzip compression, set thread pool, add listener to httpServer.
+        for (NetworkListener listener : new NetworkListener[] {httpListener, httpsListener}) {
+            CompressionConfig cc = listener.getCompressionConfig();
+            cc.setCompressionMode(CompressionConfig.CompressionMode.ON);
+            cc.setCompressionMinSize(50000); // the min number of bytes to compress
+            cc.setCompressableMimeTypes("application/json", "text/json"); // the mime types to compress
+            listener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+            httpServer.addListener(listener);
+        }
 
         /* Add a few handlers (~= servlets) to the Grizzly server. */
 

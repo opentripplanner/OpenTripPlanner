@@ -75,7 +75,7 @@ public class TimetableTest {
         patternIndex = new HashMap<AgencyAndId, TripPattern>();
         for (TransitStopDepart tsd : filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
-                if (!tba.isBoarding())
+                if (!tba.boarding)
                     continue;
                 TripPattern pattern = tba.getPattern();
                 for (Trip trip : pattern.getTrips()) {
@@ -98,8 +98,8 @@ public class TimetableTest {
 
         int trip_1_1_index = timetable.getTripIndex(new AgencyAndId("agency", "1.1"));
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_a = graph.getVertex("agency:A");
+        Vertex stop_c = graph.getVertex("agency:C");
         RoutingRequest options = new RoutingRequest();
 
         ShortestPathTree spt;

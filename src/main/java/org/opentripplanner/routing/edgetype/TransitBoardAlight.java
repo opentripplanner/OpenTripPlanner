@@ -15,8 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
 
-import lombok.Getter;
-
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -61,7 +59,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     private int modeMask; // TODO: via TablePatternEdge it should be possible to grab this from the pattern
    
     /** True if this edge represents boarding a vehicle, false if it represents alighting. */
-    @Getter private boolean boarding;
+    public boolean boarding;
 
     /** Boarding constructor (TransitStopDepart --> PatternStopVertex) */
     public TransitBoardAlight (TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
@@ -143,8 +141,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
          * transit when traversing an alight edge backward.
          */
         boolean leavingTransit = 
-                ( boarding &&  options.isArriveBy()) || 
-                (!boarding && !options.isArriveBy()); 
+                ( boarding &&  options.arriveBy) || 
+                (!boarding && !options.arriveBy); 
 
         /* TODO pull on/off transit out into two functions. */
         if (leavingTransit) { 
@@ -179,10 +177,10 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             
             // during reverse optimization, board costs should be applied to PatternBoards
             // so that comparable trip plans result (comparable to non-optimized plans)
-            if (options.isReverseOptimizing())
+            if (options.reverseOptimizing)
                 s1.incrementWeight(options.getBoardCost(s0.getNonTransitMode()));
 
-            if (options.isReverseOptimizeOnTheFly()) {
+            if (options.reverseOptimizeOnTheFly) {
                 TripPattern pattern = getPattern();
                 int thisDeparture = s0.getTripTimes().getDepartureTime(stopIndex);
                 int numTrips = getPattern().getNumScheduledTrips(); 
@@ -212,7 +210,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
             
             /* Check this pattern's mode against those allowed in the request. */
-            if (!options.getModes().get(modeMask)) {
+            if (!options.modes.get(modeMask)) {
                 return null;
             }
 
@@ -299,7 +297,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             double wait_cost = bestWait;
 
-            if (!s0.isEverBoarded() && !options.isReverseOptimizing()) {
+            if (!s0.isEverBoarded() && !options.reverseOptimizing) {
                 wait_cost *= options.waitAtBeginningFactor;
                 s1.setInitialWaitTimeSeconds(bestWait);
             } else {
@@ -311,7 +309,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             // when reverse optimizing, the board cost needs to be applied on
             // alight to prevent state domination due to free alights
-            if (options.isReverseOptimizing()) {
+            if (options.reverseOptimizing) {
                 s1.incrementWeight(wait_cost);
             } else {
                 s1.incrementWeight(wait_cost + options.getBoardCost(s0.getNonTransitMode()));
@@ -321,8 +319,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // determine if this needs to be reverse-optimized.
             // The last alight can be moved forward by bestWait (but no further) without
             // impacting the possibility of this trip
-            if (options.isReverseOptimizeOnTheFly() && 
-               !options.isReverseOptimizing() && 
+            if (options.reverseOptimizeOnTheFly && 
+               !options.reverseOptimizing && 
                 s0.isEverBoarded() && 
                 s0.getLastNextArrivalDelta() <= bestWait &&
                 s0.getLastNextArrivalDelta() > -1) {
@@ -352,8 +350,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     /* See weightLowerBound comment. */
     public double timeLowerBound(RoutingRequest options) {
-        if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding)) {
-            if (!options.getModes().get(modeMask)) {
+        if ((options.arriveBy && boarding) || (!options.arriveBy && !boarding)) {
+            if (!options.modes.get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
             BitSet services = getPattern().services;
@@ -373,7 +371,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
      * pattern was already deemed useful. */
     public double weightLowerBound(RoutingRequest options) {
         // return 0; // for testing/comparison, since 0 is always a valid heuristic value
-        if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding))
+        if ((options.arriveBy && boarding) || (!options.arriveBy && !boarding))
             return timeLowerBound(options);
         else
             return options.getBoardCostLowerBound();

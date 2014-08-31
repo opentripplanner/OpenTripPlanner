@@ -17,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.osm.Relation.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,10 @@ import crosby.binary.file.BlockInputStream;
  * handleWay, and handleRelation. Each block of a PBF file can be of a different type, so if we want
  * to examine nodes, then ways we must parse the entire file several times. This is just the nature
  * of OSM PBF.
+ *
+ * Subclasses of Parser that wish to skip certain OSM element types should override parseWays,
+ * parseDense, etc. rather than the corresponding handle* methods to avoid ever converting the
+ * low-level PBF objects into objects using OTP's internal OSM model.
  */
 public abstract class Parser extends BinaryParser {
 

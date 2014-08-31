@@ -1,7 +1,5 @@
 package org.opentripplanner.profile;
 
-import lombok.EqualsAndHashCode;
-
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
@@ -11,34 +9,40 @@ import org.opentripplanner.routing.edgetype.TripPattern;
  * pattern of a route, and we need to store indexes rather than stop objects because a stop can
  * appear more than once in a pattern. When a ride is unfinished (waiting in the queue for
  * exploration in the next round) its toIndex is -1 and its stats field is null.
- * 
- * The hash code and equals method allow adding the same PatternRide to a set multiple times, but
- * coming from different transfers.
  */
-@EqualsAndHashCode(exclude="xfer")
 class PatternRide {
     
-    TripPattern pattern; // uses identity hash code
-    int fromIndex;
-    int toIndex = -1;
-    Ride previous;
-    ProfileTransfer xfer; // how did we get here
-    Stats stats = null;
+    final TripPattern pattern; // TripPatterns use identity equality
+    final int fromIndex;       // Always set, even on unfinished PatternRides
+    final int toIndex;  // set when PatternRide is finished by extending it to a specific stop
+    final Stats stats;  // set when PatternRide is finished by extending it to a specific stop
     
+    @Override
+    public boolean equals(Object o){
+    	if(o==this) return true;
+    	if (!(o instanceof PatternRide)) return false;
+    	PatternRide other = (PatternRide) o;
+    	if(!other.pattern.equals(this.pattern)) return false;
+    	if(other.fromIndex != fromIndex) return false;
+    	if(other.toIndex != toIndex) return false;
+    	if(!other.stats.equals(this.stats)) return false;
+    	return true;
+    }
+
     /** Construct an unfinished PatternRide, lacking a toIndex and stats. */
-    public PatternRide (TripPattern pattern, int fromIndex, Ride previous, ProfileTransfer xfer) {
+    public PatternRide (TripPattern pattern, int fromIndex) {
         this.pattern   = pattern;
         this.fromIndex = fromIndex;
-        this.previous  = previous;
-        this.xfer      = xfer;
+        this.toIndex = -1;
+        this.stats = null;
     }
-    
+
     /** Construct an unfinished PatternRide (lacking toIndex and stats) from another PatternRide. */
-    public PatternRide (PatternRide other) {
+    public PatternRide (PatternRide other, int toIndex, Stats stats) {
         this.pattern   = other.pattern;
         this.fromIndex = other.fromIndex;
-        this.previous  = other.previous;
-        this.xfer      = other.xfer;
+        this.toIndex = toIndex;
+        this.stats = stats;
     }
     
     public Stop getFromStop() {
@@ -54,22 +58,23 @@ class PatternRide {
     }
     
     public String toString () {
-        return String.format("%s from %d, prev is %s", pattern.getCode(), fromIndex, previous);
+        return String.format("%s %d to %d", pattern.code, fromIndex, toIndex);
     }
-    
-    /** Complete an unfinished ride as a new object. */
-    // Perhaps we should check in advance whether a pattern is running at all, but results will vary
-    // depending on the fromIndex and toIndex. Some indexes can be reached within the window, others
-    // not. But that's an optimization.
+
+    /**
+     * Complete an unfinished ride as a new object.
+     * Perhaps we should check in advance whether a pattern is running at all, but results will vary depending on the
+     * fromIndex and toIndex. Some indexes can be reached within the window, others not. But that's an optimization.
+     * It's actually advantageous to call this sequentially for each to-stop instead of incrementally along a pattern.
+     * This is because we store the absolute times of arrivals and departures, and by subtracting those we get accurate
+     * min and max ride times rather than looser lower and upper bounds on travel time.
+     */
     public PatternRide extendToIndex(int toIndex, TimeWindow window) {
         Stats stats = Stats.create (pattern, fromIndex, toIndex, window);
         /* There might not be any trips within the time window. */ 
         if (stats == null) return null;
-        /* Copy most fields from this unfinished ride. */
-        PatternRide ret = new PatternRide(this);
-        /* Then set the other fields to complete the ride. */
-        ret.toIndex = toIndex;
-        ret.stats = stats;
+        /* Copy most fields from this unfinished ride, setting the other fields to complete the ride. */
+        PatternRide ret = new PatternRide(this, toIndex, stats);
         return ret;
     }
 

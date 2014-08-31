@@ -98,7 +98,7 @@ public class ParkAndRideLinkEdge extends Edge {
             return null;
         }
         Edge backEdge = s0.getBackEdge();
-        boolean back = s0.getOptions().isArriveBy();
+        boolean back = s0.getOptions().arriveBy;
         // If we are exiting (or entering-backward), check if we
         // really parked a car: this will prevent using P+R as
         // shortcut.
@@ -110,15 +110,17 @@ public class ParkAndRideLinkEdge extends Edge {
         if (mode == TraverseMode.WALK) {
             // Walking
             double walkTime = linkDistance * WALK_OBSTRUCTION_FACTOR
-                    / s0.getOptions().getWalkSpeed();
+                    / s0.getOptions().walkSpeed;
             s1.incrementTimeInSeconds((int) Math.round(walkTime));
             s1.incrementWeight(walkTime);
             s1.incrementWalkDistance(linkDistance);
+            s1.setBackMode(TraverseMode.WALK);
         } else if (mode == TraverseMode.CAR) {
             // Driving
             double driveTime = linkDistance * DRIVE_OBSTRUCTION_FACTOR / DRIVE_SPEED_MS;
             s1.incrementTimeInSeconds((int) Math.round(driveTime));
             s1.incrementWeight(driveTime);
+            s1.setBackMode(TraverseMode.CAR);
         } else {
             // Can't cycle in/out a P+R.
             return null;
@@ -133,7 +135,7 @@ public class ParkAndRideLinkEdge extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest options) {
-        boolean parkAndRide = options.getModes().getWalk() && options.getModes().getCar();
+        boolean parkAndRide = options.modes.getWalk() && options.modes.getCar();
         return parkAndRide ? 0 : Double.POSITIVE_INFINITY;
     }
 

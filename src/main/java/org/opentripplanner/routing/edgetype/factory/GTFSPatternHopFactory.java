@@ -441,7 +441,7 @@ public class GTFSPatternHopFactory {
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
         for (TripPattern tableTripPattern : tripPatterns.values()) {
-            tableTripPattern.getScheduledTimetable().finish();
+            tableTripPattern.scheduledTimetable.finish();
         }
         
         clearCachedData(); // eh?
@@ -464,9 +464,9 @@ public class GTFSPatternHopFactory {
 
         LOG.info("Finding interlining trips based on block IDs.");
         for (TripPattern pattern : tripPatterns) {
-            Timetable timetable = pattern.getScheduledTimetable();
+            Timetable timetable = pattern.scheduledTimetable;
             /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
-            for (TripTimes tripTimes : timetable.getTripTimes()) {
+            for (TripTimes tripTimes : timetable.tripTimes) {
                 Trip trip = tripTimes.trip;
                 if ( ! Strings.isNullOrEmpty(trip.getBlockId())) {
                     tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);
@@ -614,6 +614,7 @@ public class GTFSPatternHopFactory {
             // linking, even though theoretically we could do better.
 
             for (int i = 0; i < stopTimes.size() - 1; ++i) {
+                if (hops[i] == null) continue;
                 st0 = stopTimes.get(i);
                 StopTime st1 = stopTimes.get(i + 1);
                 LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());

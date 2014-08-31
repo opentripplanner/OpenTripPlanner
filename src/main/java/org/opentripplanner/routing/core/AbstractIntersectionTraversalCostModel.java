@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.core;
 
-import lombok.Setter;
-
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
@@ -27,19 +25,14 @@ public abstract class AbstractIntersectionTraversalCostModel implements
         IntersectionTraversalCostModel {
 
     /** Factor by which absolute turn angles are divided to get turn costs for non-driving scenarios. */
-    @Setter
     protected Double nonDrivingTurnCostFactor = 1.0 / 20.0;
 
-    @Setter
     protected Integer minRightTurnAngle = 45;
     
-    @Setter
     protected Integer maxRightTurnAngle = 135;
 
-    @Setter
     protected Integer minLeftTurnAngle = 225;
     
-    @Setter
     protected Integer maxLeftTurnAngle = 315;
 
     /** Returns true if this angle represents a right turn. */

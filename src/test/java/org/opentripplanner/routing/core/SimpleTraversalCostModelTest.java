@@ -48,10 +48,10 @@ public class SimpleTraversalCostModelTest {
         
         // Initialize the routing request.
         options = new RoutingRequest();
-        options.setCarSpeed(1.0);
-        options.setWalkSpeed(1.0);
-        options.setCarDecelerationSpeed(2.0);
-        options.setCarAccelerationSpeed(2.0);
+        options.carSpeed = 1.0;
+        options.walkSpeed = 1.0;
+        options.carDecelerationSpeed = (2.0);
+        options.carAccelerationSpeed  = (2.0);
         options.setModes(TraverseModeSet.allModes());
     }
     
@@ -118,7 +118,7 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex u = vertex("from_v", a, false);
         IntersectionVertex v = vertex("intersection", b, false);
         IntersectionVertex w = vertex("to_v", c, false);
-        v.setFreeFlowing(true);
+        v.freeFlowing = (true);
         
         // Two edges.
         PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
@@ -261,7 +261,7 @@ public class SimpleTraversalCostModelTest {
 
     private IntersectionVertex vertex(String label, Coordinate coord, boolean hasLight) {
         IntersectionVertex v = new IntersectionVertex(_graph, label, coord.y, coord.x);
-        v.setTrafficLight(hasLight);
+        v.trafficLight = (hasLight);
         return v;
     }
 

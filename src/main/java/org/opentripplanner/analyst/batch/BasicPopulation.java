@@ -21,9 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +30,10 @@ public class BasicPopulation implements Population {
 
     private static final Logger LOG = LoggerFactory.getLogger(BasicPopulation.class);
     
-    @Setter 
     public String sourceFilename;
     
-    @Setter @Getter 
     public List<Individual> individuals = new ArrayList<Individual>(); 
     
-    @Setter @Getter 
     public List<IndividualFilter> filterChain = null; 
 
     private boolean[] skip = null;

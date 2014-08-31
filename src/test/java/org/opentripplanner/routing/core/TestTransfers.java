@@ -90,13 +90,13 @@ class Context {
                 GtfsLibrary.createCalendarServiceData(context.getDao()));
 
         // Add simple transfer to make transfer possible between N-K and F-H
-        createSimpleTransfer("agency_K", "agency_F", 100);
+        createSimpleTransfer("agency:K", "agency:F", 100);
 
         // Add simple transfer to make transfer possible between O-P and U-V
-        createSimpleTransfer("agency_P", "agency_U", 100);
+        createSimpleTransfer("agency:P", "agency:U", 100);
 
         // Add simple transfer to make transfer possible between U-V and I-J
-        createSimpleTransfer("agency_V", "agency_I", 100);
+        createSimpleTransfer("agency:V", "agency:I", 100);
 
         // Create dummy TimetableResolver
         TimetableResolver resolver = new TimetableResolver();
@@ -106,7 +106,7 @@ class Context {
 
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
     }
 
     /**
@@ -184,7 +184,7 @@ public class TestTransfers extends TestCase {
     private void applyUpdateToTripPattern(TripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
-        TimetableResolver snapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
+        TimetableResolver snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         Timetable timetable = snapshot.resolve(pattern, serviceDate);
         TimeZone timeZone = new SimpleTimeZone(-7, "PST");
         long today = serviceDate.getAsDate(timeZone).getTime() / 1000;
@@ -221,8 +221,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency_N");
-        Vertex destination = graph.getVertex("agency_H");
+        Vertex origin = graph.getVertex("agency:N");
+        Vertex destination = graph.getVertex("agency:H");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -262,8 +262,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency_N");
-        Vertex destination = graph.getVertex("agency_H");
+        Vertex origin = graph.getVertex("agency:N");
+        Vertex destination = graph.getVertex("agency:H");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -304,8 +304,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency_O");
-        Vertex destination = graph.getVertex("agency_V");
+        Vertex origin = graph.getVertex("agency:O");
+        Vertex destination = graph.getVertex("agency:V");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -323,7 +323,7 @@ public class TestTransfers extends TestCase {
         // Find state with FrequencyBoard back edge and save time of that state
         long time = -1;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof TransitBoardAlight && ((TransitBoardAlight)s.getBackEdge()).isBoarding())  {
+            if (s.getBackEdge() instanceof TransitBoardAlight && ((TransitBoardAlight)s.getBackEdge()).boarding)  {
                 time = s.getTimeSeconds(); // find the final board edge, don't break
             }
         }
@@ -346,7 +346,7 @@ public class TestTransfers extends TestCase {
         // Find state with FrequencyBoard back edge and save time of that state
         long newTime = -1;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof TransitBoardAlight && ((TransitBoardAlight)s.getBackEdge()).isBoarding())  {
+            if (s.getBackEdge() instanceof TransitBoardAlight && ((TransitBoardAlight)s.getBackEdge()).boarding)  {
                 newTime = s.getTimeSeconds(); // find the final board edge, don't break
             }
         }
@@ -365,9 +365,9 @@ public class TestTransfers extends TestCase {
 
         // Compute a normal path between two stops
         @SuppressWarnings("deprecation")
-        Vertex origin = graph.getVertex("agency_U");
+        Vertex origin = graph.getVertex("agency:U");
         @SuppressWarnings("deprecation")
-        Vertex destination = graph.getVertex("agency_J");
+        Vertex destination = graph.getVertex("agency:J");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -431,8 +431,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency_N");
-        Vertex destination = graph.getVertex("agency_H");
+        Vertex origin = graph.getVertex("agency:N");
+        Vertex destination = graph.getVertex("agency:H");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -472,8 +472,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency_U");
-        Vertex destination = graph.getVertex("agency_J");
+        Vertex origin = graph.getVertex("agency:U");
+        Vertex destination = graph.getVertex("agency:J");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -516,8 +516,8 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        Vertex origin = graph.getVertex("agency_N");
-        Vertex destination = graph.getVertex("agency_H");
+        Vertex origin = graph.getVertex("agency:N");
+        Vertex destination = graph.getVertex("agency:H");
 
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
@@ -540,8 +540,8 @@ public class TestTransfers extends TestCase {
         stopF.setId(new AgencyAndId("agency", "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, StopTransfer.TIMED_TRANSFER);
         // Don't forget to also add a TimedTransferEdge
-        Vertex fromVertex = graph.getVertex("agency_K_arrive");
-        Vertex toVertex = graph.getVertex("agency_F_depart");
+        Vertex fromVertex = graph.getVertex("agency:K_arrive");
+        Vertex toVertex = graph.getVertex("agency:F_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
 
         // Plan journey

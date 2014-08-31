@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.Setter;
-
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
@@ -93,6 +91,7 @@ import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
+import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.visibility.Environment;
 import org.opentripplanner.visibility.VLPoint;
@@ -169,8 +168,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     /**
      * WayPropertySet computes edge properties from OSM way data.
      */
-    @Setter
-    private WayPropertySet wayPropertySet = new WayPropertySet();
+    public WayPropertySet wayPropertySet = new WayPropertySet();
 
     /**
      * Providers of OSM data.
@@ -180,40 +178,34 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     /**
      * Allows for arbitrary custom naming of edges.
      */
-    @Setter
-    private CustomNamer customNamer;
+    public CustomNamer customNamer;
     
     /**
      * Ignore wheelchair accessibility information.
      */
-    @Setter
-    private boolean ignoreWheelchairAccessibility = false;
+    public boolean ignoreWheelchairAccessibility = false;
 
     /**
      * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
      * around.
      */
-    @Setter
-    private OSMPlainStreetEdgeFactory edgeFactory = new DefaultOSMPlainStreetEdgeFactory();
+    public OSMPlainStreetEdgeFactory edgeFactory = new DefaultOSMPlainStreetEdgeFactory();
 
     /**
      * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in the United States. This does not affect floor
      * names from level maps.
      */
-    @Setter
-    private boolean noZeroLevels = true;
+    public boolean noZeroLevels = true;
 
     /**
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
      */
-    @Setter
-    private boolean staticBikeRental = false;
+    public boolean staticBikeRental = false;
     
     /**
      * Whether we should create P+R stations from OSM data. 
      */
-    @Setter
-    private boolean staticParkAndRide = true;
+    public boolean staticParkAndRide = true;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -336,7 +328,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
                 nodes = osmNodes;
                 for (OSMNode node : osmNodes) {
-                    VLPoint point = new VLPoint(node.getLon(), node.getLat());
+                    VLPoint point = new VLPoint(node.lon, node.lat);
                     vertices.add(point);
                 }
                 geometry = new VLPolygon(vertices);
@@ -352,7 +344,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         // close polygons
                         continue;
                     }
-                    VLPoint point = new VLPoint(node.getLon(), node.getLat());
+                    VLPoint point = new VLPoint(node.lon, node.lat);
                     nodes.add(node);
                     vertices.add(point);
                 }
@@ -659,11 +651,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     for (Ring ring : area.outermostRings) {
                         allRings.add(ring.toJtsPolygon());
                         for (OSMNode node : ring.nodes) {
-                            nodeMap.put(new Coordinate(node.getLon(), node.getLat()), node);
+                            nodeMap.put(new Coordinate(node.lon, node.lat), node);
                         }
                         for (Ring inner : ring.holes) {
                             for (OSMNode node : inner.nodes) {
-                                nodeMap.put(new Coordinate(node.getLon(), node.getLat()), node);
+                                nodeMap.put(new Coordinate(node.lon, node.lat), node);
                             }
                         }
                     }
@@ -885,8 +877,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 BikeRentalStation station = new BikeRentalStation();
                 station.id = "" + node.getId();
                 station.name = creativeName;
-                station.x = node.getLon();
-                station.y = node.getLat();
+                station.x = node.lon;
+                station.y = node.lat;
                 // The following make sure that spaces+bikes=capacity, always.
                 // Also, for the degenerate case of capacity=1, we should have 1
                 // bike available, not 0.
@@ -1072,9 +1064,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         // We need to lazy create the envelope as the default
                         // constructor include (0,0) in the bounds...
                         if (envelope == null)
-                            envelope = new Envelope2D(null, node.getLon(), node.getLat(), 0, 0);
+                            envelope = new Envelope2D(null, node.lon, node.lat, 0, 0);
                         else
-                            envelope.add(node.getLon(), node.getLat());
+                            envelope.add(node.lon, node.lat);
                         IntersectionVertex accessVertex = getVertexForOsmNode(node, area.parent);
                         if (accessVertex.getIncoming().isEmpty()
                                 || accessVertex.getOutgoing().isEmpty())
@@ -1141,7 +1133,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (_nodesWithNeighbors.contains(node.getId()) || multipleAreasContain(node.getId())) {
 
                 startingNodes.add(node);
-                VLPoint point = new VLPoint(node.getLon(), node.getLat());
+                VLPoint point = new VLPoint(node.lon, node.lat);
                 if (!visibilityPoints.contains(point)) {
                     visibilityPoints.add(point);
                     visibilityNodes.add(node);
@@ -1337,7 +1329,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     // close polygons
                     continue;
                 }
-                VLPoint point = new VLPoint(node.getLon(), node.getLat());
+                VLPoint point = new VLPoint(node.lon, node.lat);
                 nodes.add(node);
                 vertices.add(point);
             }
@@ -1576,11 +1568,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         }
                     }
                     if (nodeId != last
-                            && (node.getLat() != lastLat || node.getLon() != lastLon || levelsDiffer))
+                            && (node.lat != lastLat || node.lon != lastLon || levelsDiffer))
                         nodes.add(nodeId);
                     last = nodeId;
-                    lastLon = node.getLon();
-                    lastLat = node.getLat();
+                    lastLon = node.lon;
+                    lastLat = node.lat;
                     lastLevel = level;
                 }
 
@@ -1619,8 +1611,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     LineString geometry;
 
                     /*
-                     * We split segments at intersections, self-intersections, and nodes with ele tags; the only processing we do on other nodes is to
-                     * accumulate their geometry
+                     * We split segments at intersections, self-intersections, nodes with ele tags, and transit stops;
+                     * the only processing we do on other nodes is to accumulate their geometry
                      */
                     if (segmentCoordinates.size() == 0) {
                         segmentCoordinates.add(getCoordinate(osmStartNode));
@@ -1628,7 +1620,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     if (intersectionNodes.containsKey(endNode) || i == nodes.size() - 2
                             || nodes.subList(0, i).contains(nodes.get(i))
-                            || osmEndNode.hasTag("ele")) {
+                            || osmEndNode.hasTag("ele")
+                            || "bus_stop".equals(osmEndNode.getTag("highway"))
+                            || "tram_stop".equals(osmEndNode.getTag("railway"))
+                            || "station".equals(osmEndNode.getTag("railway"))
+                            || "halt".equals(osmEndNode.getTag("railway"))
+                            || "bus_station".equals(osmEndNode.getTag("amenity"))) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
 
                         geometry = GeometryUtils.getGeometryFactory().createLineString(
@@ -1953,7 +1950,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private Coordinate getCoordinate(OSMNode osmNode) {
-            return new Coordinate(osmNode.getLon(), osmNode.getLat());
+            return new Coordinate(osmNode.lon, osmNode.lat);
         }
 
         public void addNode(OSMNode node) {
@@ -2011,14 +2008,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Determine whether any mode can ever traverse the given way.
-         * If not, we can safely leave the way out of the OTP graph without affecting routing.
-         * Potentially routable ways are those that have the tags :
+         * Determine whether any mode can or should ever traverse the given way. If not, we leave the way out of the
+         * OTP graph. Potentially routable ways are those that have the tags :
          * highway=*
          * public_transport=platform
          * railway=platform
-         * But not conveyers, proposed highways/roads, and raceways (as well as ways where all
-         * access is specifically forbidden to the public).
+         *
+         * But not conveyers, proposed highways/roads or those still under construction, and raceways
+         * (as well as ways where all access is specifically forbidden to the public).
+         * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dproposed
          */
         private boolean isWayRoutable(OSMWithTags way) {
             if (!isOsmEntityRoutable(way))
@@ -2026,7 +2024,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             String highway = way.getTag("highway");
             if (highway != null && (highway.equals("conveyer") || highway.equals("proposed") ||
-                    highway.equals("raceway") || highway.equals("unbuilt")))
+                highway.equals("construction") || highway.equals("raceway") || highway.equals("unbuilt")))
                 return false;
 
             if (way.isGeneralAccessDenied()) {
@@ -2780,12 +2778,26 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
 
+                if ("bus_stop".equals(node.getTag("highway"))
+                        || "tram_stop".equals(node.getTag("railway"))
+                        || "station".equals(node.getTag("railway"))
+                        || "halt".equals(node.getTag("railway"))
+                        || "bus_station".equals(node.getTag("amenity"))) {
+                    String ref = node.getTag("ref");
+                    String name = node.getTag("name");
+                    if (ref != null) {
+                        TransitStopStreetVertex tsv = new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, name, ref);
+                        iv = tsv;
+                    }
+                }
+
                 if (iv == null) {
                     iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
                     if (node.hasTrafficLight()) {
-                        iv.setTrafficLight(true);
+                        iv.trafficLight = (true);
                     }
                 }
+
                 intersectionNodes.put(nid, iv);
                 endpoints.add(iv);
             }

@@ -49,8 +49,8 @@ public class TestWayPropertySet extends TestCase {
      */
     private SpeedPicker getSpeedPicker (String specifier, float speed) {
         SpeedPicker sp = new SpeedPicker();
-        sp.setSpecifier(new OSMSpecifier(specifier));
-        sp.setSpeed(speed);
+        sp.specifier = new OSMSpecifier(specifier);
+        sp.speed = speed;
         return sp;
     }
     
@@ -101,7 +101,7 @@ public class TestWayPropertySet extends TestCase {
        wps.addSpeedPicker(getSpeedPicker("highway=motorway", kmhAsMs(100)));
        wps.addSpeedPicker(getSpeedPicker("highway=*", kmhAsMs(35)));
        wps.addSpeedPicker(getSpeedPicker("surface=gravel", kmhAsMs(10)));
-       wps.setDefaultSpeed(kmhAsMs(25));
+       wps.defaultSpeed = kmhAsMs(25);
        
        way = new OSMWithTags();
      

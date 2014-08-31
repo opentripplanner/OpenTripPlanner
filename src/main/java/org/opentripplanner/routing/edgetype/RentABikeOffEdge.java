@@ -38,7 +38,7 @@ public class RentABikeOffEdge extends RentABikeAbstractEdge {
     @Override
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             return super.traverseRent(s0);
         } else {
             return super.traverseDropoff(s0);

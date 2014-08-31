@@ -69,7 +69,7 @@ class RoutesHandler implements OTPHandler {
     public Object handle (OTPRequest oreq) {
         Map<String, Route> routes = Maps.newHashMap();
         for (TransitBoardAlight ba : Iterables.filter(oreq.graph.getEdges(), TransitBoardAlight.class)) {
-            Route route = ba.getPattern().getRoute();
+            Route route = ba.getPattern().route;
             routes.put(route.getId().toString(), route);
         }
         if (oreq.id != null) {

@@ -38,7 +38,7 @@ public class StreetfulStopLinkerTest {
     @Test
     public final void testStreetfulStopLinker() {
         final Boolean results[] = new Boolean[4];
-        final double speed = new RoutingRequest().getWalkSpeed();
+        final double speed = new RoutingRequest().walkSpeed;
 
         Graph graph = new Graph();
 
@@ -75,10 +75,10 @@ public class StreetfulStopLinkerTest {
         IntersectionVertex intersectionC = new IntersectionVertex(graph, "Intersection C", 2, 2);
         IntersectionVertex intersectionD = new IntersectionVertex(graph, "Intersection D", 2, 1);
 
-        intersectionA.setFreeFlowing(true);
-        intersectionB.setFreeFlowing(true);
-        intersectionC.setFreeFlowing(true);
-        intersectionD.setFreeFlowing(true);
+        intersectionA.freeFlowing = (true);
+        intersectionB.freeFlowing = (true);
+        intersectionC.freeFlowing = (true);
+        intersectionD.freeFlowing = (true);
 
         new StreetTransitLink(transitStopA, intersectionA, true);
         new StreetTransitLink(intersectionB, transitStopB, true);
@@ -118,12 +118,12 @@ public class StreetfulStopLinkerTest {
         assertEquals(9, graph.countEdges());
 
         // The duration of the shortest path (A => E) is 2 seconds
-        streetfulStopLinker.setMaxDuration(1);
+        streetfulStopLinker.maxDuration = 1;
         streetfulStopLinker.buildGraph(graph, null);
         assertEquals(9, graph.countEdges());
 
         // The duration of the longest path (A => D) is 16 seconds
-        streetfulStopLinker.setMaxDuration(16);
+        streetfulStopLinker.maxDuration = 16;
         streetfulStopLinker.buildGraph(graph, null);
         assertEquals(13, graph.countEdges());
         assertEquals(9, graph.countVertices());

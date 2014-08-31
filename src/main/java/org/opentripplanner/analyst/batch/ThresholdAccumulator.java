@@ -16,13 +16,11 @@ package org.opentripplanner.analyst.batch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Setter;
 public class ThresholdAccumulator implements Accumulator {
 
     private static final Logger LOG = LoggerFactory.getLogger(ThresholdAccumulator.class);
 
-    @Setter 
-    int thresholdSeconds = 60 * 90; // 1.5 hours in seconds
+    public int thresholdSeconds = 60 * 90; // 1.5 hours in seconds
 
     public void setThresholdMinutes(int minutes) {
         this.thresholdSeconds = minutes * 60;

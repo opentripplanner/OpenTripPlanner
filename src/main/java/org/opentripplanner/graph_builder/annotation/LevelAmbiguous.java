@@ -13,9 +13,6 @@
 
 package org.opentripplanner.graph_builder.annotation;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class LevelAmbiguous extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -27,6 +24,11 @@ public class LevelAmbiguous extends GraphBuilderAnnotation {
     final String layerName;
 
     final long osmNode;
+    
+    public LevelAmbiguous(String layerName, long osmNode){
+    	this.layerName = layerName;
+    	this.osmNode = osmNode;
+    }
     
     @Override
     public String getMessage() {

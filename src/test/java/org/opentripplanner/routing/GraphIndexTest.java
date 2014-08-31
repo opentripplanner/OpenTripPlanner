@@ -63,7 +63,7 @@ public class GraphIndexTest extends GtfsTest {
         /* This one depends on a feed where each TripPattern appears on only one route. */
         for (Route route : graph.index.routeForId.values()) {
             for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
-                assertEquals(pattern.getRoute(), route);
+                assertEquals(pattern.route, route);
             }
         }
         for (Stop stop : graph.index.stopForId.values()) {

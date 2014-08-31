@@ -13,8 +13,6 @@
 
 package org.opentripplanner.analyst.batch.aggregator;
 
-import lombok.Setter;
-
 import org.opentripplanner.analyst.batch.Individual;
 import org.opentripplanner.analyst.batch.ResultSet;
 
@@ -26,7 +24,7 @@ import org.opentripplanner.analyst.batch.ResultSet;
  */
 public class ThresholdSumAggregator implements Aggregator {
 
-    @Setter int threshold = 60 * 90; // 1.5 hours in seconds
+    public int threshold = 60 * 90; // 1.5 hours in seconds
 
     @Override
     public double computeAggregate(ResultSet rs) {

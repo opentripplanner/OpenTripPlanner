@@ -38,7 +38,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 
     public boolean add(CandidateEdge ce) {
         if (best == null || ce.score < best.score) {
-            endwiseVertex = ce.getEndwiseVertex();
+            endwiseVertex = ce.endwiseVertex;
             best = ce;
         }
         return super.add(ce);
@@ -47,7 +47,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
     public List<StreetEdge> toEdgeList() {
         List<StreetEdge> ret = new ArrayList<StreetEdge>();
         for (CandidateEdge ce : this) {
-            ret.add(ce.getEdge());
+            ret.add(ce.edge);
         }
         return ret;
     }
@@ -73,14 +73,14 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
             for (Entry<DistanceAndAngle, CandidateEdgeBundle> bin : bins.entrySet()) {
                 double distance = bin.getKey().distance;
                 double direction = bin.getKey().angle;
-                if (Math.abs(direction - ce.getDirectionToEdge()) < DIRECTION_ERROR
+                if (Math.abs(direction - ce.directionToEdge) < DIRECTION_ERROR
                         && Math.abs(distance - ce.distance) < DISTANCE_ERROR
                         && ce.endwise() == bin.getKey().endwise) {
                     bin.getValue().add(ce);
                     continue CANDIDATE;
                 }
             }
-            DistanceAndAngle rTheta = new DistanceAndAngle(ce.distance, ce.getDirectionToEdge(),
+            DistanceAndAngle rTheta = new DistanceAndAngle(ce.distance, ce.directionToEdge,
                     ce.endwise());
             CandidateEdgeBundle bundle = new CandidateEdgeBundle();
             bundle.add(ce);
@@ -99,7 +99,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 
     public boolean isPlatform() {
         for (CandidateEdge ce : CandidateEdgeBundle.this) {
-            StreetEdge e = ce.getEdge();
+            StreetEdge e = ce.edge;
             if ((e.getStreetClass() & StreetEdge.ANY_PLATFORM_MASK) != 0) {
                 return true;
             }
@@ -109,7 +109,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 
     public boolean allowsCars() {
         for (CandidateEdge ce : CandidateEdgeBundle.this) {
-            StreetEdge e = ce.getEdge();
+            StreetEdge e = ce.edge;
             if (e.getPermission().allows(StreetTraversalPermission.CAR)) {
                 return true;
             }

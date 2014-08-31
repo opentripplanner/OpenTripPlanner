@@ -86,7 +86,7 @@ public class BasicPathParser extends PathParser {
     public int terminalFor(State state) {
         Vertex v = state.getVertex();
         if (v instanceof StreetVertex || v instanceof StreetLocation) {
-            TraverseModeSet modes = state.getOptions().getModes();
+            TraverseModeSet modes = state.getOptions().modes;
             if (modes.contains(TraverseMode.BICYCLE)
                     && (!modes.contains(TraverseMode.WALK) || !state.isBikeRenting())) {
                 Edge edge = state.getBackEdge();
