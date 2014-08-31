@@ -276,7 +276,7 @@ public class PlanGenerator {
      * @param edges The array of input edges
      * @return The coordinates of the points on the edges
      */
-    private CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
+    private static CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
 
         for (Edge edge : edges) {

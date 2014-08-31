@@ -48,4 +48,9 @@ public class StopCluster {
         lat = latSum / children.size();
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }
