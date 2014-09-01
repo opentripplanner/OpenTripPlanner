@@ -18,10 +18,18 @@ import java.awt.Color;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
+import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
+import org.opentripplanner.routing.vertextype.TransitStation;
+import org.opentripplanner.routing.vertextype.TransitStop;
 
 /**
  * Render traversal permissions for each edge by color and label (walk, bicycle, car, stairs).
@@ -30,35 +38,65 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
-    // TODO
-    private static final Color LINK_COLOR = Color.ORANGE;
+    private static final Color LINK_COLOR_EDGE = Color.ORANGE;
 
-    private static final Color STAIRS_COLOR = Color.PINK;
+    private static final Color STAIRS_COLOR_EDGE = Color.PINK;
 
-    public TraversalPermissionsEdgeRenderer() {
-    }
+    private static final Color STREET_COLOR_VERTEX = Color.DARK_GRAY;
+
+    private static final Color TRANSIT_STOP_COLOR_VERTEX = new Color(0.0f, 0.0f, 0.8f);
+
+    private static final Color TRANSIT_STATION_COLOR_VERTEX = new Color(0.4f, 0.0f, 0.8f);
+
+    private static final Color BIKE_RENTAL_COLOR_VERTEX = new Color(0.0f, 0.7f, 0.0f);
+
+    private static final Color PARK_AND_RIDE_COLOR_VERTEX = Color.RED;
 
     @Override
     public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
-        // TODO Add link edges
         if (e instanceof PlainStreetEdge) {
             PlainStreetEdge pse = (PlainStreetEdge) e;
             if (pse.isStairs()) {
-                attrs.color = STAIRS_COLOR;
+                attrs.color = STAIRS_COLOR_EDGE;
                 attrs.label = "stairs";
             } else {
                 attrs.color = getColor(pse.getPermission());
                 attrs.label = getLabel(pse.getPermission());
             }
-            return true;
+        } else if (e instanceof StreetTransitLink) {
+            attrs.color = LINK_COLOR_EDGE;
+            attrs.label = "link";
+        } else if (e instanceof StreetBikeRentalLink) {
+            attrs.color = LINK_COLOR_EDGE;
+            attrs.label = "link";
+        } else if (e instanceof ParkAndRideLinkEdge) {
+            attrs.color = LINK_COLOR_EDGE;
+            attrs.label = "link";
+        } else {
+            return false;
         }
-        return false;
+        return true;
     }
 
     @Override
     public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
-        // TODO
-        attrs.color = Color.DARK_GRAY;
+        if (v instanceof IntersectionVertex) {
+            attrs.color = STREET_COLOR_VERTEX;
+        } else if (v instanceof TransitStop) {
+            attrs.color = TRANSIT_STOP_COLOR_VERTEX;
+            attrs.label = v.getName();
+        } else if (v instanceof TransitStation) {
+            attrs.color = TRANSIT_STATION_COLOR_VERTEX;
+            attrs.label = v.getName();
+        } else if (v instanceof BikeRentalStationVertex) {
+            attrs.color = BIKE_RENTAL_COLOR_VERTEX;
+            attrs.label = v.getName();
+        } else if (v instanceof ParkAndRideVertex) {
+            attrs.color = PARK_AND_RIDE_COLOR_VERTEX;
+            attrs.label = v.getName();
+        } else {
+            return false;
+        }
         return true;
     }
 

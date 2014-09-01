@@ -48,6 +48,9 @@ public interface TileRenderer {
         /** Ground pixel density inverse */
         public double metersPerPixel;
 
+        /** Tile size in pixels */
+        public int tileWidth, tileHeight;
+
         /** Expand the bounding box to add some margins, in pixel size. */
         public abstract Envelope expandPixels(double marginXPixels, double marginYPixels);
     }

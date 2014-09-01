@@ -62,7 +62,8 @@ public class TileRendererManager {
             @Override
             public Envelope expandPixels(double marginXPixels, double marginYPixels) {
                 Envelope retval = new Envelope(bbox);
-                retval.expandBy(marginXPixels / tileRequest.width * (bbox.getMaxX() - bbox.getMinX()),
+                retval.expandBy(
+                        marginXPixels / tileRequest.width * (bbox.getMaxX() - bbox.getMinX()),
                         marginYPixels / tileRequest.height * (bbox.getMaxY() - bbox.getMinY()));
                 return retval;
             }
@@ -89,10 +90,12 @@ public class TileRendererManager {
         context.transform.translate(-trbb.x, -trbb.y - trbb.height);
         context.transform.scale(xScale, -yScale);
         context.metersPerPixel = Math.toRadians(trbb.height) * 6371000 / tileRequest.height;
+        context.tileWidth = tileRequest.width;
+        context.tileHeight = tileRequest.height;
 
         long start = System.currentTimeMillis();
         renderer.renderTile(context);
-        LOG.info("Rendered tile at {},{} in {} ms", tileRequest.bbox.y, tileRequest.bbox.x,
+        LOG.debug("Rendered tile at {},{} in {} ms", tileRequest.bbox.y, tileRequest.bbox.x,
                 System.currentTimeMillis() - start);
         return image;
     }

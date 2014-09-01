@@ -16,14 +16,17 @@ package org.opentripplanner.inspector;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -93,16 +96,25 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     @Override
     public void renderTile(TileRenderContext context) {
 
-        float lineWidth = (float) (1.0f + 5.0f / Math.sqrt(context.metersPerPixel));
+        float lineWidth = (float) (1.0f + 3.0f / Math.sqrt(context.metersPerPixel));
 
         // Grow a bit the envelope to prevent rendering glitches between tiles
         Envelope bboxWithMargins = context.expandPixels(lineWidth * 2.0, lineWidth * 2.0);
 
         Collection<Vertex> vertices = context.graph.streetIndex
                 .getVerticesForEnvelope(bboxWithMargins);
-        // TODO Include all edges in the spatial index
-        Collection<StreetEdge> edges = context.graph.streetIndex
-                .getEdgesForEnvelope(bboxWithMargins);
+        Collection<Edge> edges = context.graph.streetIndex.getEdgesForEnvelope(bboxWithMargins);
+        Set<Edge> edgesSet = new HashSet<>(edges);
+
+        /*
+         * Some edges do not have geometry and thus do not get spatial-indexed. Add
+         * outgoing/incoming edges of all vertices. This is not perfect, as if the edge cross a tile
+         * it will not be rendered on it.
+         */
+        for (Vertex vertex : vertices) {
+            edgesSet.addAll(vertex.getIncoming());
+            edgesSet.addAll(vertex.getOutgoing());
+        }
 
         // Note: we do not use the transform inside the shapeWriter, but do it ourselves
         // since it's easier for the offset to work in pixel size.
@@ -114,12 +126,17 @@ public class EdgeVertexTileRenderer implements TileRenderer {
                 BasicStroke.JOIN_BEVEL);
         Stroke halfStroke = new BasicStroke(lineWidth * 0.6f + 1.0f, BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_BEVEL);
+        Stroke halfDashedStroke = new BasicStroke(lineWidth * 0.6f + 1.0f, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_BEVEL, 1.0f, new float[] { 4 * lineWidth, lineWidth },
+                2 * lineWidth);
         Stroke arrowStroke = new ShapeStroke(new Polygon(new int[] { 0, 0, 30 }, new int[] { 0, 20,
                 10 }, 3), lineWidth / 2, 5.0f * lineWidth, 2.5f * lineWidth);
         BasicStroke finStroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
 
         Font font = new Font(Font.SANS_SERIF, Font.PLAIN, Math.round(lineWidth));
-        context.graphics.setFont(font);
+        Font largeFont = new Font(Font.SANS_SERIF, Font.PLAIN, Math.round(lineWidth * 1.5f));
+        FontMetrics largeFontMetrics = context.graphics.getFontMetrics(largeFont);
+        context.graphics.setFont(largeFont);
         context.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         context.graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -130,12 +147,18 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         bufParams.setJoinStyle(BufferParameters.JOIN_BEVEL);
 
         EdgeVisualAttributes evAttrs = new EdgeVisualAttributes();
-        for (Edge edge : edges) {
+        for (Edge edge : edgesSet) {
             evAttrs.color = null;
             evAttrs.label = null;
             Geometry edgeGeom = edge.getGeometry();
-            if (edgeGeom == null)
-                continue;
+            boolean hasGeom = true;
+            if (edgeGeom == null) {
+                Coordinate[] coordinates = new Coordinate[] { edge.getFromVertex().getCoordinate(),
+                        edge.getToVertex().getCoordinate() };
+                edgeGeom = GeometryUtils.getGeometryFactory().createLineString(coordinates);
+                hasGeom = false;
+            }
+
             boolean render = evRenderer.renderEdge(edge, evAttrs);
             if (!render)
                 continue;
@@ -149,9 +172,8 @@ public class EdgeVertexTileRenderer implements TileRenderer {
             Shape midLineShape = shapeWriter.toShape(midLineGeom);
             Shape offsetShape = shapeWriter.toShape(offsetLine);
 
-            context.graphics.setStroke(halfStroke);
+            context.graphics.setStroke(hasGeom ? halfStroke : halfDashedStroke);
             context.graphics.setColor(evAttrs.color);
-            // context.graphics.fill(oneSideShape);
             context.graphics.draw(offsetShape);
             if (lineWidth > 6.0f) {
                 context.graphics.setColor(Color.WHITE);
@@ -186,10 +208,18 @@ public class EdgeVertexTileRenderer implements TileRenderer {
             context.graphics.setColor(vvAttrs.color);
             context.graphics.setStroke(stroke);
             context.graphics.draw(shape);
-            if (vvAttrs.label != null && context.metersPerPixel < 1.0) {
+            if (vvAttrs.label != null && lineWidth > 6.0f
+                    && context.bbox.contains(point.getCoordinate())) {
                 context.graphics.setColor(Color.BLACK);
-                context.graphics.drawString(vvAttrs.label, (float) tilePoint.getX(),
-                        (float) tilePoint.getY());
+                int labelWidth = largeFontMetrics.stringWidth(vvAttrs.label);
+                /*
+                 * Poor man's solution: stay on the tile if possible. Otherwise the renderer would
+                 * need to expand the envelope by an unbounded amount (max label size).
+                 */
+                double x = tilePoint.getX();
+                if (x + labelWidth > context.tileWidth)
+                    x -= labelWidth;
+                context.graphics.drawString(vvAttrs.label, (float) x, (float) tilePoint.getY());
             }
         }
     }
