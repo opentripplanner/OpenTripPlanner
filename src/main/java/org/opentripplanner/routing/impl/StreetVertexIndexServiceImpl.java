@@ -37,7 +37,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -69,7 +68,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     protected STRtree transitStopTree;
 
-    protected STRtree intersectionTree;
+    protected STRtree verticesTree;
 
     public DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -115,12 +114,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     private void postSetup() {
 
         transitStopTree = new STRtree();
-        intersectionTree = new STRtree();
+        verticesTree = new STRtree();
 
         for (Vertex gv : graph.getVertices()) {
             Vertex v = gv;
-            // We only care about StreetEdges
-            for (StreetEdge e : filter(gv.getOutgoing(), StreetEdge.class)) {
+            /*
+             * We add all edges, filtering them out after. The overhead compared to storing only
+             * street edges is rather low, as most edges are street-ones anyway.
+             */
+            for (Edge e : gv.getOutgoing()) {
                 if (e.getGeometry() == null) {
                     continue;
                 }
@@ -131,10 +133,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 Envelope env = new Envelope(v.getCoordinate());
                 transitStopTree.insert(env, v);
             }
-            if (v instanceof IntersectionVertex) {
-                Envelope env = new Envelope(v.getCoordinate());
-                intersectionTree.insert(env, v);
-            }
+            Envelope env = new Envelope(v.getCoordinate());
+            verticesTree.insert(env, v);
         }
         transitStopTree.build();
     }
@@ -292,12 +292,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @SuppressWarnings("unchecked")
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope) {
-        return intersectionTree.query(envelope);
+        return verticesTree.query(envelope);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<StreetEdge> getEdgesForEnvelope(Envelope envelope) {
+    public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
         return edgeTree.query(envelope);
     }
 
@@ -328,7 +328,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 return candidateEdges; // empty list
             }
 
-            Iterable<StreetEdge> nearbyEdges = edgeTree.query(envelope);
+            Iterable<Edge> nearbyEdges = edgeTree.query(envelope);
             if (nearbyEdges != null) {
                 nearbyEdges = Iterables.concat(nearbyEdges, extraStreets);
             }
@@ -336,15 +336,16 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             // oh. This is part of the problem: we're not linking to one-way
             // streets, even though that is a perfectly reasonable thing to do.
             // we need to handle that using bundles.
-            for (StreetEdge e : nearbyEdges) {
+            for (Edge e : nearbyEdges) {
                 // Ignore invalid edges.
-                if (e == null || e.getFromVertex() == null) {
+                if (e == null || e.getFromVertex() == null || !(e instanceof StreetEdge)) {
                     continue;
                 }
+                StreetEdge se = (StreetEdge)e;
 
                 // Ignore those edges we can't traverse. canBeTraversed checks internally if 
                 // walking a bike is possible on this StreetEdge.
-                if (!reqs.canBeTraversed(e)) {
+                if (!reqs.canBeTraversed(se)) {
                     continue;
                 }
 
@@ -355,7 +356,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
 
                 TraverseModeSet modes = reqs.modes;
-                CandidateEdge ce = new CandidateEdge(e, location, preferrence, modes);
+                CandidateEdge ce = new CandidateEdge(se, location, preferrence, modes);
 
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
@@ -423,15 +424,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public StreetVertex getIntersectionAt(Coordinate coordinate, double distanceError) {
         Envelope envelope = new Envelope(coordinate);
         envelope.expandBy(distanceError * 2);
-        List<StreetVertex> nearby = intersectionTree.query(envelope);
+        List<Vertex> nearby = verticesTree.query(envelope);
         StreetVertex nearest = null;
         double bestDistance = Double.POSITIVE_INFINITY;
-        for (StreetVertex v : nearby) {
-            double distance = coordinate.distance(v.getCoordinate());
-            if (distance < distanceError) {
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    nearest = v;
+        for (Vertex v : nearby) {
+            if (v instanceof StreetVertex) {
+                double distance = coordinate.distance(v.getCoordinate());
+                if (distance < distanceError) {
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        nearest = (StreetVertex)v;
+                    }
                 }
             }
         }
