@@ -70,13 +70,7 @@ public class TiledInspector extends RoutingResource {
 
         BufferedImage image = otpServer.tileRendererManager.renderTile(tileRequest, layer);
 
-        MIMEImageFormat format = new MIMEImageFormat("image/png"); // TODO ext
-        if (image == null) {
-            // TODO Return error as text over image
-            LOG.warn("null image");
-            return null;
-        }
-
+        MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(image.getWidth() * image.getHeight()
                 / 4);
         ImageIO.write(image, format.type, baos);

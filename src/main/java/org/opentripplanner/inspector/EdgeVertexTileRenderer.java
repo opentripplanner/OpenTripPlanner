@@ -31,6 +31,7 @@ import com.vividsolutions.jts.awt.IdentityPointTransformation;
 import com.vividsolutions.jts.awt.PointShapeFactory;
 import com.vividsolutions.jts.awt.ShapeWriter;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -78,6 +79,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         public abstract boolean renderVertex(Vertex v, VertexVisualAttributes attrs);
     }
 
+    @Override
     public int getColorModel() {
         return BufferedImage.TYPE_INT_ARGB;
     }
@@ -88,15 +90,19 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         this.evRenderer = evRenderer;
     }
 
+    @Override
     public void renderTile(TileRenderContext context) {
 
         float lineWidth = (float) (1.0f + 5.0f / Math.sqrt(context.metersPerPixel));
 
-        // TODO Grow a bit the envelope to prevent rendering glitches between tiles
+        // Grow a bit the envelope to prevent rendering glitches between tiles
+        Envelope bboxWithMargins = context.expandPixels(lineWidth * 2.0, lineWidth * 2.0);
+
         Collection<Vertex> vertices = context.graph.streetIndex
-                .getVerticesForEnvelope(context.bbox);
+                .getVerticesForEnvelope(bboxWithMargins);
         // TODO Include all edges in the spatial index
-        Collection<StreetEdge> edges = context.graph.streetIndex.getEdgesForEnvelope(context.bbox);
+        Collection<StreetEdge> edges = context.graph.streetIndex
+                .getEdgesForEnvelope(bboxWithMargins);
 
         // Note: we do not use the transform inside the shapeWriter, but do it ourselves
         // since it's easier for the offset to work in pixel size.
@@ -129,8 +135,6 @@ public class EdgeVertexTileRenderer implements TileRenderer {
             evAttrs.label = null;
             Geometry edgeGeom = edge.getGeometry();
             if (edgeGeom == null)
-                continue;
-            if (!context.bbox.intersects(edgeGeom.getEnvelopeInternal()))
                 continue;
             boolean render = evRenderer.renderEdge(edge, evAttrs);
             if (!render)
@@ -172,8 +176,6 @@ public class EdgeVertexTileRenderer implements TileRenderer {
             vvAttrs.color = null;
             vvAttrs.label = null;
             Point point = geomFactory.createPoint(new Coordinate(vertex.getLon(), vertex.getLat()));
-            if (!context.bbox.contains(point.getCoordinate()))
-                continue;
             boolean render = evRenderer.renderVertex(vertex, vvAttrs);
             if (!render)
                 continue;

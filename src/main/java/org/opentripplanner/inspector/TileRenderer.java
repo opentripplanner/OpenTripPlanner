@@ -31,7 +31,7 @@ public interface TileRenderer {
      * Context used for rendering a tile.
      * 
      */
-    public class TileRenderContext {
+    public abstract class TileRenderContext {
 
         /** Graphics where to paint tile to, in pixel CRS (no transform set) */
         public Graphics2D graphics;
@@ -42,11 +42,14 @@ public interface TileRenderer {
         /** The graph being processed */
         public Graph graph;
 
-        /** Bounding box of the rendered tile in WGS84 CRS */
+        /** Bounding box of the rendered tile in WGS84 CRS, w/o margins */
         public Envelope bbox;
 
         /** Ground pixel density inverse */
         public double metersPerPixel;
+
+        /** Expand the bounding box to add some margins, in pixel size. */
+        public abstract Envelope expandPixels(double marginXPixels, double marginYPixels);
     }
 
     /** Return the BufferedImage color model the renderer would like to use */

@@ -56,9 +56,17 @@ public class TileRendererManager {
         renderers.put(layer, tileRenderer);
     }
 
-    public BufferedImage renderTile(TileRequest tileRequest, String layer) {
+    public BufferedImage renderTile(final TileRequest tileRequest, String layer) {
 
-        TileRenderContext context = new TileRenderContext();
+        TileRenderContext context = new TileRenderContext() {
+            @Override
+            public Envelope expandPixels(double marginXPixels, double marginYPixels) {
+                Envelope retval = new Envelope(bbox);
+                retval.expandBy(marginXPixels / tileRequest.width * (bbox.getMaxX() - bbox.getMinX()),
+                        marginYPixels / tileRequest.height * (bbox.getMaxY() - bbox.getMinY()));
+                return retval;
+            }
+        };
 
         context.graph = graphService.getGraph(tileRequest.routerId);
         if (context.graph == null)
