@@ -16,7 +16,7 @@ package org.opentripplanner.inspector;
 import java.awt.Color;
 
 /**
- * Convert a bounded scalar to a color.
+ * Convert a scalar value (bounded or unbounded) to a color.
  * 
  * @author laurent
  */
