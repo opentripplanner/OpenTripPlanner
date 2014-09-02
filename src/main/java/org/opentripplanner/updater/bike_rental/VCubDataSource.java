@@ -13,6 +13,7 @@
 
 package org.opentripplanner.updater.bike_rental;
 
+import java.util.HashSet;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -52,6 +53,16 @@ public class VCubDataSource extends GenericXmlBikeRentalDataSource {
         String nbVelos = attributes.get("ms:NBVELOS");
         if (nbVelos != null)
             brstation.bikesAvailable = Integer.parseInt(nbVelos);
+        @SuppressWarnings("unused")
+        String type = attributes.get("ms:TYPE");
+        /*
+         * Please see http://www.vcub.fr/stations-vcub-1 for more information on rules of VCUB vs
+         * VCUB+. Apparently both network are compatible, VCUB+ only offer more renting options
+         * which are not handled by OTP anyway.
+         */
+        brstation.networks = new HashSet<String>();
+        brstation.networks.add("VCUB");
+        brstation.networks.add("VCUB+");
         return brstation;
     }
 }
