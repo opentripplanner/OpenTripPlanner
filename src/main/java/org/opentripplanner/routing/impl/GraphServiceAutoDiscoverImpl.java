@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.opentripplanner.routing.graph.Graph;
@@ -139,9 +138,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
      * graph file in a subdirectory of the resourceBase path. Also register and load the graph for
      * the defaultRouterId and warn if no routerIds are registered.
      */
-    @PostConstruct
-    // PostConstruct means run on startup after all injection has occurred
-    private void startup() {
+    public void startup() {
         /* Run the first one syncronously as other initialization methods may need a default router. */
         autoDiscoverGraphs();
         /*

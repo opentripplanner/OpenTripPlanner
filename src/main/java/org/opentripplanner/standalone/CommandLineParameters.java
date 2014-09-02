@@ -69,8 +69,8 @@ public class CommandLineParameters {
  
     @Parameter(names = { "--preFlight"},
     description = "pass the graph to the server in-memory after building it, and saving to disk")
+
     boolean preFlight;
-    
     @Parameter(names = {"--noTransit"},
     description = "skip all transit input files (GTFS)")
     boolean noTransit;
@@ -126,6 +126,9 @@ public class CommandLineParameters {
     @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class,
             description = "path to graph directory")
     String graphDirectory;
+
+    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs in graph directory. Also activate auto-reload.")
+    boolean autoScan = false;
 
     @Parameter( names = { "-l", "--longDistance"}, 
             description = "use an algorithm tailored for long-distance routing")
