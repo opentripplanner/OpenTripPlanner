@@ -31,7 +31,7 @@ public class StreetSegment {
     public TraverseMode mode;
     public int time;
     public EncodedPolylineBean geometry;
-    public List<WalkStep> walkSteps;
+    public List<WalkStep> walkSteps = Lists.newArrayList();
 
     /**
      * Build the walksteps from the final State of a path.
