@@ -31,13 +31,29 @@ import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.standalone.OTPServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * Slippy map tile API for rendering various graph information for inspection/debugging purpose
+ * (bike safety factor, connectivity...).
+ * 
+ * One can easily add a new layer by adding the following kind of code to a leaflet map:
+ * 
+ * <pre>
+ *   var bikesafety = new L.TileLayer(
+ *      'http://localhost:8080/otp/routers/default/inspector/tile/bike-safety/{z}/{x}/{y}.png',
+ *      { maxZoom : 22 });
+ *   var map = L.map(...);
+ *   L.control.layers(null, { "Bike safety": bikesafety }).addTo(map);
+ * </pre>
+ * 
+ * Tile rendering goes through TileRendererManager which select the appropriate renderer for the
+ * given layer.
+ * 
+ * @author laurent
+ * 
+ */
 @Path("/routers/{routerId}/inspector/tile/{layer}/{z}/{x}/{y}.{ext}")
-public class TiledInspector extends RoutingResource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TiledInspector.class);
+public class GraphInspectorTileResource extends RoutingResource {
 
     @Context
     private OTPServer otpServer;

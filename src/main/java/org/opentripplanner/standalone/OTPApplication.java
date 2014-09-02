@@ -11,6 +11,7 @@ import org.opentripplanner.api.model.JSONObjectMapperProvider;
 import org.opentripplanner.api.resource.AlertPatcher;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.ExternalGeocoderResource;
+import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.api.resource.Metadata;
 import org.opentripplanner.api.resource.Planner;
 import org.opentripplanner.api.resource.PointSetResource;
@@ -23,16 +24,15 @@ import org.opentripplanner.api.resource.Raster;
 import org.opentripplanner.api.resource.SIsochrone;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.api.resource.SurfaceResource;
-import org.opentripplanner.api.resource.TiledInspector;
 import org.opentripplanner.api.resource.TileService;
 import org.opentripplanner.api.resource.TimeGridWs;
 import org.opentripplanner.index.GeocoderResource;
 import org.opentripplanner.index.IndexAPI;
-import org.opentripplanner.inspector.TileRenderer;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,7 +73,8 @@ public class OTPApplication extends Application {
      */
     @Override
     public Set<Class<?>> getClasses() {
-        return Sets.newHashSet(
+        Set<Class<?>> classes = Sets.newHashSet();
+        classes.addAll(Arrays.asList(
             /* Jersey resource classes: define web services, i.e. an HTTP API. */
             Planner.class,
             IndexAPI.class,
@@ -97,13 +98,14 @@ public class OTPApplication extends Application {
             ServerInfo.class,
             SurfaceResource.class,
             PointSetResource.class,
-            TiledInspector.class,
+            GraphInspectorTileResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             AuthFilter.class,
             CorsFilter.class,
             // Enforce roles annotations defined by JSR-250
             RolesAllowedDynamicFeature.class
-        );
+        ));
+        return classes;
     }
 
     /**
@@ -113,7 +115,7 @@ public class OTPApplication extends Application {
      * Leave <Object> out of method signature to avoid confusing the Guava type inference.
      */
     @Override
-    public Set getSingletons() {
+    public Set<Object> getSingletons() {
         return Sets.newHashSet (
             // Show exception messages in responses
             new OTPExceptionMapper(),
@@ -131,7 +133,7 @@ public class OTPApplication extends Application {
      */
     @Override
     public Map<String, Object> getProperties() {
-        Map props = Maps.newHashMap();
+        Map<String, Object> props = Maps.newHashMap();
         props.put(ServerProperties.TRACING, Boolean.TRUE);
         props.put(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, Boolean.TRUE);
         return props;
