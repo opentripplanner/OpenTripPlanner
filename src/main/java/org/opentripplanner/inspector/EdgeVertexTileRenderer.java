@@ -131,7 +131,8 @@ public class EdgeVertexTileRenderer implements TileRenderer {
                 2 * lineWidth);
         Stroke arrowStroke = new ShapeStroke(new Polygon(new int[] { 0, 0, 30 }, new int[] { 0, 20,
                 10 }, 3), lineWidth / 2, 5.0f * lineWidth, 2.5f * lineWidth);
-        BasicStroke finStroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
+        BasicStroke thinStroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_BEVEL);
 
         Font font = new Font(Font.SANS_SERIF, Font.PLAIN, Math.round(lineWidth));
         Font largeFont = new Font(Font.SANS_SERIF, Font.PLAIN, Math.round(lineWidth * 1.5f));
@@ -146,6 +147,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
         bufParams.setSingleSided(true);
         bufParams.setJoinStyle(BufferParameters.JOIN_BEVEL);
 
+        // Render all edges
         EdgeVisualAttributes evAttrs = new EdgeVisualAttributes();
         for (Edge edge : edgesSet) {
             evAttrs.color = null;
@@ -182,7 +184,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
             }
             if (lineWidth > 4.0f) {
                 context.graphics.setColor(Color.BLACK);
-                context.graphics.setStroke(finStroke);
+                context.graphics.setStroke(thinStroke);
                 context.graphics.draw(midLineShape);
             }
             if (evAttrs.label != null && lineWidth > 8.0f) {
@@ -193,6 +195,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
             }
         }
 
+        // Render all vertices
         VertexVisualAttributes vvAttrs = new VertexVisualAttributes();
         for (Vertex vertex : vertices) {
             vvAttrs.color = null;

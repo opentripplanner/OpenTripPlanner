@@ -46,7 +46,7 @@ public class TileRendererManager {
     public TileRendererManager(GraphService graphService) {
         this.graphService = graphService;
 
-        // TODO
+        // Register layers.
         renderers.put("bike-safety", new EdgeVertexTileRenderer(new BikeSafetyEdgeRenderer()));
         renderers.put("traversal", new EdgeVertexTileRenderer(
                 new TraversalPermissionsEdgeRenderer()));
