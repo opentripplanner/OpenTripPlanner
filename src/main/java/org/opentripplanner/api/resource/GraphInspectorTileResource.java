@@ -30,6 +30,7 @@ import org.opentripplanner.analyst.core.SlippyTile;
 import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
+import org.opentripplanner.inspector.TileRenderer;
 import org.opentripplanner.standalone.OTPServer;
 
 /**
@@ -48,6 +49,9 @@ import org.opentripplanner.standalone.OTPServer;
  * 
  * Tile rendering goes through TileRendererManager which select the appropriate renderer for the
  * given layer.
+ * 
+ * @see TileRendererManager
+ * @see TileRenderer
  * 
  * @author laurent
  * 

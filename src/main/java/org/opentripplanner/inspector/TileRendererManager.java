@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.analyst.request.TileRequest;
+import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.inspector.TileRenderer.TileRenderContext;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
@@ -28,9 +29,12 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.util.AffineTransformation;
 
 /**
- * Process tile rendering requests. Get the tile renderer for the given layer, setup a tile
- * rendering context (bounding box, image graphic context, affine transform, etc...) and call the
- * renderer to paint the tile.
+ * Process slippy map tile rendering requests. Get the tile renderer for the given layer, setup a
+ * tile rendering context (bounding box, image graphic context, affine transform, etc...) and call
+ * the renderer to paint the tile.
+ * 
+ * @see GraphInspectorTileResource
+ * @see TileRenderer
  * 
  * @author laurent
  * 

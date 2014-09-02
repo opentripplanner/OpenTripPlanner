@@ -30,6 +30,8 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
+import com.jhlabs.awt.ShapeStroke;
+import com.jhlabs.awt.TextStroke;
 import com.vividsolutions.jts.awt.IdentityPointTransformation;
 import com.vividsolutions.jts.awt.PointShapeFactory;
 import com.vividsolutions.jts.awt.ShapeWriter;

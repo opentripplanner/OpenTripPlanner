@@ -21,7 +21,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.util.AffineTransformation;
 
 /**
- * Interface for a tile renderer.
+ * Interface for a slippy map tile renderer.
  * 
  * @author laurent
  */

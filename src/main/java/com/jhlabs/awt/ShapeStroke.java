@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-package org.opentripplanner.inspector;
+package com.jhlabs.awt;
 
 import java.awt.Shape;
 import java.awt.Stroke;
@@ -27,7 +27,10 @@ import java.awt.geom.Rectangle2D;
 /**
  * Stroke that draw a shape.
  * 
- * @see http://www.jhlabs.com/java/java2d/strokes/
+ * Slightly adapted to OTP from original source.
+ * 
+ * @see <a
+ *      href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
  * 
  */
 public class ShapeStroke implements Stroke {

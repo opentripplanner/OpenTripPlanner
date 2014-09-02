@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 
-package org.opentripplanner.inspector;
+package com.jhlabs.awt;
 
 import java.awt.Font;
 import java.awt.Shape;
@@ -32,7 +32,10 @@ import org.apache.commons.math3.util.FastMath;
 /**
  * Stroke that paint a text.
  * 
- * @see http://www.jhlabs.com/java/java2d/strokes/
+ * Slightly adapted to OTP from original source.
+ * 
+ * @see <a
+ *      href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
  * 
  */
 public class TextStroke implements Stroke {
