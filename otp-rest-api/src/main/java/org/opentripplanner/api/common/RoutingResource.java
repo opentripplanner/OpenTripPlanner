@@ -14,6 +14,7 @@
 package org.opentripplanner.api.common;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -22,6 +23,9 @@ import java.util.TimeZone;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -257,8 +261,16 @@ public abstract class RoutingResource {
             if (d == null && t != null) { 
                 LOG.debug("parsing ISO datetime {}", t);
                 try { // Full ISO date in time param ?
-                    request.setDateTime(javax.xml.datatype.DatatypeFactory.newInstance()
-                           .newXMLGregorianCalendar(t).toGregorianCalendar().getTime());
+                    // if the time param doesn't specify a timezone, use default as that of graph.
+                    // See issue #1373
+                    DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
+                    XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(t);
+                    GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
+                    if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                        gregCal.setTimeZone(tz);
+                    }
+                    Date d2 = gregCal.getTime();
+                    request.setDateTime(d2);
                 } catch (DatatypeConfigurationException e) {
                     request.setDateTime(d, t, tz);
                 }
