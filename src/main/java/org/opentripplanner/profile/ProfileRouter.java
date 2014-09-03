@@ -427,13 +427,11 @@ public class ProfileRouter {
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         GenericAStar astar = new GenericAStar();
-        int oldNumItineraries = rr.getNumItineraries();
         rr.setNumItineraries(1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode);
         astar.setTraverseVisitor(visitor);
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
         // Save the routing context for later cleanup. We need its temporary edges to render street segments at the end.
-        rr.setNumItineraries(oldNumItineraries);
         routingContexts.add(rr.rctx);
         return visitor.stopClustersFound.values();
     }
@@ -473,7 +471,6 @@ public class ProfileRouter {
         rr.walkSpeed = request.walkSpeed;
         rr.bikeSpeed = request.bikeSpeed;
         GenericAStar astar = new GenericAStar();
-        int oldNumItineraries = rr.getNumItineraries();
         rr.setNumItineraries(1);
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
         State state = spt.getState(rr.rctx.target);
@@ -481,7 +478,6 @@ public class ProfileRouter {
             LOG.info("Found non-transit option for mode {}", mode);
             directPaths.add(new StopAtDistance(state));
         }
-        rr.setNumItineraries(oldNumItineraries);
         routingContexts.add(rr.rctx); // save context for later cleanup so temp edges remain available
     }
 
@@ -498,7 +494,6 @@ public class ProfileRouter {
         rr.worstTime = (rr.dateTime + worstElapsedTime);
         rr.batch = (true);
         GenericAStar astar = new GenericAStar();
-        int oldNumItineraries = rr.getNumItineraries();
         rr.setNumItineraries(1);
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             int index = tstop.getIndex();
@@ -512,7 +507,6 @@ public class ProfileRouter {
         minSurface = new TimeSurface(this, false);
         maxSurface = new TimeSurface(this, true);
         LOG.info("done making timesurfaces.");
-        rr.setNumItineraries(oldNumItineraries);
         return new P2<TimeSurface>(minSurface, maxSurface);
     }
 
