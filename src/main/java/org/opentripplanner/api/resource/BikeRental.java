@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.standalone.OTPServer;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -39,8 +39,8 @@ import com.vividsolutions.jts.geom.Envelope;
 @XmlRootElement
 public class BikeRental {
 
-    @Context // FIXME inject Application context
-    public GraphService graphService;
+    @Context
+    OTPServer server;
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
@@ -49,7 +49,7 @@ public class BikeRental {
             @QueryParam("upperRight") String upperRight,
             @PathParam("routerId") String routerId) {
 
-        Graph graph = graphService.getGraph(routerId);
+        Graph graph = server.graphService.getGraph(routerId);
         if (graph == null) return null;
         BikeRentalStationService bikeRentalService = graph.getService(BikeRentalStationService.class);
         if (bikeRentalService == null) return new BikeRentalStationList();

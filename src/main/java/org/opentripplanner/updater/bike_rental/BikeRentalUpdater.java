@@ -97,6 +97,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new OVFietsKMLDataSource();
             } else if (sourceType.equals("city-bikes")) {
                 source = new CityBikesBikeRentalDataSource();
+            } else if (sourceType.equals("vcub")) {
+                source = new VCubDataSource();
             }
         }
 
@@ -157,16 +159,20 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         private List<BikeRentalStation> stations;
 
         public BikeRentalGraphWriterRunnable(List<BikeRentalStation> stations) {
-			this.stations = stations;
-		}
+            this.stations = stations;
+        }
 
 		@Override
         public void run(Graph graph) {
             // Apply stations to graph
             Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
-            Set<String> networks = new HashSet<String>(Arrays.asList(network));
+            Set<String> defaultNetworks = new HashSet<String>(Arrays.asList(network));
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
+                if (station.networks == null) {
+                    /* API did not provide a network list, use default */
+                    station.networks = defaultNetworks;
+                }
                 service.addStation(station);
                 stationSet.add(station);
                 BikeRentalStationVertex vertex = verticesByStation.get(station);
@@ -177,8 +183,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                         graph.addTemporaryEdge(e);
                     }
                     verticesByStation.put(station, vertex);
-                    new RentABikeOnEdge(vertex, vertex, networks);
-                    new RentABikeOffEdge(vertex, vertex, networks);
+                    new RentABikeOnEdge(vertex, vertex, station.networks);
+                    new RentABikeOffEdge(vertex, vertex, station.networks);
                 } else {
                     vertex.setBikesAvailable(station.bikesAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);
