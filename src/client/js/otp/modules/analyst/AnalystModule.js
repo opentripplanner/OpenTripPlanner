@@ -58,7 +58,7 @@ otp.modules.analyst.AnalystModule =
 
         modeSelector.refreshModeControls();
 
-        var buttonRow = $('<div style="text-align: center; margin-top: 6px;"></div>')
+        var buttonRow = $('<div class="notDraggable" style="text-align: center; margin-top: 6px;"></div>')
         .appendTo(this.optionsWidget.$());
         //TRANSLATORS: Button to update analyst information 
         $('<button>' + _tr("Refresh") + '</button>').button().click(function() {
