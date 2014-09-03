@@ -16,7 +16,6 @@ package org.opentripplanner.routing.services;
 import java.io.InputStream;
 import java.util.Collection;
 
-import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 

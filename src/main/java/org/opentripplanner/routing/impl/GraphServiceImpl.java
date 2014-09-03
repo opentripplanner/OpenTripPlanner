@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.opentripplanner.routing.graph.Graph;

@@ -40,6 +40,7 @@ import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderI
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.impl.GraphServiceAutoDiscoverImpl;
 import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.services.GraphService;
@@ -88,6 +89,17 @@ public class OTPConfigurator {
                 if (params.graphConfigFile != null) LOG.error("Can't read config file", e);
                 this.graphService = new GraphServiceBeanImpl(graph, null);
             }
+        } else if (params.autoScan) {
+            /* Create an auto-scan+reload GraphService */
+            GraphServiceAutoDiscoverImpl graphService = new GraphServiceAutoDiscoverImpl();
+            if (params.graphDirectory != null) {
+                graphService.setPath(params.graphDirectory);
+            }
+            if (params.routerIds.size() > 0) {
+                graphService.setDefaultRouterId(params.routerIds.get(0));
+            }
+            graphService.startup();
+            this.graphService = graphService;
         } else {
             /* Create a conventional GraphService that loads graphs from disk. */
             GraphServiceImpl graphService = new GraphServiceImpl();
