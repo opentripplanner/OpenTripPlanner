@@ -1859,6 +1859,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
+            // Intersect ways at walkable area boundaries if needed.
+            for (Area area : _walkableAreas) {
+                for (Ring outerRing : area.outermostRings) {
+                    for (OSMNode node : outerRing.nodes) {
+                        long nodeId = node.getId();
+                        if (possibleIntersectionNodes.contains(nodeId)) {
+                            intersectionNodes.put(nodeId, null);
+                        } else {
+                            possibleIntersectionNodes.add(nodeId);
+                        }
+                    }
+                }
+            }
             // Intersect ways at P+R area boundaries if needed.
             for (Area area : _parkAndRideAreas) {
                 for (Ring outerRing : area.outermostRings) {
