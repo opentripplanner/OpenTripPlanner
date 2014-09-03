@@ -303,6 +303,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
 
+        private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
+
         class Ring {
             public List<OSMNode> nodes;
 
@@ -942,6 +944,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         continue;
                     }
 
+                    // Add stops from public transit relations into the area
+                    if (stopsInAreas.containsKey(area.parent)){
+                        for(OSMNode node : stopsInAreas.get(area.parent)){
+                            addtoVisibilityAndStartSets(startingNodes, visibilityPoints, visibilityNodes, node);
+                        }
+                    }
+
+
                     for (Ring outerRing : area.outermostRings) {
                         for (int i = 0; i < outerRing.nodes.size(); ++i) {
                             OSMNode node = outerRing.nodes.get(i);
@@ -1130,7 +1140,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private void addtoVisibilityAndStartSets(Set<OSMNode> startingNodes,
                                                  ArrayList<VLPoint> visibilityPoints, ArrayList<OSMNode> visibilityNodes,
                                                  OSMNode node) {
-            if (_nodesWithNeighbors.contains(node.getId()) || multipleAreasContain(node.getId())) {
+            if (_nodesWithNeighbors.contains(node.getId()) || multipleAreasContain(node.getId()) || node.isStop()) {
 
                 startingNodes.add(node);
                 VLPoint point = new VLPoint(node.lon, node.lat);
@@ -2064,7 +2074,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             } else if (!(relation.isTag("type", "restriction"))
                     && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
                     && !(relation.isTag("type", "multipolygon") && isOsmEntityRoutable(relation))
-                    && !(relation.isTag("type", "level_map"))) {
+                    && !(relation.isTag("type", "level_map"))
+                    && !(relation.isTag("type", "public_transport") && relation.isTag("public_transport", "stop_area"))) {
                 return;
             }
 
@@ -2258,6 +2269,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     processLevelMap(relation);
                 } else if (relation.isTag("type", "route")) {
                     processRoad(relation);
+                } else if (relation.isTag("type", "public_transport")) {
+                    processPublicTransportStopArea(relation);
                 }
 
                 // multipolygons will be further processed in secondPhase()
@@ -2403,6 +2416,43 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
+        }
+
+        /**
+         * Process an OSM public transport stop area relation.
+         *
+         * This goes through all public_transport=stop_area relations and adds the parent
+         * (either an area or multipolygon relation) as the key and a Set of transit stop nodes
+         * that should be included in the parent area as the value into stopsInAreas.
+         * This improves TransitToTaggedStopsGraphBuilder by enabling us to have unconnected
+         * stop nodes within the areas by creating relations .
+         *
+         * @param relation
+         * @author hannesj
+         * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
+         */
+        private void processPublicTransportStopArea(OSMRelation relation) {
+            OSMWithTags platformArea = null;
+            Set<OSMNode> platformsNodes = new HashSet<>();
+            for (OSMRelationMember member : relation.getMembers()) {
+                if ("way".equals(member.getType()) && "platform".equals(member.getRole()) && _areaWayIds.contains(member.getRef())) {
+                    if (platformArea == null)
+                        platformArea = _areaWaysById.get(member.getRef());
+                    else
+                        LOG.warn("Too many areas in relation " + relation.getId());
+                } else if ("relation".equals(member.getType()) && "platform".equals(member.getRole()) && _relations.containsKey(member.getRef())) {
+                    if (platformArea == null)
+                        platformArea = _relations.get(member.getRef());
+                    else
+                        LOG.warn("Too many areas in relation " + relation.getId());
+                } else if ("node".equals(member.getType()) && _nodes.containsKey(member.getRef())) {
+                    platformsNodes.add(_nodes.get(member.getRef()));
+                }
+            }
+            if (platformArea != null && !platformsNodes.isEmpty())
+                stopsInAreas.put(platformArea, platformsNodes);
+            else
+                LOG.warn("Unable to process public transportation relation " + relation.getId());
         }
 
         private String addUniqueName(String routes, String name) {
