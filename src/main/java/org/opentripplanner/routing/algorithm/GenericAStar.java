@@ -48,10 +48,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private boolean verbose = false;
 
     private TraverseVisitor traverseVisitor;
-    
-    /** The number of paths to attempt to find */
-    public int nPaths = 3; // TODO this should really be set based on the routing request
-    
+
     enum RunStatus {
         RUNNING, STOPPED
     }
@@ -283,7 +280,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
-                if (runState.targetAcceptedStates.size() >= nPaths) {
+                if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
 
                     break;

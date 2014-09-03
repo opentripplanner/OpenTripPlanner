@@ -427,7 +427,7 @@ public class ProfileRouter {
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         GenericAStar astar = new GenericAStar();
-        astar.nPaths = (1);
+        rr.setNumItineraries(1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode);
         astar.setTraverseVisitor(visitor);
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
@@ -471,7 +471,7 @@ public class ProfileRouter {
         rr.walkSpeed = request.walkSpeed;
         rr.bikeSpeed = request.bikeSpeed;
         GenericAStar astar = new GenericAStar();
-        astar.nPaths = (1);
+        rr.setNumItineraries(1);
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
         State state = spt.getState(rr.rctx.target);
         if (state != null) {
@@ -494,7 +494,7 @@ public class ProfileRouter {
         rr.worstTime = (rr.dateTime + worstElapsedTime);
         rr.batch = (true);
         GenericAStar astar = new GenericAStar();
-        astar.nPaths = (1);
+        rr.setNumItineraries(1);
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             int index = tstop.getIndex();
             // Generate a tree outward from all stops that have been touched in the basic profile search
