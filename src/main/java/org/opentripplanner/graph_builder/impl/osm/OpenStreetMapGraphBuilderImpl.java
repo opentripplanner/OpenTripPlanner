@@ -1967,7 +1967,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 _bikeRentalNodes.add(node);
                 return;
             }
-            if (!(_nodesWithNeighbors.contains(node.getId()) || _areaNodes.contains(node.getId())))
+            if (!(_nodesWithNeighbors.contains(node.getId()) || _areaNodes.contains(node.getId()) || node.isStop()))
                 return;
 
             if (_nodes.containsKey(node.getId()))
