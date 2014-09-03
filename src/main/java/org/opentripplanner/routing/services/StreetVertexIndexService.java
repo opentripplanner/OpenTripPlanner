@@ -38,7 +38,14 @@ public interface StreetVertexIndexService {
      */
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
-    public Collection<StreetEdge> getEdgesForEnvelope(Envelope envelope);
+    /**
+     * Return the edges whose geometry intersect with the specified envelope. Warning: edges w/o
+     * geometry will not be indexed.
+     * 
+     * @param envelope
+     * @return
+     */
+    public Collection<Edge> getEdgesForEnvelope(Envelope envelope);
 
     /**
      * Get the closest edges to this location are traversable given these preferences.
