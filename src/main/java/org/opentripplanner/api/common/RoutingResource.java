@@ -13,17 +13,16 @@
 
 package org.opentripplanner.api.common;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
@@ -337,17 +336,25 @@ public abstract class RoutingResource {
             String d = get(date, n, null);
             String t = get(time, n, null);
             TimeZone tz;
-            if (otpServer.graphService != null) { // in tests it will be null
+            if (otpServer.graphService != null) { // in tests graphService can be null
                 tz = otpServer.graphService.getGraph(request.routerId).getTimeZone();
             } else {
-                LOG.warn("no graph service available, using default timezone.");
+                LOG.warn("No graph service available, using default time zone.");
                 tz = TimeZone.getDefault();
+                LOG.info("Time zone set to {}", tz);
             }
-            if (d == null && t != null) { 
+            if (d == null && t != null) { // Time was provided but not date
                 LOG.debug("parsing ISO datetime {}", t);
-                try { // Full ISO date in time param ?
-                    request.setDateTime(javax.xml.datatype.DatatypeFactory.newInstance()
-                           .newXMLGregorianCalendar(t).toGregorianCalendar().getTime());
+                try {
+                    // If the time query param doesn't specify a timezone, use the graph's default. See issue #1373.
+                    DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
+                    XMLGregorianCalendar xmlGregCal = df.newXMLGregorianCalendar(t);
+                    GregorianCalendar gregCal = xmlGregCal.toGregorianCalendar();
+                    if (xmlGregCal.getTimezone() == DatatypeConstants.FIELD_UNDEFINED) {
+                        gregCal.setTimeZone(tz);
+                    }
+                    Date d2 = gregCal.getTime();
+                    request.setDateTime(d2);
                 } catch (DatatypeConfigurationException e) {
                     request.setDateTime(d, t, tz);
                 }
