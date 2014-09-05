@@ -16,20 +16,46 @@
     // Or access using a file:// URL to allow modifying this client while using a running OTP server.
     // When you move the markers, sends a JSON request to OTP profile router and prints the resulting JSON in the JS console.
 
+    var map = L.map('map');
     var arlington = new L.LatLng(38.868, -77.14);
     var dc = new L.LatLng(38.896, -77.022);
-    var map = L.map('map');
     map.setView(dc, 13);
 
     L.tileLayer('http://otile4.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    var fromMarker = L.marker(arlington, {draggable: true});
-    var toMarker = L.marker(dc, {draggable: true});
+    var bikesafety = new L.TileLayer('http://localhost:8080/otp/routers/default/inspector/tile/bike-safety/{z}/{x}/{y}.png',
+        { maxZoom : 21 }
+    );
+
+    var traversal = new L.TileLayer('http://localhost:8080/otp/routers/default/inspector/tile/traversal/{z}/{x}/{y}.png',
+        { maxZoom : 21 }
+    );
+
+    L.control.layers(null, { "Bike safety": bikesafety, "Street permissions": traversal }).addTo(map); // first param is radio buttons, second is checkboxes
+
+    var fromMarker = L.marker(center, {draggable: true});
+    var toMarker = L.marker(center, {draggable: true});
+
+    // Find center of default region
+    var center;
+    var req = new XMLHttpRequest();
+    req.open('GET', 'http://localhost:8080/otp/routers/default/metadata', false); // async=false, define center before setting up map
+    req.setRequestHeader("Accept", "application/json");
+    req.onload = function() {
+        var resp = JSON.parse(req.responseText);
+        // console.log(resp);
+        var lat = resp['centerLatitude'];
+        var lng = resp['centerLongitude'];
+        var center = new L.LatLng(lat, lng);
+        map.setView(center, 13);
+        fromMarker.setLatLng(center);
+        toMarker.setLatLng(center);
+    };
+    req.send(null);
 
     function profileRoute() {
-        var req = new XMLHttpRequest();
         req.overrideMimeType("application/json");
         var url = "http://localhost:8080/otp/routers/default/profile";
         var fromPos = fromMarker.getLatLng();
@@ -37,14 +63,6 @@
         var qstring = '?from=' + fromPos.lat + ',' + fromPos.lng;
         qstring += '&to=' + toPos.lat + ',' + toPos.lng;
         qstring += '&modes=WALK,BICYCLE,TRANSIT'; // note that TRANSIT or specific transit modes must be included
-        /* AJAX
-        req.open('GET', url + qstring, true);
-        req.onload  = function() {
-            var resp = JSON.parse(req.responseText);
-            console.log(resp);
-        };
-        req.send(null);
-         */
         // Open directly in new tab
         window.open(url + qstring, '_blank');
     }
