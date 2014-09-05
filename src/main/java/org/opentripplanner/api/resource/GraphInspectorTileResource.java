@@ -91,8 +91,7 @@ public class GraphInspectorTileResource extends RoutingResource {
         BufferedImage image = otpServer.tileRendererManager.renderTile(tileRequest, layer);
 
         MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(image.getWidth() * image.getHeight()
-                / 4);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(image.getWidth() * image.getHeight() / 4);
         ImageIO.write(image, format.type, baos);
         CacheControl cc = new CacheControl();
         cc.setMaxAge(3600);
