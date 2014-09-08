@@ -23,6 +23,7 @@ import java.util.zip.ZipFile;
 
 import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.GraphStatisticsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
@@ -223,6 +224,9 @@ public class OTPConfigurator {
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
+        }
+        if (params.graphStatistics) {
+            graphBuilder.addGraphBuilder(new GraphStatisticsGraphBuilderImpl());
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
