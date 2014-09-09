@@ -14,6 +14,7 @@
 package org.opentripplanner.common.geometry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -54,5 +55,56 @@ public class CompactLineStringTest extends TestCase {
         assertTrue(cls != CompactLineString.STRAIGHT_LINE);
         ls2 = cls.toLineString(x0, y0, x1, y1);
         assertTrue(ls.equalsExact(ls2, 0.00000015));
+    }
+
+    @Test
+    public final void testDlugoszVarLenIntPacker() {
+
+        packTest(new int[] {}, 0);
+        packTest(new int[] { 0 }, 1);
+        packTest(new int[] { 63 }, 1);
+        packTest(new int[] { -64 }, 1);
+        packTest(new int[] { 64 }, 2);
+        packTest(new int[] { -65 }, 2);
+        packTest(new int[] { -8192 }, 2);
+        packTest(new int[] { -8193 }, 3);
+        packTest(new int[] { 8191 }, 2);
+        packTest(new int[] { 8192 }, 3);
+        packTest(new int[] { -1048576 }, 3);
+        packTest(new int[] { -1048577 }, 4);
+        packTest(new int[] { 1048575 }, 3);
+        packTest(new int[] { 1048576 }, 4);
+        packTest(new int[] { -67108864 }, 4);
+        packTest(new int[] { -67108865 }, 5);
+        packTest(new int[] { 67108863 }, 4);
+        packTest(new int[] { 67108864 }, 5);
+        packTest(new int[] { Integer.MAX_VALUE }, 5);
+        packTest(new int[] { Integer.MIN_VALUE }, 5);
+
+        packTest(new int[] { 0, 0 }, 2);
+        packTest(new int[] { 0, 0, 0 }, 3);
+
+        packTest(new int[] { 8100, 8200, 8300 }, 8);
+    }
+
+    private void packTest(int[] arr, int expectedPackedLen) {
+        byte[] packed = DlugoszVarLenIntPacker.pack(arr);
+        System.out.println("Unpacked: " + Arrays.toString(arr) + " -> packed: "
+                + unsignedCharString(packed));
+        assertEquals(expectedPackedLen, packed.length);
+        int[] unpacked = DlugoszVarLenIntPacker.unpack(packed);
+        assertTrue(Arrays.equals(arr, unpacked));
+    }
+
+    private String unsignedCharString(byte[] data) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("[");
+        for (int i = 0; i < data.length; i++) {
+            sb.append(String.format("%02X", data[i] & 0xFF));
+            if (i < data.length - 1)
+                sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }
