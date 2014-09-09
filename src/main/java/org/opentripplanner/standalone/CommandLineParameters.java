@@ -103,10 +103,6 @@ public class CommandLineParameters {
             description = "skip area visibility calculations, which are often time consuming.")
     boolean skipVisibility;
 
-    @Parameter(names = { "--graphStatistics"},
-            description = "print graph/memory statistics during build.")
-    boolean graphStatistics;
-
     /* Options for the server sub-task. */
 
     @Parameter( names = { "-a", "--analyst"}, 

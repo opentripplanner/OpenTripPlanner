@@ -15,7 +15,6 @@ package org.opentripplanner.standalone;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
@@ -23,7 +22,6 @@ import java.util.zip.ZipFile;
 
 import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.GraphStatisticsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
@@ -224,9 +222,6 @@ public class OTPConfigurator {
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
-        }
-        if (params.graphStatistics) {
-            graphBuilder.addGraphBuilder(new GraphStatisticsGraphBuilderImpl());
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
