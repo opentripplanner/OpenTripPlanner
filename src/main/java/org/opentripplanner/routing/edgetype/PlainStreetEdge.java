@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
+import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -59,7 +60,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private double length;
 
-    private LineString geometry;
+    private CompactLineString compactGeometry;
     
     private String name;
 
@@ -652,11 +653,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 	}
 
 	public LineString getGeometry() {
-		return geometry;
+		return compactGeometry.toLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat());
 	}
 
 	public void setGeometry(LineString geometry) {
-		this.geometry = geometry;
+		this.compactGeometry = CompactLineString.create(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry);
 	}
 
 	public String getLabel() {
