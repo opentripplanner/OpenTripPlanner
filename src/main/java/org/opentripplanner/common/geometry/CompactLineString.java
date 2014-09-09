@@ -26,8 +26,9 @@ import com.vividsolutions.jts.geom.LineString;
  * vertices)</li>
  * <li>For straight-line geometries (sometimes around half of the street geometries), re-use the
  * same static object (since there is nothing to store)</li>
- * <li>Store intermediate point in fixed floating points with fixed precision, in a simple int array
- * inside the object itself</li>
+ * <li>Store intermediate point in fixed floating points with fixed precision, using delta coding
+ * from the previous point, and variable length coding (most of the delta coordinates will thus fits
+ * in 1 or 2 bytes).</li>
  * </ul>
  * 
  * This trick alone saves around 20% of memory compared to the bulky JTS LineString, which is split
