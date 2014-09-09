@@ -66,7 +66,7 @@ public class CompactLineString implements Serializable {
     /**
      * Can also be null if empty. Note: Integer.MAX_VALUE / FIXED_FLOAT_MULT = 2147.483647
      */
-    private int[] coords;
+    private byte[] packedCoords;
 
     /**
      * Public factory to create a compact line string. Optimize for straight-line only line string
@@ -108,7 +108,7 @@ public class CompactLineString implements Serializable {
                     "CompactLineString geometry must stick to given end points. If you need to relax this, please read source code.");
         int oix = (int) Math.round(x0 * FIXED_FLOAT_MULT);
         int oiy = (int) Math.round(y0 * FIXED_FLOAT_MULT);
-        coords = new int[(c.length - 2) * 2];
+        int[] coords = new int[(c.length - 2) * 2];
         for (int i = 1; i < c.length - 1; i++) {
             /*
              * Note: We should do the rounding *before* the delta to prevent rounding errors from
@@ -123,6 +123,7 @@ public class CompactLineString implements Serializable {
             oix = ix;
             oiy = iy;
         }
+        packedCoords = DlugoszVarLenIntPacker.pack(coords);
     }
 
     /**
@@ -135,7 +136,10 @@ public class CompactLineString implements Serializable {
      * @return
      */
     public LineString toLineString(double x0, double y0, double x1, double y1) {
-        int size = coords == null ? 2 : (coords.length / 2) + 2;
+        int[] coords = packedCoords == null ? null : DlugoszVarLenIntPacker.unpack(packedCoords);
+        int size = packedCoords == null ? 2 : (coords.length / 2) + 2;
+        if (packedCoords == null) {
+        }
         Coordinate[] c = new Coordinate[size];
         c[0] = new Coordinate(x0, y0);
         if (coords != null) {
@@ -159,7 +163,7 @@ public class CompactLineString implements Serializable {
         if (this == STRAIGHT_LINE) {
             return "CompactLineString.STRAIGHT_LINE";
         } else {
-            return "CompactLineString(" + (2 + coords.length) + ")";
+            return "CompactLineString(" + (packedCoords.length) + ")";
         }
     }
 }
