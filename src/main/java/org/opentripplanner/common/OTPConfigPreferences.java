@@ -46,9 +46,8 @@ public class OTPConfigPreferences extends AbstractPreferences {
     private Map<String, OTPConfigPreferences> children = Maps.newHashMap();
 
     private static void parseError(String msg, String filename, int line) {
-        String longmsg = String.format("config file parse error in file '%s' at line %d:\n%s", filename, line, msg);
+        String longmsg = String.format("parse error in config file '%s' at line %d:\n    %s", filename, line, msg);
         LOG.error(longmsg);
-        throw new RuntimeException(longmsg);
     }
 
     private OTPConfigPreferences (OTPConfigPreferences parent, String name) {
@@ -71,30 +70,36 @@ public class OTPConfigPreferences extends AbstractPreferences {
                 if (tokens.length > 2) {
                     parseError("line must contain a key-value pair, a child name and an opening bracket, " +
                             "or a single closing bracket.", filename, nline);
+                    return null;
                 }
                 String key = tokens[0].trim();
                 String val = "NONE";
                 if (tokens.length > 1) val = tokens[1].trim();
                 if (key.equals("}")) {
                     if (tokens.length > 1) {
-                        parseError("closing bracket should appear alone on a line.", filename, nline);
+                        parseError("Closing bracket should appear alone on a line.", filename, nline);
+                        return null;
                     }
                     if (stack.isEmpty()) {
-                        parseError("bracket mismatch (too many closing brackets)", filename, nline);
+                        parseError("Bracket mismatch (too many closing brackets).", filename, nline);
+                        return null;
                     }
                     curr = stack.pop();
                     continue;
                 }
                 if (key.endsWith("{")) {
-                    parseError("an opening bracket should be preceded by a child name and whitespace.", filename, nline);
+                    parseError("An opening bracket should be preceded by a child name and whitespace.", filename, nline);
+                    return null;
                 }
                 if (val.startsWith("{") && val.length() > 1) {
-                    parseError("opening bracket should be the last element on a line.", filename, nline);
+                    parseError("The opening bracket should be the last element on a line.", filename, nline);
+                    return null;
                 }
                 if ("{".equals(val)) {
                     OTPConfigPreferences child = curr.children.get(key);
                     if (child != null) {
-                        parseError(String.format("multiple definitions of child %s.", key), filename, nline);
+                        parseError(String.format("Multiple definitions of child '%s'.", key), filename, nline);
+                        return null;
                     }
                     child = new OTPConfigPreferences(curr, key);
                     curr.children.put(key, child);
@@ -102,12 +107,16 @@ public class OTPConfigPreferences extends AbstractPreferences {
                     curr = child;
                 } else {
                     if (curr.entries.get(key) != null) {
-                        parseError(String.format("key '%s' appears multiple times.", key), filename, nline);
+                        parseError(String.format("Multiple definitions of key '%s'.", key), filename, nline);
+                        return null;
                     }
                     curr.entries.put(key, val);
                 }
             }
-            if ( ! stack.isEmpty()) parseError("Bracket mismatch: not enough closing brackets.", filename, nline);
+            if ( ! stack.isEmpty()) {
+                parseError("Bracket mismatch (not enough closing brackets).", filename, nline);
+                return null;
+            }
             return curr;
         } catch (IOException e) {
             e.printStackTrace();

@@ -12,11 +12,12 @@ import java.util.prefs.Preferences;
  */
 public class TestConfigFile extends TestCase {
 
-    private static String CONFIG1 = "src/test/resources/test1.config";
+    private static String VALID = "src/test/resources/org/opentripplanner/common/valid1.config";
 
     @Test
     public void testLoadPreferences() throws Exception {
-        OTPConfigPreferences config = OTPConfigPreferences.fromFile(CONFIG1);
+        OTPConfigPreferences config = OTPConfigPreferences.fromFile(VALID);
+        assertNotNull(config);
         // System.out.println(config.toString());
         assertTrue(config.nodeExists("/origins/filters/graphGeographicFilter"));
         assertTrue (config.nodeExists("/request"));
@@ -35,6 +36,17 @@ public class TestConfigFile extends TestCase {
         node = config.node("/request");
         assertTrue(Arrays.asList(node.keys()).contains("routerId"));
         assertFalse(Arrays.asList(node.keys()).contains("missingThing"));
+
+        /* Ensure that comments are being ignored */
+        assertEquals(config.childrenNames().length, 4);
+        assertEquals(config.keys().length, 3);
+
+        /* Test some invalid input */
+        for (int i = 1; i <= 6; i++) {
+            String filename = String.format("src/test/resources/org/opentripplanner/common/invalid%d.config", i);
+            config = OTPConfigPreferences.fromFile(filename);
+            assertNull("For invalid input, factory method should return null.", config);
+        }
     }
 
 }
