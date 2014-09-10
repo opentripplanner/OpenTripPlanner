@@ -64,8 +64,8 @@ public class SimpleTraversalCostModelTest {
         PlainStreetEdge e1 = edge(v1, v2, 1.0, false);
 
         // Edge has same first and last angle.
-        assertEquals(91, e1.getInAngle());
-        assertEquals(91, e1.getOutAngle());
+        assertEquals(90, e1.getInAngle());
+        assertEquals(90, e1.getOutAngle());
         
         // 2 new ones
         IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false);
@@ -78,10 +78,10 @@ public class SimpleTraversalCostModelTest {
         
         // Difference should be about 90.
         int diff = (e1.getOutAngle() - e2.getInAngle());
-        assertEquals(91, diff);
+        assertEquals(90, diff);
         
         int turnAngle = costModel.calculateTurnAngle(e1, e2, options);
-        assertEquals(269, turnAngle);
+        assertEquals(270, turnAngle);
     }
     
     @Test
