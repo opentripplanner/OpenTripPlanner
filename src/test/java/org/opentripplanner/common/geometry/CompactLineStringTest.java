@@ -40,9 +40,13 @@ public class CompactLineStringTest extends TestCase {
         c.add(new Coordinate(x0, y0));
         c.add(new Coordinate(x1, y1));
         LineString ls = gf.createLineString(c.toArray(new Coordinate[0]));
-        CompactLineString cls = CompactLineString.create(x0, y0, x1, y1, ls);
-        assertTrue(cls == CompactLineString.STRAIGHT_LINE); // ==, not equals
-        LineString ls2 = cls.toLineString(x0, y0, x1, y1);
+        int[] coords = CompactLineString.compactLineString(x0, y0, x1, y1, ls);
+        assertTrue(coords == CompactLineString.STRAIGHT_LINE); // ==, not equals
+        LineString ls2 = CompactLineString.uncompactLineString(x0, y0, x1, y1, coords);
+        assertTrue(ls.equalsExact(ls2, 0.00000015));
+        byte[] packedCoords = CompactLineString.compackLineString(x0, y0, x1, y1, ls);
+        assertTrue(packedCoords == CompactLineString.STRAIGHT_LINE_PACKED); // ==, not equals
+        ls2 = CompactLineString.uncompackLineString(x0, y0, x1, y1, packedCoords);
         assertTrue(ls.equalsExact(ls2, 0.00000015));
 
         c.clear();
@@ -51,9 +55,13 @@ public class CompactLineStringTest extends TestCase {
         c.add(new Coordinate(179.99, 1.12345));
         c.add(new Coordinate(x1, y1));
         ls = gf.createLineString(c.toArray(new Coordinate[0]));
-        cls = CompactLineString.create(x0, y0, x1, y1, ls);
-        assertTrue(cls != CompactLineString.STRAIGHT_LINE);
-        ls2 = cls.toLineString(x0, y0, x1, y1);
+        coords = CompactLineString.compactLineString(x0, y0, x1, y1, ls);
+        assertTrue(coords != CompactLineString.STRAIGHT_LINE);
+        ls2 = CompactLineString.uncompactLineString(x0, y0, x1, y1, coords);
+        assertTrue(ls.equalsExact(ls2, 0.00000015));
+        packedCoords = CompactLineString.compackLineString(x0, y0, x1, y1, ls);
+        assertTrue(packedCoords != CompactLineString.STRAIGHT_LINE_PACKED);
+        ls2 = CompactLineString.uncompackLineString(x0, y0, x1, y1, packedCoords);
         assertTrue(ls.equalsExact(ls2, 0.00000015));
     }
 
