@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.LineString;
  * 
  * @author laurent
  */
-public class CompactLineString implements Serializable {
+public final class CompactLineString implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -57,17 +57,14 @@ public class CompactLineString implements Serializable {
     /**
      * Singleton representation of a straight-line (where nothing has to be stored), to be re-used.
      */
-    protected static final CompactLineString STRAIGHT_LINE = new CompactLineString();
+    protected static final int[] STRAIGHT_LINE = new int[0];
+
+    protected static final byte[] STRAIGHT_LINE_PACKED = new byte[0];
 
     /**
      * Geometry factory. TODO - Do we need to make this parametrable?
      */
     private static GeometryFactory geometryFactory = new GeometryFactory();
-
-    /**
-     * Can also be null if empty. Note: Integer.MAX_VALUE / FIXED_FLOAT_MULT = 2147.483647
-     */
-    private byte[] packedCoords;
 
     /**
      * Public factory to create a compact line string. Optimize for straight-line only line string
@@ -82,26 +79,16 @@ public class CompactLineString implements Serializable {
      *        y1).
      * @return
      */
-    public static CompactLineString create(double x0, double y0, double x1, double y1,
+    public static int[] compactLineString(double x0, double y0, double x1, double y1,
             LineString lineString) {
         if (lineString == null)
             return null;
         if (lineString.getCoordinates().length == 2)
             return STRAIGHT_LINE;
-        return new CompactLineString(x0, y0, x1, y1, lineString);
-    }
-
-    /**
-     * Nothing to store, used only for straight line version (no intermediate points).
-     */
-    private CompactLineString() {
-    }
-
-    protected CompactLineString(double x0, double y0, double x1, double y1, LineString lineString) {
         Coordinate[] c = lineString.getCoordinates();
         /*
          * Check if the lineString is really sticking to the given end-points. TODO: If this is not
-         * guaranteed, store all delta (from 0 to n-1) and set a flag (or use a sub-class marker).
+         * guaranteed, store all delta (from 0 to n-1) -- but how to mark it? A prefix?
          */
         if (Math.abs(x0 - c[0].x) > EPS || Math.abs(y0 - c[0].y) > EPS
                 || Math.abs(x1 - c[c.length - 1].x) > EPS || Math.abs(y1 - c[c.length - 1].y) > EPS)
@@ -124,23 +111,40 @@ public class CompactLineString implements Serializable {
             oix = ix;
             oiy = iy;
         }
-        packedCoords = DlugoszVarLenIntPacker.pack(coords);
+        return coords;
     }
 
     /**
-     * Construct a LineString based on external end-points.
+     * Same as the other version, but in a var-len int packed form (Dlugosz coding).
      * 
      * @param x0
      * @param y0
      * @param x1
      * @param y1
+     * @param lineString
      * @return
      */
-    public LineString toLineString(double x0, double y0, double x1, double y1) {
-        int[] coords = packedCoords == null ? null : DlugoszVarLenIntPacker.unpack(packedCoords);
-        int size = packedCoords == null ? 2 : (coords.length / 2) + 2;
-        if (packedCoords == null) {
-        }
+    public static byte[] compackLineString(double x0, double y0, double x1, double y1,
+            LineString lineString) {
+        int[] coords = compactLineString(x0, y0, x1, y1, lineString);
+        if (coords == STRAIGHT_LINE)
+            return STRAIGHT_LINE_PACKED;
+        return DlugoszVarLenIntPacker.pack(coords);
+    }
+
+    /**
+     * Construct a LineString based on external end-points and compacted int version.
+     * 
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     * @param coords Compact version of coordinates
+     * @return
+     */
+    public static LineString uncompactLineString(double x0, double y0, double x1, double y1,
+            int[] coords) {
+        int size = coords == null ? 2 : (coords.length / 2) + 2;
         Coordinate[] c = new Coordinate[size];
         c[0] = new Coordinate(x0, y0);
         if (coords != null) {
@@ -158,13 +162,18 @@ public class CompactLineString implements Serializable {
         return geometryFactory.createLineString(c);
     }
 
-    @Override
-    public String toString() {
-        // We do not have much to print here.
-        if (this == STRAIGHT_LINE) {
-            return "CompactLineString.STRAIGHT_LINE";
-        } else {
-            return "CompactLineString(" + (packedCoords.length) + ")";
-        }
+    /**
+     * Same as the other version, but in a var-len int packed form (Dlugosz coding).
+     * 
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     * @param coords
+     * @return
+     */
+    public static LineString uncompackLineString(double x0, double y0, double x1, double y1,
+            byte[] packedCoords) {
+        return uncompactLineString(x0, y0, x1, y1, DlugoszVarLenIntPacker.unpack(packedCoords));
     }
 }
