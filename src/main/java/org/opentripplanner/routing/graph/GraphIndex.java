@@ -1,10 +1,6 @@
 package org.opentripplanner.routing.graph;
 
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -35,6 +31,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -278,6 +275,16 @@ public class GraphIndex {
             if ( ! times.times.isEmpty()) ret.add(times);
         }
         return ret;
+    }
+
+    public Timetable timeTableForTrip(TripPattern tripPattern) {
+        RoutingRequest req = new RoutingRequest();
+        req.setRoutingContext(graph, (Vertex)null, (Vertex)null);
+
+        Calendar calendar = Calendar.getInstance();
+        ServiceDate serviceDate = new ServiceDate(calendar.getTime());
+        Timetable table = req.rctx.timetableSnapshot.resolve(tripPattern, serviceDate);
+        return table;
     }
 
     /**
