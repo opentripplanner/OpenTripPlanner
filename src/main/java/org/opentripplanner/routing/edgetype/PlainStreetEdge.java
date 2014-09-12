@@ -60,7 +60,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private double length;
 
-    private byte[] compactGeometry;
+    private int[] compactGeometry;
     
     private String name;
 
@@ -653,11 +653,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 	}
 
 	public LineString getGeometry() {
-		return CompactLineString.uncompackLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry);
+		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry);
 	}
 
 	public void setGeometry(LineString geometry) {
-		this.compactGeometry = CompactLineString.compackLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry);
+		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry);
 	}
 
 	public String getLabel() {
