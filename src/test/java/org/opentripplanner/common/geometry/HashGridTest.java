@@ -44,7 +44,7 @@ public class HashGridTest extends TestCase {
      */
     @SuppressWarnings("unchecked")
     public void testHashGridRandom() {
-        final double X0 = 1.0;
+        final double X0 = -0.05;
         final double Y0 = 44.0;
         final double DX = 0.1;
         final double DY = 0.1;
