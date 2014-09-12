@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,34 +125,27 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     }
 
     @Override
-    public final boolean remove(Envelope envelope, Object item) {
-        boolean retval = false;
-        Coordinate min = new Coordinate(envelope.getMinX(), envelope.getMinY());
-        Coordinate max = new Coordinate(envelope.getMaxX(), envelope.getMaxY());
-        long minXKey = xKey(min.x);
-        long maxXKey = xKey(max.x);
-        long minYKey = yKey(min.y);
-        long maxYKey = yKey(max.y);
-        for (long xKey = minXKey; xKey <= maxXKey; xKey++) {
-            for (long yKey = minYKey; yKey <= maxYKey; yKey++) {
-                long mapKey = xKey << 32 | yKey;
-                List<T> bin = bins.get(mapKey);
-                if (bin != null) {
-                    boolean removed = bin.remove(item);
-                    if (removed)
-                        retval = true;
+    public final boolean remove(Envelope envelope, final Object item) {
+        final AtomicInteger removedCount = new AtomicInteger();
+        visit(envelope, false, new BinVisitor<T>() {
+            @Override
+            public boolean visit(List<T> bin) {
+                boolean removed = bin.remove(item);
+                if (removed) {
+                    nEntries--;
+                    removedCount.addAndGet(1);
                 }
+                return removed;
             }
-        }
-        if (retval)
-            nEntries--;
-        return retval;
+        });
+        return removedCount.get() > 0;
     }
 
     private interface BinVisitor<T> {
 
         /**
          * Bin visitor callback.
+         * 
          * @param bin
          * @return true if something has been removed from the bin.
          */
@@ -160,6 +154,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
 
     /**
      * Visit each bin touching the envelope.
+     * 
      * @param envelope Self-descripting.
      * @param createIfEmpty Create a new bin if not existing.
      * @param binVisitor The callback to call for each visited bin.
@@ -167,13 +162,19 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     private void visit(Envelope envelope, boolean createIfEmpty, final BinVisitor<T> binVisitor) {
         Coordinate min = new Coordinate(envelope.getMinX(), envelope.getMinY());
         Coordinate max = new Coordinate(envelope.getMaxX(), envelope.getMaxY());
-        long minXKey = xKey(min.x);
-        long maxXKey = xKey(max.x);
-        long minYKey = yKey(min.y);
-        long maxYKey = yKey(max.y);
+        long minXKey = Math.round(min.x / xBinSize);
+        long maxXKey = Math.round(max.x / xBinSize);
+        long minYKey = Math.round(min.y / yBinSize);
+        long maxYKey = Math.round(max.y / yBinSize);
         for (long xKey = minXKey; xKey <= maxXKey; xKey++) {
             for (long yKey = minYKey; yKey <= maxYKey; yKey++) {
-                long mapKey = xKey << 32 | yKey;
+                /*
+                 * For all known use, the average absolute value of x/y keys will be rather small
+                 * compared to Integer.MAX_VALUE. We need to swap the two words (MSB and LSB) of
+                 * xKey in order to have a well-behaving long hash, fitting in an int, because the
+                 * default implementation is: hashInt = (int)(value ^ (value >>> 32));
+                 */
+                long mapKey = (yKey << 32) | ((xKey & 0xFFFF) << 16) | ((xKey >> 16) & 0xFFFF);
                 List<T> bin = bins.get(mapKey);
                 if (createIfEmpty && bin == null) {
                     bin = new ArrayList<>();
@@ -189,34 +190,6 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
                 }
             }
         }
-    }
-
-    /**
-     * Compute the X index of the bin. Could overflow for really large coordinates: TODO wrap if needed.
-     * @param x coordinate
-     * @return index between 0 and Integer.MAX_VALUE
-     */
-    private final long xKey(double x) {
-        long xKey = Math.round(x / xBinSize) + 0x8000000;
-        // This should not happen for geographical uses,
-        // even with ridiculously small bin size (>0.14m)
-        if (xKey < 0 || xKey > Integer.MAX_VALUE)
-            throw new RuntimeException("HashGrid bin X-index overflow, please use larger bin size.");
-        return xKey;
-    }
-
-    /**
-     * Compute the Y index of the bin.
-     * @param y coordinate
-     * @return index between 0 and Integer.MAX_VALUE
-     */
-    private final long yKey(double y) {
-        long yKey = Math.round(y / yBinSize) + 0x8000000;
-        // This should not happen for geographical uses,
-        // even with ridiculously small bin size (>0.14m)
-        if (yKey < 0 || yKey > Integer.MAX_VALUE)
-            throw new RuntimeException("HashGrid bin Y-index overflow, please use larger bin size.");
-        return yKey;
     }
 
     public String toString() {
