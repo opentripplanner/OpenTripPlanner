@@ -40,7 +40,7 @@ otp.modules.bikeshare.StationCollection =
     model: otp.modules.bikeshare.StationModel,
     
     sync: function(method, model, options) {
-        options.dataType = 'jsonp';
+        options.dataType = 'json';
         options.data = options.data || {};
         if(otp.config.routerId !== undefined) {
             options.data.routerId = otp.config.routerId;
