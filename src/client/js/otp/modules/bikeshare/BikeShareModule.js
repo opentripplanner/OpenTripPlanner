@@ -161,7 +161,7 @@ otp.modules.bikeshare.BikeShareModule =
         this.drawItinerary(itin);
         
         if(tripPlan.queryParams.mode === 'WALK,BICYCLE_RENT') { // bikeshare trip
-            var polyline = new L.Polyline(otp.util.Geo.decodePolyline(itin.itinData.legs[0].legGeometry.points));
+            var polyline = new L.Polyline(otp.util.Geo.decodePolyline(itin.itinData.legs[1].legGeometry.points));
             var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
         }
         else { // "my own bike" trip
