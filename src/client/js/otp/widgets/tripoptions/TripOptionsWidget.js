@@ -968,7 +968,7 @@ otp.widgets.tripoptions.BikeType =
             //module.mode = "WALK,BICYCLE";
             //module.planTrip();
             this_.tripWidget.inputChanged({
-                mode : "WALK,BICYCLE",
+                mode : "WALK,BICYCLE_RENT",
             });
         });
     },
@@ -977,7 +977,7 @@ otp.widgets.tripoptions.BikeType =
         if(planData.queryParams.mode === "BICYCLE") {
             $('#'+this.id+'-myOwnBikeRBtn').attr('checked', 'checked');
         }
-        if(planData.queryParams.mode === "WALK,BICYCLE") {
+        if(planData.queryParams.mode === "WALK,BICYCLE_RENT") {
             $('#'+this.id+'-sharedBikeRBtn').attr('checked', 'checked');
         }
     },
