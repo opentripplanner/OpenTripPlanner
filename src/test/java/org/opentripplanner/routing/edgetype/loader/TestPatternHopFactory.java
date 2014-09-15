@@ -74,7 +74,7 @@ public class TestPatternHopFactory extends TestCase {
         factory.run(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
         
-        String[] stops = {"agency:A", "agency:B", "agency:C", "agency:D", "agency:E"};
+        String[] stops = {"agency:A", "agency:B", "agency:C", "agency:D", "agency:E", "agency:entrance_a", "agency:entrance_b"};
         for (int i = 0; i < stops.length; ++i) {
             TransitStop stop = (TransitStop) (graph.getVertex(stops[i]));
             
@@ -435,8 +435,8 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testWheelchairAccessible() throws Exception {
-        Vertex near_a = graph.getVertex("near_1_agency_A");
-        Vertex near_b = graph.getVertex("near_1_agency_B");
+        Vertex near_a = graph.getVertex("near_1_agency_entrance_a");
+        Vertex near_b = graph.getVertex("near_1_agency_entrance_b");
         Vertex near_c = graph.getVertex("near_1_agency_C");
         Vertex near_e = graph.getVertex("near_1_agency_E");
 
