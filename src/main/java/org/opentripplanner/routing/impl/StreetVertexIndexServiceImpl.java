@@ -66,9 +66,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * Contains only instances of {@link StreetEdge}
      */
     protected SpatialIndex edgeTree;
-
     protected SpatialIndex transitStopTree;
-
     protected SpatialIndex verticesTree;
 
     public DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
@@ -111,6 +109,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private void postSetup() {
         for (Vertex gv : graph.getVertices()) {
             Vertex v = gv;
@@ -124,7 +123,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     continue;
                 }
                 Envelope env = geometry.getEnvelopeInternal();
-                edgeTree.insert(env, e);
+                if (edgeTree instanceof HashGridSpatialIndex)
+                    ((HashGridSpatialIndex)edgeTree).insert(geometry, e);
+                else
+                    edgeTree.insert(env, e);
             }
             if (v instanceof TransitStop) {
                 Envelope env = new Envelope(v.getCoordinate());
@@ -493,4 +495,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return graph.getVertex(place);
     }
 
+    @Override
+    public String toString() {
+        return getClass().getName() + " -- edgeTree: " + edgeTree.toString() + " -- verticesTree: " + verticesTree.toString();
+    }
 }
