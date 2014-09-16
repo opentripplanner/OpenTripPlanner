@@ -1,13 +1,6 @@
 package org.opentripplanner.profile;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.google.common.collect.TreeMultimap;
-import org.onebusaway.gtfs.model.AgencyAndId;
+import com.google.common.collect.*;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.resource.SimpleIsochrone;
@@ -16,7 +9,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -30,13 +22,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public class ProfileRouter {
 
@@ -287,8 +274,6 @@ public class ProfileRouter {
             Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStopCluster());
             Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStopCluster());
             Option option = new Option(ride, accessPaths, egressPaths);
-            StopCluster s0 = ride.getAccessStopCluster();
-            StopCluster s1 = ride.getEgressStopCluster();
             if ( ! option.hasEmptyRides()) options.add(option);
         }
         /* Include the direct (no-transit) biking, driving, and walking options. */
@@ -408,12 +393,14 @@ public class ProfileRouter {
      */
     private Collection<StopAtDistance> findClosestStops(final TraverseMode mode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        RoutingRequest rr = new RoutingRequest(mode);
+        if (mode == TraverseMode.CAR) {
+            rr.kissAndRide = true; // allow car->walk transition. we are assuming that someone will drop you off.
+        }
         rr.from = (new GenericLocation(request.from.lat, request.from.lon));
         // FIXME requires destination to be set, not necesary for analyst
         rr.to = new GenericLocation(request.to.lat, request.to.lon);
         rr.setArriveBy(dest);
-        rr.setMode(mode);
         // TODO CAR does not seem to work. rr.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
