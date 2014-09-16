@@ -14,6 +14,9 @@
 package org.opentripplanner.common.geometry;
 
 import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.procedure.TLongProcedure;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.ItemVisitor;
 import com.vividsolutions.jts.index.SpatialIndex;
 
@@ -53,10 +57,12 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(HashGridSpatialIndex.class);
 
     /* Computation done based on geographical coordinates. */
-    private static final double DEFAULT_Y_BIN_SIZE = 0.010; // ~1km
+    // private static final double DEFAULT_Y_BIN_SIZE = 0.010; // ~1km
+    private static final double DEFAULT_Y_BIN_SIZE = 0.005; // ~500m
 
     /* Computation done based on geographical coordinates at ~45 degree lat */
-    private static final double DEFAULT_X_BIN_SIZE = 0.007; // ~1km
+    // private static final double DEFAULT_X_BIN_SIZE = 0.007; // ~1km
+    private static final double DEFAULT_X_BIN_SIZE = 0.0035; // ~500m
 
     /* Size of bin in X and Y direction, in coordinates units. */
     private final double xBinSize, yBinSize;
@@ -65,6 +71,8 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     private final TLongObjectHashMap<List<T>> bins;
 
     private int nBins = 0;
+
+    private int nObjects = 0;
 
     private int nEntries = 0;
 
@@ -87,7 +95,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
         visit(envelope, true, new BinVisitor<T>() {
             @SuppressWarnings("unchecked")
             @Override
-            public boolean visit(List<T> bin) {
+            public boolean visit(List<T> bin, long mapKey) {
                 /*
                  * Note: here we can end-up having several time the same object in the same bin, if
                  * the client insert multiple times the same object with different envelopes.
@@ -96,10 +104,39 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
                  * list.
                  */
                 bin.add((T) item);
+                nEntries++;
                 return false;
             }
         });
-        nEntries++;
+        nObjects++;
+    }
+
+    public final void insert(LineString geom, final Object item) {
+        Coordinate[] coord = geom.getCoordinates();
+        final TLongSet keys = new TLongHashSet(coord.length * 8);
+        for (int i = 0; i < coord.length - 1; i++) {
+            // TODO Cut the segment if longer than bin size
+            // to reduce the number of wrong bins
+            Envelope env = new Envelope(coord[i], coord[i + 1]);
+            visit(env, true, new BinVisitor<T>() {
+                @Override
+                public boolean visit(List<T> bin, long mapKey) {
+                    keys.add(mapKey);
+                    return false;
+                }
+            });
+        }
+        keys.forEach(new TLongProcedure() {
+            @SuppressWarnings("unchecked")
+            @Override
+            public boolean execute(long key) {
+                // Note: bins have been initialized in the previous visit
+                bins.get(key).add((T) item);
+                nEntries++;
+                return true;
+            }
+        });
+        nObjects++;
     }
 
     @Override
@@ -107,7 +144,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
         final Set<T> ret = new HashSet<>(1024);
         visit(envelope, false, new BinVisitor<T>() {
             @Override
-            public boolean visit(List<T> bin) {
+            public boolean visit(List<T> bin, long mapKey) {
                 ret.addAll(bin);
                 return false;
             }
@@ -129,7 +166,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
         final AtomicInteger removedCount = new AtomicInteger();
         visit(envelope, false, new BinVisitor<T>() {
             @Override
-            public boolean visit(List<T> bin) {
+            public boolean visit(List<T> bin, long mapKey) {
                 boolean removed = bin.remove(item);
                 if (removed) {
                     nEntries--;
@@ -138,7 +175,12 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
                 return removed;
             }
         });
-        return removedCount.get() > 0;
+        if (removedCount.get() > 0) {
+            nObjects--;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private interface BinVisitor<T> {
@@ -149,7 +191,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
          * @param bin
          * @return true if something has been removed from the bin.
          */
-        abstract boolean visit(List<T> bin);
+        abstract boolean visit(List<T> bin, long mapKey);
     }
 
     /**
@@ -182,7 +224,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
                     nBins++;
                 }
                 if (bin != null) {
-                    boolean modified = binVisitor.visit(bin);
+                    boolean modified = binVisitor.visit(bin, mapKey);
                     if (modified && bin.isEmpty()) {
                         bins.remove(mapKey);
                         nBins--;
@@ -193,9 +235,9 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     }
 
     public String toString() {
-        return String.format(
-                "HashGridSpatialIndex %f x %f, %d bins allocated, %d objects (%.2f load factor)",
-                this.xBinSize, this.yBinSize, this.nBins, this.nEntries, this.nEntries * 1.0
-                        / this.nBins);
+        return String
+                .format("HashGridSpatialIndex %f x %f, %d bins allocated, %d objs, %d entries (avg %.2f entries/bin, %.2f entries/object)",
+                        this.xBinSize, this.yBinSize, this.nBins, this.nObjects, this.nEntries,
+                        this.nEntries * 1.0 / this.nBins, this.nEntries * 1.0 / this.nObjects);
     }
 }
