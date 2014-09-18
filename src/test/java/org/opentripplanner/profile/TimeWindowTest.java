@@ -21,7 +21,7 @@ public class TimeWindowTest extends TestCase {
         assertEquals("Service running, overlap should exist.", 500, tw.overlap(500, 1500, 2));
         assertEquals("No service codes in common, overlap should be zero.", 0, tw.overlap(500, 1500, 8));
         assertEquals("Interval entirely within window.", 1000, tw.overlap(1500, 2500, 4));
-        assertEquals("Interval entirely outside window.", 0, tw.overlap(1500, 2500, 4));
+        assertEquals("Service running, but interval entirely outside window.", 0, tw.overlap(3500, 4000, 4));
     }
 
 }
