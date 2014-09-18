@@ -67,7 +67,7 @@ public class Timetable implements Serializable {
     /**
      * Contains one FrequencyEntry object for each block of frequency-based trips.
      */
-    private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+    public final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
 
     /**
      * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.

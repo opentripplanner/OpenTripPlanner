@@ -182,6 +182,8 @@ public class Ride {
     public List<Integer> getSortedStoptimes (TimeWindow window, boolean arrivals) {
         // Using Lists because we don't know the length in advance
         List<Integer> times = Lists.newArrayList();
+        // TODO include: non-frequency trips; exact-times frequency trips
+        // non-exact (headway-based) frequency trips will be handled elsewhere since they don't have specific boarding times.
         for (PatternRide patternRide : patternRides) {
             for (TripTimes tt : patternRide.pattern.scheduledTimetable.tripTimes) {
                 if (window.servicesRunning.get(tt.serviceCode)) {
