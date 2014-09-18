@@ -19,9 +19,6 @@
     <properties>
         <geotools.version>10.5</geotools.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <distribution_id>opengeo</distribution_id>
-        <distribution_name>OpenGeo Maven Repository</distribution_name>
-        <distribution_url>dav:http://repo.opengeo.org</distribution_url>
     </properties>
 
     <build>
@@ -331,9 +328,9 @@
             <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
         </repository>
         <repository>
-            <id>opengeo</id>
-            <name>OpenGeo Maven Repository</name>
-            <url>http://repo.opengeo.org/</url>
+            <id>conveyal</id>
+            <name>Conveyal Maven Repository</name>
+            <url>http://maven.conveyal.com/</url>
             <!-- Avoid downloading OTP snapshots from repo -->
             <releases>
                 <enabled>true</enabled>
