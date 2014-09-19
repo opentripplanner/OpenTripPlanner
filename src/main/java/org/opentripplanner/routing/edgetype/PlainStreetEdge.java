@@ -33,6 +33,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.BitSetUtils;
@@ -70,6 +71,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private ElevationProfileSegment elevationProfileSegment;
 
     private double length;
+
+    // TODO Convert this to a multiplier and reduce size
+    private double bicycleSafetyEffectiveLength;
 
     private LineString geometry;
     
@@ -123,6 +127,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         super(v1, v2);
         this.setGeometry(geometry);
         this.length = length;
+        this.bicycleSafetyEffectiveLength = length;
         this.elevationProfileSegment = new ElevationProfileSegment(length);
         this.name = name;
         this.setPermission(permission);
@@ -188,7 +193,13 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     @Override
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        return elevationProfileSegment.setElevationProfile(elev, computed, getPermission().allows(StreetTraversalPermission.CAR));
+        SlopeCosts costs = elevationProfileSegment.setElevationProfile(elev, computed,
+                getPermission().allows(StreetTraversalPermission.CAR));
+        if (costs == null)
+            return false;
+        bicycleSafetyEffectiveLength *= costs.lengthMultiplier;
+        bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
+        return costs.flattened;
     }
 
     @Override
@@ -281,11 +292,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
             switch (options.optimize) {
             case SAFE:
-                weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
+                weight = bicycleSafetyEffectiveLength / speed;
                 break;
             case GREENWAYS:
-                weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
-                if (elevationProfileSegment.getBicycleSafetyEffectiveLength() / length <= GREENWAY_SAFETY_FACTOR) {
+                weight = bicycleSafetyEffectiveLength / speed;
+                if (bicycleSafetyEffectiveLength / length <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
                 }
@@ -299,7 +310,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 break;
             case TRIANGLE:
                 double quick = elevationProfileSegment.getSlopeSpeedEffectiveLength();
-                double safety = elevationProfileSegment.getBicycleSafetyEffectiveLength();
+                double safety = bicycleSafetyEffectiveLength;
                 double slope = elevationProfileSegment.getSlopeWorkCost();
                 weight = quick * options.triangleTimeFactor + slope
                         * options.triangleSlopeFactor + safety
@@ -526,11 +537,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
-        elevationProfileSegment.setBicycleSafetyEffectiveLength(bicycleSafetyEffectiveLength);
+        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
     }
 
     public double getBicycleSafetyEffectiveLength() {
-        return elevationProfileSegment.getBicycleSafetyEffectiveLength();
+        return bicycleSafetyEffectiveLength;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {

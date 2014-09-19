@@ -54,11 +54,10 @@ public class TestTriangle extends TestCase {
         };
         PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
         testStreet.setElevationProfile(elev, false);
-        
-        double trueLength = ElevationUtils.getLengthMultiplierFromElevation(elev) * length;
-        testStreet.setSlopeSpeedEffectiveLength(trueLength); // normalize length
-        
+
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
+        double trueLength = costs.lengthMultiplier * length;
+        testStreet.setSlopeSpeedEffectiveLength(trueLength); // normalize length
         
         RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);
         options.optimize = OptimizeType.TRIANGLE;

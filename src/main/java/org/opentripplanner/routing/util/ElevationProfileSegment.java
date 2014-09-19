@@ -30,13 +30,12 @@ public class ElevationProfileSegment implements Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
+    @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(ElevationProfileSegment.class);
 
     private PackedCoordinateSequence elevationProfile;
 
     private double slopeSpeedEffectiveLength;
-
-    private double bicycleSafetyEffectiveLength;
 
     private double slopeWorkCost;
 
@@ -48,7 +47,6 @@ public class ElevationProfileSegment implements Serializable {
 
     public ElevationProfileSegment(double length) {
         slopeSpeedEffectiveLength = length;
-        bicycleSafetyEffectiveLength = length;
         slopeWorkCost = length;
     }
 
@@ -72,15 +70,6 @@ public class ElevationProfileSegment implements Serializable {
         return slopeSpeedEffectiveLength;
     }
 
-    // TODO Do we really want to be using "effective lengths" instead of just edge weights?
-    public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
-        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
-    }
-
-    public double getBicycleSafetyEffectiveLength() {
-        return bicycleSafetyEffectiveLength;
-    }
-
     public void setSlopeWorkCost(double slopeWorkCost) {
         this.slopeWorkCost = slopeWorkCost;
     }
@@ -101,35 +90,25 @@ public class ElevationProfileSegment implements Serializable {
         this.elevationProfile = elevationProfile;
     }
 
-    public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed,
+    public SlopeCosts setElevationProfile(PackedCoordinateSequence elev, boolean computed,
             boolean slopeLimit) {
         if (elev == null || elev.size() < 2) {
-            return false;
+            return null;
         }
 
         if (slopeOverride && !computed) {
-            return false;
+            return null;
         }
 
         elevationProfile = elev;
-
-        // compute the various costs of the elevation changes
-        double lengthMultiplier = ElevationUtils.getLengthMultiplierFromElevation(elev);
-        if (Double.isNaN(lengthMultiplier)) {
-            LOG.error("lengthMultiplier from elevation profile is NaN, setting to 1");
-            lengthMultiplier = 1;
-        }
-
-        bicycleSafetyEffectiveLength *= lengthMultiplier;
 
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
         slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
         maxSlope = costs.maxSlope;
         slopeWorkCost = costs.slopeWorkCost;
-        bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
         flattened = costs.flattened;
 
-        return costs.flattened;
+        return costs;
     }
 
     public String toString() {

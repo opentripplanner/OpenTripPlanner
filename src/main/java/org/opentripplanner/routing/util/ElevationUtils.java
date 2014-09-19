@@ -34,7 +34,7 @@ public class ElevationUtils {
 
     private static final double ENERGY_SLOPE_FACTOR = 4000;
 
-    public static double getLengthMultiplierFromElevation(CoordinateSequence elev) {
+    private static double getLengthMultiplierFromElevation(CoordinateSequence elev) {
 
         double trueLength = 0;
         double flatLength = 0;
@@ -57,18 +57,23 @@ public class ElevationUtils {
 
     /**
      * 
-     * @param elev The elevatioon profile, where each (x, y) is (distance along edge, elevation)
+     * @param elev The elevation profile, where each (x, y) is (distance along edge, elevation)
      * @param slopeLimit Whether the slope should be limited to 0.35, which is the max slope for
      * streets that take cars.
      * @return
      */
-    public static SlopeCosts getSlopeCosts(PackedCoordinateSequence elev, boolean slopeLimit) {
+    public static SlopeCosts getSlopeCosts(CoordinateSequence elev, boolean slopeLimit) {
         Coordinate[] coordinates = elev.toCoordinateArray();
         boolean flattened = false;
         double maxSlope = 0;
         double slopeSpeedEffectiveLength = 0;
         double slopeWorkCost = 0;
         double slopeSafetyCost = 0;
+        double lengthMultiplier = getLengthMultiplierFromElevation(elev);
+        if (Double.isNaN(lengthMultiplier)) {
+            log.error("lengthMultiplier from elevation profile is NaN, setting to 1");
+            lengthMultiplier = 1;
+        }
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
@@ -105,7 +110,7 @@ public class ElevationUtils {
                 slopeSafetyCost += safetyCost;
             }
         }
-        return new SlopeCosts(slopeSpeedEffectiveLength, slopeWorkCost, slopeSafetyCost, maxSlope, flattened);
+        return new SlopeCosts(slopeSpeedEffectiveLength, slopeWorkCost, slopeSafetyCost, maxSlope, lengthMultiplier, flattened);
     }
 
     /** constants for slope computation */
