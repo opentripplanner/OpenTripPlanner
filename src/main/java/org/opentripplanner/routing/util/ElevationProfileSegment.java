@@ -34,8 +34,6 @@ public class ElevationProfileSegment implements Serializable {
 
     private PackedCoordinateSequence elevationProfile;
 
-    private double length;
-
     private double slopeSpeedEffectiveLength;
 
     private double bicycleSafetyEffectiveLength;
@@ -49,7 +47,6 @@ public class ElevationProfileSegment implements Serializable {
     private boolean flattened;
 
     public ElevationProfileSegment(double length) {
-        this.length = length;
         slopeSpeedEffectiveLength = length;
         bicycleSafetyEffectiveLength = length;
         slopeWorkCost = length;
@@ -65,14 +62,6 @@ public class ElevationProfileSegment implements Serializable {
 
     public boolean getSlopeOverride() {
         return slopeOverride;
-    }
-
-    public void setLength(double length) {
-        this.length = length;
-    }
-
-    public double getLength() {
-        return length;
     }
 
     public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
@@ -131,7 +120,6 @@ public class ElevationProfileSegment implements Serializable {
             lengthMultiplier = 1;
         }
 
-        length *= lengthMultiplier;
         bicycleSafetyEffectiveLength *= lengthMultiplier;
 
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
