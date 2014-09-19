@@ -62,16 +62,12 @@ public class ElevationProfileSegment implements Serializable {
         return slopeOverride;
     }
 
-    public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
-        this.slopeSpeedEffectiveLength = slopeSpeedEffectiveLength;
+    public boolean isFlattened() {
+        return flattened;
     }
 
     public double getSlopeSpeedEffectiveLength() {
         return slopeSpeedEffectiveLength;
-    }
-
-    public void setSlopeWorkCost(double slopeWorkCost) {
-        this.slopeWorkCost = slopeWorkCost;
     }
 
     public double getSlopeWorkCost() {
@@ -84,10 +80,6 @@ public class ElevationProfileSegment implements Serializable {
 
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
         return ElevationUtils.getPartialElevationProfile(elevationProfile, start, end);
-    }
-
-    public void setElevationProfile(PackedCoordinateSequence elevationProfile) {
-        this.elevationProfile = elevationProfile;
     }
 
     public SlopeCosts setElevationProfile(PackedCoordinateSequence elev, boolean computed,
@@ -121,9 +113,5 @@ public class ElevationProfileSegment implements Serializable {
             out += "(" + coord.x + "," + coord.y + "), ";
         }
         return out.substring(0, out.length() - 2);
-    }
-
-    public boolean isFlattened() {
-        return flattened;
     }
 }

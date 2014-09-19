@@ -520,16 +520,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return this.length / options.getStreetSpeedUpperBound();
     }
 
-    public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
-        elevationProfileSegment.setSlopeSpeedEffectiveLength(slopeSpeedEffectiveLength);
-    }
-
     public double getSlopeSpeedEffectiveLength() {
         return elevationProfileSegment.getSlopeSpeedEffectiveLength();
-    }
-
-    public void setSlopeWorkCost(double slopeWorkCost) {
-        elevationProfileSegment.setSlopeWorkCost(slopeWorkCost);
     }
 
     public double getWorkCost() {
