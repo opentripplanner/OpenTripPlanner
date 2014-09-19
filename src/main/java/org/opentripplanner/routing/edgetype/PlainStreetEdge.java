@@ -35,6 +35,7 @@ import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.BitSetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,17 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private static final double GREENWAY_SAFETY_FACTOR = 0.1;
 
+    /** If you have more than 8 flags, increase flags to short or int */
+    private static final int BACK_FLAG_INDEX = 0;
+    private static final int ROUNDABOUT_FLAG_INDEX = 1;
+    private static final int HASBOGUSNAME_FLAG_INDEX = 2;
+    private static final int NOTHRUTRAFFIC_FLAG_INDEX = 3;
+    private static final int STAIRS_FLAG_INDEX = 4;
+    private static final int TOLL_FLAG_INDEX = 5;
+
+    /** back, roundabout, stairs, toll, ... */
+    private byte flags;
+
     private ElevationProfileSegment elevationProfileSegment;
 
     private double length;
@@ -71,34 +83,14 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private int streetClass = CLASS_OTHERPATH;
     
-    /**
-     * Marks that this edge is the reverse of the one defined in the source
-     * data. Does NOT mean fromv/tov are reversed.
-     */
-    private boolean back;
-    
-    private boolean roundabout = false;
-    
     private Set<Alert> notes;
 
-    private boolean hasBogusName;
-
-    private boolean noThruTraffic;
-
-    /**
-     * This street is a staircase
-     */
-    private boolean stairs;
-    
     /**
      * The speed (meters / sec) at which an automobile can traverse
      * this street segment.
      */
     private float carSpeed;
     
-    /** This street has a toll */
-    private boolean toll;
-
     private Set<Alert> wheelchairNotes;
 
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
@@ -565,10 +557,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 + " permission=" + this.getPermission() + ")";
     }
 
-    public boolean hasBogusName() {
-        return this.hasBogusName;
-    }
-
     /** Returns true if there are any turn restrictions defined. */
     public boolean hasExplicitTurnRestrictions() {
         return this.turnRestrictions != null && this.turnRestrictions.size() > 0;
@@ -691,44 +679,51 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 		this.streetClass = streetClass;
 	}
 
+	/**
+	 * Marks that this edge is the reverse of the one defined in the source
+	 * data. Does NOT mean fromv/tov are reversed.
+	 */
 	public boolean isBack() {
-		return back;
+	    return BitSetUtils.get(flags, BACK_FLAG_INDEX);
 	}
 
 	public void setBack(boolean back) {
-		this.back = back;
+            flags = BitSetUtils.set(flags, BACK_FLAG_INDEX, back);
 	}
 
 	public boolean isRoundabout() {
-		return roundabout;
+            return BitSetUtils.get(flags, ROUNDABOUT_FLAG_INDEX);
 	}
 
 	public void setRoundabout(boolean roundabout) {
-		this.roundabout = roundabout;
+	    flags = BitSetUtils.set(flags, ROUNDABOUT_FLAG_INDEX, roundabout);
 	}
 
-	public Set<Alert> getNotes() {
-		return notes;
+	public boolean hasBogusName() {
+	    return BitSetUtils.get(flags, HASBOGUSNAME_FLAG_INDEX);
 	}
 
 	public void setHasBogusName(boolean hasBogusName) {
-		this.hasBogusName = hasBogusName;
+	    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
 	}
 
 	public boolean isNoThruTraffic() {
-		return noThruTraffic;
+            return BitSetUtils.get(flags, NOTHRUTRAFFIC_FLAG_INDEX);
 	}
 
 	public void setNoThruTraffic(boolean noThruTraffic) {
-		this.noThruTraffic = noThruTraffic;
+	    flags = BitSetUtils.set(flags, NOTHRUTRAFFIC_FLAG_INDEX, noThruTraffic);
 	}
 
+	/**
+	 * This street is a staircase
+	 */
 	public boolean isStairs() {
-		return stairs;
+            return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
 	}
 
 	public void setStairs(boolean stairs) {
-		this.stairs = stairs;
+	    flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
 	}
 
 	public float getCarSpeed() {
@@ -739,13 +734,20 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 		this.carSpeed = carSpeed;
 	}
 
+	/**
+	 * This street has a toll.
+	 */
 	public boolean isToll() {
-		return toll;
+	    return BitSetUtils.get(flags, TOLL_FLAG_INDEX);
 	}
 
 	public void setToll(boolean toll) {
-		this.toll = toll;
+	    flags = BitSetUtils.set(flags, TOLL_FLAG_INDEX, toll);
 	}
+
+        public Set<Alert> getNotes() {
+            return notes;
+        }
 
 	public Set<Alert> getWheelchairNotes() {
 		return wheelchairNotes;
