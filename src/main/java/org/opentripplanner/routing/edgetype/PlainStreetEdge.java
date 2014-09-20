@@ -64,6 +64,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private static final int NOTHRUTRAFFIC_FLAG_INDEX = 3;
     private static final int STAIRS_FLAG_INDEX = 4;
     private static final int TOLL_FLAG_INDEX = 5;
+    private static final int SLOPEOVERRIDE_FLAG_INDEX = 6;
 
     /** back, roundabout, stairs, toll, ... */
     private byte flags;
@@ -128,7 +129,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         this.setGeometry(geometry);
         this.length = length;
         this.bicycleSafetyEffectiveLength = length;
-        this.elevationProfileSegment = new ElevationProfileSegment();
+        this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
         this.setPermission(permission);
         this.setBack(back);
@@ -193,10 +194,15 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     @Override
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        SlopeCosts costs = elevationProfileSegment.setElevationProfile(elev, computed,
-                getPermission().allows(StreetTraversalPermission.CAR));
-        if (costs == null)
+        if (elev == null || elev.size() < 2) {
             return false;
+        }
+        if (isSlopeOverride() && !computed) {
+            return false;
+        }
+        boolean slopeLimit = getPermission().allows(StreetTraversalPermission.CAR);
+        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
+        elevationProfileSegment = new ElevationProfileSegment(costs, elev);
         bicycleSafetyEffectiveLength *= costs.lengthMultiplier;
         bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
         return costs.flattened;
@@ -546,10 +552,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return elevationProfileSegment.getElevationProfile(start, end);
     }
 
-    public void setSlopeOverride(boolean slopeOverride) {
-        elevationProfileSegment.setSlopeOverride(slopeOverride);
-    }
-    
     public void setNote(Set<Alert> notes) {
         this.notes = notes;
     }
@@ -747,6 +749,14 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
 	public void setToll(boolean toll) {
 	    flags = BitSetUtils.set(flags, TOLL_FLAG_INDEX, toll);
+	}
+
+	private boolean isSlopeOverride() {
+	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
+	}
+
+	public void setSlopeOverride(boolean slopeOverride) {
+	    flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
 	}
 
         public Set<Alert> getNotes() {

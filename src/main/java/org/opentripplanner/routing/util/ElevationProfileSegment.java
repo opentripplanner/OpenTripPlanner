@@ -33,6 +33,8 @@ public class ElevationProfileSegment implements Serializable {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(ElevationProfileSegment.class);
 
+    private static final ElevationProfileSegment FLAT_PROFILE = new ElevationProfileSegment();
+
     private PackedCoordinateSequence elevationProfile;
 
     private double slopeSpeedFactor;
@@ -41,25 +43,27 @@ public class ElevationProfileSegment implements Serializable {
 
     private double maxSlope;
 
-    protected boolean slopeOverride;
-
     private boolean flattened;
 
-    public ElevationProfileSegment() {
+    private ElevationProfileSegment() {
         slopeSpeedFactor = 1.0;
         slopeWorkFactor = 1.0;
     }
 
+    public ElevationProfileSegment(SlopeCosts costs, PackedCoordinateSequence elev) {
+        elevationProfile = elev;
+        slopeSpeedFactor = costs.slopeSpeedFactor;
+        slopeWorkFactor = costs.slopeWorkFactor;
+        maxSlope = costs.maxSlope;
+        flattened = costs.flattened;
+    }
+
+    public static ElevationProfileSegment getFlatProfile() {
+        return FLAT_PROFILE;
+    }
+
     public double getMaxSlope() {
         return maxSlope;
-    }
-
-    public void setSlopeOverride(boolean slopeOverride) {
-        this.slopeOverride = slopeOverride;
-    }
-
-    public boolean getSlopeOverride() {
-        return slopeOverride;
     }
 
     public boolean isFlattened() {
@@ -80,27 +84,6 @@ public class ElevationProfileSegment implements Serializable {
 
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
         return ElevationUtils.getPartialElevationProfile(elevationProfile, start, end);
-    }
-
-    public SlopeCosts setElevationProfile(PackedCoordinateSequence elev, boolean computed,
-            boolean slopeLimit) {
-        if (elev == null || elev.size() < 2) {
-            return null;
-        }
-
-        if (slopeOverride && !computed) {
-            return null;
-        }
-
-        elevationProfile = elev;
-
-        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
-        slopeSpeedFactor = costs.slopeSpeedFactor;
-        slopeWorkFactor = costs.slopeWorkFactor;
-        maxSlope = costs.maxSlope;
-        flattened = costs.flattened;
-
-        return costs;
     }
 
     public String toString() {
