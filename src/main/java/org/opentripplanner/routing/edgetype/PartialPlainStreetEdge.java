@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import com.google.common.base.Objects;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;

@@ -172,7 +172,8 @@ public class OTPConfigurator {
                 OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
                 osmProviders.add(osmProvider);
             }
-            OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders); 
+            OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders);
+            osmBuilder.staticBikeRental = true;
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
             osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
             osmBuilder.skipVisibility = params.skipVisibility;

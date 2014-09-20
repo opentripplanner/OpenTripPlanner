@@ -218,12 +218,11 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 street.setSlopeOverride(slopeOverride);
                 backStreet.setSlopeOverride(slopeOverride);
 
-                P2<Double> effectiveLength;
                 if (safetyConverter != null) {
-                    effectiveLength = safetyConverter.convert(feature);
-                    if (effectiveLength != null) {
-                        street.setBicycleSafetyEffectiveLength(effectiveLength.getFirst() * length);
-                        backStreet.setBicycleSafetyEffectiveLength(effectiveLength.getSecond() * length);
+                    P2<Double> safetyFactors = safetyConverter.convert(feature);
+                    if (safetyFactors != null) {
+                        street.setBicycleSafetyFactor(safetyFactors.getFirst());
+                        backStreet.setBicycleSafetyFactor(safetyFactors.getSecond());
                     }
                 }
             }

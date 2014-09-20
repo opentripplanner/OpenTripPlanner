@@ -73,8 +73,13 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private double length;
 
-    // TODO Convert this to a multiplier and reduce size
-    private double bicycleSafetyEffectiveLength;
+    /**
+     * bicycleSafetyWeight = length * bicycleSafetyFactor. For example, a 100m street with a safety
+     * factor of 2.0 will be considered in term of safety cost as the same as a 150m street with a
+     * safety factor of 1.0.
+     */
+    // TODO Reduce size
+    private double bicycleSafetyFactor;
 
     private LineString geometry;
     
@@ -128,7 +133,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         super(v1, v2);
         this.setGeometry(geometry);
         this.length = length;
-        this.bicycleSafetyEffectiveLength = length;
+        this.bicycleSafetyFactor = 1.0;
         this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
         this.setPermission(permission);
@@ -203,8 +208,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         boolean slopeLimit = getPermission().allows(StreetTraversalPermission.CAR);
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
         elevationProfileSegment = new ElevationProfileSegment(costs, elev);
-        bicycleSafetyEffectiveLength *= costs.lengthMultiplier;
-        bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
+        bicycleSafetyFactor *= costs.lengthMultiplier;
+        bicycleSafetyFactor += costs.slopeSafetyCost / length;
         return costs.flattened;
     }
 
@@ -298,11 +303,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             time = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
             switch (options.optimize) {
             case SAFE:
-                weight = bicycleSafetyEffectiveLength / speed;
+                weight = bicycleSafetyFactor * length / speed;
                 break;
             case GREENWAYS:
-                weight = bicycleSafetyEffectiveLength / speed;
-                if (bicycleSafetyEffectiveLength / length <= GREENWAY_SAFETY_FACTOR) {
+                weight = bicycleSafetyFactor * length / speed;
+                if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
                 }
@@ -316,7 +321,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 break;
             case TRIANGLE:
                 double quick = elevationProfileSegment.getSlopeSpeedFactor() * length;
-                double safety = bicycleSafetyEffectiveLength;
+                double safety = bicycleSafetyFactor * length;
                 // TODO This computation is not coherent with the one for FLAT
                 double slope = elevationProfileSegment.getSlopeWorkFactor() * length;
                 weight = quick * options.triangleTimeFactor + slope
@@ -535,12 +540,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return elevationProfileSegment.getSlopeWorkFactor() * length;
     }
 
-    public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
-        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
+    public void setBicycleSafetyFactor(double bicycleSafetyFactor) {
+        this.bicycleSafetyFactor = bicycleSafetyFactor;
     }
 
-    public double getBicycleSafetyEffectiveLength() {
-        return bicycleSafetyEffectiveLength;
+    public double getBicycleSafetyFactor() {
+        return bicycleSafetyFactor;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {

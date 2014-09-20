@@ -46,7 +46,7 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
         if (e instanceof PlainStreetEdge) {
             PlainStreetEdge pse = (PlainStreetEdge) e;
             if (pse.getPermission().allows(TraverseMode.BICYCLE)) {
-                double bikeSafety = pse.getBicycleSafetyEffectiveLength() / pse.getLength();
+                double bikeSafety = pse.getBicycleSafetyFactor();
                 attrs.color = palette.getColor(bikeSafety);
                 attrs.label = String.format("%.02f", bikeSafety);
             } else {

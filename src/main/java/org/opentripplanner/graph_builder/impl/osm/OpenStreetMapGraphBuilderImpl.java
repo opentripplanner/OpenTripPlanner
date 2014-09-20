@@ -1689,7 +1689,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().getFirst();
-                street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
+                street.setBicycleSafetyFactor(safety);
                 if (safety < bestBikeSafety) {
                     bestBikeSafety = safety;
                 }
@@ -1707,7 +1707,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (safety < bestBikeSafety) {
                     bestBikeSafety = safety;
                 }
-                backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
+                backStreet.setBicycleSafetyFactor(safety);
                 if (note != null) {
                     backStreet.setNote(note);
                 }
@@ -1949,8 +1949,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     if (!seenEdges.contains(e)) {
                         seenEdges.add(e);
-                        pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength()
-                                / bestBikeSafety);
+                        pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
                     }
                 }
                 for (Edge e : vertex.getIncoming()) {
@@ -1961,8 +1960,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     if (!seenEdges.contains(e)) {
                         seenEdges.add(e);
-                        pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength()
-                                / bestBikeSafety);
+                        pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
                     }
                 }
             }
