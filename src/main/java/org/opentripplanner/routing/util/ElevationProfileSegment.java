@@ -35,9 +35,9 @@ public class ElevationProfileSegment implements Serializable {
 
     private PackedCoordinateSequence elevationProfile;
 
-    private double slopeSpeedEffectiveLength;
+    private double slopeSpeedFactor;
 
-    private double slopeWorkCost;
+    private double slopeWorkFactor;
 
     private double maxSlope;
 
@@ -45,9 +45,9 @@ public class ElevationProfileSegment implements Serializable {
 
     private boolean flattened;
 
-    public ElevationProfileSegment(double length) {
-        slopeSpeedEffectiveLength = length;
-        slopeWorkCost = length;
+    public ElevationProfileSegment() {
+        slopeSpeedFactor = 1.0;
+        slopeWorkFactor = 1.0;
     }
 
     public double getMaxSlope() {
@@ -66,12 +66,12 @@ public class ElevationProfileSegment implements Serializable {
         return flattened;
     }
 
-    public double getSlopeSpeedEffectiveLength() {
-        return slopeSpeedEffectiveLength;
+    public double getSlopeSpeedFactor() {
+        return slopeSpeedFactor;
     }
 
-    public double getSlopeWorkCost() {
-        return slopeWorkCost;
+    public double getSlopeWorkFactor() {
+        return slopeWorkFactor;
     }
 
     public PackedCoordinateSequence getElevationProfile() {
@@ -95,9 +95,9 @@ public class ElevationProfileSegment implements Serializable {
         elevationProfile = elev;
 
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
-        slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
+        slopeSpeedFactor = costs.slopeSpeedFactor;
+        slopeWorkFactor = costs.slopeWorkFactor;
         maxSlope = costs.maxSlope;
-        slopeWorkCost = costs.slopeWorkCost;
         flattened = costs.flattened;
 
         return costs;

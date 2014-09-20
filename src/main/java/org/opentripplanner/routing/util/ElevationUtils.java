@@ -34,7 +34,7 @@ public class ElevationUtils {
 
     private static final double ENERGY_SLOPE_FACTOR = 4000;
 
-    private static double getLengthMultiplierFromElevation(CoordinateSequence elev) {
+    private static double[] getLengthsFromElevation(CoordinateSequence elev) {
 
         double trueLength = 0;
         double flatLength = 0;
@@ -49,10 +49,7 @@ public class ElevationUtils {
             lastX = c.x;
             lastY = c.y;
         }
-        if (flatLength == 0) {
-            return 0;
-        }
-        return trueLength / flatLength;
+        return new double[] { trueLength, flatLength };
     }
 
     /**
@@ -69,7 +66,10 @@ public class ElevationUtils {
         double slopeSpeedEffectiveLength = 0;
         double slopeWorkCost = 0;
         double slopeSafetyCost = 0;
-        double lengthMultiplier = getLengthMultiplierFromElevation(elev);
+        double[] lengths = getLengthsFromElevation(elev);
+        double trueLength = lengths[0];
+        double flatLength = lengths[1];
+        double lengthMultiplier = flatLength == 0 ? 0 : trueLength / flatLength;
         if (Double.isNaN(lengthMultiplier)) {
             log.error("lengthMultiplier from elevation profile is NaN, setting to 1");
             lengthMultiplier = 1;
@@ -102,15 +102,20 @@ public class ElevationUtils {
                     * (ENERGY_PER_METER_ON_FLAT + ENERGY_SLOPE_FACTOR * slope_or_zero
                             * slope_or_zero * slope_or_zero);
             slopeWorkCost += energy;
-            slopeSpeedEffectiveLength += hypotenuse
-                    / slopeSpeedCoefficient(slope, coordinates[i].y);
+            double slopeSpeedCoef = slopeSpeedCoefficient(slope, coordinates[i].y);
+            slopeSpeedEffectiveLength += hypotenuse / slopeSpeedCoef;
             // assume that speed and safety are inverses
-            double safetyCost = hypotenuse * (slopeSpeedCoefficient(slope, coordinates[i].y) - 1) * 0.25;
+            double safetyCost = hypotenuse * (slopeSpeedCoef - 1) * 0.25;
             if (safetyCost > 0) {
                 slopeSafetyCost += safetyCost;
             }
         }
-        return new SlopeCosts(slopeSpeedEffectiveLength, slopeWorkCost, slopeSafetyCost, maxSlope, lengthMultiplier, flattened);
+        /*
+         * Here we divide by the *flat length* as the slope/work cost factors are multipliers of the
+         * length of the street edge which is the flat one.
+         */
+        return new SlopeCosts(slopeSpeedEffectiveLength / flatLength, slopeWorkCost / flatLength,
+                slopeSafetyCost, maxSlope, lengthMultiplier, flattened);
     }
 
     /** constants for slope computation */
