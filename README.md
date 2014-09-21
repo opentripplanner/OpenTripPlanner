@@ -47,6 +47,15 @@ and save data in there
 
     java -jar ./target/otp.jar --build somedata
 
-Visualize :
+And run the server :
 
-    ./otp --graphs somedata/  --visualize
+    ./otp --graphs somedata/  --server
+
+
+Look at the website:
+
+    http://localhost:8080/index.html
+
+Read more :
+
+    https://github.com/opentripplanner/OpenTripPlanner/wiki/Minimal-Introduction
