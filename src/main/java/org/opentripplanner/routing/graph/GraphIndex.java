@@ -27,6 +27,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
@@ -175,7 +176,7 @@ public class GraphIndex {
     public void initializeProfileTransfers() {
         transfersFromStopCluster = HashMultimap.create();
         final double TRANSFER_RADIUS = 500.0; // meters
-        SimpleIsochrone.MinMap<P2<TripPattern>, ProfileTransfer> bestTransfers = new SimpleIsochrone.MinMap<P2<TripPattern>, ProfileTransfer>();
+        Map<P2<TripPattern>, ProfileTransfer.GoodTransferList> transfers = Maps.newHashMap();
         LOG.info("Finding transfers...");
         for (StopCluster sc0 : stopClusterForId.values()) {
             Set<TripPattern> tripPatterns0 = patternsForStopCluster(sc0);
@@ -187,13 +188,25 @@ public class GraphIndex {
                 for (TripPattern tp0 : tripPatterns0) {
                     for (TripPattern tp1 : tripPatterns1) {
                         if (tp0 == tp1) continue;
-                        bestTransfers.putMin(new P2<TripPattern>(tp0, tp1), new ProfileTransfer(tp0, tp1, sc0, sc1, (int)distance));
+                        P2<TripPattern> pair = new P2<TripPattern>(tp0, tp1);
+                        ProfileTransfer.GoodTransferList list = transfers.get(pair);
+                        if (list == null) {
+                            list = new ProfileTransfer.GoodTransferList();
+                            transfers.put(pair, list);
+                        }
+                        list.add(new ProfileTransfer(tp0, tp1, sc0, sc1, (int)distance));
                     }
                 }
             }
         }
-        for (ProfileTransfer tr : bestTransfers.values()) {
-            transfersFromStopCluster.put(tr.sc1, tr);
+        for (P2<TripPattern> pair : transfers.keySet()) {
+            ProfileTransfer.GoodTransferList list = transfers.get(pair);
+            //LOG.info("patterns {}, {} transfers", pair, list.good.size());
+            for (ProfileTransfer tr : list.good) {
+                transfersFromStopCluster.put(tr.sc1, tr);
+                // LOG.info("   {}", tr);
+                break; // FIXME only storing the first one for now... need to break into contiguous blocks.
+            }
         }
         /*
          * for (Stop stop : transfersForStop.keys()) { System.out.println("STOP " + stop); for
