@@ -20,3 +20,33 @@ In summer of 2013, the OpenTripPlanner project was accepted for membership in th
 ## Mailing Lists
 
 The main forums through which the OpenTripPlanner community organizes development and provides mutual assistance are our two Google discussion groups. Changes and extensions to OTP are debated on the developers' list (opentripplanner-dev). More general questions and announcements of interest to non-developer OTP users should be directed to the opentripplanner-users list.
+
+
+## Installation
+
+First you will need maven3 to build.
+
+    git clone https://git-wip-us.apache.org/repos/asf/maven.git
+
+check that out and build it with your maven
+
+then you run the new maven binary :
+
+    apache-maven/target/apache-maven-3.2.4-SNAPSHOT/bin/mvn package
+
+now you can run the otp :
+
+    java -jar ./target/otp.jar
+
+Then you want to create a directory with OSM data
+
+    mkdir somedata
+    
+and save data in there
+    cp test.osm somedata/test.osm
+
+    java -jar ./target/otp.jar --build somedata
+
+Visualize :
+
+    ./otp --graphs somedata/  --visualize
