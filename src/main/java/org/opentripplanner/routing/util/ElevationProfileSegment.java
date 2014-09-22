@@ -16,11 +16,13 @@ package org.opentripplanner.routing.util;
 import java.io.Serializable;
 
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 
 /**
  * This class is an helper for Edges and Vertexes to store various data about elevation profiles.
@@ -35,7 +37,7 @@ public class ElevationProfileSegment implements Serializable {
 
     private static final ElevationProfileSegment FLAT_PROFILE = new ElevationProfileSegment();
 
-    private PackedCoordinateSequence elevationProfile;
+    private byte[] packedElevationProfile;
 
     private double slopeSpeedFactor;
 
@@ -46,12 +48,12 @@ public class ElevationProfileSegment implements Serializable {
     private boolean flattened;
 
     private ElevationProfileSegment() {
-        slopeSpeedFactor = 1.0;
-        slopeWorkFactor = 1.0;
+        slopeSpeedFactor = 1.0f;
+        slopeWorkFactor = 1.0f;
     }
 
-    public ElevationProfileSegment(SlopeCosts costs, PackedCoordinateSequence elev) {
-        elevationProfile = elev;
+    public ElevationProfileSegment(SlopeCosts costs, CoordinateSequence elev) {
+        packedElevationProfile = CompactElevationProfile.compactElevationProfile(elev);
         slopeSpeedFactor = costs.slopeSpeedFactor;
         slopeWorkFactor = costs.slopeWorkFactor;
         maxSlope = costs.maxSlope;
@@ -79,15 +81,16 @@ public class ElevationProfileSegment implements Serializable {
     }
 
     public PackedCoordinateSequence getElevationProfile() {
-        return elevationProfile;
+        return CompactElevationProfile.uncompactElevationProfile(packedElevationProfile);
     }
 
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return ElevationUtils.getPartialElevationProfile(elevationProfile, start, end);
+        return ElevationUtils.getPartialElevationProfile(getElevationProfile(), start, end);
     }
 
     public String toString() {
         String out = "";
+        PackedCoordinateSequence elevationProfile = getElevationProfile();
         if (elevationProfile == null || elevationProfile.size() == 0) {
             return "(empty elevation profile)";
         }
