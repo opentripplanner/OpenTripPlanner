@@ -199,13 +199,34 @@ public class GraphIndex {
                 }
             }
         }
+        /* Now filter the transfers down to eliminate long series of transfers in shared trunks. */
+        LOG.info("Filtering out long series of transfers on trunks shared between patterns.");
         for (P2<TripPattern> pair : transfers.keySet()) {
             ProfileTransfer.GoodTransferList list = transfers.get(pair);
-            //LOG.info("patterns {}, {} transfers", pair, list.good.size());
-            for (ProfileTransfer tr : list.good) {
+            TripPattern fromPattern = pair.getFirst(); // TODO consider using second (think of express-local transfers in NYC)
+            Map<StopCluster, ProfileTransfer> transfersByFromCluster = Maps.newHashMap();
+            for (ProfileTransfer transfer : list.good) {
+                transfersByFromCluster.put(transfer.sc1, transfer);
+            }
+            List<ProfileTransfer> retainedTransfers = Lists.newArrayList();
+            boolean inSeries = false; // true whenever a transfer existed for the last stop in the stop pattern
+            for (Stop stop : fromPattern.stopPattern.stops) {
+                StopCluster cluster = this.stopClusterForStop.get(stop);
+                //LOG.info("stop {} cluster {}", stop, cluster.id);
+                ProfileTransfer transfer = transfersByFromCluster.get(cluster);
+                if (transfer == null) {
+                    inSeries = false;
+                    continue;
+                }
+                if (inSeries) continue;
+                // Keep this transfer: it's not preceded by another stop with a transfer in this stop pattern
+                retainedTransfers.add(transfer);
+                inSeries = true;
+            }
+            //LOG.info("patterns {}, {} transfers", pair, retainedTransfers.size());
+            for (ProfileTransfer tr : retainedTransfers) {
                 transfersFromStopCluster.put(tr.sc1, tr);
-                // LOG.info("   {}", tr);
-                break; // FIXME only storing the first one for now... need to break into contiguous blocks.
+                //LOG.info("   {}", tr);
             }
         }
         /*
