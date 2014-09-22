@@ -39,11 +39,11 @@ public class ElevationProfileSegment implements Serializable {
 
     private byte[] packedElevationProfile;
 
-    private double slopeSpeedFactor;
+    private float slopeSpeedFactor;
 
-    private double slopeWorkFactor;
+    private float slopeWorkFactor;
 
-    private double maxSlope;
+    private float maxSlope;
 
     private boolean flattened;
 
@@ -54,9 +54,9 @@ public class ElevationProfileSegment implements Serializable {
 
     public ElevationProfileSegment(SlopeCosts costs, CoordinateSequence elev) {
         packedElevationProfile = CompactElevationProfile.compactElevationProfile(elev);
-        slopeSpeedFactor = costs.slopeSpeedFactor;
-        slopeWorkFactor = costs.slopeWorkFactor;
-        maxSlope = costs.maxSlope;
+        slopeSpeedFactor = (float)costs.slopeSpeedFactor;
+        slopeWorkFactor = (float)costs.slopeWorkFactor;
+        maxSlope = (float)costs.maxSlope;
         flattened = costs.flattened;
     }
 
