@@ -565,6 +565,7 @@ public class PlanGenerator {
             PackedCoordinateSequence coordinates = profileSegment.getElevationProfile();
 
             if (coordinates == null) continue;
+            // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
             if (coordinates.getDimension() != 2) continue;
 
             for (int i = 0; i < coordinates.size() - 1; i++) {
