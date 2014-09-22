@@ -78,8 +78,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
      * factor of 2.0 will be considered in term of safety cost as the same as a 150m street with a
      * safety factor of 1.0.
      */
-    // TODO Reduce size
-    private double bicycleSafetyFactor;
+    private float bicycleSafetyFactor;
 
     private LineString geometry;
     
@@ -133,7 +132,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         super(v1, v2);
         this.setGeometry(geometry);
         this.length = length;
-        this.bicycleSafetyFactor = 1.0;
+        this.bicycleSafetyFactor = 1.0f;
         this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
         this.setPermission(permission);
@@ -540,11 +539,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return elevationProfileSegment.getSlopeWorkFactor() * length;
     }
 
-    public void setBicycleSafetyFactor(double bicycleSafetyFactor) {
+    public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
         this.bicycleSafetyFactor = bicycleSafetyFactor;
     }
 
-    public double getBicycleSafetyFactor() {
+    public float getBicycleSafetyFactor() {
         return bicycleSafetyFactor;
     }
 

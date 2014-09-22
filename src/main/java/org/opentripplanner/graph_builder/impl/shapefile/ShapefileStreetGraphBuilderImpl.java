@@ -221,8 +221,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 if (safetyConverter != null) {
                     P2<Double> safetyFactors = safetyConverter.convert(feature);
                     if (safetyFactors != null) {
-                        street.setBicycleSafetyFactor(safetyFactors.getFirst());
-                        backStreet.setBicycleSafetyFactor(safetyFactors.getSecond());
+                        street.setBicycleSafetyFactor(safetyFactors.getFirst().floatValue());
+                        backStreet.setBicycleSafetyFactor(safetyFactors.getSecond().floatValue());
                     }
                 }
             }

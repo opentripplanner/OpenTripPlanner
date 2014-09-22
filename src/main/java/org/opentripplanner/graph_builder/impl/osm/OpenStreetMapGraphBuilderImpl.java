@@ -725,7 +725,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * The bike safety factor of the safest street
          */
-        private double bestBikeSafety = 1;
+        private float bestBikeSafety = 1.0f;
 
         // track OSM nodes which are decomposed into multiple graph vertices because they are
         // elevators. later they will be iterated over to build ElevatorEdges between them.
@@ -1689,9 +1689,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().getFirst();
-                street.setBicycleSafetyFactor(safety);
+                street.setBicycleSafetyFactor((float)safety);
                 if (safety < bestBikeSafety) {
-                    bestBikeSafety = safety;
+                    bestBikeSafety = (float)safety;
                 }
                 if (note != null) {
                     street.setNote(note);
@@ -1705,9 +1705,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (backStreet != null) {
                 double safety = wayData.getSafetyFeatures().getSecond();
                 if (safety < bestBikeSafety) {
-                    bestBikeSafety = safety;
+                    bestBikeSafety = (float)safety;
                 }
-                backStreet.setBicycleSafetyFactor(safety);
+                backStreet.setBicycleSafetyFactor((float)safety);
                 if (note != null) {
                     backStreet.setNote(note);
                 }

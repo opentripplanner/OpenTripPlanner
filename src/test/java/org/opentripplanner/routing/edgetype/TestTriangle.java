@@ -45,7 +45,7 @@ public class TestTriangle extends TestCase {
 
         PlainStreetEdge testStreet = new PlainStreetEdge(v1, v2, geometry, "Test Lane", length,
                 StreetTraversalPermission.ALL, false);
-        testStreet.setBicycleSafetyFactor(0.74); // a safe street
+        testStreet.setBicycleSafetyFactor(0.74f); // a safe street
 
         Coordinate[] profile = new Coordinate[] { 
                 new Coordinate(0, 0), // slope = 0.1
