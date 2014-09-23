@@ -209,8 +209,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 	String note = noteConverter.convert(feature);
                 	if (note != null && note.length() > 0) {
                 		HashSet<Alert> notes = Alert.newSimpleAlertSet(note);
-                		street.setNote(notes);
-                		backStreet.setNote(notes);
+				graph.streetNotesService.addNotes(street, notes);
+				graph.streetNotesService.addNotes(backStreet, notes);
                 	}
                 }
 

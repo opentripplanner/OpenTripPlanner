@@ -583,7 +583,7 @@ public class PlanGeneratorTest {
         e41.setHasBogusName(true);
         e49.setElevationProfile(elevation49, false);
         e53.setElevationProfile(elevation53, false);
-        e53.setNote(Alert.newSimpleAlertSet(alertsExample));
+        graph.streetNotesService.addNotes(e53, Alert.newSimpleAlertSet(alertsExample));
 
         // Add an extra edge to the graph in order to generate stayOn = true for one walk step.
         new PlainStreetEdge(v40,

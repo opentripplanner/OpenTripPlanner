@@ -18,13 +18,11 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -63,10 +61,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private static final int HASBOGUSNAME_FLAG_INDEX = 2;
     private static final int NOTHRUTRAFFIC_FLAG_INDEX = 3;
     private static final int STAIRS_FLAG_INDEX = 4;
-    private static final int TOLL_FLAG_INDEX = 5;
-    private static final int SLOPEOVERRIDE_FLAG_INDEX = 6;
+    private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
 
-    /** back, roundabout, stairs, toll, ... */
+    /** back, roundabout, stairs, ... */
     private byte flags;
 
     private ElevationProfileSegment elevationProfileSegment;
@@ -92,15 +89,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private int streetClass = CLASS_OTHERPATH;
     
-    private Set<Alert> notes;
-
     /**
      * The speed (meters / sec) at which an automobile can traverse
      * this street segment.
      */
     private float carSpeed;
-    
-    private Set<Alert> wheelchairNotes;
 
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
@@ -367,10 +360,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
 
-        if (getWheelchairNotes() != null && options.wheelchairAccessible) {
-            s1.addAlerts(getWheelchairNotes());
-        }
-
         /* Compute turn cost. */
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
@@ -473,13 +462,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         s1.incrementTimeInSeconds(roundedTime);
         
         s1.incrementWeight(weight);
-        
-        s1.addAlerts(getNotes());
-        
-        if (this.isToll() && traverseMode.isDriving()) {
-            s1.addAlert(Alert.createSimpleAlerts("Toll road"));
-        }
-        
+
         return s1;
     }
 
@@ -556,10 +539,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return elevationProfileSegment.getElevationProfile(start, end);
     }
 
-    public void setNote(Set<Alert> notes) {
-        this.notes = notes;
-    }
-    
     @Override
     public String toString() {
         return "PlainStreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
@@ -570,10 +549,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     /** Returns true if there are any turn restrictions defined. */
     public boolean hasExplicitTurnRestrictions() {
         return this.turnRestrictions != null && this.turnRestrictions.size() > 0;
-    }
-
-    public void setWheelchairNote(Set<Alert> wheelchairNotes) {
-        this.wheelchairNotes = wheelchairNotes;
     }
 
     public void addTurnRestriction(TurnRestriction turnRestriction) {
@@ -744,31 +719,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 		this.carSpeed = carSpeed;
 	}
 
-	/**
-	 * This street has a toll.
-	 */
-	public boolean isToll() {
-	    return BitSetUtils.get(flags, TOLL_FLAG_INDEX);
-	}
-
-	public void setToll(boolean toll) {
-	    flags = BitSetUtils.set(flags, TOLL_FLAG_INDEX, toll);
-	}
-
 	private boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
 	}
 
 	public void setSlopeOverride(boolean slopeOverride) {
 	    flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
-	}
-
-        public Set<Alert> getNotes() {
-            return notes;
-        }
-
-	public Set<Alert> getWheelchairNotes() {
-		return wheelchairNotes;
 	}
 
 	@Override
@@ -785,5 +741,4 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 	public int getOutAngle() {
 		return this.outAngle;
 	}
-
 }

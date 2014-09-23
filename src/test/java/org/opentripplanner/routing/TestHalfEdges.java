@@ -42,6 +42,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.services.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -336,8 +337,8 @@ public class TestHalfEdges extends TestCase {
         Set<Alert> alert = new HashSet<Alert>();
         alert.add(Alert.createSimpleAlerts("This is the alert"));
 
-        left.setNote(alert);
-        leftBack.setNote(alert);
+        graph.streetNotesService.addNotes(left, alert);
+        graph.streetNotesService.addNotes(leftBack, alert);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
                 cast(turns, StreetEdge.class),
@@ -357,7 +358,7 @@ public class TestHalfEdges extends TestCase {
             }
         }
 
-        assertEquals(alert, traversedOne.getBackAlerts());
+        assertEquals(alert, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
 
@@ -365,10 +366,12 @@ public class TestHalfEdges extends TestCase {
         Set<Alert> wheelchairAlert = new HashSet<Alert>();
         wheelchairAlert.add(Alert.createSimpleAlerts("This is the wheelchair alert"));
 
-        left.setNote(null);
-        leftBack.setNote(null);
-        left.setWheelchairNote(wheelchairAlert);
-        leftBack.setWheelchairNote(wheelchairAlert);
+        graph.streetNotesService.removeNotes(left);
+        graph.streetNotesService.removeNotes(leftBack);
+        graph.streetNotesService.addNotes(left, wheelchairAlert,
+                StreetNotesService.WHEELCHAIR_MATCHER);
+        graph.streetNotesService.addNotes(leftBack, wheelchairAlert,
+                StreetNotesService.WHEELCHAIR_MATCHER);
 
         req.setWheelchairAccessible(true);
 
@@ -385,7 +388,7 @@ public class TestHalfEdges extends TestCase {
             }
         }
 
-        assertEquals(wheelchairAlert, traversedOne.getBackAlerts());
+        assertEquals(wheelchairAlert, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
     }

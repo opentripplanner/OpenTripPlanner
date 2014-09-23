@@ -164,6 +164,8 @@ public class StreetUtils {
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                     permission = permission.remove(StreetTraversalPermission.BICYCLE);
                     if (permission == StreetTraversalPermission.NONE) {
+                        // TODO Shouldn't we have a graph.removeEdge()?
+                        graph.streetNotesService.removeNotes(pse);
                         pse.detach();
                     } else {
                         pse.setPermission(permission);

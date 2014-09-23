@@ -82,6 +82,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -1683,8 +1684,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private void applyWayProperties(PlainStreetEdge street, PlainStreetEdge backStreet,
                                         WayProperties wayData, OSMWithTags way) {
 
-            Set<Alert> note = wayPropertySet.getNoteForWay(way);
-            Set<Alert> wheelchairNote = getWheelchairNotes(way);
+            Set<Alert> notes = wayPropertySet.getNoteForWay(way);
+            Set<Alert> wheelchairNotes = getWheelchairNotes(way);
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
@@ -1693,11 +1694,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (safety < bestBikeSafety) {
                     bestBikeSafety = (float)safety;
                 }
-                if (note != null) {
-                    street.setNote(note);
+                if (notes != null) {
+                    graph.streetNotesService.addNotes(street, notes);
                 }
-                if (wheelchairNote != null) {
-                    street.setWheelchairNote(wheelchairNote);
+                if (wheelchairNotes != null) {
+                    graph.streetNotesService.addNotes(street, notes,
+                            StreetNotesService.WHEELCHAIR_MATCHER);
                 }
                 street.setNoThruTraffic(noThruTraffic);
             }
@@ -1708,11 +1710,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     bestBikeSafety = (float)safety;
                 }
                 backStreet.setBicycleSafetyFactor((float)safety);
-                if (note != null) {
-                    backStreet.setNote(note);
+                if (notes != null) {
+                    graph.streetNotesService.addNotes(backStreet, notes);
                 }
-                if (wheelchairNote != null) {
-                    backStreet.setWheelchairNote(wheelchairNote);
+                if (wheelchairNotes != null) {
+                    graph.streetNotesService.addNotes(backStreet, wheelchairNotes,
+                            StreetNotesService.WHEELCHAIR_MATCHER);
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
@@ -2607,10 +2610,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             street.setStairs(steps);
 
-            if (way.isTagTrue("toll") || way.isTagTrue("toll:motorcar"))
-                street.setToll(true);
-            else
-                street.setToll(false);
+            if (way.isTagTrue("toll") || way.isTagTrue("toll:motorcar")) {
+                graph.streetNotesService.addNotes(street, Alert.newSimpleAlertSet("Toll road"),
+                        StreetNotesService.DRIVING_MATCHER);
+            }
 
             /* TODO: This should probably generalized somehow? */
             if (!ignoreWheelchairAccessibility

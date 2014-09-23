@@ -226,15 +226,13 @@ public class StreetLocation extends StreetVertex {
         newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
         newLeft.setNoThruTraffic(street.isNoThruTraffic());
         newLeft.setStreetClass(street.getStreetClass());
-        newLeft.setWheelchairNote(street.getWheelchairNotes());
-        newLeft.setNote(street.getNotes());
+        graph.streetNotesService.copyNotes(street, newLeft);
 
         newRight.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut),
                 false);
         newRight.setStreetClass(street.getStreetClass());
         newRight.setNoThruTraffic(street.isNoThruTraffic());
-        newRight.setWheelchairNote(street.getWheelchairNotes());
-        newRight.setNote(street.getNotes());
+        graph.streetNotesService.copyNotes(street, newRight);
         
         // Copy turn restrictions onto the outgoing half-edge.
         for (TurnRestriction turnRestriction : street.getTurnRestrictions()) {
