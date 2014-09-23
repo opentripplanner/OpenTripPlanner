@@ -88,4 +88,12 @@ public class Alert implements Serializable {
                 + (alertHeaderText == null ? 0 : alertHeaderText.hashCode())
                 + (alertUrl == null ? 0 : alertUrl.hashCode());
     }
+
+    @Override
+    public String toString() {
+        return "Alert('"
+                + (alertHeaderText != null ? alertHeaderText.getSomeTranslation()
+                        : alertDescriptionText != null ? alertDescriptionText.getSomeTranslation()
+                                : "?") + "')";
+    }
 }
