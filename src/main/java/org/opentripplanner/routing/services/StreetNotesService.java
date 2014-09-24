@@ -99,19 +99,22 @@ public class StreetNotesService implements Serializable {
     public StreetNotesService() {
     }
 
-    public void addNotes(Edge edge, Collection<Alert> notes) {
-        addNotes(edge, notes, ALWAYS_MATCHER);
+    public void addNote(Edge edge, Alert note) {
+        addNote(edge, note, ALWAYS_MATCHER);
     }
 
     public void addNotes(Edge edge, Collection<Alert> notes, NoteMatcher matcher) {
-        if (LOG.isDebugEnabled())
-            LOG.debug("Adding notes {} to {} with matcher {}", Arrays.toString(notes.toArray()),
-                    edge, matcher);
         if (notes == null || notes.isEmpty())
             return; // Prevent unnecessary clutter on the map
         for (Alert note : notes) {
-            notesForEdge.put(edge, new MatcherAndAlert(matcher, note));
+            addNote(edge, note, matcher);
         }
+    }
+
+    public void addNote(Edge edge, Alert note, NoteMatcher matcher) {
+        if (LOG.isDebugEnabled())
+            LOG.debug("Adding note {} to {} with matcher {}", note, edge, matcher);
+        notesForEdge.put(edge, new MatcherAndAlert(matcher, note));
     }
 
     public void copyNotes(Edge edgeFrom, Edge edgeTo) {

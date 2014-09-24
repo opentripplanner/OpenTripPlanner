@@ -13,21 +13,26 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.services.StreetNotesService.NoteMatcher;
 
 public class NoteProperties {
 
     public String notePattern;
 
-    public NoteProperties(String notePattern) {
-		this.notePattern = notePattern;
-	}
+    public NoteMatcher noteMatcher;
 
-	public NoteProperties() {
-		this.notePattern = null;
-	}
+    public NoteProperties(String notePattern, NoteMatcher noteMatcher) {
+        this.notePattern = notePattern;
+        this.noteMatcher = noteMatcher;
+    }
 
-	public String generateNote(OSMWithTags way) {
-        return TemplateLibrary.generate(notePattern, way);
+    public T2<Alert, NoteMatcher> generateNote(OSMWithTags way) {
+        // TODO create a I18n template library generate
+        String noteText = TemplateLibrary.generate(notePattern, way);
+        Alert note = Alert.createSimpleAlerts(noteText.intern());
+        return new T2<>(note, noteMatcher);
     }
 }

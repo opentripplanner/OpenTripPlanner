@@ -15,11 +15,13 @@ package org.opentripplanner.graph_builder.impl.osm;
 
 import java.beans.PropertyEditorSupport;
 
+import org.opentripplanner.routing.services.StreetNotesService;
+
 public class NotePropertiesEditor extends PropertyEditorSupport {
     private NoteProperties value;
 
     public void setAsText(String pattern) {
-        value = new NoteProperties(pattern);
+        value = new NoteProperties(pattern, StreetNotesService.ALWAYS_MATCHER);
     }
 
     public String getAsText() {

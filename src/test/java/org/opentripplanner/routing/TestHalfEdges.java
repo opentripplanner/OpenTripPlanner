@@ -97,8 +97,10 @@ public class TestHalfEdges extends TestCase {
                 GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500,
                 StreetTraversalPermission.PEDESTRIAN, false);
         
+        @SuppressWarnings("unused")
         PlainStreetEdge topBack = new PlainStreetEdge(tr, tl, (LineString) top.getGeometry()
                 .reverse(), "topBack", 1500, StreetTraversalPermission.ALL, true);
+        @SuppressWarnings("unused")
         PlainStreetEdge bottomBack = new PlainStreetEdge(br, bl, (LineString) bottom.getGeometry()
                 .reverse(), "bottomBack", 1500, StreetTraversalPermission.ALL, true);
         leftBack = new PlainStreetEdge(tl, bl, (LineString) left.getGeometry().reverse(),
@@ -334,11 +336,12 @@ public class TestHalfEdges extends TestCase {
         turns.add(left);
         turns.add(leftBack);
 
-        Set<Alert> alert = new HashSet<Alert>();
-        alert.add(Alert.createSimpleAlerts("This is the alert"));
+        Alert alert = Alert.createSimpleAlerts("This is the alert");
+        Set<Alert> alerts = new HashSet<>();
+        alerts.add(alert);
 
-        graph.streetNotesService.addNotes(left, alert);
-        graph.streetNotesService.addNotes(leftBack, alert);
+        graph.streetNotesService.addNote(left, alert);
+        graph.streetNotesService.addNote(leftBack, alert);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
                 cast(turns, StreetEdge.class),
@@ -358,19 +361,20 @@ public class TestHalfEdges extends TestCase {
             }
         }
 
-        assertEquals(alert, graph.streetNotesService.getNotes(traversedOne));
+        assertEquals(alerts, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
 
         // now, make sure wheelchair alerts are preserved
-        Set<Alert> wheelchairAlert = new HashSet<Alert>();
-        wheelchairAlert.add(Alert.createSimpleAlerts("This is the wheelchair alert"));
+        Alert wheelchairAlert = Alert.createSimpleAlerts("This is the wheelchair alert");
+        Set<Alert> wheelchairAlerts = new HashSet<>();
+        wheelchairAlerts.add(wheelchairAlert);
 
         graph.streetNotesService.removeNotes(left);
         graph.streetNotesService.removeNotes(leftBack);
-        graph.streetNotesService.addNotes(left, wheelchairAlert,
+        graph.streetNotesService.addNote(left, wheelchairAlert,
                 StreetNotesService.WHEELCHAIR_MATCHER);
-        graph.streetNotesService.addNotes(leftBack, wheelchairAlert,
+        graph.streetNotesService.addNote(leftBack, wheelchairAlert,
                 StreetNotesService.WHEELCHAIR_MATCHER);
 
         req.setWheelchairAccessible(true);
@@ -388,7 +392,7 @@ public class TestHalfEdges extends TestCase {
             }
         }
 
-        assertEquals(wheelchairAlert, graph.streetNotesService.getNotes(traversedOne));
+        assertEquals(wheelchairAlerts, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
     }

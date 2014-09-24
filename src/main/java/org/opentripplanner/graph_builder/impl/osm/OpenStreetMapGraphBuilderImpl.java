@@ -33,6 +33,7 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
 import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
@@ -83,6 +84,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.StreetNotesService;
+import org.opentripplanner.routing.services.StreetNotesService.NoteMatcher;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -1684,8 +1686,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private void applyWayProperties(PlainStreetEdge street, PlainStreetEdge backStreet,
                                         WayProperties wayData, OSMWithTags way) {
 
-            Set<Alert> notes = wayPropertySet.getNoteForWay(way);
-            Set<Alert> wheelchairNotes = getWheelchairNotes(way);
+            Set<T2<Alert, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
@@ -1695,11 +1696,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     bestBikeSafety = (float)safety;
                 }
                 if (notes != null) {
-                    graph.streetNotesService.addNotes(street, notes);
-                }
-                if (wheelchairNotes != null) {
-                    graph.streetNotesService.addNotes(street, notes,
-                            StreetNotesService.WHEELCHAIR_MATCHER);
+                    for (T2<Alert, NoteMatcher> note : notes)
+                        graph.streetNotesService.addNote(street, note.getFirst(), note.getSecond());
                 }
                 street.setNoThruTraffic(noThruTraffic);
             }
@@ -1711,11 +1709,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
                 backStreet.setBicycleSafetyFactor((float)safety);
                 if (notes != null) {
-                    graph.streetNotesService.addNotes(backStreet, notes);
-                }
-                if (wheelchairNotes != null) {
-                    graph.streetNotesService.addNotes(backStreet, wheelchairNotes,
-                            StreetNotesService.WHEELCHAIR_MATCHER);
+                    for (T2<Alert, NoteMatcher> note : notes)
+                        graph.streetNotesService.addNote(backStreet, note.getFirst(),
+                                note.getSecond());
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
@@ -1898,28 +1894,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
-        }
-
-        private Set<Alert> getWheelchairNotes(OSMWithTags way) {
-            Map<String, String> tags = way.getTagsByPrefix("wheelchair:description");
-            if (tags == null) {
-                return null;
-            }
-            Set<Alert> alerts = new HashSet<Alert>();
-            Alert alert = new Alert();
-            alerts.add(alert);
-            for (Map.Entry<String, String> entry : tags.entrySet()) {
-                String k = entry.getKey();
-                String v = entry.getValue();
-                if (k.equals("wheelchair:description")) {
-                    // no language, assume default from TranslatedString
-                    alert.alertHeaderText = new TranslatedString(v);
-                } else {
-                    String lang = k.substring("wheelchair:description:".length());
-                    alert.alertHeaderText = new TranslatedString(lang, v);
-                }
-            }
-            return alerts;
         }
 
         /**
@@ -2609,11 +2583,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 street.setHasBogusName(true);
             }
             street.setStairs(steps);
-
-            if (way.isTagTrue("toll") || way.isTagTrue("toll:motorcar")) {
-                graph.streetNotesService.addNotes(street, Alert.newSimpleAlertSet("Toll road"),
-                        StreetNotesService.DRIVING_MATCHER);
-            }
 
             /* TODO: This should probably generalized somehow? */
             if (!ignoreWheelchairAccessibility
