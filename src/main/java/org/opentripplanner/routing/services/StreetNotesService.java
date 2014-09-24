@@ -14,10 +14,12 @@
 package org.opentripplanner.routing.services;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -29,6 +31,22 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
+/**
+ * This service is a manager / index for edge notes. An edge note is an free-format alert attached
+ * to an edge, which is returned in the itinerary when this edge is used, and which *does not have
+ * any impact on routing*. The last restriction is necessary as the edge do not know which notes it
+ * is attached to (this to prevent having to store note lists in the edge, which is memory consuming
+ * as only few notes will have notes).
+ * 
+ * Typical notes are: Toll (driving), unpaved surface (walk,bike), wheelchair notes...
+ * 
+ * Each note is attached to a matcher, whose responsibility is to determine if the note is relevant
+ * for an edge, based on the itinerary state at this edge (the state after the edge has been
+ * traversed). Usually matcher will match note based on the mode (cycling, driving) or if a
+ * wheelchair access is requested.
+ * 
+ * @author laurent
+ */
 public class StreetNotesService implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -95,6 +113,12 @@ public class StreetNotesService implements Serializable {
     private final SetMultimap<Edge, MatcherAndAlert> notesForEdge = Multimaps
             .synchronizedSetMultimap(HashMultimap.<Edge, MatcherAndAlert> create());
 
+    /**
+     * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
+     * are identical).
+     */
+    private transient Map<T2<NoteMatcher, Alert>, MatcherAndAlert> uniqueMatchers = new HashMap<>();
+
     public StreetNotesService() {
     }
 
@@ -102,18 +126,10 @@ public class StreetNotesService implements Serializable {
         addNote(edge, note, ALWAYS_MATCHER);
     }
 
-    public void addNotes(Edge edge, Collection<Alert> notes, NoteMatcher matcher) {
-        if (notes == null || notes.isEmpty())
-            return; // Prevent unnecessary clutter on the map
-        for (Alert note : notes) {
-            addNote(edge, note, matcher);
-        }
-    }
-
     public void addNote(Edge edge, Alert note, NoteMatcher matcher) {
         if (LOG.isDebugEnabled())
             LOG.debug("Adding note {} to {} with matcher {}", note, edge, matcher);
-        notesForEdge.put(edge, new MatcherAndAlert(matcher, note));
+        notesForEdge.put(edge, buildMatcherAndAlert(matcher, note));
     }
 
     public void copyNotes(Edge edgeFrom, Edge edgeTo) {
@@ -142,5 +158,25 @@ public class StreetNotesService implements Serializable {
         if (LOG.isDebugEnabled())
             LOG.debug("Removing notes for edge: {}", edge);
         notesForEdge.removeAll(edge);
+    }
+
+    /**
+     * Create a MatcherAndAlert, interning it if the note and matcher pair is already created. Note:
+     * we use the default Object.equals() for matchers, as they are mostly already singleton
+     * instances.
+     * 
+     * @param noteMatcher
+     * @param note
+     * @return
+     */
+    private MatcherAndAlert buildMatcherAndAlert(NoteMatcher noteMatcher, Alert note) {
+        T2<NoteMatcher, Alert> key = new T2<>(noteMatcher, note);
+        MatcherAndAlert interned = uniqueMatchers.get(key);
+        if (interned != null) {
+            return interned;
+        }
+        MatcherAndAlert ret = new MatcherAndAlert(noteMatcher, note);
+        uniqueMatchers.put(key, ret);
+        return ret;
     }
 }
