@@ -41,7 +41,6 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
         LOG.info("Linking transit stops to tagged bus stops...");
 
         index = new StreetVertexIndexServiceImpl(graph);
-        index.setup();
 
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<>();

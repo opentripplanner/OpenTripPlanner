@@ -367,6 +367,12 @@
             <artifactId>guava</artifactId>
             <version>14.0.1</version>
         </dependency>
+        <!-- Trove provides optimized map/set collections for native types (int, long...) -->
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+            <version>3.0.3</version>
+        </dependency>
 
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
         <!-- GEOTOOLS includes JTS as a transitive dependency. -->

@@ -13,7 +13,7 @@
 
 package org.opentripplanner.common.geometry;
 
-import org.geotools.referencing.GeodeticCalculator;
+import org.apache.commons.math3.util.FastMath;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -24,35 +24,26 @@ public class DirectionUtils {
 
     public static DirectionUtils instance;
     private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-    /* this is used to calculate angles on a sphere */
-    private GeodeticCalculator geodeticCalculator;
 
     private DirectionUtils() {
-        // TODO(flamholz): Is constructing GeodeticCalculator really so
-        // heavyweight that we need this synchronization?
-        geodeticCalculator = new GeodeticCalculator();
-    }
-
-    private static synchronized DirectionUtils getInstance() {
-        if (instance == null) {
-            instance = new DirectionUtils();
-        }
-        return instance;
     }
 
     /**
-     * Returns the azimuth in decimal degrees from (-180° to +180°) between
-     * Coordinates A and B.
+     * Returns the approximate azimuth in decimal degrees from (-180° to +180°) between
+     * Coordinates A and B. The computation is exact for small delta between A and B.
      * 
      * @param a
      * @param b
      * @return
      */
     public static synchronized double getAzimuth(Coordinate a, Coordinate b) {
-    	DirectionUtils utils = getInstance();
-        utils.geodeticCalculator.setStartingGeographicPoint(a.x, a.y);
-        utils.geodeticCalculator.setDestinationGeographicPoint(b.x, b.y);
-    	return utils.geodeticCalculator.getAzimuth();
+        double cosLat = FastMath.cos(FastMath.toRadians((a.y + b.y) / 2.0)); 
+        double dY = (b.y - a.y); // in degrees, we do not care about the units
+        double dX = (b.x - a.x) * cosLat; // same
+        if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10)
+            return 180;
+        double az = FastMath.toDegrees(FastMath.atan2(dX, dY));
+        return az;
     }
     
     /**
@@ -79,10 +70,7 @@ public class DirectionUtils {
             coord0 = line.getCoordinateN(i--);
         }
 
-        DirectionUtils utils = getInstance();
-        utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
-        utils.geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
-        double az = utils.geodeticCalculator.getAzimuth();
+        double az = getAzimuth(coord0, coord1);
         return az * Math.PI / 180;
     }
 
@@ -111,10 +99,7 @@ public class DirectionUtils {
             coord1 = line.getCoordinateN(i++);
         }
 
-        DirectionUtils utils = getInstance();
-        utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
-        utils.geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
-        double az = utils.geodeticCalculator.getAzimuth();
+        double az = getAzimuth(coord0, coord1);
         return az * Math.PI / 180;
     }
 }

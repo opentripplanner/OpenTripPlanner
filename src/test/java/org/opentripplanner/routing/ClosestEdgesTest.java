@@ -89,7 +89,6 @@ public class ClosestEdgesTest {
                 .reverse(), "rightBack", 1500, StreetTraversalPermission.CAR, true);
 
         StreetVertexIndexServiceImpl myFinder = new StreetVertexIndexServiceImpl(graph);
-        myFinder.setup();
         finder = myFinder;
     }
 
