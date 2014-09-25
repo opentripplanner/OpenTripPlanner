@@ -112,8 +112,8 @@ otp.modules.planner.PlannerModule =
         if(_.has(this.options, 'defaultQueryParams')) {
             _.extend(this.defaultQueryParams, this.options.defaultQueryParams);
         }
-        
-        _.extend(this, _.clone(otp.modules.planner.defaultQueryParams));    
+
+        _.extend(this, this.defaultQueryParams);
     },
     
     activate : function() {
@@ -316,7 +316,9 @@ otp.modules.planner.PlannerModule =
                     triangleSlopeFactor: this_.triangleSlopeFactor,
                     triangleSafetyFactor: this_.triangleSafetyFactor
                 });
-            } 
+            }
+            if(this.maxHours) queryParams.maxHours = this.maxHours;
+
             _.extend(queryParams, this.getExtendedQueryParams());
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;
