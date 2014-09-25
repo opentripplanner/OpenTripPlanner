@@ -53,6 +53,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -308,6 +309,44 @@ public class PointSet implements Serializable{
 			while (jp.nextToken() != JsonToken.END_OBJECT) {
 				String key = jp.getCurrentName();
 				current = jp.nextToken();
+				if (key.equals("properties")) {
+					JsonNode properties = jp.readValueAsTree();
+
+					if(properties.get("id") != null)
+						ret.id = properties.get("id").asText();
+					if(properties.get("label") != null)
+						ret.label = properties.get("label").asText();
+					if(properties.get("description") != null)
+						ret.label = properties.get("description").asText();
+					
+					if(properties.get("schema") != null) {
+						
+						Iterator<Entry<String, JsonNode>> catIter = properties.get("schema").fields();
+						while (catIter.hasNext()) {
+							Entry<String, JsonNode> catEntry = catIter.next();
+							String catName = catEntry.getKey();
+							JsonNode catNode = catEntry.getValue();
+							
+							PropertyMetadata cat = new PropertyMetadata(catName);
+					 
+							if(catNode.get("label") != null)
+								cat.label = catNode.get("label").asText();
+							
+							if(catNode.get("style") != null) {
+								Iterator<Entry<String, JsonNode>> styleIter = catNode.get("style").fields();
+								while (styleIter.hasNext()) {
+									Entry<String, JsonNode> styleEntry = styleIter.next();
+									String styleName = styleEntry.getKey();
+									JsonNode styleValue = styleEntry.getValue();
+	
+									cat.addStyle(styleName, styleValue.asText());
+								}
+							}
+							
+							ret.propMetadata.put(catName, cat);
+						}
+					}					
+				}	
 				if (key.equals("features")) {
 					while (jp.nextToken() != JsonToken.END_ARRAY) {
 						// Read the feature into a tree model, which moves
@@ -508,8 +547,10 @@ public class PointSet implements Serializable{
 		if (property == null) {
 			property = new PropertyMetadata(id);
 			propMetadata.put(id, property);
-			properties.put(id, new int[capacity]);
 		}
+		if(!properties.containsKey(id))
+			properties.put(id, new int[capacity]);
+		
 		return property;
 	}
 
@@ -674,6 +715,31 @@ public class PointSet implements Serializable{
 		jgen.writeEndObject();
 	}
 
+	public PointSet slice(List<String> ids) {
+		
+		PointSet ret = new PointSet(ids.size());
+		
+		HashSet<String> idsHashSet = new HashSet<String>(ids);
+		
+		ret.id = id;
+		ret.label = label;
+		ret.description = description;
+
+		int n = 0;
+		
+		for (int i = 0; i < this.ids.length; i++) {
+			if(idsHashSet.contains(this.ids[i])) {	
+				ret.lats[n] = this.lats[i];
+				ret.lons[n] = this.lons[i];
+				ret.ids[n] = this.ids[i];
+				ret.polygons[n] = this.polygons[i];
+				n++;
+			}
+		}
+		
+		return ret;
+	}
+	
 	public PointSet slice(int start, int end) {
 		PointSet ret = new PointSet(end - start);
 

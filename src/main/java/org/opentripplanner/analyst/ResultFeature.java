@@ -46,6 +46,29 @@ public class ResultFeature implements Serializable{
         }
     }
     
+    public Long sum(Integer timeLimit) {
+    	
+    	Long value = 0l;
+    
+    	int maxMinutes;
+    	
+    	if(timeLimit != null)
+    		maxMinutes = timeLimit / 60;
+    	else
+    		maxMinutes = Integer.MAX_VALUE;
+    	
+    	for(String k : histograms.keySet()) {
+    		int minute = 0;
+    		for(int v : histograms.get(k).sums) {
+    			if(minute < maxMinutes)
+    				value += v;
+    			minute++;
+    		}
+    	}
+    	
+    	return value;
+    }
+    
     
     /**
      * Each origin will yield CSV with columns category,min,q25,q50,q75,max

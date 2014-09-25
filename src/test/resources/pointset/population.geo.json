@@ -26,16 +26,8 @@
             "properties": {
                 "label": "Block One",
                 "structured": {
-                    "age": {
-                        "child": 10,
-                        "adult": 15,
-                        "senior": 5
-                    },
-                    "education": {
-                        "low": 15,
-                        "mid": 5,
-                        "high": 10
-                    }
+                    "age": 10,
+                    "education": 6
                 }
             },
             "geometry": {
@@ -49,16 +41,8 @@
             "properties": {
                 "label": "Block Two",
                 "structured": {
-                    "age": {
-                        "child": 5,
-                        "adult": 10,
-                        "senior": 5
-                    },
-                    "education": {
-                        "low": 6,
-                        "mid": 6,
-                        "high": 8
-                    }
+                    "age": 5,
+                    "education": 5
                 }
             },
             "geometry": {

@@ -106,16 +106,8 @@ public class PointFeature implements Serializable {
 			while (catIter.hasNext()) {
 				Entry<String, JsonNode> catEntry = catIter.next();
 				String catName = catEntry.getKey();
-				JsonNode catNode = catEntry.getValue();
-				Iterator<Entry<String, JsonNode>> propIter = catNode.fields();
-				while (propIter.hasNext()) {
-					Entry<String, JsonNode> propEntry = propIter.next();
-					String propName = propEntry.getKey();
-					int magnitude = propEntry.getValue().asInt();
-					// TODO Maybe we should be using a String[2] instead of
-					// joined strings.
-					properties.put(catName+":"+propName, magnitude);
-				}
+				Integer value = catEntry.getValue().asInt();
+				properties.put(catName, value);
 			}
 		}
 
