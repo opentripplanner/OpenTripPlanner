@@ -779,7 +779,6 @@ public class Graph implements Serializable {
     }
 
     public void removeTemporaryEdge(Edge edge) {
-        streetNotesService.removeNotes(edge);
         if (edge.getFromVertex() == null || edge.getToVertex() == null) {
             return;
         }

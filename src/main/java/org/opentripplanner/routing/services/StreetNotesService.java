@@ -23,12 +23,12 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 
 /**
@@ -107,11 +107,11 @@ public class StreetNotesService implements Serializable {
     }
 
     /**
-     * Notes for street edges. We need to synchronize access to the map as they will be concurrent
-     * write access (notes for temporary splitted street edges).
+     * Notes for street edges. No need to synchronize access to the map as they will not be
+     * concurrent write access (no notes for temporary edges, we use notes from parent).
      */
-    private final SetMultimap<Edge, MatcherAndAlert> notesForEdge = Multimaps
-            .synchronizedSetMultimap(HashMultimap.<Edge, MatcherAndAlert> create());
+    private final SetMultimap<Edge, MatcherAndAlert> notesForEdge = HashMultimap
+            .<Edge, MatcherAndAlert> create();
 
     /**
      * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
@@ -132,14 +132,17 @@ public class StreetNotesService implements Serializable {
         notesForEdge.put(edge, buildMatcherAndAlert(matcher, note));
     }
 
-    public void copyNotes(Edge edgeFrom, Edge edgeTo) {
-        Set<MatcherAndAlert> notes = notesForEdge.get(edgeFrom);
-        if (notes != null && !notes.isEmpty())
-            notesForEdge.putAll(edgeTo, notes);
-    }
-
+    /**
+     * Return the set of notes applicable for this state / backedge pair.
+     * 
+     * @param state
+     * @return The set of notes or null if empty.
+     */
     public Set<Alert> getNotes(State state) {
         Edge edge = state.getBackEdge();
+        if (edge instanceof PartialPlainStreetEdge) {
+            edge = ((PartialPlainStreetEdge) edge).getParentEdge();
+        }
         Set<MatcherAndAlert> maas = notesForEdge.get(edge);
         if (maas == null || maas.isEmpty()) {
             return null;
@@ -154,6 +157,12 @@ public class StreetNotesService implements Serializable {
         return notes;
     }
 
+    /**
+     * Remove all notes attached to this edge. NOTE: this should only be called within a graph
+     * building context (or unit testing).
+     * 
+     * @param edge
+     */
     public void removeNotes(Edge edge) {
         if (LOG.isDebugEnabled())
             LOG.debug("Removing notes for edge: {}", edge);
