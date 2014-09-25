@@ -11,6 +11,9 @@ public class LatLon extends QueryParameter {
 
     @Override
     protected void parse(String value) throws Throwable {
+    	if(value == null || value.isEmpty())
+    		return;
+    	
         String[] fields = value.split(",");
         lat = Double.parseDouble(fields[0]);
         lon = Double.parseDouble(fields[1]);
