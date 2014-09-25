@@ -215,7 +215,7 @@ public class Ride {
     /** Calculate the wait time stats for boarding all (non-exact) frequency entries in this Ride. */
     private Stats calcStatsForFreqs(TimeWindow window) {
         Stats stats = new Stats(); // all stats fields are initialized to zero
-        int n = 0; // the total number of seconds that headway boarding is possible
+        stats.num = 0; // the total number of seconds that headway boarding is possible
         for (PatternRide patternRide : patternRides) {
             for (FrequencyEntry freq : patternRide.pattern.scheduledTimetable.frequencyEntries) {
                 if (freq.exactTimes) {
@@ -227,13 +227,13 @@ public class Ride {
                     if (freq.headway > stats.max) stats.max = freq.headway;
                     // weight the average of each headway by the number of seconds it is valid
                     stats.avg += (freq.headway / 2) * overlap;
-                    n += overlap;
+                    stats.num += overlap;
                 }
             }
         }
-        if (n == 0) return null;
+        if (stats.num == 0) return null;
         /* Some frequency entries were added to the stats. */
-        stats.avg /= n;
+        stats.avg /= stats.num;
         return stats;
     }
 
