@@ -119,6 +119,10 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
         return fromCoord.equals(toCoord);
     }
     
+    public StreetEdge getParentEdge() {
+        return parentEdge;
+    }
+
     @Override
     public String toString() {
         return "PartialPlainStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
