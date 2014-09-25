@@ -114,6 +114,7 @@ public class PlanGeneratorTest {
     private static final double NORTHEAST = OCTANT * 1;
     private static final double EAST = OCTANT * 2;
     private static final double NORTHWEST = OCTANT * -1;
+    private static final double SOUTH = OCTANT * 4;
     private static final double EPSILON = 1e-1;
 
     private static final SimpleTimeZone timeZone = new SimpleTimeZone(2, "CEST");
@@ -1364,9 +1365,9 @@ public class PlanGeneratorTest {
         assertFalse(steps[5][1].area);
         assertNull(steps[5][1].exit);
 
-        assertEquals(AbsoluteDirection.NORTHWEST, steps[6][0].absoluteDirection);
-        assertEquals(RelativeDirection.LEFT, steps[6][0].relativeDirection);
-        assertEquals(NORTHWEST, steps[6][0].angle, EPSILON);
+        assertEquals(AbsoluteDirection.SOUTH, steps[6][0].absoluteDirection);
+        assertEquals(RelativeDirection.HARD_LEFT, steps[6][0].relativeDirection);
+        assertEquals(SOUTH, steps[6][0].angle, EPSILON);
         assertEquals("Edge 49", steps[6][0].streetName);
         assertEquals(2.0, steps[6][0].distance, 0.0);
         assertFalse(steps[6][0].bogusName);
@@ -1378,15 +1379,15 @@ public class PlanGeneratorTest {
         assertNull(steps[6][0].exit);
 
         /*
-         * The behavior of the relative direction computation code is actually incorrect here.
-         * However, it seems unlikely that anyone would care about correct relative directions in
+         * The behavior of the relative direction computation code should now be correct here.
+         * Anyway, it seems unlikely that anyone would care about correct relative directions in
          * the arctic regions. Of course, longitude becomes meaningless at the poles themselves, but
-         * walking towards the pole, past it, and then back again will also yield incorrect results.
+         * walking towards the pole, past it, and then back again will now yield correct results.
          */
         assertEquals(alertsExample, steps[7][0].alerts.get(0).alertHeaderText.getSomeTranslation());
-        assertEquals(AbsoluteDirection.NORTHWEST, steps[7][0].absoluteDirection);
+        assertEquals(AbsoluteDirection.SOUTH, steps[7][0].absoluteDirection);
         assertEquals(RelativeDirection.CONTINUE, steps[7][0].relativeDirection);
-        assertEquals(NORTHWEST, steps[7][0].angle, EPSILON);
+        assertEquals(SOUTH, steps[7][0].angle, EPSILON);
         assertEquals("Edge 53", steps[7][0].streetName);
         assertEquals(1.0, steps[7][0].distance, 0.0);
         assertEquals(1, steps[7][0].alerts.size());

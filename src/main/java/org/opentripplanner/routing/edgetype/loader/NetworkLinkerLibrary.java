@@ -66,7 +66,6 @@ public class NetworkLinkerLibrary {
         this.edgesForRoute = edgesForRoute;
         LOG.debug("constructing index...");
         this.index = new StreetVertexIndexServiceImpl(graph);
-        this.index.setup();
     }
 
     /**

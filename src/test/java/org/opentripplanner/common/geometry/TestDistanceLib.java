@@ -21,6 +21,28 @@ import junit.framework.TestCase;
 
 public class TestDistanceLib extends TestCase {
 
+    public void testMetersToDegree() {
+        // Note: 111194.926644559 is 1 degree at the equator, given the earth radius used in the lib
+        double degree;
+        degree = SphericalDistanceLibrary.metersToDegrees(111194.926644559);
+        assertTrue(Math.abs(degree - 1.0) < 1e-5);
+        degree = SphericalDistanceLibrary.metersToLonDegrees(111194.926644559, 0);
+        assertTrue(Math.abs(degree - 1.0 / Math.cos(Math.toRadians(1))) < 1e-5);
+        degree = SphericalDistanceLibrary.metersToLonDegrees(111194.926644559, 1.0);
+        assertTrue(Math.abs(degree - 1.0 / Math.cos(Math.toRadians(2))) < 1e-5);
+        degree = SphericalDistanceLibrary.metersToLonDegrees(111194.926644559, -1.0);
+        assertTrue(Math.abs(degree - 1.0 / Math.cos(Math.toRadians(2))) < 1e-5);
+        degree = SphericalDistanceLibrary.metersToLonDegrees(111194.926644559, 45.0);
+        assertTrue(Math.abs(degree - 1.0 / Math.cos(Math.toRadians(46))) < 1e-5);
+        degree = SphericalDistanceLibrary.metersToLonDegrees(111194.926644559, -45.0);
+        assertTrue(Math.abs(degree - 1.0 / Math.cos(Math.toRadians(46))) < 1e-5);
+        // Further north, solutions get degenerated.
+        degree = SphericalDistanceLibrary.metersToLonDegrees(111194.926644559, 80);
+        assertTrue(Math.abs(degree - 1.0 / Math.cos(Math.toRadians(81))) < 1e-4);
+        degree = SphericalDistanceLibrary.metersToLonDegrees(111.194926, 45);
+        assertTrue(Math.abs(degree - 1.0 / Math.cos(Math.toRadians(44.999)) / 1000) < 1e-5);
+    }
+
     public void testPointToLineStringFastDistance() {
         // Note: the meridian length of 1 degree of latitude on the sphere is around 111.2 km
         DistanceLibrary dlib = new SphericalDistanceLibrary();

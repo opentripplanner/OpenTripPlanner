@@ -13,11 +13,11 @@
 
 package org.opentripplanner.routing.impl;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -45,8 +46,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 /**
@@ -65,10 +66,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * Contains only instances of {@link StreetEdge}
      */
     protected SpatialIndex edgeTree;
-
-    protected STRtree transitStopTree;
-
-    protected STRtree verticesTree;
+    protected SpatialIndex transitStopTree;
+    protected SpatialIndex verticesTree;
 
     public DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -84,50 +83,50 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public static final double DISTANCE_ERROR = 0.000001;
 
     // If a point is within MAX_CORNER_DISTANCE, it is treated as at the corner.
-    // This distance is a euclidean distance in lat/lng space.
-    private static final double MAX_CORNER_DISTANCE = 0.0001;
+    private static final double MAX_CORNER_DISTANCE_METERS = 10;
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
     public StreetVertexIndexServiceImpl(Graph graph) {
+        this(graph, true);
+    }
+
+    public StreetVertexIndexServiceImpl(Graph graph, boolean hashGrid) {
         this.graph = graph;
-        setup();
-    }
-
-    public StreetVertexIndexServiceImpl(Graph graph, DistanceLibrary distanceLibrary) {
-        this.graph = graph;
-        this.distanceLibrary = distanceLibrary;
-        setup();
-    }
-
-    public void setup_modifiable() {
-        edgeTree = new Quadtree();
+        if (hashGrid) {
+            edgeTree = new HashGridSpatialIndex<>();
+            transitStopTree = new HashGridSpatialIndex<>();
+            verticesTree = new HashGridSpatialIndex<>();
+        } else {
+            edgeTree = new STRtree();
+            transitStopTree = new STRtree();
+            verticesTree = new STRtree();
+        }
         postSetup();
+        if (!hashGrid) {
+            ((STRtree) edgeTree).build();
+            ((STRtree) transitStopTree).build();
+        }
     }
 
-    public void setup() {
-        edgeTree = new STRtree();
-        postSetup();
-        ((STRtree) edgeTree).build();
-    }
-
+    @SuppressWarnings("rawtypes")
     private void postSetup() {
-
-        transitStopTree = new STRtree();
-        verticesTree = new STRtree();
-
         for (Vertex gv : graph.getVertices()) {
             Vertex v = gv;
             /*
-             * We add all edges, filtering them out after. The overhead compared to storing only
-             * street edges is rather low, as most edges are street-ones anyway.
+             * We add all edges with geometry, filtering them out after. The overhead compared to
+             * storing only street edges is rather low, as most edges are street-ones anyway.
              */
             for (Edge e : gv.getOutgoing()) {
-                if (e.getGeometry() == null) {
+                LineString geometry = e.getGeometry();
+                if (geometry == null) {
                     continue;
                 }
-                Envelope env = e.getGeometry().getEnvelopeInternal();
-                edgeTree.insert(env, e);
+                Envelope env = geometry.getEnvelopeInternal();
+                if (edgeTree instanceof HashGridSpatialIndex)
+                    ((HashGridSpatialIndex)edgeTree).insert(geometry, e);
+                else
+                    edgeTree.insert(env, e);
             }
             if (v instanceof TransitStop) {
                 Envelope env = new Envelope(v.getCoordinate());
@@ -136,7 +135,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             Envelope env = new Envelope(v.getCoordinate());
             verticesTree.insert(env, v);
         }
-        transitStopTree.build();
     }
 
     /**
@@ -144,14 +142,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * 
      * @param distance in meters
      */
-    @SuppressWarnings("unchecked")
-    public List<TransitStop> getLocalTransitStops(Coordinate c, double distance) {
-        Envelope env = new Envelope(c);
-        env.expandBy(SphericalDistanceLibrary.metersToDegrees(distance));
-        List<TransitStop> nearby = transitStopTree.query(env);
+    @Override
+    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
+        Envelope env = new Envelope(coordinate);
+        env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(radius, coordinate.y),
+                SphericalDistanceLibrary.metersToDegrees(radius));
+        List<TransitStop> nearby = getTransitStopForEnvelope(env);
         List<TransitStop> results = new ArrayList<TransitStop>();
         for (TransitStop v : nearby) {
-            if (distanceLibrary.distance(v.getCoordinate(), c) <= distance) {
+            if (distanceLibrary.distance(v.getCoordinate(), coordinate) <= radius) {
                 results.add(v);
             }
         }
@@ -177,7 +176,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
-        StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
+        StreetVertex intersection = getIntersectionAt(coord);
         String calculatedName = location.name;
         if (intersection != null) {
             // We have an intersection vertex. Check that this vertex has edges we can traverse.
@@ -240,7 +239,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // elsewhere options=null means no restrictions, find anything.
         // here we skip examining stops, as they are really only relevant when transit is being used
         if (options != null && options.modes.isTransit()) {
-            for (TransitStop v : getLocalTransitStops(coord, 1000)) {
+            for (TransitStop v : getNearbyTransitStops(coord, 1000)) {
                 if (!v.isStreetLinkable()) continue;
 
                 double d = distanceLibrary.distance(v.getCoordinate(), coord);
@@ -291,18 +290,44 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<Vertex> getVerticesForEnvelope(Envelope envelope) {
-        return verticesTree.query(envelope);
+    @Override
+    public List<Vertex> getVerticesForEnvelope(Envelope envelope) {
+        List<Vertex> vertices = verticesTree.query(envelope);
+        // Here we assume vertices list modifiable
+        for (Iterator<Vertex> iv = vertices.iterator(); iv.hasNext();) {
+            Vertex v = iv.next();
+            if (!envelope.contains(new Coordinate(v.getLon(), v.getLat())))
+                iv.remove();
+        }
+        return vertices;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
-        return edgeTree.query(envelope);
+        List<Edge> edges = edgeTree.query(envelope);
+        for (Iterator<Edge> ie = edges.iterator(); ie.hasNext();) {
+            Edge e = ie.next();
+            Envelope eenv = e.getGeometry().getEnvelopeInternal();
+            //Envelope eenv = e.getEnvelope();
+            if (!envelope.intersects(eenv))
+                ie.remove();
+        }
+        return edges;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<TransitStop> getTransitStopForEnvelope(Envelope envelope) {
+        List<TransitStop> transitStops = transitStopTree.query(envelope);
+        for (Iterator<TransitStop> its = transitStops.iterator(); its.hasNext();) {
+            TransitStop ts = its.next();
+            if (!envelope.intersects(new Coordinate(ts.getLon(), ts.getLat())))
+                its.remove();
+        }
+        return transitStops;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public CandidateEdgeBundle getClosestEdges(GenericLocation location,
             TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
             boolean possibleTransitLinksOnly) {
@@ -328,7 +353,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 return candidateEdges; // empty list
             }
 
-            Iterable<Edge> nearbyEdges = edgeTree.query(envelope);
+            Iterable<Edge> nearbyEdges = getEdgesForEnvelope(envelope);
             if (nearbyEdges != null) {
                 nearbyEdges = Iterables.concat(nearbyEdges, extraStreets);
             }
@@ -411,67 +436,30 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     /**
-     * Convenience wrapper that uses MAX_CORNER_DISTANCE.
-     * 
-     * @param coordinate
-     * @return
+     * @param coordinate Location to search intersection at. Look in a MAX_CORNER_DISTANCE_METERS radius.
+     * @return The nearest intersection, null if none found.
      */
     public StreetVertex getIntersectionAt(Coordinate coordinate) {
-        return getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
-    }
-
-    @SuppressWarnings("unchecked")
-    public StreetVertex getIntersectionAt(Coordinate coordinate, double distanceError) {
+        double dLon = SphericalDistanceLibrary.metersToLonDegrees(MAX_CORNER_DISTANCE_METERS,
+                coordinate.y);
+        double dLat = SphericalDistanceLibrary.metersToDegrees(MAX_CORNER_DISTANCE_METERS);
         Envelope envelope = new Envelope(coordinate);
-        envelope.expandBy(distanceError * 2);
-        List<Vertex> nearby = verticesTree.query(envelope);
+        envelope.expandBy(dLon, dLat);
+        List<Vertex> nearby = getVerticesForEnvelope(envelope);
         StreetVertex nearest = null;
-        double bestDistance = Double.POSITIVE_INFINITY;
+        double bestDistanceMeter = Double.POSITIVE_INFINITY;
         for (Vertex v : nearby) {
             if (v instanceof StreetVertex) {
-                double distance = coordinate.distance(v.getCoordinate());
-                if (distance < distanceError) {
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        nearest = (StreetVertex)v;
+                double distanceMeter = distanceLibrary.fastDistance(coordinate, v.getCoordinate());
+                if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
+                    if (distanceMeter < bestDistanceMeter) {
+                        bestDistanceMeter = distanceMeter;
+                        nearest = (StreetVertex) v;
                     }
                 }
             }
         }
         return nearest;
-    }
-
-    @Override
-    /** radius is meters */
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
-        Envelope envelope = new Envelope(coordinate);
-
-        envelope.expandBy(SphericalDistanceLibrary.metersToDegrees(radius));
-        List<?> stops = transitStopTree.query(envelope);
-        ArrayList<TransitStop> out = new ArrayList<TransitStop>();
-        for (Object o : stops) {
-            TransitStop stop = (TransitStop) o;
-            if (distanceLibrary.distance(stop.getCoordinate(), coordinate) < radius) {
-                out.add(stop);
-            }
-        }
-        return out;
-    }
-
-    @Override
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne,
-            Coordinate coordinateTwo) {
-        Envelope envelope = new Envelope(coordinateOne, coordinateTwo);
-
-        List<?> stops = transitStopTree.query(envelope);
-        ArrayList<TransitStop> out = new ArrayList<TransitStop>();
-        for (Object o : stops) {
-            TransitStop stop = (TransitStop) o;
-            if(envelope.contains(stop.getCoordinate())) {
-                out.add(stop);
-            }
-        }
-        return out;
     }
 
     @Override
@@ -507,4 +495,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return graph.getVertex(place);
     }
 
+    @Override
+    public String toString() {
+        return getClass().getName() + " -- edgeTree: " + edgeTree.toString() + " -- verticesTree: " + verticesTree.toString();
+    }
 }

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
+import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -31,10 +32,8 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.util.BitSetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +76,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
      */
     private float bicycleSafetyFactor;
 
-    private LineString geometry;
+    private int[] compactGeometry;
     
     private String name;
 
@@ -625,11 +624,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 	}
 
 	public LineString getGeometry() {
-		return geometry;
+		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry);
 	}
 
 	public void setGeometry(LineString geometry) {
-		this.geometry = geometry;
+		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry);
 	}
 
 	public String getLabel() {
@@ -741,4 +740,5 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 	public int getOutAngle() {
 		return this.outAngle;
 	}
+
 }

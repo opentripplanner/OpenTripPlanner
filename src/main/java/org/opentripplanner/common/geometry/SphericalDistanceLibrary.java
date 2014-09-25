@@ -166,9 +166,35 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
         return a * a;
     }
 
-    /** this is an overestimate */
-    public static double metersToDegrees(double distance) {
-        return 360 * distance / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
+    /**
+     * @param distanceMeters Distance in meters.
+     * @return The number of degree for the given distance. For a latitude, this is exact. For a
+     *         longitude, this is an overestimate.
+     */
+    public static double metersToDegrees(double distanceMeters) {
+        return 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
+    }
+
+    /**
+     * @param distanceMeters Distance in meters.
+     * @param latDeg Latitude of center point, in degree.
+     * @return The number of longitude degree for the given distance. This is a slight overestimate
+     *         as the number of degree of longitude for a given distance depends on the exact
+     *         latitude.
+     */
+    public static double metersToLonDegrees(double distanceMeters, double latDeg) {
+        double dLatDeg = 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
+        /*
+         * The computation below ensure that minCosLat is the minimum value of cos(lat) for lat in
+         * the range [lat-dLat, lat+dLat].
+         */
+        double minCosLat;
+        if (latDeg > 0) {
+            minCosLat = FastMath.cos(FastMath.toRadians(latDeg + dLatDeg));
+        } else {
+            minCosLat = FastMath.cos(FastMath.toRadians(latDeg - dLatDeg));
+        }
+        return dLatDeg / minCosLat;
     }
 
     public final Envelope bounds(double lat, double lon, double latDistance,
