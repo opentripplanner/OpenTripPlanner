@@ -58,7 +58,7 @@ otp.modules.analyst.AnalystModule =
 
         modeSelector.refreshModeControls();
 
-        var buttonRow = $('<div style="text-align: center; margin-top: 6px;"></div>')
+        var buttonRow = $('<div class="notDraggable" style="text-align: center; margin-top: 6px;"></div>')
         .appendTo(this.optionsWidget.$());
         //TRANSLATORS: Button to update analyst information 
         $('<button>' + _tr("Refresh") + '</button>').button().click(function() {
@@ -113,19 +113,15 @@ otp.modules.analyst.AnalystModule =
 	        toPlace : this.startLatLng.lat+','+this.startLatLng.lng
         }
 
-        	
         var URL = this.analystUrl + this.buildQuery(params);
-        console.log(params);
-        console.log(URL);
-        
-        // is there a better way to trigger a refresh than removing and re-adding?
-	    if(this.analystLayer != null)
-		    this.webapp.map.lmap.removeLayer(this.analystLayer);
-        else {
-            this.analystLayer = new L.TileLayer(this.analystUrl, {zIndex : 100});
-            this.addLayer("Analyst Accessibility", this.analystLayer)
+
+        if(this.analystLayer != null) {
+            this.analystLayer.setUrl(URL); // trigger a refresh without removing the layer
+        } else {
+            this.analystLayer = new L.TileLayer(URL, {zIndex : 100});
+            this.addLayer("Analyst Accessibility", this.analystLayer);
         }
-            
+        
 	    this.analystLayer._url = URL;
         this.webapp.map.lmap.addLayer(this.analystLayer);
 

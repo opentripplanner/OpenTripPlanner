@@ -22,8 +22,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import lombok.Setter;
-
 import org.opentripplanner.api.parameter.BoundingBox;
 import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResults;
@@ -38,8 +36,7 @@ public class ExternalGeocoderResource {
   
 // uncommenting injectparam will require a specific Geocoder to be instantiated
 //    @InjectParam 
-    @Setter 
-    private Geocoder geocoder;
+    public Geocoder geocoder;
     
     @GET
     @Produces({MediaType.APPLICATION_JSON + "; charset=UTF-8"})

@@ -76,7 +76,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.earlyStart = preferences.getInt("earlyStartSec", 0);
         this.defaultAgencyId = preferences.get("defaultAgencyId", null);
         LOG.info("Creating real-time alert updater running every {} seconds : {}",
-                getFrequencySec(), url);
+        		frequencySec, url);
     }
 
     @Override

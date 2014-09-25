@@ -99,12 +99,12 @@ public class StreetLocation extends StreetVertex {
                 for (StreetEdge e : ((AreaEdge) street).getArea().getEdges()) {
                     if (!allEdges.contains(e)) {
                         CandidateEdge ce = new CandidateEdge(e, originalCoordinate, 0, modes);
-                        if (ce.endwise() || ce.getDistance() > .0005) {
+                        if (ce.endwise() || ce.distance > .0005) {
                             // skip inappropriate area edges
                             continue;
                         }
                         StreetLocation areaSplitter = createStreetLocation(graph, label, name,
-                                Arrays.asList(e), ce.getNearestPointOnEdge());
+                                Arrays.asList(e), ce.nearestPointOnEdge);
                         location.extra.addAll(areaSplitter.getExtra());
                         location.extra.add(new FreeEdge(location, areaSplitter));
                         location.extra.add(new FreeEdge(areaSplitter, location));

@@ -114,6 +114,7 @@ public class PlanGeneratorTest {
     private static final double NORTHEAST = OCTANT * 1;
     private static final double EAST = OCTANT * 2;
     private static final double NORTHWEST = OCTANT * -1;
+    private static final double SOUTH = OCTANT * 4;
     private static final double EPSILON = 1e-1;
 
     private static final SimpleTimeZone timeZone = new SimpleTimeZone(2, "CEST");
@@ -452,15 +453,15 @@ public class PlanGeneratorTest {
 
         // Vertex initialization that can't be done using the constructor
         v0.setExitName("Ausfahrt");
-        v2.setFreeFlowing(true);
-        v4.setFreeFlowing(true);
-        v38.setFreeFlowing(true);
-        v40.setFreeFlowing(true);
-        v42.setFreeFlowing(true);
-        v48.setFreeFlowing(true);
-        v50.setFreeFlowing(true);
-        v52.setFreeFlowing(true);
-        v54.setFreeFlowing(true);
+        v2.freeFlowing = (true);
+        v4.freeFlowing = (true);
+        v38.freeFlowing = (true);
+        v40.freeFlowing = (true);
+        v42.freeFlowing = (true);
+        v48.freeFlowing = (true);
+        v50.freeFlowing = (true);
+        v52.freeFlowing = (true);
+        v54.freeFlowing = (true);
 
         // Elevation profiles for the street edges that will be created later
         PackedCoordinateSequence elevation3 = new PackedCoordinateSequence.Double(
@@ -658,7 +659,7 @@ public class PlanGeneratorTest {
         graph.putService(FareService.class, fareServiceStub);
         graph.addAgency(trainAgency);
         graph.addAgency(ferryAgency);
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
         graph.addAlertPatch(e29, alertPatch);
 
         // Routing context creation and initialization
@@ -667,7 +668,7 @@ public class PlanGeneratorTest {
         // Temporary graph objects for onboard depart tests
         OnboardDepartVertex onboardDepartVertex = new OnboardDepartVertex("Onboard", 23.0, 12.0);
         OnBoardDepartPatternHop onBoardDepartPatternHop = new OnBoardDepartPatternHop(
-                onboardDepartVertex, v12, firstTripPattern.getScheduledTimetable().getTripTimes(0), serviceDay, 0, 0.5);
+                onboardDepartVertex, v12, firstTripPattern.scheduledTimetable.getTripTimes(0), serviceDay, 0, 0.5);
 
         // Traverse the path forward first
         RoutingRequest forwardOptions = options.clone();
@@ -1364,9 +1365,9 @@ public class PlanGeneratorTest {
         assertFalse(steps[5][1].area);
         assertNull(steps[5][1].exit);
 
-        assertEquals(AbsoluteDirection.NORTHWEST, steps[6][0].absoluteDirection);
-        assertEquals(RelativeDirection.LEFT, steps[6][0].relativeDirection);
-        assertEquals(NORTHWEST, steps[6][0].angle, EPSILON);
+        assertEquals(AbsoluteDirection.SOUTH, steps[6][0].absoluteDirection);
+        assertEquals(RelativeDirection.HARD_LEFT, steps[6][0].relativeDirection);
+        assertEquals(SOUTH, steps[6][0].angle, EPSILON);
         assertEquals("Edge 49", steps[6][0].streetName);
         assertEquals(2.0, steps[6][0].distance, 0.0);
         assertFalse(steps[6][0].bogusName);
@@ -1378,15 +1379,15 @@ public class PlanGeneratorTest {
         assertNull(steps[6][0].exit);
 
         /*
-         * The behavior of the relative direction computation code is actually incorrect here.
-         * However, it seems unlikely that anyone would care about correct relative directions in
+         * The behavior of the relative direction computation code should now be correct here.
+         * Anyway, it seems unlikely that anyone would care about correct relative directions in
          * the arctic regions. Of course, longitude becomes meaningless at the poles themselves, but
-         * walking towards the pole, past it, and then back again will also yield incorrect results.
+         * walking towards the pole, past it, and then back again will now yield correct results.
          */
         assertEquals(alertsExample, steps[7][0].alerts.get(0).alertHeaderText.getSomeTranslation());
-        assertEquals(AbsoluteDirection.NORTHWEST, steps[7][0].absoluteDirection);
+        assertEquals(AbsoluteDirection.SOUTH, steps[7][0].absoluteDirection);
         assertEquals(RelativeDirection.CONTINUE, steps[7][0].relativeDirection);
-        assertEquals(NORTHWEST, steps[7][0].angle, EPSILON);
+        assertEquals(SOUTH, steps[7][0].angle, EPSILON);
         assertEquals("Edge 53", steps[7][0].streetName);
         assertEquals(1.0, steps[7][0].distance, 0.0);
         assertEquals(1, steps[7][0].alerts.size());

@@ -14,13 +14,15 @@
 package org.opentripplanner.common.geometry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.internal.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * A spatial index using a 2D hashtable that wraps around at the edges.
@@ -274,7 +276,7 @@ public class HashGrid <T> {
      */
     public List<T> query (double lon, double lat, double radiusMeters) {
         Coordinate c = new Coordinate(lon, lat);
-        List<T> ret = Lists.newArrayList();
+        Set<T> ret = new HashSet<>();
         int radiusBins = (int) Math.ceil(radiusMeters / binSizeMeters);
         int xBin = xBin(c);
         int yBin = yBin(c);
@@ -284,7 +286,7 @@ public class HashGrid <T> {
         int maxBinY = yBin + radiusBins;
         for (int x = minBinX; x <= maxBinX; x += 1) {
             int wrappedX = xWrap(x);
-            for (int y = minBinY; y <=maxBinY; y += 1) {
+            for (int y = minBinY; y <= maxBinY; y += 1) {
                 int wrappedY = yWrap(y);
                 List<T> bin = bins[wrappedX][wrappedY];
                 if (bin != null) {
@@ -292,9 +294,29 @@ public class HashGrid <T> {
                 }
             }
         }
-        return ret;
+        return new ArrayList<>(ret);
     }
 
+    public List<T> query (Envelope env) {
+        Set<T> retval = new HashSet<T>(1024);
+        Coordinate min = new Coordinate(env.getMinX(), env.getMinY());
+        Coordinate max = new Coordinate(env.getMaxX(), env.getMaxY());
+        int minBinX = xBin(min);
+        int maxBinX = xBin(max);
+        int minBinY = yBin(min);
+        int maxBinY = yBin(max);
+        for (int x = minBinX; x <= maxBinX; x += 1) {
+            int wrappedX = xWrap(x);
+            for (int y = minBinY; y <=maxBinY; y += 1) {
+                int wrappedY = yWrap(y);
+                List<T> bin = bins[wrappedX][wrappedY];
+                if (bin != null) {
+                    retval.addAll(bin);
+                }
+            }
+        }
+        return new ArrayList<>(retval);
+    }
     
     static final double M_PER_DEGREE_LAT = 111111.111111;
     

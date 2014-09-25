@@ -18,8 +18,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import lombok.Data;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -34,7 +32,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
-@Data
 public class GraphGeographicFilter implements IndividualFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphGeographicFilter.class);
@@ -58,7 +55,7 @@ public class GraphGeographicFilter implements IndividualFilter {
         LOG.debug("using only stops? {}", useOnlyStops);
         if (bufferMeters < prototypeRoutingRequest.maxWalkDistance)
             LOG.warn("geographic filter buffer is smaller than max walk distance, this will probably yield incorrect results.");
-        Graph graph= graphService.getGraph(prototypeRoutingRequest.getRouterId());
+        Graph graph= graphService.getGraph(prototypeRoutingRequest.routerId);
         List<Geometry> geometries = new ArrayList<Geometry>();
         for (Vertex v : graph.getVertices()) {
             if (useOnlyStops && ! (v instanceof TransitStop))

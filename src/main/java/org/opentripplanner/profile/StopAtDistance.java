@@ -1,6 +1,5 @@
 package org.opentripplanner.profile;
 
-import lombok.AllArgsConstructor;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -21,7 +20,7 @@ import java.util.List;
  */
 public class StopAtDistance implements Comparable<StopAtDistance> {
 
-    public Stop stop;
+    public StopCluster stop; // TODO rename to stopCluster, use StopCluster objects not strings?
     public TraverseMode mode;
     public int etime;
     public State state;
@@ -33,7 +32,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
         mode = state.getNonTransitMode(); // not sure if this is reliable, reset in caller.
         if (state.getVertex() instanceof TransitStop) {
             TransitStop tstop = (TransitStop) state.getVertex();
-            stop = tstop.getStop();
+            stop = state.getOptions().rctx.graph.index.stopClusterForStop.get(tstop.getStop());
         }
     }
 
@@ -43,7 +42,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     }
 
     public String toString() {
-        return String.format("stop %s via mode %s at %d min", stop.getCode(), mode, etime / 60);
+        return String.format("stop cluster %s via mode %s at %d min", stop, mode, etime / 60);
     }
 
 }

@@ -39,17 +39,17 @@ public class CSVPopulationTest {
                 csvFile, Charset.forName("utf-8"));
 
         CSVPopulation pop = new CSVPopulation();
-        pop.setSourceFilename(csvFile.getAbsolutePath());
-        pop.setSkipHeaders(false);
-        pop.setXCol(2);
-        pop.setYCol(3);
-        pop.setInputCol(1);
-        pop.setLabelCol(0);
-        pop.setCrs("EPSG:2229"); // State Plane CA Zone 5, US Survey Feet
+        pop.sourceFilename = csvFile.getAbsolutePath();
+        pop.skipHeaders = false;
+        pop.xCol = 2;
+        pop.yCol = 3;
+        pop.inputCol = 1;
+        pop.labelCol = 0;
+        pop.crs = "EPSG:2229"; // State Plane CA Zone 5, US Survey Feet
 
         pop.createIndividuals();
 
-        Individual sbbg = pop.getIndividuals().get(0);
+        Individual sbbg = pop.individuals.get(0);
         assertEquals(sbbg.lat, 34.45659, 0.00001);
         assertEquals(sbbg.lon, -119.70843, 0.00001);
     }
@@ -63,31 +63,31 @@ public class CSVPopulationTest {
                 csvFile, Charset.forName("utf-8"));
 
         CSVPopulation pop = new CSVPopulation();
-        pop.setSourceFilename(csvFile.getAbsolutePath());
-        pop.setSkipHeaders(false);
+        pop.sourceFilename = csvFile.getAbsolutePath();
+        pop.skipHeaders = false;
         pop.setLonCol(2);
         pop.setLatCol(3);
-        pop.setInputCol(1);
-        pop.setLabelCol(0);
+        pop.inputCol = 1;
+        pop.labelCol = 0;
 
         pop.createIndividuals();
 
-        Individual marsci = pop.getIndividuals().get(0);
+        Individual marsci = pop.individuals.get(0);
         assertEquals(marsci.lat, 34.40783, 0.00001);
         assertEquals(marsci.lon, -119.84330, 0.00001);
 
         pop = new CSVPopulation();
-        pop.setSourceFilename(csvFile.getAbsolutePath());
-        pop.setSkipHeaders(false);
+        pop.sourceFilename = csvFile.getAbsolutePath();
+        pop.skipHeaders = false;
         pop.setLonCol(2);
         pop.setLatCol(3);
-        pop.setInputCol(1);
-        pop.setLabelCol(0);
-        pop.setCrs("EPSG:4326");
+        pop.inputCol = 1;
+        pop.labelCol = 0;
+        pop.crs = "EPSG:4326";
 
         pop.createIndividuals();
 
-        marsci = pop.getIndividuals().get(0);
+        marsci = pop.individuals.get(0);
         assertEquals(marsci.lat, 34.40783, 0.00001);
         assertEquals(marsci.lon, -119.84330, 0.00001);
     }

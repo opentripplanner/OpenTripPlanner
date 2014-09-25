@@ -17,9 +17,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
@@ -34,14 +31,10 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
 
     private final class SparseMatrixSamplePoint implements ZSamplePoint<TZ>, DelaunayPoint<TZ> {
 
-        @Getter
         private int x;
 
-        @Getter
         private int y;
 
-        @Getter
-        @Setter
         private TZ z;
 
         private SparseMatrixSamplePoint up, down, right, left;
@@ -72,6 +65,26 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
         public Coordinate getCoordinates() {
             return SparseMatrixZSampleGrid.this.getCoordinates(this);
         }
+
+		@Override
+		public int getX() {
+			return this.x;
+		}
+
+		@Override
+		public int getY() {
+			return this.y;
+		}
+
+		@Override
+		public TZ getZ() {
+			return this.z;
+		}
+
+		@Override
+		public void setZ(TZ z) {
+			this.z = z;
+		}
     }
 
     private final class GridDelaunayEdge implements DelaunayEdge<TZ> {
@@ -250,22 +263,22 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
 
     @Override
     public int getXMin() {
-        return allSamples.getXMin();
+        return allSamples.xMin;
     }
 
     @Override
     public int getXMax() {
-        return allSamples.getXMax();
+        return allSamples.xMax;
     }
 
     @Override
     public int getYMin() {
-        return allSamples.getYMin();
+        return allSamples.yMin;
     }
 
     @Override
     public int getYMax() {
-        return allSamples.getYMax();
+        return allSamples.yMax;
     }
     
     @Override

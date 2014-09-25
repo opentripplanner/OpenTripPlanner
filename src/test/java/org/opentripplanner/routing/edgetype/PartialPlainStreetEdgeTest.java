@@ -142,8 +142,8 @@ public class PartialPlainStreetEdgeTest {
 
         // All intersections take 10 minutes - we'll notice if one isn't counted.
         double turnDurationSecs = 10.0 * 60.0;  
-        options.setTraversalCostModel(new DummyCostModel(turnDurationSecs));
-        options.setTurnReluctance(1.0);
+        options.traversalCostModel = (new DummyCostModel(turnDurationSecs));
+        options.turnReluctance = (1.0);
         
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
@@ -170,7 +170,7 @@ public class PartialPlainStreetEdgeTest {
         assertTrue(Math.abs(s3.getWeight() - partialS3.getWeight()) <= 1);
         
         // All intersections take 0 seconds now.
-        options.setTraversalCostModel(new DummyCostModel(0.0));
+        options.traversalCostModel = (new DummyCostModel(0.0));
 
         State s0NoCost = new State(options);
         State s1NoCost = e1.traverse(s0NoCost);

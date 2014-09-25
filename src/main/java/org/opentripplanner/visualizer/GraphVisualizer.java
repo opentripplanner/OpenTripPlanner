@@ -87,6 +87,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.ParetoPathService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
@@ -547,7 +548,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				State s1 = firstComparePathStates.getSelectedValue();
 				State s2 = secondComparePathStates.getSelectedValue();
 				
-				System.out.println("s1 dominates s2:"+s1.dominates(s2));
+				System.out.println("s1 dominates s2:"+MultiShortestPathTree.dominates(s1,s2));
 			}
         });
         pane.add(dominateButton);
@@ -1429,19 +1430,19 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.setDateTime(when);
         options.setFromString(from);
         options.setToString(to);
-        options.setWalkSpeed(Float.parseFloat(walkSpeed.getText()));
-        options.setBikeSpeed(Float.parseFloat(bikeSpeed.getText()));
-        options.setHeuristicWeight(Float.parseFloat(heuristicWeight.getText()));
-        options.setSoftWalkLimiting( softWalkLimiting.isSelected() );
-        options.setSoftWalkPenalty(Float.parseFloat(softWalkPenalty.getText()));
-        options.setSoftWalkOverageRate(Float.parseFloat(this.softWalkOverageRate.getText()));
+        options.walkSpeed = Float.parseFloat(walkSpeed.getText());
+        options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
+        options.heuristicWeight = (Float.parseFloat(heuristicWeight.getText()));
+        options.softWalkLimiting = ( softWalkLimiting.isSelected() );
+        options.softWalkPenalty = (Float.parseFloat(softWalkPenalty.getText()));
+        options.softWalkOverageRate = (Float.parseFloat(this.softWalkOverageRate.getText()));
         options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
         
-        sptService.setNPaths( Integer.parseInt( this.nPaths.getText() ) );
+        options.numItineraries = ( Integer.parseInt( this.nPaths.getText() ) );
         
         // apply callback if the options call for it
         if( dontUseGraphicalCallbackCheckBox.isSelected() ){

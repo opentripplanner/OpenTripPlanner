@@ -25,9 +25,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
-import lombok.AllArgsConstructor;
-import lombok.Setter;
-
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
@@ -75,7 +72,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private BikeRentalStationService service;
 
-    @Setter
     private String network = "default";
 
     @Override
@@ -101,6 +97,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new OVFietsKMLDataSource();
             } else if (sourceType.equals("city-bikes")) {
                 source = new CityBikesBikeRentalDataSource();
+            } else if (sourceType.equals("vcub")) {
+                source = new VCubDataSource();
             }
         }
 
@@ -114,8 +112,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up bike rental updater.");
         this.graph = graph;
         this.source = source;
-        setNetwork(preferences.get("networks", DEFAULT_NETWORK_LIST));
-        LOG.info("Creating bike-rental updater running every {} seconds : {}", getFrequencySec(),
+        this.network = (preferences.get("networks", DEFAULT_NETWORK_LIST));
+        LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec,
                 source);
     }
 
@@ -156,18 +154,25 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     public void teardown() {
     }
 
-    @AllArgsConstructor
     private class BikeRentalGraphWriterRunnable implements GraphWriterRunnable {
 
         private List<BikeRentalStation> stations;
 
-        @Override
+        public BikeRentalGraphWriterRunnable(List<BikeRentalStation> stations) {
+            this.stations = stations;
+        }
+
+		@Override
         public void run(Graph graph) {
             // Apply stations to graph
             Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
-            Set<String> networks = new HashSet<String>(Arrays.asList(network));
+            Set<String> defaultNetworks = new HashSet<String>(Arrays.asList(network));
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
+                if (station.networks == null) {
+                    /* API did not provide a network list, use default */
+                    station.networks = defaultNetworks;
+                }
                 service.addStation(station);
                 stationSet.add(station);
                 BikeRentalStationVertex vertex = verticesByStation.get(station);
@@ -178,8 +183,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                         graph.addTemporaryEdge(e);
                     }
                     verticesByStation.put(station, vertex);
-                    new RentABikeOnEdge(vertex, vertex, networks);
-                    new RentABikeOffEdge(vertex, vertex, networks);
+                    new RentABikeOnEdge(vertex, vertex, station.networks);
+                    new RentABikeOffEdge(vertex, vertex, station.networks);
                 } else {
                     vertex.setBikesAvailable(station.bikesAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);

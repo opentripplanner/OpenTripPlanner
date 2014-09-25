@@ -36,8 +36,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import lombok.AllArgsConstructor;
-
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -163,7 +161,7 @@ public class SimpleIsochrone extends RoutingResource {
         request = buildRequest(0);
         Graph graph = otpServer.graphService.getGraph();
         //double speed = request.getWalkSpeed();
-        Coordinate originCoord = request.getFrom().getCoordinate();
+        Coordinate originCoord = request.from.getCoordinate();
         if (originCoord == null) return null;
         List<TransitStop> stops = graph.streetIndex.getNearbyTransitStops(originCoord, radiusMeters);
         if (stops.isEmpty()) {
@@ -181,7 +179,7 @@ public class SimpleIsochrone extends RoutingResource {
         
         /* Make one request every M minutes over H hours */
         int nRequests = (requestTimespanHours * 60) / requestSpacingMinutes;
-        request.setClampInitialWait(requestSpacingMinutes * 60);
+        request.clampInitialWait = (requestSpacingMinutes * 60);
         Date date = request.getDateTime();
         MinMap<Vertex, Double> points = new MinMap<Vertex, Double>();
         for (int r = 0; r < nRequests; r++) {
@@ -222,7 +220,7 @@ public class SimpleIsochrone extends RoutingResource {
             for (Map.Entry<Vertex, Double> vertexSeconds : points.entrySet()) {
                 double remainingSeconds = thresholdSeconds - vertexSeconds.getValue();
                 if (remainingSeconds > 60) { // avoid degenerate geometries
-                    double remainingMeters = remainingSeconds * request.getWalkSpeed();
+                    double remainingMeters = remainingSeconds * request.walkSpeed;
                     Geometry point = geomf.createPoint(vertexSeconds.getKey().getCoordinate());
                     point = JTS.transform(point, toMeters);
                     Geometry buffer = point.buffer(remainingMeters);
@@ -323,9 +321,13 @@ public class SimpleIsochrone extends RoutingResource {
         }
     }   
     
-    @AllArgsConstructor
     private static class DirectoryZipper implements StreamingOutput {
         private File directory;
+        
+        DirectoryZipper(File directory){
+        	this.directory = directory;
+        }
+        
         @Override
         public void write(OutputStream outStream) throws IOException {
             ZipOutputStream zip = new ZipOutputStream(outStream);

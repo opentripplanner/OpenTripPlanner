@@ -392,10 +392,9 @@ public class TestHalfEdges extends TestCase {
 
     public void testStreetLocationFinder() {
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
-        finder.setup();
         // test that the local stop finder finds stops
         GenericLocation loc = new GenericLocation(40.01, -74.005000001);
-        assertTrue(finder.getLocalTransitStops(loc.getCoordinate(), 100).size() > 0);
+        assertTrue(finder.getNearbyTransitStops(loc.getCoordinate(), 100).size() > 0);
 
         // test that the closest vertex finder returns the closest vertex
         StreetLocation some = (StreetLocation) finder.getVertexForLocation(new GenericLocation(

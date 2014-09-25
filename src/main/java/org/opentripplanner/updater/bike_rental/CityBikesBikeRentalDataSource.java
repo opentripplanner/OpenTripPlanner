@@ -90,12 +90,16 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Pref
         ObjectMapper mapper = new ObjectMapper();
         for (JsonNode stationNode : mapper.readTree(data)) {
             BikeRentalStation brStation = new BikeRentalStation();
-            brStation.id = stationNode.get("id").textValue();
+            // We need string IDs but they are in JSON as numbers. Avoid null from textValue(). See pull req #1450.
+            brStation.id = String.valueOf(stationNode.get("id").intValue());
             brStation.x = stationNode.get("lng").doubleValue() / 1000000.0;
             brStation.y = stationNode.get("lat").doubleValue() / 1000000.0;
             brStation.name = stationNode.get("name").textValue();
             brStation.bikesAvailable = stationNode.get("bikes").intValue();
             brStation.spacesAvailable = stationNode.get("free").intValue();
+            if (brStation != null && brStation.id != null) {
+                out.add(brStation);
+            }
         }
         synchronized (this) {
             stations = out;

@@ -150,7 +150,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
         int departureTime;
         AgencyAndId tripId = state0.getTripId();
 
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             // traversing backward
             newPattern = ((OnboardVertex) fromv).getTripPattern();
             newTripTimes = newPattern.getResolvedTripTimes(newTrip, state0);

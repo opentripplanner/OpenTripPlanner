@@ -58,7 +58,7 @@ public class ProfileResource {
             @QueryParam("bikeSpeed")  @DefaultValue("4.1")   float bikeSpeed, // m/sec
             @QueryParam("streetTime") @DefaultValue("90")    int streetTime,  // max minutes to reach destination with no transit
             @QueryParam("accessTime") @DefaultValue("15")    int accessTime,  // max minutes to reach transit
-            @QueryParam("orderBy")    @DefaultValue("MIN")   Option.SortOrder orderBy,
+            @QueryParam("orderBy")    @DefaultValue("AVG")   Option.SortOrder orderBy,
             @QueryParam("limit")      @DefaultValue("10")    int limit,
             @QueryParam("modes")      @DefaultValue("WALK,TRANSIT") TraverseModeSet modes)
             throws Exception {

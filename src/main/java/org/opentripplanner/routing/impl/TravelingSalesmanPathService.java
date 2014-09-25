@@ -20,9 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
@@ -61,7 +58,7 @@ public class TravelingSalesmanPathService implements PathService {
         }
 
         /* intermediate places present, intercept request */
-        Graph graph = graphService.getGraph(options.getRouterId());
+        Graph graph = graphService.getGraph(options.routerId);
         long time = options.dateTime;
         options.setRoutingContext(graph);
         options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),

@@ -32,20 +32,16 @@ import org.opentripplanner.routing.services.GraphService;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.opentripplanner.standalone.OTPApplication;
+import org.opentripplanner.standalone.OTPServer;
 
 public class AlertPatchServiceImpl implements AlertPatchService {
 
     private Graph graph;
 
-    @Context // FIXME inject Application
-    private GraphService graphService;
-
     private Map<String, AlertPatch> alertPatches = new HashMap<String, AlertPatch>();
     private ListMultimap<AgencyAndId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
     private ListMultimap<AgencyAndId, AlertPatch> patchesByStop = LinkedListMultimap.create();
-
-    protected AlertPatchServiceImpl() {
-    }
 
     public AlertPatchServiceImpl(Graph graph) {
         this.graph = graph;
@@ -77,10 +73,6 @@ public class AlertPatchServiceImpl implements AlertPatchService {
 
     @Override
     public synchronized void apply(AlertPatch alertPatch) {
-        if (graph == null) {
-            graph = graphService.getGraph();
-        }
-
         if (alertPatches.containsKey(alertPatch.getId())) {
             expire(alertPatches.get(alertPatch.getId()));
         }
@@ -132,10 +124,6 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     private void expire(AlertPatch alertPatch) {
-        if (graph == null) {
-            graph = graphService.getGraph();
-        }
-
         AgencyAndId stop = alertPatch.getStop();
         if (stop != null) {
             patchesByStop.remove(stop, alertPatch);

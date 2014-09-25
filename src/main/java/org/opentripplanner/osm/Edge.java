@@ -1,8 +1,5 @@
 package org.opentripplanner.osm;
 
-import lombok.ToString;
-
-@ToString
 public class Edge {
     long way;
     long from;

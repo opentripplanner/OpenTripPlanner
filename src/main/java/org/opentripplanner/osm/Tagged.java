@@ -1,6 +1,9 @@
 package org.opentripplanner.osm;
 
+import com.google.common.collect.Lists;
+
 import java.io.Serializable;
+import java.util.List;
 
 public abstract class Tagged implements Serializable {
 
@@ -28,5 +31,24 @@ public abstract class Tagged implements Serializable {
     public boolean tagless() {
         return tags == null || tags.isEmpty();
     }
-    
+
+    public List<Tag> getTags() {
+        List<Tag> ret = Lists.newArrayList();
+        if (tags != null) {
+            for (String tag : tags.split(";")) {
+                String[] kv = tag.split("=");
+                if (kv.length < 1) continue;
+                Tag t = new Tag();
+                t.key = kv[0];
+                if (kv.length > 1) t.value = kv[1];
+                ret.add(t);
+            }
+        }
+        return ret;
+    }
+
+    public static class Tag {
+        String key, value;
+    }
+
 }

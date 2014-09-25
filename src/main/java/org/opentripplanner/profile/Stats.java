@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import lombok.Getter;
 
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
@@ -107,8 +107,10 @@ class Stats implements Cloneable {
         Stats s = new Stats ();
         s.min = Integer.MAX_VALUE;
         s.num = 0;
-        // TODO maybe we should prefilter the triptimes so we aren't constantly iterating over the trips whose service is not running
-        for (TripTimes tripTimes : pattern.getScheduledTimetable().getTripTimes()) {
+        /* Scan through all non-frequency trips accumulating them into stats. */
+        // TODO maybe we should prefilter the triptimes so we aren't constantly iterating over
+        // the trips whose service is not running
+        for (TripTimes tripTimes : pattern.scheduledTimetable.tripTimes) {
             int depart = tripTimes.getDepartureTime(stop0);
             int arrive = tripTimes.getArrivalTime(stop1);
             if (window.includes (depart) && 
@@ -121,6 +123,20 @@ class Stats implements Cloneable {
                 ++s.num;
             }
         }
+        /* Do the same thing for any frequency-based trips. */
+        for (FrequencyEntry freq : pattern.scheduledTimetable.frequencyEntries) {
+            TripTimes tt = freq.tripTimes;
+            int overlap = window.overlap(freq.startTime, freq.endTime, tt.serviceCode);
+            if (overlap == 0) continue;
+            int n = overlap / freq.headway + 1; // number of trip instances in the overlap. round up, avoid zeros.
+            int depart = tt.getDepartureTime(stop0);
+            int arrive = tt.getArrivalTime(stop1);
+            int t = arrive - depart;
+            if (t < s.min) s.min = t;
+            if (t > s.max) s.max = t;
+            s.avg += (t * n);
+            s.num += n;
+        }
         if (s.num > 0) {
             s.avg /= s.num;
             return s;
@@ -128,5 +144,9 @@ class Stats implements Cloneable {
         /* There are no running trips within the time range, on the given serviceIds. */
         return null;
     }
-    
+
+    @Override
+    public String toString() {
+        return String.format("avg=%.1f min=%.1f max=%.1f", avg/60.0, min/60.0, max/60.0);
+    }
 }

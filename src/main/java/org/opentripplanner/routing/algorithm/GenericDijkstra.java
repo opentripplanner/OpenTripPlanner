@@ -88,7 +88,7 @@ public class GenericDijkstra {
                     null, u, spt, options))
                         break;
 
-            for (Edge edge : options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing()) {
+            for (Edge edge : options.arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing()) {
 
                 if (skipEdgeStrategy != null
                         && skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt,

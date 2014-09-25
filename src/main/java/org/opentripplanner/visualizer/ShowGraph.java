@@ -582,7 +582,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         for (State s : gp.states) {
             Edge e = s.getBackEdge();
             if (e instanceof TransitBoardAlight) {
-                if (((TransitBoardAlight) e).isBoarding()) {
+                if (((TransitBoardAlight) e).boarding) {
                     labelState(s, "board");
                 } else {
                     labelState(s, "alight");
@@ -754,7 +754,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 			}
 			if (drawStreetVertices && v instanceof IntersectionVertex) {
 		        IntersectionVertex iv = (IntersectionVertex) v;
-		        if (iv.isTrafficLight()) {
+		        if (iv.trafficLight) {
 		            drawVertex(v, 7);
 		        }
 		    }

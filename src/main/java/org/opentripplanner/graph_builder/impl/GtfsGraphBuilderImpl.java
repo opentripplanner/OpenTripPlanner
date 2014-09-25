@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.Setter;
-
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
@@ -71,10 +69,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     private FareServiceFactory _fareServiceFactory;
 
     /** will be applied to all bundles which do not have the cacheDirectory property set */
-    @Setter private File cacheDirectory; 
+    private File cacheDirectory; 
     
     /** will be applied to all bundles which do not have the useCached property set */
-    @Setter private Boolean useCached; 
+    private Boolean useCached; 
 
     Set<String> agencyIdsSeen = Sets.newHashSet();
 
@@ -129,10 +127,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         try {
             for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
                 // apply global defaults to individual GTFSBundles (if globals have been set) 
-                if (cacheDirectory != null && gtfsBundle.getCacheDirectory() == null)
-                    gtfsBundle.setCacheDirectory(cacheDirectory);
-                if (useCached != null && gtfsBundle.getUseCached() == null)
-                    gtfsBundle.setUseCached(useCached);
+                if (cacheDirectory != null && gtfsBundle.cacheDirectory == null)
+                    gtfsBundle.cacheDirectory = cacheDirectory;
+                if (useCached != null && gtfsBundle.useCached == null)
+                    gtfsBundle.useCached = useCached;
                 GtfsMutableRelationalDao dao = new GtfsRelationalDaoImpl();
                 GtfsContext context = GtfsLibrary.createContext(dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
@@ -153,10 +151,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {
                     hf.createTransfersTxtTransfers();
                 }
-                if (gtfsBundle.isLinkStopsToParentStations()) {
+                if (gtfsBundle.linkStopsToParentStations) {
                     hf.linkStopsToParentStations(graph);
                 } 
-                if (gtfsBundle.isParentStationTransfers()) {
+                if (gtfsBundle.parentStationTransfers) {
                     hf.createParentStationTransfers();
                 }
             }

@@ -50,13 +50,13 @@ public class GeocoderServerTest {
         final double lng = -43.237;
         final String description = "121 elm street";
         
-        geocoderServer.setGeocoder(new Geocoder() {
+        geocoderServer.geocoder = new Geocoder() {
             @Override
             public GeocoderResults geocode(String address, Envelope bbox) {
                 GeocoderResult result = new GeocoderResult(lat, lng, description);
                 return new GeocoderResults(Arrays.asList(result));
             }
-        });
+        };
         
         GeocoderResults results = geocoderServer.geocode("121 elm street", null);
         for (GeocoderResult result : results.getResults()) {
@@ -70,12 +70,12 @@ public class GeocoderServerTest {
     @Test
     public void testGeocodeInvalidAddress() {
         final String error = "uh oh";
-        geocoderServer.setGeocoder(new Geocoder() {
+        geocoderServer.geocoder = new Geocoder() {
             @Override
             public GeocoderResults geocode(String address, Envelope bbox) {
                 return new GeocoderResults(error);
             }
-        });
+        };
 
         GeocoderResults result = geocoderServer.geocode("121 elm street", null);
         assertEquals("error returned", error, result.getError());

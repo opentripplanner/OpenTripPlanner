@@ -61,7 +61,7 @@ public class GraphUpdaterConfigurator {
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
 
         // Look for embedded config if it exists
-        Properties embeddedGraphPreferences = graph.getEmbeddedPreferences();
+        Properties embeddedGraphPreferences = graph.embeddedPreferences;
         Preferences embeddedConfig = null;
         if (embeddedGraphPreferences != null) {
             embeddedConfig = new PropertiesPreferences(embeddedGraphPreferences);
@@ -78,7 +78,7 @@ public class GraphUpdaterConfigurator {
         }
         // Otherwise add it to the graph
         else {
-            graph.setUpdaterManager(updaterManager);
+            graph.updaterManager = updaterManager;
         }
     }
 
@@ -161,7 +161,7 @@ public class GraphUpdaterConfigurator {
     }
 
     public void shutdownGraph(Graph graph) {
-        GraphUpdaterManager updaterManager = graph.getUpdaterManager();
+        GraphUpdaterManager updaterManager = graph.updaterManager;
         if (updaterManager != null) {
             LOG.info("Stopping updater manager with " + updaterManager.size() + " updaters.");
             updaterManager.stop();

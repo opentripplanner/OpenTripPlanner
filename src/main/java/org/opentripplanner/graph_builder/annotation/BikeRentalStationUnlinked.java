@@ -15,9 +15,6 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class BikeRentalStationUnlinked extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
@@ -25,6 +22,10 @@ public class BikeRentalStationUnlinked extends GraphBuilderAnnotation {
     public static final String FMT = "Bike rental station %s not near any streets; it will not be usable.";
     
     final BikeRentalStationVertex station;
+    
+    public BikeRentalStationUnlinked(BikeRentalStationVertex station){
+    	this.station = station;
+    }
     
     @Override
     public String getMessage() {

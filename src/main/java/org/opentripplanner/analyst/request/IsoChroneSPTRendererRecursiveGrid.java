@@ -63,17 +63,16 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
     public List<IsochroneData> getIsochrones(IsoChroneRequest isoChroneRequest,
             RoutingRequest sptRequest) {
 
-        if (sptRequest.getRouterId() != null && !sptRequest.getRouterId().isEmpty())
+        if (sptRequest.routerId != null && !sptRequest.routerId.isEmpty())
             throw new IllegalArgumentException(
                     "TODO: SampleSource is not multi-router compatible (yet).");
 
         // 1. Compute the Shortest Path Tree.
         long t0 = System.currentTimeMillis();
-        sptRequest.setWorstTime(sptRequest.dateTime
-                + (sptRequest.arriveBy ? -isoChroneRequest.getMaxCutoffSec() : isoChroneRequest
-                        .getMaxCutoffSec()));
-        sptRequest.setBatch(true);
-        sptRequest.setRoutingContext(graphService.getGraph(sptRequest.getRouterId()));
+        sptRequest.worstTime = (sptRequest.dateTime
+                + (sptRequest.arriveBy ? -isoChroneRequest.maxCutoffSec : isoChroneRequest.maxCutoffSec));
+        sptRequest.batch = true;
+        sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));
         final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
         sptRequest.cleanup();
 
@@ -95,21 +94,21 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
             }
         };
         // TODO Snap the center as XYZ tile grid for better sample-reuse (if using sample cache).
-        Coordinate center = sptRequest.getFrom().getCoordinate();
-        double gridSizeMeters = isoChroneRequest.getPrecisionMeters();
+        Coordinate center = sptRequest.from.getCoordinate();
+        double gridSizeMeters = isoChroneRequest.precisionMeters;
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / Math.cos(Math.toRadians(center.x));
         LOG.info("dX={}, dY={}", dX, dY);
         RecursiveGridIsolineBuilder isolineBuilder = new RecursiveGridIsolineBuilder(dX, dY,
                 center, timeFunc, initialPoints);
-        isolineBuilder.setDebugCrossingEdges(isoChroneRequest.isIncludeDebugGeometry());
-        isolineBuilder.setDebugSeedGrid(isoChroneRequest.isIncludeDebugGeometry());
+        isolineBuilder.setDebugCrossingEdges(isoChroneRequest.includeDebugGeometry);
+        isolineBuilder.setDebugSeedGrid(isoChroneRequest.includeDebugGeometry);
         List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
-        for (Integer cutoffSec : isoChroneRequest.getCutoffSecList()) {
+        for (Integer cutoffSec : isoChroneRequest.cutoffSecList) {
             IsochroneData isochrone = new IsochroneData(cutoffSec,
                     isolineBuilder.computeIsoline(cutoffSec));
-            if (isoChroneRequest.isIncludeDebugGeometry())
-                isochrone.setDebugGeometry(isolineBuilder.getDebugGeometry());
+            if (isoChroneRequest.includeDebugGeometry)
+                isochrone.debugGeometry = isolineBuilder.getDebugGeometry();
             isochrones.add(isochrone);
         }
         long t2 = System.currentTimeMillis();

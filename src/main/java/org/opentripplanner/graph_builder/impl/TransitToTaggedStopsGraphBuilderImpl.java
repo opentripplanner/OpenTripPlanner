@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.impl;
 
 import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
@@ -24,6 +25,8 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsGraphBuilderImpl.class);
 
     StreetVertexIndexServiceImpl index;
+    private double searchRadiusM = 250;
+    private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
 
     public List<String> provides() {
         return Arrays.asList("street to transit", "linking");
@@ -38,7 +41,6 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
         LOG.info("Linking transit stops to tagged bus stops...");
 
         index = new StreetVertexIndexServiceImpl(graph);
-        index.setup();
 
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<>();
@@ -60,7 +62,7 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!connectVertexToStop(ts, wheelchairAccessible)) {
-                    LOG.debug("Could not connect " + ts.toString());
+                    LOG.debug("Could not connect " + ts.getStopCode() + " at " + ts.getCoordinate().toString());
                     //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
             }
@@ -73,7 +75,8 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
             return false;
         }
         Envelope envelope = new Envelope(ts.getCoordinate());
-        envelope.expandBy(0.003); // ~200 meters
+        double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
+        envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
         Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
         for (Vertex v : vertices){
             if (!(v instanceof TransitStopStreetVertex)){
@@ -82,7 +85,7 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
             TransitStopStreetVertex tsv = (TransitStopStreetVertex) v;
 
             // Only use stop codes for linking TODO: find better method to connect stops without stop code
-            if (tsv.getStopCode() != null && tsv.getStopCode().equals(stopCode)) {
+            if (tsv.stopCode != null && tsv.stopCode.equals(stopCode)) {
                 new StreetTransitLink(ts, tsv, wheelchairAccessible);
                 new StreetTransitLink(tsv, ts, wheelchairAccessible);
                 LOG.debug("Connected " + ts.toString() + " to " + tsv.getLabel());

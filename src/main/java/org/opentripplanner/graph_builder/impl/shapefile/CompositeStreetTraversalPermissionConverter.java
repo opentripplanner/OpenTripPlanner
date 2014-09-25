@@ -77,10 +77,10 @@ public class CompositeStreetTraversalPermissionConverter implements SimpleFeatur
                     first = result.getFirst().add(value.getFirst());
                     second = result.getSecond().add(value.getSecond());
                 } else {
-                    first = StreetTraversalPermission.get(result.getFirst().getCode()
-                            & value.getFirst().getCode());
-                    second = StreetTraversalPermission.get(result.getSecond().getCode()
-                            & value.getSecond().getCode());
+                    first = StreetTraversalPermission.get(result.getFirst().code
+                            & value.getFirst().code);
+                    second = StreetTraversalPermission.get(result.getSecond().code
+                            & value.getSecond().code);
                 }
                 result = new P2<StreetTraversalPermission>(first, second);
             }

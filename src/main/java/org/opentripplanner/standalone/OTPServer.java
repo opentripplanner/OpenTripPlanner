@@ -16,6 +16,7 @@ import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
+import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.impl.LongDistancePathService;
@@ -57,6 +58,8 @@ public class OTPServer {
     public SurfaceCache surfaceCache;
     public PointSetCache pointSetCache;
 
+    public TileRendererManager tileRendererManager;
+
     public Router getRouter(String routerId) {
         return routers.get(routerId);
     }
@@ -72,7 +75,7 @@ public class OTPServer {
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
         if (params.longDistance) {
             LongDistancePathService pathService = new LongDistancePathService(graphService, sptService);
-            pathService.setTimeout(10);
+            pathService.timeout = 10;
             this.pathService = pathService;
         } else {
             RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(graphService, sptService);
@@ -84,6 +87,7 @@ public class OTPServer {
         }
 
         planGenerator = new PlanGenerator(graphService, pathService);
+        tileRendererManager = new TileRendererManager(graphService);
 
         // Optional Analyst Modules.
         if (params.analyst) {

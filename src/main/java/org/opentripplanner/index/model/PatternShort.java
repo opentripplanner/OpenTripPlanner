@@ -13,8 +13,8 @@ public class PatternShort {
     public String desc;
     
     public PatternShort (TripPattern pattern) {
-        id = pattern.getCode();
-        desc = pattern.getName();
+        id = pattern.code;
+        desc = pattern.name;
     }
     
     public static List<PatternShort> list (Collection<TripPattern> in) {

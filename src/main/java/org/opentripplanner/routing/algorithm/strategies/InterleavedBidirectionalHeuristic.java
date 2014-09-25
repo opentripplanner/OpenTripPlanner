@@ -108,8 +108,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         this.options = s.getOptions();
         this.origin = s.getVertex();
         // do not use soft limiting in long-distance mode
-        options.setSoftWalkLimiting(false);
-        options.setSoftPreTransitLimiting(false);
+        options.softWalkLimiting = false;
+        options.softPreTransitLimiting = false;
         // make sure distance table is initialized before starting thread
         LOG.debug("initializing heuristic computation thread");
         // forward street search first, sets values around origin to 0
@@ -156,10 +156,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 //                    Double.isInfinite(uw) ? -1.0 : uw);
 
             // OUTgoing for heuristic search when main search is arriveBy 
-            for (Edge e : options.isArriveBy() ? u.getOutgoing() : u.getIncoming()) {
+            for (Edge e : options.arriveBy ? u.getOutgoing() : u.getIncoming()) {
                 // Do not enter streets in this phase.
                 if (e instanceof StreetTransitLink) continue;
-                Vertex v = options.isArriveBy() ? e.getToVertex() : e.getFromVertex();
+                Vertex v = options.arriveBy ? e.getToVertex() : e.getFromVertex();
                 double ew = e.weightLowerBound(options);
                 // INF heuristic value indicates unreachable (e.g. non-running transit service)
                 // this saves time by not reverse-exploring those routes and avoids maxFound of INF.
@@ -252,7 +252,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     private List<State> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
         rr = rr.clone();
         if (fromTarget)
-            rr.setArriveBy( ! rr.isArriveBy());
+            rr.setArriveBy( ! rr.arriveBy);
         List<State> stopStates = Lists.newArrayList();
         ShortestPathTree spt = new BasicShortestPathTree(rr);
         BinHeap<State> pq = new BinHeap<State>();
@@ -307,7 +307,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     public static class Factory implements RemainingWeightHeuristicFactory {
         @Override
         public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
-            if (opt.getModes().isTransit()) {
+            if (opt.modes.isTransit()) {
                 LOG.debug("Transit itinerary requested.");
                 return new InterleavedBidirectionalHeuristic (opt.rctx.graph);
             } else {

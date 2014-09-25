@@ -15,7 +15,6 @@ package org.opentripplanner.standalone;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
@@ -40,6 +39,7 @@ import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderI
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.impl.GraphServiceAutoDiscoverImpl;
 import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.services.GraphService;
@@ -88,6 +88,17 @@ public class OTPConfigurator {
                 if (params.graphConfigFile != null) LOG.error("Can't read config file", e);
                 this.graphService = new GraphServiceBeanImpl(graph, null);
             }
+        } else if (params.autoScan) {
+            /* Create an auto-scan+reload GraphService */
+            GraphServiceAutoDiscoverImpl graphService = new GraphServiceAutoDiscoverImpl();
+            if (params.graphDirectory != null) {
+                graphService.setPath(params.graphDirectory);
+            }
+            if (params.routerIds.size() > 0) {
+                graphService.setDefaultRouterId(params.routerIds.get(0));
+            }
+            graphService.startup();
+            this.graphService = graphService;
         } else {
             /* Create a conventional GraphService that loads graphs from disk. */
             GraphServiceImpl graphService = new GraphServiceImpl();
@@ -96,7 +107,7 @@ public class OTPConfigurator {
             }
             if (params.routerIds.size() > 0) {
                 graphService.setDefaultRouterId(params.routerIds.get(0));
-                graphService.setAutoRegister(params.routerIds);
+                graphService.autoRegister = params.routerIds;
             }
             graphService.startup();
             this.graphService = graphService;
@@ -174,9 +185,9 @@ public class OTPConfigurator {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
                 gtfsBundle.setTransfersTxtDefinesStationPaths(params.useTransfersTxt);
                 if (!params.noParentStopLinking) {
-                    gtfsBundle.setLinkStopsToParentStations(true);
+                    gtfsBundle.linkStopsToParentStations = true;
                 }
-                gtfsBundle.setParentStationTransfers(params.parentStationTransfers);
+                gtfsBundle.parentStationTransfers = params.parentStationTransfers;
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
@@ -203,7 +214,7 @@ public class OTPConfigurator {
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
-            embeddedConfigBuilder.setPropertiesFile(configFile);
+            embeddedConfigBuilder.propertiesFile = configFile;
             graphBuilder.addGraphBuilder(embeddedConfigBuilder);
         }
         if (params.elevation) {
@@ -212,7 +223,7 @@ public class OTPConfigurator {
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
         }
-        graphBuilder.setSerializeGraph( ( ! params.inMemory ) || params.preFlight );
+        graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
 

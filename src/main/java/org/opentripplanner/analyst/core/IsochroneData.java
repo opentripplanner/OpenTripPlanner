@@ -13,9 +13,6 @@
 
 package org.opentripplanner.analyst.core;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -25,15 +22,11 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class IsochroneData {
 
-    @Getter
-    private int cutoffSec;
+    public int cutoffSec;
 
-    @Getter
-    private Geometry geometry;
+    public Geometry geometry;
 
-    @Getter
-    @Setter
-    private Geometry debugGeometry;
+    public Geometry debugGeometry;
 
     public IsochroneData(int cutoffSec, Geometry geometry) {
         this.cutoffSec = cutoffSec;

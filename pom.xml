@@ -19,9 +19,6 @@
     <properties>
         <geotools.version>10.5</geotools.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <distribution_id>opengeo</distribution_id>
-        <distribution_name>OpenGeo Maven Repository</distribution_name>
-        <distribution_url>dav:http://repo.opengeo.org</distribution_url>
     </properties>
 
     <build>
@@ -331,9 +328,9 @@
             <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
         </repository>
         <repository>
-            <id>opengeo</id>
-            <name>OpenGeo Maven Repository</name>
-            <url>http://repo.opengeo.org/</url>
+            <id>conveyal</id>
+            <name>Conveyal Maven Repository</name>
+            <url>http://maven.conveyal.com/</url>
             <!-- Avoid downloading OTP snapshots from repo -->
             <releases>
                 <enabled>true</enabled>
@@ -349,7 +346,7 @@
         <dependency>
             <groupId>org.mapdb</groupId>
             <artifactId>mapdb</artifactId>
-            <version>0.9.10</version>
+            <version>1.0.6</version>
         </dependency>
 
         <!-- Logging library -->
@@ -364,17 +361,17 @@
             <artifactId>jul-to-slf4j</artifactId>
             <version>1.7.6</version>
         </dependency>
-        <!-- Lombok provides annotation-driven field accessor methods. -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.12.6</version>
-        </dependency>
         <!-- Guava provides improved collections, among other things. -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>14.0.1</version>
+        </dependency>
+        <!-- Trove provides optimized map/set collections for native types (int, long...) -->
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+            <version>3.0.3</version>
         </dependency>
 
         <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->

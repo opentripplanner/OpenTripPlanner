@@ -44,24 +44,24 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
         RoutingRequest options = s0.getOptions();
         
         // Ignore this edge if its stop is banned
-        if (!options.getBannedStops().isEmpty()) {
-            if (options.getBannedStops().matches(((TransitStop) fromv).getStop())) {
+        if (!options.bannedStops.isEmpty()) {
+            if (options.bannedStops.matches(((TransitStop) fromv).getStop())) {
                 return null;
             }
         }
-        if (!options.getBannedStopsHard().isEmpty()) {
-            if (options.getBannedStopsHard().matches(((TransitStop) fromv).getStop())) {
+        if (!options.bannedStopsHard.isEmpty()) {
+            if (options.bannedStopsHard.matches(((TransitStop) fromv).getStop())) {
                 return null;
             }
         }
         
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             /* Traverse backward: not much to do */
             StateEditor s1 = s0.edit(this);
             TransitStop fromVertex = (TransitStop) getFromVertex();
 
             //apply board slack
-            s1.incrementTimeInSeconds(options.getBoardSlack());
+            s1.incrementTimeInSeconds(options.boardSlack);
             s1.alightTransit();
             s1.setBackMode(getMode());
             return s1.makeState();
@@ -71,7 +71,7 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
             // Do not pre-board if transit modes are not selected.
             // Return null here rather than in StreetTransitLink so that walk-only
             // options can be used to find transit stops without boarding vehicles.
-            if (!options.getModes().isTransit())
+            if (!options.modes.isTransit())
                 return null;
 
             // If we've hit our transfer limit, don't go any further
@@ -86,9 +86,9 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
 
             long slack;
             if (s0.isEverBoarded()) {
-                slack = options.getTransferSlack() - options.getAlightSlack();
+                slack = options.transferSlack - options.alightSlack;
             } else {
-                slack = options.getBoardSlack();
+                slack = options.boardSlack;
             }
             long board_after = t0 + slack;
             long transfer_penalty = 0;

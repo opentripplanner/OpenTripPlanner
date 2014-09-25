@@ -17,8 +17,6 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import lombok.Data;
-
 /**
  * Represents a repeating time period, used for opening hours &c.
  * For instance: Monday - Friday 8AM to 8PM, Satuday 10AM to 5PM, Sunday closed.
@@ -28,7 +26,6 @@ import lombok.Data;
  * @author mattwigway
  *
  */
-@Data
 public class RepeatingTimePeriod implements Serializable {
     private static final long serialVersionUID = -5977328371879835782L;
     
@@ -89,25 +86,25 @@ public class RepeatingTimePeriod implements Serializable {
             
             if (active) {
                 if (today == "monday")
-                    ret.setMonday(onOff);
+                    ret.monday = onOff;
                 
                 else if (today == "tuesday")
-                    ret.setTuesday(onOff);
+                    ret.tuesday = onOff;
         
                 else if (today == "wednesday")
-                    ret.setWednesday(onOff);
+                    ret.wednesday = onOff;
                     
                 else if (today == "thursday")
-                    ret.setThursday(onOff);
+                    ret.thursday = onOff;
                 
                 else if (today == "friday")
-                    ret.setFriday(onOff);
+                    ret.friday = onOff;
                 
                 else if (today == "saturday")
-                    ret.setSaturday(onOff);
+                    ret.saturday = onOff;
                 
                 else if (today == "sunday")
-                    ret.setSunday(onOff);
+                    ret.sunday = onOff;
             }
                 
             if (today.startsWith(day_off.toLowerCase()))

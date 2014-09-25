@@ -83,8 +83,8 @@ public abstract class GtfsTest extends TestCase {
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
         graph.index(new DefaultStreetVertexIndexFactory());
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
-        timetableSnapshotSource.setPurgeExpiredData(false);
-        graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        timetableSnapshotSource.purgeExpiredData = (false);
+        graph.timetableSnapshotSource = (timetableSnapshotSource);
         alertPatchServiceImpl = new AlertPatchServiceImpl(graph);
         alertsUpdateHandler.setAlertPatchService(alertPatchServiceImpl);
         alertsUpdateHandler.setDefaultAgencyId("MMRI");
@@ -106,7 +106,6 @@ public abstract class GtfsTest extends TestCase {
             pathService = new LongDistancePathService(null, genericAStar);
         } else {
             pathService = new RetryingPathServiceImpl(null, genericAStar);
-            genericAStar.setNPaths(1);
         }
         planGenerator = new PlanGenerator(null, pathService);
     }
@@ -123,21 +122,22 @@ public abstract class GtfsTest extends TestCase {
                String excludedRoute, String excludedStop, int legCount) {
         final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
         RoutingRequest routingRequest = new RoutingRequest();
-
+        routingRequest.setNumItineraries(1);
+        
         routingRequest.setArriveBy(dateTime < 0);
         routingRequest.dateTime = Math.abs(dateTime);
         if (fromVertex != null && !fromVertex.isEmpty()) {
-            routingRequest.setFrom(new GenericLocation(null, agencyId + ":" + fromVertex));
+            routingRequest.from = (new GenericLocation(null, agencyId + ":" + fromVertex));
         }
         if (toVertex != null && !toVertex.isEmpty()) {
-            routingRequest.setTo(new GenericLocation(null, agencyId + ":" + toVertex));
+            routingRequest.to = new GenericLocation(null, agencyId + ":" + toVertex);
         }
         if (onTripId != null && !onTripId.isEmpty()) {
-            routingRequest.setStartingTransitTripId(new AgencyAndId(agencyId, onTripId));
+            routingRequest.startingTransitTripId = (new AgencyAndId(agencyId, onTripId));
         }
         routingRequest.setRoutingContext(graph);
         routingRequest.setWheelchairAccessible(wheelchairAccessible);
-        routingRequest.setTransferPenalty(preferLeastTransfers ? 300 : 0);
+        routingRequest.transferPenalty = (preferLeastTransfers ? 300 : 0);
         routingRequest.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {

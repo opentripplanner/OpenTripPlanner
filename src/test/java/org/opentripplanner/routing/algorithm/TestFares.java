@@ -65,8 +65,6 @@ public class TestFares extends TestCase {
 
         Graph gg = ConstantsForTests.getInstance().getPortlandGraph();
         RoutingRequest options = new RoutingRequest();
-        StreetVertexIndexServiceImpl index = new StreetVertexIndexServiceImpl(gg);
-        index.setup();
         ShortestPathTree spt;
         GraphPath path = null;
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);

@@ -508,7 +508,7 @@ otp.modules.planner.PlannerModule =
                 this.drawStartBubble(leg, false);
             }
             else if(leg.mode === 'BICYCLE') {
-                if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
+                if(queryParams.mode === 'WALK,BICYCLE_RENT') { // bikeshare trip
                         //TRANSLATORS: shown when clicked on route on map
                 	polyline.bindPopup(_tr('Your %(bike_share_name)s route', {'bike_share_name': otp.config.bikeshareName}));
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
@@ -521,7 +521,7 @@ otp.modules.planner.PlannerModule =
                 }	
             }
             else if(leg.mode === 'WALK') {
-                if(queryParams.mode === 'WALK,BICYCLE') { 
+                if(queryParams.mode === 'WALK,BICYCLE_RENT') { 
                     if(i == 0) {
                         //TRANSLATORS:Shown in map when clicking on a route 
                     	polyline.bindPopup(_tr('Walk to the %(bike_share_name)s dock.', {'bike_share_name': otp.config.bikeshareName}));

@@ -60,7 +60,7 @@ public class FindMaxWalkDistances {
         RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
         options.setMaxWalkDistance(Double.MAX_VALUE);
         options.walkReluctance = 1.0;
-        options.setWalkSpeed(1.0);
+        options.walkSpeed = 1.0;
         
         // Iteration Variables
         State u, v;

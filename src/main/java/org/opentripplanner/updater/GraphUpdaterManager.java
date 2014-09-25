@@ -86,7 +86,7 @@ public class GraphUpdaterManager {
     public GraphUpdaterManager(Graph graph) {
         this.graph = graph;
         
-        String routerId = graph.getRouterId();
+        String routerId = graph.routerId;
         if(routerId == null || routerId.isEmpty())
             routerId = DEFAULT_ROUTER_ID;
         

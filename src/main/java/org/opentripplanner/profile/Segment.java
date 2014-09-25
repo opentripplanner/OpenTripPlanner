@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
-import lombok.Getter;
 
 import com.beust.jcommander.internal.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -30,7 +29,7 @@ public class Segment {
         public int toIndex;
         public int nTrips;
         public SegmentPattern (PatternRide patternRide) {
-            this.patternId = patternRide.pattern.getCode();
+            this.patternId = patternRide.pattern.code;
             this.fromIndex = patternRide.fromIndex;
             this.toIndex   = patternRide.toIndex;
             this.nTrips    = patternRide.stats.num; // this stats has time window applied
@@ -42,8 +41,8 @@ public class Segment {
     }
 
     // Use AgencyAndId instead of String to get both since we are now multi-feed
-    public AgencyAndId from;
-    public AgencyAndId to;
+    public String from;
+    public String to;
     public int walkTime;
     public int walkDistance;
     public Stats waitStats;
@@ -57,16 +56,18 @@ public class Segment {
     public String endTime;
 
     public Segment (Ride ride) {
-        Route route = ride.patternRides.get(0).pattern.getRoute();
-        from = ride.from.getId();
-        to = ride.to.getId();
-        fromName = ride.from.getName();
-        toName = ride.to.getName();
+        Route route = ride.patternRides.get(0).pattern.route;
+        from = ride.from.id;
+        to = ride.to.id;
+        fromName = ride.from.name;
+        toName = ride.to.name;
         rideStats = ride.rideStats;
         Set<Route> routes = Sets.newHashSet();
+        //LOG.info(" Ride fom {} to {}", ride.from.id, ride.to.id);
         for (PatternRide patternRide : ride.patternRides) {
             segmentPatterns.add(new SegmentPattern(patternRide));
             routes.add(patternRide.pattern.route);
+            //LOG.info("   pattern {} {} from {} to {}", patternRide.pattern.mode, patternRide.pattern.getCode(), patternRide.getFromStop(), patternRide.getToStop());
         }
         Collections.sort(segmentPatterns);
         // Note that despite the fact that multiple patterns from different routes will appear in the same ride,

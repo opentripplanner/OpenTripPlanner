@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.Setter;
-
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -43,7 +41,7 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public class StreetlessStopLinker implements GraphBuilder {
 
-    @Setter private double radius = 500; 
+    private double radius = 500; 
 
     private static Logger LOG = LoggerFactory.getLogger(StreetlessStopLinker.class); 
 

@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import com.beust.jcommander.internal.Lists;
-import lombok.Getter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
@@ -57,27 +56,23 @@ public class Timetable implements Serializable {
     /**
      * A circular reference between TripPatterns and their scheduled (non-updated) timetables.
      */
-    @Getter
-    private final TripPattern pattern;
+    public final TripPattern pattern;
 
     /**
      * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
      * additional TripTimes objects for unscheduled trips. Frequency entries are stored separately.
      */
-    @Getter
-    private final List<TripTimes> tripTimes = Lists.newArrayList();
+    public final List<TripTimes> tripTimes = Lists.newArrayList();
 
     /**
      * Contains one FrequencyEntry object for each block of frequency-based trips.
      */
-    @Getter
-    private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+    public final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
 
     /**
      * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all dates.
      */
-    @Getter
-    private final ServiceDate serviceDate;
+    public final ServiceDate serviceDate;
 
     /**
      * For each hop, the best running time. This serves to provide lower bounds on traversal time.

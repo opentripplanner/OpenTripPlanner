@@ -89,7 +89,7 @@ public class RetryingPathServiceImpl implements PathService {
         // make sure the options has a routing context *before* cloning it (otherwise you get
         // orphan RoutingContexts leaving temporary edges in the graph until GC)
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.getRouterId()));
+            options.setRoutingContext(graphService.getGraph(options.routerId));
             options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
                     new NoThruTrafficPathParser() };
         }
@@ -104,7 +104,7 @@ public class RetryingPathServiceImpl implements PathService {
         double maxWeight = Double.MAX_VALUE;
         double maxWalk = options.getMaxWalkDistance();
         double initialMaxWalk = maxWalk;
-        long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
+        long maxTime = options.arriveBy ? 0 : Long.MAX_VALUE;
         RoutingRequest currOptions;
         while (paths.size() < options.numItineraries) {
             currOptions = optionQueue.poll();
@@ -175,7 +175,7 @@ public class RetryingPathServiceImpl implements PathService {
                 LOG.debug("Setting max time and weight for subsequent searches.");
                 LOG.debug("First path start time:  {}", path.getStartTime());
                 maxTime = path.getStartTime() + 
-                		  MAX_TIME_FACTOR * (currOptions.isArriveBy() ? -duration : duration);
+                		  MAX_TIME_FACTOR * (currOptions.arriveBy ? -duration : duration);
                 LOG.debug("First path duration:  {}", duration);
                 LOG.debug("Max time set to:  {}", maxTime);
                 maxWeight = path.getWeight() * MAX_WEIGHT_FACTOR;
@@ -200,7 +200,7 @@ public class RetryingPathServiceImpl implements PathService {
             return null;
         }
         // We order the list of returned paths by the time of arrival or departure (not path duration)
-        Collections.sort(paths, new PathComparator(options.isArriveBy()));
+        Collections.sort(paths, new PathComparator(options.arriveBy));
         return paths;
     }
 

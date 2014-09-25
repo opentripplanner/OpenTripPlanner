@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import lombok.Getter;
-
 import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
@@ -37,7 +35,6 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
     /**
      * Default agency id that is used for the trip ids in the TripUpdates
      */
-    @Getter
     private String agencyId;
 
     private String url;
@@ -76,4 +73,9 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
     public String toString() {
         return "GtfsRealtimeHttpUpdateStreamer(" + url + ")";
     }
+
+	@Override
+	public String getAgencyId() {
+		return this.agencyId;
+	}
 }

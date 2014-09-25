@@ -56,7 +56,7 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
     protected void configurePolling(Graph graph, Preferences preferences) throws Exception {
         url = preferences.get("url", null);
         LOG.info("Configured example polling updater: frequencySec={} and url={}",
-                getFrequencySec(), url);
+                frequencySec, url);
     }
 
     // Here the updater gets to know its parent manager to execute GraphWriterRunnables.

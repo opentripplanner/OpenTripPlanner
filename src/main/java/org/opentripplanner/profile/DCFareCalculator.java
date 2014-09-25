@@ -65,7 +65,11 @@ public class DCFareCalculator {
         List<FareRide> fareRides = Lists.newArrayList();
         FareRide prev = null;
         for (Ride ride : rides) {
-            FareRide fareRide = new FareRide(ride, prev);
+            // Calculate the fare for a ride based on only one of its patterns. This is usually right as long as the
+            // patterns are all the same mode and operator. That happens less naturally now that stops are being grouped.
+            // FIXME cluster stops considering mode and operator
+            PatternRide exemplarPatternRide = ride.patternRides.get(0);
+            FareRide fareRide = new FareRide(exemplarPatternRide, prev);
             if (prev != null && prev.type == fareRide.type) {
                 prev.to = fareRide.to;
                 prev.calcFare(); // recalculate existing fare using new destination
@@ -88,13 +92,13 @@ public class DCFareCalculator {
         RideType type;
         Fare fare;
         FareRide prev;
-        public FareRide (Ride ride, FareRide prevRide) {
-            from = ride.from;
-            to = ride.to;
+        public FareRide (PatternRide pRide, FareRide prevRide) {
+            from = pRide.getFromStop();
+            to = pRide.getToStop();
             // Problem: Rides no longer have a single fare because they may be on multiple routes.
             // TODO: make sure Patterns in Rides are all the same mode and operator.
             // This seems to happen naturally because different operators generally do not share stops.
-            route = ride.patternRides.get(0).pattern.route;
+            route = pRide.pattern.route;
             type = classify(route);
             prev = prevRide;
             calcFare();

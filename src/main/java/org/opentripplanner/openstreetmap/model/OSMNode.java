@@ -16,18 +16,10 @@
 
 package org.opentripplanner.openstreetmap.model;
 
-import lombok.Setter;
-import lombok.Getter;
-
 public class OSMNode extends OSMWithTags {
 
-    @Setter
-    @Getter
-    private double lat;
-
-    @Setter
-    @Getter
-    private double lon;
+    public double lat;
+    public double lon;
 
     public String toString() {
         return "osm node " + id;
@@ -61,4 +53,17 @@ public class OSMNode extends OSMWithTags {
         return hasTag("highway") && "traffic_signals".equals(getTag("highway"));
     }
 
+    /**
+     * Is this a public transport stop that can be linked to a transit stop vertex later on.
+     *
+     * @return whether the node is a transit stop
+     * @author hannesj
+     */
+    public boolean isStop() {
+        return "bus_stop".equals(getTag("highway"))
+                || "tram_stop".equals(getTag("railway"))
+                || "station".equals(getTag("railway"))
+                || "halt".equals(getTag("railway"))
+                || "bus_station".equals(getTag("amenity"));
+    }
 }
