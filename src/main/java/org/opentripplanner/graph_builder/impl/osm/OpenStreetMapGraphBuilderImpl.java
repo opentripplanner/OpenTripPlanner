@@ -56,7 +56,6 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -83,8 +82,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.StreetNotesService;
-import org.opentripplanner.routing.services.StreetNotesService.NoteMatcher;
+import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -1697,7 +1695,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
-                        graph.streetNotesService.addNote(street, note.getFirst(), note.getSecond());
+                        graph.streetNotesService.addStaticNote(street, note.getFirst(), note.getSecond());
                 }
                 street.setNoThruTraffic(noThruTraffic);
             }
@@ -1710,7 +1708,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 backStreet.setBicycleSafetyFactor((float)safety);
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
-                        graph.streetNotesService.addNote(backStreet, note.getFirst(),
+                        graph.streetNotesService.addStaticNote(backStreet, note.getFirst(),
                                 note.getSecond());
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);

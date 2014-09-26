@@ -11,28 +11,18 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.routing.services.notes;
 
-import java.beans.PropertyEditorSupport;
+import java.io.Serializable;
 
-import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.routing.core.State;
 
-public class NotePropertiesEditor extends PropertyEditorSupport {
-    private NoteProperties value;
-
-    public void setAsText(String pattern) {
-        value = new NoteProperties(pattern, StreetNotesService.ALWAYS_MATCHER);
-    }
-
-    public String getAsText() {
-        return value.notePattern;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object object) {
-        value = (NoteProperties) object;
-    }
+/**
+ * A note matcher will determine if a note is applicable to a given state, based on condition such
+ * as current traverse mode, wheelchair access, etc...
+ * 
+ * @author laurent
+ */
+public interface NoteMatcher extends Serializable {
+    public boolean matches(State state);
 }

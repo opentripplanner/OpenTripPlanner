@@ -11,28 +11,18 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.routing.services.notes;
 
-import java.beans.PropertyEditorSupport;
+import java.util.Set;
 
-import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.routing.graph.Edge;
 
-public class NotePropertiesEditor extends PropertyEditorSupport {
-    private NoteProperties value;
+/**
+ * A source of notes for edges.
+ * 
+ * @author laurent
+ */
+public interface StreetNotesSource {
 
-    public void setAsText(String pattern) {
-        value = new NoteProperties(pattern, StreetNotesService.ALWAYS_MATCHER);
-    }
-
-    public String getAsText() {
-        return value.notePattern;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object object) {
-        value = (NoteProperties) object;
-    }
+    public Set<MatcherAndAlert> getNotes(Edge edge);
 }

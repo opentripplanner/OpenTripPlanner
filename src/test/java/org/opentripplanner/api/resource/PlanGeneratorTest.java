@@ -82,6 +82,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -585,7 +586,8 @@ public class PlanGeneratorTest {
         e41.setHasBogusName(true);
         e49.setElevationProfile(elevation49, false);
         e53.setElevationProfile(elevation53, false);
-        graph.streetNotesService.addNote(e53p, Alert.createSimpleAlerts(alertsExample));
+        graph.streetNotesService.addStaticNote(e53p, Alert.createSimpleAlerts(alertsExample),
+                StreetNotesService.ALWAYS_MATCHER);
 
         // Add an extra edge to the graph in order to generate stayOn = true for one walk step.
         new PlainStreetEdge(v40,

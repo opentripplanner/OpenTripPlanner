@@ -19,8 +19,8 @@ import java.util.ResourceBundle;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.services.StreetNotesService;
-import org.opentripplanner.routing.services.StreetNotesService.NoteMatcher;
+import org.opentripplanner.routing.services.notes.NoteMatcher;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

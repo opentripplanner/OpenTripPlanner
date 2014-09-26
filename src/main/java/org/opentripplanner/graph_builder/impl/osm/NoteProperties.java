@@ -19,7 +19,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.TranslatedString;
-import org.opentripplanner.routing.services.StreetNotesService.NoteMatcher;
+import org.opentripplanner.routing.services.notes.NoteMatcher;
 
 public class NoteProperties {
 
