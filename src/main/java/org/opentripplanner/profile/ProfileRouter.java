@@ -252,7 +252,7 @@ public class ProfileRouter {
             makeSurfaces();
             return null;
         }
-        /* Determine which rides are good ways to reach the destination. */
+        /* Non-analyst: Determine which rides are good ways to reach the destination. */
         Set<Ride> targetRides = Sets.newHashSet(); // FIXME determine why there are multiple copies of the same ride then maybe use a list
         for (StopCluster cluster : toStopPaths.keySet()) {
             for (Ride ride : retainedRides.get(cluster)) {
@@ -266,7 +266,7 @@ public class ProfileRouter {
             }
         }
         LOG.info("{} nondominated rides stop near the destination.", targetRides.size());
-        /* Non-analyst. Build the list of Options by following the back-pointers in Rides. */
+        /* Non-analyst: Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
