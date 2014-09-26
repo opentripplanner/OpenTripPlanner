@@ -32,6 +32,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -114,10 +115,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         for (Vertex gv : graph.getVertices()) {
             Vertex v = gv;
             /*
-             * We add all edges with geometry, filtering them out after. The overhead compared to
-             * storing only street edges is rather low, as most edges are street-ones anyway.
+             * We add all edges with geometry, skipping transit, filtering them out after. We do not
+             * index transit edges as we do not need them and some GTFS do not have shape data, so
+             * long straight lines between 2 faraway stations will wreck performance on a hash grid
+             * spatial index.
+             * 
+             * If one need to store transit edges in the index, we could improve the hash grid
+             * rasterizing splitting long segments.
              */
             for (Edge e : gv.getOutgoing()) {
+                if (e instanceof PatternEdge)
+                    continue;
                 LineString geometry = e.getGeometry();
                 if (geometry == null) {
                     continue;
