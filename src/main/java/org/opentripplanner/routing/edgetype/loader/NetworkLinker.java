@@ -66,6 +66,7 @@ public class NetworkLinker {
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
 
+        int nUnlinked = 0;
         for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
@@ -82,9 +83,13 @@ public class NetworkLinker {
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible).getResult()) {
-                    LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
+                    LOG.debug(graph.addBuilderAnnotation(new StopUnlinked(ts)));
+                    nUnlinked += 1;
                 }
             }
+        }
+        if (nUnlinked > 0) {
+            LOG.warn("{} transit stops were not close enough to the street network to be connected to it.", nUnlinked);
         }
         //remove replaced edges
         for (HashSet<StreetEdge> toRemove : networkLinkerLibrary.replacements.keySet()) {
