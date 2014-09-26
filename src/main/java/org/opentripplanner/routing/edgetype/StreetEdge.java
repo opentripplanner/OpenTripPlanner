@@ -93,8 +93,6 @@ public class StreetEdge extends Edge implements Cloneable {
     
     private String name;
 
-    private String label;
-    
     private StreetTraversalPermission permission;
 
     private int streetClass = CLASS_OTHERPATH;
@@ -632,14 +630,6 @@ public class StreetEdge extends Edge implements Cloneable {
 
 	public void setGeometry(LineString geometry) {
 		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry);
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
 	}
 
 	public boolean isWheelchairAccessible() {

@@ -44,7 +44,6 @@ public class DefaultOSMPlainStreetEdgeFactory implements OSMPlainStreetEdgeFacto
             float carSpeed) {
         StreetEdge pse = new StreetEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,
                 back, carSpeed);
-        pse.setLabel(getLabelForWay(way));
         return pse;
     }
 
@@ -56,7 +55,6 @@ public class DefaultOSMPlainStreetEdgeFactory implements OSMPlainStreetEdgeFacto
             boolean back, float carSpeed, AreaEdgeList area) {
         AreaEdge ae = new AreaEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,
                 back, carSpeed, area);
-        ae.setLabel(getLabelForArea(areaEntity));
         return ae;
     }
 }
