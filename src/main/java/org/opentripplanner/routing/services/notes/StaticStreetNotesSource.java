@@ -20,7 +20,9 @@ import java.util.Set;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,15 +66,13 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
 
     /**
      * Return the set of notes applicable for this state / backedge pair.
-     * 
-     * @param state
      * @return The set of notes or null if empty.
      */
     @Override
     public Set<MatcherAndAlert> getNotes(Edge edge) {
         /* If the edge is temporary, we look for notes in it's parent edge. */
-        if (edge instanceof PartialPlainStreetEdge) {
-            edge = ((PartialPlainStreetEdge) edge).getParentEdge();
+        if (edge instanceof PartialStreetEdge) {
+            edge = ((PartialStreetEdge) edge).getParentEdge();
         }
         Set<MatcherAndAlert> maas = notesForEdge.get(edge);
         if (maas == null || maas.isEmpty()) {

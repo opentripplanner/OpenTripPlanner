@@ -30,7 +30,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
+import org.opentripplanner.routing.edgetype.PartialStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -218,9 +218,9 @@ public class StreetLocation extends StreetVertex {
         double lengthIn = street.getLength() * lengthRatioIn;
         double lengthOut = street.getLength() * (1 - lengthRatioIn);
 
-        StreetEdge newLeft = new PartialPlainStreetEdge(street, fromv, base,
+        StreetEdge newLeft = new PartialStreetEdge(street, fromv, base,
                 geometries.getFirst(), name, lengthIn);
-        StreetEdge newRight = new PartialPlainStreetEdge(street, base, tov,
+        StreetEdge newRight = new PartialStreetEdge(street, base, tov,
                 geometries.getSecond(), name, lengthOut);
 
         newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
@@ -316,7 +316,7 @@ public class StreetLocation extends StreetVertex {
      * all temporary edges after they are created.
      */
     public void setTemporaryEdgeVisibility(RoutingContext rctx) {
-        for (PartialPlainStreetEdge ppse : Iterables.filter(this.extra, PartialPlainStreetEdge.class)) {
+        for (PartialStreetEdge ppse : Iterables.filter(this.extra, PartialStreetEdge.class)) {
             ppse.visibleTo = rctx;
         }
         // There are other temporary edges (FreeEdges) but it's a rabbit hole...

@@ -61,7 +61,7 @@ public class PartialPlainStreetEdgeTest {
     @Test
     public void testConstruction() {
         StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
-        PartialPlainStreetEdge pEdge = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(),
+        PartialStreetEdge pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getLength(), perm, true);
 
         assertTrue(pEdge.isEquivalentTo(e1));
@@ -74,7 +74,7 @@ public class PartialPlainStreetEdgeTest {
         assertEquals(e1.getCarSpeed(), pEdge.getCarSpeed(), 0.0);
 
         // Simpler constructor - copies permission from parent edge and sets back to true.
-        pEdge = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(), "partial e1",
+        pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(), "partial e1",
                 e1.getLength());
 
         assertTrue(pEdge.isEquivalentTo(e1));
@@ -94,9 +94,9 @@ public class PartialPlainStreetEdgeTest {
         options.setRoutingContext(_graph, v1, v2);
 
         // Partial edge with same endpoints as the parent.
-        PartialPlainStreetEdge pEdge1 = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(),
+        PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getLength());
-        PartialPlainStreetEdge pEdge2 = new PartialPlainStreetEdge(e2, v2, v3, e2.getGeometry(),
+        PartialStreetEdge pEdge2 = new PartialStreetEdge(e2, v2, v3, e2.getGeometry(),
                 "partial e2", e2.getLength());
 
         // Partial edges are temporary edges. They are only traversable by one routing context.
@@ -205,9 +205,9 @@ public class PartialPlainStreetEdgeTest {
     
     @Test
     public void testReverseEdge() {
-        PartialPlainStreetEdge pEdge1 = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(),
+        PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
                 "partial e1", e1.getLength());
-        PartialPlainStreetEdge pEdge2 = new PartialPlainStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
+        PartialStreetEdge pEdge2 = new PartialStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
                 "partial e2", e1Reverse.getLength());
         
         assertFalse(e1.isReverseOf(pEdge1));
