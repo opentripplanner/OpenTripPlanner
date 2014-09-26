@@ -33,6 +33,7 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
 import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
@@ -82,6 +83,8 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.StreetNotesService;
+import org.opentripplanner.routing.services.StreetNotesService.NoteMatcher;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -725,7 +728,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * The bike safety factor of the safest street
          */
-        private double bestBikeSafety = 1;
+        private float bestBikeSafety = 1.0f;
 
         // track OSM nodes which are decomposed into multiple graph vertices because they are
         // elevators. later they will be iterated over to build ElevatorEdges between them.
@@ -1683,21 +1686,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private void applyWayProperties(PlainStreetEdge street, PlainStreetEdge backStreet,
                                         WayProperties wayData, OSMWithTags way) {
 
-            Set<Alert> note = wayPropertySet.getNoteForWay(way);
-            Set<Alert> wheelchairNote = getWheelchairNotes(way);
+            Set<T2<Alert, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().getFirst();
-                street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
+                street.setBicycleSafetyFactor((float)safety);
                 if (safety < bestBikeSafety) {
-                    bestBikeSafety = safety;
+                    bestBikeSafety = (float)safety;
                 }
-                if (note != null) {
-                    street.setNote(note);
-                }
-                if (wheelchairNote != null) {
-                    street.setWheelchairNote(wheelchairNote);
+                if (notes != null) {
+                    for (T2<Alert, NoteMatcher> note : notes)
+                        graph.streetNotesService.addNote(street, note.getFirst(), note.getSecond());
                 }
                 street.setNoThruTraffic(noThruTraffic);
             }
@@ -1705,14 +1705,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (backStreet != null) {
                 double safety = wayData.getSafetyFeatures().getSecond();
                 if (safety < bestBikeSafety) {
-                    bestBikeSafety = safety;
+                    bestBikeSafety = (float)safety;
                 }
-                backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
-                if (note != null) {
-                    backStreet.setNote(note);
-                }
-                if (wheelchairNote != null) {
-                    backStreet.setWheelchairNote(wheelchairNote);
+                backStreet.setBicycleSafetyFactor((float)safety);
+                if (notes != null) {
+                    for (T2<Alert, NoteMatcher> note : notes)
+                        graph.streetNotesService.addNote(backStreet, note.getFirst(),
+                                note.getSecond());
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
@@ -1897,28 +1896,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        private Set<Alert> getWheelchairNotes(OSMWithTags way) {
-            Map<String, String> tags = way.getTagsByPrefix("wheelchair:description");
-            if (tags == null) {
-                return null;
-            }
-            Set<Alert> alerts = new HashSet<Alert>();
-            Alert alert = new Alert();
-            alerts.add(alert);
-            for (Map.Entry<String, String> entry : tags.entrySet()) {
-                String k = entry.getKey();
-                String v = entry.getValue();
-                if (k.equals("wheelchair:description")) {
-                    // no language, assume default from TranslatedString
-                    alert.alertHeaderText = new TranslatedString(v);
-                } else {
-                    String lang = k.substring("wheelchair:description:".length());
-                    alert.alertHeaderText = new TranslatedString(lang, v);
-                }
-            }
-            return alerts;
-        }
-
         /**
          * The safest bike lane should have a safety weight no lower than the time weight of a flat street. This method divides the safety lengths by
          * the length ratio of the safest street, ensuring this property.
@@ -1949,8 +1926,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     if (!seenEdges.contains(e)) {
                         seenEdges.add(e);
-                        pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength()
-                                / bestBikeSafety);
+                        pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
                     }
                 }
                 for (Edge e : vertex.getIncoming()) {
@@ -1961,8 +1937,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     if (!seenEdges.contains(e)) {
                         seenEdges.add(e);
-                        pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength()
-                                / bestBikeSafety);
+                        pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
                     }
                 }
             }
@@ -2608,11 +2583,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 street.setHasBogusName(true);
             }
             street.setStairs(steps);
-
-            if (way.isTagTrue("toll") || way.isTagTrue("toll:motorcar"))
-                street.setToll(true);
-            else
-                street.setToll(false);
 
             /* TODO: This should probably generalized somehow? */
             if (!ignoreWheelchairAccessibility

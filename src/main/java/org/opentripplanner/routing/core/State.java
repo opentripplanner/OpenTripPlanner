@@ -364,10 +364,6 @@ public class State implements Cloneable {
         return stateData.backWalkingBike;
     }
 
-    public Set<Alert> getBackAlerts () {
-        return stateData.notes;
-    }
-    
     /**
      * Get the name of the direction used to get to this state. For transit, it is the headsign,
      * while for other things it is what you would expect.
@@ -726,9 +722,8 @@ public class State implements Cloneable {
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
                 editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
                 
-                // propagate the modes and alerts through to the reversed edge
+                // propagate the modes through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
-                editor.addAlerts(orig.getBackAlerts());
 
                 if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());

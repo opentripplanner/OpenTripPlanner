@@ -208,9 +208,9 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
                 	if (note != null && note.length() > 0) {
-                		HashSet<Alert> notes = Alert.newSimpleAlertSet(note);
-                		street.setNote(notes);
-                		backStreet.setNote(notes);
+				Alert noteAlert = Alert.createSimpleAlerts(note);
+				graph.streetNotesService.addNote(street, noteAlert);
+				graph.streetNotesService.addNote(backStreet, noteAlert);
                 	}
                 }
 
@@ -218,12 +218,11 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 street.setSlopeOverride(slopeOverride);
                 backStreet.setSlopeOverride(slopeOverride);
 
-                P2<Double> effectiveLength;
                 if (safetyConverter != null) {
-                    effectiveLength = safetyConverter.convert(feature);
-                    if (effectiveLength != null) {
-                        street.setBicycleSafetyEffectiveLength(effectiveLength.getFirst() * length);
-                        backStreet.setBicycleSafetyEffectiveLength(effectiveLength.getSecond() * length);
+                    P2<Double> safetyFactors = safetyConverter.convert(feature);
+                    if (safetyFactors != null) {
+                        street.setBicycleSafetyFactor(safetyFactors.getFirst().floatValue());
+                        backStreet.setBicycleSafetyFactor(safetyFactors.getSecond().floatValue());
                     }
                 }
             }

@@ -539,6 +539,11 @@
             <artifactId>commons-compress</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.4</version>
+        </dependency>
         <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
             <groupId>net.java.dev.jets3t</groupId>

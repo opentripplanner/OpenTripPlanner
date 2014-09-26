@@ -62,6 +62,7 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.services.StreetNotesService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -96,6 +97,8 @@ public class Graph implements Serializable {
     public String routerId;
 
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
+
+    public final StreetNotesService streetNotesService = new StreetNotesService();
 
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;

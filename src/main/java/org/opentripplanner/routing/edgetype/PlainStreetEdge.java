@@ -18,14 +18,12 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -34,8 +32,10 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.BitSetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +56,27 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private static final double GREENWAY_SAFETY_FACTOR = 0.1;
 
+    /** If you have more than 8 flags, increase flags to short or int */
+    private static final int BACK_FLAG_INDEX = 0;
+    private static final int ROUNDABOUT_FLAG_INDEX = 1;
+    private static final int HASBOGUSNAME_FLAG_INDEX = 2;
+    private static final int NOTHRUTRAFFIC_FLAG_INDEX = 3;
+    private static final int STAIRS_FLAG_INDEX = 4;
+    private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
+
+    /** back, roundabout, stairs, ... */
+    private byte flags;
+
     private ElevationProfileSegment elevationProfileSegment;
 
     private double length;
+
+    /**
+     * bicycleSafetyWeight = length * bicycleSafetyFactor. For example, a 100m street with a safety
+     * factor of 2.0 will be considered in term of safety cost as the same as a 150m street with a
+     * safety factor of 1.0.
+     */
+    private float bicycleSafetyFactor;
 
     private int[] compactGeometry;
     
@@ -73,34 +91,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private int streetClass = CLASS_OTHERPATH;
     
     /**
-     * Marks that this edge is the reverse of the one defined in the source
-     * data. Does NOT mean fromv/tov are reversed.
-     */
-    private boolean back;
-    
-    private boolean roundabout = false;
-    
-    private Set<Alert> notes;
-
-    private boolean hasBogusName;
-
-    private boolean noThruTraffic;
-
-    /**
-     * This street is a staircase
-     */
-    private boolean stairs;
-    
-    /**
      * The speed (meters / sec) at which an automobile can traverse
      * this street segment.
      */
     private float carSpeed;
-    
-    /** This street has a toll */
-    private boolean toll;
-
-    private Set<Alert> wheelchairNotes;
 
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
@@ -132,7 +126,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         super(v1, v2);
         this.setGeometry(geometry);
         this.length = length;
-        this.elevationProfileSegment = new ElevationProfileSegment(length);
+        this.bicycleSafetyFactor = 1.0f;
+        this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
         this.setPermission(permission);
         this.setBack(back);
@@ -197,7 +192,18 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     @Override
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        return elevationProfileSegment.setElevationProfile(elev, computed, getPermission().allows(StreetTraversalPermission.CAR));
+        if (elev == null || elev.size() < 2) {
+            return false;
+        }
+        if (isSlopeOverride() && !computed) {
+            return false;
+        }
+        boolean slopeLimit = getPermission().allows(StreetTraversalPermission.CAR);
+        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
+        elevationProfileSegment = new ElevationProfileSegment(costs, elev);
+        bicycleSafetyFactor *= costs.lengthMultiplier;
+        bicycleSafetyFactor += costs.slopeSafetyCost / length;
+        return costs.flattened;
     }
 
     @Override
@@ -285,31 +291,32 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         double weight;
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
-            weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
+            weight = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
         } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
-            time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
+            time = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
             switch (options.optimize) {
             case SAFE:
-                weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
+                weight = bicycleSafetyFactor * length / speed;
                 break;
             case GREENWAYS:
-                weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
-                if (elevationProfileSegment.getBicycleSafetyEffectiveLength() / length <= GREENWAY_SAFETY_FACTOR) {
+                weight = bicycleSafetyFactor * length / speed;
+                if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
                 }
                 break;
             case FLAT:
                 /* see notes in StreetVertex on speed overhead */
-                weight = length / speed + elevationProfileSegment.getSlopeWorkCost();
+                weight = length / speed + elevationProfileSegment.getSlopeWorkFactor() * length;
                 break;
             case QUICK:
-                weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
+                weight = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
                 break;
             case TRIANGLE:
-                double quick = elevationProfileSegment.getSlopeSpeedEffectiveLength();
-                double safety = elevationProfileSegment.getBicycleSafetyEffectiveLength();
-                double slope = elevationProfileSegment.getSlopeWorkCost();
+                double quick = elevationProfileSegment.getSlopeSpeedFactor() * length;
+                double safety = bicycleSafetyFactor * length;
+                // TODO This computation is not coherent with the one for FLAT
+                double slope = elevationProfileSegment.getSlopeWorkFactor() * length;
                 weight = quick * options.triangleTimeFactor + slope
                         * options.triangleSlopeFactor + safety
                         * options.triangleSafetyFactor;
@@ -321,7 +328,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         } else {
             if (walkingBike) {
                 // take slopes into account when walking bikes
-                time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
+                time = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
             }
             weight = time;
             if (traverseMode.equals(TraverseMode.WALK)) {
@@ -353,10 +360,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         StateEditor s1 = s0.edit(this);
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
-
-        if (getWheelchairNotes() != null && options.wheelchairAccessible) {
-            s1.addAlerts(getWheelchairNotes());
-        }
 
         /* Compute turn cost. */
         PlainStreetEdge backPSE;
@@ -460,13 +463,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         s1.incrementTimeInSeconds(roundedTime);
         
         s1.incrementWeight(weight);
-        
-        s1.addAlerts(getNotes());
-        
-        if (this.isToll() && traverseMode.isDriving()) {
-            s1.addAlert(Alert.createSimpleAlerts("Toll road"));
-        }
-        
+
         return s1;
     }
 
@@ -518,28 +515,20 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return this.length / options.getStreetSpeedUpperBound();
     }
 
-    public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
-        elevationProfileSegment.setSlopeSpeedEffectiveLength(slopeSpeedEffectiveLength);
-    }
-
     public double getSlopeSpeedEffectiveLength() {
-        return elevationProfileSegment.getSlopeSpeedEffectiveLength();
-    }
-
-    public void setSlopeWorkCost(double slopeWorkCost) {
-        elevationProfileSegment.setSlopeWorkCost(slopeWorkCost);
+        return elevationProfileSegment.getSlopeSpeedFactor() * length;
     }
 
     public double getWorkCost() {
-        return elevationProfileSegment.getSlopeWorkCost();
+        return elevationProfileSegment.getSlopeWorkFactor() * length;
     }
 
-    public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
-        elevationProfileSegment.setBicycleSafetyEffectiveLength(bicycleSafetyEffectiveLength);
+    public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
+        this.bicycleSafetyFactor = bicycleSafetyFactor;
     }
 
-    public double getBicycleSafetyEffectiveLength() {
-        return elevationProfileSegment.getBicycleSafetyEffectiveLength();
+    public float getBicycleSafetyFactor() {
+        return bicycleSafetyFactor;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -551,14 +540,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return elevationProfileSegment.getElevationProfile(start, end);
     }
 
-    public void setSlopeOverride(boolean slopeOverride) {
-        elevationProfileSegment.setSlopeOverride(slopeOverride);
-    }
-    
-    public void setNote(Set<Alert> notes) {
-        this.notes = notes;
-    }
-    
     @Override
     public String toString() {
         return "PlainStreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
@@ -566,17 +547,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 + " permission=" + this.getPermission() + ")";
     }
 
-    public boolean hasBogusName() {
-        return this.hasBogusName;
-    }
-
     /** Returns true if there are any turn restrictions defined. */
     public boolean hasExplicitTurnRestrictions() {
         return this.turnRestrictions != null && this.turnRestrictions.size() > 0;
-    }
-
-    public void setWheelchairNote(Set<Alert> wheelchairNotes) {
-        this.wheelchairNotes = wheelchairNotes;
     }
 
     public void addTurnRestriction(TurnRestriction turnRestriction) {
@@ -692,44 +665,51 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 		this.streetClass = streetClass;
 	}
 
+	/**
+	 * Marks that this edge is the reverse of the one defined in the source
+	 * data. Does NOT mean fromv/tov are reversed.
+	 */
 	public boolean isBack() {
-		return back;
+	    return BitSetUtils.get(flags, BACK_FLAG_INDEX);
 	}
 
 	public void setBack(boolean back) {
-		this.back = back;
+            flags = BitSetUtils.set(flags, BACK_FLAG_INDEX, back);
 	}
 
 	public boolean isRoundabout() {
-		return roundabout;
+            return BitSetUtils.get(flags, ROUNDABOUT_FLAG_INDEX);
 	}
 
 	public void setRoundabout(boolean roundabout) {
-		this.roundabout = roundabout;
+	    flags = BitSetUtils.set(flags, ROUNDABOUT_FLAG_INDEX, roundabout);
 	}
 
-	public Set<Alert> getNotes() {
-		return notes;
+	public boolean hasBogusName() {
+	    return BitSetUtils.get(flags, HASBOGUSNAME_FLAG_INDEX);
 	}
 
 	public void setHasBogusName(boolean hasBogusName) {
-		this.hasBogusName = hasBogusName;
+	    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
 	}
 
 	public boolean isNoThruTraffic() {
-		return noThruTraffic;
+            return BitSetUtils.get(flags, NOTHRUTRAFFIC_FLAG_INDEX);
 	}
 
 	public void setNoThruTraffic(boolean noThruTraffic) {
-		this.noThruTraffic = noThruTraffic;
+	    flags = BitSetUtils.set(flags, NOTHRUTRAFFIC_FLAG_INDEX, noThruTraffic);
 	}
 
+	/**
+	 * This street is a staircase
+	 */
 	public boolean isStairs() {
-		return stairs;
+            return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
 	}
 
 	public void setStairs(boolean stairs) {
-		this.stairs = stairs;
+	    flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
 	}
 
 	public float getCarSpeed() {
@@ -740,16 +720,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 		this.carSpeed = carSpeed;
 	}
 
-	public boolean isToll() {
-		return toll;
+	private boolean isSlopeOverride() {
+	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
 	}
 
-	public void setToll(boolean toll) {
-		this.toll = toll;
-	}
-
-	public Set<Alert> getWheelchairNotes() {
-		return wheelchairNotes;
+	public void setSlopeOverride(boolean slopeOverride) {
+	    flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
 	}
 
 	@Override

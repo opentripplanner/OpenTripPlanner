@@ -42,6 +42,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.services.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -96,8 +97,10 @@ public class TestHalfEdges extends TestCase {
                 GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500,
                 StreetTraversalPermission.PEDESTRIAN, false);
         
+        @SuppressWarnings("unused")
         PlainStreetEdge topBack = new PlainStreetEdge(tr, tl, (LineString) top.getGeometry()
                 .reverse(), "topBack", 1500, StreetTraversalPermission.ALL, true);
+        @SuppressWarnings("unused")
         PlainStreetEdge bottomBack = new PlainStreetEdge(br, bl, (LineString) bottom.getGeometry()
                 .reverse(), "bottomBack", 1500, StreetTraversalPermission.ALL, true);
         leftBack = new PlainStreetEdge(tl, bl, (LineString) left.getGeometry().reverse(),
@@ -333,11 +336,12 @@ public class TestHalfEdges extends TestCase {
         turns.add(left);
         turns.add(leftBack);
 
-        Set<Alert> alert = new HashSet<Alert>();
-        alert.add(Alert.createSimpleAlerts("This is the alert"));
+        Alert alert = Alert.createSimpleAlerts("This is the alert");
+        Set<Alert> alerts = new HashSet<>();
+        alerts.add(alert);
 
-        left.setNote(alert);
-        leftBack.setNote(alert);
+        graph.streetNotesService.addNote(left, alert);
+        graph.streetNotesService.addNote(leftBack, alert);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
                 cast(turns, StreetEdge.class),
@@ -357,18 +361,21 @@ public class TestHalfEdges extends TestCase {
             }
         }
 
-        assertEquals(alert, traversedOne.getBackAlerts());
+        assertEquals(alerts, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
 
         // now, make sure wheelchair alerts are preserved
-        Set<Alert> wheelchairAlert = new HashSet<Alert>();
-        wheelchairAlert.add(Alert.createSimpleAlerts("This is the wheelchair alert"));
+        Alert wheelchairAlert = Alert.createSimpleAlerts("This is the wheelchair alert");
+        Set<Alert> wheelchairAlerts = new HashSet<>();
+        wheelchairAlerts.add(wheelchairAlert);
 
-        left.setNote(null);
-        leftBack.setNote(null);
-        left.setWheelchairNote(wheelchairAlert);
-        leftBack.setWheelchairNote(wheelchairAlert);
+        graph.streetNotesService.removeNotes(left);
+        graph.streetNotesService.removeNotes(leftBack);
+        graph.streetNotesService.addNote(left, wheelchairAlert,
+                StreetNotesService.WHEELCHAIR_MATCHER);
+        graph.streetNotesService.addNote(leftBack, wheelchairAlert,
+                StreetNotesService.WHEELCHAIR_MATCHER);
 
         req.setWheelchairAccessible(true);
 
@@ -385,7 +392,7 @@ public class TestHalfEdges extends TestCase {
             }
         }
 
-        assertEquals(wheelchairAlert, traversedOne.getBackAlerts());
+        assertEquals(wheelchairAlerts, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
     }

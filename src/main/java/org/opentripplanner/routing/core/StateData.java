@@ -19,7 +19,6 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -83,16 +82,7 @@ public class StateData implements Cloneable {
      * that could have been taken. It is used to determine if a path needs reverse-optimization.
      */
     protected int lastNextArrivalDelta;
-    
-    /**
-     * This is a list of notes that should be applied to this state.
-     * This means that we clone StateData before and after a notated edge, but notated edges
-     * are rare enough this likely doesn't matter.
-     * 
-     * @author mattwigway
-     */
-    protected Set<Alert> notes = null;
-    
+
     /**
      * The mode that was used to traverse the backEdge
      */
@@ -109,7 +99,7 @@ public class StateData implements Cloneable {
         else if (modes.getCustomMotorVehicle())
             nonTransitMode = TraverseMode.CUSTOM_MOTOR_VEHICLE;
         else if (modes.getWalk())
-            nonTransitMode =  TraverseMode.WALK;
+            nonTransitMode = TraverseMode.WALK;
         else if (modes.getBicycle())
             nonTransitMode = TraverseMode.BICYCLE;
         else

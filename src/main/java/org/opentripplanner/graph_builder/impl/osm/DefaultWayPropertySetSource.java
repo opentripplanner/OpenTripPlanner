@@ -19,6 +19,8 @@ import java.util.ResourceBundle;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.services.StreetNotesService;
+import org.opentripplanner.routing.services.StreetNotesService.NoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -478,17 +480,23 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.defaultProperties.setPermission(StreetTraversalPermission.ALL);
 
         /* and the notes */
-        createNotes(props, "note=*", "{note}");
-        createNotes(props, "notes=*", "{notes}");
-        createNotes(props, "RLIS:bicycle=caution_area", "note.caution");
-        createNotes(props, "CCGIS:bicycle=caution_area", "note.caution");
-        createNotes(props, "surface=unpaved", "note.unpaved_surface");
-        createNotes(props, "surface=compacted", "note.unpaved_surface");
-        createNotes(props, "surface=ground", "note.unpaved_surface");
-        createNotes(props, "surface=dirt", "note.unpaved_surface");
-        createNotes(props, "surface=earth", "note.unpaved_surface");
-        createNotes(props, "surface=grass", "note.unpaved_surface");
-        createNotes(props, "surface=mud", "note.muddy_surface");
+        // TODO: The two entries below produce lots of spurrious notes (OSM mapper comments)
+        createNotes(props, "note=*", "{note}", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "notes=*", "{notes}", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "RLIS:bicycle=caution_area", "note.caution", StreetNotesService.BICYCLE_MATCHER);
+        createNotes(props, "CCGIS:bicycle=caution_area", "note.caution", StreetNotesService.BICYCLE_MATCHER);
+        // TODO: Maybe we should apply the following notes only for car/bike
+        createNotes(props, "surface=unpaved", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "surface=compacted", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "surface=ground", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "surface=dirt", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "surface=earth", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "surface=grass", "note.unpaved_surface", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "surface=mud", "note.muddy_surface", StreetNotesService.ALWAYS_MATCHER);
+        createNotes(props, "toll=yes", "note.toll", StreetNotesService.DRIVING_MATCHER);
+        createNotes(props, "toll:motorcar=yes", "note.toll", StreetNotesService.DRIVING_MATCHER);
+        createNotes(props, "wheelchair:description=*", "{wheelchair:description}",
+                StreetNotesService.WHEELCHAIR_MATCHER);
 
         /* and some names */
         // Basics
@@ -570,10 +578,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         propset.addCreativeNamer(new OSMSpecifier(spec), namer);
     }
 
-    private void createNotes(WayPropertySet propset, String spec, String patternKey) {
-        NoteProperties properties = new NoteProperties();
+    private void createNotes(WayPropertySet propset, String spec, String patternKey, NoteMatcher matcher) {
         String pattern = localize(patternKey);
-        properties.notePattern = pattern;
+        NoteProperties properties = new NoteProperties(pattern, matcher);
         propset.addNote(new OSMSpecifier(spec), properties);
     }
 

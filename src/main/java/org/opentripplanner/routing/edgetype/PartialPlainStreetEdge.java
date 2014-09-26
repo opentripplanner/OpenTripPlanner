@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import com.google.common.base.Objects;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -120,6 +119,10 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
         return fromCoord.equals(toCoord);
     }
     
+    public StreetEdge getParentEdge() {
+        return parentEdge;
+    }
+
     @Override
     public String toString() {
         return "PartialPlainStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "

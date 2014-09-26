@@ -560,9 +560,10 @@ public class PlanGeneratorTest {
         // Edges for legs 6, 7 and 8
         LegSwitchingEdge e51 = new LegSwitchingEdge(
                 v50, v52);
-        PartialPlainStreetEdge e53 = new PartialPlainStreetEdge(new PlainStreetEdge(
-                v52, v54, l53, "Edge 53", 1.0, StreetTraversalPermission.ALL, false, 0),
-                v52, v54, l53, "Edge 53", 1.0, StreetTraversalPermission.ALL, false);
+        PlainStreetEdge e53p = new PlainStreetEdge(v52, v54, l53, "Edge 53", 1.0,
+                StreetTraversalPermission.ALL, false, 0);
+        PartialPlainStreetEdge e53 = new PartialPlainStreetEdge(e53p, v52, v54, l53, "Edge 53",
+                1.0, StreetTraversalPermission.ALL, false);
         StreetBikeRentalLink e55 = new StreetBikeRentalLink(
                 v54, v56);
         RentABikeOffEdge e57 = new RentABikeOffEdge(
@@ -584,7 +585,7 @@ public class PlanGeneratorTest {
         e41.setHasBogusName(true);
         e49.setElevationProfile(elevation49, false);
         e53.setElevationProfile(elevation53, false);
-        e53.setNote(Alert.newSimpleAlertSet(alertsExample));
+        graph.streetNotesService.addNote(e53p, Alert.createSimpleAlerts(alertsExample));
 
         // Add an extra edge to the graph in order to generate stayOn = true for one walk step.
         new PlainStreetEdge(v40,

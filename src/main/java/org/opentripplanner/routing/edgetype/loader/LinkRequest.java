@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -290,19 +289,15 @@ public class LinkRequest {
             if (e2 instanceof AreaEdge) {
                 ((AreaEdge) e2).getArea().addVertex(e2midpoint, linker.graph);
             }
-            double backwardBseLengthIn = e2.getBicycleSafetyEffectiveLength() * lengthRatioIn;
-            double backwardBseLengthOut = e2.getBicycleSafetyEffectiveLength() * (1 - lengthRatioIn);
-            backward1.setBicycleSafetyEffectiveLength(backwardBseLengthIn);
-            backward2.setBicycleSafetyEffectiveLength(backwardBseLengthOut);
+            backward1.setBicycleSafetyFactor(e2.getBicycleSafetyFactor());
+            backward2.setBicycleSafetyFactor(e2.getBicycleSafetyFactor());
             backward1.setElevationProfile(e2.getElevationProfile(0, lengthOut), false);
             backward2.setElevationProfile(e2.getElevationProfile(lengthIn, totalGeomLength), false);
             addEdges(backward1, backward2);
         }
 
-        double forwardBseLengthIn = e1.getBicycleSafetyEffectiveLength() * lengthRatioIn;
-        double forwardBseLengthOut = e1.getBicycleSafetyEffectiveLength() * (1 - lengthRatioIn);
-        forward1.setBicycleSafetyEffectiveLength(forwardBseLengthIn);
-        forward2.setBicycleSafetyEffectiveLength(forwardBseLengthOut);
+        forward1.setBicycleSafetyFactor(e1.getBicycleSafetyFactor());
+        forward2.setBicycleSafetyFactor(e1.getBicycleSafetyFactor());
 
         forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn), false);
         forward2.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength), false);

@@ -16,11 +16,13 @@ package org.opentripplanner.routing.util;
 import java.io.Serializable;
 
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 
 /**
  * This class is an helper for Edges and Vertexes to store various data about elevation profiles.
@@ -30,122 +32,65 @@ public class ElevationProfileSegment implements Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
+    @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(ElevationProfileSegment.class);
 
-    private PackedCoordinateSequence elevationProfile;
+    private static final ElevationProfileSegment FLAT_PROFILE = new ElevationProfileSegment();
 
-    private double length;
+    private byte[] packedElevationProfile;
 
-    private double slopeSpeedEffectiveLength;
+    private float slopeSpeedFactor;
 
-    private double bicycleSafetyEffectiveLength;
+    private float slopeWorkFactor;
 
-    private double slopeWorkCost;
-
-    private double maxSlope;
-
-    protected boolean slopeOverride;
+    private float maxSlope;
 
     private boolean flattened;
 
-    public ElevationProfileSegment(double length) {
-        this.length = length;
-        slopeSpeedEffectiveLength = length;
-        bicycleSafetyEffectiveLength = length;
-        slopeWorkCost = length;
+    private ElevationProfileSegment() {
+        slopeSpeedFactor = 1.0f;
+        slopeWorkFactor = 1.0f;
+    }
+
+    public ElevationProfileSegment(SlopeCosts costs, CoordinateSequence elev) {
+        packedElevationProfile = CompactElevationProfile.compactElevationProfile(elev);
+        slopeSpeedFactor = (float)costs.slopeSpeedFactor;
+        slopeWorkFactor = (float)costs.slopeWorkFactor;
+        maxSlope = (float)costs.maxSlope;
+        flattened = costs.flattened;
+    }
+
+    public static ElevationProfileSegment getFlatProfile() {
+        return FLAT_PROFILE;
     }
 
     public double getMaxSlope() {
         return maxSlope;
     }
 
-    public void setSlopeOverride(boolean slopeOverride) {
-        this.slopeOverride = slopeOverride;
+    public boolean isFlattened() {
+        return flattened;
     }
 
-    public boolean getSlopeOverride() {
-        return slopeOverride;
+    public double getSlopeSpeedFactor() {
+        return slopeSpeedFactor;
     }
 
-    public void setLength(double length) {
-        this.length = length;
-    }
-
-    public double getLength() {
-        return length;
-    }
-
-    public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
-        this.slopeSpeedEffectiveLength = slopeSpeedEffectiveLength;
-    }
-
-    public double getSlopeSpeedEffectiveLength() {
-        return slopeSpeedEffectiveLength;
-    }
-
-    // TODO Do we really want to be using "effective lengths" instead of just edge weights?
-    public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
-        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
-    }
-
-    public double getBicycleSafetyEffectiveLength() {
-        return bicycleSafetyEffectiveLength;
-    }
-
-    public void setSlopeWorkCost(double slopeWorkCost) {
-        this.slopeWorkCost = slopeWorkCost;
-    }
-
-    public double getSlopeWorkCost() {
-        return slopeWorkCost;
+    public double getSlopeWorkFactor() {
+        return slopeWorkFactor;
     }
 
     public PackedCoordinateSequence getElevationProfile() {
-        return elevationProfile;
+        return CompactElevationProfile.uncompactElevationProfile(packedElevationProfile);
     }
 
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return ElevationUtils.getPartialElevationProfile(elevationProfile, start, end);
-    }
-
-    public void setElevationProfile(PackedCoordinateSequence elevationProfile) {
-        this.elevationProfile = elevationProfile;
-    }
-
-    public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed,
-            boolean slopeLimit) {
-        if (elev == null || elev.size() < 2) {
-            return false;
-        }
-
-        if (slopeOverride && !computed) {
-            return false;
-        }
-
-        elevationProfile = elev;
-
-        // compute the various costs of the elevation changes
-        double lengthMultiplier = ElevationUtils.getLengthMultiplierFromElevation(elev);
-        if (Double.isNaN(lengthMultiplier)) {
-            LOG.error("lengthMultiplier from elevation profile is NaN, setting to 1");
-            lengthMultiplier = 1;
-        }
-
-        length *= lengthMultiplier;
-        bicycleSafetyEffectiveLength *= lengthMultiplier;
-
-        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
-        slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
-        maxSlope = costs.maxSlope;
-        slopeWorkCost = costs.slopeWorkCost;
-        bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
-        flattened = costs.flattened;
-
-        return costs.flattened;
+        return ElevationUtils.getPartialElevationProfile(getElevationProfile(), start, end);
     }
 
     public String toString() {
         String out = "";
+        PackedCoordinateSequence elevationProfile = getElevationProfile();
         if (elevationProfile == null || elevationProfile.size() == 0) {
             return "(empty elevation profile)";
         }
@@ -154,9 +99,5 @@ public class ElevationProfileSegment implements Serializable {
             out += "(" + coord.x + "," + coord.y + "), ";
         }
         return out.substring(0, out.length() - 2);
-    }
-
-    public boolean isFlattened() {
-        return flattened;
     }
 }

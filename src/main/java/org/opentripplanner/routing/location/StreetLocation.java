@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Iterables;
+
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -226,15 +227,11 @@ public class StreetLocation extends StreetVertex {
         newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
         newLeft.setNoThruTraffic(street.isNoThruTraffic());
         newLeft.setStreetClass(street.getStreetClass());
-        newLeft.setWheelchairNote(street.getWheelchairNotes());
-        newLeft.setNote(street.getNotes());
 
         newRight.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut),
                 false);
         newRight.setStreetClass(street.getStreetClass());
         newRight.setNoThruTraffic(street.isNoThruTraffic());
-        newRight.setWheelchairNote(street.getWheelchairNotes());
-        newRight.setNote(street.getNotes());
         
         // Copy turn restrictions onto the outgoing half-edge.
         for (TurnRestriction turnRestriction : street.getTurnRestrictions()) {
