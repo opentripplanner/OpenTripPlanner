@@ -42,7 +42,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.services.StreetNotesService;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -340,8 +340,8 @@ public class TestHalfEdges extends TestCase {
         Set<Alert> alerts = new HashSet<>();
         alerts.add(alert);
 
-        graph.streetNotesService.addNote(left, alert);
-        graph.streetNotesService.addNote(leftBack, alert);
+        graph.streetNotesService.addStaticNote(left, alert, StreetNotesService.ALWAYS_MATCHER);
+        graph.streetNotesService.addStaticNote(leftBack, alert, StreetNotesService.ALWAYS_MATCHER);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
                 filter(turns, StreetEdge.class),
@@ -370,11 +370,11 @@ public class TestHalfEdges extends TestCase {
         Set<Alert> wheelchairAlerts = new HashSet<>();
         wheelchairAlerts.add(wheelchairAlert);
 
-        graph.streetNotesService.removeNotes(left);
-        graph.streetNotesService.removeNotes(leftBack);
-        graph.streetNotesService.addNote(left, wheelchairAlert,
+        graph.streetNotesService.removeStaticNotes(left);
+        graph.streetNotesService.removeStaticNotes(leftBack);
+        graph.streetNotesService.addStaticNote(left, wheelchairAlert,
                 StreetNotesService.WHEELCHAIR_MATCHER);
-        graph.streetNotesService.addNote(leftBack, wheelchairAlert,
+        graph.streetNotesService.addStaticNote(leftBack, wheelchairAlert,
                 StreetNotesService.WHEELCHAIR_MATCHER);
 
         req.setWheelchairAccessible(true);

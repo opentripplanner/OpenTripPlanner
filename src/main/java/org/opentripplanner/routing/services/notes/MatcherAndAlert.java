@@ -11,28 +11,34 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.routing.services.notes;
 
-import java.beans.PropertyEditorSupport;
+import java.io.Serializable;
 
-import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.routing.alertpatch.Alert;
 
-public class NotePropertiesEditor extends PropertyEditorSupport {
-    private NoteProperties value;
+/**
+ * A container for a pair (note matcher, note).
+ * 
+ * @author laurent
+ */
+public class MatcherAndAlert implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    public void setAsText(String pattern) {
-        value = new NoteProperties(pattern, StreetNotesService.ALWAYS_MATCHER);
+    public MatcherAndAlert(NoteMatcher matcher, Alert note) {
+        this.matcher = matcher;
+        this.note = note;
     }
 
-    public String getAsText() {
-        return value.notePattern;
+    private NoteMatcher matcher;
+
+    private Alert note;
+
+    public NoteMatcher getMatcher() {
+        return matcher;
     }
 
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object object) {
-        value = (NoteProperties) object;
+    public Alert getNote() {
+        return note;
     }
 }

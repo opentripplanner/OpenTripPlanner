@@ -43,6 +43,7 @@ import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -209,8 +210,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 	String note = noteConverter.convert(feature);
                 	if (note != null && note.length() > 0) {
 				Alert noteAlert = Alert.createSimpleAlerts(note);
-				graph.streetNotesService.addNote(street, noteAlert);
-				graph.streetNotesService.addNote(backStreet, noteAlert);
+				graph.streetNotesService.addStaticNote(street, noteAlert, StreetNotesService.ALWAYS_MATCHER);
+				graph.streetNotesService.addStaticNote(backStreet, noteAlert, StreetNotesService.ALWAYS_MATCHER);
                 	}
                 }
 
