@@ -73,6 +73,7 @@ public class StreetEdge extends Edge implements Cloneable {
     private static final int NOTHRUTRAFFIC_FLAG_INDEX = 3;
     private static final int STAIRS_FLAG_INDEX = 4;
     private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
+    private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
 
     /** back, roundabout, stairs, ... */
     private byte flags;
@@ -94,8 +95,6 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private String label;
     
-    private boolean wheelchairAccessible = true;
-
     private StreetTraversalPermission permission;
 
     private int streetClass = CLASS_OTHERPATH;
@@ -142,6 +141,7 @@ public class StreetEdge extends Edge implements Cloneable {
         this.setPermission(permission);
         this.setBack(back);
         this.setCarSpeed(carSpeed);
+        this.setWheelchairAccessible(true); // accessible by default
         if (geometry != null) {
             try {
                 for (Coordinate c : geometry.getCoordinates()) {
@@ -643,11 +643,11 @@ public class StreetEdge extends Edge implements Cloneable {
 	}
 
 	public boolean isWheelchairAccessible() {
-		return wheelchairAccessible;
+		return BitSetUtils.get(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX);
 	}
 
 	public void setWheelchairAccessible(boolean wheelchairAccessible) {
-		this.wheelchairAccessible = wheelchairAccessible;
+        flags = BitSetUtils.set(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX, wheelchairAccessible);
 	}
 
 	public StreetTraversalPermission getPermission() {
