@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -24,6 +22,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
@@ -449,7 +448,7 @@ public class TestPatternHopFactory extends TestCase {
 
         Vertex stop_d = graph.getVertex("agency:D");
         Vertex split_d = null;
-        for (StreetTransitLink e : filter(stop_d.getOutgoing(), StreetTransitLink.class)) {
+        for (StreetTransitLink e : Iterables.filter(stop_d.getOutgoing(), StreetTransitLink.class)) {
             split_d = e.getToVertex();
         }
         

@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing;
 
-import static org.opentripplanner.common.IterableLibrary.cast;
+import static com.google.common.collect.Iterables.filter;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -142,7 +142,7 @@ public class TestHalfEdges extends TestCase {
         turns.add(leftBack);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         HashSet<Edge> endTurns = new HashSet<Edge>();
@@ -150,7 +150,7 @@ public class TestHalfEdges extends TestCase {
         endTurns.add(rightBack);
 
         StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end",
-                cast(endTurns, StreetEdge.class),
+                filter(endTurns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
 
         assertTrue(start.getX() < end.getX());
@@ -214,10 +214,10 @@ public class TestHalfEdges extends TestCase {
 
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         start = StreetLocation.createStreetLocation(graph, "start1", "start1",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation(graph, "end1", "end1",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
 
         options.setRoutingContext(graph, start, end);
@@ -238,10 +238,10 @@ public class TestHalfEdges extends TestCase {
         assertEquals(nEdges, graph.getEdges().size());
 
         start = StreetLocation.createStreetLocation(graph, "start2", "start2",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation(graph, "end2", "end2",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()));
 
         options.setRoutingContext(graph, start, end);
@@ -270,11 +270,11 @@ public class TestHalfEdges extends TestCase {
         turns.add(leftBack);
         
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(left.getGeometry()));
 
         assertEquals(start.getX(), end.getX());
@@ -303,11 +303,11 @@ public class TestHalfEdges extends TestCase {
         turns.add(left);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(left.getGeometry()));
         
         StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         assertEquals(start.getX(), end.getX());
@@ -344,7 +344,7 @@ public class TestHalfEdges extends TestCase {
         graph.streetNotesService.addNote(leftBack, alert);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         // The alert should be preserved
@@ -380,7 +380,7 @@ public class TestHalfEdges extends TestCase {
         req.setWheelchairAccessible(true);
 
         start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         traversedOne = new State((Vertex) start, req);

@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.graph;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -41,6 +39,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.common.collect.*;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -50,7 +49,6 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.api.resource.GraphMetadata;
-import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
@@ -74,11 +72,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -332,7 +325,7 @@ public class Graph implements Serializable {
      */
     public Collection<StreetEdge> getStreetEdges() {
         Collection<Edge> allEdges = this.getEdges();
-        return Lists.newArrayList(filter(allEdges, StreetEdge.class));
+        return Lists.newArrayList(Iterables.filter(allEdges, StreetEdge.class));
     }    
     
     public boolean containsVertex(Vertex v) {
@@ -575,7 +568,7 @@ public class Graph implements Serializable {
         LOG.debug("Rebuilding edge and vertex indices.");
         rebuildVertexAndEdgeIndices();
         Set<TripPattern> tableTripPatterns = Sets.newHashSet();
-        for (PatternArriveVertex pav : IterableLibrary.filter(this.getVertices(), PatternArriveVertex.class)) {
+        for (PatternArriveVertex pav : Iterables.filter(this.getVertices(), PatternArriveVertex.class)) {
             tableTripPatterns.add(pav.getTripPattern());
         }
         for (TripPattern ttp : tableTripPatterns) {

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.opentripplanner.common.IterableLibrary;
+import com.google.common.collect.Iterables;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
@@ -66,7 +66,7 @@ public class NetworkLinker {
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
 
-        for (TransitStop ts : IterableLibrary.filter(vertices, TransitStop.class)) {
+        for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;
@@ -113,7 +113,7 @@ public class NetworkLinker {
         FindMaxWalkDistances.find(graph);
 
         LOG.debug("Linking bike rental stations...");
-        for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
+        for (BikeRentalStationVertex brsv : Iterables.filter(vertices,
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));

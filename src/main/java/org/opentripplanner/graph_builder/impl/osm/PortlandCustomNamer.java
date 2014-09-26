@@ -15,7 +15,7 @@ package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.HashSet;
 
-import org.opentripplanner.common.IterableLibrary;
+import com.google.common.collect.Iterables;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -144,7 +144,7 @@ public class PortlandCustomNamer implements CustomNamer {
             return null;
         }
         Vertex toVertex = e.getToVertex();
-        for (PlainStreetEdge out : IterableLibrary.filter(toVertex.getOutgoing(), PlainStreetEdge.class)) {
+        for (PlainStreetEdge out : Iterables.filter(toVertex.getOutgoing(), PlainStreetEdge.class)) {
             if (out.hasBogusName()) {
                 String name = nameAccordingToDestination(graph, out, maxDepth - 1);
                 if (name == null) {
@@ -166,7 +166,7 @@ public class PortlandCustomNamer implements CustomNamer {
             return null;
         }
         Vertex fromVertex = e.getFromVertex();
-        for (PlainStreetEdge in : IterableLibrary.filter(fromVertex.getIncoming(), PlainStreetEdge.class)) {
+        for (PlainStreetEdge in : Iterables.filter(fromVertex.getIncoming(), PlainStreetEdge.class)) {
             if (in.hasBogusName()) {
                 String name = nameAccordingToOrigin(graph, in, maxDepth - 1);
                 if (name == null) {

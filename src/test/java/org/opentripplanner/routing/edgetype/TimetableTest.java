@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.common.IterableLibrary.filter;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
 import java.io.File;
@@ -25,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.google.common.collect.Iterables;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -73,8 +73,8 @@ public class TimetableTest {
                 GtfsLibrary.createCalendarServiceData(context.getDao()));
 
         patternIndex = new HashMap<AgencyAndId, TripPattern>();
-        for (TransitStopDepart tsd : filter(graph.getVertices(), TransitStopDepart.class)) {
-            for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
+        for (TransitStopDepart tsd : Iterables.filter(graph.getVertices(), TransitStopDepart.class)) {
+            for (TransitBoardAlight tba : Iterables.filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.boarding)
                     continue;
                 TripPattern pattern = tba.getPattern();

@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -80,7 +80,7 @@ public class StreetfulStopLinker implements GraphBuilder {
         EarliestArrivalSPTService earliestArrivalSPTService = new EarliestArrivalSPTService();
         earliestArrivalSPTService.maxDuration = (maxDuration);
 
-        for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
+        for (TransitStop ts : Iterables.filter(graph.getVertices(), TransitStop.class)) {
             // Only link street linkable stops
             if (!ts.isStreetLinkable())
                 continue;
