@@ -34,7 +34,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphService;
@@ -656,7 +656,7 @@ public class SIsochrone extends RoutingResource {
             // try to identify u-shapes by checking if the angle EndPoint-StartPoint-StartPoint+1
             // is about 90 degrees (using Azimuths on the sphere)
             double diffTo90Azimuths = 360;
-            if (edge instanceof PlainStreetEdge) {
+            if (edge instanceof StreetEdge) {
                 double firstSegmentAngle = DirectionUtils.getFirstAngle(edge.getGeometry());
                 if (firstSegmentAngle < 0)
                     firstSegmentAngle = firstSegmentAngle + Math.PI;
@@ -715,8 +715,8 @@ public class SIsochrone extends RoutingResource {
 
         if (originalTravelSpeed < userSpeed) {
             // we may have slope effects
-            if (edge instanceof PlainStreetEdge) {
-                PlainStreetEdge pe = (PlainStreetEdge) edge;
+            if (edge instanceof StreetEdge) {
+                StreetEdge pe = (StreetEdge) edge;
                 double maxSlope = pe.getElevationProfileSegment().getMaxSlope();
                 // if we are over the slope limit, then we should use the slower speed
                 if (maxSlope > 0.06) { // limit 6m/100m = 3.4 degree
@@ -746,8 +746,8 @@ public class SIsochrone extends RoutingResource {
         }
         // correct speed for car use, as each road has its speed limits
         if (usesCar) {
-            if (edge instanceof PlainStreetEdge) {
-                PlainStreetEdge pe = (PlainStreetEdge) edge;
+            if (edge instanceof StreetEdge) {
+                StreetEdge pe = (StreetEdge) edge;
                 userSpeed = pe.getCarSpeed();
                 // we need to check again if the originalTravelSpeed is faster
                 if ((isTooFast == true) && (originalTravelSpeed > userSpeed)

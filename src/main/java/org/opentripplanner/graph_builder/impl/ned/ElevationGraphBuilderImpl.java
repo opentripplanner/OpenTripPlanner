@@ -34,7 +34,7 @@ import org.opentripplanner.graph_builder.annotation.ElevationFlattened;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -102,13 +102,13 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
         coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
         log.info("setting street elevation profiles from NED data...");
-        List<EdgeWithElevation> edgesWithElevation = new ArrayList<EdgeWithElevation>();
+        List<StreetEdge> edgesWithElevation = new ArrayList<StreetEdge>();
         int nProcessed = 0;
         int nTotal = graph.countEdges();
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
-                if (ee instanceof EdgeWithElevation) {
-                    EdgeWithElevation edgeWithElevation = (EdgeWithElevation) ee;
+                if (ee instanceof StreetEdge) {
+                    StreetEdge edgeWithElevation = (StreetEdge) ee;
                     processEdge(graph, edgeWithElevation);
                     if (edgeWithElevation.getElevationProfile() != null && !edgeWithElevation.isElevationFlattened()) {
                         edgesWithElevation.add(edgeWithElevation);
@@ -127,7 +127,7 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
 
     class ElevationRepairState {
         /* This uses an intuitionist approach to elevation inspection */
-        public EdgeWithElevation backEdge;
+        public StreetEdge backEdge;
 
         public ElevationRepairState backState;
 
@@ -137,7 +137,7 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
 
         public double initialElevation;
 
-        public ElevationRepairState(EdgeWithElevation backEdge, ElevationRepairState backState,
+        public ElevationRepairState(StreetEdge backEdge, ElevationRepairState backState,
                 Vertex vertex, double distance, double initialElevation) {
             this.backEdge = backEdge;
             this.backState = backState;
@@ -151,7 +151,7 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
      * Assign missing elevations by interpolating from nearby points with known
      * elevation; also handle osm ele tags
      */
-    private void assignMissingElevations(Graph graph, List<EdgeWithElevation> edgesWithElevation, HashMap<Vertex, Double> knownElevations) {
+    private void assignMissingElevations(Graph graph, List<StreetEdge> edgesWithElevation, HashMap<Vertex, Double> knownElevations) {
 
         log.debug("Assigning missing elevations");
 
@@ -169,7 +169,7 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
         HashSet<Vertex> closed = new HashSet<Vertex>();
 
         // initialize queue with all vertices which already have known elevation
-        for (EdgeWithElevation e : edgesWithElevation) {
+        for (StreetEdge e : edgesWithElevation) {
             PackedCoordinateSequence profile = e.getElevationProfile();
 
             if (!elevations.containsKey(e.getFromVertex())) {
@@ -208,10 +208,10 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
             double bestDistance = Double.MAX_VALUE;
             double bestElevation = 0;
             for (Edge e : state.vertex.getOutgoing()) {
-                if (!(e instanceof EdgeWithElevation)) {
+                if (!(e instanceof StreetEdge)) {
                     continue;
                 }
-                EdgeWithElevation edge = (EdgeWithElevation) e;
+                StreetEdge edge = (StreetEdge) e;
                 Vertex tov = e.getToVertex();
                 if (tov == initialVertex)
                     continue;
@@ -232,10 +232,10 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
             } // end loop over outgoing edges
 
             for (Edge e : state.vertex.getIncoming()) {
-                if (!(e instanceof EdgeWithElevation)) {
+                if (!(e instanceof StreetEdge)) {
                     continue;
                 }
-                EdgeWithElevation edge = (EdgeWithElevation) e;
+                StreetEdge edge = (StreetEdge) e;
                 Vertex fromv = e.getFromVertex();
                 if (fromv == initialVertex)
                     continue;
@@ -291,8 +291,8 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
         for (Vertex v : graph.getVertices()) {
             Double fromElevation = elevations.get(v);
             for (Edge e : v.getOutgoing()) {
-                if (e instanceof EdgeWithElevation) {
-                    EdgeWithElevation edge = ((EdgeWithElevation) e);
+                if (e instanceof StreetEdge) {
+                    StreetEdge edge = ((StreetEdge) e);
 
                     Double toElevation = elevations.get(edge.getToVertex());
 
@@ -325,7 +325,7 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
      * @param ee the street edge
      * @param graph the graph (used only for error handling)
      */
-    private void processEdge(Graph graph, EdgeWithElevation ee) {
+    private void processEdge(Graph graph, StreetEdge ee) {
         if (ee.getElevationProfile() != null) {
             return; /* already set up */
         }

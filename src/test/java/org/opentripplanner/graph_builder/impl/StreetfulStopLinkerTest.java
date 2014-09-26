@@ -22,7 +22,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -103,13 +103,13 @@ public class StreetfulStopLinkerTest {
         LineString lineStringAD = new LineString(coordinatesAD, geometryFactory);
 
         // Powers of 2 avoid complications related to floating point arithmetic
-        new PlainStreetEdge(intersectionA, intersectionB, lineStringAB, "Edge AB", 2 * speed,
+        new StreetEdge(intersectionA, intersectionB, lineStringAB, "Edge AB", 2 * speed,
                 StreetTraversalPermission.ALL, false, 0);
-        new PlainStreetEdge(intersectionB, intersectionC, lineStringBC, "Edge BC", 4 * speed,
+        new StreetEdge(intersectionB, intersectionC, lineStringBC, "Edge BC", 4 * speed,
                 StreetTraversalPermission.ALL, false, 0);
-        new PlainStreetEdge(intersectionC, intersectionD, lineStringCD, "Edge CD", 8 * speed,
+        new StreetEdge(intersectionC, intersectionD, lineStringCD, "Edge CD", 8 * speed,
                 StreetTraversalPermission.ALL, false, 0);
-        new PlainStreetEdge(intersectionA, intersectionD, lineStringAD, "Edge AD", 16 * speed,
+        new StreetEdge(intersectionA, intersectionD, lineStringAD, "Edge AD", 16 * speed,
                 StreetTraversalPermission.ALL, false, 0);
 
         StreetfulStopLinker streetfulStopLinker = new StreetfulStopLinker();

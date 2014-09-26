@@ -10,7 +10,6 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -20,16 +19,13 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
@@ -107,7 +103,7 @@ public class LuceneIndex {
         String mainStreet = null;
         String crossStreet = null;
         // TODO score based on OSM street type, using intersection nodes instead of vertices.
-        for (PlainStreetEdge pse : Iterables.filter(sv.getOutgoing(), PlainStreetEdge.class)) {
+        for (StreetEdge pse : Iterables.filter(sv.getOutgoing(), StreetEdge.class)) {
             if (mainStreet == null) mainStreet = pse.getName();
             else crossStreet = pse.getName();
         }

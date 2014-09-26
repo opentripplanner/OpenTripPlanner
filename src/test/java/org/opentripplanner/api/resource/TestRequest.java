@@ -63,7 +63,6 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -74,12 +73,8 @@ import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TimedTransferEdge;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.graph.Vertex;
@@ -299,11 +294,11 @@ class Context {
                 v1.getCoordinate().y, v2.getCoordinate().x, v2.getCoordinate().y);
         double length = SphericalDistanceLibrary.getInstance().distance(v1.getCoordinate(),
                 v2.getCoordinate());
-        new PlainStreetEdge(v1, v2, geometry, name, length, StreetTraversalPermission.ALL, false);
+        new StreetEdge(v1, v2, geometry, name, length, StreetTraversalPermission.ALL, false);
 
         geometry = GeometryUtils.makeLineString(v2.getCoordinate().x, v2.getCoordinate().y,
                 v1.getCoordinate().x, v1.getCoordinate().y);
-        new PlainStreetEdge(v2, v1, geometry, name, length, StreetTraversalPermission.ALL, true);
+        new StreetEdge(v2, v1, geometry, name, length, StreetTraversalPermission.ALL, true);
     }
 }
 

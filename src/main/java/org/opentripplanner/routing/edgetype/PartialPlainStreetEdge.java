@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.LineString;
  * TODO we need a way to make sure all temporary edges are recorded as such and assigned a routingcontext when they are
  * created. That list should probably be in the routingContext itself instead of the created StreetLocation.
  */
-public class PartialPlainStreetEdge extends PlainStreetEdge {
+public class PartialPlainStreetEdge extends StreetEdge {
 
     private static final long serialVersionUID = 1L;
 

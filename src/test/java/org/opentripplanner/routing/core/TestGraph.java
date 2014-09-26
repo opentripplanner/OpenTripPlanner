@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -160,7 +159,7 @@ public class TestGraph extends TestCase {
      * @param vB
      * @param length
      */
-    private PlainStreetEdge edge(StreetVertex vA, StreetVertex vB, double length) {
+    private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length) {
         String labelA = vA.getLabel();
         String labelB = vB.getLabel();
         String name = String.format("%s_%s", labelA, labelB);
@@ -170,7 +169,7 @@ public class TestGraph extends TestCase {
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
         StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-        return new PlainStreetEdge(vA, vB, geom, name, length, perm, false);
+        return new StreetEdge(vA, vB, geom, name, length, perm, false);
     }
 
 }

@@ -74,10 +74,9 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -134,9 +133,9 @@ class TurnRestrictionTag {
 
     RepeatingTimePeriod time;
 
-    public List<PlainStreetEdge> possibleFrom = new ArrayList<PlainStreetEdge>();
+    public List<StreetEdge> possibleFrom = new ArrayList<StreetEdge>();
 
-    public List<PlainStreetEdge> possibleTo = new ArrayList<PlainStreetEdge>();
+    public List<StreetEdge> possibleTo = new ArrayList<StreetEdge>();
 
     public TraverseModeSet modes;
 
@@ -794,12 +793,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         LOG.warn("No to edge found for " + restrictionTag);
                         continue;
                     }
-                    for (PlainStreetEdge from : restrictionTag.possibleFrom) {
+                    for (StreetEdge from : restrictionTag.possibleFrom) {
                         if (from == null) {
                             LOG.warn("from-edge is null in turn " + restrictionTag);
                             continue;
                         }
-                        for (PlainStreetEdge to : restrictionTag.possibleTo) {
+                        for (StreetEdge to : restrictionTag.possibleTo) {
                             if (from == null || to == null) {
                                 continue;
                             }
@@ -1495,7 +1494,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (edges.size() == 0)
                 return;
             TraverseMode mode;
-            PlainStreetEdge firstEdge = (PlainStreetEdge) edges.iterator().next();
+            StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
 
             if (firstEdge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
                 mode = TraverseMode.WALK;
@@ -1668,11 +1667,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             elevationData.put(endEndpoint, elevation);
                         }
                     }
-                    P2<PlainStreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
+                    P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
-                    PlainStreetEdge street = streets.getFirst();
-                    PlainStreetEdge backStreet = streets.getSecond();
+                    StreetEdge street = streets.getFirst();
+                    StreetEdge backStreet = streets.getSecond();
                     applyWayProperties(street, backStreet, wayData, way);
 
                     applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -1682,7 +1681,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             } // END loop over OSM ways
         }
 
-        private void applyWayProperties(PlainStreetEdge street, PlainStreetEdge backStreet,
+        private void applyWayProperties(StreetEdge street, StreetEdge backStreet,
                                         WayProperties wayData, OSMWithTags way) {
 
             Set<T2<Alert, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
@@ -1805,7 +1804,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private void applyEdgesToTurnRestrictions(OSMWay way, long startNode, long endNode,
-                                                  PlainStreetEdge street, PlainStreetEdge backStreet) {
+                                                  StreetEdge street, StreetEdge backStreet) {
             /* Check if there are turn restrictions starting on this segment */
             Collection<TurnRestrictionTag> restrictionTags = turnRestrictionsByFromWay.get(way.getId());
 
@@ -1918,10 +1917,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                     / bestBikeSafety);
                         }
                     }
-                    if (!(e instanceof PlainStreetEdge)) {
+                    if (!(e instanceof StreetEdge)) {
                         continue;
                     }
-                    PlainStreetEdge pse = (PlainStreetEdge) e;
+                    StreetEdge pse = (StreetEdge) e;
 
                     if (!seenEdges.contains(e)) {
                         seenEdges.add(e);
@@ -1929,10 +1928,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
                 for (Edge e : vertex.getIncoming()) {
-                    if (!(e instanceof PlainStreetEdge)) {
+                    if (!(e instanceof StreetEdge)) {
                         continue;
                     }
-                    PlainStreetEdge pse = (PlainStreetEdge) e;
+                    StreetEdge pse = (StreetEdge) e;
 
                     if (!seenEdges.contains(e)) {
                         seenEdges.add(e);
@@ -2461,16 +2460,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param end
          * @param start
          */
-        private P2<PlainStreetEdge> getEdgesForStreet(IntersectionVertex start,
+        private P2<StreetEdge> getEdgesForStreet(IntersectionVertex start,
                                                       IntersectionVertex end, OSMWay way, int index, long startNode, long endNode,
                                                       StreetTraversalPermission permissions, LineString geometry) {
             // No point in returning edges that can't be traversed by anyone.
             if (permissions.allowsNothing()) {
-                return new P2<PlainStreetEdge>(null, null);
+                return new P2<StreetEdge>(null, null);
             }
 
             LineString backGeometry = (LineString) geometry.reverse();
-            PlainStreetEdge street = null, backStreet = null;
+            StreetEdge street = null, backStreet = null;
             double length = this.getGeometryLengthMeters(geometry);
 
             P2<StreetTraversalPermission> permissionPair = getPermissions(permissions, way);
@@ -2494,7 +2493,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     backStreet.setRoundabout(true);
             }
 
-            return new P2<PlainStreetEdge>(street, backStreet);
+            return new P2<StreetEdge>(street, backStreet);
         }
 
         /**
@@ -2539,7 +2538,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
         }
 
-        private PlainStreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
+        private StreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
                                                  OSMWay way, int index, long startNode, long endNode, double length,
                                                  StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
@@ -2555,7 +2554,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
-            PlainStreetEdge street = edgeFactory.createEdge(_nodes.get(startNode),
+            StreetEdge street = edgeFactory.createEdge(_nodes.get(startNode),
                     _nodes.get(endNode), way, start, end, geometry, name, length, permissions,
                     back, carSpeed);
 

@@ -18,7 +18,7 @@ import java.util.HashSet;
 import com.google.common.collect.Iterables;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -38,9 +38,9 @@ public class PortlandCustomNamer implements CustomNamer {
     public static String[] PATH_WORDS = { "Trail", "Trails", "Greenway", "Esplanade", "Spur",
             "Loop" };
 
-    private HashSet<PlainStreetEdge> nameByOrigin = new HashSet<PlainStreetEdge>();
+    private HashSet<StreetEdge> nameByOrigin = new HashSet<StreetEdge>();
 
-    private HashSet<PlainStreetEdge> nameByDestination = new HashSet<PlainStreetEdge>();
+    private HashSet<StreetEdge> nameByDestination = new HashSet<StreetEdge>();
 
     @Override
     public String name(OSMWithTags way, String defaultName) {
@@ -108,7 +108,7 @@ public class PortlandCustomNamer implements CustomNamer {
     }
 
     @Override
-    public void nameWithEdge(OSMWithTags way, PlainStreetEdge edge) {
+    public void nameWithEdge(OSMWithTags way, StreetEdge edge) {
         if (!edge.hasBogusName()) {
             return; // this edge already has a real name so there is nothing to do
         }
@@ -131,20 +131,20 @@ public class PortlandCustomNamer implements CustomNamer {
 
     @Override
     public void postprocess(Graph graph) {
-        for (PlainStreetEdge e : nameByOrigin) {
+        for (StreetEdge e : nameByOrigin) {
             nameAccordingToOrigin(graph, e, 15);
         }
-        for (PlainStreetEdge e : nameByDestination) {
+        for (StreetEdge e : nameByDestination) {
             nameAccordingToDestination(graph, e, 15);
         }
     }
 
-    private String nameAccordingToDestination(Graph graph, PlainStreetEdge e, int maxDepth) {
+    private String nameAccordingToDestination(Graph graph, StreetEdge e, int maxDepth) {
         if (maxDepth == 0) {
             return null;
         }
         Vertex toVertex = e.getToVertex();
-        for (PlainStreetEdge out : Iterables.filter(toVertex.getOutgoing(), PlainStreetEdge.class)) {
+        for (StreetEdge out : Iterables.filter(toVertex.getOutgoing(), StreetEdge.class)) {
             if (out.hasBogusName()) {
                 String name = nameAccordingToDestination(graph, out, maxDepth - 1);
                 if (name == null) {
@@ -161,12 +161,12 @@ public class PortlandCustomNamer implements CustomNamer {
         return null;
     }
 
-    private String nameAccordingToOrigin(Graph graph, PlainStreetEdge e, int maxDepth) {
+    private String nameAccordingToOrigin(Graph graph, StreetEdge e, int maxDepth) {
         if (maxDepth == 0) {
             return null;
         }
         Vertex fromVertex = e.getFromVertex();
-        for (PlainStreetEdge in : Iterables.filter(fromVertex.getIncoming(), PlainStreetEdge.class)) {
+        for (StreetEdge in : Iterables.filter(fromVertex.getIncoming(), StreetEdge.class)) {
             if (in.hasBogusName()) {
                 String name = nameAccordingToOrigin(graph, in, maxDepth - 1);
                 if (name == null) {

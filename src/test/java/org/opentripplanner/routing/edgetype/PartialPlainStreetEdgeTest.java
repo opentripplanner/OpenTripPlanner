@@ -40,7 +40,7 @@ public class PartialPlainStreetEdgeTest {
     
     private Graph _graph;
     private IntersectionVertex v1, v2, v3, v4;
-    private PlainStreetEdge e1, e1Reverse, e2, e3;
+    private StreetEdge e1, e1Reverse, e2, e3;
     
     @Before
     public void setUp() throws Exception {
@@ -241,7 +241,7 @@ public class PartialPlainStreetEdgeTest {
      * @param length
      * @param back true if this is a reverse edge
      */
-    private PlainStreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
+    private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
             StreetTraversalPermission perm) {
         String labelA = vA.getLabel();
         String labelB = vB.getLabel();
@@ -251,7 +251,7 @@ public class PartialPlainStreetEdgeTest {
         coords[1] = vB.getCoordinate();
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-        return new PlainStreetEdge(vA, vB, geom, name, length, perm, false, 5.0f);
+        return new StreetEdge(vA, vB, geom, name, length, perm, false, 5.0f);
     }
     
     /**
@@ -266,8 +266,8 @@ public class PartialPlainStreetEdgeTest {
         }
         
         @Override
-        public double computeTraversalCost(IntersectionVertex v, PlainStreetEdge from,
-                PlainStreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
+        public double computeTraversalCost(IntersectionVertex v, StreetEdge from,
+                StreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
                 float toSpeed) {
             return this.turnCostSecs;
         }
