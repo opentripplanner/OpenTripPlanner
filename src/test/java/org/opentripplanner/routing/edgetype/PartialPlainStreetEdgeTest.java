@@ -62,7 +62,7 @@ public class PartialPlainStreetEdgeTest {
     public void testConstruction() {
         StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
         PartialStreetEdge pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getLength(), perm, true);
+                "partial e1", e1.getDistance(), perm, true);
 
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
@@ -75,7 +75,7 @@ public class PartialPlainStreetEdgeTest {
 
         // Simpler constructor - copies permission from parent edge and sets back to true.
         pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(), "partial e1",
-                e1.getLength());
+                e1.getDistance());
 
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
@@ -95,9 +95,9 @@ public class PartialPlainStreetEdgeTest {
 
         // Partial edge with same endpoints as the parent.
         PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getLength());
+                "partial e1", e1.getDistance());
         PartialStreetEdge pEdge2 = new PartialStreetEdge(e2, v2, v3, e2.getGeometry(),
-                "partial e2", e2.getLength());
+                "partial e2", e2.getDistance());
 
         // Partial edges are temporary edges. They are only traversable by one routing context.
         // They are associated with a routing context when an edge is split for a StreetLocation,
@@ -206,9 +206,9 @@ public class PartialPlainStreetEdgeTest {
     @Test
     public void testReverseEdge() {
         PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getLength());
+                "partial e1", e1.getDistance());
         PartialStreetEdge pEdge2 = new PartialStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
-                "partial e2", e1Reverse.getLength());
+                "partial e2", e1Reverse.getDistance());
         
         assertFalse(e1.isReverseOf(pEdge1));
         assertFalse(pEdge1.isReverseOf(e1));
@@ -239,7 +239,6 @@ public class PartialPlainStreetEdgeTest {
      * @param vA
      * @param vB
      * @param length
-     * @param back true if this is a reverse edge
      */
     private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
             StreetTraversalPermission perm) {

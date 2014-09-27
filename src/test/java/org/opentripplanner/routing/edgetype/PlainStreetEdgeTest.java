@@ -90,7 +90,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getLength() / options.walkSpeed;
+        double expectedWeight = e1.getDistance() / options.walkSpeed;
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -109,7 +109,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getLength() / e1.getCarSpeed();
+        double expectedWeight = e1.getDistance() / e1.getCarSpeed();
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -128,7 +128,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getLength() / e1.getCarSpeed();
+        double expectedWeight = e1.getDistance() / e1.getCarSpeed();
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -300,7 +300,6 @@ public class PlainStreetEdgeTest {
      * @param vA
      * @param vB
      * @param length
-     * @param back true if this is a reverse edge
      */
     private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
             StreetTraversalPermission perm) {

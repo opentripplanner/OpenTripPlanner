@@ -80,7 +80,12 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private ElevationProfileSegment elevationProfileSegment;
 
-    private double length;
+    /**
+     * Length is stored internally as 32-bit fixed-point (millimeters). This allows edges of up to ~2100km.
+     * Distances used in calculations and exposed outside this class are still in double-precision floating point meters.
+     * Someday we might want to convert everything to fixed point representations.
+     */
+    private int length_mm;
 
     /**
      * bicycleSafetyWeight = length * bicycleSafetyFactor. For example, a 100m street with a safety
@@ -132,7 +137,7 @@ public class StreetEdge extends Edge implements Cloneable {
                       StreetTraversalPermission permission, boolean back, float carSpeed) {
         super(v1, v2);
         this.setGeometry(geometry);
-        this.length = length;
+        this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
         this.bicycleSafetyFactor = 1.0f;
         this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
@@ -206,7 +211,7 @@ public class StreetEdge extends Edge implements Cloneable {
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
         elevationProfileSegment = new ElevationProfileSegment(costs, elev);
         bicycleSafetyFactor *= costs.lengthMultiplier;
-        bicycleSafetyFactor += costs.slopeSafetyCost / length;
+        bicycleSafetyFactor += costs.slopeSafetyCost / getDistance();
         return costs.flattened;
     }
 
@@ -216,7 +221,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     @Override
     public double getDistance() {
-        return length;
+        return length_mm / 1000.0; // CONVERT FROM FIXED MILLIMETERS TO FLOAT METERS
     }
 
     @Override
@@ -290,19 +295,19 @@ public class StreetEdge extends Edge implements Cloneable {
         // Automobiles have variable speeds depending on the edge type
         double speed = calculateSpeed(options, traverseMode);
         
-        double time = length / speed;
+        double time = getDistance() / speed;
         double weight;
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
-            weight = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
+            weight = elevationProfileSegment.getSlopeSpeedFactor() * getDistance() / speed;
         } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
-            time = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
+            time = elevationProfileSegment.getSlopeSpeedFactor() * getDistance() / speed;
             switch (options.optimize) {
             case SAFE:
-                weight = bicycleSafetyFactor * length / speed;
+                weight = bicycleSafetyFactor * getDistance() / speed;
                 break;
             case GREENWAYS:
-                weight = bicycleSafetyFactor * length / speed;
+                weight = bicycleSafetyFactor * getDistance() / speed;
                 if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
@@ -310,34 +315,34 @@ public class StreetEdge extends Edge implements Cloneable {
                 break;
             case FLAT:
                 /* see notes in StreetVertex on speed overhead */
-                weight = length / speed + elevationProfileSegment.getSlopeWorkFactor() * length;
+                weight = getDistance() / speed + elevationProfileSegment.getSlopeWorkFactor() * getDistance();
                 break;
             case QUICK:
-                weight = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
+                weight = elevationProfileSegment.getSlopeSpeedFactor() * getDistance() / speed;
                 break;
             case TRIANGLE:
-                double quick = elevationProfileSegment.getSlopeSpeedFactor() * length;
-                double safety = bicycleSafetyFactor * length;
+                double quick = elevationProfileSegment.getSlopeSpeedFactor() * getDistance();
+                double safety = bicycleSafetyFactor * getDistance();
                 // TODO This computation is not coherent with the one for FLAT
-                double slope = elevationProfileSegment.getSlopeWorkFactor() * length;
+                double slope = elevationProfileSegment.getSlopeWorkFactor() * getDistance();
                 weight = quick * options.triangleTimeFactor + slope
                         * options.triangleSlopeFactor + safety
                         * options.triangleSafetyFactor;
                 weight /= speed;
                 break;
             default:
-                weight = length / speed;
+                weight = getDistance() / speed;
             }
         } else {
             if (walkingBike) {
                 // take slopes into account when walking bikes
-                time = elevationProfileSegment.getSlopeSpeedFactor() * length / speed;
+                time = elevationProfileSegment.getSlopeSpeedFactor() * getDistance() / speed;
             }
             weight = time;
             if (traverseMode.equals(TraverseMode.WALK)) {
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
-                double costs = ElevationUtils.getWalkCostsForSlope(length, elevationProfileSegment.getMaxSlope());
+                double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), elevationProfileSegment.getMaxSlope());
                 // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
                 // for the walkspeed set by the user
                 double elevationUtilsSpeed = 4.0 / 3.0;
@@ -427,7 +432,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         if (!traverseMode.isDriving()) {
-            s1.incrementWalkDistance(length);
+            s1.incrementWalkDistance(getDistance());
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
@@ -515,15 +520,15 @@ public class StreetEdge extends Edge implements Cloneable {
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return this.length / options.getStreetSpeedUpperBound();
+        return this.getDistance() / options.getStreetSpeedUpperBound();
     }
 
     public double getSlopeSpeedEffectiveLength() {
-        return elevationProfileSegment.getSlopeSpeedFactor() * length;
+        return elevationProfileSegment.getSlopeSpeedFactor() * getDistance();
     }
 
     public double getWorkCost() {
-        return elevationProfileSegment.getSlopeWorkFactor() * length;
+        return elevationProfileSegment.getSlopeWorkFactor() * getDistance();
     }
 
     public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
@@ -544,7 +549,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public String toString() {
         return "PlainStreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
-                + " length=" + this.getLength() + " carSpeed=" + this.getCarSpeed()
+                + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()
                 + " permission=" + this.getPermission() + ")";
     }
 
@@ -610,10 +615,6 @@ public class StreetEdge extends Edge implements Cloneable {
         }
         return super.detachFrom();
     }
-
-	public double getLength() {
-		return this.length;
-	}
 
 	@Override
 	public String getName() {

@@ -235,11 +235,6 @@ public class TestStreetMatcher {
         }
         
         @Override
-        public double getLength() {
-            return getDistance();
-        }
-
-        @Override
         public StreetTraversalPermission getPermission() {
             return StreetTraversalPermission.ALL;
         }

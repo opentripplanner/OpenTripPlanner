@@ -258,8 +258,8 @@ public class LinkRequest {
             return out;
         }
 
-        double lengthIn  = e1.getLength() * lengthRatioIn;
-        double lengthOut = e1.getLength() * (1 - lengthRatioIn);
+        double lengthIn  = e1.getDistance() * lengthRatioIn;
+        double lengthOut = e1.getDistance() * (1 - lengthRatioIn);
 
         // Split each edge independently. If a only one splitter vertex is used, routing may take 
         // shortcuts thought the splitter vertex to avoid turn penalties.

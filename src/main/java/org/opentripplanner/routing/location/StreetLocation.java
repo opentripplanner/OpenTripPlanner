@@ -215,8 +215,8 @@ public class StreetLocation extends StreetVertex {
         double totalGeomLength = geometry.getLength();
         double lengthRatioIn = geometries.getFirst().getLength() / totalGeomLength;
 
-        double lengthIn = street.getLength() * lengthRatioIn;
-        double lengthOut = street.getLength() * (1 - lengthRatioIn);
+        double lengthIn = street.getDistance() * lengthRatioIn;
+        double lengthOut = street.getDistance() * (1 - lengthRatioIn);
 
         StreetEdge newLeft = new PartialStreetEdge(street, fromv, base,
                 geometries.getFirst(), name, lengthIn);

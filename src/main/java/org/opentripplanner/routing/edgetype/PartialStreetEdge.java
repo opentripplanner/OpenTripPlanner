@@ -126,7 +126,7 @@ public class PartialStreetEdge extends StreetEdge {
     @Override
     public String toString() {
         return "PartialPlainStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
-                + this.getToVertex() + " length=" + this.getLength() + " carSpeed="
+                + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }
 

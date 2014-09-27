@@ -200,7 +200,7 @@ public class RoutingContext implements Cloneable {
                 second.getCoordinate());
 
         double lengthRatio = myGeom.getLength() / parentGeom.getLength();
-        double length = e.getLength() * lengthRatio;
+        double length = e.getDistance() * lengthRatio;
 
         String name = first.getLabel() + " to " + second.getLabel();
         return new PartialStreetEdge(e, first, second, myGeom, name, length);
