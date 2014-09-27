@@ -1522,6 +1522,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             for (Edge edge : edges) {
                 if (!usedEdges.contains(edge)) {
+                    graph.streetNotesService.removeStaticNotes(edge);
                     edge.detach();
                 }
             }
