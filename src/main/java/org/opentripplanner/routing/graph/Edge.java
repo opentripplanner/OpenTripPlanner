@@ -270,13 +270,9 @@ public abstract class Edge implements Serializable {
 
     private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         if (fromv == null) {
-            if (this instanceof PlainStreetEdge)
-                System.out.println(((PlainStreetEdge) this).getGeometry());
             System.out.printf("fromv null %s \n", this);
         }
         if (tov == null) {
-            if (this instanceof PlainStreetEdge)
-                System.out.println(((PlainStreetEdge) this).getGeometry());
             System.out.printf("tov null %s \n", this);
         }
         out.defaultWriteObject();
