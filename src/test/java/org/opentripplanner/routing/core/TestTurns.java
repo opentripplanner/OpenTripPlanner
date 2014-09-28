@@ -46,7 +46,7 @@ public class TestTurns extends TestCase {
 
         StreetEdge rightEdge = new StreetEdge(v1, v2, geometry2, "fleem", 10.0, StreetTraversalPermission.ALL, false);
 
-        assertEquals(180, Math.abs(leftEdge.outAngle - rightEdge.outAngle));
+        assertEquals(180, Math.abs(leftEdge.getOutAngle() - rightEdge.getOutAngle()));
 
     }
 

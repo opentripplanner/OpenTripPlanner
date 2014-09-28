@@ -40,7 +40,7 @@ public class PlainStreetEdgeTest {
     public void before() {
         _graph = new Graph();
 
-        v0 = vertex("maple_0th", 0.0, 0.0);
+        v0 = vertex("maple_0th", 0.0, 0.0); // label, X, Y
         v1 = vertex("maple_1st", 2.0, 2.0);
         v2 = vertex("maple_2nd", 1.0, 2.0);
         
@@ -56,6 +56,7 @@ public class PlainStreetEdgeTest {
     
     @Test
     public void testInAndOutAngles() {
+        // An edge heading straight West
         StreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
         
         // Edge has same first and last angle.
@@ -66,15 +67,12 @@ public class PlainStreetEdgeTest {
         StreetVertex u = vertex("test1", 2.0, 1.0);
         StreetVertex v = vertex("test2", 2.0, 2.0);
         
-        // Second edge
+        // Second edge, heading straight North
         StreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
 
-        assertEquals(180, e2.getInAngle());
-        assertEquals(180, e2.getOutAngle());
-        
-        // Difference should be about 90.
-        int diff = (e1.getOutAngle() - e2.getInAngle());
-        assertEquals(-90, diff);
+        // 180 degrees could be expressed as 180 or -180. Our implementation happens to use -180.
+        assertEquals(180, Math.abs(e2.getInAngle()));
+        assertEquals(180, Math.abs(e2.getOutAngle()));
     }
 
     @Test

@@ -110,11 +110,14 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
-    /** 0 -> 360 degree angle - the angle at the start of the edge geometry */
-    public int inAngle;
+    /**
+     * The angle at the start of the edge geometry.
+     * Internal representation is -180 to +179 integer degrees mapped to -128 to +127 (brads)
+     */
+    private byte inAngle;
 
-    /** 0 -> 360 degree angle - the angle at the end of the edge geometry */
-    public int outAngle;
+    /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
+    private byte outAngle;
 
     /**
      * No-arg constructor used only for customization -- do not call this unless you know
@@ -155,10 +158,16 @@ public class StreetEdge extends Edge implements Cloneable {
                         System.out.println("Y DOOM");
                     }
                 }
-                double angleR = DirectionUtils.getLastAngle(geometry);
-                outAngle = ((int) Math.toDegrees(angleR) + 180) % 360;
-                angleR = DirectionUtils.getFirstAngle(geometry);
-                inAngle = ((int) Math.toDegrees(angleR) + 180) % 360;
+                // Conversion from radians to internal representation as a single signed byte.
+                // We also reorient the angles since OTP seems to use South as a reference
+                // while the azimuth functions use North.
+                // FIXME Use only North as a reference, not a mix of North and South!
+                // Range restriction happens automatically due to Java signed overflow behavior.
+                // 180 degrees exists as a negative rather than a positive due to the integer range.
+                double angleRadians = DirectionUtils.getLastAngle(geometry);
+                outAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
+                angleRadians = DirectionUtils.getFirstAngle(geometry);
+                inAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
             } catch (IllegalArgumentException iae) {
                 LOG.error("exception while determining street edge angles. setting to zero. there is probably something wrong with this street segment's geometry.");
                 inAngle = 0;
@@ -724,12 +733,17 @@ public class StreetEdge extends Edge implements Cloneable {
 		return this.turnRestrictions;
 	}
 
+    /**
+     * Return the azimuth of the first segment in this edge in integer degrees clockwise from South.
+     * TODO change everything to clockwise from North
+     */
 	public int getInAngle() {
-		return this.inAngle;
+		return this.inAngle * 180 / 128;
 	}
 
+    /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
 	public int getOutAngle() {
-		return this.outAngle;
+		return this.outAngle * 180 / 128;
 	}
 
 }
