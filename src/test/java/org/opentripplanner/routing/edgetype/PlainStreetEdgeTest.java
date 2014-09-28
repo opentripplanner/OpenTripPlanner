@@ -289,8 +289,8 @@ public class PlainStreetEdgeTest {
      * Private Methods
      ****/
 
-    private IntersectionVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, lat, lon);
+    private IntersectionVertex vertex(String label, double x, double y) {
+        IntersectionVertex v = new IntersectionVertex(_graph, label, x, y);
         return v;
     }
 
