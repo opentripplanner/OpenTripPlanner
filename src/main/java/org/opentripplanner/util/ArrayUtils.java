@@ -13,6 +13,7 @@
 
 package org.opentripplanner.util;
 
+
 /**
  * This class replaces a small part of the functionality provided by ArrayUtils from Apache Commons.
  */
@@ -26,14 +27,5 @@ public class ArrayUtils {
             }
         }
         return false;
-    }
-
-    public static boolean deepEquals(int[] arr1, int[] arr2) {
-        if (arr1.length != arr2.length)
-            return false;
-        for (int i = 0; i < arr1.length; i++)
-            if (arr1[i] != arr2[i])
-                return false;
-        return true;
     }
 }
