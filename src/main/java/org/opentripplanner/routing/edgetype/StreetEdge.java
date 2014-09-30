@@ -35,6 +35,7 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.ArrayUtils;
 import org.opentripplanner.util.BitSetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -640,6 +641,14 @@ public class StreetEdge extends Edge implements Cloneable {
 
 	private void setGeometry(LineString geometry) {
 		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), isBack() ? (LineString)geometry.reverse() : geometry, isBack());
+	}
+
+	public void shareData(StreetEdge reversedEdge) {
+	    if (ArrayUtils.deepEquals(compactGeometry, reversedEdge.compactGeometry)) {
+	        compactGeometry = reversedEdge.compactGeometry;
+	    } else {
+	        LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
+	    }
 	}
 
 	public boolean isWheelchairAccessible() {
