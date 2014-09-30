@@ -638,7 +638,7 @@ public class StreetEdge extends Edge implements Cloneable {
 		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry);
 	}
 
-	public void setGeometry(LineString geometry) {
+	private void setGeometry(LineString geometry) {
 		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry);
 	}
 
