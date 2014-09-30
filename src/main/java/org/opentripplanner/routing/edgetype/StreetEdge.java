@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +36,6 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.util.ArrayUtils;
 import org.opentripplanner.util.BitSetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -644,7 +644,7 @@ public class StreetEdge extends Edge implements Cloneable {
 	}
 
 	public void shareData(StreetEdge reversedEdge) {
-	    if (ArrayUtils.deepEquals(compactGeometry, reversedEdge.compactGeometry)) {
+	    if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
 	        compactGeometry = reversedEdge.compactGeometry;
 	    } else {
 	        LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
