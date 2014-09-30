@@ -18,16 +18,13 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGrid;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
@@ -331,7 +328,6 @@ public class GraphIndex {
         int psIdx = 0; // unique index for next parent stop
         LOG.info("Clustering stops by geographic proximity and name...");
         // Each stop without a cluster will greedily claim other stops without clusters.
-        Map<String, String> descriptionForStationId = Maps.newHashMap();
         for (Stop s0 : stopForId.values()) {
             if (stopClusterForStop.containsKey(s0)) continue; // skip stops that have already been claimed by a cluster
             String s0normalizedName = StopNameNormalizer.normalize(s0.getName());
