@@ -322,7 +322,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @SuppressWarnings("unchecked")
-    private List<TransitStop> getTransitStopForEnvelope(Envelope envelope) {
+    @Override
+    public List<TransitStop> getTransitStopForEnvelope(Envelope envelope) {
         List<TransitStop> transitStops = transitStopTree.query(envelope);
         for (Iterator<TransitStop> its = transitStops.iterator(); its.hasNext();) {
             TransitStop ts = its.next();
