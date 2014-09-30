@@ -205,6 +205,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 LineString reversed = (LineString) geom.reverse();
                 StreetEdge backStreet = new StreetEdge(endIntersection,
                         startIntersection, reversed, name, length, permissions.getSecond(), true);
+                backStreet.shareData(street);
 
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
