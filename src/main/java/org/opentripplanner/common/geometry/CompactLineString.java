@@ -70,21 +70,25 @@ public final class CompactLineString implements Serializable {
      * Public factory to create a compact line string. Optimize for straight-line only line string
      * (w/o intermediate end-points).
      * 
-     * @param x0 X coordinate of first end point (ie from vertex)
-     * @param y0 Y coordinate of first end point (ie from vertex)
-     * @param x1 X coordinate of last end point (ie to vertex)
-     * @param y1 Y coordinate of last end point (ie to vertex)
+     * @param xa X coordinate of end point A
+     * @param ya Y coordinate of end point A
+     * @param xb X coordinate of end point B
+     * @param yb Y coordinate of end point B
      * @param lineString The geometry to compact. Please be aware that we ignore first and last
-     *        coordinate in the line string, they need to be exactly the same as (x0,y0) and (x1,
-     *        y1).
+     *        coordinate in the line string, they need to be exactly the same as A and B.
+     * @param reverse True if A and B are inverted (B is start, A is end).
      * @return
      */
-    public static int[] compactLineString(double x0, double y0, double x1, double y1,
-            LineString lineString) {
+    public static int[] compactLineString(double xa, double ya, double xb, double yb,
+            LineString lineString, boolean reverse) {
         if (lineString == null)
             return null;
         if (lineString.getCoordinates().length == 2)
             return STRAIGHT_LINE;
+        double x0 = reverse ? xb : xa;
+        double y0 = reverse ? yb : ya;
+        double x1 = reverse ? xa : xb;
+        double y1 = reverse ? ya : yb;
         Coordinate[] c = lineString.getCoordinates();
         /*
          * Check if the lineString is really sticking to the given end-points. TODO: If this is not
@@ -125,8 +129,8 @@ public final class CompactLineString implements Serializable {
      * @return
      */
     public static byte[] compackLineString(double x0, double y0, double x1, double y1,
-            LineString lineString) {
-        int[] coords = compactLineString(x0, y0, x1, y1, lineString);
+            LineString lineString, boolean reverse) {
+        int[] coords = compactLineString(x0, y0, x1, y1, lineString, reverse);
         if (coords == STRAIGHT_LINE)
             return STRAIGHT_LINE_PACKED;
         return DlugoszVarLenIntPacker.pack(coords);
@@ -135,17 +139,22 @@ public final class CompactLineString implements Serializable {
     /**
      * Construct a LineString based on external end-points and compacted int version.
      * 
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
+     * @param xa
+     * @param ya
+     * @param xb
+     * @param yb
      * @param coords Compact version of coordinates
+     * @param reverse True if A and B and the compacted geometry is reversed.
      * @return
      */
-    public static LineString uncompactLineString(double x0, double y0, double x1, double y1,
-            int[] coords) {
+    public static LineString uncompactLineString(double xa, double ya, double xb, double yb,
+            int[] coords, boolean reverse) {
         int size = coords == null ? 2 : (coords.length / 2) + 2;
         Coordinate[] c = new Coordinate[size];
+        double x0 = reverse ? xb : xa;
+        double y0 = reverse ? yb : ya;
+        double x1 = reverse ? xa : xb;
+        double y1 = reverse ? ya : yb;
         c[0] = new Coordinate(x0, y0);
         if (coords != null) {
             int oix = (int) Math.round(x0 * FIXED_FLOAT_MULT);
@@ -159,7 +168,10 @@ public final class CompactLineString implements Serializable {
             }
         }
         c[c.length - 1] = new Coordinate(x1, y1);
-        return geometryFactory.createLineString(c);
+        LineString out = geometryFactory.createLineString(c);
+        if (reverse)
+            out = (LineString) out.reverse();
+        return out;
     }
 
     /**
@@ -173,7 +185,7 @@ public final class CompactLineString implements Serializable {
      * @return
      */
     public static LineString uncompackLineString(double x0, double y0, double x1, double y1,
-            byte[] packedCoords) {
-        return uncompactLineString(x0, y0, x1, y1, DlugoszVarLenIntPacker.unpack(packedCoords));
+            byte[] packedCoords, boolean reverse) {
+        return uncompactLineString(x0, y0, x1, y1, DlugoszVarLenIntPacker.unpack(packedCoords), reverse);
     }
 }

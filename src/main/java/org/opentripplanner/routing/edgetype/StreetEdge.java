@@ -139,13 +139,13 @@ public class StreetEdge extends Edge implements Cloneable {
                       String name, double length,
                       StreetTraversalPermission permission, boolean back, float carSpeed) {
         super(v1, v2);
+        this.setBack(back);
         this.setGeometry(geometry);
         this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
         this.bicycleSafetyFactor = 1.0f;
         this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
         this.setPermission(permission);
-        this.setBack(back);
         this.setCarSpeed(carSpeed);
         this.setWheelchairAccessible(true); // accessible by default
         if (geometry != null) {
@@ -635,11 +635,11 @@ public class StreetEdge extends Edge implements Cloneable {
 	}
 
 	public LineString getGeometry() {
-		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry);
+		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry, false);
 	}
 
 	private void setGeometry(LineString geometry) {
-		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry);
+		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry, false);
 	}
 
 	public boolean isWheelchairAccessible() {
