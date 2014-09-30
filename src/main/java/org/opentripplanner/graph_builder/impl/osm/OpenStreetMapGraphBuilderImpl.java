@@ -2484,6 +2484,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, length,
                         permissionsBack, backGeometry, true);
             }
+            if (street != null && backStreet != null) {
+                backStreet.shareData(street);
+            }
 
             /* mark edges that are on roundabouts */
             if (way.isRoundabout()) {
