@@ -79,7 +79,7 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -1100,8 +1100,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	        // fromv
 	        Vertex fromv = selected.getFromVertex();
 	        getMetadata(fromv);
-	        if (selected instanceof EdgeWithElevation) {
-	            getMetadata(((EdgeWithElevation) selected).getElevationProfileSegment());
+	        if (selected instanceof StreetEdge) {
+	            getMetadata(((StreetEdge) selected).getElevationProfileSegment());
 	        }
 	        metadataList.revalidate();
 	

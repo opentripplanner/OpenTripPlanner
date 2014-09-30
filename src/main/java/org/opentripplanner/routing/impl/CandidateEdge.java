@@ -243,7 +243,7 @@ public class CandidateEdge {
 
         // break ties by choosing shorter edges; this should cause split streets
         // to be preferred
-        myScore += edge.getLength() / 1000000;
+        myScore += edge.getDistance() / 1000000;
         return myScore;
     }
 }

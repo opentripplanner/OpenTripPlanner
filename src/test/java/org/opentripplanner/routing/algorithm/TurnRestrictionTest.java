@@ -26,7 +26,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -46,7 +46,7 @@ public class TurnRestrictionTest {
 
     private Vertex bottomLeft;
     
-    private PlainStreetEdge maple_main1, broad1_2;
+    private StreetEdge maple_main1, broad1_2;
 
     @Before
     public void before() {
@@ -66,24 +66,24 @@ public class TurnRestrictionTest {
         StreetVertex broad3 = vertex("broad_3rd", 0.0, 0.0);
 
         // Each block along the main streets has unit length and is one-way
-        PlainStreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
-        PlainStreetEdge maple2_3 = edge(maple2, maple3, 100.0, false);
+        StreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
+        StreetEdge maple2_3 = edge(maple2, maple3, 100.0, false);
 
-        PlainStreetEdge main1_2 = edge(main1, main2, 100.0, false);
-        PlainStreetEdge main2_3 = edge(main2, main3, 100.0, false);
+        StreetEdge main1_2 = edge(main1, main2, 100.0, false);
+        StreetEdge main2_3 = edge(main2, main3, 100.0, false);
 
         broad1_2 = edge(broad1, broad2, 100.0, false);
-        PlainStreetEdge broad2_3 = edge(broad2, broad3, 100.0, false);
+        StreetEdge broad2_3 = edge(broad2, broad3, 100.0, false);
 
         // Each cross-street connects
         maple_main1 = edge(maple1, main1, 50.0, false);
-        PlainStreetEdge main_broad1 = edge(main1, broad1, 100.0, false);
+        StreetEdge main_broad1 = edge(main1, broad1, 100.0, false);
 
-        PlainStreetEdge maple_main2 = edge(maple2, main2, 50.0, false);
-        PlainStreetEdge main_broad2 = edge(main2, broad2, 50.0, false);
+        StreetEdge maple_main2 = edge(maple2, main2, 50.0, false);
+        StreetEdge main_broad2 = edge(main2, broad2, 50.0, false);
 
-        PlainStreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
-        PlainStreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
+        StreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
+        StreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
 
         // Turn restrictions are only for driving modes.
         // - can't turn from 1st onto Main.
@@ -224,7 +224,7 @@ public class TurnRestrictionTest {
      * @param length
      * @param back true if this is a reverse edge
      */
-    private PlainStreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
+    private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
         String labelA = vA.getLabel();
         String labelB = vB.getLabel();
         String name = String.format("%s_%s", labelA, labelB);
@@ -234,10 +234,10 @@ public class TurnRestrictionTest {
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
         StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-        return new PlainStreetEdge(vA, vB, geom, name, length, perm, back);
+        return new StreetEdge(vA, vB, geom, name, length, perm, back);
     }
 
-    private void DisallowTurn(PlainStreetEdge from, PlainStreetEdge to) {
+    private void DisallowTurn(StreetEdge from, StreetEdge to) {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.CUSTOM_MOTOR_VEHICLE);
         TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);

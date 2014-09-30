@@ -40,7 +40,7 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -200,10 +200,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 }
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
 
-                PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection,
+                StreetEdge street = new StreetEdge(startIntersection, endIntersection,
                         geom, name, length, permissions.getFirst(), false);
                 LineString reversed = (LineString) geom.reverse();
-                PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection,
+                StreetEdge backStreet = new StreetEdge(endIntersection,
                         startIntersection, reversed, name, length, permissions.getSecond(), true);
 
                 if (noteConverter != null) {

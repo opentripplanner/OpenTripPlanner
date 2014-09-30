@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
@@ -50,8 +50,8 @@ public abstract class AbstractIntersectionTraversalCostModel implements
      * 
      * TODO(flamholz): this should probably account for whether there is a traffic light?
      */
-    protected double computeNonDrivingTraversalCost(IntersectionVertex v, PlainStreetEdge from,
-            PlainStreetEdge to, float fromSpeed, float toSpeed) {
+    protected double computeNonDrivingTraversalCost(IntersectionVertex v, StreetEdge from,
+            StreetEdge to, float fromSpeed, float toSpeed) {
         int outAngle = to.getOutAngle();
         int inAngle = from.getInAngle();
         int turnCost = Math.abs(outAngle - inAngle);
@@ -68,7 +68,7 @@ public abstract class AbstractIntersectionTraversalCostModel implements
      * 
      * Corrects for the side of the street they are driving on.
      */
-    protected int calculateTurnAngle(PlainStreetEdge from, PlainStreetEdge to,
+    protected int calculateTurnAngle(StreetEdge from, StreetEdge to,
             RoutingRequest options) {
         int angleOutOfIntersection = to.getInAngle();
         int angleIntoIntersection = from.getOutAngle();
@@ -90,8 +90,8 @@ public abstract class AbstractIntersectionTraversalCostModel implements
 
     /* Concrete subclasses must implement this */
     @Override
-    public abstract double computeTraversalCost(IntersectionVertex v, PlainStreetEdge from,
-            PlainStreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
+    public abstract double computeTraversalCost(IntersectionVertex v, StreetEdge from,
+            StreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
             float toSpeed);
 
 }

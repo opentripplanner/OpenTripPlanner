@@ -43,8 +43,6 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     private int index;
     
-    private int groupIndex = -1;
-
     /* short debugging name */
     private final String label;
     
@@ -227,15 +225,6 @@ public abstract class Vertex implements Serializable, Cloneable {
     /** Get the latitude of the vertex */
     public double getLat() {
         return y;
-    }
-
-    public void setGroupIndex(int groupIndex) {
-        this.groupIndex = groupIndex;
-    }
-
-    @XmlTransient
-    public int getGroupIndex() {
-        return groupIndex;
     }
 
     /** If this vertex is located on only one street, get that street's name. */

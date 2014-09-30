@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
@@ -37,16 +37,16 @@ public class TestTurns extends TestCase {
         IntersectionVertex v1 = new IntersectionVertex(null, "v1", -0.10, 0);
         IntersectionVertex v2 = new IntersectionVertex(null, "v2", 0, 0);
         
-        PlainStreetEdge leftEdge = new PlainStreetEdge(v1, v2, geometry, "morx", 10.0, StreetTraversalPermission.ALL, true);
+        StreetEdge leftEdge = new StreetEdge(v1, v2, geometry, "morx", 10.0, StreetTraversalPermission.ALL, true);
 
         LineString geometry2 = gf.createLineString(new Coordinate[] {
                 new Coordinate(0, 0),
                 new Coordinate(-0.10, 0)
                 });
 
-        PlainStreetEdge rightEdge = new PlainStreetEdge(v1, v2, geometry2, "fleem", 10.0, StreetTraversalPermission.ALL, false);
+        StreetEdge rightEdge = new StreetEdge(v1, v2, geometry2, "fleem", 10.0, StreetTraversalPermission.ALL, false);
 
-        assertEquals(180, Math.abs(leftEdge.outAngle - rightEdge.outAngle));
+        assertEquals(180, Math.abs(leftEdge.getOutAngle() - rightEdge.getOutAngle()));
 
     }
 

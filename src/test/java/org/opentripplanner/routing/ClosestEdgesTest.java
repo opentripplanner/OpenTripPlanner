@@ -23,7 +23,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -44,7 +43,7 @@ public class ClosestEdgesTest {
 
     private StreetVertexIndexService finder;
 
-    private PlainStreetEdge top, bottom, left, right;
+    private StreetEdge top, bottom, left, right;
 
     private IntersectionVertex br, tr, bl, tl;
 
@@ -65,27 +64,27 @@ public class ClosestEdgesTest {
         bl = new IntersectionVertex(graph, "bl", -74.01, 40.0);
         br = new IntersectionVertex(graph, "br", -74.00, 40.0);
 
-        top = new PlainStreetEdge(tl, tr,
+        top = new StreetEdge(tl, tr,
                 GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01), "top", 1500,
                 StreetTraversalPermission.CAR, false);
-        bottom = new PlainStreetEdge(br, bl,
+        bottom = new StreetEdge(br, bl,
                 GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0), "bottom", 1500,
                 StreetTraversalPermission.BICYCLE_AND_CAR, false);
-        left = new PlainStreetEdge(bl, tl,
+        left = new StreetEdge(bl, tl,
                 GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01), "left", 1500,
                 StreetTraversalPermission.BICYCLE_AND_CAR, false);
-        right = new PlainStreetEdge(br, tr,
+        right = new StreetEdge(br, tr,
                 GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500,
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false);
 
-        StreetEdge topBack = new PlainStreetEdge(tr, tl, (LineString) top.getGeometry().reverse(),
+        StreetEdge topBack = new StreetEdge(tr, tl, (LineString) top.getGeometry().reverse(),
                 "topBack", 1500, StreetTraversalPermission.CAR, true);
-        StreetEdge bottomBack = new PlainStreetEdge(br, bl, (LineString) bottom.getGeometry()
+        StreetEdge bottomBack = new StreetEdge(br, bl, (LineString) bottom.getGeometry()
                 .reverse(), "bottomBack", 1500, StreetTraversalPermission.BICYCLE_AND_CAR, true);
-        StreetEdge leftBack = new PlainStreetEdge(tl, bl,
+        StreetEdge leftBack = new StreetEdge(tl, bl,
                 (LineString) left.getGeometry().reverse(), "leftBack", 1500,
                 StreetTraversalPermission.BICYCLE_AND_CAR, true);
-        StreetEdge rightBack = new PlainStreetEdge(tr, br, (LineString) right.getGeometry()
+        StreetEdge rightBack = new StreetEdge(tr, br, (LineString) right.getGeometry()
                 .reverse(), "rightBack", 1500, StreetTraversalPermission.CAR, true);
 
         StreetVertexIndexServiceImpl myFinder = new StreetVertexIndexServiceImpl(graph);

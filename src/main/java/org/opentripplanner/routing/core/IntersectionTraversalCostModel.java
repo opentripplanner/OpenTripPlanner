@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
@@ -30,8 +30,8 @@ public interface IntersectionTraversalCostModel {
      * 
      * @return expected number of seconds the traversal is expected to take.
      */
-    public double computeTraversalCost(IntersectionVertex v, PlainStreetEdge from,
-            PlainStreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
+    public double computeTraversalCost(IntersectionVertex v, StreetEdge from,
+            StreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
             float toSpeed);
 
 }

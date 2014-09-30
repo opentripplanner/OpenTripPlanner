@@ -166,7 +166,8 @@ public abstract class Edge implements Serializable {
     }
 
     /**
-     * This should only be called inside State; other methods should call {@link org.opentripplanner.routing.core.State.getBackTrip()}.
+     * This should only be called inside State; other methods should call
+     * org.opentripplanner.routing.core.State.getBackTrip()
      * 
      * @author mattwigway
      */

@@ -20,7 +20,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -46,11 +46,11 @@ public class TestParkAndRide extends TestCase {
         StreetVertex C = new IntersectionVertex(graph, "C", 0.002, 45, "C");
 
         @SuppressWarnings("unused")
-        Edge walk = new PlainStreetEdge(A, B, GeometryUtils.makeLineString(0.000, 45, 0.001, 45),
+        Edge walk = new StreetEdge(A, B, GeometryUtils.makeLineString(0.000, 45, 0.001, 45),
                 "AB street", 87, StreetTraversalPermission.CAR, false);
 
         @SuppressWarnings("unused")
-        Edge mustDrive = new PlainStreetEdge(B, C, GeometryUtils.makeLineString(0.001, 45, 0.002,
+        Edge mustDrive = new StreetEdge(B, C, GeometryUtils.makeLineString(0.001, 45, 0.002,
                 45), "BC street", 87, StreetTraversalPermission.PEDESTRIAN, false);
 
         GenericAStar aStar = new GenericAStar();

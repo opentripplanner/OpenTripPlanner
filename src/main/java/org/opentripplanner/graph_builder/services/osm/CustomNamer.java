@@ -14,7 +14,7 @@
 package org.opentripplanner.graph_builder.services.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
@@ -26,7 +26,7 @@ import org.opentripplanner.routing.graph.Graph;
 public interface CustomNamer {
     public String name(OSMWithTags way, String defaultName);
 
-    public void nameWithEdge(OSMWithTags way, PlainStreetEdge edge);
+    public void nameWithEdge(OSMWithTags way, StreetEdge edge);
 
     public void postprocess(Graph graph);
 }

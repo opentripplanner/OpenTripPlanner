@@ -40,7 +40,7 @@ public class PartialPlainStreetEdgeTest {
     
     private Graph _graph;
     private IntersectionVertex v1, v2, v3, v4;
-    private PlainStreetEdge e1, e1Reverse, e2, e3;
+    private StreetEdge e1, e1Reverse, e2, e3;
     
     @Before
     public void setUp() throws Exception {
@@ -61,8 +61,8 @@ public class PartialPlainStreetEdgeTest {
     @Test
     public void testConstruction() {
         StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
-        PartialPlainStreetEdge pEdge = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getLength(), perm, true);
+        PartialStreetEdge pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+                "partial e1", e1.getDistance(), perm, true);
 
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
@@ -74,8 +74,8 @@ public class PartialPlainStreetEdgeTest {
         assertEquals(e1.getCarSpeed(), pEdge.getCarSpeed(), 0.0);
 
         // Simpler constructor - copies permission from parent edge and sets back to true.
-        pEdge = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(), "partial e1",
-                e1.getLength());
+        pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(), "partial e1",
+                e1.getDistance());
 
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
@@ -94,10 +94,10 @@ public class PartialPlainStreetEdgeTest {
         options.setRoutingContext(_graph, v1, v2);
 
         // Partial edge with same endpoints as the parent.
-        PartialPlainStreetEdge pEdge1 = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getLength());
-        PartialPlainStreetEdge pEdge2 = new PartialPlainStreetEdge(e2, v2, v3, e2.getGeometry(),
-                "partial e2", e2.getLength());
+        PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+                "partial e1", e1.getDistance());
+        PartialStreetEdge pEdge2 = new PartialStreetEdge(e2, v2, v3, e2.getGeometry(),
+                "partial e2", e2.getDistance());
 
         // Partial edges are temporary edges. They are only traversable by one routing context.
         // They are associated with a routing context when an edge is split for a StreetLocation,
@@ -205,10 +205,10 @@ public class PartialPlainStreetEdgeTest {
     
     @Test
     public void testReverseEdge() {
-        PartialPlainStreetEdge pEdge1 = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getLength());
-        PartialPlainStreetEdge pEdge2 = new PartialPlainStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
-                "partial e2", e1Reverse.getLength());
+        PartialStreetEdge pEdge1 = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
+                "partial e1", e1.getDistance());
+        PartialStreetEdge pEdge2 = new PartialStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
+                "partial e2", e1Reverse.getDistance());
         
         assertFalse(e1.isReverseOf(pEdge1));
         assertFalse(pEdge1.isReverseOf(e1));
@@ -239,9 +239,8 @@ public class PartialPlainStreetEdgeTest {
      * @param vA
      * @param vB
      * @param length
-     * @param back true if this is a reverse edge
      */
-    private PlainStreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
+    private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
             StreetTraversalPermission perm) {
         String labelA = vA.getLabel();
         String labelB = vB.getLabel();
@@ -251,7 +250,7 @@ public class PartialPlainStreetEdgeTest {
         coords[1] = vB.getCoordinate();
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-        return new PlainStreetEdge(vA, vB, geom, name, length, perm, false, 5.0f);
+        return new StreetEdge(vA, vB, geom, name, length, perm, false, 5.0f);
     }
     
     /**
@@ -266,8 +265,8 @@ public class PartialPlainStreetEdgeTest {
         }
         
         @Override
-        public double computeTraversalCost(IntersectionVertex v, PlainStreetEdge from,
-                PlainStreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
+        public double computeTraversalCost(IntersectionVertex v, StreetEdge from,
+                StreetEdge to, TraverseMode mode, RoutingRequest options, float fromSpeed,
                 float toSpeed) {
             return this.turnCostSecs;
         }

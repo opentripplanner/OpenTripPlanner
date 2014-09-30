@@ -42,13 +42,12 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -555,9 +554,9 @@ public class PlanGenerator {
      */
     private void calculateElevations(Itinerary itinerary, Edge[] edges) {
         for (Edge edge : edges) {
-            if (!(edge instanceof EdgeWithElevation)) continue;
+            if (!(edge instanceof StreetEdge)) continue;
 
-            EdgeWithElevation edgeWithElevation = (EdgeWithElevation) edge;
+            StreetEdge edgeWithElevation = (StreetEdge) edge;
             ElevationProfileSegment profileSegment = edgeWithElevation.getElevationProfileSegment();
 
             if (profileSegment == null) continue;
@@ -887,7 +886,7 @@ public class PlanGenerator {
                     // intersection
                     // to see if we should generate a "left to continue" instruction.
                     boolean shouldGenerateContinue = false;
-                    if (edge instanceof PlainStreetEdge) {
+                    if (edge instanceof StreetEdge) {
                         // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
@@ -1066,10 +1065,10 @@ public class PlanGenerator {
     }
 
     private static List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
-        if (!(edge instanceof EdgeWithElevation)) {
+        if (!(edge instanceof StreetEdge)) {
             return new ArrayList<P2<Double>>();
         }
-        EdgeWithElevation elevEdge = (EdgeWithElevation) edge;
+        StreetEdge elevEdge = (StreetEdge) edge;
         if (elevEdge.getElevationProfile() == null) {
             return new ArrayList<P2<Double>>();
         }

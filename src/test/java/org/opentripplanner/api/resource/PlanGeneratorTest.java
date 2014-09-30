@@ -58,27 +58,8 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
-import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
-import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PreAlightEdge;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
@@ -502,7 +483,7 @@ public class PlanGeneratorTest {
         // Edges for leg 0
         FreeEdge e1 = new FreeEdge(
                 v0, v2);
-        PlainStreetEdge e3 = new PlainStreetEdge(
+        StreetEdge e3 = new StreetEdge(
                 v2, v4, l3, "Edge 3", 3.0, StreetTraversalPermission.ALL, false, 0);
 
         // Edges for legs 1 and 2
@@ -547,7 +528,7 @@ public class PlanGeneratorTest {
         AreaEdge e39 = new AreaEdge(
                 v38, v40, l39, "Edge 39 / 41", 2.1, StreetTraversalPermission.ALL, false, 0,
                 new AreaEdgeList());
-        PlainStreetEdge e41 = new PlainStreetEdge(
+        StreetEdge e41 = new StreetEdge(
                 v40, v42, l41, "Edge 39 / 41", 1.9, StreetTraversalPermission.ALL, false, 0);
         StreetBikeRentalLink e43 = new StreetBikeRentalLink(
                 v42, v44);
@@ -555,15 +536,15 @@ public class PlanGeneratorTest {
                 v44, v46, Collections.singleton(""));
         StreetBikeRentalLink e47 = new StreetBikeRentalLink(
                 v46, v48);
-        PlainStreetEdge e49 = new PlainStreetEdge(
+        StreetEdge e49 = new StreetEdge(
                 v48, v50, l49, "Edge 49", 2.0, StreetTraversalPermission.ALL, false, 0);
 
         // Edges for legs 6, 7 and 8
         LegSwitchingEdge e51 = new LegSwitchingEdge(
                 v50, v52);
-        PlainStreetEdge e53p = new PlainStreetEdge(v52, v54, l53, "Edge 53", 1.0,
+        StreetEdge e53p = new StreetEdge(v52, v54, l53, "Edge 53", 1.0,
                 StreetTraversalPermission.ALL, false, 0);
-        PartialPlainStreetEdge e53 = new PartialPlainStreetEdge(e53p, v52, v54, l53, "Edge 53",
+        PartialStreetEdge e53 = new PartialStreetEdge(e53p, v52, v54, l53, "Edge 53",
                 1.0, StreetTraversalPermission.ALL, false);
         StreetBikeRentalLink e55 = new StreetBikeRentalLink(
                 v54, v56);
@@ -590,7 +571,7 @@ public class PlanGeneratorTest {
                 StreetNotesService.ALWAYS_MATCHER);
 
         // Add an extra edge to the graph in order to generate stayOn = true for one walk step.
-        new PlainStreetEdge(v40,
+        new StreetEdge(v40,
                 new IntersectionVertex(graph, "Extra vertex", 180, 88),
                 new LineString(new PackedCoordinateSequence.Double(
                         new double[]{180, 89, 180, 88}, 2), geometryFactory),

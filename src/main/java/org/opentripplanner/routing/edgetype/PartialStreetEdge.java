@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.LineString;
  * TODO we need a way to make sure all temporary edges are recorded as such and assigned a routingcontext when they are
  * created. That list should probably be in the routingContext itself instead of the created StreetLocation.
  */
-public class PartialPlainStreetEdge extends PlainStreetEdge {
+public class PartialStreetEdge extends StreetEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,9 +38,9 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
      */
     private StreetEdge parentEdge;
 
-    public PartialPlainStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-            LineString geometry, String name, double length, StreetTraversalPermission permission,
-            boolean back) {
+    public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+                             LineString geometry, String name, double length, StreetTraversalPermission permission,
+                             boolean back) {
         super(v1, v2, geometry, name, length, permission, back, parentEdge.getCarSpeed());
 
         this.parentEdge = parentEdge;
@@ -49,8 +49,8 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     /**
      * Simplifies construction by copying some stuff from the parentEdge.
      */
-    public PartialPlainStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-            LineString geometry, String name, double length) {
+    public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+                             LineString geometry, String name, double length) {
         this(parentEdge, v1, v2, geometry, name, length, parentEdge.getPermission(), false);
     }
     
@@ -97,8 +97,8 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     @Override
     public boolean isReverseOf(Edge e) {
         Edge other = e;
-        if (e instanceof PartialPlainStreetEdge) {
-            other = ((PartialPlainStreetEdge) e).parentEdge;
+        if (e instanceof PartialStreetEdge) {
+            other = ((PartialStreetEdge) e).parentEdge;
         }
         
         // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
@@ -126,7 +126,7 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     @Override
     public String toString() {
         return "PartialPlainStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
-                + this.getToVertex() + " length=" + this.getLength() + " carSpeed="
+                + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }
 

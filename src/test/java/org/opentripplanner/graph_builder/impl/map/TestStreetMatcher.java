@@ -169,11 +169,12 @@ public class TestStreetMatcher {
         }
     }
 
+    /* TODO explain why this exists and is "simple" */
     private static class SimpleEdge extends StreetEdge {
         private static final long serialVersionUID = 1L;
 
         public SimpleEdge(StreetVertex v1, StreetVertex v2) {
-            super(v1, v2);
+            super(v1, v2, null, null, 0, null, false);
         }
         
         public Set<Alert> getNotes () {
@@ -234,11 +235,6 @@ public class TestStreetMatcher {
         }
         
         @Override
-        public double getLength() {
-            return getDistance();
-        }
-
-        @Override
         public StreetTraversalPermission getPermission() {
             return StreetTraversalPermission.ALL;
         }
@@ -297,11 +293,6 @@ public class TestStreetMatcher {
 
         @Override
         public void setCarSpeed(float carSpeed) {}
-
-        @Override
-        public String getLabel() {
-            return "label";
-        }
 
     }
 }

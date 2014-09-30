@@ -33,7 +33,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
@@ -60,7 +59,7 @@ public class TestHalfEdges extends TestCase {
 
     private GenericAStar aStar = new GenericAStar();
 
-    private PlainStreetEdge top, bottom, left, right, leftBack, rightBack;
+    private StreetEdge top, bottom, left, right, leftBack, rightBack;
 
     private IntersectionVertex br, tr, bl, tl;
 
@@ -84,28 +83,28 @@ public class TestHalfEdges extends TestCase {
         bl = new IntersectionVertex(graph, "bl", -74.01, 40.0);
         br = new IntersectionVertex(graph, "br", -74.00, 40.0);
 
-        top = new PlainStreetEdge(tl, tr,
+        top = new StreetEdge(tl, tr,
                 GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01), "top", 1500,
                 StreetTraversalPermission.ALL, false);
-        bottom = new PlainStreetEdge(br, bl,
+        bottom = new StreetEdge(br, bl,
                 GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0), "bottom", 1500,
                 StreetTraversalPermission.ALL, false);
-        left = new PlainStreetEdge(bl, tl,
+        left = new StreetEdge(bl, tl,
                 GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01), "left", 1500,
                 StreetTraversalPermission.ALL, false);
-        right = new PlainStreetEdge(br, tr,
+        right = new StreetEdge(br, tr,
                 GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500,
                 StreetTraversalPermission.PEDESTRIAN, false);
         
         @SuppressWarnings("unused")
-        PlainStreetEdge topBack = new PlainStreetEdge(tr, tl, (LineString) top.getGeometry()
+        StreetEdge topBack = new StreetEdge(tr, tl, (LineString) top.getGeometry()
                 .reverse(), "topBack", 1500, StreetTraversalPermission.ALL, true);
         @SuppressWarnings("unused")
-        PlainStreetEdge bottomBack = new PlainStreetEdge(br, bl, (LineString) bottom.getGeometry()
+        StreetEdge bottomBack = new StreetEdge(br, bl, (LineString) bottom.getGeometry()
                 .reverse(), "bottomBack", 1500, StreetTraversalPermission.ALL, true);
-        leftBack = new PlainStreetEdge(tl, bl, (LineString) left.getGeometry().reverse(),
+        leftBack = new StreetEdge(tl, bl, (LineString) left.getGeometry().reverse(),
                 "leftBack", 1500, StreetTraversalPermission.ALL, true);
-        rightBack = new PlainStreetEdge(tr, br, (LineString) right.getGeometry().reverse(),
+        rightBack = new StreetEdge(tr, br, (LineString) right.getGeometry().reverse(),
                 "rightBack", 1500, StreetTraversalPermission.ALL, true);
 
         Stop s1 = new Stop();
