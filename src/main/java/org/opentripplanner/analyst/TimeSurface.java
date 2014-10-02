@@ -35,7 +35,7 @@ import static org.apache.commons.math3.util.FastMath.toRadians;
  * In Portland, one timesurface takes roughly one MB of memory and is also about that size as JSON.
  * However it is proportionate to the graph size not the time cutoff.
  */
-public class TimeSurface implements Serializable{
+public class TimeSurface implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TimeSurface.class);
     public static final int UNREACHABLE = -1;

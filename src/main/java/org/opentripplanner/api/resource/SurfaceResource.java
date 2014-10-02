@@ -147,6 +147,7 @@ public class SurfaceResource extends RoutingResource {
         TimeSurface surface = server.surfaceCache.get(surfaceId);
         if (surface == null) return Response.status(Response.Status.NOT_FOUND).entity("Invalid surface ID.").build();
         return Response.ok().entity(new TimeSurfaceShort(surface)).build();
+        // DEBUG return Response.ok().entity(surface).build();
     }
 
     /** Evaluate a surface at all the points in a PointSet. */

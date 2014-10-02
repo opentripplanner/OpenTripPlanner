@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.google.common.collect.Lists;
+import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.model.TimeSurfaceShort;
 import org.opentripplanner.api.param.HourMinuteSecond;
@@ -40,9 +41,11 @@ import org.opentripplanner.standalone.OTPServer;
 public class ProfileResource {
 
     private Graph graph;
+    private SurfaceCache surfaceCache;
 
     public ProfileResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         graph = otpServer.graphService.getGraph(routerId);
+        surfaceCache = otpServer.surfaceCache;
     }
 
     @GET
@@ -87,6 +90,8 @@ public class ProfileResource {
         try {
             ProfileResponse response = router.route();
             if (req.analyst) {
+                surfaceCache.add(router.minSurface);
+                surfaceCache.add(router.maxSurface);
                 List<TimeSurfaceShort> surfaceShorts = Lists.newArrayList();
                 surfaceShorts.add(new TimeSurfaceShort(router.minSurface));
                 surfaceShorts.add(new TimeSurfaceShort(router.maxSurface));
