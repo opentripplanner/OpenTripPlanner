@@ -32,7 +32,6 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -47,7 +46,9 @@ import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
@@ -56,11 +57,13 @@ import org.slf4j.LoggerFactory;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 @Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
+    @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
     private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
@@ -74,9 +77,12 @@ public class IndexAPI {
     @QueryParam("refs") private boolean refs = false;
 
     private final GraphIndex index;
+    private final StreetVertexIndexService streetIndex;
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        index = otpServer.graphService.getGraph(routerId).index;
+        Graph graph = otpServer.graphService.getGraph(routerId);
+        index = graph.index;
+        streetIndex = graph.streetIndex;
     }
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
@@ -142,8 +148,8 @@ public class IndexAPI {
            }
            List<StopShort> stops = Lists.newArrayList(); 
            Coordinate coord = new Coordinate(lon, lat);
-           /* TODO Ack this should use the spatial index! */
-           for (TransitStop stopVertex : index.stopSpatialIndex.query(lon, lat, radius)) {
+           for (TransitStop stopVertex : streetIndex.getNearbyTransitStops(
+                    new Coordinate(lon, lat), radius)) {
                double distance = distanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
                    stops.add(new StopShort(stopVertex.getStop(), (int) distance));
@@ -158,15 +164,14 @@ public class IndexAPI {
            if (maxLat <= minLat || maxLon <= minLon) {
                return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
            }
-           List<StopShort> stops = Lists.newArrayList(); 
-           for (TransitStop stopVertex : index.stopSpatialIndex.query(lon, lat, radius)) {
-               /* TODO The spatial index needs a rectangle query function. */
-               index.stopSpatialIndex.query(lon, lat, radius);
+           List<StopShort> stops = Lists.newArrayList();
+           Envelope envelope = new Envelope(new Coordinate(minLon, minLat), new Coordinate(maxLon, maxLat));
+           for (TransitStop stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
                stops.add(new StopShort(stopVertex.getStop()));
            }
            return Response.status(Status.OK).entity(stops).build();           
        }
-}
+   }
 
    @GET
    @Path("/stops/{stopId}/routes")

@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -139,13 +140,13 @@ public class StreetEdge extends Edge implements Cloneable {
                       String name, double length,
                       StreetTraversalPermission permission, boolean back, float carSpeed) {
         super(v1, v2);
+        this.setBack(back);
         this.setGeometry(geometry);
         this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
         this.bicycleSafetyFactor = 1.0f;
         this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
         this.setPermission(permission);
-        this.setBack(back);
         this.setCarSpeed(carSpeed);
         this.setWheelchairAccessible(true); // accessible by default
         if (geometry != null) {
@@ -635,11 +636,19 @@ public class StreetEdge extends Edge implements Cloneable {
 	}
 
 	public LineString getGeometry() {
-		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry);
+		return CompactLineString.uncompactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), compactGeometry, isBack());
 	}
 
-	public void setGeometry(LineString geometry) {
-		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), geometry);
+	private void setGeometry(LineString geometry) {
+		this.compactGeometry = CompactLineString.compactLineString(fromv.getLon(), fromv.getLat(), tov.getLon(), tov.getLat(), isBack() ? (LineString)geometry.reverse() : geometry, isBack());
+	}
+
+	public void shareData(StreetEdge reversedEdge) {
+	    if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
+	        compactGeometry = reversedEdge.compactGeometry;
+	    } else {
+	        LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
+	    }
 	}
 
 	public boolean isWheelchairAccessible() {

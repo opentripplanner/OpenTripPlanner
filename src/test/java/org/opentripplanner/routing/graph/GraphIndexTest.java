@@ -1,4 +1,4 @@
-package org.opentripplanner.routing;
+package org.opentripplanner.routing.graph;
 
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -6,9 +6,13 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.GtfsTest;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 import java.util.List;
 
@@ -81,7 +85,10 @@ public class GraphIndexTest extends GtfsTest {
         TransitStop stopvL = graph.index.stopVertexForStop.get(stopL);
         TransitStop stopvM = graph.index.stopVertexForStop.get(stopM);
         // There are a two other stops within 100 meters of stop J.
-        List<TransitStop> stops = graph.index.stopSpatialIndex.query(stopJ.getLon(), stopJ.getLat(), 100);
+        Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
+        env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
+                SphericalDistanceLibrary.metersToDegrees(100));
+        List<TransitStop> stops = graph.index.stopSpatialIndex.query(env);
         assertTrue(stops.contains(stopvJ));
         assertTrue(stops.contains(stopvL));
         assertTrue(stops.contains(stopvM));
