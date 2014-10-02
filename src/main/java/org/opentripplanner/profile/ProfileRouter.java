@@ -190,15 +190,17 @@ public class ProfileRouter {
                 if ( ! addIfNondominated(r1)) continue; // abandon this ride if it is dominated by some existing ride at the same location
                 // We have a new, nondominated, completed ride. Record its lower and upper bounds at the arrival stop.
                 if (request.analyst) {
-                    // This could be done at the end now that we are retaining all rides.
-                    TransitStop tstop = graph.index.stopVertexForStop.get(r1.to);
-                    int tsidx = tstop.getIndex();
-                    int lb = r1.durationLowerBound();
-                    int ub = r1.durationUpperBound();
-                    if (mins[tsidx] == TimeSurface.UNREACHABLE || mins[tsidx] > lb)
-                        mins[tsidx] = lb;
-                    if (maxs[tsidx] == TimeSurface.UNREACHABLE || maxs[tsidx] > ub) // Yes, we want the _minimum_ upper bound.
-                        maxs[tsidx] = ub;
+                    for (Stop s : r1.to.children) {
+                        // TODO This could be done at the end now that we are retaining all rides.
+                        TransitStop tstop = graph.index.stopVertexForStop.get(s);
+                        int tsidx = tstop.getIndex();
+                        int lb = r1.durationLowerBound();
+                        int ub = r1.durationUpperBound();
+                        if (mins[tsidx] == TimeSurface.UNREACHABLE || mins[tsidx] > lb)
+                            mins[tsidx] = lb;
+                        if (maxs[tsidx] == TimeSurface.UNREACHABLE || maxs[tsidx] > ub) // Yes, we want the _minimum_ upper bound.
+                            maxs[tsidx] = ub;
+                    }
                 }
                 /* Find transfers out of this new ride. */
                 // Do not transfer too many times. Check after calculating stats since stats are needed in any case.
@@ -252,7 +254,7 @@ public class ProfileRouter {
             makeSurfaces();
             return null;
         }
-        /* Determine which rides are good ways to reach the destination. */
+        /* Non-analyst: Determine which rides are good ways to reach the destination. */
         Set<Ride> targetRides = Sets.newHashSet(); // FIXME determine why there are multiple copies of the same ride then maybe use a list
         for (StopCluster cluster : toStopPaths.keySet()) {
             for (Ride ride : retainedRides.get(cluster)) {
@@ -266,7 +268,7 @@ public class ProfileRouter {
             }
         }
         LOG.info("{} nondominated rides stop near the destination.", targetRides.size());
-        /* Non-analyst. Build the list of Options by following the back-pointers in Rides. */
+        /* Non-analyst: Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
@@ -401,7 +403,6 @@ public class ProfileRouter {
         // FIXME requires destination to be set, not necesary for analyst
         rr.to = new GenericLocation(request.to.lat, request.to.lon);
         rr.setArriveBy(dest);
-        // TODO CAR does not seem to work. rr.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
         rr.batch = (true);

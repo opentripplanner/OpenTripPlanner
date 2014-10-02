@@ -18,7 +18,7 @@ import com.vividsolutions.jts.geom.LineString;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -61,7 +61,7 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex v1 = vertex("maple_1st", new Coordinate(2.0, 2.0), false);
         IntersectionVertex v2 = vertex("maple_2nd", new Coordinate(2.0, 1.0), false);
         
-        PlainStreetEdge e1 = edge(v1, v2, 1.0, false);
+        StreetEdge e1 = edge(v1, v2, 1.0, false);
 
         // Edge has same first and last angle.
         assertEquals(90, e1.getInAngle());
@@ -71,7 +71,7 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex v3 = vertex("test2", new Coordinate(1.0, 1.0), false);
         
         // Second edge
-        PlainStreetEdge e2 = edge(v2, v3, 1.0, false);
+        StreetEdge e2 = edge(v2, v3, 1.0, false);
 
         assertEquals(0, e2.getInAngle());
         assertEquals(0, e2.getOutAngle());
@@ -97,8 +97,8 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex w = vertex("to_v", c, false);
         
         // Two edges.
-        PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
-        PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        StreetEdge fromEdge = edge(u, v, 1.0, false);
+        StreetEdge toEdge = edge(v, w, 1.0, false);
         
         int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
         assertFalse(costModel.isRightTurn(turnAngle));
@@ -121,8 +121,8 @@ public class SimpleTraversalCostModelTest {
         v.freeFlowing = (true);
         
         // Two edges.
-        PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
-        PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        StreetEdge fromEdge = edge(u, v, 1.0, false);
+        StreetEdge toEdge = edge(v, w, 1.0, false);
         
         float fromSpeed = 1.0f;
         float toSpeed = 1.0f;
@@ -147,8 +147,8 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex w = vertex("to_v", c, false);
         
         // Two edges - will infer that the vertex is free-flowing since there is no light.
-        PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
-        PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        StreetEdge fromEdge = edge(u, v, 1.0, false);
+        StreetEdge toEdge = edge(v, w, 1.0, false);
         
         float fromSpeed = 1.0f;
         float toSpeed = 1.0f;
@@ -173,11 +173,11 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex w = vertex("to_v", c, false);
     
         // Two edges.
-        PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
-        PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        StreetEdge fromEdge = edge(u, v, 1.0, false);
+        StreetEdge toEdge = edge(v, w, 1.0, false);
         
         // 3rd edge prevents inferral of free-flowingness
-        PlainStreetEdge extraEdge = edge(v, u, 1.0, false);
+        StreetEdge extraEdge = edge(v, u, 1.0, false);
                 
         float fromSpeed = 1.0f;
         float toSpeed = 1.0f;
@@ -202,11 +202,11 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex w = vertex("to_v", c, false);
     
         // Two edges.
-        PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
-        PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        StreetEdge fromEdge = edge(u, v, 1.0, false);
+        StreetEdge toEdge = edge(v, w, 1.0, false);
         
         // 3rd edge prevents inferral of free-flowingness
-        PlainStreetEdge extraEdge = edge(v, u, 1.0, false);
+        StreetEdge extraEdge = edge(v, u, 1.0, false);
                 
         int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
         assertTrue(costModel.isRightTurn(turnAngle));
@@ -235,11 +235,11 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex w = vertex("to_v", c, false);
     
         // Two edges.
-        PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
-        PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        StreetEdge fromEdge = edge(u, v, 1.0, false);
+        StreetEdge toEdge = edge(v, w, 1.0, false);
         
         // 3rd edge prevents inferral of free-flowingness
-        PlainStreetEdge extraEdge = edge(v, u, 1.0, false);
+        StreetEdge extraEdge = edge(v, u, 1.0, false);
                 
         int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
         assertFalse(costModel.isRightTurn(turnAngle));
@@ -273,7 +273,7 @@ public class SimpleTraversalCostModelTest {
      * @param length
      * @param back true if this is a reverse edge
      */
-    private PlainStreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
+    private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
         String labelA = vA.getLabel();
         String labelB = vB.getLabel();
         String name = String.format("%s_%s", labelA, labelB);
@@ -283,6 +283,6 @@ public class SimpleTraversalCostModelTest {
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
         StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-        return new PlainStreetEdge(vA, vB, geom, name, length, perm, back);
+        return new StreetEdge(vA, vB, geom, name, length, perm, back);
     }
 }

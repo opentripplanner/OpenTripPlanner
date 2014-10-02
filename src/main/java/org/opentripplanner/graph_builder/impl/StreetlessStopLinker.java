@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.common.IterableLibrary;
+import com.google.common.collect.Iterables;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -60,7 +60,7 @@ public class StreetlessStopLinker implements GraphBuilder {
         StreetVertexIndexService index = new StreetVertexIndexServiceImpl(graph);
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
         
-        for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
+        for (TransitStop ts : Iterables.filter(graph.getVertices(), TransitStop.class)) {
             Coordinate c = ts.getCoordinate();
             LOG.trace("linking stop {}", ts);
             int n = 0;

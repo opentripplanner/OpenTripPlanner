@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -32,6 +31,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -114,10 +114,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         for (Vertex gv : graph.getVertices()) {
             Vertex v = gv;
             /*
-             * We add all edges with geometry, filtering them out after. The overhead compared to
-             * storing only street edges is rather low, as most edges are street-ones anyway.
+             * We add all edges with geometry, skipping transit, filtering them out after. We do not
+             * index transit edges as we do not need them and some GTFS do not have shape data, so
+             * long straight lines between 2 faraway stations will wreck performance on a hash grid
+             * spatial index.
+             * 
+             * If one need to store transit edges in the index, we could improve the hash grid
+             * rasterizing splitting long segments.
              */
             for (Edge e : gv.getOutgoing()) {
+                if (e instanceof PatternEdge)
+                    continue;
                 LineString geometry = e.getGeometry();
                 if (geometry == null) {
                     continue;
@@ -139,8 +146,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     /**
      * Get all transit stops within a given distance of a coordinate
-     * 
-     * @param distance in meters
      */
     @Override
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
@@ -185,7 +190,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 canEscape = true; // Some tests do not supply options.
             } else {
                 TraversalRequirements reqs = new TraversalRequirements(options);
-                for (StreetEdge e : IterableLibrary.filter ( options.arriveBy ? 
+                for (StreetEdge e : Iterables.filter ( options.arriveBy ?
                         intersection.getIncoming() : intersection.getOutgoing(),
                         StreetEdge.class)) {
                     if (reqs.canBeTraversed(e)) {
@@ -335,10 +340,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Envelope envelope = new Envelope(coordinate);
 
         // Collect the extra StreetEdges to consider.
-        Iterable<StreetEdge> extraStreets = IterableLibrary.filter(graph.getTemporaryEdges(),
+        Iterable<StreetEdge> extraStreets = Iterables.filter(graph.getTemporaryEdges(),
                 StreetEdge.class);
         if (extraEdges != null) {
-            extraStreets = Iterables.concat(IterableLibrary.filter(extraEdges, StreetEdge.class),
+            extraStreets = Iterables.concat(Iterables.filter(extraEdges, StreetEdge.class),
                     extraStreets);
         }
 
@@ -419,7 +424,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * 
      * TODO(flamholz): consider deleting.
      * 
-     * @param coordinate Point to get edges near
+     * @param location Point to get edges near
      * @param request RoutingRequest that must be able to traverse the edge (all edges if null)
      * @param extraEdges Any edges not in the graph that might be included (allows trips within one block)
      * @param preferredEdges Any edges to prefer in the search

@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -38,7 +38,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
@@ -80,7 +80,7 @@ public class StreetfulStopLinker implements GraphBuilder {
         EarliestArrivalSPTService earliestArrivalSPTService = new EarliestArrivalSPTService();
         earliestArrivalSPTService.maxDuration = (maxDuration);
 
-        for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
+        for (TransitStop ts : Iterables.filter(graph.getVertices(), TransitStop.class)) {
             // Only link street linkable stops
             if (!ts.isStreetLinkable())
                 continue;
@@ -123,7 +123,7 @@ public class StreetfulStopLinker implements GraphBuilder {
                         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
 
                         for (Edge edge : graphPath.edges) {
-                            if (edge instanceof PlainStreetEdge) {
+                            if (edge instanceof StreetEdge) {
                                 LineString geometry = edge.getGeometry();
 
                                 if (geometry != null) {
@@ -186,7 +186,7 @@ public class StreetfulStopLinker implements GraphBuilder {
         public int terminalFor(State state) {
             Edge edge = state.getBackEdge();
 
-            if (edge instanceof PlainStreetEdge)   return STREET;
+            if (edge instanceof StreetEdge)   return STREET;
             if (edge instanceof StreetTransitLink) return LINK;
 
             return OTHER;

@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -29,8 +29,8 @@ public class IntersectionVertexTest {
 
     private Graph _graph;
 
-    private PlainStreetEdge fromEdge;
-    private PlainStreetEdge straightAheadEdge;
+    private StreetEdge fromEdge;
+    private StreetEdge straightAheadEdge;
     
     @Before
     public void before() {
@@ -50,24 +50,24 @@ public class IntersectionVertexTest {
         StreetVertex broad3 = vertex("broad_3rd", 0.0, 0.0);
 
         // Each block along the main streets has unit length and is one-way
-        PlainStreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
-        PlainStreetEdge maple2_3 = edge(maple2, maple3, 100.0, false);
+        StreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
+        StreetEdge maple2_3 = edge(maple2, maple3, 100.0, false);
 
-        PlainStreetEdge main1_2 = edge(main1, main2, 100.0, false);
-        PlainStreetEdge main2_3 = edge(main2, main3, 100.0, false);
+        StreetEdge main1_2 = edge(main1, main2, 100.0, false);
+        StreetEdge main2_3 = edge(main2, main3, 100.0, false);
 
-        PlainStreetEdge broad1_2 = edge(broad1, broad2, 100.0, false);
-        PlainStreetEdge broad2_3 = edge(broad2, broad3, 100.0, false);
+        StreetEdge broad1_2 = edge(broad1, broad2, 100.0, false);
+        StreetEdge broad2_3 = edge(broad2, broad3, 100.0, false);
 
         // Each cross-street connects
-        PlainStreetEdge maple_main1 = edge(maple1, main1, 50.0, false);
-        PlainStreetEdge main_broad1 = edge(main1, broad1, 100.0, false);
+        StreetEdge maple_main1 = edge(maple1, main1, 50.0, false);
+        StreetEdge main_broad1 = edge(main1, broad1, 100.0, false);
 
-        PlainStreetEdge maple_main2 = edge(maple2, main2, 50.0, false);
-        PlainStreetEdge main_broad2 = edge(main2, broad2, 50.0, false);
+        StreetEdge maple_main2 = edge(maple2, main2, 50.0, false);
+        StreetEdge main_broad2 = edge(main2, broad2, 50.0, false);
 
-        PlainStreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
-        PlainStreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
+        StreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
+        StreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
 
         this.fromEdge = maple1_2;
         this.straightAheadEdge = maple2_3;
@@ -130,7 +130,7 @@ public class IntersectionVertexTest {
      * @param length
      * @param back true if this is a reverse edge
      */
-    private PlainStreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
+    private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
         String labelA = vA.getLabel();
         String labelB = vB.getLabel();
         String name = String.format("%s_%s", labelA, labelB);
@@ -140,6 +140,6 @@ public class IntersectionVertexTest {
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
         StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-        return new PlainStreetEdge(vA, vB, geom, name, length, perm, back);
+        return new StreetEdge(vA, vB, geom, name, length, perm, back);
     }
 }

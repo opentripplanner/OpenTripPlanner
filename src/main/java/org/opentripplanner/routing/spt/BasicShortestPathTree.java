@@ -23,7 +23,7 @@ import java.util.Map;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -80,8 +80,8 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
             return true;
         } else {
             final Edge backEdge = existing.getBackEdge();
-            if (backEdge instanceof PlainStreetEdge) {
-                PlainStreetEdge pseBack = (PlainStreetEdge) backEdge;
+            if (backEdge instanceof StreetEdge) {
+                StreetEdge pseBack = (StreetEdge) backEdge;
                 if (pseBack.hasExplicitTurnRestrictions()) {
                     // If the previous back edge had turn restrictions, we need to continue
                     // the search because the previous path may be prevented by from reaching the end by turn restrictions.
@@ -111,8 +111,8 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
     public boolean visit(State s) {
         final State existing = states.get(s.getVertex());
         final Edge backEdge = existing.getBackEdge();
-        if (backEdge instanceof PlainStreetEdge) {
-            PlainStreetEdge pseBack = (PlainStreetEdge) backEdge;
+        if (backEdge instanceof StreetEdge) {
+            StreetEdge pseBack = (StreetEdge) backEdge;
             if (pseBack.hasExplicitTurnRestrictions()) {
                 // If the previous back edge had turn restrictions, we need to continue
                 // the search because the previous path may be prevented by from reaching the end by turn restrictions.

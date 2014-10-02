@@ -40,7 +40,7 @@ public class PlainStreetEdgeTest {
     public void before() {
         _graph = new Graph();
 
-        v0 = vertex("maple_0th", 0.0, 0.0);
+        v0 = vertex("maple_0th", 0.0, 0.0); // label, X, Y
         v1 = vertex("maple_1st", 2.0, 2.0);
         v2 = vertex("maple_2nd", 1.0, 2.0);
         
@@ -56,7 +56,8 @@ public class PlainStreetEdgeTest {
     
     @Test
     public void testInAndOutAngles() {
-        PlainStreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
+        // An edge heading straight West
+        StreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
         
         // Edge has same first and last angle.
         assertEquals(90, e1.getInAngle());
@@ -66,20 +67,17 @@ public class PlainStreetEdgeTest {
         StreetVertex u = vertex("test1", 2.0, 1.0);
         StreetVertex v = vertex("test2", 2.0, 2.0);
         
-        // Second edge
-        PlainStreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
+        // Second edge, heading straight North
+        StreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
 
-        assertEquals(180, e2.getInAngle());
-        assertEquals(180, e2.getOutAngle());
-        
-        // Difference should be about 90.
-        int diff = (e1.getOutAngle() - e2.getInAngle());
-        assertEquals(-90, diff);
+        // 180 degrees could be expressed as 180 or -180. Our implementation happens to use -180.
+        assertEquals(180, Math.abs(e2.getInAngle()));
+        assertEquals(180, Math.abs(e2.getOutAngle()));
     }
 
     @Test
     public void testTraverseAsPedestrian() {
-        PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
         e1.setCarSpeed(10.0f);
 
         RoutingRequest options = proto.clone();
@@ -90,7 +88,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getLength() / options.walkSpeed;
+        double expectedWeight = e1.getDistance() / options.walkSpeed;
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -98,7 +96,7 @@ public class PlainStreetEdgeTest {
     
     @Test
     public void testTraverseAsCar() {
-        PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
         e1.setCarSpeed(10.0f);
 
         RoutingRequest options = proto.clone();
@@ -109,7 +107,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getLength() / e1.getCarSpeed();
+        double expectedWeight = e1.getDistance() / e1.getCarSpeed();
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -117,7 +115,7 @@ public class PlainStreetEdgeTest {
     
     @Test
     public void testTraverseAsCustomMotorVehicle() {
-        PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
         e1.setCarSpeed(10.0f);
 
         RoutingRequest options = proto.clone();
@@ -128,7 +126,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getLength() / e1.getCarSpeed();
+        double expectedWeight = e1.getDistance() / e1.getCarSpeed();
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -136,7 +134,7 @@ public class PlainStreetEdgeTest {
     
     @Test
     public void testModeSetCanTraverse() {
-        PlainStreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
+        StreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
         
         TraverseModeSet modes = TraverseModeSet.allModes();
         assertTrue(e.canTraverse(modes));
@@ -160,8 +158,8 @@ public class PlainStreetEdgeTest {
      */
     @Test
     public void testTraverseModeSwitchBike() {
-        PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
-        PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
+        StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
         v1.trafficLight = (true);
 
@@ -197,8 +195,8 @@ public class PlainStreetEdgeTest {
      */
     @Test
     public void testTraverseModeSwitchWalk() {
-        PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-        PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
+        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
         v1.trafficLight = (true);
 
@@ -228,9 +226,9 @@ public class PlainStreetEdgeTest {
      */
     @Test
     public void testBikeSwitch() {
-        PlainStreetEdge e0 = edge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
-        PlainStreetEdge e1 = edge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
-        PlainStreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        StreetEdge e0 = edge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
+        StreetEdge e1 = edge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
+        StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
         RoutingRequest noPenalty = proto.clone();
         noPenalty.setMode(TraverseMode.BICYCLE);
@@ -275,8 +273,8 @@ public class PlainStreetEdgeTest {
 
     @Test
     public void testTurnRestriction() {
-        PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
-        PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
+        StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
+        StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
         State state = new State(v2, 0, proto.clone());
 
         state.getOptions().setArriveBy(true);
@@ -289,8 +287,8 @@ public class PlainStreetEdgeTest {
      * Private Methods
      ****/
 
-    private IntersectionVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(_graph, label, lat, lon);
+    private IntersectionVertex vertex(String label, double x, double y) {
+        IntersectionVertex v = new IntersectionVertex(_graph, label, x, y);
         return v;
     }
 
@@ -300,9 +298,8 @@ public class PlainStreetEdgeTest {
      * @param vA
      * @param vB
      * @param length
-     * @param back true if this is a reverse edge
      */
-    private PlainStreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
+    private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
             StreetTraversalPermission perm) {
         String labelA = vA.getLabel();
         String labelB = vB.getLabel();
@@ -312,7 +309,7 @@ public class PlainStreetEdgeTest {
         coords[1] = vB.getCoordinate();
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-        return new PlainStreetEdge(vA, vB, geom, name, length, perm, false);
+        return new StreetEdge(vA, vB, geom, name, length, perm, false);
     }
 
 }

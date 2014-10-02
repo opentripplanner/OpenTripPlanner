@@ -50,7 +50,6 @@ public interface StreetVertexIndexService {
      * Get the closest edges to this location are traversable given these preferences.
      * 
      * @param location
-     * @param prefs Must be able to traverse these edges given these preferences.
      * @param extraEdges Additional edges to consider, may be null
      * @param preferredEdges Edges which are preferred, may be null
      * @param possibleTransitLinksOnly Only include possible transit links.
@@ -66,7 +65,6 @@ public interface StreetVertexIndexService {
      * Convenience wrapper for above.
      * 
      * @param location
-     * @param prefs
      * @return
      */
     public CandidateEdgeBundle getClosestEdges(GenericLocation location,

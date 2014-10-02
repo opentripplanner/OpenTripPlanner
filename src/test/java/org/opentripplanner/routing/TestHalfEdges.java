@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing;
 
-import static org.opentripplanner.common.IterableLibrary.cast;
+import static com.google.common.collect.Iterables.filter;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,7 +33,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
@@ -42,6 +41,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -59,7 +59,7 @@ public class TestHalfEdges extends TestCase {
 
     private GenericAStar aStar = new GenericAStar();
 
-    private PlainStreetEdge top, bottom, left, right, leftBack, rightBack;
+    private StreetEdge top, bottom, left, right, leftBack, rightBack;
 
     private IntersectionVertex br, tr, bl, tl;
 
@@ -83,26 +83,28 @@ public class TestHalfEdges extends TestCase {
         bl = new IntersectionVertex(graph, "bl", -74.01, 40.0);
         br = new IntersectionVertex(graph, "br", -74.00, 40.0);
 
-        top = new PlainStreetEdge(tl, tr,
+        top = new StreetEdge(tl, tr,
                 GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01), "top", 1500,
                 StreetTraversalPermission.ALL, false);
-        bottom = new PlainStreetEdge(br, bl,
+        bottom = new StreetEdge(br, bl,
                 GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0), "bottom", 1500,
                 StreetTraversalPermission.ALL, false);
-        left = new PlainStreetEdge(bl, tl,
+        left = new StreetEdge(bl, tl,
                 GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01), "left", 1500,
                 StreetTraversalPermission.ALL, false);
-        right = new PlainStreetEdge(br, tr,
+        right = new StreetEdge(br, tr,
                 GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500,
                 StreetTraversalPermission.PEDESTRIAN, false);
         
-        PlainStreetEdge topBack = new PlainStreetEdge(tr, tl, (LineString) top.getGeometry()
+        @SuppressWarnings("unused")
+        StreetEdge topBack = new StreetEdge(tr, tl, (LineString) top.getGeometry()
                 .reverse(), "topBack", 1500, StreetTraversalPermission.ALL, true);
-        PlainStreetEdge bottomBack = new PlainStreetEdge(br, bl, (LineString) bottom.getGeometry()
+        @SuppressWarnings("unused")
+        StreetEdge bottomBack = new StreetEdge(br, bl, (LineString) bottom.getGeometry()
                 .reverse(), "bottomBack", 1500, StreetTraversalPermission.ALL, true);
-        leftBack = new PlainStreetEdge(tl, bl, (LineString) left.getGeometry().reverse(),
+        leftBack = new StreetEdge(tl, bl, (LineString) left.getGeometry().reverse(),
                 "leftBack", 1500, StreetTraversalPermission.ALL, true);
-        rightBack = new PlainStreetEdge(tr, br, (LineString) right.getGeometry().reverse(),
+        rightBack = new StreetEdge(tr, br, (LineString) right.getGeometry().reverse(),
                 "rightBack", 1500, StreetTraversalPermission.ALL, true);
 
         Stop s1 = new Stop();
@@ -139,7 +141,7 @@ public class TestHalfEdges extends TestCase {
         turns.add(leftBack);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         HashSet<Edge> endTurns = new HashSet<Edge>();
@@ -147,7 +149,7 @@ public class TestHalfEdges extends TestCase {
         endTurns.add(rightBack);
 
         StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end",
-                cast(endTurns, StreetEdge.class),
+                filter(endTurns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
 
         assertTrue(start.getX() < end.getX());
@@ -211,10 +213,10 @@ public class TestHalfEdges extends TestCase {
 
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         start = StreetLocation.createStreetLocation(graph, "start1", "start1",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation(graph, "end1", "end1",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
 
         options.setRoutingContext(graph, start, end);
@@ -235,10 +237,10 @@ public class TestHalfEdges extends TestCase {
         assertEquals(nEdges, graph.getEdges().size());
 
         start = StreetLocation.createStreetLocation(graph, "start2", "start2",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation(graph, "end2", "end2",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()));
 
         options.setRoutingContext(graph, start, end);
@@ -267,11 +269,11 @@ public class TestHalfEdges extends TestCase {
         turns.add(leftBack);
         
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(left.getGeometry()));
 
         assertEquals(start.getX(), end.getX());
@@ -300,11 +302,11 @@ public class TestHalfEdges extends TestCase {
         turns.add(left);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(left.getGeometry()));
         
         StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         assertEquals(start.getX(), end.getX());
@@ -333,14 +335,15 @@ public class TestHalfEdges extends TestCase {
         turns.add(left);
         turns.add(leftBack);
 
-        Set<Alert> alert = new HashSet<Alert>();
-        alert.add(Alert.createSimpleAlerts("This is the alert"));
+        Alert alert = Alert.createSimpleAlerts("This is the alert");
+        Set<Alert> alerts = new HashSet<>();
+        alerts.add(alert);
 
-        left.setNote(alert);
-        leftBack.setNote(alert);
+        graph.streetNotesService.addStaticNote(left, alert, StreetNotesService.ALWAYS_MATCHER);
+        graph.streetNotesService.addStaticNote(leftBack, alert, StreetNotesService.ALWAYS_MATCHER);
 
         StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         // The alert should be preserved
@@ -357,23 +360,26 @@ public class TestHalfEdges extends TestCase {
             }
         }
 
-        assertEquals(alert, traversedOne.getBackAlerts());
+        assertEquals(alerts, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
 
         // now, make sure wheelchair alerts are preserved
-        Set<Alert> wheelchairAlert = new HashSet<Alert>();
-        wheelchairAlert.add(Alert.createSimpleAlerts("This is the wheelchair alert"));
+        Alert wheelchairAlert = Alert.createSimpleAlerts("This is the wheelchair alert");
+        Set<Alert> wheelchairAlerts = new HashSet<>();
+        wheelchairAlerts.add(wheelchairAlert);
 
-        left.setNote(null);
-        leftBack.setNote(null);
-        left.setWheelchairNote(wheelchairAlert);
-        leftBack.setWheelchairNote(wheelchairAlert);
+        graph.streetNotesService.removeStaticNotes(left);
+        graph.streetNotesService.removeStaticNotes(leftBack);
+        graph.streetNotesService.addStaticNote(left, wheelchairAlert,
+                StreetNotesService.WHEELCHAIR_MATCHER);
+        graph.streetNotesService.addStaticNote(leftBack, wheelchairAlert,
+                StreetNotesService.WHEELCHAIR_MATCHER);
 
         req.setWheelchairAccessible(true);
 
         start = StreetLocation.createStreetLocation(graph, "start", "start",
-                cast(turns, StreetEdge.class),
+                filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         traversedOne = new State((Vertex) start, req);
@@ -385,7 +391,7 @@ public class TestHalfEdges extends TestCase {
             }
         }
 
-        assertEquals(wheelchairAlert, traversedOne.getBackAlerts());
+        assertEquals(wheelchairAlerts, graph.streetNotesService.getNotes(traversedOne));
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
     }

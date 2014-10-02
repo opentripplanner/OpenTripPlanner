@@ -18,11 +18,11 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import com.google.common.collect.Iterables;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.ReversibleLineStringWrapper;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -59,8 +59,8 @@ public class GeometryIndex implements GeometryIndexService {
             throw new IllegalStateException(message);
         }
         Map<ReversibleLineStringWrapper, StreetEdge> edges = Maps.newHashMap();
-        for (StreetVertex vertex : IterableLibrary.filter(graph.getVertices(), StreetVertex.class)) {
-            for (StreetEdge e: IterableLibrary.filter(vertex.getOutgoing(), StreetEdge.class)) {
+        for (StreetVertex vertex : Iterables.filter(graph.getVertices(), StreetVertex.class)) {
+            for (StreetEdge e: Iterables.filter(vertex.getOutgoing(), StreetEdge.class)) {
                 LineString geom = e.getGeometry();
                 if (e.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
                     edges.put(new ReversibleLineStringWrapper(geom), e);

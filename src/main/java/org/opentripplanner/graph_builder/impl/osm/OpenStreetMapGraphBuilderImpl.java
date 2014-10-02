@@ -33,6 +33,7 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
 import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
@@ -55,7 +56,6 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -74,14 +74,14 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -133,9 +133,9 @@ class TurnRestrictionTag {
 
     RepeatingTimePeriod time;
 
-    public List<PlainStreetEdge> possibleFrom = new ArrayList<PlainStreetEdge>();
+    public List<StreetEdge> possibleFrom = new ArrayList<StreetEdge>();
 
-    public List<PlainStreetEdge> possibleTo = new ArrayList<PlainStreetEdge>();
+    public List<StreetEdge> possibleTo = new ArrayList<StreetEdge>();
 
     public TraverseModeSet modes;
 
@@ -725,7 +725,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * The bike safety factor of the safest street
          */
-        private double bestBikeSafety = 1;
+        private float bestBikeSafety = 1.0f;
 
         // track OSM nodes which are decomposed into multiple graph vertices because they are
         // elevators. later they will be iterated over to build ElevatorEdges between them.
@@ -793,12 +793,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         LOG.warn("No to edge found for " + restrictionTag);
                         continue;
                     }
-                    for (PlainStreetEdge from : restrictionTag.possibleFrom) {
+                    for (StreetEdge from : restrictionTag.possibleFrom) {
                         if (from == null) {
                             LOG.warn("from-edge is null in turn " + restrictionTag);
                             continue;
                         }
-                        for (PlainStreetEdge to : restrictionTag.possibleTo) {
+                        for (StreetEdge to : restrictionTag.possibleTo) {
                             if (from == null || to == null) {
                                 continue;
                             }
@@ -1494,7 +1494,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (edges.size() == 0)
                 return;
             TraverseMode mode;
-            PlainStreetEdge firstEdge = (PlainStreetEdge) edges.iterator().next();
+            StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
 
             if (firstEdge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
                 mode = TraverseMode.WALK;
@@ -1521,6 +1521,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             for (Edge edge : edges) {
                 if (!usedEdges.contains(edge)) {
+                    graph.streetNotesService.removeStaticNotes(edge);
                     edge.detach();
                 }
             }
@@ -1666,11 +1667,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             elevationData.put(endEndpoint, elevation);
                         }
                     }
-                    P2<PlainStreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
+                    P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
-                    PlainStreetEdge street = streets.getFirst();
-                    PlainStreetEdge backStreet = streets.getSecond();
+                    StreetEdge street = streets.getFirst();
+                    StreetEdge backStreet = streets.getSecond();
                     applyWayProperties(street, backStreet, wayData, way);
 
                     applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -1680,24 +1681,21 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             } // END loop over OSM ways
         }
 
-        private void applyWayProperties(PlainStreetEdge street, PlainStreetEdge backStreet,
+        private void applyWayProperties(StreetEdge street, StreetEdge backStreet,
                                         WayProperties wayData, OSMWithTags way) {
 
-            Set<Alert> note = wayPropertySet.getNoteForWay(way);
-            Set<Alert> wheelchairNote = getWheelchairNotes(way);
+            Set<T2<Alert, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().getFirst();
-                street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
+                street.setBicycleSafetyFactor((float)safety);
                 if (safety < bestBikeSafety) {
-                    bestBikeSafety = safety;
+                    bestBikeSafety = (float)safety;
                 }
-                if (note != null) {
-                    street.setNote(note);
-                }
-                if (wheelchairNote != null) {
-                    street.setWheelchairNote(wheelchairNote);
+                if (notes != null) {
+                    for (T2<Alert, NoteMatcher> note : notes)
+                        graph.streetNotesService.addStaticNote(street, note.getFirst(), note.getSecond());
                 }
                 street.setNoThruTraffic(noThruTraffic);
             }
@@ -1705,14 +1703,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (backStreet != null) {
                 double safety = wayData.getSafetyFeatures().getSecond();
                 if (safety < bestBikeSafety) {
-                    bestBikeSafety = safety;
+                    bestBikeSafety = (float)safety;
                 }
-                backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
-                if (note != null) {
-                    backStreet.setNote(note);
-                }
-                if (wheelchairNote != null) {
-                    backStreet.setWheelchairNote(wheelchairNote);
+                backStreet.setBicycleSafetyFactor((float)safety);
+                if (notes != null) {
+                    for (T2<Alert, NoteMatcher> note : notes)
+                        graph.streetNotesService.addStaticNote(backStreet, note.getFirst(),
+                                note.getSecond());
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
@@ -1807,7 +1804,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private void applyEdgesToTurnRestrictions(OSMWay way, long startNode, long endNode,
-                                                  PlainStreetEdge street, PlainStreetEdge backStreet) {
+                                                  StreetEdge street, StreetEdge backStreet) {
             /* Check if there are turn restrictions starting on this segment */
             Collection<TurnRestrictionTag> restrictionTags = turnRestrictionsByFromWay.get(way.getId());
 
@@ -1897,28 +1894,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        private Set<Alert> getWheelchairNotes(OSMWithTags way) {
-            Map<String, String> tags = way.getTagsByPrefix("wheelchair:description");
-            if (tags == null) {
-                return null;
-            }
-            Set<Alert> alerts = new HashSet<Alert>();
-            Alert alert = new Alert();
-            alerts.add(alert);
-            for (Map.Entry<String, String> entry : tags.entrySet()) {
-                String k = entry.getKey();
-                String v = entry.getValue();
-                if (k.equals("wheelchair:description")) {
-                    // no language, assume default from TranslatedString
-                    alert.alertHeaderText = new TranslatedString(v);
-                } else {
-                    String lang = k.substring("wheelchair:description:".length());
-                    alert.alertHeaderText = new TranslatedString(lang, v);
-                }
-            }
-            return alerts;
-        }
-
         /**
          * The safest bike lane should have a safety weight no lower than the time weight of a flat street. This method divides the safety lengths by
          * the length ratio of the safest street, ensuring this property.
@@ -1942,27 +1917,25 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                     / bestBikeSafety);
                         }
                     }
-                    if (!(e instanceof PlainStreetEdge)) {
+                    if (!(e instanceof StreetEdge)) {
                         continue;
                     }
-                    PlainStreetEdge pse = (PlainStreetEdge) e;
+                    StreetEdge pse = (StreetEdge) e;
 
                     if (!seenEdges.contains(e)) {
                         seenEdges.add(e);
-                        pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength()
-                                / bestBikeSafety);
+                        pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
                     }
                 }
                 for (Edge e : vertex.getIncoming()) {
-                    if (!(e instanceof PlainStreetEdge)) {
+                    if (!(e instanceof StreetEdge)) {
                         continue;
                     }
-                    PlainStreetEdge pse = (PlainStreetEdge) e;
+                    StreetEdge pse = (StreetEdge) e;
 
                     if (!seenEdges.contains(e)) {
                         seenEdges.add(e);
-                        pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength()
-                                / bestBikeSafety);
+                        pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
                     }
                 }
             }
@@ -2487,16 +2460,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param end
          * @param start
          */
-        private P2<PlainStreetEdge> getEdgesForStreet(IntersectionVertex start,
+        private P2<StreetEdge> getEdgesForStreet(IntersectionVertex start,
                                                       IntersectionVertex end, OSMWay way, int index, long startNode, long endNode,
                                                       StreetTraversalPermission permissions, LineString geometry) {
             // No point in returning edges that can't be traversed by anyone.
             if (permissions.allowsNothing()) {
-                return new P2<PlainStreetEdge>(null, null);
+                return new P2<StreetEdge>(null, null);
             }
 
             LineString backGeometry = (LineString) geometry.reverse();
-            PlainStreetEdge street = null, backStreet = null;
+            StreetEdge street = null, backStreet = null;
             double length = this.getGeometryLengthMeters(geometry);
 
             P2<StreetTraversalPermission> permissionPair = getPermissions(permissions, way);
@@ -2520,7 +2493,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     backStreet.setRoundabout(true);
             }
 
-            return new P2<PlainStreetEdge>(street, backStreet);
+            return new P2<StreetEdge>(street, backStreet);
         }
 
         /**
@@ -2565,7 +2538,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
         }
 
-        private PlainStreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
+        private StreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
                                                  OSMWay way, int index, long startNode, long endNode, double length,
                                                  StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
@@ -2581,7 +2554,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
-            PlainStreetEdge street = edgeFactory.createEdge(_nodes.get(startNode),
+            StreetEdge street = edgeFactory.createEdge(_nodes.get(startNode),
                     _nodes.get(endNode), way, start, end, geometry, name, length, permissions,
                     back, carSpeed);
 
@@ -2608,11 +2581,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 street.setHasBogusName(true);
             }
             street.setStairs(steps);
-
-            if (way.isTagTrue("toll") || way.isTagTrue("toll:motorcar"))
-                street.setToll(true);
-            else
-                street.setToll(false);
 
             /* TODO: This should probably generalized somehow? */
             if (!ignoreWheelchairAccessibility

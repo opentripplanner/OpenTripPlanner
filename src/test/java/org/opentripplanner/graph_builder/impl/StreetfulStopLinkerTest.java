@@ -22,7 +22,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -37,7 +37,6 @@ import com.vividsolutions.jts.geom.LineString;
 public class StreetfulStopLinkerTest {
     @Test
     public final void testStreetfulStopLinker() {
-        final Boolean results[] = new Boolean[4];
         final double speed = new RoutingRequest().walkSpeed;
 
         Graph graph = new Graph();
@@ -103,13 +102,13 @@ public class StreetfulStopLinkerTest {
         LineString lineStringAD = new LineString(coordinatesAD, geometryFactory);
 
         // Powers of 2 avoid complications related to floating point arithmetic
-        new PlainStreetEdge(intersectionA, intersectionB, lineStringAB, "Edge AB", 2 * speed,
+        new StreetEdge(intersectionA, intersectionB, lineStringAB, "Edge AB", 2 * speed,
                 StreetTraversalPermission.ALL, false, 0);
-        new PlainStreetEdge(intersectionB, intersectionC, lineStringBC, "Edge BC", 4 * speed,
+        new StreetEdge(intersectionB, intersectionC, lineStringBC, "Edge BC", 4 * speed,
                 StreetTraversalPermission.ALL, false, 0);
-        new PlainStreetEdge(intersectionC, intersectionD, lineStringCD, "Edge CD", 8 * speed,
+        new StreetEdge(intersectionC, intersectionD, lineStringCD, "Edge CD", 8 * speed,
                 StreetTraversalPermission.ALL, false, 0);
-        new PlainStreetEdge(intersectionA, intersectionD, lineStringAD, "Edge AD", 16 * speed,
+        new StreetEdge(intersectionA, intersectionD, lineStringAD, "Edge AD", 16 * speed,
                 StreetTraversalPermission.ALL, false, 0);
 
         StreetfulStopLinker streetfulStopLinker = new StreetfulStopLinker();
@@ -123,15 +122,17 @@ public class StreetfulStopLinkerTest {
         assertEquals(9, graph.countEdges());
 
         // The duration of the longest path (A => D) is 16 seconds
-        streetfulStopLinker.maxDuration = 16;
+        streetfulStopLinker.maxDuration = 18;
         streetfulStopLinker.buildGraph(graph, null);
         assertEquals(13, graph.countEdges());
         assertEquals(9, graph.countVertices());
 
+        final double results[] = new double[4];
         for (Edge edge : graph.getEdges()) {
             if (edge instanceof SimpleTransfer) {
                 assertEquals(transitStopA, edge.getFromVertex());
                 assertNotSame(transitStopA, edge.getToVertex());
+                double EPSILON_D = 0.1;
                 if (edge.getToVertex().equals(transitStopB)) {
                     LineString lineString = edge.getGeometry();
                     assertEquals(2, lineString.getNumPoints());
@@ -139,7 +140,7 @@ public class StreetfulStopLinkerTest {
                     assertEquals(1.0, lineString.getPointN(0).getY(), 0.0);
                     assertEquals(1.0, lineString.getPointN(1).getX(), 0.0);
                     assertEquals(2.0, lineString.getPointN(1).getY(), 0.0);
-                    results[0] = (edge.getDistance() == 2.0 * speed);
+                    results[0] = edge.getDistance();
                 }
                 if (edge.getToVertex().equals(transitStopC)) {
                     LineString lineString = edge.getGeometry();
@@ -150,7 +151,7 @@ public class StreetfulStopLinkerTest {
                     assertEquals(2.0, lineString.getPointN(1).getY(), 0.0);
                     assertEquals(2.0, lineString.getPointN(2).getX(), 0.0);
                     assertEquals(2.0, lineString.getPointN(2).getY(), 0.0);
-                    results[1] = (edge.getDistance() == 6.0 * speed);
+                    results[1] = edge.getDistance();
                 }
                 if (edge.getToVertex().equals(transitStopD)) {
                     LineString lineString = edge.getGeometry();
@@ -163,7 +164,7 @@ public class StreetfulStopLinkerTest {
                     assertEquals(2.0, lineString.getPointN(2).getY(), 0.0);
                     assertEquals(2.0, lineString.getPointN(3).getX(), 0.0);
                     assertEquals(1.0, lineString.getPointN(3).getY(), 0.0);
-                    results[2] = (edge.getDistance() == 14.0 * speed);
+                    results[2] = edge.getDistance();
                 }
                 if (edge.getToVertex().equals(transitStopE)) {
                     LineString lineString = edge.getGeometry();
@@ -172,11 +173,14 @@ public class StreetfulStopLinkerTest {
                     assertEquals(1.0, lineString.getPointN(0).getY(), 0.0);
                     assertEquals(1.0, lineString.getPointN(1).getX(), 0.0);
                     assertEquals(1.0, lineString.getPointN(1).getY(), 0.0);
-                    results[3] = (edge.getDistance() == 0.0 * speed);
+                    results[3] = edge.getDistance();
                 }
             }
         }
-
-        assertArrayEquals(new Boolean[] {true, true, true, true}, results);
+        // TODO confirm with author that we are checking these all at the end to make sure each conditional was hit.
+        assertEquals(results[0],  2.0 * speed, 0.001); // street length quantum is the millimeter
+        assertEquals(results[1],  6.0 * speed, 0.001);
+        assertEquals(results[2], 14.0 * speed, 0.001);
+        assertEquals(results[3],  0.0 * speed, 0.001);
     }
 }

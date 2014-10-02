@@ -18,13 +18,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.opentripplanner.common.IterableLibrary;
+import com.google.common.collect.Iterables;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
@@ -66,7 +65,8 @@ public class NetworkLinker {
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
 
-        for (TransitStop ts : IterableLibrary.filter(vertices, TransitStop.class)) {
+        int nUnlinked = 0;
+        for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;
@@ -82,9 +82,13 @@ public class NetworkLinker {
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible).getResult()) {
-                    LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
+                    LOG.debug(graph.addBuilderAnnotation(new StopUnlinked(ts)));
+                    nUnlinked += 1;
                 }
             }
+        }
+        if (nUnlinked > 0) {
+            LOG.warn("{} transit stops were not close enough to the street network to be connected to it.", nUnlinked);
         }
         //remove replaced edges
         for (HashSet<StreetEdge> toRemove : networkLinkerLibrary.replacements.keySet()) {
@@ -94,15 +98,15 @@ public class NetworkLinker {
             }
         }
         //and add back in replacements
-        for (LinkedList<P2<PlainStreetEdge>> toAdd : networkLinkerLibrary.replacements.values()) {
-            for (P2<PlainStreetEdge> edges : toAdd) {
-                PlainStreetEdge edge1 = edges.getFirst();
+        for (LinkedList<P2<StreetEdge>> toAdd : networkLinkerLibrary.replacements.values()) {
+            for (P2<StreetEdge> edges : toAdd) {
+                StreetEdge edge1 = edges.getFirst();
                 if (edge1.getToVertex().getLabel().startsWith("split ") || edge1.getFromVertex().getLabel().startsWith("split ")) {
                     continue;
                 }
                 edge1.getFromVertex().addOutgoing(edge1);
                 edge1.getToVertex().addIncoming(edge1);
-                PlainStreetEdge edge2 = edges.getSecond();
+                StreetEdge edge2 = edges.getSecond();
                 if (edge2 != null) {
                     edge2.getFromVertex().addOutgoing(edge2);
                     edge2.getToVertex().addIncoming(edge2);
@@ -113,7 +117,7 @@ public class NetworkLinker {
         FindMaxWalkDistances.find(graph);
 
         LOG.debug("Linking bike rental stations...");
-        for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
+        for (BikeRentalStationVertex brsv : Iterables.filter(vertices,
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Iterables;
+
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -29,8 +30,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.PartialStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -215,26 +215,22 @@ public class StreetLocation extends StreetVertex {
         double totalGeomLength = geometry.getLength();
         double lengthRatioIn = geometries.getFirst().getLength() / totalGeomLength;
 
-        double lengthIn = street.getLength() * lengthRatioIn;
-        double lengthOut = street.getLength() * (1 - lengthRatioIn);
+        double lengthIn = street.getDistance() * lengthRatioIn;
+        double lengthOut = street.getDistance() * (1 - lengthRatioIn);
 
-        PlainStreetEdge newLeft = new PartialPlainStreetEdge(street, fromv, base,
+        StreetEdge newLeft = new PartialStreetEdge(street, fromv, base,
                 geometries.getFirst(), name, lengthIn);
-        PlainStreetEdge newRight = new PartialPlainStreetEdge(street, base, tov,
+        StreetEdge newRight = new PartialStreetEdge(street, base, tov,
                 geometries.getSecond(), name, lengthOut);
 
         newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
         newLeft.setNoThruTraffic(street.isNoThruTraffic());
         newLeft.setStreetClass(street.getStreetClass());
-        newLeft.setWheelchairNote(street.getWheelchairNotes());
-        newLeft.setNote(street.getNotes());
 
         newRight.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut),
                 false);
         newRight.setStreetClass(street.getStreetClass());
         newRight.setNoThruTraffic(street.isNoThruTraffic());
-        newRight.setWheelchairNote(street.getWheelchairNotes());
-        newRight.setNote(street.getNotes());
         
         // Copy turn restrictions onto the outgoing half-edge.
         for (TurnRestriction turnRestriction : street.getTurnRestrictions()) {
@@ -320,7 +316,7 @@ public class StreetLocation extends StreetVertex {
      * all temporary edges after they are created.
      */
     public void setTemporaryEdgeVisibility(RoutingContext rctx) {
-        for (PartialPlainStreetEdge ppse : Iterables.filter(this.extra, PartialPlainStreetEdge.class)) {
+        for (PartialStreetEdge ppse : Iterables.filter(this.extra, PartialStreetEdge.class)) {
             ppse.visibleTo = rctx;
         }
         // There are other temporary edges (FreeEdges) but it's a rabbit hole...

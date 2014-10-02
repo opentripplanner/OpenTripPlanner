@@ -28,16 +28,8 @@ import static org.mockito.Mockito.when;
 
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PreAlightEdge;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.StationStopEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TimedTransferEdge;
-import org.opentripplanner.routing.edgetype.TransferEdge;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.impl.LongDistancePathService.Parser;
 import org.opentripplanner.routing.vertextype.TransitStation;
@@ -52,7 +44,7 @@ public class LongDistancePathServiceTest {
         State emptyState = mock(State.class);
 
         State streetState = mock(State.class);
-        when(streetState.getBackEdge()).thenReturn(mock(PlainStreetEdge.class));
+        when(streetState.getBackEdge()).thenReturn(mock(StreetEdge.class));
 
         State linkState = mock(State.class);
         when(linkState.getBackEdge()).thenReturn(mock(StreetTransitLink.class));
@@ -97,16 +89,16 @@ public class LongDistancePathServiceTest {
 
         { // Test street only path (allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(PlainStreetEdge.class);
-            path.add(PlainStreetEdge.class);
-            path.add(PlainStreetEdge.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
+            path.add(StreetEdge.class);
+            path.add(StreetEdge.class);
+            path.add(StreetEdge.class);
             assertTrue(parsePath(parser, path));
         }
 
         { // Test street-transit-street (allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(PreBoardEdge.class);
             path.add(TransitBoardAlight.class);
@@ -114,7 +106,7 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             assertTrue(parsePath(parser, path));
         }
 
@@ -125,7 +117,7 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             assertTrue(parsePath(parser, path));
         }
 
@@ -140,7 +132,7 @@ public class LongDistancePathServiceTest {
 
         { // Test street-transit-street-transit-street (not allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(PreBoardEdge.class);
             path.add(TransitBoardAlight.class);
@@ -148,7 +140,7 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(PreBoardEdge.class);
             path.add(TransitBoardAlight.class);
@@ -156,13 +148,13 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             assertFalse(parsePath(parser, path));
         }
 
         { // Test street-transit-transfer-transit-street (allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(PreBoardEdge.class);
             path.add(TransitBoardAlight.class);
@@ -176,13 +168,13 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             assertTrue(parsePath(parser, path));
         }
 
         { // Test street-transit-transfer-transfer-transit-street (not allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(PreBoardEdge.class);
             path.add(TransitBoardAlight.class);
@@ -197,13 +189,13 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             assertFalse(parsePath(parser, path));
         }
 
         { // Test street-transit-simpletransfer-transit-street (allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(PreBoardEdge.class);
             path.add(TransitBoardAlight.class);
@@ -217,13 +209,13 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             assertTrue(parsePath(parser, path));
         }
 
         { // Test street-transit-timed transfer-transit-street (allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(PreBoardEdge.class);
             path.add(TransitBoardAlight.class);
@@ -235,13 +227,13 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             assertTrue(parsePath(parser, path));
         }
 
         { // Test street-transit (allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(PreBoardEdge.class);
             path.add(TransitBoardAlight.class);
@@ -267,7 +259,7 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
             assertTrue(parsePath(parser, path));
         }
 
@@ -353,9 +345,9 @@ public class LongDistancePathServiceTest {
             path.add(TransitBoardAlight.class);
             path.add(PreAlightEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
-            path.add(PlainStreetEdge.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
+            path.add(StreetEdge.class);
+            path.add(StreetEdge.class);
             assertTrue(parsePath(parser, path));
         }
 
@@ -363,9 +355,9 @@ public class LongDistancePathServiceTest {
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
             path.add(StationStopEdge.class);
             path.add(StreetTransitLink.class);
-            path.add(PlainStreetEdge.class);
-            path.add(PlainStreetEdge.class);
-            path.add(PlainStreetEdge.class);
+            path.add(StreetEdge.class);
+            path.add(StreetEdge.class);
+            path.add(StreetEdge.class);
             path.add(StreetTransitLink.class);
             path.add(StationStopEdge.class);
             assertTrue(parsePath(parser, path));

@@ -20,7 +20,7 @@ import static org.opentripplanner.routing.automata.Nonterminal.star;
 import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 
 /**
  * Reject non-walking trips that use no-thru-traffic streets
@@ -50,8 +50,8 @@ public class NoThruTrafficPathParser extends PathParser {
 
     @Override
     public int terminalFor(State state) {
-        if (state.getBackEdge() instanceof PlainStreetEdge) {
-            if (((PlainStreetEdge)state.getBackEdge()).isNoThruTraffic()) {
+        if (state.getBackEdge() instanceof StreetEdge) {
+            if (((StreetEdge)state.getBackEdge()).isNoThruTraffic()) {
                 return NOTRAFFIC;
             } else {
                 return REGULAR;

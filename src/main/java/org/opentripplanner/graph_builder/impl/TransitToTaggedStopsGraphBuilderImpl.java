@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.impl;
 
+import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Envelope;
-import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -46,7 +46,7 @@ public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
         ArrayList<Vertex> vertices = new ArrayList<>();
         vertices.addAll(graph.getVertices());
 
-        for (TransitStop ts : IterableLibrary.filter(vertices, TransitStop.class)) {
+        for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;

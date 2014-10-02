@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import com.google.common.collect.Iterables;
 import org.geotools.referencing.GeodeticCalculator;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -216,7 +216,7 @@ public class GraphStats {
             try {
                 writer.writeRecord( new String[] {"route", "distance", "time", "speed"} );
                 for (Vertex v : graph.getVertices()) {
-                    for (PatternHop ph : IterableLibrary.filter(v.getOutgoing(), PatternHop.class)) {
+                    for (PatternHop ph : Iterables.filter(v.getOutgoing(), PatternHop.class)) {
                         // Vertex fromv = ph.getFromVertex();
                         // Vertex tov = ph.getToVertex();
                         double distance = ph.getDistance();
@@ -260,7 +260,7 @@ public class GraphStats {
                         "cumulativeTrips", "empiricalDistTrips" } );
                 Set<TripPattern> patterns = new HashSet<TripPattern>();
                 for (Vertex v : graph.getVertices()) {
-                    for (PatternHop ph : IterableLibrary.filter(v.getOutgoing(), PatternHop.class)) {
+                    for (PatternHop ph : Iterables.filter(v.getOutgoing(), PatternHop.class)) {
                         TripPattern ttp = ph.getPattern();
                         patterns.add(ttp);
                     }

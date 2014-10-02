@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -33,9 +32,8 @@ import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -164,9 +162,9 @@ public class LinkRequest {
 
         // Has this set of original edges already been replaced by split edges?
         HashSet<StreetEdge> edgeSet = new HashSet<StreetEdge>(edges);
-        LinkedList<P2<PlainStreetEdge>> replacement = linker.replacements.get(edgeSet);
+        LinkedList<P2<StreetEdge>> replacement = linker.replacements.get(edgeSet);
         if (replacement == null) {
-            replacement = new LinkedList<P2<PlainStreetEdge>>();
+            replacement = new LinkedList<P2<StreetEdge>>();
             Iterator<StreetEdge> iter = edges.iterator();
             StreetEdge first = iter.next();
             StreetEdge second = null;
@@ -176,13 +174,13 @@ public class LinkRequest {
                     second = edge;
                 }
             }
-            PlainStreetEdge secondClone;
+            StreetEdge secondClone;
             if (second == null) {
                 secondClone = null;
             } else {
-                secondClone = ((PlainStreetEdge) second).clone();
+                secondClone = ((StreetEdge) second).clone();
             }
-            P2<PlainStreetEdge> newEdges = new P2<PlainStreetEdge>(((PlainStreetEdge) first).clone(), secondClone); 
+            P2<StreetEdge> newEdges = new P2<StreetEdge>(((StreetEdge) first).clone(), secondClone);
             replacement.add(newEdges);
             linker.replacements.put(edgeSet, replacement);
         }
@@ -190,10 +188,10 @@ public class LinkRequest {
         // If the original replacement edge pair has already been split,
         // decide out which sub-segment the current coordinate lies on.
         double bestDist = Double.MAX_VALUE;
-        P2<PlainStreetEdge> bestPair = null;
+        P2<StreetEdge> bestPair = null;
         Point p = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-        for (P2<PlainStreetEdge> pair : replacement) {
-            PlainStreetEdge e1 = pair.getFirst();
+        for (P2<StreetEdge> pair : replacement) {
+            StreetEdge e1 = pair.getFirst();
             double dist = e1.getGeometry().distance(p);
             if (dist < bestDist) {
                 bestDist = dist;
@@ -209,11 +207,11 @@ public class LinkRequest {
      * Split a matched (bidirectional) pair of edges at the given coordinate, unless the coordinate is
      * very close to one of the existing endpoints. Returns the vertices located at the split point.
      */
-    private Collection<StreetVertex> split(LinkedList<P2<PlainStreetEdge>> replacement, String label,
-            P2<PlainStreetEdge> bestPair, Coordinate coordinate) {
+    private Collection<StreetVertex> split(LinkedList<P2<StreetEdge>> replacement, String label,
+            P2<StreetEdge> bestPair, Coordinate coordinate) {
 
-        PlainStreetEdge e1 = bestPair.getFirst();
-        PlainStreetEdge e2 = bestPair.getSecond();
+        StreetEdge e1 = bestPair.getFirst();
+        StreetEdge e2 = bestPair.getSecond();
 
         String name = e1.getName();
         StreetVertex e1v1 = (StreetVertex) e1.getFromVertex();
@@ -260,16 +258,16 @@ public class LinkRequest {
             return out;
         }
 
-        double lengthIn  = e1.getLength() * lengthRatioIn;
-        double lengthOut = e1.getLength() * (1 - lengthRatioIn);
+        double lengthIn  = e1.getDistance() * lengthRatioIn;
+        double lengthOut = e1.getDistance() * (1 - lengthRatioIn);
 
         // Split each edge independently. If a only one splitter vertex is used, routing may take 
         // shortcuts thought the splitter vertex to avoid turn penalties.
         IntersectionVertex e1midpoint = new IntersectionVertex(linker.graph, "split 1 at " + label, midCoord.x, midCoord.y, name);
         // We are replacing two edges with four edges
-        PlainStreetEdge forward1 = new PlainStreetEdge(e1v1, e1midpoint, toMidpoint, name, lengthIn,
+        StreetEdge forward1 = new StreetEdge(e1v1, e1midpoint, toMidpoint, name, lengthIn,
                 e1.getPermission(), false);
-        PlainStreetEdge forward2 = new PlainStreetEdge(e1midpoint, e1v2,
+        StreetEdge forward2 = new StreetEdge(e1midpoint, e1v2,
                 forwardGeometryPair.getSecond(), name, lengthOut, e1.getPermission(), true);
 
         if (e1 instanceof AreaEdge) {
@@ -278,42 +276,38 @@ public class LinkRequest {
 
         addEdges(forward1, forward2);
 
-        PlainStreetEdge backward1 = null;
-        PlainStreetEdge backward2 = null;
+        StreetEdge backward1 = null;
+        StreetEdge backward2 = null;
         IntersectionVertex e2midpoint = null;
         if (e2 != null) {
             e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord.x, midCoord.y, name);
-            backward1 = new PlainStreetEdge(e2v1, e2midpoint, backGeometryPair.getFirst(),
+            backward1 = new StreetEdge(e2v1, e2midpoint, backGeometryPair.getFirst(),
                     name, lengthOut, e2.getPermission(), false);
-            backward2 = new PlainStreetEdge(e2midpoint, e2v2, backGeometryPair.getSecond(),
+            backward2 = new StreetEdge(e2midpoint, e2v2, backGeometryPair.getSecond(),
                     name, lengthIn, e2.getPermission(), true);
             if (e2 instanceof AreaEdge) {
                 ((AreaEdge) e2).getArea().addVertex(e2midpoint, linker.graph);
             }
-            double backwardBseLengthIn = e2.getBicycleSafetyEffectiveLength() * lengthRatioIn;
-            double backwardBseLengthOut = e2.getBicycleSafetyEffectiveLength() * (1 - lengthRatioIn);
-            backward1.setBicycleSafetyEffectiveLength(backwardBseLengthIn);
-            backward2.setBicycleSafetyEffectiveLength(backwardBseLengthOut);
+            backward1.setBicycleSafetyFactor(e2.getBicycleSafetyFactor());
+            backward2.setBicycleSafetyFactor(e2.getBicycleSafetyFactor());
             backward1.setElevationProfile(e2.getElevationProfile(0, lengthOut), false);
             backward2.setElevationProfile(e2.getElevationProfile(lengthIn, totalGeomLength), false);
             addEdges(backward1, backward2);
         }
 
-        double forwardBseLengthIn = e1.getBicycleSafetyEffectiveLength() * lengthRatioIn;
-        double forwardBseLengthOut = e1.getBicycleSafetyEffectiveLength() * (1 - lengthRatioIn);
-        forward1.setBicycleSafetyEffectiveLength(forwardBseLengthIn);
-        forward2.setBicycleSafetyEffectiveLength(forwardBseLengthOut);
+        forward1.setBicycleSafetyFactor(e1.getBicycleSafetyFactor());
+        forward2.setBicycleSafetyFactor(e1.getBicycleSafetyFactor());
 
         forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn), false);
         forward2.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength), false);
 
         // swap the new split edge into the replacements list, and remove the old ones
-        ListIterator<P2<PlainStreetEdge>> it = replacement.listIterator();
+        ListIterator<P2<StreetEdge>> it = replacement.listIterator();
         while (it.hasNext()) {
-            P2<PlainStreetEdge> pair = it.next();
+            P2<StreetEdge> pair = it.next();
             if (pair == bestPair) {
-                it.set(new P2<PlainStreetEdge>(forward1, backward2));
-                it.add(new P2<PlainStreetEdge>(forward2, backward1));
+                it.set(new P2<StreetEdge>(forward1, backward2));
+                it.add(new P2<StreetEdge>(forward2, backward1));
                 break;
             }
         }

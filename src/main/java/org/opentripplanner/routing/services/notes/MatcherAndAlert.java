@@ -11,22 +11,34 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.routing.services.notes;
+
+import java.io.Serializable;
+
+import org.opentripplanner.routing.alertpatch.Alert;
 
 /**
- * Defines which OSM ways get notes and what kind of notes they get.
+ * A container for a pair (note matcher, note).
  * 
- * @author novalis
- * 
+ * @author laurent
  */
-public class NotePicker {
+public class MatcherAndAlert implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    public OSMSpecifier specifier;
+    public MatcherAndAlert(NoteMatcher matcher, Alert note) {
+        this.matcher = matcher;
+        this.note = note;
+    }
 
-    public NoteProperties noteProperties;
+    private NoteMatcher matcher;
 
-    public NotePicker(OSMSpecifier specifier, NoteProperties noteProperties) {
-        this.specifier = specifier;
-        this.noteProperties = noteProperties;
+    private Alert note;
+
+    public NoteMatcher getMatcher() {
+        return matcher;
+    }
+
+    public Alert getNote() {
+        return note;
     }
 }

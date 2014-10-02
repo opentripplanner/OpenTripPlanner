@@ -24,11 +24,8 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -46,11 +43,11 @@ public class TestBikeRental extends TestCase {
         StreetVertex v3 = new IntersectionVertex(graph, "v3", -77.0492, 38.858, "v3");
 
         @SuppressWarnings("unused")
-        Edge walk = new PlainStreetEdge(v1, v2, GeometryUtils.makeLineString(-77.0492, 38.856,
+        Edge walk = new StreetEdge(v1, v2, GeometryUtils.makeLineString(-77.0492, 38.856,
                 -77.0492, 38.857), "S. Crystal Dr", 87, StreetTraversalPermission.PEDESTRIAN, false);
 
         @SuppressWarnings("unused")
-        Edge mustBike = new PlainStreetEdge(v2, v3, GeometryUtils.makeLineString(-77.0492, 38.857,
+        Edge mustBike = new StreetEdge(v2, v3, GeometryUtils.makeLineString(-77.0492, 38.857,
                 -77.0492, 38.858), "S. Crystal Dr", 87, StreetTraversalPermission.BICYCLE, false);
 
         GenericAStar aStar = new GenericAStar();

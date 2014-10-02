@@ -27,8 +27,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.PartialStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
@@ -146,7 +146,7 @@ public class RoutingContext implements Cloneable {
     /**
      * Returns the PlainStreetEdges that overlap between two vertices edge sets.
      */
-    private Set<PlainStreetEdge> overlappingPlainStreetEdges(Vertex u, Vertex v) {
+    private Set<StreetEdge> overlappingPlainStreetEdges(Vertex u, Vertex v) {
         Set<Integer> vIds = new HashSet<Integer>();
         Set<Integer> uIds = new HashSet<Integer>();
         for (Edge e : Iterables.concat(v.getIncoming(), v.getOutgoing())) {
@@ -161,14 +161,14 @@ public class RoutingContext implements Cloneable {
         Set<Integer> overlappingIds = uIds;
 
         // Fetch the edges by ID - important so we aren't stuck with temporary edges.
-        Set<PlainStreetEdge> overlap = new HashSet<PlainStreetEdge>();
+        Set<StreetEdge> overlap = new HashSet<StreetEdge>();
         for (Integer id : overlappingIds) {
             Edge e = graph.getEdgeById(id);
-            if (e == null || !(e instanceof PlainStreetEdge)) {
+            if (e == null || !(e instanceof StreetEdge)) {
                 continue;
             }
 
-            overlap.add((PlainStreetEdge) e);
+            overlap.add((StreetEdge) e);
         }
         return overlap;
     }
@@ -178,7 +178,7 @@ public class RoutingContext implements Cloneable {
      * 
      * Orders the endpoints u, v so that they are consistent with the direction of the edge e.
      */
-    private PartialPlainStreetEdge makePartialEdgeAlong(PlainStreetEdge e, StreetVertex u,
+    private PartialStreetEdge makePartialEdgeAlong(StreetEdge e, StreetVertex u,
             StreetVertex v) {
         DistanceLibrary dLib = SphericalDistanceLibrary.getInstance();
 
@@ -200,10 +200,10 @@ public class RoutingContext implements Cloneable {
                 second.getCoordinate());
 
         double lengthRatio = myGeom.getLength() / parentGeom.getLength();
-        double length = e.getLength() * lengthRatio;
+        double length = e.getDistance() * lengthRatio;
 
         String name = first.getLabel() + " to " + second.getLabel();
-        return new PartialPlainStreetEdge(e, first, second, myGeom, name, length);
+        return new PartialStreetEdge(e, first, second, myGeom, name, length);
     }
 
     /**
@@ -285,11 +285,11 @@ public class RoutingContext implements Cloneable {
         if (fromVertex instanceof StreetLocation && toVertex instanceof StreetLocation) {
             StreetVertex fromStreetVertex = (StreetVertex) fromVertex;
             StreetVertex toStreetVertex = (StreetVertex) toVertex;
-            Set<PlainStreetEdge> overlap = overlappingPlainStreetEdges(fromStreetVertex,
+            Set<StreetEdge> overlap = overlappingPlainStreetEdges(fromStreetVertex,
                     toStreetVertex);
 
-            for (PlainStreetEdge pse : overlap) {
-                PartialPlainStreetEdge ppse = makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
+            for (StreetEdge pse : overlap) {
+                PartialStreetEdge ppse = makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
                 // Register this edge-fragment as a temporary edge so it will be assigned a routing context and cleaned up.
                 // It's connecting the from and to vertices so it could be placed in either vertex's temp edge list.
                 ((StreetLocation)fromVertex).getExtra().add(ppse);

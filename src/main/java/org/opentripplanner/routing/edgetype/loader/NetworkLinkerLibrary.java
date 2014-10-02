@@ -24,7 +24,6 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -42,8 +41,8 @@ public class NetworkLinkerLibrary {
 
     /* for each original bundle of (turn)edges making up a street, a list of 
        edge pairs that will replace it */
-    HashMap<HashSet<StreetEdge>, LinkedList<P2<PlainStreetEdge>>> replacements = 
-        new HashMap<HashSet<StreetEdge>, LinkedList<P2<PlainStreetEdge>>>();
+    HashMap<HashSet<StreetEdge>, LinkedList<P2<StreetEdge>>> replacements =
+        new HashMap<HashSet<StreetEdge>, LinkedList<P2<StreetEdge>>>();
     
     /* a map to track which vertices were associated with each transit stop, to avoid repeat splitting */
     HashMap<Vertex, Collection<StreetVertex>> splitVertices = 

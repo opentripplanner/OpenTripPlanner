@@ -85,7 +85,7 @@ public class GraphIndexTest extends GtfsTest {
         assertTrue(stops.contains(stopvJ));
         assertTrue(stops.contains(stopvL));
         assertTrue(stops.contains(stopvM));
-        assertEquals(stops.size(), 3);
+        assertTrue(stops.size() >= 3); // Query can overselect
     }
 
     public void testParentStations() {
