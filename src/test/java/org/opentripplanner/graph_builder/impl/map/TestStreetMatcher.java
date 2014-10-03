@@ -18,13 +18,11 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -177,10 +175,6 @@ public class TestStreetMatcher {
             super(v1, v2, null, null, 0, null, false);
         }
         
-        public Set<Alert> getNotes () {
-            return null;
-        }
-        
         @Override
         public State traverse(State s0) {
             double d = getDistance();
@@ -220,11 +214,6 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public boolean setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed) {
-            return false;
-        }
-
-        @Override
         public boolean canTraverse(RoutingRequest options) {
             return true;
         }
@@ -248,10 +237,6 @@ public class TestStreetMatcher {
             return "SimpleEdge(" + fromv + ", " + tov + ")";
         }
         
-        public Set<Alert> getWheelchairNotes () {
-            return null;
-        }
-
         @Override
         public int getStreetClass() {
             return StreetEdge.CLASS_STREET;

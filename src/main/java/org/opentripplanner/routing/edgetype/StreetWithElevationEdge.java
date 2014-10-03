@@ -48,7 +48,6 @@ public class StreetWithElevationEdge extends StreetEdge {
         return elevationProfileSegment;
     }
 
-    @Override
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
         if (elev == null || elev.size() < 2) {
             return false;

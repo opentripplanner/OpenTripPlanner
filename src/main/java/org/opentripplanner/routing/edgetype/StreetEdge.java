@@ -193,10 +193,6 @@ public class StreetEdge extends Edge implements Cloneable {
         return getElevationProfileSegment().getElevationProfile();
     }
 
-    public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        throw new RuntimeException("Can't set elevation profile on a StreetEdge. Please use a StreetWithElevationEdge instead (set useElevation flag in DefaultStreetEdgeFactory).");
-    }
-
     public boolean isElevationFlattened() {
         return getElevationProfileSegment().isFlattened();
     }
