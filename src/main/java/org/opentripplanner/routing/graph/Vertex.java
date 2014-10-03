@@ -129,7 +129,7 @@ public abstract class Vertex implements Serializable, Cloneable {
                 LOG.error("Requested removal of an edge which isn't connected to this vertex");
                 return existing;
             }
-            }
+        }
         // Sanity check
         for (Edge edge : copy) {
             if (edge == e) {
