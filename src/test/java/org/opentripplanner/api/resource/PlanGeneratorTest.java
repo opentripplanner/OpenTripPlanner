@@ -483,8 +483,8 @@ public class PlanGeneratorTest {
         // Edges for leg 0
         FreeEdge e1 = new FreeEdge(
                 v0, v2);
-        StreetEdge e3 = new StreetEdge(
-                v2, v4, l3, "Edge 3", 3.0, StreetTraversalPermission.ALL, false, 0);
+        StreetWithElevationEdge e3 = new StreetWithElevationEdge(
+                v2, v4, l3, "Edge 3", 3.0, StreetTraversalPermission.ALL, false);
 
         // Edges for legs 1 and 2
         StreetTransitLink e5 = new StreetTransitLink(
@@ -526,24 +526,24 @@ public class PlanGeneratorTest {
 
         // Edges for legs 5 and 6, where edges 39 and 41 have the same name to trigger stayOn = true
         AreaEdge e39 = new AreaEdge(
-                v38, v40, l39, "Edge 39 / 41", 2.1, StreetTraversalPermission.ALL, false, 0,
+                v38, v40, l39, "Edge 39 / 41", 2.1, StreetTraversalPermission.ALL, false,
                 new AreaEdgeList());
-        StreetEdge e41 = new StreetEdge(
-                v40, v42, l41, "Edge 39 / 41", 1.9, StreetTraversalPermission.ALL, false, 0);
+        StreetWithElevationEdge e41 = new StreetWithElevationEdge(
+                v40, v42, l41, "Edge 39 / 41", 1.9, StreetTraversalPermission.ALL, false);
         StreetBikeRentalLink e43 = new StreetBikeRentalLink(
                 v42, v44);
         RentABikeOnEdge e45 = new RentABikeOnEdge(
                 v44, v46, Collections.singleton(""));
         StreetBikeRentalLink e47 = new StreetBikeRentalLink(
                 v46, v48);
-        StreetEdge e49 = new StreetEdge(
-                v48, v50, l49, "Edge 49", 2.0, StreetTraversalPermission.ALL, false, 0);
+        StreetWithElevationEdge e49 = new StreetWithElevationEdge(
+                v48, v50, l49, "Edge 49", 2.0, StreetTraversalPermission.ALL, false);
 
         // Edges for legs 6, 7 and 8
         LegSwitchingEdge e51 = new LegSwitchingEdge(
                 v50, v52);
         StreetEdge e53p = new StreetEdge(v52, v54, l53, "Edge 53", 1.0,
-                StreetTraversalPermission.ALL, false, 0);
+                StreetTraversalPermission.ALL, false);
         PartialStreetEdge e53 = new PartialStreetEdge(e53p, v52, v54, l53, "Edge 53",
                 1.0, StreetTraversalPermission.ALL, false);
         StreetBikeRentalLink e55 = new StreetBikeRentalLink(
@@ -575,7 +575,7 @@ public class PlanGeneratorTest {
                 new IntersectionVertex(graph, "Extra vertex", 180, 88),
                 new LineString(new PackedCoordinateSequence.Double(
                         new double[]{180, 89, 180, 88}, 2), geometryFactory),
-                "Extra edge", 1.9, StreetTraversalPermission.NONE, true, 0);
+                "Extra edge", 1.9, StreetTraversalPermission.NONE, true);
 
         // Various bookkeeping operations
         graph.serviceCodes.put(firstTrip.getId(), 0);

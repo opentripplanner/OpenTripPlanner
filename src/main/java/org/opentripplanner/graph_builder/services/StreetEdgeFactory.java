@@ -11,10 +11,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.graph_builder.services;
 
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -23,20 +21,21 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
 
-// TODO: Why is there an OSMPlainStreetEdgeFactory?
-// What is wrong with just calling the constructor?
+/**
+ * Edge factory to build StreetEdge and AreaEdge.
+ * 
+ * We use a factory to be able to build either StreetEdge or StreetWithElevationEdge, depending on
+ * whether you want elevation data later on or not.
+ * 
+ */
+public interface StreetEdgeFactory {
 
-public interface OSMPlainStreetEdgeFactory {
-    public StreetEdge createEdge(OSMNode fromNode, OSMNode toNode, OSMWithTags wayOrArea,
-            IntersectionVertex startEndpoint, IntersectionVertex endEndpoint, LineString geometry,
+    public StreetEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
+            LineString geometry, String name, double length, StreetTraversalPermission permissions,
+            boolean back);
 
-            String name, double length, StreetTraversalPermission permissions, boolean back,
-            float carSpeed);
-
-    public AreaEdge createAreaEdge(OSMNode nodeI, OSMNode nodeJ,
-            OSMWithTags areaEntity, IntersectionVertex startEndpoint,
-            IntersectionVertex endEndpoint, LineString geometry, String name,
-            double length, StreetTraversalPermission permissions, boolean back,
-            float carSpeed, AreaEdgeList area);
+    public AreaEdge createAreaEdge(IntersectionVertex startEndpoint,
+            IntersectionVertex endEndpoint, LineString geometry, String name, double length,
+            StreetTraversalPermission permissions, boolean back, AreaEdgeList area);
 
 }

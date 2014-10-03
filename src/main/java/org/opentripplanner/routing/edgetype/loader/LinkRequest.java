@@ -35,6 +35,7 @@ import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
@@ -266,9 +267,10 @@ public class LinkRequest {
         // shortcuts thought the splitter vertex to avoid turn penalties.
         IntersectionVertex e1midpoint = new IntersectionVertex(linker.graph, "split 1 at " + label, midCoord.x, midCoord.y, name);
         // We are replacing two edges with four edges
-        StreetEdge forward1 = new StreetEdge(e1v1, e1midpoint, forward1Geom, name, lengthIn,
+        // Note: Always enable elevation. This should not be a big waste of memory.
+        StreetWithElevationEdge forward1 = new StreetWithElevationEdge(e1v1, e1midpoint, forward1Geom, name, lengthIn,
                 e1.getPermission(), e1.isBack());
-        StreetEdge forward2 = new StreetEdge(e1midpoint, e1v2, forward2Geom, name, lengthOut,
+        StreetWithElevationEdge forward2 = new StreetWithElevationEdge(e1midpoint, e1v2, forward2Geom, name, lengthOut,
                 e1.getPermission(), e1.isBack());
         if (e1 instanceof AreaEdge) {
             ((AreaEdge) e1).getArea().addVertex(e1midpoint, linker.graph);
@@ -276,14 +278,14 @@ public class LinkRequest {
 
         addEdges(forward1, forward2);
 
-        StreetEdge backward1 = null;
-        StreetEdge backward2 = null;
+        StreetWithElevationEdge backward1 = null;
+        StreetWithElevationEdge backward2 = null;
         IntersectionVertex e2midpoint = null;
         if (e2 != null) {
             e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord.x, midCoord.y, name);
-            backward1 = new StreetEdge(e2v1, e2midpoint, backGeometryPair.getFirst(),
+            backward1 = new StreetWithElevationEdge(e2v1, e2midpoint, backGeometryPair.getFirst(),
                     name, lengthOut, e2.getPermission(), e2.isBack());
-            backward2 = new StreetEdge(e2midpoint, e2v2, backGeometryPair.getSecond(),
+            backward2 = new StreetWithElevationEdge(e2midpoint, e2v2, backGeometryPair.getSecond(),
                     name, lengthIn, e2.getPermission(), e2.isBack());
             if (e2 instanceof AreaEdge) {
                 ((AreaEdge) e2).getArea().addVertex(e2midpoint, linker.graph);
