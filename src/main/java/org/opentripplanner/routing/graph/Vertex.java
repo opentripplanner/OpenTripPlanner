@@ -124,12 +124,12 @@ public abstract class Vertex implements Serializable, Cloneable {
         for (int i = 0, j = 0; i < existing.length; i++) {
             if (existing[i] == e) continue;
             copy[j++] = existing[i];
-            if (j == existing.length) {
+            if (j == copy.length) {
                 // The array did not get shorter by one -- the edge to remove must not have been present
                 LOG.error("Requested removal of an edge which isn't connected to this vertex");
                 return existing;
             }
-        }
+            }
         // Sanity check
         for (Edge edge : copy) {
             if (edge == e) {
