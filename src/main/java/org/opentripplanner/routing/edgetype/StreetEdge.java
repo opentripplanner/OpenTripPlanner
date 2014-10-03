@@ -169,7 +169,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (!isWheelchairAccessible()) {
                 return false;
             }
-            if (elevationProfileSegment.getMaxSlope() > options.maxSlope) {
+            if (getElevationProfileSegment().getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
@@ -186,7 +186,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (!isWheelchairAccessible()) {
                 return false;
             }
-            if (elevationProfileSegment.getMaxSlope() > options.maxSlope) {
+            if (getElevationProfileSegment().getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
@@ -194,7 +194,7 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public PackedCoordinateSequence getElevationProfile() {
-        return elevationProfileSegment.getElevationProfile();
+        return getElevationProfileSegment().getElevationProfile();
     }
 
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
@@ -213,7 +213,7 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public boolean isElevationFlattened() {
-        return elevationProfileSegment.isFlattened();
+        return getElevationProfileSegment().isFlattened();
     }
 
     @Override
@@ -294,11 +294,12 @@ public class StreetEdge extends Edge implements Cloneable {
         
         double time = getDistance() / speed;
         double weight;
+        ElevationProfileSegment elevationProfile = getElevationProfileSegment();
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
-            weight = elevationProfileSegment.getSlopeSpeedFactor() * getDistance() / speed;
+            weight = elevationProfile.getSlopeSpeedFactor() * getDistance() / speed;
         } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
-            time = elevationProfileSegment.getSlopeSpeedFactor() * getDistance() / speed;
+            time = elevationProfile.getSlopeSpeedFactor() * getDistance() / speed;
             switch (options.optimize) {
             case SAFE:
                 weight = bicycleSafetyFactor * getDistance() / speed;
@@ -312,16 +313,16 @@ public class StreetEdge extends Edge implements Cloneable {
                 break;
             case FLAT:
                 /* see notes in StreetVertex on speed overhead */
-                weight = getDistance() / speed + elevationProfileSegment.getSlopeWorkFactor() * getDistance();
+                weight = getDistance() / speed + elevationProfile.getSlopeWorkFactor() * getDistance();
                 break;
             case QUICK:
-                weight = elevationProfileSegment.getSlopeSpeedFactor() * getDistance() / speed;
+                weight = elevationProfile.getSlopeSpeedFactor() * getDistance() / speed;
                 break;
             case TRIANGLE:
-                double quick = elevationProfileSegment.getSlopeSpeedFactor() * getDistance();
+                double quick = elevationProfile.getSlopeSpeedFactor() * getDistance();
                 double safety = bicycleSafetyFactor * getDistance();
                 // TODO This computation is not coherent with the one for FLAT
-                double slope = elevationProfileSegment.getSlopeWorkFactor() * getDistance();
+                double slope = elevationProfile.getSlopeWorkFactor() * getDistance();
                 weight = quick * options.triangleTimeFactor + slope
                         * options.triangleSlopeFactor + safety
                         * options.triangleSafetyFactor;
@@ -333,13 +334,13 @@ public class StreetEdge extends Edge implements Cloneable {
         } else {
             if (walkingBike) {
                 // take slopes into account when walking bikes
-                time = elevationProfileSegment.getSlopeSpeedFactor() * getDistance() / speed;
+                time = elevationProfile.getSlopeSpeedFactor() * getDistance() / speed;
             }
             weight = time;
             if (traverseMode.equals(TraverseMode.WALK)) {
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
-                double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), elevationProfileSegment.getMaxSlope());
+                double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), elevationProfile.getMaxSlope());
                 // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
                 // for the walkspeed set by the user
                 double elevationUtilsSpeed = 4.0 / 3.0;
@@ -349,7 +350,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 // debug code
                 if(weight > 100){
                     double timeflat = length / speed;
-                    System.out.format("line length: %.1f m, slope: %.3f ---> slope costs: %.1f , weight: %.1f , time (flat):  %.1f %n", length, elevationProfileSegment.getMaxSlope(), costs, weight, timeflat);
+                    System.out.format("line length: %.1f m, slope: %.3f ---> slope costs: %.1f , weight: %.1f , time (flat):  %.1f %n", length, elevationProfile.getMaxSlope(), costs, weight, timeflat);
                 }
                 */
             }
@@ -521,11 +522,11 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public double getSlopeSpeedEffectiveLength() {
-        return elevationProfileSegment.getSlopeSpeedFactor() * getDistance();
+        return getElevationProfileSegment().getSlopeSpeedFactor() * getDistance();
     }
 
     public double getWorkCost() {
-        return elevationProfileSegment.getSlopeWorkFactor() * getDistance();
+        return getElevationProfileSegment().getSlopeWorkFactor() * getDistance();
     }
 
     public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
@@ -541,7 +542,7 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return elevationProfileSegment.getElevationProfile(start, end);
+        return getElevationProfileSegment().getElevationProfile(start, end);
     }
 
     public String toString() {
