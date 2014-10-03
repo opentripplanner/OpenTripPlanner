@@ -23,9 +23,13 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
 
-// TODO: Why is there an OSMPlainStreetEdgeFactory?
-// What is wrong with just calling the constructor?
-
+/**
+ * Edge factory to build StreetEdge and AreaEdge.
+ * 
+ * We use a factory to be able to build either StreetEdge or StreetWithElevationEdge, depending on
+ * whether you want elevation data later on or not.
+ * 
+ */
 public interface OSMPlainStreetEdgeFactory {
 
     public StreetEdge createEdge(OSMNode fromNode, OSMNode toNode, OSMWithTags wayOrArea,
@@ -33,10 +37,9 @@ public interface OSMPlainStreetEdgeFactory {
             String name, double length, StreetTraversalPermission permissions, boolean back,
             float carSpeed);
 
-    public AreaEdge createAreaEdge(OSMNode nodeI, OSMNode nodeJ,
-            OSMWithTags areaEntity, IntersectionVertex startEndpoint,
-            IntersectionVertex endEndpoint, LineString geometry, String name,
-            double length, StreetTraversalPermission permissions, boolean back,
+    public AreaEdge createAreaEdge(OSMNode nodeI, OSMNode nodeJ, OSMWithTags areaEntity,
+            IntersectionVertex startEndpoint, IntersectionVertex endEndpoint, LineString geometry,
+            String name, double length, StreetTraversalPermission permissions, boolean back,
             float carSpeed, AreaEdgeList area);
 
 }
