@@ -699,7 +699,7 @@ public class StreetEdge extends Edge implements Cloneable {
 		this.carSpeed = carSpeed;
 	}
 
-	protected boolean isSlopeOverride() {
+	public boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
 	}
 
