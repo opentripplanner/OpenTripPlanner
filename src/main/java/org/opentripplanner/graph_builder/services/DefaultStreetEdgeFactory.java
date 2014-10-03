@@ -29,7 +29,7 @@ public class DefaultStreetEdgeFactory implements StreetEdgeFactory {
     @Override
     public StreetEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
             LineString geometry, String name, double length, StreetTraversalPermission permissions,
-            boolean back, float carSpeed) {
+            boolean back) {
         StreetEdge pse;
         if (useElevationData) {
             pse = new StreetWithElevationEdge(startEndpoint, endEndpoint, geometry, name, length,
@@ -38,18 +38,16 @@ public class DefaultStreetEdgeFactory implements StreetEdgeFactory {
             pse = new StreetEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,
                     back);
         }
-        pse.setCarSpeed(carSpeed);
         return pse;
     }
 
     @Override
     public AreaEdge createAreaEdge(IntersectionVertex startEndpoint,
             IntersectionVertex endEndpoint, LineString geometry, String name, double length,
-            StreetTraversalPermission permissions, boolean back, float carSpeed, AreaEdgeList area) {
+            StreetTraversalPermission permissions, boolean back, AreaEdgeList area) {
         // By default AreaEdge are elevation-capable so nothing to do.
         AreaEdge ae = new AreaEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,
                 back, area);
-        ae.setCarSpeed(carSpeed);
         return ae;
     }
 }

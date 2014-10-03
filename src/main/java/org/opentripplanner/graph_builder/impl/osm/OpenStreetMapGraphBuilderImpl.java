@@ -1259,7 +1259,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 String name = getNameForWay(areaEntity, label);
 
                 AreaEdge street = edgeFactory.createAreaEdge(startEndpoint, endEndpoint, line,
-                        name, length, areaPermissions, false, carSpeed, edgeList);
+                        name, length, areaPermissions, false, edgeList);
+                street.setCarSpeed(carSpeed);
 
                 street.setStreetClass(cls);
                 edges.add(street);
@@ -1270,8 +1271,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 name = getNameForWay(areaEntity, label);
 
                 AreaEdge backStreet = edgeFactory.createAreaEdge(endEndpoint, startEndpoint,
-                        (LineString) line.reverse(), name, length, areaPermissions, true, carSpeed,
-                        edgeList);
+                        (LineString) line.reverse(), name, length, areaPermissions, true, edgeList);
+                backStreet.setCarSpeed(carSpeed);
 
                 backStreet.setStreetClass(cls);
                 edges.add(backStreet);
@@ -2559,7 +2560,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
             StreetEdge street = edgeFactory.createEdge(start, end, geometry, name, length,
-                    permissions, back, carSpeed);
+                    permissions, back);
+            street.setCarSpeed(carSpeed);
 
             String highway = way.getTag("highway");
             int cls;
