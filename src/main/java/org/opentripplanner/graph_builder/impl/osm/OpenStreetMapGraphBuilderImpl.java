@@ -1256,9 +1256,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 label = unique(label);
                 String name = getNameForWay(areaEntity, label);
 
-                AreaEdge street = edgeFactory.createAreaEdge(fromNode, toNode, areaEntity,
-                        startEndpoint, endEndpoint, line, name, length, areaPermissions, false,
-                        carSpeed, edgeList);
+                AreaEdge street = edgeFactory.createAreaEdge(startEndpoint, endEndpoint, line,
+                        name, length, areaPermissions, false, carSpeed, edgeList);
 
                 street.setStreetClass(cls);
                 edges.add(street);
@@ -1268,9 +1267,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 label = unique(label);
                 name = getNameForWay(areaEntity, label);
 
-                AreaEdge backStreet = edgeFactory.createAreaEdge(toNode, fromNode, areaEntity,
-                        endEndpoint, startEndpoint, (LineString) line.reverse(), name, length,
-                        areaPermissions, true, carSpeed, edgeList);
+                AreaEdge backStreet = edgeFactory.createAreaEdge(endEndpoint, startEndpoint,
+                        (LineString) line.reverse(), name, length, areaPermissions, true, carSpeed,
+                        edgeList);
 
                 backStreet.setStreetClass(cls);
                 edges.add(backStreet);
@@ -2557,9 +2556,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
-            StreetEdge street = edgeFactory.createEdge(_nodes.get(startNode),
-                    _nodes.get(endNode), way, start, end, geometry, name, length, permissions,
-                    back, carSpeed);
+            StreetEdge street = edgeFactory.createEdge(start, end, geometry, name, length,
+                    permissions, back, carSpeed);
 
             String highway = way.getTag("highway");
             int cls;

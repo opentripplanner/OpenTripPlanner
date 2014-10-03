@@ -13,8 +13,6 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -32,14 +30,12 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public interface OSMPlainStreetEdgeFactory {
 
-    public StreetEdge createEdge(OSMNode fromNode, OSMNode toNode, OSMWithTags wayOrArea,
-            IntersectionVertex startEndpoint, IntersectionVertex endEndpoint, LineString geometry,
-            String name, double length, StreetTraversalPermission permissions, boolean back,
-            float carSpeed);
+    public StreetEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
+            LineString geometry, String name, double length, StreetTraversalPermission permissions,
+            boolean back, float carSpeed);
 
-    public AreaEdge createAreaEdge(OSMNode nodeI, OSMNode nodeJ, OSMWithTags areaEntity,
-            IntersectionVertex startEndpoint, IntersectionVertex endEndpoint, LineString geometry,
-            String name, double length, StreetTraversalPermission permissions, boolean back,
-            float carSpeed, AreaEdgeList area);
+    public AreaEdge createAreaEdge(IntersectionVertex startEndpoint,
+            IntersectionVertex endEndpoint, LineString geometry, String name, double length,
+            StreetTraversalPermission permissions, boolean back, float carSpeed, AreaEdgeList area);
 
 }
