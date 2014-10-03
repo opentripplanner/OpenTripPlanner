@@ -17,7 +17,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
 
-public class AreaEdge extends StreetEdge {
+public class AreaEdge extends StreetWithElevationEdge {
     private static final long serialVersionUID = 6761687673982054612L;
     private AreaEdgeList area;
 

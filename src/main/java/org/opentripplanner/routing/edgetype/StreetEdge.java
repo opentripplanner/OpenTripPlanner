@@ -33,7 +33,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.BitSetUtils;
@@ -82,8 +81,6 @@ public class StreetEdge extends Edge implements Cloneable {
     /** back, roundabout, stairs, ... */
     private byte flags;
 
-    private ElevationProfileSegment elevationProfileSegment;
-
     /**
      * Length is stored internally as 32-bit fixed-point (millimeters). This allows edges of up to ~2100km.
      * Distances used in calculations and exposed outside this class are still in double-precision floating point meters.
@@ -96,7 +93,7 @@ public class StreetEdge extends Edge implements Cloneable {
      * factor of 2.0 will be considered in term of safety cost as the same as a 150m street with a
      * safety factor of 1.0.
      */
-    private float bicycleSafetyFactor;
+    protected float bicycleSafetyFactor;
 
     private int[] compactGeometry;
     
@@ -131,7 +128,6 @@ public class StreetEdge extends Edge implements Cloneable {
         this.setGeometry(geometry);
         this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
         this.bicycleSafetyFactor = 1.0f;
-        this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
         this.setPermission(permission);
         this.setCarSpeed(DEFAULT_CAR_SPEED);
@@ -198,18 +194,7 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        if (elev == null || elev.size() < 2) {
-            return false;
-        }
-        if (isSlopeOverride() && !computed) {
-            return false;
-        }
-        boolean slopeLimit = getPermission().allows(StreetTraversalPermission.CAR);
-        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
-        elevationProfileSegment = new ElevationProfileSegment(costs, elev);
-        bicycleSafetyFactor *= costs.lengthMultiplier;
-        bicycleSafetyFactor += costs.slopeSafetyCost / getDistance();
-        return costs.flattened;
+        throw new RuntimeException("Can't set elevation profile on a StreetEdge. Please use a StreetWithElevationEdge instead.");
     }
 
     public boolean isElevationFlattened() {
@@ -595,7 +580,7 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public ElevationProfileSegment getElevationProfileSegment() {
-        return elevationProfileSegment;
+        return ElevationProfileSegment.getFlatProfile();
     }
 
     protected boolean detachFrom() {
@@ -718,7 +703,7 @@ public class StreetEdge extends Edge implements Cloneable {
 		this.carSpeed = carSpeed;
 	}
 
-	private boolean isSlopeOverride() {
+	protected boolean isSlopeOverride() {
 	    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
 	}
 

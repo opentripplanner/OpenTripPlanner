@@ -483,7 +483,7 @@ public class PlanGeneratorTest {
         // Edges for leg 0
         FreeEdge e1 = new FreeEdge(
                 v0, v2);
-        StreetEdge e3 = new StreetEdge(
+        StreetWithElevationEdge e3 = new StreetWithElevationEdge(
                 v2, v4, l3, "Edge 3", 3.0, StreetTraversalPermission.ALL, false);
 
         // Edges for legs 1 and 2
@@ -528,7 +528,7 @@ public class PlanGeneratorTest {
         AreaEdge e39 = new AreaEdge(
                 v38, v40, l39, "Edge 39 / 41", 2.1, StreetTraversalPermission.ALL, false,
                 new AreaEdgeList());
-        StreetEdge e41 = new StreetEdge(
+        StreetWithElevationEdge e41 = new StreetWithElevationEdge(
                 v40, v42, l41, "Edge 39 / 41", 1.9, StreetTraversalPermission.ALL, false);
         StreetBikeRentalLink e43 = new StreetBikeRentalLink(
                 v42, v44);
@@ -536,7 +536,7 @@ public class PlanGeneratorTest {
                 v44, v46, Collections.singleton(""));
         StreetBikeRentalLink e47 = new StreetBikeRentalLink(
                 v46, v48);
-        StreetEdge e49 = new StreetEdge(
+        StreetWithElevationEdge e49 = new StreetWithElevationEdge(
                 v48, v50, l49, "Edge 49", 2.0, StreetTraversalPermission.ALL, false);
 
         // Edges for legs 6, 7 and 8

@@ -43,7 +43,7 @@ public class TestTriangle extends TestCase {
 
         double length = 650.0;
 
-        StreetEdge testStreet = new StreetEdge(v1, v2, geometry, "Test Lane", length,
+        StreetWithElevationEdge testStreet = new StreetWithElevationEdge(v1, v2, geometry, "Test Lane", length,
                 StreetTraversalPermission.ALL, false);
         testStreet.setBicycleSafetyFactor(0.74f); // a safe street
 
