@@ -43,7 +43,9 @@ import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.annotation.TurnRestrictionException;
 import org.opentripplanner.graph_builder.annotation.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
+import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
@@ -189,7 +191,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
      * around.
      */
-    public OSMPlainStreetEdgeFactory edgeFactory = new DefaultOSMPlainStreetEdgeFactory();
+    public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
     /**
      * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in the United States. This does not affect floor

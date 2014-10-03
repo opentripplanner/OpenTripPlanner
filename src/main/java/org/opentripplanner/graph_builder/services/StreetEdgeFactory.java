@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.graph_builder.services;
 
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.LineString;
  * whether you want elevation data later on or not.
  * 
  */
-public interface OSMPlainStreetEdgeFactory {
+public interface StreetEdgeFactory {
 
     public StreetEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
             LineString geometry, String name, double length, StreetTraversalPermission permissions,
