@@ -298,7 +298,8 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
                     Double toElevation = elevations.get(edge.getToVertex());
 
                     if (fromElevation == null || toElevation == null) {
-                        log.warn("Unexpectedly missing elevation for edge " + edge);
+                        if (!edge.isElevationFlattened() && !edge.isSlopeOverride())
+                            log.warn("Unexpectedly missing elevation for edge " + edge);
                         continue;
                     }
 
