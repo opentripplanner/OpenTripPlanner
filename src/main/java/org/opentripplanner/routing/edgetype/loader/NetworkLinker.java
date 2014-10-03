@@ -114,8 +114,6 @@ public class NetworkLinker {
             }
         }
 
-        FindMaxWalkDistances.find(graph);
-
         LOG.debug("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : Iterables.filter(vertices,
                 BikeRentalStationVertex.class)) {
