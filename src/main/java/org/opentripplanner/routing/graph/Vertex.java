@@ -120,22 +120,20 @@ public abstract class Vertex implements Serializable, Cloneable {
      * Synchronization must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
      */
     public static Edge[] removeEdge(Edge[] existing, Edge e) {
-        Edge[] copy = new Edge[existing.length - 1];
+        int nfound = 0;
         for (int i = 0, j = 0; i < existing.length; i++) {
-            if (existing[i] == e) continue;
-            if (j == copy.length) {
-                // The array did not get shorter by one -- the edge to remove must not have been present
-                LOG.error("Requested removal of an edge which isn't connected to this vertex.");
-                return existing;
-            }
-            copy[j++] = existing[i];
+            if (existing[i] == e) nfound++;
         }
-        // Sanity check
-        for (Edge edge : copy) {
-            if (edge == e) {
-                LOG.error("An edge is still present after being removed (there were multiple copies?)");
-                return existing;
-            }
+        if (nfound == 0) {
+            LOG.error("Requested removal of an edge which isn't connected to this vertex.");
+            return existing;
+        }
+        if (nfound > 1) {
+            LOG.error("There are multiple copies of the edge to be removed.)");
+        }
+        Edge[] copy = new Edge[existing.length - nfound];
+        for (int i = 0, j = 0; i < existing.length; i++) {
+            if (existing[i] != e) copy[j++] = existing[i];
         }
         return copy;
     }
