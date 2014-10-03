@@ -32,6 +32,7 @@ import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PartialStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -218,9 +219,9 @@ public class StreetLocation extends StreetVertex {
         double lengthIn = street.getDistance() * lengthRatioIn;
         double lengthOut = street.getDistance() * (1 - lengthRatioIn);
 
-        StreetEdge newLeft = new PartialStreetEdge(street, fromv, base,
+        StreetWithElevationEdge newLeft = new PartialStreetEdge(street, fromv, base,
                 geometries.getFirst(), name, lengthIn);
-        StreetEdge newRight = new PartialStreetEdge(street, base, tov,
+        StreetWithElevationEdge newRight = new PartialStreetEdge(street, base, tov,
                 geometries.getSecond(), name, lengthOut);
 
         newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
