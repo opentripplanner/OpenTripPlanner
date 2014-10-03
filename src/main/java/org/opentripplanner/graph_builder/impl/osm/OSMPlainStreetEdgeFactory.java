@@ -27,9 +27,9 @@ import com.vividsolutions.jts.geom.LineString;
 // What is wrong with just calling the constructor?
 
 public interface OSMPlainStreetEdgeFactory {
+
     public StreetEdge createEdge(OSMNode fromNode, OSMNode toNode, OSMWithTags wayOrArea,
             IntersectionVertex startEndpoint, IntersectionVertex endEndpoint, LineString geometry,
-
             String name, double length, StreetTraversalPermission permissions, boolean back,
             float carSpeed);
 
