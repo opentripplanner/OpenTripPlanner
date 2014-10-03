@@ -67,6 +67,9 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private static final double GREENWAY_SAFETY_FACTOR = 0.1;
 
+    // TODO(flamholz): do something smarter with the car speed here.
+    public static final float DEFAULT_CAR_SPEED = 11.2f;
+
     /** If you have more than 8 flags, increase flags to short or int */
     private static final int BACK_FLAG_INDEX = 0;
     private static final int ROUNDABOUT_FLAG_INDEX = 1;
@@ -120,25 +123,9 @@ public class StreetEdge extends Edge implements Cloneable {
     /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
     private byte outAngle;
 
-    /**
-     * No-arg constructor used only for customization -- do not call this unless you know
-     * what you are doing
-     */
-    public StreetEdge() {
-        super(null, null);
-    }
-
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
                       String name, double length,
                       StreetTraversalPermission permission, boolean back) {
-        // use a default car speed of ~25 mph for splitter vertices and the like
-        // TODO(flamholz): do something smarter with the car speed here.
-        this(v1, v2, geometry, name, length, permission, back, 11.2f);
-    }
-
-    public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
-                      String name, double length,
-                      StreetTraversalPermission permission, boolean back, float carSpeed) {
         super(v1, v2);
         this.setBack(back);
         this.setGeometry(geometry);
@@ -147,7 +134,7 @@ public class StreetEdge extends Edge implements Cloneable {
         this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
         this.name = name;
         this.setPermission(permission);
-        this.setCarSpeed(carSpeed);
+        this.setCarSpeed(DEFAULT_CAR_SPEED);
         this.setWheelchairAccessible(true); // accessible by default
         if (geometry != null) {
             try {

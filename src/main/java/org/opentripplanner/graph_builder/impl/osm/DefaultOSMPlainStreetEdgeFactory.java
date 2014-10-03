@@ -43,7 +43,8 @@ public class DefaultOSMPlainStreetEdgeFactory implements OSMPlainStreetEdgeFacto
             String name, double length, StreetTraversalPermission permissions, boolean back,
             float carSpeed) {
         StreetEdge pse = new StreetEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,
-                back, carSpeed);
+                back);
+        pse.setCarSpeed(carSpeed);
         return pse;
     }
 
@@ -54,7 +55,8 @@ public class DefaultOSMPlainStreetEdgeFactory implements OSMPlainStreetEdgeFacto
             double length, StreetTraversalPermission permissions,
             boolean back, float carSpeed, AreaEdgeList area) {
         AreaEdge ae = new AreaEdge(startEndpoint, endEndpoint, geometry, name, length, permissions,
-                back, carSpeed, area);
+                back, area);
+        ae.setCarSpeed(carSpeed);
         return ae;
     }
 }

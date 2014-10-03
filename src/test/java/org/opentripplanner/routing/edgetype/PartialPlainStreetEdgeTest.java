@@ -250,7 +250,7 @@ public class PartialPlainStreetEdgeTest {
         coords[1] = vB.getCoordinate();
         LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-        return new StreetEdge(vA, vB, geom, name, length, perm, false, 5.0f);
+        return new StreetEdge(vA, vB, geom, name, length, perm, false);
     }
     
     /**

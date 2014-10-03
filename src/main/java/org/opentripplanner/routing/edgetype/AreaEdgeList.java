@@ -137,10 +137,10 @@ public class AreaEdgeList implements Serializable {
             double length = distanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
             AreaEdge forward = new AreaEdge(from, to, line, area.getName(), length,
-                    area.getPermission(), false, 0, this);
+                    area.getPermission(), false, this);
             forward.setStreetClass(area.getStreetClass());
             AreaEdge backward = new AreaEdge(to, from, (LineString) line.reverse(), area.getName(),
-                    length, area.getPermission(), true, 0, this);
+                    length, area.getPermission(), true, this);
             backward.setStreetClass(area.getStreetClass());
             edges.add(forward);
             edges.add(backward);

@@ -41,8 +41,8 @@ public class PartialStreetEdge extends StreetEdge {
     public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
                              LineString geometry, String name, double length, StreetTraversalPermission permission,
                              boolean back) {
-        super(v1, v2, geometry, name, length, permission, back, parentEdge.getCarSpeed());
-
+        super(v1, v2, geometry, name, length, permission, back);
+        setCarSpeed(parentEdge.getCarSpeed());
         this.parentEdge = parentEdge;
     }
     
