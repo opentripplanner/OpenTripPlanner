@@ -33,11 +33,13 @@ public class GenericDijkstra {
 
     private RoutingRequest options;
 
-    private SearchTerminationStrategy searchTerminationStrategy;
+    public SearchTerminationStrategy searchTerminationStrategy;
 
-    private SkipEdgeStrategy skipEdgeStrategy;
+    public SkipEdgeStrategy skipEdgeStrategy;
 
-    private SkipTraverseResultStrategy skipTraverseResultStrategy;
+    public SkipTraverseResultStrategy skipTraverseResultStrategy;
+
+    public TraverseVisitor traverseVisitor;
 
     private boolean verbose = false;
 
@@ -74,6 +76,10 @@ public class GenericDijkstra {
             State u = queue.extract_min();
             Vertex u_vertex = u.getVertex();
 
+            if (traverseVisitor != null) {
+                traverseVisitor.visitVertex(u);
+            }
+
             if (!spt.getStates(u_vertex).contains(u)) {
                 continue;
             }
@@ -83,39 +89,35 @@ public class GenericDijkstra {
                 System.out.println(u_vertex);
             }
 
-            if (searchTerminationStrategy != null
-                    && !searchTerminationStrategy.shouldSearchContinue(initialState.getVertex(), 
-                    null, u, spt, options))
-                        break;
+            if (searchTerminationStrategy != null &&
+                searchTerminationStrategy.shouldSearchTerminate(initialState.getVertex(), null, u, spt, options)) {
+                break;
+            }
 
             for (Edge edge : options.arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing()) {
-
-                if (skipEdgeStrategy != null
-                        && skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt,
-                                options))
+                if (skipEdgeStrategy != null &&
+                    skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt, options)) {
                     continue;
-
+                }
                 // Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over.
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
-
-                    if (skipTraverseResultStrategy != null
-                            && skipTraverseResultStrategy.shouldSkipTraversalResult(initialState.getVertex(),
-                                    null, u, v, spt, options))
+                    if (skipTraverseResultStrategy != null &&
+                        skipTraverseResultStrategy.shouldSkipTraversalResult(initialState.getVertex(), null, u, v, spt, options)) {
                         continue;
-
-                    if (verbose)
-                        System.out.printf("  w = %f + %f = %f %s", u.getWeight(), v.getWeightDelta(), 
-                        		v.getWeight(),  v.getVertex());
-                    
-                    if (v.exceedsWeightLimit(options.maxWeight))
-                        continue;
-
+                    }
+                    if (traverseVisitor != null) {
+                        traverseVisitor.visitEdge(edge, v);
+                    }
+                    if (verbose) {
+                        System.out.printf("  w = %f + %f = %f %s", u.getWeight(), v.getWeightDelta(), v.getWeight(), v.getVertex());
+                    }
+                    if (v.exceedsWeightLimit(options.maxWeight)) continue;
                     if (spt.add(v)) {
                         double estimate = heuristic.computeForwardWeight(v, target);
                         queue.insert(v, v.getWeight() + estimate);
+                        if (traverseVisitor != null) traverseVisitor.visitEnqueue(v);
                     }
-
                 }
             }
             spt.postVisit(u);

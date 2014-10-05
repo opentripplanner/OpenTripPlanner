@@ -96,8 +96,7 @@ public class AStarTest {
     public void testForward() {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
-        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
-                _graph.getVertex("leary_20th"));
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
@@ -228,8 +227,7 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
         options.batch = true;
-        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
-                _graph.getVertex("leary_20th"));
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
 
         Set<Vertex> targets = new HashSet<Vertex>();
         targets.add(_graph.getVertex("shilshole_22nd"));

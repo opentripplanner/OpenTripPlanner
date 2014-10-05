@@ -105,12 +105,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         runState.heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
+        runState.heuristic = new TrivialRemainingWeightHeuristic();
 
         // heuristic calc could actually be done when states are constructed, inside state
         State initialState = new State(options);
         runState.heuristic.initialize(initialState, runState.rctx.target, abortTime);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-            LOG.warn("Timeout during initialization of interleaved bidirectional heuristic.");
+            LOG.warn("Timeout during initialization of goal direction heuristic.");
             options.rctx.debugOutput.timedOut = true;
             runState = null; // Search timed out
             return;
@@ -190,11 +191,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 // }
 
                 double remaining_w = computeRemainingWeight(runState.heuristic, v, runState.rctx.target, runState.options);
-
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
-                double estimate = v.getWeight() + remaining_w*runState.options.heuristicWeight;
+                double estimate = v.getWeight() + remaining_w * runState.options.heuristicWeight;
 
                 if (verbose) {
                     System.out.println("      edge " + edge);
@@ -267,14 +267,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             // Don't search too far past the most recently found accepted path/state
             if (runState.foundPathWeight != null &&
                 runState.u.getWeight() > runState.foundPathWeight * OVERSEARCH_MULTIPLIER ) {
-
                 break;
             }
             if (runState.terminationStrategy != null) {
-                if (!runState.terminationStrategy.shouldSearchContinue(
-                    runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options))
-
+                if (runState.terminationStrategy.shouldSearchTerminate(
+                    runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options)) {
                     break;
+                }
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
             }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
                 runState.targetAcceptedStates.add(runState.u);
@@ -282,7 +281,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 runState.options.rctx.debugOutput.foundPath();
                 if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
-
                     break;
                 }
             }
@@ -291,10 +289,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
 
     /** @return the shortest path, or null if none is found */
-    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeoutSeconds,
             SearchTerminationStrategy terminationStrategy) {
         ShortestPathTree spt = null;
-        long abortTime = DateUtils.absoluteTimeout(relTimeout);
+        long abortTime = DateUtils.absoluteTimeout(relTimeoutSeconds);
 
         startSearch (options, terminationStrategy, abortTime);
 

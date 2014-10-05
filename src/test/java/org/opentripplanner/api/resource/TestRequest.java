@@ -619,8 +619,7 @@ public class TestRequest extends TestCase {
 
     public void testTransferPenalty() {
         // Plan short trip
-        TestPlanner planner = new TestPlanner(
-                "portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
+        TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
         // Don't use non-preferred transfer penalty
         planner.setNonpreferredTransferPenalty(Arrays.asList(0));
         // Check number of legs when using different transfer penalties
@@ -630,8 +629,7 @@ public class TestRequest extends TestCase {
 
     public void testTransferPenalty2() {
         // Plan short trip
-        TestPlanner planner = new TestPlanner(
-                "portland", "45.514861,-122.612035", "45.483096,-122.540624");
+        TestPlanner planner = new TestPlanner("portland", "45.514861,-122.612035", "45.483096,-122.540624");
         // Don't use non-preferred transfer penalty
         planner.setNonpreferredTransferPenalty(Arrays.asList(0));
         // Check number of legs when using different transfer penalties

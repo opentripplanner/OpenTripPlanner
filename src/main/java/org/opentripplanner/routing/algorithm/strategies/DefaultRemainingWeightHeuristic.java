@@ -13,15 +13,29 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
+import com.fasterxml.jackson.jaxrs.json.annotation.JSONP;
+import com.google.common.collect.Maps;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.profile.StopAtDistance;
+import org.opentripplanner.profile.StopCluster;
+import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.GenericDijkstra;
+import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * A Euclidean remaining weight strategy that takes into account transit boarding costs where applicable.
@@ -30,36 +44,31 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     private static final long serialVersionUID = -5172878150967231550L;
-
-    private RoutingRequest options;
-
-    private boolean useTransit = false;
-
-    private double maxSpeed;
+    private static Logger LOG = LoggerFactory.getLogger(DefaultRemainingWeightHeuristic.class);
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-
-    private TransitLocalStreetService localStreetService;
-
     private double targetX;
-
     private double targetY;
+    private boolean transit;
+    private double walkReluctance;
+    private double maxStreetSpeed;
+    private double maxTransitSpeed;
+    private double requiredWalkDistance;
 
     @Override
     public void initialize(State s, Vertex target, long abortTime) {
-        this.options = s.getOptions();
-        this.useTransit = options.modes.isTransit();
-        this.maxSpeed = getMaxSpeed(options);
-
-        Graph graph = options.rctx.graph;
-        localStreetService = graph.getService(TransitLocalStreetService.class);
-
+        RoutingRequest req = s.getOptions();
+        this.transit = req.modes.isTransit();
+        maxStreetSpeed = req.getStreetSpeedUpperBound();
+        maxTransitSpeed = req.getTransitSpeedUpperBound();
         targetX = target.getX();
         targetY = target.getY();
+        requiredWalkDistance = determineRequiredWalkDistance(req);
+        walkReluctance = req.walkReluctance;
     }
 
     /**
-     * On a non-transit trip, the remaining weight is simply distance / speed.
+     * On a non-transit trip, the remaining weight is simply distance / street speed.
      * On a transit trip, there are two cases: 
      * (1) we're not on a transit vehicle. In this case, there are two possible ways to compute 
      *     the remaining distance, and we take whichever is smaller: 
@@ -73,49 +82,51 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     @Override
     public double computeForwardWeight(State s, Vertex target) {
         Vertex sv = s.getVertex();
-        double euclideanDistance = distanceLibrary.fastDistance(sv.getY(), sv.getX(), targetY,
-                targetX);
-        if (useTransit) {
-            double streetSpeed = options.getStreetSpeedUpperBound();
-            if (euclideanDistance < target.getDistanceToNearestTransitStop()) { 
-                return options.walkReluctance * euclideanDistance / streetSpeed;
+        double euclideanDistance = distanceLibrary.fastDistance(sv.getY(), sv.getX(), targetY, targetX);
+        if (transit) {
+            if (euclideanDistance < requiredWalkDistance) {
+                return walkReluctance * euclideanDistance / maxStreetSpeed;
             }
-            // Search allows using transit, passenger is not alighted local and is not within 
-            // mandatory walking distance of the target: It is possible we will reach the 
-            // destination using transit. Find lower bound on cost of this hypothetical trip.
-            int boardCost;
-            if (s.isOnboard()) {
-                // onboard: we might not need any more boardings (remember this is a lower bound).
-                boardCost = 0;
-            } else {
-                // offboard: we know that using transit to reach the destination would require at
-                // least one boarding.
-                boardCost = options.getBoardCostLowerBound();
-                if (s.isEverBoarded()) {
-                    // the boarding would be a transfer, because we've boarded before.
-                    boardCost += options.transferPenalty;
-                    if (localStreetService != null) {
-                        if (options.getMaxWalkDistance() - s.getWalkDistance() < euclideanDistance
-                                && sv instanceof IntersectionVertex
-                                && !localStreetService.transferrable(sv)) {
-                            return Double.POSITIVE_INFINITY;
-                        }
-                    }
-                }
-            }
-            // Find how much mandatory walking is needed to use transit from here.
-            // If the passenger is onboard, the second term is zero.
-            double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
-                    + sv.getDistanceToNearestTransitStop();
-            double transitCost = (euclideanDistance - mandatoryWalkDistance) / maxSpeed + boardCost; 
-            double transitStreetCost = mandatoryWalkDistance * options.walkReluctance / streetSpeed; 
-            // Compare transit use with the cost of just walking all the way to the destination, 
-            // and return the lower of the two.
-            return Math.min(transitCost + transitStreetCost, 
-                            options.walkReluctance * euclideanDistance / streetSpeed);
+            /* Due to the above conditional, the following value is known to be positive. */
+            double transitWeight = (euclideanDistance - requiredWalkDistance) / maxTransitSpeed;
+            double streetWeight = walkReluctance * (requiredWalkDistance / maxStreetSpeed);
+            return transitWeight + streetWeight;
         } else {
-            // search disallows using transit: all travel is on-street
-            return options.walkReluctance * euclideanDistance / maxSpeed;
+            // all travel is on-street, no transit involved
+            return walkReluctance * euclideanDistance / maxStreetSpeed;
+        }
+    }
+
+    /**
+     * Figure out the minimum amount of walking to reach the destination from transit.
+     * This is done by doing a Dijkstra search for the first reachable transit stop.
+     */
+    private double determineRequiredWalkDistance(RoutingRequest req) {
+        if ( ! req.modes.isTransit()) return 0; // required walk distance will be unused.
+        GenericDijkstra gd = new GenericDijkstra(req);
+        State s = new State(req.rctx.target, req);
+        gd.setHeuristic(new TrivialRemainingWeightHeuristic());
+        final ClosestStopTraverseVisitor visitor = new ClosestStopTraverseVisitor();
+        gd.traverseVisitor = visitor;
+        gd.searchTerminationStrategy = new SearchTerminationStrategy() {
+            @Override public boolean shouldSearchTerminate(Vertex origin, Vertex target, State current,
+                                                           ShortestPathTree spt, RoutingRequest traverseOptions) {
+                return visitor.distanceToClosestStop != Double.POSITIVE_INFINITY;
+            }
+        };
+        gd.getShortestPathTree(s);
+        return visitor.distanceToClosestStop;
+    }
+
+    static class ClosestStopTraverseVisitor implements TraverseVisitor {
+        public double distanceToClosestStop = Double.POSITIVE_INFINITY;
+        @Override public void visitEdge(Edge edge, State state) { }
+        @Override public void visitEnqueue(State state) { }
+        @Override public void visitVertex(State state) {
+            if (state.getVertex() instanceof TransitStop) {
+                distanceToClosestStop = state.getWalkDistance();
+                LOG.info("Found closest stop to search target: {} at {}m", state.getVertex(), (int) distanceToClosestStop);
+            }
         }
     }
 
@@ -126,28 +137,6 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     @Override
     public double computeReverseWeight(State s, Vertex target) {
         return computeForwardWeight(s, target);
-    }
-
-    /** 
-     * Get the maximum expected speed over all modes. This should probably be moved to
-     * RoutingRequest. 
-     */
-    public static double getMaxSpeed(RoutingRequest options) {
-        if (options.modes.contains(TraverseMode.TRANSIT)) {
-            // assume that the max average transit speed over a hop is 10 m/s, which is roughly
-            // true in Portland and NYC, but *not* true on highways
-            // FIXME this is extremely wrong if you include rail
-            return 10;
-        } else {
-            if (options.optimize == OptimizeType.QUICK) {
-                return options.getStreetSpeedUpperBound();
-            } else {
-                // assume that the best route is no more than 10 times better than
-                // the as-the-crow-flies flat base route.
-                // FIXME random magic constants
-                return options.getStreetSpeedUpperBound() * 10;
-            }
-        }
     }
 
     @Override

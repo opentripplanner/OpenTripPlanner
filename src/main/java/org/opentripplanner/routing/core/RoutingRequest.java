@@ -1173,4 +1173,19 @@ public class RoutingRequest implements Cloneable, Serializable {
         return preferences_penalty;
     }
 
+    /**
+     * Get the maximum expected speed over all transit modes.
+     * TODO derive actual speeds from GTFS feeds. On the other hand, that's what the bidirectional heuristic does on the fly.
+     */
+    public double getTransitSpeedUpperBound() {
+        if (modes.contains(TraverseMode.RAIL)) {
+            return 84; // 300kph typical peak speed of a TGV
+        }
+        if (modes.contains(TraverseMode.CAR)) {
+            return 40; // 130kph max speed of a car on a highway
+        }
+        // Considering that buses can travel on highways, return the same max speed for all other transit.
+        return 40; // TODO find accurate max speeds
+    }
+
 }

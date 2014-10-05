@@ -418,7 +418,7 @@ public class ProfileRouter {
         rr.setNumItineraries(1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode);
         astar.setTraverseVisitor(visitor);
-        ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
+        astar.getShortestPathTree(rr, 5); // timeout in seconds
         // Save the routing context for later cleanup. We need its temporary edges to render street segments at the end.
         routingContexts.add(rr.rctx);
         return visitor.stopClustersFound.values();

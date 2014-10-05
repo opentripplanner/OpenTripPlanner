@@ -100,7 +100,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             return;
         }
         long start = System.currentTimeMillis();
-        LOG.info("initialize()");
         this.target = target;
         // int nVertices = AbstractVertex.getMaxIndex(); // will be ever increasing?
         int nVertices = graph.countVertices();
@@ -115,7 +114,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // forward street search first, sets values around origin to 0
         List<State> search = streetSearch(options, false, abortTime); // ~30 msec
         if (search == null) return; // Search timed out
-        LOG.info("end foreward street search {} ms", System.currentTimeMillis() - start);
+        LOG.debug("end foreward street search {} ms", System.currentTimeMillis() - start);
         // create a new priority queue
         q = new BinHeap<Vertex>();
         // enqueue states for each stop within walking distance of the destination
@@ -124,7 +123,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         for (State stopState : search) { // backward street search
             q.insert(stopState.getVertex(), stopState.getWeight());
         }
-        LOG.info("end backward street search {} ms", System.currentTimeMillis() - start);
+        LOG.debug("end backward street search {} ms", System.currentTimeMillis() - start);
         // once street searches are done, raise the limits to max
         // because hard walk limiting is incorrect and is observed to cause problems 
         // for trips near the cutoff
@@ -140,7 +139,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (finished) return;
         for (int i = 0; i < HEURISTIC_STEPS_PER_MAIN_STEP; ++i) {
             if (q.empty()) {
-                LOG.info("Emptied SSSP queue.");
+                LOG.debug("Emptied SSSP queue.");
                 finished = true;
                 break;
             }
@@ -246,7 +245,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     
     Another way of achieving this is to search from the origin first, saving 0s, then search from
     the destination without overwriting any 0s.
-    
+
+    TODO perhaps reimplement using the generic dijkstra class
     */
 
     private List<State> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
