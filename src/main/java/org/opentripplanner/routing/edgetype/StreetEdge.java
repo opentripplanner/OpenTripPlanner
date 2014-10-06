@@ -165,7 +165,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (!isWheelchairAccessible()) {
                 return false;
             }
-            if (getElevationProfileSegment().getMaxSlope() > options.maxSlope) {
+            if (getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
@@ -182,7 +182,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (!isWheelchairAccessible()) {
                 return false;
             }
-            if (getElevationProfileSegment().getMaxSlope() > options.maxSlope) {
+            if (getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
@@ -198,7 +198,11 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public boolean isElevationFlattened() {
-        return getElevationProfileSegment().isFlattened();
+        return false;
+    }
+
+    public float getMaxSlope() {
+        return 0.0f;
     }
 
     @Override
@@ -325,7 +329,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (traverseMode.equals(TraverseMode.WALK)) {
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
-                double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), elevationProfile.getMaxSlope());
+                double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), getMaxSlope());
                 // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
                 // for the walkspeed set by the user
                 double elevationUtilsSpeed = 4.0 / 3.0;

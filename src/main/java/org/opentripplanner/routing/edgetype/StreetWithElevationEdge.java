@@ -65,12 +65,22 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public PackedCoordinateSequence getElevationProfile() {
-        return getElevationProfileSegment().getElevationProfile();
+        return elevationProfileSegment.getElevationProfile();
     }
 
     @Override
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return getElevationProfileSegment().getElevationProfile(start, end);
+        return elevationProfileSegment.getElevationProfile(start, end);
+    }
+
+    @Override
+    public boolean isElevationFlattened() {
+        return elevationProfileSegment.isFlattened();
+    }
+
+    @Override
+    public float getMaxSlope() {
+        return (float)elevationProfileSegment.getMaxSlope();
     }
 
     @Override
