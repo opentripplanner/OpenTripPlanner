@@ -33,7 +33,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -249,11 +248,6 @@ public class TestStreetMatcher {
 
         public boolean isElevationFlattened() {
             return false;
-        }
-
-        @Override
-        public ElevationProfileSegment getElevationProfileSegment() {
-            return null;
         }
 
         @Override
