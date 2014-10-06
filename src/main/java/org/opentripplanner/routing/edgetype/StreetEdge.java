@@ -286,9 +286,9 @@ public class StreetEdge extends Edge implements Cloneable {
         ElevationProfileSegment elevationProfile = getElevationProfileSegment();
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
-            weight = elevationProfile.getSlopeSpeedFactor() * getDistance() / speed;
+            weight = getSlopeSpeedEffectiveLength() / speed;
         } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
-            time = elevationProfile.getSlopeSpeedFactor() * getDistance() / speed;
+            time = getSlopeSpeedEffectiveLength() / speed;
             switch (options.optimize) {
             case SAFE:
                 weight = bicycleSafetyFactor * getDistance() / speed;
@@ -302,16 +302,16 @@ public class StreetEdge extends Edge implements Cloneable {
                 break;
             case FLAT:
                 /* see notes in StreetVertex on speed overhead */
-                weight = getDistance() / speed + elevationProfile.getSlopeWorkFactor() * getDistance();
+                weight = getDistance() / speed + getSlopeWorkCostEffectiveLength();
                 break;
             case QUICK:
-                weight = elevationProfile.getSlopeSpeedFactor() * getDistance() / speed;
+                weight = getSlopeSpeedEffectiveLength() / speed;
                 break;
             case TRIANGLE:
-                double quick = elevationProfile.getSlopeSpeedFactor() * getDistance();
+                double quick = getSlopeSpeedEffectiveLength();
                 double safety = bicycleSafetyFactor * getDistance();
                 // TODO This computation is not coherent with the one for FLAT
-                double slope = elevationProfile.getSlopeWorkFactor() * getDistance();
+                double slope = getSlopeWorkCostEffectiveLength();
                 weight = quick * options.triangleTimeFactor + slope
                         * options.triangleSlopeFactor + safety
                         * options.triangleSafetyFactor;
@@ -323,7 +323,7 @@ public class StreetEdge extends Edge implements Cloneable {
         } else {
             if (walkingBike) {
                 // take slopes into account when walking bikes
-                time = elevationProfile.getSlopeSpeedFactor() * getDistance() / speed;
+                time = getSlopeSpeedEffectiveLength() / speed;
             }
             weight = time;
             if (traverseMode.equals(TraverseMode.WALK)) {
@@ -511,11 +511,11 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public double getSlopeSpeedEffectiveLength() {
-        return getElevationProfileSegment().getSlopeSpeedFactor() * getDistance();
+        return getDistance();
     }
 
-    public double getWorkCost() {
-        return getElevationProfileSegment().getSlopeWorkFactor() * getDistance();
+    public double getSlopeWorkCostEffectiveLength() {
+        return getDistance();
     }
 
     public void setBicycleSafetyFactor(float bicycleSafetyFactor) {

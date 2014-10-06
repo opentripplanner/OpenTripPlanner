@@ -1101,7 +1101,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	        Vertex fromv = selected.getFromVertex();
 	        getMetadata(fromv);
 	        if (selected instanceof StreetEdge) {
-	            getMetadata(((StreetEdge) selected).getElevationProfileSegment());
+	            //TODO ElevationProfileSegment do not exist anymore
+	            //getMetadata(((StreetEdge) selected).getElevationProfileSegment());
 	        }
 	        metadataList.revalidate();
 	

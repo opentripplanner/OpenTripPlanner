@@ -84,6 +84,16 @@ public class StreetWithElevationEdge extends StreetEdge {
     }
 
     @Override
+    public double getSlopeSpeedEffectiveLength() {
+        return elevationProfileSegment.getSlopeSpeedFactor() * getDistance();
+    }
+
+    @Override
+    public double getSlopeWorkCostEffectiveLength() {
+        return elevationProfileSegment.getSlopeWorkFactor() * getDistance();
+    }
+
+    @Override
     public String toString() {
         return "StreetWithElevationEdge(" + getId() + ", " + getName() + ", " + fromv + " -> "
                 + tov + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()
