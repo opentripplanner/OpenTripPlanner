@@ -77,11 +77,6 @@ public class StreetWithElevationEdge extends StreetEdge {
     }
 
     @Override
-    public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return ElevationUtils.getPartialElevationProfile(getElevationProfile(), start, end);
-    }
-
-    @Override
     public boolean isElevationFlattened() {
         return flattened;
     }

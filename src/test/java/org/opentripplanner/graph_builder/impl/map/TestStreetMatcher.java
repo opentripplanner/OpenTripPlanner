@@ -208,11 +208,6 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public PackedCoordinateSequence getElevationProfile(double from, double to) {
-            return null;
-        }
-
-        @Override
         public boolean canTraverse(RoutingRequest options) {
             return true;
         }
