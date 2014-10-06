@@ -331,19 +331,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testFirstAndLastLeg() throws Exception {
-        TestPlanner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
-
-        Response response = planner.getFirstTrip();
-        Itinerary itinerary = response.getPlan().itinerary.get(0);
-        List<Leg> legs = itinerary.legs;
-        Leg firstLeg = legs.get(0);
-        Leg lastLeg = legs.get(legs.size() - 1);
-
-        // The start time of the first leg should equal the start time of the entire itinerary
-        assertEquals(itinerary.startTime, firstLeg.startTime);
-
-        // The end time of the last leg should equal the end time of the entire itinerary
-        assertEquals(itinerary.endTime, lastLeg.endTime);
+        /** Subsumed by tests in {@link PlanGeneratorTest}. */
     }
 
     public void testAlerts() throws Exception {
