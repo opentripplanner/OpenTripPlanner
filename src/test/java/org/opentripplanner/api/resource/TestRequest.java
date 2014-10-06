@@ -56,8 +56,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopMatcher;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
@@ -303,24 +301,7 @@ class Context {
 
 public class TestRequest extends TestCase {
     public void testRequest() {
-        RoutingRequest request = new RoutingRequest();
-
-        request.addMode(TraverseMode.CAR);
-        assertTrue(request.modes.getCar());
-        request.removeMode(TraverseMode.CAR);
-        assertFalse(request.modes.getCar());
-
-        request.addMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.modes.getCar());
-        assertTrue(request.modes.getDriving());
-        request.removeMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.modes.getCar());
-        assertFalse(request.modes.getDriving());
-
-        request.setModes(new TraverseModeSet("BICYCLE,WALK"));
-        assertFalse(request.modes.getCar());
-        assertTrue(request.modes.getBicycle());
-        assertTrue(request.modes.getWalk());
+        /** Moved to {@link RoutingRequest). */
     }
 
     public void testBuildRequest() throws Exception {
