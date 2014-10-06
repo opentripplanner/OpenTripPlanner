@@ -43,11 +43,6 @@ public class StreetWithElevationEdge extends StreetEdge {
         return (StreetWithElevationEdge) super.clone();
     }
 
-    @Override
-    public ElevationProfileSegment getElevationProfileSegment() {
-        return elevationProfileSegment;
-    }
-
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
         if (elev == null || elev.size() < 2) {
             return false;

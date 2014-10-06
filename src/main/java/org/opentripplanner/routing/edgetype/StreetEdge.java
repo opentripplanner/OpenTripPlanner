@@ -31,7 +31,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -283,7 +282,6 @@ public class StreetEdge extends Edge implements Cloneable {
         
         double time = getDistance() / speed;
         double weight;
-        ElevationProfileSegment elevationProfile = getElevationProfileSegment();
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
             weight = getSlopeSpeedEffectiveLength() / speed;
@@ -577,10 +575,6 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
         return true;
-    }
-
-    public ElevationProfileSegment getElevationProfileSegment() {
-        return ElevationProfileSegment.getFlatProfile();
     }
 
     protected boolean detachFrom() {
