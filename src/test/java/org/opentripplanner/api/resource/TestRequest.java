@@ -84,7 +84,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.SimpleTimeZone;
@@ -305,13 +304,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testBuildRequest() throws Exception {
-        TestPlanner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
-        RoutingRequest options = planner.buildRequest();
-
-        assertEquals(new Date(1254420671000L), options.getDateTime());
-        assertEquals(1600.0, options.getMaxWalkDistance());
-        assertEquals(8.0, options.walkReluctance);
-        assertEquals(1, options.getNumItineraries());
+        /** Removed on grounds of being redundant and testing internal functionality only. */
     }
 
     public void testPlanner() throws Exception {
