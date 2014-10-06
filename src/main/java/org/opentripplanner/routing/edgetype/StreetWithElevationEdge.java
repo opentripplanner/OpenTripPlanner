@@ -64,6 +64,16 @@ public class StreetWithElevationEdge extends StreetEdge {
     }
 
     @Override
+    public PackedCoordinateSequence getElevationProfile() {
+        return getElevationProfileSegment().getElevationProfile();
+    }
+
+    @Override
+    public PackedCoordinateSequence getElevationProfile(double start, double end) {
+        return getElevationProfileSegment().getElevationProfile(start, end);
+    }
+
+    @Override
     public String toString() {
         return "StreetWithElevationEdge(" + getId() + ", " + getName() + ", " + fromv + " -> "
                 + tov + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()

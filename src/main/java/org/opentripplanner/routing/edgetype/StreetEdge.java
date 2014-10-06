@@ -190,11 +190,11 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public PackedCoordinateSequence getElevationProfile() {
-        return getElevationProfileSegment().getElevationProfile();
+        return null;
     }
 
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return getElevationProfileSegment().getElevationProfile(start, end);
+        return null;
     }
 
     public boolean isElevationFlattened() {
