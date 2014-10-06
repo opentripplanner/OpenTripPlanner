@@ -193,6 +193,10 @@ public class StreetEdge extends Edge implements Cloneable {
         return getElevationProfileSegment().getElevationProfile();
     }
 
+    public PackedCoordinateSequence getElevationProfile(double start, double end) {
+        return getElevationProfileSegment().getElevationProfile(start, end);
+    }
+
     public boolean isElevationFlattened() {
         return getElevationProfileSegment().isFlattened();
     }
@@ -520,10 +524,6 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
-    }
-
-    public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return getElevationProfileSegment().getElevationProfile(start, end);
     }
 
     public String toString() {
