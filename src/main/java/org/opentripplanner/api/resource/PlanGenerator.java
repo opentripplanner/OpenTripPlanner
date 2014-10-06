@@ -557,11 +557,7 @@ public class PlanGenerator {
             if (!(edge instanceof StreetEdge)) continue;
 
             StreetEdge edgeWithElevation = (StreetEdge) edge;
-            ElevationProfileSegment profileSegment = edgeWithElevation.getElevationProfileSegment();
-
-            if (profileSegment == null) continue;
-
-            PackedCoordinateSequence coordinates = profileSegment.getElevationProfile();
+            PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
 
             if (coordinates == null) continue;
             // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
