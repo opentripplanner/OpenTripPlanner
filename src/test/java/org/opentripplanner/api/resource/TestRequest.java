@@ -30,8 +30,6 @@ import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.RouterInfo;
-import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
@@ -52,6 +50,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingRequestTest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopMatcher;
 import org.opentripplanner.routing.core.StopTransfer;
@@ -300,7 +299,7 @@ class Context {
 
 public class TestRequest extends TestCase {
     public void testRequest() {
-        /** Moved to {@link RoutingRequest). */
+        /** Moved to {@link RoutingRequestTest). */
     }
 
     public void testBuildRequest() throws Exception {
@@ -435,24 +434,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testRouters() {
-        Routers routerApi = new Routers();
-        routerApi.server = Context.getInstance().otpServer;
-        RouterList routers = routerApi.getRouterIds();
-        assertEquals(2, routers.routerInfo.size());
-        RouterInfo router0 = routers.routerInfo.get(0);
-        RouterInfo router1 = routers.routerInfo.get(1);
-        RouterInfo otherRouter;
-        RouterInfo defaultRouter;
-        if (router0.routerId == null) {
-            defaultRouter = router0;
-            otherRouter = router1;
-        } else {
-            defaultRouter = router1;
-            otherRouter = router0;
-        }
-        assertNull(defaultRouter.routerId);
-        assertNotNull(otherRouter.routerId);
-        assertTrue(otherRouter.polygon.getArea() > 0);
+        /** Moved to {@link RoutersTest). */
     }
 
     public void testBannedTrips() {
