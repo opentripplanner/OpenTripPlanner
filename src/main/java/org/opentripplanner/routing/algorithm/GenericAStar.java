@@ -105,7 +105,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         runState.heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
-        runState.heuristic = new TrivialRemainingWeightHeuristic();
 
         // heuristic calc could actually be done when states are constructed, inside state
         State initialState = new State(options);
