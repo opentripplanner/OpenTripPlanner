@@ -96,7 +96,12 @@ public class GraphServiceImpl implements GraphService {
                 LOG.error("no graph registered with the routerId '{}'", routerId);
                 throw new GraphNotFoundException();
             } else {
-                return graphSources.get(routerId).getGraph();
+                Graph graph = graphSources.get(routerId).getGraph();
+                if (graph == null) {
+                    evictGraph(routerId);
+                    throw new GraphNotFoundException();
+                }
+                return graph;
             }
         }
     }
