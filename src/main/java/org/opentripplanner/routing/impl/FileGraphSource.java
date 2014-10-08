@@ -43,13 +43,19 @@ public class FileGraphSource implements GraphSource {
 
     public static final String CONFIG_FILENAME = "Graph.properties";
 
+    private static final long LOAD_DELAY_SEC = 10;
+
     private Graph graph;
 
     private String routerId;
 
-    private File path;
+    protected File path;
+
+    private long graphLastModified = 0L;
 
     private LoadLevel loadLevel;
+
+    private Object preEvictMutex = new Boolean(false);
 
     // TODO Why do we need a factory? There is a single one implementation.
     private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
@@ -60,52 +66,87 @@ public class FileGraphSource implements GraphSource {
         this.routerId = routerId;
         this.path = path;
         this.loadLevel = loadLevel;
-        this.reload(false);
+        this.reload(true, false);
     }
 
     @Override
     public Graph getGraph() {
-        return graph;
+        /*
+         * We synchronize on pre-evict mutex in case we are in the middle of reloading in pre-evict
+         * mode. In that case we must make the client wait until the new graph is loaded, because
+         * the old one is gone to the GC. Performance hit should be low as getGraph() is not called
+         * often.
+         */
+        synchronized (preEvictMutex) {
+            return graph;
+        }
     }
 
     @Override
-    public boolean reload(boolean preEvict) {
+    public boolean reload(boolean force, boolean preEvict) {
+        /* We synchronize on 'this' to prevent multiple reloads from being called at the same time */
         synchronized (this) {
+            long lastModified = getLastModified();
+            boolean doReload = force ? true : checkAutoReload(lastModified);
+            if (!doReload)
+                return true;
             if (preEvict) {
-                Graph oldGraph = graph;
-                graph = null;
-                if (oldGraph != null)
-                    decorator.shutdownGraph(oldGraph);
-                graph = loadGraph();
+                synchronized (preEvictMutex) {
+                    if (graph != null)
+                        decorator.shutdownGraph(graph);
+                    /*
+                     * Forcing graph to null here should remove any references to the graph once all
+                     * current requests are done. So the next reload is supposed to have more
+                     * memory.
+                     */
+                    graph = null;
+                    graph = loadGraph();
+                }
             } else {
                 Graph newGraph = loadGraph();
-                Graph oldGraph = graph;
-                graph = newGraph;
-                if (oldGraph != null)
-                    decorator.shutdownGraph(oldGraph);
+                if (graph != null)
+                    decorator.shutdownGraph(graph);
+                // TODO: If load fails, keep the old graph?
+                graph = newGraph; // Assignment in java is atomic
             }
+            if (graph == null)
+                graphLastModified = 0L;
+            else
+                graphLastModified = lastModified;
+            // If a graph is null, it will be evicted.
             return (graph != null);
+        }
+    }
+
+    private boolean checkAutoReload(long lastModified) {
+        // We check only for graph file modification, not config
+        long validEndTime = System.currentTimeMillis() - LOAD_DELAY_SEC * 1000;
+        LOG.debug(
+                "checkAutoReload router '{}' validEndTime={} lastModified={} graphLastModified={}",
+                routerId, validEndTime, lastModified, graphLastModified);
+        if (lastModified != graphLastModified && lastModified <= validEndTime) {
+            // Only reload graph modified more than 1 mn ago.
+            LOG.info("Router ID '{}' graph input modification detected, force reload.", routerId);
+            return true;
+        } else {
+            return false;
         }
     }
 
     @Override
     public void evict() {
-        if (graph != null) {
-            decorator.shutdownGraph(graph);
+        synchronized (this) {
+            if (graph != null) {
+                decorator.shutdownGraph(graph);
+            }
         }
     }
 
     private Graph loadGraph() {
-        LOG.debug("Loading serialized graph for routerId {}", routerId);
 
-        String graphFileName = new File(path, GRAPH_FILENAME).getPath();
-        String configFileName = new File(path, CONFIG_FILENAME).getPath();
-
-        LOG.debug("Graph file for routerId '{}' is at {}", routerId, graphFileName);
-        InputStream is = getGraphInputStream(graphFileName);
+        InputStream is = getGraphInputStream();
         if (is == null) {
-            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId,
-                    graphFileName);
+            LOG.warn("Graph file not found or not openable for routerId '{}'", routerId);
             return null;
         }
         LOG.info("Loading graph...");
@@ -113,7 +154,7 @@ public class FileGraphSource implements GraphSource {
         try {
             graph = Graph.load(new ObjectInputStream(is), loadLevel, streetVertexIndexFactory);
         } catch (Exception ex) {
-            LOG.error("Exception while loading graph from {}.", graphFileName);
+            LOG.error("Exception while loading graph '{}'.", routerId);
             ex.printStackTrace();
             return null;
         }
@@ -123,7 +164,7 @@ public class FileGraphSource implements GraphSource {
         // Decorate the graph. Even if a config file is not present
         // one could be bundled inside.
         try {
-            is = getConfigInputStream(configFileName);
+            is = getConfigInputStream();
             Preferences config = is == null ? null : new PropertiesPreferences(is);
             decorator.setupGraph(graph, config);
         } catch (IOException e) {
@@ -132,9 +173,10 @@ public class FileGraphSource implements GraphSource {
         return graph;
     }
 
-    protected InputStream getGraphInputStream(String graphFileName) {
+    protected InputStream getGraphInputStream() {
         try {
-            File graphFile = new File(graphFileName);
+            File graphFile = new File(path, GRAPH_FILENAME);
+            LOG.info("Loading graph from file '{}'", graphFile.getPath());
             return new FileInputStream(graphFile);
         } catch (IOException ex) {
             LOG.warn("Error creating graph input stream", ex);
@@ -142,13 +184,18 @@ public class FileGraphSource implements GraphSource {
         }
     }
 
-    protected InputStream getConfigInputStream(String configFileName) throws IOException {
-        File configFile = new File(configFileName);
+    protected InputStream getConfigInputStream() throws IOException {
+        File configFile = new File(path, CONFIG_FILENAME);
         if (configFile.canRead()) {
-            LOG.info("Loading config from file {}", configFileName);
+            LOG.info("Loading config from file '{}'", configFile.getPath());
             return new FileInputStream(configFile);
         } else {
             return null;
         }
+    }
+
+    protected long getLastModified() {
+        // Note: this returns 0L if the file does not exists
+        return new File(path, GRAPH_FILENAME).lastModified();
     }
 }

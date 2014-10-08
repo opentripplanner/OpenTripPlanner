@@ -23,8 +23,20 @@ public interface GraphSource {
 
     /** @return The graph object */
     public Graph getGraph();
-    
-    public boolean reload(boolean preEvict);
-    
+
+    /**
+     * Reload the graph from it's source.
+     * 
+     * @param force True to force a reload, false to check only.
+     * @param preEvict True to evict the old version *before* loading the new one. In that case the
+     *        implementation have to take care of making the getGraph() call wait while the new
+     *        graph is being loaded and not return null.
+     * @return False if a new graph has not been reloaded and this graph must be evicted.
+     */
+    public boolean reload(boolean force, boolean preEvict);
+
+    /**
+     * Callback when the graph (source) gets evicted from the repository.
+     */
     public void evict();
 }

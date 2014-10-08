@@ -45,7 +45,7 @@ public class MemoryGraphSource implements GraphSource {
     }
 
     @Override
-    public boolean reload(boolean preEvict) {
+    public boolean reload(boolean force, boolean preEvict) {
         /*
          * The method does not make sense for memory-graph, but we want to be able to support it if
          * we want to mix in-memory graph with file-based graphs.

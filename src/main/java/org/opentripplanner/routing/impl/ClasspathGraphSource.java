@@ -34,14 +34,24 @@ public class ClasspathGraphSource extends FileGraphSource {
     }
 
     @Override
-    protected InputStream getGraphInputStream(String graphFileName) {
-        LOG.debug("Loading graph from classpath at '{}'", graphFileName);
-        return Thread.currentThread().getContextClassLoader().getResourceAsStream(graphFileName);
+    protected InputStream getGraphInputStream() {
+        File graphFile = new File(path, GRAPH_FILENAME);
+        LOG.debug("Loading graph from classpath at '{}'", graphFile.getPath());
+        return Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(graphFile.getPath());
     }
 
     @Override
-    protected InputStream getConfigInputStream(String configFileName) {
-        LOG.debug("Trying to load config on classpath at {}", configFileName);
-        return Thread.currentThread().getContextClassLoader().getResourceAsStream(configFileName);
+    protected InputStream getConfigInputStream() {
+        File configFile = new File(path, CONFIG_FILENAME);
+        LOG.debug("Trying to load config on classpath at '{}'", configFile.getPath());
+        return Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(configFile.getPath());
     }
+
+    @Override
+    protected long getLastModified() {
+        return 0L;
+    }
+
 }

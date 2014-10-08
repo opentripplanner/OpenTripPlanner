@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +47,10 @@ public class GraphServiceImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
+    private static final int AUTOSCAN_PERIOD_SEC = 10;
+
+    private static final boolean AUTORELOAD_PREEVICT = false;
+
     private Map<String, GraphSource> graphSources = new HashMap<>();
 
     /**
@@ -57,7 +64,15 @@ public class GraphServiceImpl implements GraphService {
 
     public GraphSourceFactory graphSourceFactory;
 
+    private ScheduledExecutorService scanExecutor = Executors.newSingleThreadScheduledExecutor();
+
     public GraphServiceImpl() {
+        scanExecutor.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                autoReloadScan();
+            }
+        }, AUTOSCAN_PERIOD_SEC, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
     }
 
     /**
@@ -91,19 +106,22 @@ public class GraphServiceImpl implements GraphService {
             routerId = defaultRouterId;
             LOG.debug("routerId not specified, set to default of '{}'", routerId);
         }
-        synchronized (graphSources) {
-            if (!graphSources.containsKey(routerId)) {
-                LOG.error("no graph registered with the routerId '{}'", routerId);
-                throw new GraphNotFoundException();
-            } else {
-                Graph graph = graphSources.get(routerId).getGraph();
-                if (graph == null) {
-                    evictGraph(routerId);
-                    throw new GraphNotFoundException();
-                }
-                return graph;
-            }
+        /*
+         * Here we should not synchronize on graphSource as it may block for a while (during
+         * reload/autoreload). For normal operations a simple get do not need to be synchronized so
+         * we should be safe.
+         */
+        GraphSource graphSource = graphSources.get(routerId);
+        if (graphSource == null) {
+            LOG.error("no graph registered with the routerId '{}'", routerId);
+            throw new GraphNotFoundException();
         }
+        Graph graph = graphSource.getGraph();
+        if (graph == null) {
+            evictGraph(routerId);
+            throw new GraphNotFoundException();
+        }
+        return graph;
     }
 
     @Override
@@ -113,7 +131,7 @@ public class GraphServiceImpl implements GraphService {
             Collection<String> routerIds = getRouterIds();
             for (String routerId : routerIds) {
                 GraphSource graphSource = graphSources.get(routerId);
-                boolean success = graphSource.reload(preEvict);
+                boolean success = graphSource.reload(true, preEvict);
                 if (!success) {
                     evictGraph(routerId);
                 }
@@ -203,5 +221,18 @@ public class GraphServiceImpl implements GraphService {
     private boolean routerIdLegal(String routerId) {
         Matcher m = routerIdPattern.matcher(routerId);
         return m.matches();
+    }
+
+    private void autoReloadScan() {
+        synchronized (graphSources) {
+            Collection<String> routerIds = getRouterIds();
+            for (String routerId : routerIds) {
+                GraphSource graphSource = graphSources.get(routerId);
+                boolean success = graphSource.reload(false, AUTORELOAD_PREEVICT);
+                if (!success) {
+                    evictGraph(routerId);
+                }
+            }
+        }
     }
 }
