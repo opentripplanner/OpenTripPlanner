@@ -96,29 +96,13 @@ public class FileGraphSource implements GraphSource {
     }
 
     private Graph loadGraph() {
-        LOG.debug("loading serialized graph for routerId {}", routerId);
+        LOG.debug("Loading serialized graph for routerId {}", routerId);
 
         String graphFileName = new File(path, GRAPH_FILENAME).getPath();
         String configFileName = new File(path, CONFIG_FILENAME).getPath();
 
-        LOG.debug("graph file for routerId '{}' is at {}", routerId, graphFileName);
-        InputStream is = null;
-        final String CLASSPATH_PREFIX = "classpath:/";
-        if (graphFileName.startsWith(CLASSPATH_PREFIX)) {
-            // look for graph on classpath
-            String resourceName = graphFileName.substring(CLASSPATH_PREFIX.length());
-            LOG.debug("loading graph on classpath at {}", resourceName);
-            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-        } else {
-            // look for graph in filesystem
-            try {
-                File graphFile = new File(graphFileName);
-                is = new FileInputStream(graphFile);
-            } catch (IOException ex) {
-                is = null;
-                LOG.warn("Error creating graph input stream", ex);
-            }
-        }
+        LOG.debug("Graph file for routerId '{}' is at {}", routerId, graphFileName);
+        InputStream is = getGraphInputStream(graphFileName);
         if (is == null) {
             LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId,
                     graphFileName);
@@ -139,27 +123,32 @@ public class FileGraphSource implements GraphSource {
         // Decorate the graph. Even if a config file is not present
         // one could be bundled inside.
         try {
-            is = null;
-            if (configFileName.startsWith(CLASSPATH_PREFIX)) {
-                // look for config on classpath
-                String resourceName = configFileName.substring(CLASSPATH_PREFIX.length());
-                LOG.debug("Trying to load config on classpath at {}", resourceName);
-                is = Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream(resourceName);
-            } else {
-                // look for config in filesystem
-                LOG.debug("Trying to load config on file at {}", configFileName);
-                File configFile = new File(configFileName);
-                if (configFile.canRead()) {
-                    LOG.info("Loading config from file {}", configFileName);
-                    is = new FileInputStream(configFile);
-                }
-            }
+            is = getConfigInputStream(configFileName);
             Preferences config = is == null ? null : new PropertiesPreferences(is);
             decorator.setupGraph(graph, config);
         } catch (IOException e) {
             LOG.error("Can't read config file", e);
         }
         return graph;
+    }
+
+    protected InputStream getGraphInputStream(String graphFileName) {
+        try {
+            File graphFile = new File(graphFileName);
+            return new FileInputStream(graphFile);
+        } catch (IOException ex) {
+            LOG.warn("Error creating graph input stream", ex);
+            return null;
+        }
+    }
+
+    protected InputStream getConfigInputStream(String configFileName) throws IOException {
+        File configFile = new File(configFileName);
+        if (configFile.canRead()) {
+            LOG.info("Loading config from file {}", configFileName);
+            return new FileInputStream(configFile);
+        } else {
+            return null;
+        }
     }
 }
