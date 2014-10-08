@@ -46,7 +46,11 @@ public class MemoryGraphSource implements GraphSource {
 
     @Override
     public boolean reload(boolean preEvict) {
-        throw new UnsupportedOperationException();
+        /*
+         * The method does not make sense for memory-graph, but we want to be able to support it if
+         * we want to mix in-memory graph with file-based graphs.
+         */
+        return true;
     }
 
     @Override
