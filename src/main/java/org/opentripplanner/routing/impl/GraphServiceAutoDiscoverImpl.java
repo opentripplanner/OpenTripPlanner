@@ -173,7 +173,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
              * available; and 2) if the loading of a new graph fails we also want to keep the old
              * one.
              */
-            this.registerGraph(routerId, new FileGraphSource(routerId, basePath, LoadLevel.FULL));
+            this.registerGraph(routerId, new FileGraphSource(routerId, baseFile, LoadLevel.FULL));
         }
         for (String routerId : getRouterIds()) {
             // Evict graph removed from disk.

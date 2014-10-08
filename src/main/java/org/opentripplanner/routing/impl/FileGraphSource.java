@@ -47,7 +47,7 @@ public class FileGraphSource implements GraphSource {
 
     private String routerId;
 
-    private String path;
+    private File path;
 
     private LoadLevel loadLevel;
 
@@ -56,7 +56,7 @@ public class FileGraphSource implements GraphSource {
 
     private GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
 
-    public FileGraphSource(String routerId, String path, LoadLevel loadLevel) {
+    public FileGraphSource(String routerId, File path, LoadLevel loadLevel) {
         this.routerId = routerId;
         this.path = path;
         this.loadLevel = loadLevel;
@@ -98,8 +98,8 @@ public class FileGraphSource implements GraphSource {
     private Graph loadGraph() {
         LOG.debug("loading serialized graph for routerId {}", routerId);
 
-        String graphFileName = path + GRAPH_FILENAME;
-        String configFileName = path + CONFIG_FILENAME;
+        String graphFileName = new File(path, GRAPH_FILENAME).getPath();
+        String configFileName = new File(path, CONFIG_FILENAME).getPath();
 
         LOG.debug("graph file for routerId '{}' is at {}", routerId, graphFileName);
         InputStream is = null;

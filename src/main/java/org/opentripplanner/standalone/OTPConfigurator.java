@@ -29,7 +29,6 @@ import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.TransitToTaggedStopsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.ElevationGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
@@ -43,7 +42,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.impl.FileGraphSourceFactory;
 import org.opentripplanner.routing.impl.GraphScanner;
-import org.opentripplanner.routing.impl.GraphServiceAutoDiscoverImpl;
 import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.services.GraphService;
@@ -99,7 +97,7 @@ public class OTPConfigurator {
             FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
             graphService.graphSourceFactory = graphSourceFactory;
             if (params.graphDirectory != null) {
-                graphSourceFactory.basePath = params.graphDirectory;
+                graphSourceFactory.basePath = new File(params.graphDirectory);
             }
             if (params.routerIds.size() > 0) {
                 GraphScanner graphScanner = new GraphScanner(graphService);

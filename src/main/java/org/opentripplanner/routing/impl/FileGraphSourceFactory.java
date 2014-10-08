@@ -34,23 +34,23 @@ public class FileGraphSourceFactory implements GraphSourceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileGraphSourceFactory.class);
 
-    public String basePath = "/var/otp/graphs";
+    public File basePath = new File("/var/otp/graphs");
 
     public LoadLevel loadLevel = LoadLevel.FULL;
 
     @Override
     public GraphSource createGraphSource(String routerId) {
-        return new FileGraphSource(routerId, createBaseFileName(routerId), loadLevel);
+        return new FileGraphSource(routerId, getBasePath(routerId), loadLevel);
     }
 
     @Override
     public boolean save(String routerId, InputStream is) {
-        String graphFileName = createBaseFileName(routerId) + FileGraphSource.GRAPH_FILENAME;
+
+        File sourceFile = new File(getBasePath(routerId), FileGraphSource.GRAPH_FILENAME);
 
         try {
 
             // Create directory if necessary
-            File sourceFile = new File(graphFileName);
             File directory = new File(sourceFile.getParentFile().getPath());
             if (!directory.exists()) {
                 directory.mkdir();
@@ -60,10 +60,9 @@ public class FileGraphSourceFactory implements GraphSourceFactory {
             // file of the original file.
 
             // Make backup file
-            sourceFile = new File(graphFileName);
             File destFile = null;
             if (sourceFile.exists()) {
-                destFile = new File(graphFileName + ".bak");
+                destFile = new File(sourceFile.getPath() + ".bak");
                 if (destFile.exists()) {
                     destFile.delete();
                 }
@@ -71,17 +70,17 @@ public class FileGraphSourceFactory implements GraphSourceFactory {
             }
 
             // Store the stream
-            FileOutputStream os = new FileOutputStream(graphFileName);
+            FileOutputStream os = new FileOutputStream(sourceFile);
             ByteStreams.copy(is, os);
 
             // And delete the backup file
-            sourceFile = new File(graphFileName + ".bak");
+            sourceFile = new File(sourceFile.getPath() + ".bak");
             if (sourceFile.exists()) {
                 sourceFile.delete();
             }
 
         } catch (Exception ex) {
-            LOG.error("Exception while storing graph to {}.", graphFileName);
+            LOG.error("Exception while storing graph to {}.", sourceFile.getPath());
             ex.printStackTrace();
             return false;
         }
@@ -89,16 +88,7 @@ public class FileGraphSourceFactory implements GraphSourceFactory {
         return true;
     }
 
-    private String createBaseFileName(String routerId) {
-        StringBuilder sb = new StringBuilder(basePath);
-        if (!(basePath.endsWith(File.separator))) {
-            sb.append(File.separator);
-        }
-        if (routerId.length() > 0) {
-            // there clearly must be a more elegant way to extend paths
-            sb.append(routerId);
-            sb.append(File.separator);
-        }
-        return sb.toString();
+    private File getBasePath(String routerId) {
+        return new File(basePath, routerId);
     }
 }

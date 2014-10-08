@@ -31,7 +31,7 @@ public class GraphScanner {
     private static final Logger LOG = LoggerFactory.getLogger(GraphScanner.class);
 
     /** Where to look for graphs */
-    public String basePath = "/var/otp/graphs";
+    public File basePath = new File("/var/otp/graphs");
 
     /** A list of routerIds to automatically register and load at startup */
     public List<String> autoRegister;
@@ -64,7 +64,7 @@ public class GraphScanner {
             LOG.info("graph files will be sought in paths relative to {}", basePath);
             for (String routerId : autoRegister) {
                 graphService.registerGraph(routerId, new FileGraphSource(routerId,
-                        createBaseFileName(routerId), loadLevel));
+                        getBasePath(routerId), loadLevel));
             }
         } else {
             LOG.info("no list of routerIds was provided for automatic registration.");
@@ -72,20 +72,11 @@ public class GraphScanner {
         if (attemptRegisterDefault && !graphService.getRouterIds().contains(defaultRouterId)) {
             LOG.info("Attempting to load graph for default routerId '{}'.", defaultRouterId);
             graphService.registerGraph(defaultRouterId, new FileGraphSource(defaultRouterId,
-                    createBaseFileName(defaultRouterId), loadLevel));
+                    getBasePath(defaultRouterId), loadLevel));
         }
     }
 
-    private String createBaseFileName(String routerId) {
-        StringBuilder sb = new StringBuilder(basePath);
-        if (!(basePath.endsWith(File.separator))) {
-            sb.append(File.separator);
-        }
-        if (routerId.length() > 0) {
-            // there clearly must be a more elegant way to extend paths
-            sb.append(routerId);
-            sb.append(File.separator);
-        }
-        return sb.toString();
+    private File getBasePath(String routerId) {
+        return new File(basePath, routerId);
     }
 }
