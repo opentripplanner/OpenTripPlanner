@@ -15,6 +15,7 @@ package org.opentripplanner.routing.services;
 
 import java.util.Collection;
 
+import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
@@ -31,10 +32,10 @@ public interface GraphService {
     public void setDefaultRouterId(String defaultRouterId);
     
     /** @return the current default graph object */
-    public Graph getGraph();
+    public Graph getGraph() throws GraphNotFoundException;
 
     /** @return the graph object for the given router ID */
-    public Graph getGraph(String routerId);
+    public Graph getGraph(String routerId) throws GraphNotFoundException;
 
     /** @return a collection of all valid router IDs for this server */
     public Collection<String> getRouterIds();

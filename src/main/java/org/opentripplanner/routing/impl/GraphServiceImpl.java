@@ -82,12 +82,12 @@ public class GraphServiceImpl implements GraphService {
     }
 
     @Override
-    public Graph getGraph() {
+    public Graph getGraph() throws GraphNotFoundException {
         return getGraph(null);
     }
 
     @Override
-    public Graph getGraph(String routerId) {
+    public Graph getGraph(String routerId) throws GraphNotFoundException {
         if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
             routerId = defaultRouterId;
             LOG.debug("routerId not specified, set to default of '{}'", routerId);
