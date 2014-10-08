@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.Executors;
@@ -26,25 +25,30 @@ import javax.annotation.PreDestroy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+import org.opentripplanner.routing.services.GraphSource;
+import org.opentripplanner.routing.services.GraphSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of the file-based GraphServiceFileImpl which auto-configure itself by scanning
  * the root resource directory.
+ * 
+ * TODO Remove, and split existing functionalities in two:
+ * 1) Graph auto-reload to FileGraphFactory,
+ * 2) Graph auto-discovery to a "GraphScanner".
  */
 public class GraphServiceAutoDiscoverImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceAutoDiscoverImpl.class);
-
-    private GraphServiceFileImpl decorated = new GraphServiceFileImpl();
 
     /** Last timestamp upper bound when we auto-scanned resources. */
     private long lastAutoScan = 0L;
 
     /** The autoscan period in seconds */
     private int autoScanPeriodSec = 60;
+
+    private String basePath, defaultRouterId;
 
     private ScheduledExecutorService scanExecutor = Executors.newSingleThreadScheduledExecutor();
 
@@ -55,82 +59,29 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
      */
     private int loadDelaySec = 10;
 
-    /**
-     * @param indexFactory
-     */
-    public void setIndexFactory(StreetVertexIndexFactory indexFactory) {
-        decorated.indexFactory = (indexFactory);
-    }
-
-    /**
-     * @param defaultRouterId
-     */
-    public void setDefaultRouterId(String defaultRouterId) {
-        decorated.defaultRouterId = (defaultRouterId);
-    }
-
-    /**
-     * Sets a base path for graph loading from the filesystem. Serialized graph files will be
-     * retrieved from sub-directories immediately below this directory. The routerId of a graph is
-     * the same as the name of its sub-directory. This does the same thing as setResource, except
-     * the parameter is interpreted as a file path.
-     */
-    public void setPath(String path) {
-        decorated.basePath = (path);
-    }
-
     @Override
     public Graph getGraph() {
-        return decorated.getGraph();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Graph getGraph(String routerId) {
-        return decorated.getGraph(routerId);
-    }
-
-    @Override
-    public void setLoadLevel(LoadLevel level) {
-        decorated.setLoadLevel(level);
-    }
-
-    @Override
-    public boolean reloadGraphs(boolean preEvict) {
-        return decorated.reloadGraphs(preEvict);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<String> getRouterIds() {
-        return decorated.getRouterIds();
-    }
-
-    @Override
-    public boolean registerGraph(String routerId, boolean preEvict) {
-        // Invalid in auto-discovery mode
-        return false;
-    }
-
-    @Override
-    public boolean registerGraph(String routerId, Graph graph) {
-        // Invalid in auto-discovery mode
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean evictGraph(String routerId) {
-        // Invalid in auto-discovery mode
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int evictAll() {
-        // Invalid in auto-discovery mode
-        return 0;
-    }
-
-    @Override
-    public boolean save(String routerId, InputStream is) {
-        return decorated.save(routerId, is);
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -161,7 +112,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
     @PreDestroy
     private void teardown() {
         LOG.info("Cleaning-up auto-discover thread and graphs");
-        decorated.evictAll();
+        //decorated.evictAll();
         scanExecutor.shutdown();
         try {
             boolean noTimeout = scanExecutor.awaitTermination(10, TimeUnit.SECONDS);
@@ -171,18 +122,18 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
             // This is not really important
             LOG.warn("Interrupted while waiting for scanner thread to finish", e);
         }
-        decorated.cleanupWebapp();
+        //decorated.cleanupWebapp();
     }
 
     private synchronized void autoDiscoverGraphs() {
-        LOG.debug("Auto discovering graphs under {}", decorated.basePath);
+        LOG.debug("Auto discovering graphs under {}", basePath);
         Collection<String> graphOnDisk = new HashSet<String>();
         Collection<String> graphToLoad = new HashSet<String>();
         // Only reload graph modified more than 1 mn ago.
         long validEndTime = System.currentTimeMillis() - loadDelaySec * 1000;
-        File baseFile = new File(decorated.basePath);
+        File baseFile = new File(basePath);
         // First check for a root graph
-        File rootGraphFile = new File(baseFile, GraphServiceFileImpl.GRAPH_FILENAME);
+        File rootGraphFile = new File(baseFile, FileGraphSource.GRAPH_FILENAME);
         if (rootGraphFile.exists() && rootGraphFile.canRead()) {
             graphOnDisk.add("");
             // lastModified can change, so test must be atomic here.
@@ -196,7 +147,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
         for (String sub : baseFile.list()) {
             File subFile = new File(baseFile, sub);
             if (subFile.isDirectory()) {
-                File graphFile = new File(subFile, GraphServiceFileImpl.GRAPH_FILENAME);
+                File graphFile = new File(subFile, FileGraphSource.GRAPH_FILENAME);
                 if (graphFile.exists() && graphFile.canRead()) {
                     graphOnDisk.add(sub);
                     long lastModified = graphFile.lastModified();
@@ -222,21 +173,21 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
              * available; and 2) if the loading of a new graph fails we also want to keep the old
              * one.
              */
-            decorated.registerGraph(routerId, false);
+            this.registerGraph(routerId, new FileGraphSource(routerId, basePath, LoadLevel.FULL));
         }
         for (String routerId : getRouterIds()) {
             // Evict graph removed from disk.
             if (!graphOnDisk.contains(routerId)) {
                 LOG.warn("Auto-evicting routerId '{}', not present on disk anymore.", routerId);
-                decorated.evictGraph(routerId);
+                this.evictGraph(routerId);
             }
         }
 
         /*
          * If the defaultRouterId is not present, print a warning and set it to some default.
          */
-        if (!getRouterIds().contains(decorated.defaultRouterId)) {
-            LOG.warn("Default routerId '{}' not available!", decorated.defaultRouterId);
+        if (!getRouterIds().contains(defaultRouterId)) {
+            LOG.warn("Default routerId '{}' not available!", defaultRouterId);
             if (!getRouterIds().isEmpty()) {
                 // Let's see which one we want to take by default
                 String defRouterId = null;
@@ -252,7 +203,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
                     else
                         LOG.info("Setting default routerId to '{}'", defRouterId);
                 }
-                decorated.defaultRouterId = (defRouterId);
+                defaultRouterId = (defRouterId);
             }
         }
         if (this.getRouterIds().isEmpty()) {
@@ -261,4 +212,23 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
         }
     }
 
+    @Override
+    public boolean registerGraph(String routerId, GraphSource graphSource) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setDefaultRouterId(String defaultRouterId) {
+        this.defaultRouterId = defaultRouterId;
+    }
+
+    @Override
+    public boolean reloadGraphs(boolean preEvict) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public GraphSourceFactory getGraphSourceFactory() {
+        throw new UnsupportedOperationException();
+    }
 }

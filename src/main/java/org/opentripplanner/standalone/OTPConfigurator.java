@@ -41,6 +41,8 @@ import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderI
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.impl.FileGraphSourceFactory;
+import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.GraphServiceAutoDiscoverImpl;
 import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
@@ -90,28 +92,22 @@ public class OTPConfigurator {
                 if (params.graphConfigFile != null) LOG.error("Can't read config file", e);
                 this.graphService = new GraphServiceBeanImpl(graph, null);
             }
-        } else if (params.autoScan) {
-            /* Create an auto-scan+reload GraphService */
-            GraphServiceAutoDiscoverImpl graphService = new GraphServiceAutoDiscoverImpl();
-            if (params.graphDirectory != null) {
-                graphService.setPath(params.graphDirectory);
-            }
-            if (params.routerIds.size() > 0) {
-                graphService.setDefaultRouterId(params.routerIds.get(0));
-            }
-            graphService.startup();
-            this.graphService = graphService;
         } else {
             /* Create a conventional GraphService that loads graphs from disk. */
+            // TODO Activate auto-scan option
             GraphServiceImpl graphService = new GraphServiceImpl();
+            FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
+            graphService.graphSourceFactory = graphSourceFactory;
             if (params.graphDirectory != null) {
-                graphService.setPath(params.graphDirectory);
+                graphSourceFactory.basePath = params.graphDirectory;
             }
             if (params.routerIds.size() > 0) {
-                graphService.setDefaultRouterId(params.routerIds.get(0));
-                graphService.autoRegister = params.routerIds;
+                GraphScanner graphScanner = new GraphScanner(graphService);
+                graphScanner.basePath = graphSourceFactory.basePath;
+                graphScanner.defaultRouterId = params.routerIds.get(0);
+                graphScanner.autoRegister = params.routerIds;
+                graphScanner.startup();
             }
-            graphService.startup();
             this.graphService = graphService;
         }
     }

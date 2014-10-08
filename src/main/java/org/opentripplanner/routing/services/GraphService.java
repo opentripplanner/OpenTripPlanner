@@ -13,11 +13,9 @@
 
 package org.opentripplanner.routing.services;
 
-import java.io.InputStream;
 import java.util.Collection;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 
 /**
  * A GraphService maps RouterIds to Graphs.
@@ -29,8 +27,8 @@ import org.opentripplanner.routing.graph.Graph.LoadLevel;
  */
 public interface GraphService {
 
-    /** Specify whether additional debug information is loaded from the serialized graphs */
-    public void setLoadLevel(LoadLevel level);
+    /** @param defaultRouterId The ID of the default router to return when no one is specified */
+    public void setDefaultRouterId(String defaultRouterId);
     
     /** @return the current default graph object */
     public Graph getGraph();
@@ -47,26 +45,19 @@ public interface GraphService {
      * The relationship between router IDs and paths in the filesystem is determined by the 
      * graphService implementation.
      * 
-     * @param preEvict When true, release the existing graph (if any) before loading. This will
-     * halve the amount of memory needed for the operation, but routing will be unavailable for 
-     * that graph during the load process
-     * .
-     * @return whether the operation completed successfully 
-     */
-    public boolean registerGraph(String routerId, boolean preEvict);
-
-    /** 
-     * Associate the routerId with the supplied Graph object. 
+     * @param routerId
+     * @param preEvict
      * 
-     * @return whether a graph was already registered under this router ID (and was evicted).
+     * @return whether the operation completed successfully
      */
-    public boolean registerGraph(String routerId, Graph graph);
+    public boolean registerGraph(String routerId, GraphSource graphSource);
 
-    /** 
+    /**
      * Reload all registered graphs from wherever they came from.
      * @param preEvict When true, release the existing graph (if any) before loading. This will
      * halve the amount of memory needed for the operation, but routing will be unavailable for 
      * that graph during the load process
+     * @return whether the operation completed successfully
      */
     public boolean reloadGraphs(boolean preEvict);
 
@@ -86,14 +77,5 @@ public interface GraphService {
      */
     public int evictAll();
     
-    /**
-     * Save the graph data, but don't load it in memory. The file location is based on the router id.
-     * If the graph already exists, the graph will be overwritten. The relationship between router IDs
-     * and paths in the filesystem is determined by the graphService implementation.
-     * 
-     * @param routerId the routerId of the graph
-     * @param is graph data as input stream
-     * @return
-     */
-    public boolean save(String routerId, InputStream is);
+    public GraphSourceFactory getGraphSourceFactory();
 }

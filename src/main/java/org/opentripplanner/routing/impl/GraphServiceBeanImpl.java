@@ -13,15 +13,15 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.GraphSource;
+import org.opentripplanner.routing.services.GraphSourceFactory;
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
 
 /**
  * This simple implementation of {@link GraphService} is mostly useful for testing
@@ -32,10 +32,6 @@ import org.opentripplanner.routing.services.GraphService;
 public class GraphServiceBeanImpl implements GraphService {
 
     private Graph graph;
-
-    // 0-arg bean constructor
-    public GraphServiceBeanImpl() {
-    }
 
     public GraphServiceBeanImpl(Graph graph, Preferences config) {
         this.graph = graph;
@@ -53,11 +49,6 @@ public class GraphServiceBeanImpl implements GraphService {
     }
 
     @Override
-    public void setLoadLevel(LoadLevel level) {
-
-    }
-
-    @Override
     public Graph getGraph(String routerId) {
         return graph;
     }
@@ -68,12 +59,7 @@ public class GraphServiceBeanImpl implements GraphService {
     }
 
     @Override
-    public boolean registerGraph(String graphId, boolean preEvict) {
-        return false;
-    }
-
-    @Override
-    public boolean registerGraph(String graphId, Graph graph) {
+    public boolean registerGraph(String routerId, GraphSource graphSource) {
         return false;
     }
 
@@ -88,13 +74,16 @@ public class GraphServiceBeanImpl implements GraphService {
     }
 
     @Override
-    public boolean reloadGraphs(boolean preEvict) {
-        throw new UnsupportedOperationException();
+    public void setDefaultRouterId(String defaultRouterId) {
     }
 
     @Override
-    public boolean save(String routerId, InputStream is) {
+    public boolean reloadGraphs(boolean preEvict) {
         return false;
     }
 
+    @Override
+    public GraphSourceFactory getGraphSourceFactory() {
+        return null;
+    }
 }

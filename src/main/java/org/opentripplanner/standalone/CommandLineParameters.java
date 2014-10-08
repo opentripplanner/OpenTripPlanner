@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.opentripplanner.routing.impl.GraphServiceFileImpl;
+import org.opentripplanner.routing.impl.GraphServiceImpl;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
@@ -264,7 +264,7 @@ public class CommandLineParameters {
     public static class RouterId implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
-            Pattern routerIdPattern = GraphServiceFileImpl.routerIdPattern;
+            Pattern routerIdPattern = GraphServiceImpl.routerIdPattern;
             Matcher m = routerIdPattern.matcher(value);
             if ( ! m.matches()) {
                 String msg = String.format("%s: '%s' is not a valid router ID.", name, value);

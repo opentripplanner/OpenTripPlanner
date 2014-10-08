@@ -21,12 +21,10 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -74,11 +72,11 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.*;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.GraphService;
@@ -104,64 +102,6 @@ import com.vividsolutions.jts.geom.LineString;
  * of thoroughness. The tests themselves may be imperfect, but they are useful. The framework sucks.
  */
 
-class SimpleGraphServiceImpl implements GraphService {
-    private HashMap<String, Graph> graphs = new HashMap<String, Graph>();
-
-    @Override
-    public void setLoadLevel(LoadLevel level) {
-    }
-
-    @Override
-    public Graph getGraph() {
-        return graphs.get(null);
-    }
-
-    @Override
-    public Graph getGraph(String routerId) {
-        return graphs.get(routerId);
-    }
-
-    @Override
-    public Collection<String> getRouterIds() {
-        return graphs.keySet();
-    }
-
-    public void putGraph(String graphId, Graph graph) {
-        graphs.put(graphId, graph);
-        graph.routerId = (graphId);
-    }
-
-    @Override
-    public boolean registerGraph(String graphId, boolean preEvict) {
-        return false;
-    }
-
-    @Override
-    public boolean registerGraph(String graphId, Graph graph) {
-        return false;
-    }
-
-    @Override
-    public boolean evictGraph(String graphId) {
-        return false;
-    }
-
-    @Override
-    public int evictAll() {
-        return 0;
-    }
-
-    @Override
-    public boolean reloadGraphs(boolean preEvict) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean save(String routerId, InputStream is) {
-        return false;
-    }
-}
-
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
     /**
@@ -171,7 +111,7 @@ class Context {
 
     public Graph graph = spy(new Graph());
 
-    public SimpleGraphServiceImpl graphService = new SimpleGraphServiceImpl();
+    public GraphService graphService = new GraphServiceImpl();
 
     public CommandLineParameters commandLineParameters = new CommandLineParameters();
 
@@ -187,8 +127,9 @@ class Context {
     }
 
     public Context() {
-        graphService.putGraph(null, makeSimpleGraph()); // default graph is tiny test graph
-        graphService.putGraph("portland", graph);
+        graphService.registerGraph("", new MemoryGraphSource(null, makeSimpleGraph())); // default graph is tiny test graph
+        graphService.setDefaultRouterId("");
+        graphService.registerGraph("portland", new MemoryGraphSource("portland", graph));
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File(
                 "src/test/resources/portland/Streets_pdx.shp"));
@@ -492,15 +433,15 @@ public class TestRequest extends TestCase {
         RouterInfo router1 = routers.routerInfo.get(1);
         RouterInfo otherRouter;
         RouterInfo defaultRouter;
-        if (router0.routerId == null) {
+        if (router0.routerId.equals("")) {
             defaultRouter = router0;
             otherRouter = router1;
         } else {
             defaultRouter = router1;
             otherRouter = router0;
         }
-        assertNull(defaultRouter.routerId);
-        assertNotNull(otherRouter.routerId);
+        assertEquals("", defaultRouter.routerId);
+        assertEquals("portland", otherRouter.routerId);
         assertTrue(otherRouter.polygon.getArea() > 0);
     }
 
