@@ -63,16 +63,21 @@ public class GraphScanner {
             LOG.info("attempting to automatically register routerIds {}", autoRegister);
             LOG.info("graph files will be sought in paths relative to {}", basePath);
             for (String routerId : autoRegister) {
-                graphService.registerGraph(routerId, new FileGraphSource(routerId,
-                        getBasePath(routerId), loadLevel));
+                FileGraphSource graphSource = new FileGraphSource(routerId, getBasePath(routerId),
+                        loadLevel);
+                if (graphSource.getGraph() != null)
+                    graphService.registerGraph(routerId, graphSource);
             }
         } else {
             LOG.info("no list of routerIds was provided for automatic registration.");
         }
-        if (attemptRegisterDefault && !graphService.getRouterIds().contains(defaultRouterId)) {
+        if (attemptRegisterDefault
+                && (autoRegister == null || !autoRegister.contains(defaultRouterId))) {
             LOG.info("Attempting to load graph for default routerId '{}'.", defaultRouterId);
-            graphService.registerGraph(defaultRouterId, new FileGraphSource(defaultRouterId,
-                    getBasePath(defaultRouterId), loadLevel));
+            FileGraphSource graphSource = new FileGraphSource(defaultRouterId,
+                    getBasePath(defaultRouterId), loadLevel);
+            if (graphSource.getGraph() != null)
+                graphService.registerGraph(defaultRouterId, graphSource);
         }
     }
 
