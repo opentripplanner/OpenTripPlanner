@@ -107,7 +107,9 @@ public class GraphServiceImplTest extends TestCase {
         assertTrue(new File(new File(basePath, "A"), FileGraphSource.GRAPH_FILENAME).canRead());
 
         // Register this empty graph, reloading it from disk
-        graphService.registerGraph("A", graphSourceFactory.createGraphSource("A"));
+        boolean registered = graphService.registerGraph("A",
+                graphSourceFactory.createGraphSource("A"));
+        assertTrue(registered);
 
         // Check if the loaded graph is the one we saved earlier
         Graph graph = graphService.getGraph("A");
@@ -137,8 +139,31 @@ public class GraphServiceImplTest extends TestCase {
         assertEquals(verticesCount, graph.getVertices().size());
         assertEquals(edgesCount, graph.getEdges().size());
 
-        // Evict the graph
-        graphService.evictGraph("A");
+        // Remove the file from disk and reload
+        boolean deleted = new File(new File(basePath, "A"), FileGraphSource.GRAPH_FILENAME)
+                .delete();
+        assertTrue(deleted);
+        graphService.reloadGraphs(false);
+
+        // Check that the graph have been evicted
+        assertEquals(0, graphService.getRouterIds().size());
+
+        // Register it manually
+        registered = graphService.registerGraph("A", graphSourceFactory.createGraphSource("A"));
+        // Check that it fails again (file still deleted)
+        assertFalse(registered);
+        assertEquals(0, graphService.getRouterIds().size());
+
+        // Re-save the graph file, register it again
+        graphSourceFactory.save("A", new ByteArrayInputStream(graphData2));
+        registered = graphService.registerGraph("A", graphSourceFactory.createGraphSource("A"));
+        // This time registering is OK
+        assertTrue(registered);
+        assertEquals(1, graphService.getRouterIds().size());
+
+        // Evict the graph, should be OK
+        boolean evicted = graphService.evictGraph("A");
+        assertTrue(evicted);
         assertEquals(0, graphService.getRouterIds().size());
     }
 
