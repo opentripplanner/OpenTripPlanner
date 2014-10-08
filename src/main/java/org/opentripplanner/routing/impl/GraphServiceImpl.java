@@ -15,7 +15,6 @@ package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -106,8 +105,13 @@ public class GraphServiceImpl implements GraphService {
     public boolean reloadGraphs(boolean preEvict) {
         boolean allSucceeded = true;
         synchronized (graphSources) {
-            for (GraphSource graphSource : graphSources.values()) {
+            Collection<String> routerIds = getRouterIds();
+            for (String routerId : routerIds) {
+                GraphSource graphSource = graphSources.get(routerId);
                 boolean success = graphSource.reload(preEvict);
+                if (!success) {
+                    evictGraph(routerId);
+                }
                 allSucceeded &= success;
             }
         }
@@ -116,7 +120,7 @@ public class GraphServiceImpl implements GraphService {
 
     @Override
     public Collection<String> getRouterIds() {
-        return Collections.unmodifiableCollection(graphSources.keySet());
+        return new ArrayList<String>(graphSources.keySet());
     }
 
     @Override
@@ -126,6 +130,10 @@ public class GraphServiceImpl implements GraphService {
             LOG.error(
                     "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
                     routerId);
+            return false;
+        }
+        if (graphSource.getGraph() == null) {
+            LOG.warn("Can't register router ID '{}', null graph.", routerId);
             return false;
         }
         synchronized (graphSources) {
