@@ -106,13 +106,23 @@ public class FileGraphSource implements GraphSource {
                 Graph newGraph = loadGraph();
                 if (graph != null)
                     decorator.shutdownGraph(graph);
-                // TODO: If load fails, keep the old graph?
-                graph = newGraph; // Assignment in java is atomic
+                // If load fails, keep the old graph
+                if (newGraph != null) {
+                    graph = newGraph; // Assignment in java is atomic
+                } else {
+                    LOG.warn("Unable to load modified data for router '{}', keeping old data.",
+                            routerId);
+                }
             }
-            if (graph == null)
+            if (graph == null) {
                 graphLastModified = 0L;
-            else
+            } else {
+                /*
+                 * Note: we flag even if loading failed, because we want to wait for fresh new data
+                 * before loading again.
+                 */
                 graphLastModified = lastModified;
+            }
             // If a graph is null, it will be evicted.
             return (graph != null);
         }
