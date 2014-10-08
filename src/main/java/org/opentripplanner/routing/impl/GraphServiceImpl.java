@@ -47,8 +47,13 @@ public class GraphServiceImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
+    /** Poll period for autoreload autoscan. 0 to disable. */
     private static final int AUTOSCAN_PERIOD_SEC = 10;
 
+    /**
+     * Should we pre-evict in auto-reload mode? False is more memory consuming but safer in case of
+     * problems.
+     */
     private static final boolean AUTORELOAD_PREEVICT = false;
 
     private Map<String, GraphSource> graphSources = new HashMap<>();
@@ -67,12 +72,13 @@ public class GraphServiceImpl implements GraphService {
     private ScheduledExecutorService scanExecutor = Executors.newSingleThreadScheduledExecutor();
 
     public GraphServiceImpl() {
-        scanExecutor.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                autoReloadScan();
-            }
-        }, AUTOSCAN_PERIOD_SEC, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
+        if (AUTOSCAN_PERIOD_SEC > 0)
+            scanExecutor.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    autoReloadScan();
+                }
+            }, AUTOSCAN_PERIOD_SEC, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
     }
 
     /**
