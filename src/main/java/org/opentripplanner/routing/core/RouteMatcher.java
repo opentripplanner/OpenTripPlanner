@@ -131,7 +131,7 @@ public class RouteMatcher implements Cloneable, Serializable {
             builder.append(",");
         }
         for (T2<String, String> agencyIdAndRouteName : agencyIdAndRouteNames) {
-            builder.append(agencyIdAndRouteName.getFirst() + "_" + agencyIdAndRouteName.getSecond());
+            builder.append(agencyIdAndRouteName.first + "_" + agencyIdAndRouteName.second);
             builder.append(",");
         }
         for (String routeName : routeNames) {

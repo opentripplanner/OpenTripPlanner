@@ -105,8 +105,8 @@ public class WayPropertySet {
             OSMSpecifier specifier = picker.getSpecifier();
             WayProperties wayProperties = picker.getProperties();
             P2<Integer> score = specifier.matchScores(way);
-            int leftScore = score.getFirst();
-            int rightScore = score.getSecond();
+            int leftScore = score.first;
+            int rightScore = score.second;
             if (picker.isSafetyMixin()) {
                 if (leftScore > 0) {
                     leftMixins.add(wayProperties);
@@ -128,8 +128,8 @@ public class WayPropertySet {
         }
 
         WayProperties result = rightResult.clone();
-        result.setSafetyFeatures(new P2<Double>(rightResult.getSafetyFeatures().getFirst(),
-                leftResult.getSafetyFeatures().getSecond()));
+        result.setSafetyFeatures(new P2<Double>(rightResult.getSafetyFeatures().first,
+                leftResult.getSafetyFeatures().second));
 
         /* apply mixins */
         if (leftMixins.size() > 0) {
@@ -165,13 +165,13 @@ public class WayPropertySet {
 
     private void applyMixins(WayProperties result, List<WayProperties> mixins, boolean right) {
         P2<Double> safetyFeatures = result.getSafetyFeatures();
-        double first = safetyFeatures.getFirst();
-        double second = safetyFeatures.getSecond();
+        double first = safetyFeatures.first;
+        double second = safetyFeatures.second;
         for (WayProperties properties : mixins) {
             if (right) {
-                second *= properties.getSafetyFeatures().getSecond();
+                second *= properties.getSafetyFeatures().second;
             } else {
-                first *= properties.getSafetyFeatures().getFirst();
+                first *= properties.getSafetyFeatures().first;
             }
         }
         result.setSafetyFeatures(new P2<Double>(first, second));

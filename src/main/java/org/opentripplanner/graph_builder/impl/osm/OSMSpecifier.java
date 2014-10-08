@@ -64,8 +64,8 @@ public class OSMSpecifier {
         for (P2<String> pair : kvpairs) {
             // TODO why are we repeatedly converting these to lower case every time they are used?
             // Probably because it used to be possible to set them from Spring XML.
-            String tag = pair.getFirst().toLowerCase();
-            String value = pair.getSecond().toLowerCase();
+            String tag = pair.first.toLowerCase();
+            String value = pair.second.toLowerCase();
             String leftMatchValue = match.getTag(tag + ":left");
             String rightMatchValue = match.getTag(tag + ":right");
             String matchValue = match.getTag(tag);
@@ -102,8 +102,8 @@ public class OSMSpecifier {
         int score = 0;
         int matches = 0;
         for (P2<String> pair : kvpairs) {
-            String tag = pair.getFirst().toLowerCase();
-            String value = pair.getSecond().toLowerCase();
+            String tag = pair.first.toLowerCase();
+            String value = pair.second.toLowerCase();
             String matchValue = match.getTag(tag);
             int tagScore = getTagScore(value, matchValue);
             score += tagScore;
@@ -149,9 +149,9 @@ public class OSMSpecifier {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (P2<String> pair : kvpairs) {
-            builder.append(pair.getFirst());
+            builder.append(pair.first);
             builder.append("=");
-            builder.append(pair.getSecond());
+            builder.append(pair.second);
             builder.append(";");
         }
         builder.deleteCharAt(builder.length() - 1); // remove trailing semicolon

@@ -204,15 +204,15 @@ public class StreetLocation extends StreetVertex {
         P2<LineString> geometries = getGeometry(street, nearestPoint);
 
         double totalGeomLength = geometry.getLength();
-        double lengthRatioIn = geometries.getFirst().getLength() / totalGeomLength;
+        double lengthRatioIn = geometries.first.getLength() / totalGeomLength;
 
         double lengthIn = street.getDistance() * lengthRatioIn;
         double lengthOut = street.getDistance() * (1 - lengthRatioIn);
 
         StreetWithElevationEdge newLeft = new PartialStreetEdge(street, fromv, base,
-                geometries.getFirst(), name, lengthIn);
+                geometries.first, name, lengthIn);
         StreetWithElevationEdge newRight = new PartialStreetEdge(street, base, tov,
-                geometries.getSecond(), name, lengthOut);
+                geometries.second, name, lengthOut);
 
         newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
         newLeft.setNoThruTraffic(street.isNoThruTraffic());

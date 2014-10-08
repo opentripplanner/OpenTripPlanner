@@ -206,10 +206,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
                 // TODO Set appropriate car speed from shapefile source.
                 StreetEdge street = edgeFactory.createEdge(startIntersection, endIntersection,
-                        geom, name, length, permissions.getFirst(), false);
+                        geom, name, length, permissions.first, false);
                 LineString reversed = (LineString) geom.reverse();
                 StreetEdge backStreet = edgeFactory.createEdge(endIntersection, startIntersection,
-                        reversed, name, length, permissions.getSecond(), true);
+                        reversed, name, length, permissions.second, true);
                 backStreet.shareData(street);
 
                 if (noteConverter != null) {
@@ -228,8 +228,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 if (safetyConverter != null) {
                     P2<Double> safetyFactors = safetyConverter.convert(feature);
                     if (safetyFactors != null) {
-                        street.setBicycleSafetyFactor(safetyFactors.getFirst().floatValue());
-                        backStreet.setBicycleSafetyFactor(safetyFactors.getSecond().floatValue());
+                        street.setBicycleSafetyFactor(safetyFactors.first.floatValue());
+                        backStreet.setBicycleSafetyFactor(safetyFactors.second.floatValue());
                     }
                 }
             }

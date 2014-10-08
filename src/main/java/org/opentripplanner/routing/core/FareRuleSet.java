@@ -52,9 +52,9 @@ public class FareRuleSet implements Serializable {
         if (originDestinations.size() > 0) {
             P2<String> od = new P2<String>(startZone, endZone);
             if (!originDestinations.contains(od)) {
-                P2<String> od2 = new P2<String>(od.getFirst(), null);
+                P2<String> od2 = new P2<String>(od.first, null);
                 if (!originDestinations.contains(od2)) {
-                    od2 = new P2<String>(null, od.getFirst());
+                    od2 = new P2<String>(null, od.first);
                     if (!originDestinations.contains(od2)) {
                         return false;
                     }
