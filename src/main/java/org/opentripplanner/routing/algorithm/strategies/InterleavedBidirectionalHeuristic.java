@@ -41,8 +41,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
     private static final long serialVersionUID = 20130813L;
 
-    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 4;
-    
+    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 5; // TODO determine a good value empirically
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();

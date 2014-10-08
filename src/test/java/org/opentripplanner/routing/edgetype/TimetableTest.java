@@ -112,7 +112,7 @@ public class TimetableTest {
         tripUpdateBuilder = TripUpdate.newBuilder();
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         tripUpdate = tripUpdateBuilder.build();
-        assertFalse(timetable.update(tripUpdate, "a", timeZone, serviceDate));
+        assertFalse(timetable.update(tripUpdate, timeZone, serviceDate));
 
         // update trip with bad data
         tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -125,7 +125,7 @@ public class TimetableTest {
         stopTimeUpdateBuilder.setStopSequence(0);
         stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
         tripUpdate = tripUpdateBuilder.build();
-        assertFalse(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertFalse(timetable.update(tripUpdate, timeZone, serviceDate));
 
         // update trip with non-increasing data
         tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -144,7 +144,7 @@ public class TimetableTest {
         stopTimeEventBuilder.setTime(TestUtils.dateInSeconds(
                 "America/New_York", 2009, AUGUST, 7, 0, 10, 0));
         tripUpdate = tripUpdateBuilder.build();
-        assertFalse(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertFalse(timetable.update(tripUpdate, timeZone, serviceDate));
 
         //---
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 0, 0);
@@ -178,7 +178,7 @@ public class TimetableTest {
                 "America/New_York", 2009, AUGUST, 7, 0, 2, 0));
         tripUpdate = tripUpdateBuilder.build();
         assertEquals(20*60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
-        assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
         assertEquals(20*60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
 
         //---
@@ -196,7 +196,7 @@ public class TimetableTest {
         tripUpdateBuilder = TripUpdate.newBuilder();
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         tripUpdate = tripUpdateBuilder.build();
-        assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
 
         TripTimes tripTimes = timetable.getTripTimes(trip_1_1_index);
         for (int i = 0; i < tripTimes.getNumStops(); i++) {
@@ -226,7 +226,7 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
         stopTimeEventBuilder.setDelay(0);
         tripUpdate = tripUpdateBuilder.build();
-        assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
 
         // update trip arrival time only
         tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -242,7 +242,7 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
         stopTimeEventBuilder.setDelay(1);
         tripUpdate = tripUpdateBuilder.build();
-        assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
 
         // update trip departure time only
         tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -258,7 +258,7 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
-        assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
 
         // update trip using stop id
         tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -274,7 +274,7 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
-        assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
 
         // update trip arrival time at first stop and make departure time incoherent at second stop
         tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -296,6 +296,6 @@ public class TimetableTest {
         stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
-        assertFalse(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertFalse(timetable.update(tripUpdate, timeZone, serviceDate));
     }
 }

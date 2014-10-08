@@ -83,6 +83,9 @@ public class GraphIndex {
     public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
     private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex;
 
+    /* Extra index for applying realtime updates (lazy-initialized). */
+    public Map<String, Trip> tripForIdWithoutAgency = null;
+
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
 

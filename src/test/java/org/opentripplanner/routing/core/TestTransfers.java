@@ -212,7 +212,7 @@ public class TestTransfers extends TestCase {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
     }
 
     public void testStopToStopTransfer() throws Exception {

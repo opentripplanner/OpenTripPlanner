@@ -26,6 +26,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.SPTService;
+import org.opentripplanner.routing.spt.EarliestArrivalShortestPathTree;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.DateUtils;
@@ -100,8 +102,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         // null checks on origin and destination vertices are already performed in setRoutingContext
         // options.rctx.check();
-        
+
         runState.spt = new MultiShortestPathTree(runState.options);
+        //runState.spt = new EarliestArrivalShortestPathTree(options); //MultiShortestPathTree(runState.options);
 
         runState.heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
@@ -278,6 +281,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
+                //new GraphPath(runState.u, false).dump();
                 if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
                     break;

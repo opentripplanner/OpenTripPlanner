@@ -910,7 +910,7 @@ public class TestRequest extends TestCase {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        assertTrue(timetable.update(tripUpdate, "TriMet", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
     }
 
     /**
