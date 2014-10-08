@@ -13,16 +13,26 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 
 public class GraphServiceImplTest extends TestCase {
 
     @Test
-    public final void testGraphService() {
+    public final void testGraphServiceMemory() {
 
         GraphServiceImpl graphService = new GraphServiceImpl();
         Graph memoryA = new Graph();
@@ -72,4 +82,64 @@ public class GraphServiceImplTest extends TestCase {
         assertEquals(0, graphService.getRouterIds().size());
 
     }
+
+    @Test
+    public final void testGraphServiceFile() throws IOException {
+
+        // Ensure a dummy disk location exists
+        File basePath = new File("test_graphs");
+        if (!basePath.exists())
+            basePath.mkdir();
+
+        // Create a GraphService and a GraphSourceFactory
+        GraphServiceImpl graphService = new GraphServiceImpl();
+        FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
+        graphSourceFactory.basePath = basePath;
+
+        // Create a dummy empty graph A and save it to disk
+        Graph graphA = new Graph();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        graphA.save(new ObjectOutputStream(baos));
+        byte[] graphData = baos.toByteArray();
+        graphSourceFactory.save("A", new ByteArrayInputStream(graphData));
+
+        // Check if the graph has been saved
+        assertTrue(new File(new File(basePath, "A"), FileGraphSource.GRAPH_FILENAME).canRead());
+
+        // Register this empty graph, reloading it from disk
+        graphService.registerGraph("A", graphSourceFactory.createGraphSource("A"));
+
+        // Check if the loaded graph is the one we saved earlier
+        Graph graph = graphService.getGraph("A");
+        assertNotNull(graph);
+        assertEquals("A", graph.routerId);
+        assertEquals(0, graph.getVertices().size());
+        assertEquals(1, graphService.getRouterIds().size());
+
+        // Add new data to our simple graph
+        StreetVertex v1 = new IntersectionVertex(graphA, "v1", 0, 0);
+        StreetVertex v2 = new IntersectionVertex(graphA, "v2", 0, 0.1);
+        new StreetEdge(v1, v2, null, "v1v2", 11000, StreetTraversalPermission.PEDESTRIAN, false);
+        int verticesCount = graphA.getVertices().size();
+        int edgesCount = graphA.getEdges().size();
+
+        // Serialize it again and save it again
+        baos = new ByteArrayOutputStream();
+        graphA.save(new ObjectOutputStream(baos));
+        byte[] graphData2 = baos.toByteArray();
+        graphSourceFactory.save("A", new ByteArrayInputStream(graphData2));
+
+        // Force a reload, get again the graph
+        graphService.reloadGraphs(false);
+        graph = graphService.getGraph("A");
+
+        // Check if loaded graph is the one modified
+        assertEquals(verticesCount, graph.getVertices().size());
+        assertEquals(edgesCount, graph.getEdges().size());
+
+        // Evict the graph
+        graphService.evictGraph("A");
+        assertEquals(0, graphService.getRouterIds().size());
+    }
+
 }
