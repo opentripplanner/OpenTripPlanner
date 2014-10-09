@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
  * The primary implementation of the GraphSource interface. The graph is loaded from a serialized
  * graph file in a given directory.
  * 
- * TODO: Implement graph auto-reload when source file has changed.
  */
 public class FileGraphSource implements GraphSource {
 
@@ -104,16 +103,20 @@ public class FileGraphSource implements GraphSource {
                 }
             } else {
                 Graph newGraph = loadGraph();
-                if (graph != null)
-                    decorator.shutdownGraph(graph);
-                // If load fails, keep the old graph
                 if (newGraph != null) {
+                    // Load OK
+                    if (graph != null)
+                        decorator.shutdownGraph(graph);
                     graph = newGraph; // Assignment in java is atomic
                 } else {
+                    // Load failed
                     if (force || graph == null) {
                         LOG.warn("Unable to load data for router '{}'.", routerId);
+                        if (graph != null)
+                            decorator.shutdownGraph(graph);
                         graph = null;
                     } else {
+                        // No shutdown, since we keep current one.
                         LOG.warn("Unable to load data for router '{}', keeping old data.", routerId);
                     }
                 }
