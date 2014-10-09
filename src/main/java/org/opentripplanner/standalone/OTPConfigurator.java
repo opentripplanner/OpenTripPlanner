@@ -100,7 +100,6 @@ public class OTPConfigurator {
             }
             if (params.routerIds.size() > 0 || params.autoScan) {
                 GraphScanner graphScanner = new GraphScanner(graphService, params.autoScan);
-                graphScanner.attemptRegisterDefault = false;
                 graphScanner.basePath = graphSourceFactory.basePath;
                 if (params.routerIds.size() > 0) {
                     graphScanner.defaultRouterId = params.routerIds.get(0);

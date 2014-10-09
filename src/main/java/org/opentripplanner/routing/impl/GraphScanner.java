@@ -47,11 +47,8 @@ public class GraphScanner {
     /** A list of routerIds to automatically register and load at startup */
     public List<String> autoRegister;
 
-    /** The default router, "" by default */
-    public String defaultRouterId = "";
-
-    /** If true, on startup register the graph in the location defaultRouterId. */
-    public boolean attemptRegisterDefault = true;
+    /** The default router, none by default */
+    public String defaultRouterId = null;
 
     /** Load level */
     public LoadLevel loadLevel = LoadLevel.FULL;
@@ -64,7 +61,6 @@ public class GraphScanner {
     public GraphScanner(GraphService graphService, boolean autoScan) {
         this.graphService = graphService;
         if (autoScan) {
-            attemptRegisterDefault = false;
             scanExecutor = Executors.newSingleThreadScheduledExecutor();
             scanExecutor.scheduleWithFixedDelay(new Runnable() {
                 @Override
@@ -81,28 +77,27 @@ public class GraphScanner {
      * the defaultRouterId and warn if no routerIds are registered.
      */
     public void startup() {
-        graphService.setDefaultRouterId(defaultRouterId);
-        if (autoRegister != null && !autoRegister.isEmpty()) {
-            LOG.info("attempting to automatically register routerIds {}", autoRegister);
-            LOG.info("graph files will be sought in paths relative to {}", basePath);
-            for (String routerId : autoRegister) {
+        Set<String> routerIds = new HashSet<String>();
+        if (autoRegister != null)
+            routerIds.addAll(autoRegister);
+        if (defaultRouterId != null) {
+            graphService.setDefaultRouterId(defaultRouterId);
+            routerIds.add(defaultRouterId);
+        }
+        if (!routerIds.isEmpty()) {
+            LOG.info("Attempting to automatically register routerIds {}", autoRegister);
+            LOG.info("Graph files will be sought in paths relative to {}", basePath);
+            for (String routerId : routerIds) {
                 FileGraphSource graphSource = new FileGraphSource(routerId, getBasePath(routerId),
                         loadLevel);
                 if (graphSource.getGraph() != null)
                     graphService.registerGraph(routerId, graphSource);
             }
         } else {
-            LOG.info("no list of routerIds was provided for automatic registration.");
-        }
-        if (attemptRegisterDefault
-                && (autoRegister == null || !autoRegister.contains(defaultRouterId))) {
-            LOG.info("Attempting to load graph for default routerId '{}'.", defaultRouterId);
-            FileGraphSource graphSource = new FileGraphSource(defaultRouterId,
-                    getBasePath(defaultRouterId), loadLevel);
-            if (graphSource.getGraph() != null)
-                graphService.registerGraph(defaultRouterId, graphSource);
+            LOG.info("No list of routerIds was provided for automatic registration.");
         }
         if (scanExecutor != null) {
+            LOG.info("Auto-scan mode activated, looking in {}", basePath);
             autoScan();
         }
     }
