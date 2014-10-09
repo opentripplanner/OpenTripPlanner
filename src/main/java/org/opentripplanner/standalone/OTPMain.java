@@ -14,6 +14,7 @@
 package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,10 @@ public class OTPMain {
         if (graphBuilder != null) {
             graphBuilder.run();
             // Inform configurator which graph is to be used for in-memory handoff.
-            if (params.inMemory || params.preFlight) configurator.makeGraphService(graphBuilder.getGraph());
+            if (params.inMemory || params.preFlight) {
+                graphBuilder.getGraph().index(new DefaultStreetVertexIndexFactory());
+                configurator.makeGraphService(graphBuilder.getGraph());
+            }
         }
         
         // start visualizer, if asked for
