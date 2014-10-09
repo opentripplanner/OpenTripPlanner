@@ -238,7 +238,7 @@ public class TransferTable implements Serializable {
             P2<AgencyAndId> p2 = entry.getKey();
             int transferTime = entry.getValue().getFirstSpecificTransferTime();
             if (transferTime != StopTransfer.UNKNOWN_TRANSFER) {
-                transfers.add(new Transfer(p2.getFirst(), p2.getSecond(), transferTime));
+                transfers.add(new Transfer(p2.first, p2.second, transferTime));
             }
         }
         return transfers;

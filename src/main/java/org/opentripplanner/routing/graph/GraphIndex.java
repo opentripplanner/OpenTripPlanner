@@ -83,6 +83,9 @@ public class GraphIndex {
     public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
     private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex;
 
+    /* Extra index for applying realtime updates (lazy-initialized). */
+    public Map<String, Trip> tripForIdWithoutAgency = null;
+
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
 
@@ -202,7 +205,7 @@ public class GraphIndex {
         LOG.info("Filtering out long series of transfers on trunks shared between patterns.");
         for (P2<TripPattern> pair : transfers.keySet()) {
             ProfileTransfer.GoodTransferList list = transfers.get(pair);
-            TripPattern fromPattern = pair.getFirst(); // TODO consider using second (think of express-local transfers in NYC)
+            TripPattern fromPattern = pair.first; // TODO consider using second (think of express-local transfers in NYC)
             Map<StopCluster, ProfileTransfer> transfersByFromCluster = Maps.newHashMap();
             for (ProfileTransfer transfer : list.good) {
                 transfersByFromCluster.put(transfer.sc1, transfer);

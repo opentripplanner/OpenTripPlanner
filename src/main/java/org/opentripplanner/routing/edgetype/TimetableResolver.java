@@ -112,7 +112,8 @@ public class TimetableResolver {
                 timetables.put(pattern, sortedTimetables);
                 dirty.add(tt);
             }
-            return tt.update(tripUpdate, agencyId, timeZone, serviceDate);
+            // Assume all trips in a pattern are from the same feed, which should be the case.
+            return tt.update(tripUpdate, timeZone, serviceDate);
         }
     }
 

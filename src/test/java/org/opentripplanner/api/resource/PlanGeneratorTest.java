@@ -875,8 +875,8 @@ public class PlanGeneratorTest {
                 if (steps[i].length <= j) break;
                 for (int k = 0; k < elevations[i][j].length; k++) {
                     if (steps[i][j].elevation.size() <= k) break;
-                    elevations[i][j][k][0] = steps[i][j].elevation.get(k).getFirst();
-                    elevations[i][j][k][1] = steps[i][j].elevation.get(k).getSecond();
+                    elevations[i][j][k][0] = steps[i][j].elevation.get(k).first;
+                    elevations[i][j][k][1] = steps[i][j].elevation.get(k).second;
                 }
             }
         }

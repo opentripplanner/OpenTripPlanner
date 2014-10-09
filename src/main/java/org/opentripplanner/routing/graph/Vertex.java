@@ -53,8 +53,6 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     private final double y;
     
-    private double distanceToNearestTransitStop = 0;
-
     private transient Edge[] incoming = new Edge[0];
 
     private transient Edge[] outgoing = new Edge[0];
@@ -195,16 +193,6 @@ public abstract class Vertex implements Serializable, Cloneable {
         return incoming.length;
     }
     
-    // TODO: this is a candidate for no-arg message-passing style
-    public void setDistanceToNearestTransitStop(double distance) {
-        distanceToNearestTransitStop = distance;
-    }
-
-    /** Get the distance from this vertex to the closest transit stop in meters. */
-    public double getDistanceToNearestTransitStop() {
-        return distanceToNearestTransitStop;
-    }
-
     /** Get the longitude of the vertex */
     public double getX() {
         return x;

@@ -508,12 +508,12 @@ public class GTFSPatternHopFactory {
           All the pattern vertices and edges must already have been created.
          */
         for (P2<TripPattern> patterns : interlines.keySet()) {
-            TripPattern prevPattern = patterns.getFirst();
-            TripPattern nextPattern = patterns.getSecond();
+            TripPattern prevPattern = patterns.first;
+            TripPattern nextPattern = patterns.second;
             // This is a single (uni-directional) edge which may be traversed forward and backward.
             PatternInterlineDwell edge = new PatternInterlineDwell(prevPattern, nextPattern);
             for (P2<Trip> trips : interlines.get(patterns)) {
-                edge.add(trips.getFirst(), trips.getSecond());
+                edge.add(trips.first, trips.second);
             }
         }
         LOG.info("Done finding interlining trips and creating the corresponding edges.");

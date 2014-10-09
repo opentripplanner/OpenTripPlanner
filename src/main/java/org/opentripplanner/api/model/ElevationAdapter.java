@@ -27,9 +27,9 @@ public class ElevationAdapter extends XmlAdapter<String, List<P2<Double>>> {
             return null;
         StringBuilder str = new StringBuilder();
         for (P2<Double> pair : pairs) {
-            str.append(Math.round(pair.getFirst()));
+            str.append(Math.round(pair.first));
             str.append(",");
-            str.append(Math.round(pair.getSecond() * 10.0) / 10.0);
+            str.append(Math.round(pair.second * 10.0) / 10.0);
             str.append(",");
         }
         if (str.length() > 0) 

@@ -1203,7 +1203,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 namedArea.setName(name);
 
                 WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
-                Double safety = wayData.getSafetyFeatures().getFirst();
+                Double safety = wayData.getSafetyFeatures().first;
                 namedArea.setBicycleSafetyMultiplier(safety);
 
                 namedArea.setOriginalEdges(intersection);
@@ -1672,8 +1672,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
-                    StreetEdge street = streets.getFirst();
-                    StreetEdge backStreet = streets.getSecond();
+                    StreetEdge street = streets.first;
+                    StreetEdge backStreet = streets.second;
                     applyWayProperties(street, backStreet, wayData, way);
 
                     applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -1690,28 +1690,27 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
-                double safety = wayData.getSafetyFeatures().getFirst();
+                double safety = wayData.getSafetyFeatures().first;
                 street.setBicycleSafetyFactor((float)safety);
                 if (safety < bestBikeSafety) {
                     bestBikeSafety = (float)safety;
                 }
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
-                        graph.streetNotesService.addStaticNote(street, note.getFirst(), note.getSecond());
+                        graph.streetNotesService.addStaticNote(street, note.first, note.second);
                 }
                 street.setNoThruTraffic(noThruTraffic);
             }
 
             if (backStreet != null) {
-                double safety = wayData.getSafetyFeatures().getSecond();
+                double safety = wayData.getSafetyFeatures().second;
                 if (safety < bestBikeSafety) {
                     bestBikeSafety = (float)safety;
                 }
                 backStreet.setBicycleSafetyFactor((float)safety);
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
-                        graph.streetNotesService.addStaticNote(backStreet, note.getFirst(),
-                                note.getSecond());
+                        graph.streetNotesService.addStaticNote(backStreet, note.first, note.second);
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
@@ -2475,8 +2474,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             double length = this.getGeometryLengthMeters(geometry);
 
             P2<StreetTraversalPermission> permissionPair = getPermissions(permissions, way);
-            StreetTraversalPermission permissionsFront = permissionPair.getFirst();
-            StreetTraversalPermission permissionsBack = permissionPair.getSecond();
+            StreetTraversalPermission permissionsFront = permissionPair.first;
+            StreetTraversalPermission permissionsBack = permissionPair.second;
 
             if (permissionsFront.allowsAnything()) {
                 street = getEdgeForStreet(start, end, way, index, startNode, endNode, length,

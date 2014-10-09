@@ -192,7 +192,7 @@ public class LinkRequest {
         P2<StreetEdge> bestPair = null;
         Point p = GeometryUtils.getGeometryFactory().createPoint(coordinate);
         for (P2<StreetEdge> pair : replacement) {
-            StreetEdge e1 = pair.getFirst();
+            StreetEdge e1 = pair.first;
             double dist = e1.getGeometry().distance(p);
             if (dist < bestDist) {
                 bestDist = dist;
@@ -211,8 +211,8 @@ public class LinkRequest {
     private Collection<StreetVertex> split(LinkedList<P2<StreetEdge>> replacement, String label,
             P2<StreetEdge> bestPair, Coordinate coordinate) {
 
-        StreetEdge e1 = bestPair.getFirst();
-        StreetEdge e2 = bestPair.getSecond();
+        StreetEdge e1 = bestPair.first;
+        StreetEdge e2 = bestPair.second;
 
         String name = e1.getName();
         StreetVertex e1v1 = (StreetVertex) e1.getFromVertex();
@@ -233,8 +233,8 @@ public class LinkRequest {
         P2<LineString> forwardGeometryPair = GeometryUtils.splitGeometryAtPoint(forwardGeometry,
                 coordinate);
 
-        LineString forward1Geom = forwardGeometryPair.getFirst();
-        LineString forward2Geom = forwardGeometryPair.getSecond();
+        LineString forward1Geom = forwardGeometryPair.first;
+        LineString forward2Geom = forwardGeometryPair.second;
         Coordinate midCoord = forward1Geom.getEndPoint().getCoordinate();
 
         // determine how far along the original pair the split would occur
@@ -283,9 +283,9 @@ public class LinkRequest {
         IntersectionVertex e2midpoint = null;
         if (e2 != null) {
             e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord.x, midCoord.y, name);
-            backward1 = new StreetWithElevationEdge(e2v1, e2midpoint, backGeometryPair.getFirst(),
+            backward1 = new StreetWithElevationEdge(e2v1, e2midpoint, backGeometryPair.first,
                     name, lengthOut, e2.getPermission(), e2.isBack());
-            backward2 = new StreetWithElevationEdge(e2midpoint, e2v2, backGeometryPair.getSecond(),
+            backward2 = new StreetWithElevationEdge(e2midpoint, e2v2, backGeometryPair.second,
                     name, lengthIn, e2.getPermission(), e2.isBack());
             if (e2 instanceof AreaEdge) {
                 ((AreaEdge) e2).getArea().addVertex(e2midpoint, linker.graph);

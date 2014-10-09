@@ -62,6 +62,9 @@ public class LongDistancePathService implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LongDistancePathService.class);
 
+    private static final double DEFAULT_MAX_WALK = 2000;
+    private static final double CLAMP_MAX_WALK = 15000;
+
     private GraphService graphService;
     private SPTService sptService;
 
@@ -103,6 +106,14 @@ public class LongDistancePathService implements PathService {
          * to see. Because people may use either the traditional path services or the 
          * LongDistancePathService, we do not change the global default but override it here. */
         options.setMaxTransfers(10);
+
+        /* In long distance mode, maxWalk has a different meaning. It's the radius around the origin or destination
+         * within which you can walk on the streets. If no value is provided, max walk defaults to the largest
+         * double-precision float. This would cause long distance mode to do unbounded street searches and consider
+         * the whole graph walkable. */
+        if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
+        if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
+
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);

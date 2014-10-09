@@ -31,8 +31,8 @@ public class MultiTargetTerminationStrategy implements SearchTerminationStrategy
      * targets have been reached.
      */
     @Override
-    public boolean shouldSearchContinue(Vertex origin, Vertex target, State current,
-            ShortestPathTree spt, RoutingRequest traverseOptions) {        
+    public boolean shouldSearchTerminate(Vertex origin, Vertex target, State current,
+                                         ShortestPathTree spt, RoutingRequest traverseOptions) {
         Vertex currentVertex = current.getVertex();
                 
         // TODO(flamholz): update this to handle vertices that are not in the graph
@@ -41,9 +41,7 @@ public class MultiTargetTerminationStrategy implements SearchTerminationStrategy
             unreachedTargets.remove(currentVertex);
             reachedTargets.add(currentVertex);
         }
-        
-        
-        return unreachedTargets.size() != 0;
+        return unreachedTargets.size() == 0;
     }
 
 }

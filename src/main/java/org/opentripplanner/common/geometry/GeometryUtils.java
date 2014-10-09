@@ -92,8 +92,8 @@ public class GeometryUtils {
     public static LineString getInteriorSegment(Geometry geomerty, Coordinate first,
             Coordinate second) {
         P2<LineString> splitGeom = GeometryUtils.splitGeometryAtPoint(geomerty, first);
-        splitGeom = GeometryUtils.splitGeometryAtPoint(splitGeom.getSecond(), second);
-        return splitGeom.getFirst();
+        splitGeom = GeometryUtils.splitGeometryAtPoint(splitGeom.second, second);
+        return splitGeom.first;
     }
 
     /**

@@ -13,23 +13,12 @@
 
 package org.opentripplanner.api.resource;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
+import com.vividsolutions.jts.geom.LineString;
 
 import junit.framework.TestCase;
 
@@ -43,8 +32,6 @@ import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.RouterInfo;
-import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
@@ -69,9 +56,12 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopMatcher;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TimedTransferEdge;
+import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -79,7 +69,6 @@ import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -88,19 +77,23 @@ import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
-import com.vividsolutions.jts.geom.LineString;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
-/*
- * FIXME: This entire file is one ugly POS that ought to be killed with infinite amounts of fire and
- * then some more. But before we throw the baby out with the bath water, we should ensure that these
- * tests are replaced by something that covers at least this functionality with at least this degree
- * of thoroughness. The tests themselves may be imperfect, but they are useful. The framework sucks.
- */
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
@@ -111,7 +104,7 @@ class Context {
 
     public Graph graph = spy(new Graph());
 
-    public GraphService graphService = new GraphServiceImpl();
+    public GraphServiceImpl graphService = new GraphServiceImpl();
 
     public CommandLineParameters commandLineParameters = new CommandLineParameters();
 
@@ -127,8 +120,7 @@ class Context {
     }
 
     public Context() {
-        graphService.registerGraph("", new MemoryGraphSource(null, makeSimpleGraph())); // default graph is tiny test graph
-        graphService.setDefaultRouterId("");
+        graphService.registerGraph("", new MemoryGraphSource("", makeSimpleGraph())); // default graph is tiny test graph
         graphService.registerGraph("portland", new MemoryGraphSource("portland", graph));
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File(
@@ -245,34 +237,11 @@ class Context {
 
 public class TestRequest extends TestCase {
     public void testRequest() {
-        RoutingRequest request = new RoutingRequest();
-
-        request.addMode(TraverseMode.CAR);
-        assertTrue(request.modes.getCar());
-        request.removeMode(TraverseMode.CAR);
-        assertFalse(request.modes.getCar());
-
-        request.addMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.modes.getCar());
-        assertTrue(request.modes.getDriving());
-        request.removeMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.modes.getCar());
-        assertFalse(request.modes.getDriving());
-
-        request.setModes(new TraverseModeSet("BICYCLE,WALK"));
-        assertFalse(request.modes.getCar());
-        assertTrue(request.modes.getBicycle());
-        assertTrue(request.modes.getWalk());
+        /** Moved to {@link RoutingRequestTest). */
     }
 
     public void testBuildRequest() throws Exception {
-        TestPlanner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
-        RoutingRequest options = planner.buildRequest();
-
-        assertEquals(new Date(1254420671000L), options.getDateTime());
-        assertEquals(1600.0, options.getMaxWalkDistance());
-        assertEquals(8.0, options.walkReluctance);
-        assertEquals(1, options.getNumItineraries());
+        /** Removed on grounds of being redundant and testing internal functionality only. */
     }
 
     public void testPlanner() throws Exception {
@@ -298,30 +267,8 @@ public class TestRequest extends TestCase {
         assertEquals("To", response.getPlan().to.orig);
     }
 
-    public void testFirstTrip() throws Exception {
-        TestPlanner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
-
-        Response response = planner.getFirstTrip();
-        Itinerary itinerary = response.getPlan().itinerary.get(0);
-        Leg leg = itinerary.legs.get(1);
-        assertTrue(leg.startTime.get(Calendar.HOUR) >= 4);
-        assertTrue(leg.startTime.get(Calendar.HOUR) <= 7);
-    }
-
     public void testFirstAndLastLeg() throws Exception {
-        TestPlanner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
-
-        Response response = planner.getFirstTrip();
-        Itinerary itinerary = response.getPlan().itinerary.get(0);
-        List<Leg> legs = itinerary.legs;
-        Leg firstLeg = legs.get(0);
-        Leg lastLeg = legs.get(legs.size() - 1);
-
-        // The start time of the first leg should equal the start time of the entire itinerary
-        assertEquals(itinerary.startTime, firstLeg.startTime);
-
-        // The end time of the last leg should equal the end time of the entire itinerary
-        assertEquals(itinerary.endTime, lastLeg.endTime);
+        /** Subsumed by tests in {@link PlanGeneratorTest}. */
     }
 
     public void testAlerts() throws Exception {
@@ -425,24 +372,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testRouters() {
-        Routers routerApi = new Routers();
-        routerApi.server = Context.getInstance().otpServer;
-        RouterList routers = routerApi.getRouterIds();
-        assertEquals(2, routers.routerInfo.size());
-        RouterInfo router0 = routers.routerInfo.get(0);
-        RouterInfo router1 = routers.routerInfo.get(1);
-        RouterInfo otherRouter;
-        RouterInfo defaultRouter;
-        if (router0.routerId.equals("")) {
-            defaultRouter = router0;
-            otherRouter = router1;
-        } else {
-            defaultRouter = router1;
-            otherRouter = router0;
-        }
-        assertEquals("", defaultRouter.routerId);
-        assertEquals("portland", otherRouter.routerId);
-        assertTrue(otherRouter.polygon.getArea() > 0);
+        /** Moved to {@link RoutersTest). */
     }
 
     public void testBannedTrips() {
@@ -560,24 +490,12 @@ public class TestRequest extends TestCase {
 
     public void testTransferPenalty() {
         // Plan short trip
-        TestPlanner planner = new TestPlanner(
-                "portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
+        TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
         // Don't use non-preferred transfer penalty
         planner.setNonpreferredTransferPenalty(Arrays.asList(0));
         // Check number of legs when using different transfer penalties
         checkLegsWithTransferPenalty(planner, 0, 7, false);
         //checkLegsWithTransferPenalty(planner, 1800, 7, true);
-    }
-
-    public void testTransferPenalty2() {
-        // Plan short trip
-        TestPlanner planner = new TestPlanner(
-                "portland", "45.514861,-122.612035", "45.483096,-122.540624");
-        // Don't use non-preferred transfer penalty
-        planner.setNonpreferredTransferPenalty(Arrays.asList(0));
-        // Check number of legs when using different transfer penalties
-        checkLegsWithTransferPenalty(planner, 0, 5, false);
-        //checkLegsWithTransferPenalty(planner, 1800, 5, true);
     }
 
     /**
@@ -685,6 +603,10 @@ public class TestRequest extends TestCase {
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
+    /*
+    TODO add tests for transfer penalties and PreferredTripToTripTransfer
+
+    The expected results seem to be dependent on errors in the older DefaultRemainingWeightHeuristic.
 
     public void testPreferredTripToTripTransfer() {
         // Plan short trip
@@ -717,6 +639,7 @@ public class TestRequest extends TestCase {
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
+    */
 
     public void testTimedTripToTripTransfer() throws ParseException {
         ServiceDate serviceDate = new ServiceDate(2009, 10, 01);
@@ -925,7 +848,7 @@ public class TestRequest extends TestCase {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        assertTrue(timetable.update(tripUpdate, "TriMet", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
     }
 
     /**

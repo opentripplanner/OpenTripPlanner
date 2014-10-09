@@ -114,7 +114,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
              */
             LineString geometry = bestHop.getGeometry();
             P2<LineString> geomPair = GeometryUtils.splitGeometryAtPoint(geometry, point);
-            geomRemaining = geomPair.getSecond();
+            geomRemaining = geomPair.second;
             double total = distanceLibrary.fastLength(geometry);
             double remaining = distanceLibrary.fastLength(geomRemaining);
             fractionCovered = total > 0.0 ? (double) (1.0 - remaining / total) : 0.0;
@@ -223,7 +223,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
 
             P2<LineString> geomPair =
                     GeometryUtils.splitGeometryAtFraction(geometry, fractionCovered);
-            geomRemaining = geomPair.getSecond();
+            geomRemaining = geomPair.second;
 
             if (geometry.isEmpty()) {
                 lon = Double.NaN;
