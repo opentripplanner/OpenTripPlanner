@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -161,7 +162,12 @@ public class CommandLineParameters {
     public void infer () {
         server |= ( inMemory || preFlight || port != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
-        if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
+        if (routerIds == null) {
+            if (autoScan)
+                routerIds = Collections.emptyList();
+            else
+                routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
+        }
         if (cacheDirectory == null) cacheDirectory = DEFAULT_CACHE_DIRECTORY;
         if (pointSetDirectory == null) pointSetDirectory = DEFAULT_POINTSET_DIRECTORY;
         if (server && port == null) {
