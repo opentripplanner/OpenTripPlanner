@@ -70,8 +70,8 @@ public class CommandLineParameters {
  
     @Parameter(names = { "--preFlight"},
     description = "pass the graph to the server in-memory after building it, and saving to disk")
-
     boolean preFlight;
+
     @Parameter(names = {"--noTransit"},
     description = "skip all transit input files (GTFS)")
     boolean noTransit;
@@ -166,7 +166,7 @@ public class CommandLineParameters {
         server |= ( inMemory || preFlight || port != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
         if (routerIds == null) {
-            if (autoScan)
+            if (autoScan || inMemory || preFlight)
                 routerIds = Collections.emptyList();
             else
                 routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
