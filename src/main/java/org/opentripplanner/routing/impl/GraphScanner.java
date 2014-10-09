@@ -92,12 +92,13 @@ public class GraphScanner {
         }
         if (scanExecutor != null) {
             LOG.info("Auto-scan mode activated, looking in {}", basePath);
+            autoScan();
             scanExecutor.scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
                     autoScan();
                 }
-            }, 0, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
+            }, AUTOSCAN_PERIOD_SEC, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
         }
     }
 
