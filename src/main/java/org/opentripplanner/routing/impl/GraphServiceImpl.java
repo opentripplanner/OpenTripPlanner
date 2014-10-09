@@ -39,9 +39,9 @@ import org.slf4j.LoggerFactory;
  * The primary implementation of the GraphService interface. It can handle multiple graphs, each
  * with its own routerId.
  * 
- * Delegate the graph creation/loading details to the GraphFactory implementation.
+ * Delegate the graph creation/loading details to the GraphSource implementations.
  * 
- * @see GraphFactory
+ * @see GraphSource
  */
 public class GraphServiceImpl implements GraphService {
 
