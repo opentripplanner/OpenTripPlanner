@@ -92,17 +92,19 @@ public class OTPConfigurator {
             }
         } else {
             /* Create a conventional GraphService that loads graphs from disk. */
-            // TODO Activate auto-scan option
-            GraphServiceImpl graphService = new GraphServiceImpl();
+            GraphServiceImpl graphService = new GraphServiceImpl(true);
             FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
             graphService.graphSourceFactory = graphSourceFactory;
             if (params.graphDirectory != null) {
                 graphSourceFactory.basePath = new File(params.graphDirectory);
             }
-            if (params.routerIds.size() > 0) {
-                GraphScanner graphScanner = new GraphScanner(graphService);
+            if (params.routerIds.size() > 0 || params.autoScan) {
+                GraphScanner graphScanner = new GraphScanner(graphService, params.autoScan);
+                graphScanner.attemptRegisterDefault = false;
                 graphScanner.basePath = graphSourceFactory.basePath;
-                graphScanner.defaultRouterId = params.routerIds.get(0);
+                if (params.routerIds.size() > 0) {
+                    graphScanner.defaultRouterId = params.routerIds.get(0);
+                }
                 graphScanner.autoRegister = params.routerIds;
                 graphScanner.startup();
             }
