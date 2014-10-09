@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
@@ -31,18 +32,68 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 public class GraphServiceImplTest extends TestCase {
 
+    File basePath;
+
+    Graph emptyGraph;
+
+    Graph smallGraph;
+
+    byte[] emptyGraphData;
+
+    byte[] smallGraphData;
+
+    @Override
+    protected void setUp() throws IOException {
+        // Ensure a dummy disk location exists
+        basePath = new File("test_graphs");
+        if (!basePath.exists())
+            basePath.mkdir();
+
+        // Create an empty graph and it's serialized form
+        emptyGraph = new Graph();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        emptyGraph.save(new ObjectOutputStream(baos));
+        emptyGraphData = baos.toByteArray();
+
+        // Create a small graph with 2 vertices and one edge and it's serialized form
+        smallGraph = new Graph();
+        StreetVertex v1 = new IntersectionVertex(smallGraph, "v1", 0, 0);
+        StreetVertex v2 = new IntersectionVertex(smallGraph, "v2", 0, 0.1);
+        new StreetEdge(v1, v2, null, "v1v2", 11000, StreetTraversalPermission.PEDESTRIAN, false);
+        baos = new ByteArrayOutputStream();
+        smallGraph.save(new ObjectOutputStream(baos));
+        smallGraphData = baos.toByteArray();
+    }
+
+    @Override
+    protected void tearDown() throws FileNotFoundException {
+        deleteRecursive(basePath);
+        basePath = null;
+    }
+
+    public static boolean deleteRecursive(File path) throws FileNotFoundException {
+        if (!path.exists())
+            throw new FileNotFoundException(path.getAbsolutePath());
+        boolean ret = true;
+        if (path.isDirectory()) {
+            for (File f : path.listFiles()) {
+                ret = ret && deleteRecursive(f);
+            }
+        }
+        return ret && path.delete();
+    }
+
     @Test
     public final void testGraphServiceMemory() {
 
         GraphServiceImpl graphService = new GraphServiceImpl();
-        Graph memoryA = new Graph();
-        graphService.registerGraph("memA", new MemoryGraphSource("memA", memoryA));
+        graphService.registerGraph("A", new MemoryGraphSource("A", emptyGraph));
         assertEquals(1, graphService.getRouterIds().size());
 
-        Graph graph = graphService.getGraph("memA");
+        Graph graph = graphService.getGraph("A");
         assertNotNull(graph);
-        assertEquals(memoryA, graph);
-        assertEquals("memA", graph.routerId);
+        assertEquals(emptyGraph, graph);
+        assertEquals("A", emptyGraph.routerId);
 
         try {
             graph = graphService.getGraph("inexistant");
@@ -50,25 +101,24 @@ public class GraphServiceImplTest extends TestCase {
         } catch (GraphNotFoundException e) {
         }
 
-        graphService.setDefaultRouterId("memA");
+        graphService.setDefaultRouterId("A");
         graph = graphService.getGraph();
 
-        assertEquals(memoryA, graph);
+        assertEquals(emptyGraph, graph);
 
-        Graph memoryB = new Graph();
-        graphService.registerGraph("memB", new MemoryGraphSource("memB", memoryB));
+        graphService.registerGraph("B", new MemoryGraphSource("B", smallGraph));
         assertEquals(2, graphService.getRouterIds().size());
 
-        graph = graphService.getGraph("memB");
+        graph = graphService.getGraph("B");
         assertNotNull(graph);
-        assertEquals(memoryB, graph);
-        assertEquals("memB", graph.routerId);
+        assertEquals(smallGraph, graph);
+        assertEquals("B", graph.routerId);
 
-        graphService.evictGraph("memA");
+        graphService.evictGraph("A");
         assertEquals(1, graphService.getRouterIds().size());
 
         try {
-            graph = graphService.getGraph("memA");
+            graph = graphService.getGraph("A");
             assertTrue(false); // Should not be there
         } catch (GraphNotFoundException e) {
         }
@@ -86,22 +136,12 @@ public class GraphServiceImplTest extends TestCase {
     @Test
     public final void testGraphServiceFile() throws IOException {
 
-        // Ensure a dummy disk location exists
-        File basePath = new File("test_graphs");
-        if (!basePath.exists())
-            basePath.mkdir();
-
         // Create a GraphService and a GraphSourceFactory
         GraphServiceImpl graphService = new GraphServiceImpl();
         FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
         graphSourceFactory.basePath = basePath;
 
-        // Create a dummy empty graph A and save it to disk
-        Graph graphA = new Graph();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        graphA.save(new ObjectOutputStream(baos));
-        byte[] graphData = baos.toByteArray();
-        graphSourceFactory.save("A", new ByteArrayInputStream(graphData));
+        graphSourceFactory.save("A", new ByteArrayInputStream(emptyGraphData));
 
         // Check if the graph has been saved
         assertTrue(new File(new File(basePath, "A"), FileGraphSource.GRAPH_FILENAME).canRead());
@@ -118,18 +158,10 @@ public class GraphServiceImplTest extends TestCase {
         assertEquals(0, graph.getVertices().size());
         assertEquals(1, graphService.getRouterIds().size());
 
-        // Add new data to our simple graph
-        StreetVertex v1 = new IntersectionVertex(graphA, "v1", 0, 0);
-        StreetVertex v2 = new IntersectionVertex(graphA, "v2", 0, 0.1);
-        new StreetEdge(v1, v2, null, "v1v2", 11000, StreetTraversalPermission.PEDESTRIAN, false);
-        int verticesCount = graphA.getVertices().size();
-        int edgesCount = graphA.getEdges().size();
-
-        // Serialize it again and save it again
-        baos = new ByteArrayOutputStream();
-        graphA.save(new ObjectOutputStream(baos));
-        byte[] graphData2 = baos.toByteArray();
-        graphSourceFactory.save("A", new ByteArrayInputStream(graphData2));
+        // Save A again, with more data this time
+        int verticesCount = smallGraph.getVertices().size();
+        int edgesCount = smallGraph.getEdges().size();
+        graphSourceFactory.save("A", new ByteArrayInputStream(smallGraphData));
 
         // Force a reload, get again the graph
         graphService.reloadGraphs(false);
@@ -155,7 +187,7 @@ public class GraphServiceImplTest extends TestCase {
         assertEquals(0, graphService.getRouterIds().size());
 
         // Re-save the graph file, register it again
-        graphSourceFactory.save("A", new ByteArrayInputStream(graphData2));
+        graphSourceFactory.save("A", new ByteArrayInputStream(smallGraphData));
         registered = graphService.registerGraph("A", graphSourceFactory.createGraphSource("A"));
         // This time registering is OK
         assertTrue(registered);
@@ -167,4 +199,54 @@ public class GraphServiceImplTest extends TestCase {
         assertEquals(0, graphService.getRouterIds().size());
     }
 
+    @Test
+    public final void testGraphServiceAutoscan() throws IOException {
+
+        // Check for no graphs
+        GraphServiceImpl graphService = new GraphServiceImpl(false);
+        GraphScanner graphScanner = new GraphScanner(graphService, true);
+        graphScanner.basePath = basePath;
+        graphScanner.startup();
+        assertEquals(0, graphService.getRouterIds().size());
+
+        System.out.println("------------------------------------------");
+        // Add a single default graph
+        FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
+        graphSourceFactory.basePath = basePath;
+        graphSourceFactory.save("", new ByteArrayInputStream(smallGraphData));
+
+        // Check that the single graph is there
+        graphService = new GraphServiceImpl(false);
+        graphScanner = new GraphScanner(graphService, true);
+        graphScanner.basePath = basePath;
+        graphScanner.startup();
+        assertEquals(1, graphService.getRouterIds().size());
+        assertEquals("", graphService.getGraph().routerId);
+        assertEquals("", graphService.getGraph("").routerId);
+
+        System.out.println("------------------------------------------");
+        // Add another graph in a sub-directory
+        graphSourceFactory.save("A", new ByteArrayInputStream(smallGraphData));
+        graphService = new GraphServiceImpl(false);
+        graphScanner = new GraphScanner(graphService, true);
+        graphScanner.basePath = basePath;
+        graphScanner.startup();
+        assertEquals(2, graphService.getRouterIds().size());
+        assertEquals("", graphService.getGraph().routerId);
+        assertEquals("A", graphService.getGraph("A").routerId);
+
+        System.out.println("------------------------------------------");
+        // Remove default Graph
+        new File(basePath, FileGraphSource.GRAPH_FILENAME).delete();
+
+        // Check that default is A this time
+        graphService = new GraphServiceImpl(false);
+        graphScanner = new GraphScanner(graphService, true);
+        graphScanner.basePath = basePath;
+        graphScanner.startup();
+        assertEquals(1, graphService.getRouterIds().size());
+        assertEquals("A", graphService.getGraph().routerId);
+        assertEquals("A", graphService.getGraph("A").routerId);
+
+    }
 }
