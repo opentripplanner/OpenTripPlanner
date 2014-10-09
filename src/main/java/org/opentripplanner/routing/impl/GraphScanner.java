@@ -62,12 +62,6 @@ public class GraphScanner {
         this.graphService = graphService;
         if (autoScan) {
             scanExecutor = Executors.newSingleThreadScheduledExecutor();
-            scanExecutor.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    autoScan();
-                }
-            }, AUTOSCAN_PERIOD_SEC, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
         }
     }
 
@@ -98,7 +92,12 @@ public class GraphScanner {
         }
         if (scanExecutor != null) {
             LOG.info("Auto-scan mode activated, looking in {}", basePath);
-            autoScan();
+            scanExecutor.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    autoScan();
+                }
+            }, 0, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
         }
     }
 
