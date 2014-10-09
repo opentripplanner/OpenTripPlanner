@@ -48,7 +48,7 @@ public class GraphServiceImpl implements GraphService {
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
     /** Poll period for autoreload autoscan. 0 to disable. */
-    private static final int AUTOSCAN_PERIOD_SEC = 10;
+    private static final int AUTORELOAD_PERIOD_SEC = 10;
 
     /**
      * Should we pre-evict in auto-reload mode? False is more memory consuming but safer in case of
@@ -69,16 +69,18 @@ public class GraphServiceImpl implements GraphService {
 
     public GraphSourceFactory graphSourceFactory;
 
-    private ScheduledExecutorService scanExecutor = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scanExecutor;
 
     public GraphServiceImpl() {
-        if (AUTOSCAN_PERIOD_SEC > 0)
+        if (AUTORELOAD_PERIOD_SEC > 0) {
+            scanExecutor = Executors.newSingleThreadScheduledExecutor();
             scanExecutor.scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
                     autoReloadScan();
                 }
-            }, AUTOSCAN_PERIOD_SEC, AUTOSCAN_PERIOD_SEC, TimeUnit.SECONDS);
+            }, AUTORELOAD_PERIOD_SEC, AUTORELOAD_PERIOD_SEC, TimeUnit.SECONDS);
+        }
     }
 
     /**
