@@ -77,6 +77,10 @@ public interface GraphService {
      * This is equivalent to calling evictGraph on every registered router ID.
      */
     public int evictAll();
-    
+
+    /**
+     * @return The default GraphSourceFactory. Needed in case someone want to register or save a new
+     *         router with a router ID only (namely, via the web-service API).
+     */
     public GraphSourceFactory getGraphSourceFactory();
 }
