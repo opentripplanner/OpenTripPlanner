@@ -32,10 +32,12 @@ public class MemoryGraphSource implements GraphSource {
     private GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
 
     public MemoryGraphSource(String routerId, Graph graph) {
+        this(routerId, graph, new PropertiesPreferences(new Properties()));
+    }
+
+    public MemoryGraphSource(String routerId, Graph graph, Preferences config) {
         this.graph = graph;
         this.graph.routerId = routerId;
-        // TODO Get properties from somewhere to configure dynamic updaters
-        Preferences config = new PropertiesPreferences(new Properties());
         decorator.setupGraph(graph, config);
     }
 
