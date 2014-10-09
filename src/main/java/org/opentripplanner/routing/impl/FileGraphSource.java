@@ -110,8 +110,12 @@ public class FileGraphSource implements GraphSource {
                 if (newGraph != null) {
                     graph = newGraph; // Assignment in java is atomic
                 } else {
-                    LOG.warn("Unable to load modified data for router '{}', keeping old data.",
-                            routerId);
+                    if (force || graph == null) {
+                        LOG.warn("Unable to load data for router '{}'.", routerId);
+                        graph = null;
+                    } else {
+                        LOG.warn("Unable to load data for router '{}', keeping old data.", routerId);
+                    }
                 }
             }
             if (graph == null) {
