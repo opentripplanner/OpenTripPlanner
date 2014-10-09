@@ -92,7 +92,7 @@ public class OTPConfigurator {
             }
         } else {
             /* Create a conventional GraphService that loads graphs from disk. */
-            GraphServiceImpl graphService = new GraphServiceImpl(true);
+            GraphServiceImpl graphService = new GraphServiceImpl(params.autoReload);
             FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
             graphService.graphSourceFactory = graphSourceFactory;
             if (params.graphDirectory != null) {

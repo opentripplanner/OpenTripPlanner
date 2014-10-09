@@ -127,8 +127,11 @@ public class CommandLineParameters {
             description = "path to graph directory")
     String graphDirectory;
 
-    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs in graph directory. Also activate auto-reload.")
+    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs to register in graph directory.")
     boolean autoScan = false;
+
+    @Parameter(names = { "--autoReload" }, description = "auto-reload registered graphs when source data is modified.")
+    boolean autoReload = false;
 
     @Parameter( names = { "-l", "--longDistance"}, 
             description = "use an algorithm tailored for long-distance routing")
