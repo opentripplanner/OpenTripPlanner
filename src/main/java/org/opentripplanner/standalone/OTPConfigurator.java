@@ -42,8 +42,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.impl.FileGraphSourceFactory;
 import org.opentripplanner.routing.impl.GraphScanner;
-import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.updater.PropertiesPreferences;
 import org.opentripplanner.visualizer.GraphVisualizer;
@@ -80,34 +80,34 @@ public class OTPConfigurator {
 
     /** Create a cached GraphService that will be shared between all OTP components. */
     public void makeGraphService(Graph graph) {
-        /* Hand off graph in memory to server in a single-graph in-memory GraphServiceImpl. */
-        if (graph != null && ( params.inMemory || params.preFlight) ) {
+        GraphServiceImpl graphService = new GraphServiceImpl(params.autoReload);
+        this.graphService = graphService;
+        FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
+        graphService.graphSourceFactory = graphSourceFactory;
+        if (params.graphDirectory != null) {
+            graphSourceFactory.basePath = new File(params.graphDirectory);
+        }
+        if (graph != null && (params.inMemory || params.preFlight)) {
+            /* Hand off graph in memory to server in a in-memory GraphSource. */
             try {
                 FileInputStream graphConfiguration = new FileInputStream(params.graphConfigFile);
                 Preferences config = new PropertiesPreferences(graphConfiguration);
-                this.graphService = new GraphServiceBeanImpl(graph, config);
+                this.graphService.registerGraph("", new MemoryGraphSource("", graph, config));
             } catch (Exception e) {
-                if (params.graphConfigFile != null) LOG.error("Can't read config file", e);
-                this.graphService = new GraphServiceBeanImpl(graph, null);
+                if (params.graphConfigFile != null)
+                    LOG.error("Can't read config file", e);
+                this.graphService.registerGraph("", new MemoryGraphSource("", graph));
             }
-        } else {
-            /* Create a conventional GraphService that loads graphs from disk. */
-            GraphServiceImpl graphService = new GraphServiceImpl(params.autoReload);
-            FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
-            graphService.graphSourceFactory = graphSourceFactory;
-            if (params.graphDirectory != null) {
-                graphSourceFactory.basePath = new File(params.graphDirectory);
+        }
+        if (params.routerIds.size() > 0 || params.autoScan) {
+            /* Auto-register pre-existing graph on disk, with optional auto-scan. */
+            GraphScanner graphScanner = new GraphScanner(graphService, params.autoScan);
+            graphScanner.basePath = graphSourceFactory.basePath;
+            if (params.routerIds.size() > 0) {
+                graphScanner.defaultRouterId = params.routerIds.get(0);
             }
-            if (params.routerIds.size() > 0 || params.autoScan) {
-                GraphScanner graphScanner = new GraphScanner(graphService, params.autoScan);
-                graphScanner.basePath = graphSourceFactory.basePath;
-                if (params.routerIds.size() > 0) {
-                    graphScanner.defaultRouterId = params.routerIds.get(0);
-                }
-                graphScanner.autoRegister = params.routerIds;
-                graphScanner.startup();
-            }
-            this.graphService = graphService;
+            graphScanner.autoRegister = params.routerIds;
+            graphScanner.startup();
         }
     }
 
