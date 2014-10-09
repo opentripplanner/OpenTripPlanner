@@ -47,7 +47,7 @@ public class GraphServiceImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
-    /** Poll period for autoreload autoscan. 0 to disable. */
+    /** Poll period for auto-reload scan. */
     private static final int AUTORELOAD_PERIOD_SEC = 10;
 
     /**
@@ -72,7 +72,11 @@ public class GraphServiceImpl implements GraphService {
     private ScheduledExecutorService scanExecutor;
 
     public GraphServiceImpl() {
-        if (AUTORELOAD_PERIOD_SEC > 0) {
+        this(false);
+    }
+
+    public GraphServiceImpl(boolean autoReload) {
+        if (autoReload) {
             scanExecutor = Executors.newSingleThreadScheduledExecutor();
             scanExecutor.scheduleWithFixedDelay(new Runnable() {
                 @Override
@@ -170,7 +174,7 @@ public class GraphServiceImpl implements GraphService {
         synchronized (graphSources) {
             GraphSource oldSource = graphSources.get(routerId);
             if (oldSource != null) {
-                LOG.info("Graph '{}' already registered. Nothing to do.");
+                LOG.info("Graph '{}' already registered. Nothing to do.", routerId);
                 return false;
             }
             graphSources.put(routerId, graphSource);
