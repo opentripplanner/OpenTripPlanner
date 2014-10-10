@@ -15,22 +15,20 @@ package org.opentripplanner.gtfs.model;
 
 import java.util.Map;
 
-public class Agency {
-    final public String agency_id;
-    final public String agency_name;
-    final public String agency_url;
-    final public String agency_timezone;
-    final public String agency_lang;
-    final public String agency_phone;
-    final public String agency_fare_url;
+public class FareAttribute {
+    final public String fare_id;
+    final public String price;
+    final public String currency_type;
+    final public String payment_method;
+    final public String transfers;
+    final public String transfer_duration;
 
-    public Agency(Map<String, String> row) {
-        agency_id = row.get("agency_id");
-        agency_name = row.get("agency_name");
-        agency_url = row.get("agency_url");
-        agency_timezone = row.get("agency_timezone");
-        agency_lang = row.get("agency_lang");
-        agency_phone = row.get("agency_phone");
-        agency_fare_url = row.get("agency_fare_url");
+    public FareAttribute(Map<String, String> row) {
+        fare_id = row.get("fare_id");
+        price = row.get("price");
+        currency_type = row.get("currency_type");
+        payment_method = row.get("payment_method");
+        transfers = row.get("transfers");
+        transfer_duration = row.get("transfer_duration");
     }
 }

@@ -41,11 +41,6 @@ public class GTFSFeed {
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
         
     private void loadFromFile(ZipFile zip) throws Exception {
-        new GTFSTable("agency",     Agency.class,   false).loadTable(zip, agency);
-        new GTFSTable("routes",     Route.class,    false).loadTable(zip, routes);
-        new GTFSTable("stops",      Stop.class,     false).loadTable(zip, stops );
-        new GTFSTable("trips",      Trip.class,     false).loadTable(zip, trips );
-        new GTFSTable("stop_times", StopTime.class, false).loadTable(zip, stop_times);
     }
     
     public static GTFSFeed fromFile(String file) {
