@@ -37,7 +37,7 @@ class Table implements Iterator<Map<String, String>>, AutoCloseable {
 
     Table(InputStream inputStream) {
         csvReader = new CsvReader(inputStream, Charset.forName("UTF-8"));
-        Map<String, Integer> map = Maps.newLinkedHashMap();
+        Map<String, Integer> map = Maps.newHashMap();
 
         try {
             if (csvReader.readHeaders()) {
@@ -180,7 +180,7 @@ class Table implements Iterator<Map<String, String>>, AutoCloseable {
 
         @Override
         public Set<Entry<String, String>> entrySet() {
-            Set<Entry<String, String>> set = Sets.newLinkedHashSet();
+            Set<Entry<String, String>> set = Sets.newHashSet();
 
             for (String string : keySet()) {
                 set.add(new Cell(string));

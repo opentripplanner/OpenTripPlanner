@@ -39,7 +39,7 @@ public class Feed implements Map<String, Iterable<Map<String, String>>>, AutoClo
         }
         autoCloseables.add(zipFile);
 
-        Map<String, Iterable<Map<String, String>>> map = Maps.newLinkedHashMap();
+        Map<String, Iterable<Map<String, String>>> map = Maps.newHashMap();
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
         while (entries.hasMoreElements()) {
