@@ -255,7 +255,8 @@ public class ProfileRouter {
             return null;
         }
         /* Non-analyst: Determine which rides are good ways to reach the destination. */
-        Set<Ride> targetRides = Sets.newHashSet(); // FIXME determine why there are multiple copies of the same ride then maybe use a list
+        // FIXME determine why there are multiple copies of the same ride then maybe use a list
+        Set<Ride> targetRides = Sets.newHashSet();
         for (StopCluster cluster : toStopPaths.keySet()) {
             for (Ride ride : retainedRides.get(cluster)) {
                 PATTERN: for (PatternRide pr : ride.patternRides) {
@@ -302,18 +303,18 @@ public class ProfileRouter {
             newRide = newRide.previous;
         }
         if (newRide.durationLowerBound() > MAX_DURATION) return false;
-        // Check whether any existing rides at the same location (stop cluster) dominate the new one
+        // Check whether any existing rides at the same location (stop cluster) dominate the new one.
         for (Ride oldRide : retainedRides.get(cluster)) {
             if (oldRide.to == null) oldRide = oldRide.previous; // rides may be unfinished
-            // new ride must be strictly better (min and max) than any existing one with less transfers.
-            // this avoids inserting extra rides "just for fun".
+            // New rides must be strictly better (min and max) than any existing one with less transfers.
+            // This avoids alternatives formed by simply inserting extra unnecessary rides.
             if (oldRide.pathLength() < newRide.pathLength() &&
                 oldRide.durationLowerBound() < newRide.durationLowerBound() &&
                 oldRide.durationUpperBound() < newRide.durationUpperBound()) {
                 return false;
             }
             // State is not strictly dominated. Perhaps it has the same number of transfers.
-            // In this case we want to keep it as long as it's sometimes better than all the others (time ranged overlap).
+            // In this case we want to keep it as long as it's sometimes better than all the others (time ranges overlap).
             if (newRide.durationLowerBound() > oldRide.durationUpperBound()) {
                 return false;
             }
@@ -444,7 +445,7 @@ public class ProfileRouter {
         }
     }
 
-    /** Look for an option connecting origin to destination with no transit. */
+    /** Look for an option connecting origin to destination without using transit. */
     private void findStreetOption(TraverseMode mode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(mode);
