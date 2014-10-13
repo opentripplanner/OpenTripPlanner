@@ -13,20 +13,39 @@
 
 package org.opentripplanner.gtfs.model;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class Frequency {
-    final public String trip_id;
-    final public String start_time;
-    final public String end_time;
-    final public String headway_secs;
-    final public String exact_times;
+public class Frequency extends Entity {
 
-    public Frequency(Map<String, String> row) {
-        trip_id = row.get("trip_id");
-        start_time = row.get("start_time");
-        end_time = row.get("end_time");
-        headway_secs = row.get("headway_secs");
-        exact_times = row.get("exact_times");
+    public String trip_id;
+    public String start_time;
+    public String end_time;
+    public String headway_secs;
+    public String exact_times;
+
+    @Override
+    public Object getKey() {
+        return trip_id;
     }
+
+    public static class Factory extends Entity.Factory<Frequency> {
+
+        public Factory() {
+            tableName = "frequencies";
+            requiredColumns = new String[] {"trip_id"};
+        }
+
+        @Override
+        public Frequency fromCsv() throws IOException {
+            Frequency f = new Frequency();
+            f.trip_id = getStringField("trip_id");
+            f.start_time = getStringField("start_time");
+            f.end_time = getStringField("end_time");
+            f.headway_secs = getStringField("headway_secs");
+            f.exact_times = getStringField("exact_times");
+            return f;
+        }
+
+    }
+
 }

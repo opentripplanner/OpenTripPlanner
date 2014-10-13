@@ -17,7 +17,6 @@ import org.mapdb.Fun;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Map;
 
 public class StopTime extends Entity implements Serializable {
 
@@ -46,15 +45,15 @@ public class StopTime extends Entity implements Serializable {
         @Override
         public StopTime fromCsv() throws IOException {
             StopTime st = new StopTime();
-            st.trip_id        = getStrField("trip_id");
-            st.arrival_time   = getIntField("arrival_time");
-            st.departure_time = getIntField("departure_time");
-            st.stop_id        = getStrField("stop_id");
+            st.trip_id        = getStringField("trip_id");
+            st.arrival_time   = getTimeField("arrival_time");
+            st.departure_time = getTimeField("departure_time");
+            st.stop_id        = getStringField("stop_id");
             st.stop_sequence  = getIntField("stop_sequence");
-            st.stop_headsign  = getStrField("stop_headsign");
+            st.stop_headsign  = getStringField("stop_headsign");
             st.pickup_type    = getIntField("pickup_type");
             st.drop_off_type  = getIntField("drop_off_type");
-            st.shape_dist_traveled = getDblField("shape_dist_traveled");
+            st.shape_dist_traveled = getDoubleField("shape_dist_traveled");
             return st;
         }
 

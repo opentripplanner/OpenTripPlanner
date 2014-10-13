@@ -13,30 +13,49 @@
 
 package org.opentripplanner.gtfs.model;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class Calendar {
-    final public String service_id;
-    final public String monday;
-    final public String tuesday;
-    final public String wednesday;
-    final public String thursday;
-    final public String friday;
-    final public String saturday;
-    final public String sunday;
-    final public String start_date;
-    final public String end_date;
+public class Calendar extends Entity {
 
-    public Calendar(Map<String, String> row) {
-        service_id = row.get("service_id");
-        monday = row.get("monday");
-        tuesday = row.get("tuesday");
-        wednesday = row.get("wednesday");
-        thursday = row.get("thursday");
-        friday = row.get("friday");
-        saturday = row.get("saturday");
-        sunday = row.get("sunday");
-        start_date = row.get("start_date");
-        end_date = row.get("end_date");
+    public String service_id;
+    public String monday;
+    public String tuesday;
+    public String wednesday;
+    public String thursday;
+    public String friday;
+    public String saturday;
+    public String sunday;
+    public String start_date;
+    public String end_date;
+
+    @Override
+    public String getKey() {
+        return ""; // TODO auto-increment
     }
+
+    public static class Factory extends Entity.Factory<Calendar> {
+
+        public Factory() {
+            tableName = "calendars";
+            requiredColumns = new String[] {"service_id"};
+        }
+
+        @Override
+        public Calendar fromCsv() throws IOException {
+            Calendar c = new Calendar();
+            c.service_id = getStringField("service_id");
+            c.monday     = getStringField("monday");
+            c.tuesday    = getStringField("tuesday");
+            c.wednesday  = getStringField("wednesday");
+            c.thursday   = getStringField("thursday");
+            c.friday     = getStringField("friday");
+            c.saturday   = getStringField("saturday");
+            c.sunday     = getStringField("sunday");
+            c.start_date = getStringField("start_date");
+            c.end_date   = getStringField("end_date");
+            return c;
+        }
+
+    }
+
 }

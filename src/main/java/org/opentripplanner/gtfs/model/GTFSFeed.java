@@ -34,18 +34,19 @@ public class GTFSFeed {
 
     String feedId;
 
+    /* Some of these should be multimaps since they don't have an obvious unique key. */
     public final Map<String, Agency>        agency         = Maps.newHashMap();
+    public final Map<String, Calendar>      calendars      = Maps.newHashMap();
+    public final Map<String, CalendarDate>  calendarDates  = Maps.newHashMap();
+    public final Map<String, FareAttribute> fareAttributes = Maps.newHashMap();
+    public final Map<String, FareRule>      fareRules      = Maps.newHashMap();
+    public final Map<String, FeedInfo>      feedInfo       = Maps.newHashMap();
+    public final Map<String, Frequency>     frequencies    = Maps.newHashMap();
     public final Map<String, Route>         routes         = Maps.newHashMap();
     public final Map<String, Shape>         shapes         = Maps.newHashMap();
     public final Map<String, Stop>          stops          = Maps.newHashMap();
     public final Map<String, Transfer>      transfers      = Maps.newHashMap();
     public final Map<String, Trip>          trips          = Maps.newHashMap();
-    public final Map<String, FareRule>      fareRules      = Maps.newHashMap();
-    public final Map<String, FeedInfo>      feedInfos      = Maps.newHashMap();
-    public final Map<String, Frequency>     frequencies    = Maps.newHashMap();
-    public final Map<String, Calendar>      calendars      = Maps.newHashMap();
-    public final Map<String, CalendarDate>  calendarDates  = Maps.newHashMap();
-    public final Map<String, FareAttribute> fareAttributes = Maps.newHashMap();
 
     // Map from 2-tuples of (trip_id, stop_sequence) to stoptimes.
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
@@ -53,18 +54,34 @@ public class GTFSFeed {
     /* A place to accumulate errors while the feed is loaded. The objective is to tolerate as many errors as possible and keep on going. */
     public List<Error> errors = Lists.newArrayList();
 
+    /* Set the feed_id from feed_info. Call only after feed_info has been loaded. */
+    private void setFeedId() {
+        if (feedInfo.size() == 0) {
+            LOG.info("feed_info not supplied.");
+            return;
+        } else if (feedInfo.size() > 1) {
+            errors.add(new Error("More than one feed_info entry. Using only the first one."));
+        }
+        feedId = feedInfo.values().iterator().next().feed_id;
+        LOG.info("Feed ID is '{}'.", feedId);
+    }
+
     private void loadFromFile(ZipFile zip) throws Exception {
-        Entity.Factory factory;
-        factory = new Route.Factory();
-        factory.loadTable(zip, errors, routes);
-        factory = new Agency.Factory();
-        factory.loadTable(zip, errors, agency);
-        factory = new Stop.Factory();
-        factory.loadTable(zip, errors, stops);
-        factory = new Trip.Factory();
-        factory.loadTable(zip, errors, trips);
-        factory = new StopTime.Factory();
-        factory.loadTable(zip, errors, stop_times);
+        new FeedInfo.Factory().loadTable(zip, errors, feedInfo); // pass in GtfsFeed, which contains these params as fields.
+        setFeedId();
+        new Agency.Factory().loadTable(zip, errors, agency);
+        new Calendar.Factory().loadTable(zip, errors, calendars);
+        new CalendarDate.Factory().loadTable(zip, errors, calendarDates);
+        new FareAttribute.Factory().loadTable(zip, errors, fareAttributes);
+        new FareRule.Factory().loadTable(zip, errors, fareRules);
+        new Frequency.Factory().loadTable(zip, errors, frequencies);
+        new Route.Factory().loadTable(zip, errors, routes);
+        new Shape.Factory().loadTable(zip, errors, shapes);
+        new Stop.Factory().loadTable(zip, errors, stops);
+        new Transfer.Factory().loadTable(zip, errors, transfers);
+        new Trip.Factory().loadTable(zip, errors, trips);
+        new StopTime.Factory().loadTable(zip, errors, stop_times);
+        LOG.info("Errors: {}", errors);
     }
     
     public static GTFSFeed fromFile(String file) {

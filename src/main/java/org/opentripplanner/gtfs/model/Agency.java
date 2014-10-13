@@ -14,7 +14,6 @@
 package org.opentripplanner.gtfs.model;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class Agency extends Entity {
 
@@ -35,19 +34,19 @@ public class Agency extends Entity {
 
         public Factory() {
             tableName = "agency";
-            requiredColumns = new String[] {"agency_id"};
+            requiredColumns = new String[] {"agency_name", "agency_timezone"};
         }
 
         @Override
         public Agency fromCsv() throws IOException {
             Agency a = new Agency();
-            a.agency_id    = getStrField("agency_id");
-            a.agency_name  = getStrField("agency_name");
-            a.agency_url   = getStrField("agency_url");
-            a.agency_lang  = getStrField("agency_lang");
-            a.agency_phone = getStrField("agency_phone");
-            a.agency_timezone = getStrField("agency_timezone");
-            a.agency_fare_url = getStrField("agency_fare_url");
+            a.agency_id    = getStringField("agency_id");
+            a.agency_name  = getStringField("agency_name");
+            a.agency_url   = getStringField("agency_url");
+            a.agency_lang  = getStringField("agency_lang");
+            a.agency_phone = getStringField("agency_phone");
+            a.agency_timezone = getStringField("agency_timezone");
+            a.agency_fare_url = getStringField("agency_fare_url");
             return a;
         }
 

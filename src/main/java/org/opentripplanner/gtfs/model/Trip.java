@@ -14,7 +14,6 @@
 package org.opentripplanner.gtfs.model;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class Trip extends Entity {
 
@@ -44,16 +43,16 @@ public class Trip extends Entity {
         @Override
         public Trip fromCsv() throws IOException {
             Trip t = new Trip();
-            t.route_id        = getStrField("route_id");
-            t.service_id      = getStrField("service_id");
-            t.trip_id         = getStrField("trip_id");
-            t.trip_headsign   = getStrField("trip_headsign");
-            t.trip_short_name = getStrField("trip_short_name");
-            t.direction_id    = getStrField("direction_id");
-            t.block_id        = getStrField("block_id");
-            t.shape_id        = getStrField("shape_id");
-            t.bikes_allowed   = getStrField("bikes_allowed");
-            t.wheelchair_accessible = getStrField("wheelchair_accessible");
+            t.route_id        = getStringField("route_id");
+            t.service_id      = getStringField("service_id");
+            t.trip_id         = getStringField("trip_id");
+            t.trip_headsign   = getStringField("trip_headsign");
+            t.trip_short_name = getStringField("trip_short_name");
+            t.direction_id    = getStringField("direction_id");
+            t.block_id        = getStringField("block_id");
+            t.shape_id        = getStringField("shape_id");
+            t.bikes_allowed   = getStringField("bikes_allowed");
+            t.wheelchair_accessible = getStringField("wheelchair_accessible");
             return t;
         }
 

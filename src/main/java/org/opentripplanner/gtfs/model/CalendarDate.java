@@ -13,16 +13,35 @@
 
 package org.opentripplanner.gtfs.model;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class CalendarDate {
-    final public String service_id;
-    final public String date;
-    final public String exception_type;
+public class CalendarDate extends Entity {
 
-    public CalendarDate(Map<String, String> row) {
-        service_id = row.get("service_id");
-        date = row.get("date");
-        exception_type = row.get("exception_type");
+    public String service_id;
+    public String date;
+    public int    exception_type;
+
+    @Override
+    public String getKey() {
+        return ""; // TODO auto-increment, list not map type (overload load function to take list types)
     }
+
+    public static class Factory extends Entity.Factory<CalendarDate> {
+
+        public Factory() {
+            tableName = "calendar_dates";
+            requiredColumns = new String[] {"service_id", "date", "exception_type"};
+        }
+
+        @Override
+        public CalendarDate fromCsv() throws IOException {
+            CalendarDate cd = new CalendarDate();
+            cd.service_id  = getStringField("service_id");
+            cd.date = getStringField("date");
+            cd.exception_type = getIntField("exception_type");
+            return cd;
+        }
+
+    }
+
 }

@@ -13,20 +13,39 @@
 
 package org.opentripplanner.gtfs.model;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class FareRule {
-    final public String fare_id;
-    final public String route_id;
-    final public String origin_id;
-    final public String destination_id;
-    final public String contains_id;
+public class FareRule extends Entity {
 
-    public FareRule(Map<String, String> row) {
-        fare_id = row.get("fare_id");
-        route_id = row.get("route_id");
-        origin_id = row.get("origin_id");
-        destination_id = row.get("destination_id");
-        contains_id = row.get("contains_id");
+    public String fare_id;
+    public String route_id;
+    public String origin_id;
+    public String destination_id;
+    public String contains_id;
+
+    @Override
+    public String getKey() {
+        return fare_id;
     }
+
+    public static class Factory extends Entity.Factory<FareRule> {
+
+        public Factory() {
+            tableName = "fare_rules";
+            requiredColumns = new String[] {"fare_id"};
+        }
+
+        @Override
+        public FareRule fromCsv() throws IOException {
+            FareRule fr = new FareRule();
+            fr.fare_id = getStringField("fare_id");
+            fr.route_id = getStringField("route_id");
+            fr.origin_id = getStringField("origin_id");
+            fr.destination_id = getStringField("destination_id");
+            fr.contains_id = getStringField("contains_id");
+            return fr;
+        }
+
+    }
+
 }

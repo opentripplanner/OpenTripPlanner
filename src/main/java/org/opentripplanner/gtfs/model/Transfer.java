@@ -13,18 +13,40 @@
 
 package org.opentripplanner.gtfs.model;
 
+import org.opentripplanner.routing.algorithm.TraverseVisitor;
+
+import java.io.IOException;
 import java.util.Map;
 
-public class Transfer {
-    final public String from_stop_id;
-    final public String to_stop_id;
-    final public String transfer_type;
-    final public String min_transfer_time;
+public class Transfer extends Entity {
 
-    public Transfer(Map<String, String> row) {
-        from_stop_id = row.get("from_stop_id");
-        to_stop_id = row.get("to_stop_id");
-        transfer_type = row.get("transfer_type");
-        min_transfer_time = row.get("min_transfer_time");
+    public String from_stop_id;
+    public String to_stop_id;
+    public String transfer_type;
+    public String min_transfer_time;
+
+    @Override
+    public String getKey() {
+        return null;
     }
+
+    public static class Factory extends Entity.Factory<Transfer> {
+
+        public Factory() {
+            tableName = "transfers";
+            requiredColumns = new String[] {"from_stop_id", "to_stop_id", "transfer_type"};
+        }
+
+        @Override
+        public Transfer fromCsv() throws IOException {
+            Transfer tr = new Transfer();
+            tr.from_stop_id      = getStringField("from_stop_id");
+            tr.to_stop_id        = getStringField("to_stop_id");
+            tr.transfer_type     = getStringField("transfer_type");
+            tr.min_transfer_time = getStringField("min_transfer_time");
+            return tr;
+        }
+
+    }
+
 }

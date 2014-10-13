@@ -13,10 +13,7 @@
 
 package org.opentripplanner.gtfs.model;
 
-import com.csvreader.CsvReader;
-
 import java.io.IOException;
-import java.util.Map;
 
 public class Route extends Entity { // implements Entity.Factory<Route>
 
@@ -41,21 +38,21 @@ public class Route extends Entity { // implements Entity.Factory<Route>
 
         public Factory() {
             tableName = "routes";
-            requiredColumns = new String[] {"route_id", "agency_id"};
+            requiredColumns = new String[] {"route_id", "route_type"};
         }
 
         @Override
         public Route fromCsv() throws IOException {
             Route r = new Route();
-            r.route_id         = getStrField("route_id");
-            r.agency_id        = getStrField("agency_id");
-            r.route_short_name = getStrField("route_short_name");
-            r.route_long_name  = getStrField("route_long_name");
-            r.route_desc       = getStrField("route_desc");
+            r.route_id         = getStringField("route_id");
+            r.agency_id        = getStringField("agency_id");
+            r.route_short_name = getStringField("route_short_name");
+            r.route_long_name  = getStringField("route_long_name");
+            r.route_desc       = getStringField("route_desc");
             r.route_type       = getIntField("route_type");
-            r.route_url        = getStrField("route_url");
-            r.route_color      = getStrField("route_color");
-            r.route_text_color = getStrField("route_text_color");
+            r.route_url        = getStringField("route_url");
+            r.route_color      = getStringField("route_color");
+            r.route_text_color = getStringField("route_text_color");
             r.feedId = "FEED";
             return r;
         }

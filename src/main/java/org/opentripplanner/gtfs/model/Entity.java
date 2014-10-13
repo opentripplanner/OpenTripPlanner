@@ -35,13 +35,14 @@ public abstract class Entity {
 
         // TODO private static final StringDeduplicator;
 
-        String tableName; // name of corresponding table without .txt
+        String   tableName; // name of corresponding table without .txt
         String[] requiredColumns;
+        boolean  required = false;
 
         CsvReader reader;
         List<Error> errorList = Lists.newArrayList();
 
-        public String getStrField(String column) throws IOException {
+        public String getStringField(String column) throws IOException {
             // TODO deduplicate strings
             String str = reader.get(column);
             return str;
@@ -61,7 +62,29 @@ public abstract class Entity {
             return val;
         }
 
-        public double getDblField(String column) throws IOException {
+        public int getTimeField(String column) throws IOException {
+            String str = null;
+            int val = -1;
+            try {
+                str = reader.get(column);
+                String[] fields = str.split(":");
+                if (fields.length != 3) {
+                    errorList.add(new Error("Wrong number of subfields in time."));
+                } else {
+                    int hours = Integer.parseInt(fields[0]);
+                    int minutes = Integer.parseInt(fields[1]);
+                    int seconds = Integer.parseInt(fields[2]);
+                    val = (hours * 60 * 60) + minutes * 60 + seconds;
+                }
+            } catch (NumberFormatException nfe) {
+                String msg = String.format("Error parsing int from time subfield in '%s' from column '%s' " +
+                        "at line number X. This does not look like an integer.", str, column);
+                errorList.add(new Error(msg));
+            }
+            return val;
+        }
+
+        public double getDoubleField(String column) throws IOException {
             String str = null;
             double val = 0;
             try {
@@ -92,6 +115,14 @@ public abstract class Entity {
         public <K> void loadTable(ZipFile zip, List<Error> errorList, Map<K, E> targetMap) throws IOException {
             this.errorList = errorList;
             ZipEntry entry = zip.getEntry(tableName + ".txt");
+            if (entry == null) {
+                /* This GTFS table did not exist in the zip. */
+                if (required) {
+                    String msg = String.format("Required table '%s' was not present.", tableName);
+                    errorList.add(new Error(msg));
+                }
+                return;
+            }
             LOG.info("Loading GTFS table {} from {}", tableName, entry);
             InputStream zis = zip.getInputStream(entry);
             CsvReader reader = new CsvReader(zis, ',', Charset.forName("UTF8"));

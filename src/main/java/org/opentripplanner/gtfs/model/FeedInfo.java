@@ -13,22 +13,45 @@
 
 package org.opentripplanner.gtfs.model;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class FeedInfo {
-    final public String feed_publisher_name;
-    final public String feed_publisher_url;
-    final public String feed_lang;
-    final public String feed_start_date;
-    final public String feed_end_date;
-    final public String feed_version;
+public class FeedInfo extends Entity {
 
-    public FeedInfo(Map<String, String> row) {
-        feed_publisher_name = row.get("feed_publisher_name");
-        feed_publisher_url = row.get("feed_publisher_url");
-        feed_lang = row.get("feed_lang");
-        feed_start_date = row.get("feed_start_date");
-        feed_end_date = row.get("feed_end_date");
-        feed_version = row.get("feed_version");
+    public String feed_id = "NONE";
+    public String feed_publisher_name;
+    public String feed_publisher_url;
+    public String feed_lang;
+    public String feed_start_date;
+    public String feed_end_date;
+    public String feed_version;
+
+    @Override
+    public String getKey() {
+        return null;
     }
+
+    public static class Factory extends Entity.Factory<FeedInfo> {
+
+        public Factory() {
+            tableName = "feed_info";
+            requiredColumns = new String[] { };
+        }
+
+        @Override
+        public FeedInfo fromCsv() throws IOException {
+            FeedInfo fi = new FeedInfo();
+            fi.feed_id = getStringField("feed_id");
+            fi.feed_publisher_name = getStringField("feed_publisher_name");
+            fi.feed_publisher_url = getStringField("feed_publisher_url");
+            fi.feed_lang = getStringField("feed_lang");
+            fi.feed_start_date = getStringField("feed_start_date");
+            fi.feed_end_date = getStringField("feed_end_date");
+            fi.feed_version = getStringField("feed_version");
+            // Note that like all other Entity subclasses, this also has a feedId field.
+            return fi;
+        }
+
+    }
+
 }

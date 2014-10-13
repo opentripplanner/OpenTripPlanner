@@ -13,20 +13,38 @@
 
 package org.opentripplanner.gtfs.model;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class Shape {
-    final public String shape_id;
-    final public String shape_pt_lat;
-    final public String shape_pt_lon;
-    final public String shape_pt_sequence;
-    final public String shape_dist_traveled;
+public class Shape extends Entity {
 
-    public Shape(Map<String, String> row) {
-        shape_id = row.get("shape_id");
-        shape_pt_lat = row.get("shape_pt_lat");
-        shape_pt_lon = row.get("shape_pt_lon");
-        shape_pt_sequence = row.get("shape_pt_sequence");
-        shape_dist_traveled = row.get("shape_dist_traveled");
+    public String shape_id;
+    public double shape_pt_lat;
+    public double shape_pt_lon;
+    public int    shape_pt_sequence;
+    public double shape_dist_traveled;
+
+    @Override
+    public Object getKey() {
+        return shape_id;
+    }
+
+    public static class Factory extends Entity.Factory<Shape> {
+
+        public Factory() {
+            tableName = "frequencies";
+            requiredColumns = new String[] {"trip_id"};
+        }
+
+        @Override
+        public Shape fromCsv() throws IOException {
+            Shape s = new Shape();
+            s.shape_id = getStringField("shape_id");
+            s.shape_pt_lat = getDoubleField("shape_pt_lat");
+            s.shape_pt_lon = getDoubleField("shape_pt_lon");
+            s.shape_pt_sequence = getIntField("shape_pt_sequence");
+            s.shape_dist_traveled = getDoubleField("shape_dist_traveled");
+            return s;
+        }
+
     }
 }

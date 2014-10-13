@@ -13,22 +13,41 @@
 
 package org.opentripplanner.gtfs.model;
 
-import java.util.Map;
+import java.io.IOException;
 
-public class FareAttribute {
-    final public String fare_id;
-    final public String price;
-    final public String currency_type;
-    final public String payment_method;
-    final public String transfers;
-    final public String transfer_duration;
+public class FareAttribute extends Entity {
 
-    public FareAttribute(Map<String, String> row) {
-        fare_id = row.get("fare_id");
-        price = row.get("price");
-        currency_type = row.get("currency_type");
-        payment_method = row.get("payment_method");
-        transfers = row.get("transfers");
-        transfer_duration = row.get("transfer_duration");
+    public String fare_id;
+    public String price;
+    public String currency_type;
+    public String payment_method;
+    public String transfers;
+    public String transfer_duration;
+
+    @Override
+    public String getKey() {
+        return fare_id;
     }
+
+    public static class Factory extends Entity.Factory<FareAttribute> {
+
+        public Factory() {
+            tableName = "fare_attributes";
+            requiredColumns = new String[] {"fare_id"};
+        }
+
+        @Override
+        public FareAttribute fromCsv() throws IOException {
+            FareAttribute fa = new FareAttribute();
+            fa.fare_id        = getStringField("fare_id");
+            fa.price          = getStringField("price");
+            fa.currency_type  = getStringField("currency_type");
+            fa.payment_method = getStringField("payment_method");
+            fa.transfers      = getStringField("transfers");
+            fa.transfer_duration = getStringField("transfer_duration");
+            return fa;
+        }
+
+    }
+
 }

@@ -14,7 +14,6 @@
 package org.opentripplanner.gtfs.model;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class Stop extends Entity {
 
@@ -22,11 +21,11 @@ public class Stop extends Entity {
     public String stop_code;
     public String stop_name;
     public String stop_desc;
-    public String stop_lat;
-    public String stop_lon;
+    public double stop_lat;
+    public double stop_lon;
     public String zone_id;
     public String stop_url;
-    public String location_type;
+    public int    location_type;
     public String parent_station;
     public String stop_timezone;
     public String wheelchair_boarding;
@@ -46,18 +45,18 @@ public class Stop extends Entity {
         @Override
         public Stop fromCsv() throws IOException {
             Stop s = new Stop();
-            s.stop_id   = getStrField("stop_id");
-            s.stop_code = getStrField("stop_code");
-            s.stop_name = getStrField("stop_name");
-            s.stop_desc = getStrField("stop_desc");
-            s.stop_lat  = getStrField("stop_lat");
-            s.stop_lon  = getStrField("stop_lon");
-            s.zone_id   = getStrField("zone_id");
-            s.stop_url  = getStrField("stop_url");
-            s.location_type  = getStrField("location_type");
-            s.parent_station = getStrField("parent_station");
-            s.stop_timezone  = getStrField("stop_timezone");
-            s.wheelchair_boarding = getStrField("wheelchair_boarding");
+            s.stop_id   = getStringField("stop_id");
+            s.stop_code = getStringField("stop_code");
+            s.stop_name = getStringField("stop_name");
+            s.stop_desc = getStringField("stop_desc");
+            s.stop_lat  = getDoubleField("stop_lat");
+            s.stop_lon  = getDoubleField("stop_lon");
+            s.zone_id   = getStringField("zone_id");
+            s.stop_url  = getStringField("stop_url");
+            s.location_type  = getIntField("location_type");
+            s.parent_station = getStringField("parent_station");
+            s.stop_timezone  = getStringField("stop_timezone");
+            s.wheelchair_boarding = getStringField("wheelchair_boarding");
             return s;
         }
 
