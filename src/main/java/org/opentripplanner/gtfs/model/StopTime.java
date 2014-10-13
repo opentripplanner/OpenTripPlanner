@@ -13,28 +13,51 @@
 
 package org.opentripplanner.gtfs.model;
 
+import org.mapdb.Fun;
+
+import java.io.IOException;
 import java.util.Map;
 
-public class StopTime {
-    final public String trip_id;
-    final public String arrival_time;
-    final public String departure_time;
-    final public String stop_id;
-    final public String stop_sequence;
-    final public String stop_headsign;
-    final public String pickup_type;
-    final public String drop_off_type;
-    final public String shape_dist_traveled;
+public class StopTime extends Entity {
 
-    public StopTime(Map<String, String> row) {
-        trip_id = row.get("trip_id");
-        arrival_time = row.get("arrival_time");
-        departure_time = row.get("departure_time");
-        stop_id = row.get("stop_id");
-        stop_sequence = row.get("stop_sequence");
-        stop_headsign = row.get("stop_headsign");
-        pickup_type = row.get("pickup_type");
-        drop_off_type = row.get("drop_off_type");
-        shape_dist_traveled = row.get("shape_dist_traveled");
+    public String trip_id;
+    public int    arrival_time;
+    public int    departure_time;
+    public String stop_id;
+    public int    stop_sequence;
+    public String stop_headsign;
+    public int    pickup_type;
+    public int    drop_off_type;
+    public double shape_dist_traveled;
+
+    @Override
+    public Fun.Tuple2 getKey() {
+        return new Fun.Tuple2(trip_id, stop_sequence);
     }
+
+    public static class Factory extends Entity.Factory<StopTime> {
+
+        public Factory() {
+            tableName = "stop_times";
+            requiredColumns = new String[] {"trip_id", "stop_sequence"};
+        }
+
+        @Override
+        public StopTime fromCsv() throws IOException {
+            StopTime st = new StopTime();
+            st.trip_id        = getStrField("trip_id");
+            st.arrival_time   = getIntField("arrival_time");
+            st.departure_time = getIntField("departure_time");
+            st.stop_id        = getStrField("stop_id");
+            st.stop_sequence  = getIntField("stop_sequence");
+            st.stop_headsign  = getStrField("stop_headsign");
+            st.pickup_type    = getIntField("pickup_type");
+            st.drop_off_type  = getIntField("drop_off_type");
+            st.shape_dist_traveled = getDblField("shape_dist_traveled");
+            return st;
+        }
+
+    }
+
+
 }

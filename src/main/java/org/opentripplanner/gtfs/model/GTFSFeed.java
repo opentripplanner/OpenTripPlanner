@@ -61,6 +61,8 @@ public class GTFSFeed {
         factory.loadTable(zip, errors, agency);
         factory = new Stop.Factory();
         factory.loadTable(zip, errors, stops);
+        factory = new StopTime.Factory();
+        factory.loadTable(zip, errors, stop_times);
     }
     
     public static GTFSFeed fromFile(String file) {
