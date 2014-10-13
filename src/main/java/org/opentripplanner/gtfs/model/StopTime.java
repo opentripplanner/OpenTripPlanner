@@ -16,9 +16,10 @@ package org.opentripplanner.gtfs.model;
 import org.mapdb.Fun;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Map;
 
-public class StopTime extends Entity {
+public class StopTime extends Entity implements Serializable {
 
     public String trip_id;
     public int    arrival_time;
