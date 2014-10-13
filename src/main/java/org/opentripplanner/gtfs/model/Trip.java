@@ -13,30 +13,50 @@
 
 package org.opentripplanner.gtfs.model;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class Trip {
-    final public String route_id;
-    final public String service_id;
-    final public String trip_id;
-    final public String trip_headsign;
-    final public String trip_short_name;
-    final public String direction_id;
-    final public String block_id;
-    final public String shape_id;
-    final public String wheelchair_accessible;
-    final public String bikes_allowed;
+public class Trip extends Entity {
 
-    public Trip(Map<String, String> row) {
-        route_id = row.get("route_id");
-        service_id = row.get("service_id");
-        trip_id = row.get("trip_id");
-        trip_headsign = row.get("trip_headsign");
-        trip_short_name = row.get("trip_short_name");
-        direction_id = row.get("direction_id");
-        block_id = row.get("block_id");
-        shape_id = row.get("shape_id");
-        wheelchair_accessible = row.get("wheelchair_accessible");
-        bikes_allowed = row.get("bikes_allowed");
+    public String route_id;
+    public String service_id;
+    public String trip_id;
+    public String trip_headsign;
+    public String trip_short_name;
+    public String direction_id;
+    public String block_id;
+    public String shape_id;
+    public String bikes_allowed;
+    public String wheelchair_accessible;
+
+    @Override
+    public Object getKey() {
+        return trip_id;
     }
+
+    public static class Factory extends Entity.Factory<Trip> {
+
+        public Factory() {
+            tableName = "trips";
+            requiredColumns = new String[] {"trip_id"};
+        }
+
+        @Override
+        public Trip fromCsv() throws IOException {
+            Trip t = new Trip();
+            t.route_id        = getStrField("route_id");
+            t.service_id      = getStrField("service_id");
+            t.trip_id         = getStrField("trip_id");
+            t.trip_headsign   = getStrField("trip_headsign");
+            t.trip_short_name = getStrField("trip_short_name");
+            t.direction_id    = getStrField("direction_id");
+            t.block_id        = getStrField("block_id");
+            t.shape_id        = getStrField("shape_id");
+            t.bikes_allowed   = getStrField("bikes_allowed");
+            t.wheelchair_accessible = getStrField("wheelchair_accessible");
+            return t;
+        }
+
+    }
+
 }
