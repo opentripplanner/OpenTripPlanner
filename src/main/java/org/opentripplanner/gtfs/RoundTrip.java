@@ -51,7 +51,7 @@ public class RoundTrip {
                         new Function<Map<String, String>, Agency>() {
                     @Override
                     public Agency apply(Map<String, String> row) {
-                        return new Agency(row);
+                        return null; //new Agency(row);
                     }
                 });
                 try {
@@ -85,7 +85,7 @@ public class RoundTrip {
                             "stop_lat", "stop_lon", "location_type", "parent_station",
                             "stop_timezone", "wheelchair_boarding", "platform_code", "zone_id"});
                     for (Map<String, String> row : stops) {
-                        Stop stop = new Stop(row);
+                        Stop stop = null; //new Stop(row);
                         final String fields[] = new String[11];
                         fields[0] = stop.stop_id;
                         fields[1] = stop.stop_code;
@@ -118,7 +118,7 @@ public class RoundTrip {
                         new Function<Map<String, String>, Route>() {
                             @Override
                             public Route apply(Map<String, String> row) {
-                                return new Route(row);
+                                return null; //new Route(row);
                             }
                         });
                 try {
@@ -132,7 +132,7 @@ public class RoundTrip {
                         fields[2] = route.route_short_name;
                         fields[3] = route.route_long_name;
                         fields[4] = route.route_desc;
-                        fields[5] = route.route_type;
+                        fields[5] = Integer.toString(route.route_type);
                         fields[6] = route.route_color;
                         fields[7] = route.route_text_color;
                         fields[8] = route.route_url;

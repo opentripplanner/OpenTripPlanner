@@ -13,24 +13,44 @@
 
 package org.opentripplanner.gtfs.model;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class Agency {
-    final public String agency_id;
-    final public String agency_name;
-    final public String agency_url;
-    final public String agency_timezone;
-    final public String agency_lang;
-    final public String agency_phone;
-    final public String agency_fare_url;
+public class Agency extends Entity {
 
-    public Agency(Map<String, String> row) {
-        agency_id = row.get("agency_id");
-        agency_name = row.get("agency_name");
-        agency_url = row.get("agency_url");
-        agency_timezone = row.get("agency_timezone");
-        agency_lang = row.get("agency_lang");
-        agency_phone = row.get("agency_phone");
-        agency_fare_url = row.get("agency_fare_url");
+    public String agency_id;
+    public String agency_name;
+    public String agency_url;
+    public String agency_timezone;
+    public String agency_lang;
+    public String agency_phone;
+    public String agency_fare_url;
+
+    @Override
+    public String getKey() {
+        return agency_id;
     }
+
+    public static class Factory extends Entity.Factory<Agency> {
+
+        public Factory() {
+            tableName = "agency";
+            requiredColumns = new String[] {"agency_id"};
+        }
+
+        @Override
+        public Agency fromCsv() throws IOException {
+            Agency a = new Agency();
+            a.agency_id    = getStrField("agency_id");
+            a.agency_name  = getStrField("agency_name");
+            a.agency_url   = getStrField("agency_url");
+            a.agency_lang  = getStrField("agency_lang");
+            a.agency_phone = getStrField("agency_phone");
+            a.agency_timezone = getStrField("agency_timezone");
+            a.agency_fare_url = getStrField("agency_fare_url");
+            return a;
+        }
+
+    }
+
 }

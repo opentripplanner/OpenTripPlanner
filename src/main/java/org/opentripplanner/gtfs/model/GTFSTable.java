@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.csvreader.CsvReader;
 
-// generic-parameterizing this is kind of useless because we need the type at runtime
-// to examine the fields.
-public class GTFSTable {
+public class GTFSTable<T extends Entity> {
     
     private static final Logger LOG = LoggerFactory.getLogger(GTFSTable.class);
     final String name; // without .txt

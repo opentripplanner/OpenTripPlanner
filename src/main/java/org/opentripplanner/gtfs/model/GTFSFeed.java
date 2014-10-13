@@ -33,14 +33,34 @@ public class GTFSFeed {
             .make(); // db.close();
 
     String feedId;
-    public final Map<String, Agency> agency = Maps.newHashMap();
-    public final Map<String, Route>  routes = Maps.newHashMap();
-    public final Map<String, Stop>   stops  = Maps.newHashMap();
-    public final Map<String, Trip>   trips  = Maps.newHashMap();
+
+    public final Map<String, Agency>        agency         = Maps.newHashMap();
+    public final Map<String, Route>         routes         = Maps.newHashMap();
+    public final Map<String, Shape>         shapes         = Maps.newHashMap();
+    public final Map<String, Stop>          stops          = Maps.newHashMap();
+    public final Map<String, Transfer>      transfers      = Maps.newHashMap();
+    public final Map<String, Trip>          trips          = Maps.newHashMap();
+    public final Map<String, FareRule>      fareRules      = Maps.newHashMap();
+    public final Map<String, FeedInfo>      feedInfos      = Maps.newHashMap();
+    public final Map<String, Frequency>     frequencies    = Maps.newHashMap();
+    public final Map<String, Calendar>      calendars      = Maps.newHashMap();
+    public final Map<String, CalendarDate>  calendarDates  = Maps.newHashMap();
+    public final Map<String, FareAttribute> fareAttributes = Maps.newHashMap();
+
     // Map from 2-tuples of (trip_id, stop_sequence) to stoptimes.
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
-        
+
+    /* A place to accumulate errors while the feed is loaded. The objective is to tolerate as many errors as possible and keep on going. */
+    public List<Error> errors = Lists.newArrayList();
+
     private void loadFromFile(ZipFile zip) throws Exception {
+        Entity.Factory factory;
+        factory = new Route.Factory();
+        factory.loadTable(zip, errors, routes);
+        factory = new Agency.Factory();
+        factory.loadTable(zip, errors, agency);
+        factory = new Stop.Factory();
+        factory.loadTable(zip, errors, stops);
     }
     
     public static GTFSFeed fromFile(String file) {

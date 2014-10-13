@@ -13,34 +13,54 @@
 
 package org.opentripplanner.gtfs.model;
 
+import java.io.IOException;
 import java.util.Map;
 
-public class Stop {
-    final public String stop_id;
-    final public String stop_code;
-    final public String stop_name;
-    final public String stop_desc;
-    final public String stop_lat;
-    final public String stop_lon;
-    final public String zone_id;
-    final public String stop_url;
-    final public String location_type;
-    final public String parent_station;
-    final public String stop_timezone;
-    final public String wheelchair_boarding;
+public class Stop extends Entity {
 
-    public Stop(Map<String, String> row) {
-        stop_id = row.get("stop_id");
-        stop_code = row.get("stop_code");
-        stop_name = row.get("stop_name");
-        stop_desc = row.get("stop_desc");
-        stop_lat = row.get("stop_lat");
-        stop_lon = row.get("stop_lon");
-        zone_id = row.get("zone_id");
-        stop_url = row.get("stop_url");
-        location_type = row.get("location_type");
-        parent_station = row.get("parent_station");
-        stop_timezone = row.get("stop_timezone");
-        wheelchair_boarding = row.get("wheelchair_boarding");
+    public String stop_id;
+    public String stop_code;
+    public String stop_name;
+    public String stop_desc;
+    public String stop_lat;
+    public String stop_lon;
+    public String zone_id;
+    public String stop_url;
+    public String location_type;
+    public String parent_station;
+    public String stop_timezone;
+    public String wheelchair_boarding;
+
+    @Override
+    public String getKey() {
+        return stop_id;
     }
+
+    public static class Factory extends Entity.Factory<Stop> {
+
+        public Factory() {
+            tableName = "stops";
+            requiredColumns = new String[] {"stop_id"};
+        }
+
+        @Override
+        public Stop fromCsv() throws IOException {
+            Stop s = new Stop();
+            s.stop_id   = getStrField("stop_id");
+            s.stop_code = getStrField("stop_code");
+            s.stop_name = getStrField("stop_name");
+            s.stop_desc = getStrField("stop_desc");
+            s.stop_lat  = getStrField("stop_lat");
+            s.stop_lon  = getStrField("stop_lon");
+            s.zone_id   = getStrField("zone_id");
+            s.stop_url  = getStrField("stop_url");
+            s.location_type  = getStrField("location_type");
+            s.parent_station = getStrField("parent_station");
+            s.stop_timezone  = getStrField("stop_timezone");
+            s.wheelchair_boarding = getStrField("wheelchair_boarding");
+            return s;
+        }
+
+    }
+
 }

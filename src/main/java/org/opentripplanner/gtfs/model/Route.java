@@ -13,28 +13,53 @@
 
 package org.opentripplanner.gtfs.model;
 
+import com.csvreader.CsvReader;
+
+import java.io.IOException;
 import java.util.Map;
 
-public class Route {
-    final public String route_id;
-    final public String agency_id;
-    final public String route_short_name;
-    final public String route_long_name;
-    final public String route_desc;
-    final public String route_type;
-    final public String route_url;
-    final public String route_color;
-    final public String route_text_color;
+public class Route extends Entity { // implements Entity.Factory<Route>
 
-    public Route(Map<String, String> row) {
-        route_id = row.get("route_id");
-        agency_id = row.get("agency_id");
-        route_short_name = row.get("route_short_name");
-        route_long_name = row.get("route_long_name");
-        route_desc = row.get("route_desc");
-        route_type = row.get("route_type");
-        route_url = row.get("route_url");
-        route_color = row.get("route_color");
-        route_text_color = row.get("route_text_color");
+    public static final int BUS = 0;
+
+    public String route_id;
+    public String agency_id;
+    public String route_short_name;
+    public String route_long_name;
+    public String route_desc;
+    public int    route_type;
+    public String route_url;
+    public String route_color;
+    public String route_text_color;
+
+    @Override
+    public String getKey() {
+        return route_id;
     }
+
+    public static class Factory extends Entity.Factory<Route> {
+
+        public Factory() {
+            tableName = "routes";
+            requiredColumns = new String[] {"route_id", "agency_id"};
+        }
+
+        @Override
+        public Route fromCsv() throws IOException {
+            Route r = new Route();
+            r.route_id         = getStrField("route_id");
+            r.agency_id        = getStrField("agency_id");
+            r.route_short_name = getStrField("route_short_name");
+            r.route_long_name  = getStrField("route_long_name");
+            r.route_desc       = getStrField("route_desc");
+            r.route_type       = getIntField("route_type");
+            r.route_url        = getStrField("route_url");
+            r.route_color      = getStrField("route_color");
+            r.route_text_color = getStrField("route_text_color");
+            r.feedId = "FEED";
+            return r;
+        }
+
+    }
+
 }
