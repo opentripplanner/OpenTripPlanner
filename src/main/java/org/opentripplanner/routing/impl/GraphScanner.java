@@ -82,8 +82,8 @@ public class GraphScanner {
             LOG.info("Attempting to automatically register routerIds {}", autoRegister);
             LOG.info("Graph files will be sought in paths relative to {}", basePath);
             for (String routerId : routerIds) {
-                FileGraphSource graphSource = new FileGraphSource(routerId, getBasePath(routerId),
-                        loadLevel);
+                InputStreamGraphSource graphSource = InputStreamGraphSource.newFileGraphSource(
+                        routerId, getBasePath(routerId), loadLevel);
                 if (graphSource.getGraph() != null)
                     graphService.registerGraph(routerId, graphSource);
             }
@@ -111,7 +111,7 @@ public class GraphScanner {
          */
         Set<String> graphOnDisk = new HashSet<String>();
         /* First check for a root graph */
-        File rootGraphFile = new File(basePath, FileGraphSource.GRAPH_FILENAME);
+        File rootGraphFile = new File(basePath, InputStreamGraphSource.GRAPH_FILENAME);
         if (rootGraphFile.exists() && rootGraphFile.canRead()) {
             graphOnDisk.add("");
         }
@@ -119,7 +119,7 @@ public class GraphScanner {
         for (String sub : basePath.list()) {
             File subPath = new File(basePath, sub);
             if (subPath.isDirectory()) {
-                File graphFile = new File(subPath, FileGraphSource.GRAPH_FILENAME);
+                File graphFile = new File(subPath, InputStreamGraphSource.GRAPH_FILENAME);
                 if (graphFile.exists() && graphFile.canRead()) {
                     graphOnDisk.add(sub);
                 }
@@ -133,8 +133,8 @@ public class GraphScanner {
             LOG.info("Found new routers to register: {}",
                     Arrays.toString(graphToRegister.toArray()));
             for (String routerId : graphToRegister) {
-                FileGraphSource graphSource = new FileGraphSource(routerId, getBasePath(routerId),
-                        loadLevel);
+                InputStreamGraphSource graphSource = InputStreamGraphSource.newFileGraphSource(
+                        routerId, getBasePath(routerId), loadLevel);
                 if (graphSource.getGraph() != null) {
                     // Can be null here if the file has been removed in the meantime.
                     graphService.registerGraph(routerId, graphSource);

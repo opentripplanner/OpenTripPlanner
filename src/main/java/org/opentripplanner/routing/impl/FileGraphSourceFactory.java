@@ -40,13 +40,14 @@ public class FileGraphSourceFactory implements GraphSourceFactory {
 
     @Override
     public GraphSource createGraphSource(String routerId) {
-        return new FileGraphSource(routerId, getBasePath(routerId), loadLevel);
+        return InputStreamGraphSource
+                .newFileGraphSource(routerId, getBasePath(routerId), loadLevel);
     }
 
     @Override
     public boolean save(String routerId, InputStream is) {
 
-        File sourceFile = new File(getBasePath(routerId), FileGraphSource.GRAPH_FILENAME);
+        File sourceFile = new File(getBasePath(routerId), InputStreamGraphSource.GRAPH_FILENAME);
 
         try {
 

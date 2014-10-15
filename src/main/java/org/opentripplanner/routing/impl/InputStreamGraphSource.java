@@ -31,16 +31,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The primary implementation of the GraphSource interface. The graph is loaded from a serialized
- * graph file in a given directory.
+ * graph from a given source.
  * 
  */
-public class FileGraphSource implements GraphSource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(FileGraphSource.class);
+public class InputStreamGraphSource implements GraphSource {
 
     public static final String GRAPH_FILENAME = "Graph.obj";
 
     public static final String CONFIG_FILENAME = "Graph.properties";
+
+    private static final Logger LOG = LoggerFactory.getLogger(InputStreamGraphSource.class);
 
     private static final long LOAD_DELAY_SEC = 10;
 
@@ -48,23 +48,34 @@ public class FileGraphSource implements GraphSource {
 
     private String routerId;
 
-    protected File path;
-
     private long graphLastModified = 0L;
 
     private LoadLevel loadLevel;
 
     private Object preEvictMutex = new Boolean(false);
 
+    private GraphInputStream graphInputStream;
+
     // TODO Why do we need a factory? There is a single one implementation.
     private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
 
     private GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
 
-    public FileGraphSource(String routerId, File path, LoadLevel loadLevel) {
+    public static InputStreamGraphSource newFileGraphSource(String routerId, File path,
+            LoadLevel loadLevel) {
+        return new InputStreamGraphSource(routerId, loadLevel, new FileGraphInputStream(path));
+    }
+
+    public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path,
+            LoadLevel loadLevel) {
+        return new InputStreamGraphSource(routerId, loadLevel, new ClasspathGraphInputStream(path));
+    }
+
+    private InputStreamGraphSource(String routerId, LoadLevel loadLevel,
+            GraphInputStream graphInputStream) {
         this.routerId = routerId;
-        this.path = path;
         this.loadLevel = loadLevel;
+        this.graphInputStream = graphInputStream;
         this.reload(true, false);
     }
 
@@ -85,7 +96,7 @@ public class FileGraphSource implements GraphSource {
     public boolean reload(boolean force, boolean preEvict) {
         /* We synchronize on 'this' to prevent multiple reloads from being called at the same time */
         synchronized (this) {
-            long lastModified = getLastModified();
+            long lastModified = graphInputStream.getLastModified();
             boolean doReload = force ? true : checkAutoReload(lastModified);
             if (!doReload)
                 return true;
@@ -161,9 +172,11 @@ public class FileGraphSource implements GraphSource {
 
     private Graph loadGraph() {
 
-        InputStream is = getGraphInputStream();
-        if (is == null) {
-            LOG.warn("Graph file not found or not openable for routerId '{}'", routerId);
+        InputStream is;
+        try {
+            is = graphInputStream.getGraphInputStream();
+        } catch (IOException e) {
+            LOG.warn("Graph file not found or not openable for routerId '{}': {}", routerId, e);
             return null;
         }
         LOG.info("Loading graph...");
@@ -181,7 +194,7 @@ public class FileGraphSource implements GraphSource {
         // Decorate the graph. Even if a config file is not present
         // one could be bundled inside.
         try {
-            is = getConfigInputStream();
+            is = graphInputStream.getConfigInputStream();
             Preferences config = is == null ? null : new PropertiesPreferences(is);
             decorator.setupGraph(graph, config);
         } catch (IOException e) {
@@ -190,29 +203,75 @@ public class FileGraphSource implements GraphSource {
         return graph;
     }
 
-    protected InputStream getGraphInputStream() {
-        try {
+    private interface GraphInputStream {
+        public abstract InputStream getGraphInputStream() throws IOException;
+
+        public abstract InputStream getConfigInputStream() throws IOException;
+
+        public abstract long getLastModified();
+    }
+
+    private static class FileGraphInputStream implements GraphInputStream {
+
+        private File path;
+
+        private FileGraphInputStream(File path) {
+            this.path = path;
+        }
+
+        @Override
+        public InputStream getGraphInputStream() throws IOException {
             File graphFile = new File(path, GRAPH_FILENAME);
-            LOG.info("Loading graph from file '{}'", graphFile.getPath());
+            LOG.debug("Loading graph from file '{}'", graphFile.getPath());
             return new FileInputStream(graphFile);
-        } catch (IOException ex) {
-            LOG.warn("Error creating graph input stream", ex);
-            return null;
+        }
+
+        @Override
+        public InputStream getConfigInputStream() throws IOException {
+            File configFile = new File(path, CONFIG_FILENAME);
+            if (configFile.canRead()) {
+                LOG.debug("Loading config from file '{}'", configFile.getPath());
+                return new FileInputStream(configFile);
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public long getLastModified() {
+            // Note: this returns 0L if the file does not exists
+            return new File(path, GRAPH_FILENAME).lastModified();
         }
     }
 
-    protected InputStream getConfigInputStream() throws IOException {
-        File configFile = new File(path, CONFIG_FILENAME);
-        if (configFile.canRead()) {
-            LOG.info("Loading config from file '{}'", configFile.getPath());
-            return new FileInputStream(configFile);
-        } else {
-            return null;
+    private static class ClasspathGraphInputStream implements GraphInputStream {
+
+        private File path;
+
+        private ClasspathGraphInputStream(File path) {
+            this.path = path;
+        }
+
+        @Override
+        public InputStream getGraphInputStream() {
+            File graphFile = new File(path, GRAPH_FILENAME);
+            LOG.debug("Loading graph from classpath at '{}'", graphFile.getPath());
+            return Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream(graphFile.getPath());
+        }
+
+        @Override
+        public InputStream getConfigInputStream() {
+            File configFile = new File(path, CONFIG_FILENAME);
+            LOG.debug("Trying to load config on classpath at '{}'", configFile.getPath());
+            return Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream(configFile.getPath());
+        }
+
+        @Override
+        public long getLastModified() {
+            return 0L;
         }
     }
 
-    protected long getLastModified() {
-        // Note: this returns 0L if the file does not exists
-        return new File(path, GRAPH_FILENAME).lastModified();
-    }
 }

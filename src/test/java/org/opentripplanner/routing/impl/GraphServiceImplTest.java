@@ -144,7 +144,7 @@ public class GraphServiceImplTest extends TestCase {
         graphSourceFactory.save("A", new ByteArrayInputStream(emptyGraphData));
 
         // Check if the graph has been saved
-        assertTrue(new File(new File(basePath, "A"), FileGraphSource.GRAPH_FILENAME).canRead());
+        assertTrue(new File(new File(basePath, "A"), InputStreamGraphSource.GRAPH_FILENAME).canRead());
 
         // Register this empty graph, reloading it from disk
         boolean registered = graphService.registerGraph("A",
@@ -172,7 +172,7 @@ public class GraphServiceImplTest extends TestCase {
         assertEquals(edgesCount, graph.getEdges().size());
 
         // Remove the file from disk and reload
-        boolean deleted = new File(new File(basePath, "A"), FileGraphSource.GRAPH_FILENAME)
+        boolean deleted = new File(new File(basePath, "A"), InputStreamGraphSource.GRAPH_FILENAME)
                 .delete();
         assertTrue(deleted);
         graphService.reloadGraphs(false);
@@ -237,7 +237,7 @@ public class GraphServiceImplTest extends TestCase {
 
         System.out.println("------------------------------------------");
         // Remove default Graph
-        new File(basePath, FileGraphSource.GRAPH_FILENAME).delete();
+        new File(basePath, InputStreamGraphSource.GRAPH_FILENAME).delete();
 
         // Check that default is A this time
         graphService = new GraphServiceImpl(false);
