@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
@@ -156,15 +157,15 @@ public class Routers {
     public Response putGraphId(
             @PathParam("routerId") String routerId, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        if (preEvict) {
-            LOG.debug("pre-evicting graph");
-            server.graphService.evictGraph(routerId);
-        }
-        LOG.debug("attempting to load graph from server's local filesystem.\n");
-        boolean exists = server.graphService.getGraph(routerId) != null;
-        if (exists) {
+        LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
+        try {
+            server.graphService.getGraph(routerId);
             return Response.status(404).entity("graph already registered.\n").build();
-        } else {
+        } catch (GraphNotFoundException e) {
+            if (preEvict) {
+                LOG.debug("Pre-evicting graph '{}'", routerId);
+                server.graphService.evictGraph(routerId);
+            }
             boolean success = server.graphService.registerGraph(routerId, server.graphService
                     .getGraphSourceFactory().createGraphSource(routerId));
             if (success)
