@@ -50,7 +50,7 @@ otp.modules.calltaker.CallTakerModule =
     getExtendedQueryParams : function() {
         return { 
             showIntermediateStops : this.showIntermediateStops,
-            minTransferTime : 300 
+            minTransferTime : 180
         };
     },
     
