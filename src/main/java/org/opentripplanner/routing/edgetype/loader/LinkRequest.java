@@ -270,8 +270,10 @@ public class LinkRequest {
         // Note: Always enable elevation. This should not be a big waste of memory.
         StreetWithElevationEdge forward1 = new StreetWithElevationEdge(e1v1, e1midpoint, forward1Geom, name, lengthIn,
                 e1.getPermission(), e1.isBack());
+        forward1.setLabel(e1.getLabel());
         StreetWithElevationEdge forward2 = new StreetWithElevationEdge(e1midpoint, e1v2, forward2Geom, name, lengthOut,
                 e1.getPermission(), e1.isBack());
+        forward2.setLabel(e1.getLabel());
         if (e1 instanceof AreaEdge) {
             ((AreaEdge) e1).getArea().addVertex(e1midpoint, linker.graph);
         }
@@ -285,8 +287,10 @@ public class LinkRequest {
             e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord.x, midCoord.y, name);
             backward1 = new StreetWithElevationEdge(e2v1, e2midpoint, backGeometryPair.first,
                     name, lengthOut, e2.getPermission(), e2.isBack());
+            backward1.setLabel(e2.getLabel());
             backward2 = new StreetWithElevationEdge(e2midpoint, e2v2, backGeometryPair.second,
                     name, lengthIn, e2.getPermission(), e2.isBack());
+            backward2.setLabel(e2.getLabel());
             if (e2 instanceof AreaEdge) {
                 ((AreaEdge) e2).getArea().addVertex(e2midpoint, linker.graph);
             }
