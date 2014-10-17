@@ -117,7 +117,7 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         return gg;
     }
     
-    public boolean findNeighbours(Vertex ts, StreetTransitLink stl, List<TransitToStreetConnection> transitConnections) {
+    public boolean findNeighbours(Vertex ts, StreetTransitLink stl, org.opentripplanner.graph_builder.impl.StreetType neighbourType, List<TransitToStreetConnection> transitConnections) {
         Envelope envelope = new Envelope(ts.getCoordinate());
         double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
         envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
@@ -125,6 +125,7 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         Collection<Edge> edges = index.getEdgesForEnvelope(envelope);
         List<T2<StreetEdge, Double>> candidateStreets = new ArrayList<>(edges.size());
         boolean hasAWalkPathNear = false;
+        System.out.println(neighbourType);
         for (Edge e : edges) {
             StreetEdge se = (StreetEdge) e;
             if (se.isBack() || se.isStairs()) {
@@ -137,10 +138,13 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
             Double distance = SphericalDistanceLibrary.getInstance().fastDistance(ts.getCoordinate(), se.getGeometry());
             System.out.println("  " + distance + ", " + e);
             //Returns true if a path that can be walked/biked and not driven is near
-            if ((se.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)
+            if ((neighbourType == StreetType.WALK_BIKE && ((se.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)
                     || (se.getPermission().allows(StreetTraversalPermission.BICYCLE)))
-                    && !(se.getPermission().allows(StreetTraversalPermission.CAR))) {
+                    && !(se.getPermission().allows(StreetTraversalPermission.CAR)))) 
+                || (neighbourType == StreetType.SERVICE 
+                    && (se.getName().equals("service road")))) {
                 candidateStreets.add(new T2<>(se, distance));
+                //TODO: some service roads aren't added in the graph because of acces:no
                 if (!hasAWalkPathNear) {
                     System.out.println("  YES");
                     hasAWalkPathNear = true;
@@ -158,7 +162,7 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
             });
             
             if(transitConnections != null) {
-                transitConnections.add(new TransitToStreetConnection((TransitStop)ts, stl, closestRoad.first, StreetType.WALK_BIKE));
+                transitConnections.add(new TransitToStreetConnection((TransitStop)ts, stl, closestRoad.first, neighbourType));
             }
         
         } else {
@@ -194,10 +198,16 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
                             && !seenTransitStops.contains(v.getIndex())) {
                         streetTransitLinks.add((StreetTransitLink) e);
                         seenTransitStops.add(v.getIndex());
-                        boolean hasWalkNeighbours = findNeighbours(e.getFromVertex(), (StreetTransitLink)e, transitConnections);
+                        String edge_out = String.format("StreetTransitLink(%d, TransitStop{%d:%s} -> %s)", e.getId(), e.getFromVertex().getIndex(), e.getFromVertex().getName(), e.getToVertex());
+                        System.out.println(edge_out);
+                        boolean hasWalkNeighbours = findNeighbours(e.getFromVertex(), (StreetTransitLink)e, StreetType.WALK_BIKE, transitConnections);
                         if (!hasWalkNeighbours) {
-                            //HACK: Is street edge always the first in to vertex?
-                            transitConnections.add(new TransitToStreetConnection((TransitStop)v, (StreetTransitLink)e, (StreetEdge)e.getToVertex().getOutgoingStreetEdges().get(0), StreetType.NORMAL));
+                            
+                            hasWalkNeighbours = findNeighbours(e.getFromVertex(), (StreetTransitLink)e, StreetType.SERVICE, transitConnections);
+                            if (!hasWalkNeighbours) {
+                                //HACK: Is street edge always the first in to vertex?
+                                transitConnections.add(new TransitToStreetConnection((TransitStop)v, (StreetTransitLink)e, (StreetEdge)e.getToVertex().getOutgoingStreetEdges().get(0), StreetType.NORMAL));
+                            }
                         }
                         
                     }
