@@ -39,6 +39,7 @@ import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.model.json_serialization.SerializerUtils;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -116,7 +117,7 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         return gg;
     }
     
-    public boolean findNeighbours(Vertex ts, List<T2<TransitStop, StreetEdge>> transitConnections) {
+    public boolean findNeighbours(Vertex ts, StreetTransitLink stl, List<TransitToStreetConnection> transitConnections) {
         Envelope envelope = new Envelope(ts.getCoordinate());
         double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
         envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
@@ -157,7 +158,7 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
             });
             
             if(transitConnections != null) {
-                transitConnections.add(new T2<>((TransitStop)ts, closestRoad.first));
+                transitConnections.add(new TransitToStreetConnection((TransitStop)ts, stl, closestRoad.first, StreetType.WALK_BIKE));
             }
         
         } else {
@@ -180,6 +181,8 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         
         
         List<StreetTransitLink> streetTransitLinks = new ArrayList<>();
+        //Which transit stop SHOULD BE connected to which edge
+        List<TransitToStreetConnection> transitConnections = new ArrayList<>();
         //Otherwise all streetTransitLinks are duplicated. One for forward and one for backward
         Set<Integer> seenTransitStops = new HashSet<>();
         for(Vertex v: gg.getVertices()) {
@@ -191,6 +194,11 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
                             && !seenTransitStops.contains(v.getIndex())) {
                         streetTransitLinks.add((StreetTransitLink) e);
                         seenTransitStops.add(v.getIndex());
+                        boolean hasWalkNeighbours = findNeighbours(e.getFromVertex(), (StreetTransitLink)e, transitConnections);
+                        if (!hasWalkNeighbours) {
+                            //HACK: Is street edge always the first in to vertex?
+                            transitConnections.add(new TransitToStreetConnection((TransitStop)v, (StreetTransitLink)e, (StreetEdge)e.getToVertex().getOutgoingStreetEdges().get(0), StreetType.NORMAL));
+                        }
                         
                     }
                 }
@@ -220,62 +228,20 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
             System.err.println(dist);
         }
         */
-        writeGeoJson("out_diff.geojson", streetTransitLinks);
+        writeGeoJson("out_transit.geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.TRANSIT_LINK));
+        writeGeoJson("out_wanted.geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.WANTED_LINK));
     }
     
     private void writeGeoJson(String filePath,
-            List<StreetTransitLink> streetTransitLinks) throws FileNotFoundException, IOException {
+            StreetFeatureCollection streetFeatureCollection) throws FileNotFoundException, IOException {
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);
         PrintStream out = new PrintStream(fileOutputStream);
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = SerializerUtils.getMapper();
         
         GeoJsonModule module = new GeoJsonModule();
+        module.addSerializer(new StreetFeatureSerializer());
+        module.addSerializer(new FeatureCollectionSerializer());
         
-        module.addSerializer(new GeoJsonEdgeListSerializer());
-        mapper.registerModule(module);
-        
-        JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(out);
-        List<T2<TransitStop, StreetEdge>> transitConnections = new ArrayList<>();
-        //jsonGenerator.setPrettyPrinter(new DefaultPrettyPrinter());
-
-        
-        //mapper.writeValue(jsonGenerator, streetTransitLinks);
-        
-        jsonGenerator.writeStartObject();
-        jsonGenerator.writeStringField("type", "FeatureCollection");
-        jsonGenerator.writeArrayFieldStart("features");
-        for(Edge e: streetTransitLinks) {
-            Envelope envelope = new Envelope(e.getFromVertex().getCoordinate());
-            double xscale = Math.cos(e.getFromVertex().getCoordinate().y * Math.PI / 180);
-            envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
-            
-            Geometry poly = GeometryUtils.getGeometryFactory().toGeometry(envelope);
-            String edge_out = String.format("StreetTransitLink(%d, TransitStop{%d:%s} -> %s)", e.getId(), e.getFromVertex().getIndex(), e.getFromVertex().getName(), e.getToVertex());
-            System.out.println(edge_out);
-            
-            boolean hasWalkNeighbours = findNeighbours(e.getFromVertex(), transitConnections);
-            GeoJsonEdgeListSerializer.writeEdge(jsonGenerator, e, hasWalkNeighbours);
-            GeoJsonEdgeListSerializer.writePolygon(jsonGenerator, poly, e);
-        }
-        jsonGenerator.writeEndArray();
-        jsonGenerator.writeEndObject();
-        jsonGenerator.flush();
-        out.flush();
-        out.close();
-        
-        //writeGeoJson2("cons.geojson", transitConnections);
-        
-    }
-    
-        private void writeGeoJson2(String filePath,
-            List<T2<TransitStop, StreetEdge>> transitCons) throws FileNotFoundException, IOException {
-        FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-        PrintStream out = new PrintStream(fileOutputStream);
-        ObjectMapper mapper = new ObjectMapper();
-        
-        GeoJsonModule module = new GeoJsonModule();
-        
-        module.addSerializer(new GeoJsonEdgeListSerializer());
         mapper.registerModule(module);
         
         JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(out);
@@ -283,25 +249,8 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         //jsonGenerator.setPrettyPrinter(new DefaultPrettyPrinter());
 
         
-        //mapper.writeValue(jsonGenerator, streetTransitLinks);
-        
-        jsonGenerator.writeStartObject();
-        jsonGenerator.writeStringField("type", "FeatureCollection");
-        jsonGenerator.writeArrayFieldStart("features");
-        for(T2<TransitStop, StreetEdge> e: transitCons) {
-            
-            GeoJsonEdgeListSerializer.writeEdge(jsonGenerator, e.second, null);
-            GeoJsonEdgeListSerializer.writeCoordinate(jsonGenerator, e.first);
-            //GeoJsonEdgeListSerializer.writePolygon(jsonGenerator, poly, e);
-        }
-        jsonGenerator.writeEndArray();
-        jsonGenerator.writeEndObject();
-        jsonGenerator.flush();
-        out.flush();
-        out.close();
-        
-    }
-    
+        mapper.writeValue(jsonGenerator, streetFeatureCollection);        
+    }   
     private static T2<Double, Integer> getMax(List<Double> list) {
         Double max = Double.MIN_VALUE;
         Integer max_index = null;
