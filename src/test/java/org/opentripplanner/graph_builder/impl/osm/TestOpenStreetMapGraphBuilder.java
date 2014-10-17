@@ -222,7 +222,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
 
         dataForWay = wayPropertySet.getDataForWay(way);
-        assertEquals(dataForWay.getSafetyFeatures().getFirst(), 1.5);
+        assertEquals(dataForWay.getSafetyFeatures().first, 1.5);
 
         // test a left-right distinction
         way = new OSMWay();
@@ -236,9 +236,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         wayPropertySet.addProperties(track_only, track_is_safest);
         dataForWay = wayPropertySet.getDataForWay(way);
-        assertEquals(0.25, dataForWay.getSafetyFeatures().getFirst()); // right (with traffic) comes
+        assertEquals(0.25, dataForWay.getSafetyFeatures().first); // right (with traffic) comes
                                                                        // from track
-        assertEquals(0.75, dataForWay.getSafetyFeatures().getSecond()); // left comes from lane
+        assertEquals(0.75, dataForWay.getSafetyFeatures().second); // left comes from lane
 
         way = new OSMWay();
         way.addTag("highway", "footway");

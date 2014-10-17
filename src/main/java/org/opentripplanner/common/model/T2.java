@@ -17,61 +17,47 @@ import java.io.Serializable;
 
 /**
  * An ordered pair of objects of potentially different types
- *
  */
 public class T2<E1, E2> implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
-    private final E1 _first;
+    public final E1 first;
 
-    private final E2 _second;
+    public final E2 second;
 
     public T2(E1 first, E2 second) {
-        _first = first;
-        _second = second;
-    }
-
-    public E1 getFirst() {
-        return _first;
-    }
-
-    public E2 getSecond() {
-        return _second;
+        this.first = first;
+        this.second = second;
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((_first == null) ? 0 : _first.hashCode());
-        result = prime * result + ((_second == null) ? 0 : _second.hashCode());
-        return result;
+        return (first != null ? first.hashCode() : 0) + (second != null ? second.hashCode() : 0);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        T2<?, ?> other = (T2<?, ?>) obj;
-        if (_first == null) {
-            if (other._first != null)
-                return false;
-        } else if (!_first.equals(other._first))
-            return false;
-        if (_second == null) {
-            if (other._second != null)
-                return false;
-        } else if (!_second.equals(other._second))
-            return false;
+    public boolean equals(Object object) {
+        if (!(object instanceof T2)) return false;
+
+        T2 other = (T2) object;
+
+        if (first == null) {
+            if (other.first != null) return false;
+        } else {
+            if (!first.equals(other.first)) return false;
+        }
+
+        if (second == null) {
+            if (other.second != null) return false;
+        } else {
+            if (!second.equals(other.second)) return false;
+        }
+
         return true;
     }
-    
+
+    @Override
     public String toString() {
-        return "T2(" + _first + ", " + _second + ")";
+        return "T2(" + first + ", " + second + ")";
     }
 }

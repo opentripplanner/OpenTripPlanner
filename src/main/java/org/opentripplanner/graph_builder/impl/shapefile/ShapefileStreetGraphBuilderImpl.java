@@ -36,7 +36,9 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -63,6 +65,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
     private FeatureSourceFactory _featureSourceFactory;
 
     private ShapefileStreetSchema _schema;
+
+    public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
     public List<String> provides() {
         return Arrays.asList("streets");
@@ -200,11 +204,13 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 }
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
 
-                StreetEdge street = new StreetEdge(startIntersection, endIntersection,
-                        geom, name, length, permissions.getFirst(), false);
+                // TODO Set appropriate car speed from shapefile source.
+                StreetEdge street = edgeFactory.createEdge(startIntersection, endIntersection,
+                        geom, name, length, permissions.first, false);
                 LineString reversed = (LineString) geom.reverse();
-                StreetEdge backStreet = new StreetEdge(endIntersection,
-                        startIntersection, reversed, name, length, permissions.getSecond(), true);
+                StreetEdge backStreet = edgeFactory.createEdge(endIntersection, startIntersection,
+                        reversed, name, length, permissions.second, true);
+                backStreet.shareData(street);
 
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
@@ -222,8 +228,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 if (safetyConverter != null) {
                     P2<Double> safetyFactors = safetyConverter.convert(feature);
                     if (safetyFactors != null) {
-                        street.setBicycleSafetyFactor(safetyFactors.getFirst().floatValue());
-                        backStreet.setBicycleSafetyFactor(safetyFactors.getSecond().floatValue());
+                        street.setBicycleSafetyFactor(safetyFactors.first.floatValue());
+                        backStreet.setBicycleSafetyFactor(safetyFactors.second.floatValue());
                     }
                 }
             }

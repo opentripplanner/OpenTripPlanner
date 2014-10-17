@@ -35,6 +35,7 @@ import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoin
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -107,8 +108,8 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
         int nTotal = graph.countEdges();
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
-                if (ee instanceof StreetEdge) {
-                    StreetEdge edgeWithElevation = (StreetEdge) ee;
+                if (ee instanceof StreetWithElevationEdge) {
+                    StreetWithElevationEdge edgeWithElevation = (StreetWithElevationEdge) ee;
                     processEdge(graph, edgeWithElevation);
                     if (edgeWithElevation.getElevationProfile() != null && !edgeWithElevation.isElevationFlattened()) {
                         edgesWithElevation.add(edgeWithElevation);
@@ -291,13 +292,14 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
         for (Vertex v : graph.getVertices()) {
             Double fromElevation = elevations.get(v);
             for (Edge e : v.getOutgoing()) {
-                if (e instanceof StreetEdge) {
-                    StreetEdge edge = ((StreetEdge) e);
+                if (e instanceof StreetWithElevationEdge) {
+                    StreetWithElevationEdge edge = ((StreetWithElevationEdge) e);
 
                     Double toElevation = elevations.get(edge.getToVertex());
 
                     if (fromElevation == null || toElevation == null) {
-                        log.warn("Unexpectedly missing elevation for edge " + edge);
+                        if (!edge.isElevationFlattened() && !edge.isSlopeOverride())
+                            log.warn("Unexpectedly missing elevation for edge " + edge);
                         continue;
                     }
 
@@ -311,7 +313,7 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
 
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
-                    if(edge.setElevationProfile(profile, true)) {
+                    if (edge.setElevationProfile(profile, true)) {
                         log.trace(graph.addBuilderAnnotation(new ElevationFlattened(edge)));
                     }
                 }
@@ -325,7 +327,7 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
      * @param ee the street edge
      * @param graph the graph (used only for error handling)
      */
-    private void processEdge(Graph graph, StreetEdge ee) {
+    private void processEdge(Graph graph, StreetWithElevationEdge ee) {
         if (ee.getElevationProfile() != null) {
             return; /* already set up */
         }

@@ -1003,7 +1003,7 @@ public class PlanGenerator {
                                     step.elevation = twoBack.elevation;
                                 } else {
                                     for (P2<Double> d : twoBack.elevation) {
-                                        step.elevation.add(new P2<Double>(d.getFirst() + step.distance, d.getSecond()));
+                                        step.elevation.add(new P2<Double>(d.first + step.distance, d.second));
                                     }
                                 }
                             }

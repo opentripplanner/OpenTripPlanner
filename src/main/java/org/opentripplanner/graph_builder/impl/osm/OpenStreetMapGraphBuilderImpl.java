@@ -43,7 +43,9 @@ import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.annotation.TurnRestrictionException;
 import org.opentripplanner.graph_builder.annotation.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
+import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
@@ -189,7 +191,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
      * around.
      */
-    public OSMPlainStreetEdgeFactory edgeFactory = new DefaultOSMPlainStreetEdgeFactory();
+    public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
     /**
      * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in the United States. This does not affect floor
@@ -1201,7 +1203,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 namedArea.setName(name);
 
                 WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
-                Double safety = wayData.getSafetyFeatures().getFirst();
+                Double safety = wayData.getSafetyFeatures().first;
                 namedArea.setBicycleSafetyMultiplier(safety);
 
                 namedArea.setOriginalEdges(intersection);
@@ -1256,9 +1258,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 label = unique(label);
                 String name = getNameForWay(areaEntity, label);
 
-                AreaEdge street = edgeFactory.createAreaEdge(fromNode, toNode, areaEntity,
-                        startEndpoint, endEndpoint, line, name, length, areaPermissions, false,
-                        carSpeed, edgeList);
+                AreaEdge street = edgeFactory.createAreaEdge(startEndpoint, endEndpoint, line,
+                        name, length, areaPermissions, false, edgeList);
+                street.setCarSpeed(carSpeed);
 
                 street.setStreetClass(cls);
                 edges.add(street);
@@ -1268,9 +1270,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 label = unique(label);
                 name = getNameForWay(areaEntity, label);
 
-                AreaEdge backStreet = edgeFactory.createAreaEdge(toNode, fromNode, areaEntity,
-                        endEndpoint, startEndpoint, (LineString) line.reverse(), name, length,
-                        areaPermissions, true, carSpeed, edgeList);
+                AreaEdge backStreet = edgeFactory.createAreaEdge(endEndpoint, startEndpoint,
+                        (LineString) line.reverse(), name, length, areaPermissions, true, edgeList);
+                backStreet.setCarSpeed(carSpeed);
 
                 backStreet.setStreetClass(cls);
                 edges.add(backStreet);
@@ -1670,8 +1672,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
-                    StreetEdge street = streets.getFirst();
-                    StreetEdge backStreet = streets.getSecond();
+                    StreetEdge street = streets.first;
+                    StreetEdge backStreet = streets.second;
                     applyWayProperties(street, backStreet, wayData, way);
 
                     applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -1688,28 +1690,27 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
-                double safety = wayData.getSafetyFeatures().getFirst();
+                double safety = wayData.getSafetyFeatures().first;
                 street.setBicycleSafetyFactor((float)safety);
                 if (safety < bestBikeSafety) {
                     bestBikeSafety = (float)safety;
                 }
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
-                        graph.streetNotesService.addStaticNote(street, note.getFirst(), note.getSecond());
+                        graph.streetNotesService.addStaticNote(street, note.first, note.second);
                 }
                 street.setNoThruTraffic(noThruTraffic);
             }
 
             if (backStreet != null) {
-                double safety = wayData.getSafetyFeatures().getSecond();
+                double safety = wayData.getSafetyFeatures().second;
                 if (safety < bestBikeSafety) {
                     bestBikeSafety = (float)safety;
                 }
                 backStreet.setBicycleSafetyFactor((float)safety);
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
-                        graph.streetNotesService.addStaticNote(backStreet, note.getFirst(),
-                                note.getSecond());
+                        graph.streetNotesService.addStaticNote(backStreet, note.first, note.second);
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
@@ -2473,8 +2474,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             double length = this.getGeometryLengthMeters(geometry);
 
             P2<StreetTraversalPermission> permissionPair = getPermissions(permissions, way);
-            StreetTraversalPermission permissionsFront = permissionPair.getFirst();
-            StreetTraversalPermission permissionsBack = permissionPair.getSecond();
+            StreetTraversalPermission permissionsFront = permissionPair.first;
+            StreetTraversalPermission permissionsBack = permissionPair.second;
 
             if (permissionsFront.allowsAnything()) {
                 street = getEdgeForStreet(start, end, way, index, startNode, endNode, length,
@@ -2483,6 +2484,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (permissionsBack.allowsAnything()) {
                 backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, length,
                         permissionsBack, backGeometry, true);
+            }
+            if (street != null && backStreet != null) {
+                backStreet.shareData(street);
             }
 
             /* mark edges that are on roundabouts */
@@ -2554,9 +2558,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
-            StreetEdge street = edgeFactory.createEdge(_nodes.get(startNode),
-                    _nodes.get(endNode), way, start, end, geometry, name, length, permissions,
-                    back, carSpeed);
+            StreetEdge street = edgeFactory.createEdge(start, end, geometry, name, length,
+                    permissions, back);
+            street.setCarSpeed(carSpeed);
 
             String highway = way.getTag("highway");
             int cls;

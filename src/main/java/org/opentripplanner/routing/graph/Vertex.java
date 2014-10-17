@@ -53,8 +53,6 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     private final double y;
     
-    private double distanceToNearestTransitStop = 0;
-
     private transient Edge[] incoming = new Edge[0];
 
     private transient Edge[] outgoing = new Edge[0];
@@ -120,22 +118,20 @@ public abstract class Vertex implements Serializable, Cloneable {
      * Synchronization must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
      */
     public static Edge[] removeEdge(Edge[] existing, Edge e) {
-        Edge[] copy = new Edge[existing.length - 1];
+        int nfound = 0;
         for (int i = 0, j = 0; i < existing.length; i++) {
-            if (existing[i] == e) continue;
-            copy[j++] = existing[i];
-            if (j == existing.length) {
-                // The array did not get shorter by one -- the edge to remove must not have been present
-                LOG.error("Requested removal of an edge which isn't connected to this vertex");
-                return existing;
-            }
+            if (existing[i] == e) nfound++;
         }
-        // Sanity check
-        for (Edge edge : copy) {
-            if (edge == e) {
-                LOG.error("An edge is still present after being removed (there were multiple copies?)");
-                return existing;
-            }
+        if (nfound == 0) {
+            LOG.error("Requested removal of an edge which isn't connected to this vertex.");
+            return existing;
+        }
+        if (nfound > 1) {
+            LOG.error("There are multiple copies of the edge to be removed.)");
+        }
+        Edge[] copy = new Edge[existing.length - nfound];
+        for (int i = 0, j = 0; i < existing.length; i++) {
+            if (existing[i] != e) copy[j++] = existing[i];
         }
         return copy;
     }
@@ -197,16 +193,6 @@ public abstract class Vertex implements Serializable, Cloneable {
         return incoming.length;
     }
     
-    // TODO: this is a candidate for no-arg message-passing style
-    public void setDistanceToNearestTransitStop(double distance) {
-        distanceToNearestTransitStop = distance;
-    }
-
-    /** Get the distance from this vertex to the closest transit stop in meters. */
-    public double getDistanceToNearestTransitStop() {
-        return distanceToNearestTransitStop;
-    }
-
     /** Get the longitude of the vertex */
     public double getX() {
         return x;

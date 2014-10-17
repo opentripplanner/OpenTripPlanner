@@ -78,6 +78,12 @@ public interface StreetVertexIndexService {
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radiusMeters);
 
     /**
+     * @param envelope
+     * @return The transit stops within an envelope.
+     */
+    public List<TransitStop> getTransitStopForEnvelope(Envelope envelope);
+
+    /**
      * Finds the appropriate vertex for this location.
      * 
      * @param location

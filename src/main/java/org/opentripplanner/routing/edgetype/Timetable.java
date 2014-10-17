@@ -300,6 +300,16 @@ public class Timetable implements Serializable {
         return -1;
     }
 
+    /** @return the index of TripTimes for this trip ID in this particular Timetable, ignoring AgencyIds. */
+    public int getTripIndex(String tripId) {
+        int ret = 0;
+        for (TripTimes tt : tripTimes) {
+            if (tt.trip.getId().getId().equals(tripId)) return ret;
+            ret += 1;
+        }
+        return -1;
+    }
+
     public TripTimes getTripTimes(int tripIndex) {
         return tripTimes.get(tripIndex);
     }
@@ -311,11 +321,12 @@ public class Timetable implements Serializable {
      * The StoptimeUpdater performs the protective copying of this Timetable. It is not done in
      * this update method to avoid repeatedly cloning the same Timetable when several updates
      * are applied to it at once.
+     * We assume here that all trips in a timetable are from the same feed, which should always be the case.
+     *
      * @return whether or not the timetable actually changed as a result of this operation
      * (maybe it should do the cloning and return the new timetable to enforce copy-on-write?)
      */
-    public boolean update(TripUpdate tripUpdate, String agencyId, TimeZone timeZone,
-            ServiceDate updateServiceDate) {
+    public boolean update(TripUpdate tripUpdate, TimeZone timeZone, ServiceDate updateServiceDate) {
         if (tripUpdate == null) {
             LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
             return false;
@@ -329,13 +340,11 @@ public class Timetable implements Serializable {
             }
 
             TripDescriptor tripDescriptor = tripUpdate.getTrip();
-
             if (!tripDescriptor.hasTripId()) {
                 LOG.error("TripDescriptor object has no TripId field");
                 return false;
             }
-            AgencyAndId tripId = new AgencyAndId(agencyId, tripDescriptor.getTripId());
-
+            String tripId = tripDescriptor.getTripId();
             int tripIndex = getTripIndex(tripId);
             if (tripIndex == -1) {
                 LOG.info("tripId {} not found in pattern.", tripId);
@@ -473,7 +482,7 @@ public class Timetable implements Serializable {
             return false;
         }
 
-        LOG.trace("A valid TripUpdate object was applied using the Timetable class update method.");
+        LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
         return true;
     }
 

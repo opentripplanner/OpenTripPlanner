@@ -13,6 +13,7 @@
 
 package org.opentripplanner.util;
 
+
 /**
  * This class replaces a small part of the functionality provided by ArrayUtils from Apache Commons.
  */

@@ -71,9 +71,9 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     private String url;
 
     /**
-     * Default agency id that is used for the trip ids in the TripUpdates
+     * The ID for the static feed to which these TripUpdates are applied
      */
-    private String agencyId;
+    private String feedId;
 
     /**
      * The number of seconds to wait before reconnecting after a failed connection.
@@ -89,7 +89,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     public void configure(Graph graph, Preferences preferences) throws Exception {
         // Read configuration
         url = preferences.get("url", null);
-        agencyId = preferences.get("defaultAgencyId", "");
+        feedId = preferences.get("feedId", "");
         reconnectPeriodSec = preferences.getInt("reconnectPeriodSec", DEFAULT_RECONNECT_PERIOD_SEC);
     }
 
@@ -187,8 +187,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
             if (updates != null && updates.size() > 0) {
                 // Handle trip updates via graph writer runnable
-                TripUpdateGraphWriterRunnable runnable =
-                        new TripUpdateGraphWriterRunnable(updates, agencyId);
+                TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates, feedId);
                 updaterManager.execute(runnable);
             }
         }

@@ -38,6 +38,6 @@ public class P2<E> extends T2<E, E> {
     }
 
     public String toString() {
-        return "P2(" + getFirst() + ", " + getSecond() + ")";
+        return "P2(" + first + ", " + second + ")";
     }
 }

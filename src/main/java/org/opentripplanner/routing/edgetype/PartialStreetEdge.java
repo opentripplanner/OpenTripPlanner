@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.LineString;
  * TODO we need a way to make sure all temporary edges are recorded as such and assigned a routingcontext when they are
  * created. That list should probably be in the routingContext itself instead of the created StreetLocation.
  */
-public class PartialStreetEdge extends StreetEdge {
+public class PartialStreetEdge extends StreetWithElevationEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,8 +41,8 @@ public class PartialStreetEdge extends StreetEdge {
     public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
                              LineString geometry, String name, double length, StreetTraversalPermission permission,
                              boolean back) {
-        super(v1, v2, geometry, name, length, permission, back, parentEdge.getCarSpeed());
-
+        super(v1, v2, geometry, name, length, permission, back);
+        setCarSpeed(parentEdge.getCarSpeed());
         this.parentEdge = parentEdge;
     }
     

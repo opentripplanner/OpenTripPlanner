@@ -26,7 +26,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -100,21 +99,19 @@ public class NetworkLinker {
         //and add back in replacements
         for (LinkedList<P2<StreetEdge>> toAdd : networkLinkerLibrary.replacements.values()) {
             for (P2<StreetEdge> edges : toAdd) {
-                StreetEdge edge1 = edges.getFirst();
+                StreetEdge edge1 = edges.first;
                 if (edge1.getToVertex().getLabel().startsWith("split ") || edge1.getFromVertex().getLabel().startsWith("split ")) {
                     continue;
                 }
                 edge1.getFromVertex().addOutgoing(edge1);
                 edge1.getToVertex().addIncoming(edge1);
-                StreetEdge edge2 = edges.getSecond();
+                StreetEdge edge2 = edges.second;
                 if (edge2 != null) {
                     edge2.getFromVertex().addOutgoing(edge2);
                     edge2.getToVertex().addIncoming(edge2);
                 }
             }
         }
-
-        FindMaxWalkDistances.find(graph);
 
         LOG.debug("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : Iterables.filter(vertices,

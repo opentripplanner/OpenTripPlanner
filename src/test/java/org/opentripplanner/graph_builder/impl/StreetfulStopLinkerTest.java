@@ -103,13 +103,13 @@ public class StreetfulStopLinkerTest {
 
         // Powers of 2 avoid complications related to floating point arithmetic
         new StreetEdge(intersectionA, intersectionB, lineStringAB, "Edge AB", 2 * speed,
-                StreetTraversalPermission.ALL, false, 0);
+                StreetTraversalPermission.ALL, false);
         new StreetEdge(intersectionB, intersectionC, lineStringBC, "Edge BC", 4 * speed,
-                StreetTraversalPermission.ALL, false, 0);
+                StreetTraversalPermission.ALL, false);
         new StreetEdge(intersectionC, intersectionD, lineStringCD, "Edge CD", 8 * speed,
-                StreetTraversalPermission.ALL, false, 0);
+                StreetTraversalPermission.ALL, false);
         new StreetEdge(intersectionA, intersectionD, lineStringAD, "Edge AD", 16 * speed,
-                StreetTraversalPermission.ALL, false, 0);
+                StreetTraversalPermission.ALL, false);
 
         StreetfulStopLinker streetfulStopLinker = new StreetfulStopLinker();
 

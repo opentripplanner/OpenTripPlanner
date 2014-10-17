@@ -77,8 +77,8 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
         List<File> paths = new ArrayList<File>();
         for (P2<Integer> tile : tiles) {
-            int x = tile.getFirst() - 1;
-            int y = tile.getSecond() + 1;
+            int x = tile.first - 1;
+            int y = tile.second + 1;
             paths.add(getPathToTile(x, y));
         }
         return paths;
