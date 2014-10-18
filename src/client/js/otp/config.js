@@ -305,3 +305,58 @@ otp.config.modes = {
     //Options widgets)
     //    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle')
     };
+
+// UI control 
+// set TripOptionsWidget_Exclude flags to remove elements from the planner widget  
+otp.config.widgetFlags={
+	TripOptionsWidget_Exclude : {
+		WheelChairSelector : false,
+		MaxDistanceSelector : false,
+		PreferredRoutes : false,
+		BannedRoutes : false
+	}
+};
+otp.config.defaultModeColours={
+	WALK:'#808080',
+        BICYCLE:'#0073e5',
+        SUBWAY:'#f00',
+        RAIL: '#ff0000',
+        BUS:'#080',
+        TRAM:'#800',
+        CAR:'#FFA500',
+	DEFAULT:'#aaa'
+};
+otp.config.defaultTripWeight=8;
+otp.config.defaultTripOpacity=0.3;
+
+// GeoJsonLayer 
+otp.config.GeoJson={};
+/*-
+otp.config.GeoJson.active='myanmar';
+otp.config.GeoJson.regions=[
+     		{
+    			label:'thailand',	
+    			name:'Thailand',	
+    			geojson:'geojson/thailand.geojson',
+			url:"http://www.chalo.org.uk/thailand"
+    		},
+    		{
+    			label:'srilanka',	
+    			name:'Sri Lanka',	
+    			geojson:'geojson/srilanka.geojson',
+			url:"http://www.chalo.org.uk/srilanka"	
+    		},
+    		{
+    			label:'myanmar',	
+    			name:'Myanmar',	
+    			geojson:'geojson/myanmar.geojson',
+			url:"http://www.chalo.org.uk/myanmar"	
+    		},
+    		{
+    			label:'bangladesh',	
+    			name:'Bangladesh',	
+    			geojson:'geojson/bangladesh.geojson',
+			url:"http://www.chalo.org.uk/bangladesh"	
+    		}
+];
+*/
