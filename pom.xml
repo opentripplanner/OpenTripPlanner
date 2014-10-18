@@ -132,7 +132,7 @@
                 <!-- Generate REST API documentation from Jersey-annotated classes -->
                 <groupId>org.codehaus.enunciate</groupId>
                 <artifactId>maven-enunciate-plugin</artifactId>
-                <version>1.28</version>
+                <version>1.29</version>
                 <executions>
                     <execution>
                         <!-- default binding for docs goal is process-sources phase, since enunciate can make a web service -->
@@ -240,19 +240,6 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>${distribution_id}</id>
-            <name>${distribution_name}</name>
-            <url>${distribution_url}</url>
-        </repository>
-        <site>
-            <id>opentripplanner-docs</id>
-            <name>OpenTripPlanner Docs</name>
-            <url>scp://www.opentripplanner.org:7777/var/www/opentripplanner.org/mvn-site</url>
-        </site>
-    </distributionManagement>
-
     <reporting>
         <!--
         Reporting plugin versions cannot be managed with entries in <build><plugins><pluginmanagement>
@@ -340,6 +327,15 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <!-- Enunciate 1.29 is not yet in Maven Central Repository -->
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>opencast-public</id>
+            <url>http://repository.opencastproject.org/nexus/content/repositories/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
         <!-- MapDB, for GTFS and OSM loading experiments. -->
