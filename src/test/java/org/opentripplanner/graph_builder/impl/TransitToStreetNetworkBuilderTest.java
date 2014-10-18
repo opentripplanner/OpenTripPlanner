@@ -5,6 +5,7 @@
  */
 package org.opentripplanner.graph_builder.impl;
 
+import org.opentripplanner.util.StreetType;
 import com.bedatadriven.geojson.GeoJsonModule;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
