@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -51,6 +52,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.util.TransitStopConnToWantedEdge;
 
 /**
  *
@@ -118,7 +120,7 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         return gg;
     }
     
-    public boolean findNeighbours(Vertex ts, StreetTransitLink stl, org.opentripplanner.graph_builder.impl.StreetType neighbourType, List<TransitToStreetConnection> transitConnections) {
+    public boolean findNeighbours(Vertex ts, StreetTransitLink stl, org.opentripplanner.util.StreetType neighbourType, List<TransitToStreetConnection> transitConnections) {
         Envelope envelope = new Envelope(ts.getCoordinate());
         double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
         envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
@@ -174,7 +176,7 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
     
     @Test
     public void testMariborBus() throws Exception {
-        Graph gg = loadGraph("maribor_clean.osm.gz", "marprom_winter_arriva_block.zip", true, true);
+        Graph gg = loadGraph("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", true, true);
         //Graph gg = loadGraph("maribor_clean.osm.gz", "small.zip", true, true);
         gg.summarizeBuilderAnnotations();
         for (GraphBuilderAnnotation gba: gg.getBuilderAnnotations()) {
@@ -241,6 +243,17 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         */
         writeGeoJson("out_transit.geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.TRANSIT_LINK));
         writeGeoJson("out_wanted.geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.WANTED_LINK));
+        writeSerial("wanted_transit.ser", TransitToStreetConnection.toSuper(transitConnections));
+    }
+    
+    private void writeSerial(String filepath,
+            List<TransitStopConnToWantedEdge> transitToStreetConnections) throws FileNotFoundException, IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream(filepath);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.writeObject(transitToStreetConnections);
+        objectOutputStream.close();
+        fileOutputStream.close();
+        
     }
     
     private void writeGeoJson(String filePath,

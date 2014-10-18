@@ -95,6 +95,20 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
+import java.awt.TrayIcon;
+import java.awt.event.MouseAdapter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.logging.Level;
+import javax.swing.JFileChooser;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.util.StreetType;
+import org.opentripplanner.util.TransitStopConnToWantedEdge;
 
 /**
  * Exit on window close.
@@ -121,7 +135,7 @@ class DisplayVertex {
         if (label.contains("osm node")) {
             label = vertex.getName();
         }
-        return label;
+        return label + " (" + vertex.getClass().getSimpleName() + ")";
     }
 }
 
@@ -384,6 +398,16 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     private HashSet<Vertex> seen;
 
     private JList<String> metadataList;
+    
+    private JList<TranstiStopOrStreetEdge> stationStreetLinkList;
+    
+    private DefaultListModel<TranstiStopOrStreetEdge> stationStreetLinkModel;
+    
+    private JButton clear_station_button;
+    
+    private JButton add_stations_button;
+    
+    private DefaultListModel<TransitStopConnToWantedEdge> stationsStreetLinkModel;
     
     private final Graph graph;
 
@@ -780,6 +804,142 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         panel.add(filler);
         return panel;
     }
+    
+    private void initStationsTabl(JTabbedPane rightPanelTabs) {
+        
+        //List with current transit and StreetEdge
+        stationStreetLinkList = new JList<>();
+        stationStreetLinkModel = new DefaultListModel<>();
+        stationStreetLinkList.setModel(stationStreetLinkModel);
+        JScrollPane stslScrollPane = new JScrollPane(stationStreetLinkList);
+        stslScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        
+        //List with all the transit -> StreetEdge connections
+        JList<TransitStopConnToWantedEdge> stationsStreetLinkList = new JList<>();
+        stationsStreetLinkModel = new DefaultListModel<>();
+        stationsStreetLinkList.setModel(stationsStreetLinkModel);
+        JScrollPane stationsScrollPane = new JScrollPane(stationsStreetLinkList);
+        stationsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        
+        Container stationPanel = new JPanel();
+        stationPanel.setLayout(new BoxLayout(stationPanel, BoxLayout.Y_AXIS));
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setMaximumSize(new Dimension(200, 40));
+        buttonPanel.setLayout(new GridLayout(0, 3));
+        stationPanel.add(buttonPanel); //, BorderLayout.PAGE_START);
+        stationPanel.add(stslScrollPane); //, BorderLayout.CENTER);
+        stationPanel.add(new JLabel("Stations:"));
+        stationPanel.add(stationsScrollPane);
+        
+        clear_station_button = new JButton("clear");
+        clear_station_button.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stationStreetLinkModel.clear();
+            }
+        });
+        add_stations_button = new JButton("add");
+        add_stations_button.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (stationStreetLinkModel.size() == 2) {
+                    if ((stationStreetLinkModel.get(0).isTransitStop() 
+                            && stationStreetLinkModel.get(1).isStreetEdge())
+                        ||(stationStreetLinkModel.get(1).isTransitStop() 
+                            && stationStreetLinkModel.get(0).isStreetEdge())) {
+                        String txt = String.format("Connected %s to %s", stationStreetLinkModel.get(0), stationStreetLinkModel.get(1));
+                        stationsStreetLinkModel.addElement(new TransitStopConnToWantedEdge(stationStreetLinkModel.get(0).transitStop, stationStreetLinkModel.get(1).wantedPath, StreetType.NORMAL));
+                        clear_station_button.doClick();
+                    } else {
+                        JOptionPane.showMessageDialog(rootPane, "A vertex and an street Edge need to be in list", "Wrong types of elements", JOptionPane.ERROR_MESSAGE);
+                    }
+                            
+                } else {
+                    JOptionPane.showMessageDialog(rootPane, "A vertex and an street Edge need to be in list", "Missing elements", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        add_stations_button.setEnabled(false);
+        clear_station_button.setEnabled(false);
+        
+        JButton open_stations_button = new JButton("open");
+        
+        open_stations_button.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser();
+                
+                int returnVal = fc.showOpenDialog(clear_station_button);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = fc.getSelectedFile();
+                        stationsStreetLinkModel.clear();
+                        
+                        List<TransitStopConnToWantedEdge> stations = openFile(file);
+                        for (TransitStopConnToWantedEdge toWantedEdge : stations) {
+                            stationsStreetLinkModel.addElement(toWantedEdge);
+                        }
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(GraphVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ClassNotFoundException ex) {
+                        java.util.logging.Logger.getLogger(GraphVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+
+            private List<TransitStopConnToWantedEdge> openFile(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
+                FileInputStream fis = new FileInputStream(file);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                List<TransitStopConnToWantedEdge> outList = (List<TransitStopConnToWantedEdge>) ois.readObject();
+                ois.close();
+                fis.close();
+                return outList;
+            }
+        });
+        
+        //enables and disables buttons
+        stationStreetLinkModel.addListDataListener(new ListDataListener() {
+
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                clear_station_button.setEnabled(!stationStreetLinkModel.isEmpty());
+                boolean add = ((stationStreetLinkModel.size() == 2) &&
+                     ((stationStreetLinkModel.get(0).isTransitStop() 
+                            && stationStreetLinkModel.get(1).isStreetEdge())
+                        ||(stationStreetLinkModel.get(1).isTransitStop() 
+                            && stationStreetLinkModel.get(0).isStreetEdge())));
+                add_stations_button.setEnabled(add);
+                
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                clear_station_button.setEnabled(!stationStreetLinkModel.isEmpty());
+                add_stations_button.setEnabled(false);
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                this.intervalAdded(e);
+            }
+        });
+        
+        buttonPanel.add(clear_station_button);
+        buttonPanel.add(add_stations_button);
+        buttonPanel.add(open_stations_button);
+        
+        Dimension size = new Dimension(200, 1600);
+
+        //stslScrollPane.setMaximumSize(size);
+        //stationPanel.setPreferredSize(size);
+        
+        rightPanelTabs.addTab("stations", stationPanel);
+
+    }
 
 	private void initRightPanel(Container pane) {
 		/* right panel holds trip pattern and stop metadata */
@@ -839,7 +999,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JScrollPane amScrollPane = new JScrollPane(annotationMatches);
         amScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("annotations", amScrollPane);
-
+        
+        initStationsTabl(rightPanelTabs);
+        
         Dimension size = new Dimension(200, 1600);
 
         amScrollPane.setMaximumSize(size);
@@ -1134,6 +1296,37 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
         });
         
+        nearbyVertices.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int wantedIndex = nearbyVertices.locationToIndex(e.getPoint());
+                    if (wantedIndex != -1) {
+                        Vertex curVertex = nearbyVertices.getModel().getElementAt(wantedIndex).vertex;
+                        
+                        if (curVertex instanceof TransitStop) {
+                            stationStreetLinkModel.addElement(new TranstiStopOrStreetEdge((TransitStop)curVertex));
+                        }
+                    }
+                    /*JPopupMenu menu = new JPopupMenu();
+                    JMenuItem item = new JMenuItem("Ahoj!");
+                    item.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JOptionPane.showMessageDialog(rootPane, "Hello " + nearbyVertices.getSelectedValue());
+                        }
+                    });
+                    menu.add(item);
+                    menu.show(rootPane, e.getX(), e.getY());*/
+                    
+                }
+            }
+            
+});
+        
+        
         // listener useful for both incoming and outgoing edge list panes
         // when a different edge is selected, change up the pattern pane and list of nearby nodes
         ListSelectionListener edgeChanged = new ListSelectionListener() {
@@ -1158,6 +1351,20 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         JScrollPane ogeScrollPane = new JScrollPane(outgoingEdges);
         vertexDataPanel.add(ogeScrollPane);
         outgoingEdges.addListSelectionListener(edgeChanged);
+        
+        outgoingEdges.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    Edge selected = outgoingEdges.getSelectedValue();
+                    if (selected instanceof StreetEdge) {
+                        stationStreetLinkModel.addElement(new TranstiStopOrStreetEdge((StreetEdge)selected));
+                    }
+                }
+            }
+            
+});
 
         // incoming edges
         JLabel iceLabel = new JLabel("Incoming edges");
