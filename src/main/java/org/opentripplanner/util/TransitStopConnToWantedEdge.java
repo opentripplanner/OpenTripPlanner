@@ -47,4 +47,16 @@ public class TransitStopConnToWantedEdge implements Serializable {
 
     }
     
+    public String getStopID() {
+        return transitStop.getLabel();
+    }
+    
+    public TransitStop getTransitStop() {
+        return transitStop;
+    }
+    
+    public StreetEdge getStreetEdge() {
+        return wantedPath;
+    }
+     
 }
