@@ -8,6 +8,8 @@ package org.opentripplanner.graph_builder.impl;
 import org.opentripplanner.util.StreetType;
 import com.vividsolutions.jts.geom.Point;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -64,6 +66,14 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         for (TransitToStreetConnection ttsc : transitToStreetConnections) {
             toWantedEdges.add(ttsc.toSuper());
         }
+        //Sort according to stop name
+        Collections.sort(transitToStreetConnections, new Comparator<TransitStopConnToWantedEdge>() {
+
+            @Override
+            public int compare(TransitStopConnToWantedEdge o1, TransitStopConnToWantedEdge o2) {
+                return o1.getTransitStop().getName().compareTo(o2.getTransitStop().getName());
+            }
+        });
         return toWantedEdges;
     }
 

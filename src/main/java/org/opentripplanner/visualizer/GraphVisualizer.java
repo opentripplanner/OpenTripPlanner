@@ -100,8 +100,10 @@ import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.logging.Level;
 import javax.swing.JFileChooser;
 import javax.swing.event.ListDataEvent;
@@ -836,7 +838,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         stationPanel.add(buttonPanel); //, BorderLayout.PAGE_START);
         stationPanel.add(stslScrollPane); //, BorderLayout.CENTER);
         JPanel buttonPanelStations = new JPanel();
-        buttonPanelStations.setLayout(new GridLayout(0, 2));
+        buttonPanelStations.setLayout(new GridLayout(0, 3));
         buttonPanelStations.setMaximumSize(new Dimension(200, 40));
         edit_cur_station_button = new JButton("Edit");
         stationPanel.add(new JLabel("Stations:"));
@@ -890,13 +892,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         edit_cur_station_button.setEnabled(false);
         
         JButton open_stations_button = new JButton("open");
+        JButton save_stations_button = new JButton("save");
         
         //Opens file with preliminary Transit_stop wanted streets connections
         open_stations_button.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = new JFileChooser();
+                JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
                 
                 int returnVal = fc.showOpenDialog(clear_station_button);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -923,6 +926,37 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                 ois.close();
                 fis.close();
                 return outList;
+            }
+        });
+        
+        save_stations_button.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+                
+                int returnVal = fc.showSaveDialog(clear_station_button);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    FileOutputStream fileOutputStream = null;
+                    try {
+                        File file = fc.getSelectedFile();
+                        fileOutputStream = new FileOutputStream(file);
+                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+                        objectOutputStream.writeObject(Collections.list(stationsStreetLinkModel.elements()));
+                        objectOutputStream.close();
+                        fileOutputStream.close();
+                    } catch (FileNotFoundException ex) {
+                        java.util.logging.Logger.getLogger(GraphVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        java.util.logging.Logger.getLogger(GraphVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        try {
+                            fileOutputStream.close();
+                        } catch (IOException ex) {
+                            java.util.logging.Logger.getLogger(GraphVisualizer.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
             }
         });
         
@@ -959,17 +993,26 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
         });
         
-        show_cur_station_button.addActionListener(new ActionListener() {
+        /*show_cur_station_button.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                TransitStop ts = stationStreetLinkModel.getVertex();
-                
-                showGraph.zoomToVertex(ts);
-                showGraph.highlightVertex(ts);
-                showGraph.highlightEdge(stationStreetLinkModel.getTransitStopConWantedEdge().getStreetEdge());
+                if (showGraph.isVertexEdgeHighlighted()) {
+                    showGraph.clearHighlight();
+                    show_cur_station_button.setText("show");
+                } else {
+                    TransitStop ts = stationStreetLinkModel.getVertex();
+
+                    showGraph.zoomToVertex(ts);
+                    
+                    
+                    showGraph.highlightEdge(stationStreetLinkModel.getTransitStopConWantedEdge().getStreetEdge());
+                    showGraph.highlightVertex(ts);
+
+                    show_cur_station_button.setText("hide");
+                }
             }
-        });
+        });*/
         
         buttonPanel.add(clear_station_button);
         buttonPanel.add(add_stations_button);
@@ -978,6 +1021,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         buttonPanelStations.add(edit_cur_station_button);
         buttonPanelStations.add(open_stations_button);
+        buttonPanelStations.add(save_stations_button);
         
         Dimension size = new Dimension(200, 1600);
 
