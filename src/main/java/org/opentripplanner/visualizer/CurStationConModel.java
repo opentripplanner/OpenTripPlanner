@@ -43,8 +43,8 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
             throw new Exception("Current station can see only 2 elements at the same time!");
         }
         if (vertex_index == null) {    
+            vertex_index = getSize();
             super.addElement(new TranstiStopOrStreetEdge(element)); 
-            vertex_index = getSize() - 1;
             LOG.info("Added vertex with index: {}", vertex_index);
         } else {
             throw new Exception("Current station can have only one TransitStop!");
@@ -53,8 +53,8 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
     
     public void addStreetEdge(StreetEdge element) throws Exception {
         if (edge_index == null) {
+            edge_index = getSize();
             super.addElement(new TranstiStopOrStreetEdge(element));
-            edge_index = getSize() - 1;
             LOG.info("Added edge with index: {}", edge_index);
         } else {
             super.set(edge_index, new TranstiStopOrStreetEdge(element));

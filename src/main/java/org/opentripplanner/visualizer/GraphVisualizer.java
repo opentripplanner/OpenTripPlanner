@@ -932,7 +932,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             @Override
             public void intervalAdded(ListDataEvent e) {
                 clear_station_button.setEnabled(!stationStreetLinkModel.isEmpty());
-                boolean isComplete = true; //stationStreetLinkModel.hasVertexAndStreet();
+                boolean isComplete = stationStreetLinkModel.hasVertexAndStreet();
                 show_cur_station_button.setEnabled(isComplete);
                 add_stations_button.setEnabled(isComplete);
                 
