@@ -1026,7 +1026,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         Dimension size = new Dimension(200, 1600);
 
         //stslScrollPane.setMaximumSize(size);
-        //stationPanel.setPreferredSize(size);
+        stationPanel.setPreferredSize(size);
+        stationPanel.setMaximumSize(size);
         
         rightPanelTabs.addTab("stations", stationPanel);
 
