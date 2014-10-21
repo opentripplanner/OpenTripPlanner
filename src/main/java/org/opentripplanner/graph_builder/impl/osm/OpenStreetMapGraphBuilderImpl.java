@@ -785,6 +785,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             buildElevatorEdges(graph);
 
             /* unify turn restrictions */
+            // Note that usually when the from or to way is not found, it's because OTP has already filtered that way.
+            // So many of these are not really problems worth issuing warnings on.
             for (Long fromWay : turnRestrictionsByFromWay.keySet()) {
                 for (TurnRestrictionTag restrictionTag : turnRestrictionsByFromWay.get(fromWay)) {
                     if (restrictionTag.possibleFrom.isEmpty()) {

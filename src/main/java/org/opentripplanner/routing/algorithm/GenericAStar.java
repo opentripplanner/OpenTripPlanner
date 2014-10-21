@@ -55,7 +55,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         RUNNING, STOPPED
     }
 
-    /* TODO instead of having a separate class for state, we should just make one GenericAStar per request. */
+    /* TODO instead of having a separate class for search state, we should just make one GenericAStar per request. */
     class RunState {
 
         public State u;
