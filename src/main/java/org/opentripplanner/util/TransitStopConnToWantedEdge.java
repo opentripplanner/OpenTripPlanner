@@ -27,6 +27,7 @@ public class TransitStopConnToWantedEdge implements Serializable {
     protected final TransitStop transitStop;
     protected final StreetEdge wantedPath;
     protected StreetType streetType;
+    protected transient boolean checked = false;
     
     private static final long serialVersionUID = 7526472295622776147L;
 
@@ -61,6 +62,14 @@ public class TransitStopConnToWantedEdge implements Serializable {
 
     public StreetType getStreetType() {
         return streetType;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+    
+    public void check() {
+        checked = true;
     }
      
 }

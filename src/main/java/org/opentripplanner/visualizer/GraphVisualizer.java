@@ -166,6 +166,33 @@ class EdgeListModel extends AbstractListModel<Edge> {
     }
 }
 
+class StationCellRenderer extends JLabel implements ListCellRenderer<TransitStopConnToWantedEdge> {
+
+    public StationCellRenderer() {
+        setOpaque(true);
+    }
+
+    @Override
+    public Component getListCellRendererComponent(JList<? extends TransitStopConnToWantedEdge> list, TransitStopConnToWantedEdge value, int index, boolean isSelected, boolean cellHasFocus) {
+        setText(value.toString());
+        
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
+            setForeground(list.getSelectionForeground());
+        } else {
+            if (value.isChecked()) {
+                setForeground(Color.GREEN);
+                setBackground(Color.WHITE);
+            } else {
+                setForeground(list.getForeground());
+                setBackground(list.getBackground());
+            }
+        }
+        return this;
+    }
+    
+}
+
 /**
  * A list of vertices where the internal container is exposed.
  */
@@ -410,6 +437,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     private JButton add_stations_button;
     
     private JButton edit_cur_station_button;
+    
+    private JButton check_station_button;
     
     private JButton show_cur_station_button;
     
@@ -826,6 +855,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         stationsStreetLinkList = new JList<>();
         stationsStreetLinkModel = new StationsListModel();
         stationsStreetLinkList.setModel(stationsStreetLinkModel);
+        stationsStreetLinkList.setCellRenderer(new StationCellRenderer());
         JScrollPane stationsScrollPane = new JScrollPane(stationsStreetLinkList);
         stationsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         
@@ -838,7 +868,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         stationPanel.add(buttonPanel); //, BorderLayout.PAGE_START);
         stationPanel.add(stslScrollPane); //, BorderLayout.CENTER);
         JPanel buttonPanelStations = new JPanel();
-        buttonPanelStations.setLayout(new GridLayout(0, 3));
+        buttonPanelStations.setLayout(new GridLayout(0, 4));
         buttonPanelStations.setMaximumSize(new Dimension(200, 40));
         edit_cur_station_button = new JButton("Edit");
         stationPanel.add(new JLabel("Stations:"));
@@ -876,6 +906,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         });
         
         show_cur_station_button = new JButton("show");
+        check_station_button = new JButton("check");
         
         //Adds currently selected station in stations list to cur_station list
         edit_cur_station_button.addActionListener(new ActionListener() {
@@ -890,6 +921,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         clear_station_button.setEnabled(false);
         show_cur_station_button.setEnabled(false);
         edit_cur_station_button.setEnabled(false);
+        check_station_button.setEnabled(false);
         
         JButton open_stations_button = new JButton("open");
         JButton save_stations_button = new JButton("save");
@@ -990,10 +1022,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 edit_cur_station_button.setEnabled(stationsStreetLinkList.getSelectedIndex()!=-1);
+                check_station_button.setEnabled(stationsStreetLinkList.getSelectedIndex()!=-1);
             }
         });
         
-        /*show_cur_station_button.addActionListener(new ActionListener() {
+        show_cur_station_button.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1012,16 +1045,26 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                     show_cur_station_button.setText("hide");
                 }
             }
-        });*/
+        });
+        
+        check_station_button.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stationsStreetLinkList.getSelectedValue().check();
+            }
+        });
         
         buttonPanel.add(clear_station_button);
         buttonPanel.add(add_stations_button);
         buttonPanel.add(show_cur_station_button);
         
         
+        
         buttonPanelStations.add(edit_cur_station_button);
         buttonPanelStations.add(open_stations_button);
         buttonPanelStations.add(save_stations_button);
+        buttonPanelStations.add(check_station_button);
         
         Dimension size = new Dimension(200, 1600);
 
