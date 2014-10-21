@@ -80,9 +80,6 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
     
     public static List<TransitStopConnToWantedEdge> toSuper(List<TransitToStreetConnection> transitToStreetConnections) {
         List <TransitStopConnToWantedEdge> toWantedEdges = new ArrayList<>(transitToStreetConnections.size());
-        for (TransitToStreetConnection ttsc : transitToStreetConnections) {
-            toWantedEdges.add(ttsc.toSuper());
-        }
         //Sort according to stop name
         Collections.sort(transitToStreetConnections, new Comparator<TransitStopConnToWantedEdge>() {
 
@@ -91,6 +88,9 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
                 return o1.getTransitStop().getName().compareTo(o2.getTransitStop().getName());
             }
         });
+         for (TransitToStreetConnection ttsc : transitToStreetConnections) {
+            toWantedEdges.add(ttsc.toSuper());
+        }
         return toWantedEdges;
     }
 
