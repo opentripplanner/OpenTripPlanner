@@ -24,6 +24,7 @@ import org.opentripplanner.util.TransitStopConnToWantedEdge;
 public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
     
     private transient StreetTransitLink streetTransitLink;
+    private Boolean correctlyLinked;
 
     private TransitStopConnToWantedEdge toSuper() {
         return new TransitStopConnToWantedEdge(transitStop, wantedPath, streetType);
@@ -31,15 +32,23 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
     
     enum CollectionType {
         TRANSIT_LINK,
-        WANTED_LINK
+        WANTED_LINK,
+        CORRECT_LINK
     }
 
     public TransitToStreetConnection(TransitStop transitStop, StreetTransitLink streetTransitLink, StreetEdge streetEdge, StreetType streetType) {
         super(transitStop, streetEdge, streetType);
         this.streetTransitLink = streetTransitLink;
-    }    
+        this.correctlyLinked = null;
+    }
     
-    public static StreetFeatureCollection toFeatureCollection(List<TransitToStreetConnection> transitToStreetConnections, CollectionType collectionType) {
+    public TransitToStreetConnection(TransitStopConnToWantedEdge transitStopConnToWantedEdge, StreetTransitLink streetTransitLink, boolean correctlyLinked) {
+        super(transitStopConnToWantedEdge.getTransitStop(), transitStopConnToWantedEdge.getStreetEdge(), transitStopConnToWantedEdge.getStreetType());
+        this.streetTransitLink = streetTransitLink;
+        this.correctlyLinked = correctlyLinked;
+    }
+    
+    public static StreetFeatureCollection toFeatureCollection(List<TransitToStreetConnection> transitToStreetConnections, CollectionType collectionType) throws Exception {
         List<StreetFeature> streetFeatures = new ArrayList<>(transitToStreetConnections.size());
         for(TransitToStreetConnection transitToStreetConnection: transitToStreetConnections) {
             streetFeatures.addAll(transitToStreetConnection.toStreetFeature(collectionType));
@@ -47,7 +56,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         return new StreetFeatureCollection(streetFeatures);
     }
     
-    private void addColor(StreetFeature sf, String propertyName) {
+    private void addColorStreetType(StreetFeature sf, String propertyName) {
         switch (streetType) {
                 case WALK_BIKE:
                     sf.addPropertie(propertyName, "#00ff00");
@@ -59,6 +68,14 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
                     sf.addPropertie(propertyName, "#ff7f00");
                     break;
             }
+    }
+    
+    private void addColorCoretness(StreetFeature sf, String propertyName) {
+        if (correctlyLinked) {
+            sf.addPropertie(propertyName, "#00ff00");
+        } else {
+            sf.addPropertie(propertyName, "#ff0000");
+        }
     }
     
     public static List<TransitStopConnToWantedEdge> toSuper(List<TransitToStreetConnection> transitToStreetConnections) {
@@ -77,12 +94,12 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         return toWantedEdges;
     }
 
-    private List<StreetFeature> toStreetFeature(CollectionType collectionType) {
+    private List<StreetFeature> toStreetFeature(CollectionType collectionType) throws Exception {
         List <StreetFeature> curFeatures = new ArrayList<>(3);
         if (collectionType == CollectionType.TRANSIT_LINK) {
             //Adds street transit link
             StreetFeature sf = StreetFeature.createRoadFeature(streetTransitLink);
-            addColor(sf, "stroke");
+            addColorStreetType(sf, "stroke");
             curFeatures.add(sf);
         } else if (collectionType == CollectionType.WANTED_LINK) {
             //Adds bus stop marker
@@ -93,7 +110,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             bus_stop_feat.addPropertie("edge_label", wantedPath.getLabel());
             bus_stop_feat.addPropertie("marker-size", "small");
             bus_stop_feat.addPropertie("marker-symbol", "bus");
-            addColor(bus_stop_feat, "marker-color");
+            addColorStreetType(bus_stop_feat, "marker-color");
             curFeatures.add(bus_stop_feat);
             
             //and wanted/connected street edge which should be connected to this bus stop
@@ -102,8 +119,32 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             wanted_edge_feat.addPropertie("label", wantedPath.getLabel());
             wanted_edge_feat.addPropertie("id", wantedPath.getId());
             wanted_edge_feat.addPropertie("stop_index", transitStop.getIndex());
-            addColor(wanted_edge_feat, "stroke");
+            addColorStreetType(wanted_edge_feat, "stroke");
             curFeatures.add(wanted_edge_feat);
+        } else if (collectionType == CollectionType.CORRECT_LINK) {
+            if (correctlyLinked == null) {
+                throw new Exception("For CORRECT_LINK feature correctlyLinked parameter can't be null!");
+            }
+            //Adds bus stop marker
+            StreetFeature bus_stop_feat = new StreetFeature(GeometryUtils.getGeometryFactory().createPoint(transitStop.getCoordinate()));
+            bus_stop_feat.addPropertie("title", transitStop.getName());
+            bus_stop_feat.addPropertie("label", transitStop.getLabel());
+            //bus_stop_feat.addPropertie("stop_index", transitStop.getIndex());
+            bus_stop_feat.addPropertie("edge_label", wantedPath.getLabel());
+            bus_stop_feat.addPropertie("marker-size", "small");
+            bus_stop_feat.addPropertie("marker-symbol", "bus");
+            addColorCoretness(bus_stop_feat, "marker-color");
+            curFeatures.add(bus_stop_feat);
+            
+            //and wanted/connected street edge which should be connected to this bus stop
+            StreetFeature wanted_edge_feat = new StreetFeature(wantedPath.getGeometry());
+            wanted_edge_feat.addPropertie("title", wantedPath.getName());
+            wanted_edge_feat.addPropertie("label", wantedPath.getLabel());
+            //wanted_edge_feat.addPropertie("id", wantedPath.getId());
+            wanted_edge_feat.addPropertie("stop_label", transitStop.getLabel());
+            addColorCoretness(wanted_edge_feat, "stroke");
+            curFeatures.add(wanted_edge_feat);
+            
         }
         return curFeatures;
     }

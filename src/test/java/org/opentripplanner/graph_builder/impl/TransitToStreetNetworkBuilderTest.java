@@ -16,9 +16,11 @@ import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.util.AbstractList;
@@ -29,10 +31,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import junit.framework.TestCase;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
@@ -53,17 +61,20 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TransitStopConnToWantedEdge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author mabu
  */
-public class TransitToStreetNetworkBuilderTest extends TestCase {
+public class TransitToStreetNetworkBuilderTest {
     private HashMap<Class<?>, Object> extra;
     StreetVertexIndexServiceImpl index;
     private Envelope extent;
     private double searchRadiusM = 10;
-    private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
+    private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);    
+    private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkBuilderTest.class);
     
     @Before
     public void setUp() {
@@ -174,8 +185,96 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         return hasAWalkPathNear;
     }
     
+    private void testBus(String osm_filename, String gtfs_filename, String wanted_con_filename) throws Exception {
+        Graph gg = loadGraph(osm_filename, gtfs_filename, true, true);
+        assertNotNull(gg);
+        
+        //Reads saved correct transit stop -> Street edge connections
+        FileInputStream fis = new FileInputStream(wanted_con_filename);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        List<TransitStopConnToWantedEdge> outList = (List<TransitStopConnToWantedEdge>) ois.readObject();
+        Map<String, TransitStopConnToWantedEdge> stop_id_toEdge = new HashMap<>(outList.size());
+        for (TransitStopConnToWantedEdge stop_edge_con: outList) {
+            stop_id_toEdge.put(stop_edge_con.getStopID(), stop_edge_con);
+        }
+        ois.close();
+        fis.close();
+        
+        List<TransitToStreetConnection> transitConnections = new ArrayList<>();
+        //For each transit stop in current graph check if transitStop is correctly connected
+        for(Vertex v: gg.getVertices()) {
+            if (v instanceof TransitStop
+                    && extent.contains(v.getCoordinate())) {
+                 for (Edge e : v.getOutgoing()) {
+                    if (e instanceof StreetTransitLink) {
+                        TransitStop ts = (TransitStop) v;
+                        TransitStopConnToWantedEdge wanted_con = stop_id_toEdge.get(ts.getLabel());
+                        if (wanted_con == null) {
+                            LOG.warn("Stop {} wasn't found in saved stops", ts.getLabel());
+                        } else {
+                           Vertex connected_vertex = e.getToVertex();
+                           String wantedEdgeLabel = wanted_con.getStreetEdge().getLabel();
+                           StringBuilder sb = new StringBuilder();
+                           boolean foundConnection = false;
+                           //Look through all outgoing street edges 
+                           //and check if street edge is correct one based on edge label
+                           for (Edge con_edge: connected_vertex.getOutgoingStreetEdges()) {
+                               StreetEdge se = (StreetEdge) con_edge;
+                               if (se.getLabel().equals(wantedEdgeLabel)) {
+                                   //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getLabel());
+                                   collector.checkThat(sb.toString(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                                   transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
+                                   foundConnection = true;
+                                   break;
+                               } else {
+                                   sb.append(se.getLabel());
+                                   sb.append("|");
+                               }
+                           }
+                           //If correct connection wasn't found we need to check incoming edges
+                           //because sometimes connection is made right on OSM way split which means different labels.
+                           if (!foundConnection) {                               
+                               for (Edge con_edge : connected_vertex.getIncoming()) {
+                                   if (con_edge instanceof StreetEdge) {
+                                       StreetEdge se = (StreetEdge) con_edge;
+                                       if (se.getLabel().equals(wantedEdgeLabel)) {
+                                           //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getLabel());
+                                           collector.checkThat(sb.toString(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                                           transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
+                                           foundConnection = true;
+                                           break;
+                                       } else {
+                                           sb.append(se.getLabel());
+                                           sb.append("|");
+                                       }
+                                   }
+                               }
+                           }
+                           if (!foundConnection) {
+                               //assertTrue(String.format("Transit stop %s connected wrongly", ts.getLabel()), foundConnection);
+                               //collector.checkThat(sb.toString(), CoreMatchers.equalTo(wantedEdgeLabel));
+                               collector.checkThat(sb.toString(), CoreMatchers.describedAs("TransitStop %0 was wrongly connected to %1 insted of %2", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), sb.toString(), wantedEdgeLabel));
+                               transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, false));
+                           }
+                        }
+                    }
+                }
+            }
+        }
+        
+        writeGeoJson("correct_maribor.geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
+    }
+    
+    @Rule
+    public ErrorCollector collector = new ErrorCollector();
+    
     @Test
     public void testMariborBus() throws Exception {
+        testBus("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "/home/mabu/programiranje/forotp/OpenTripPlanner/wanted_transit.ser");
+    }
+    
+    //Creates wanted connections for Maribor
+    public void makeTestMariborBus() throws Exception {
         Graph gg = loadGraph("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", true, true);
         //Graph gg = loadGraph("maribor_clean.osm.gz", "small.zip", true, true);
         gg.summarizeBuilderAnnotations();
@@ -256,6 +355,13 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         
     }
     
+    /**
+     * Writes Geojson of Features
+     * @param filePath path where geojson is saved
+     * @param streetFeatureCollection collection that is saved
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     private void writeGeoJson(String filePath,
             StreetFeatureCollection streetFeatureCollection) throws FileNotFoundException, IOException {
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);
@@ -289,5 +395,4 @@ public class TransitToStreetNetworkBuilderTest extends TestCase {
         return new T2(max, max_index);
         
     }
-    
 }

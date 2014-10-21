@@ -58,5 +58,9 @@ public class TransitStopConnToWantedEdge implements Serializable {
     public StreetEdge getStreetEdge() {
         return wantedPath;
     }
+
+    public StreetType getStreetType() {
+        return streetType;
+    }
      
 }
