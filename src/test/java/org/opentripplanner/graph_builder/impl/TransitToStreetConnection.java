@@ -104,9 +104,9 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         } else if (collectionType == CollectionType.WANTED_LINK) {
             //Adds bus stop marker
             StreetFeature bus_stop_feat = new StreetFeature(GeometryUtils.getGeometryFactory().createPoint(transitStop.getCoordinate()));
-            bus_stop_feat.addPropertie("title", transitStop.getName());
+            bus_stop_feat.addPropertie("title", transitStop.getName() + "(" + transitStop.getStopId().getId() + ")");
             bus_stop_feat.addPropertie("label", transitStop.getLabel());
-            bus_stop_feat.addPropertie("stop_index", transitStop.getIndex());
+            //bus_stop_feat.addPropertie("stop_index", transitStop.getIndex());
             bus_stop_feat.addPropertie("edge_label", wantedPath.getLabel());
             bus_stop_feat.addPropertie("marker-size", "small");
             bus_stop_feat.addPropertie("marker-symbol", "bus");
@@ -117,8 +117,9 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             StreetFeature wanted_edge_feat = new StreetFeature(wantedPath.getGeometry());
             wanted_edge_feat.addPropertie("title", wantedPath.getName());
             wanted_edge_feat.addPropertie("label", wantedPath.getLabel());
-            wanted_edge_feat.addPropertie("id", wantedPath.getId());
-            wanted_edge_feat.addPropertie("stop_index", transitStop.getIndex());
+            //wanted_edge_feat.addPropertie("id", wantedPath.getId());
+            //wanted_edge_feat.addPropertie("stop_index", transitStop.getIndex());
+            wanted_edge_feat.addPropertie("stop_label", transitStop.getLabel());
             addColorStreetType(wanted_edge_feat, "stroke");
             curFeatures.add(wanted_edge_feat);
         } else if (collectionType == CollectionType.CORRECT_LINK) {
@@ -127,7 +128,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             }
             //Adds bus stop marker
             StreetFeature bus_stop_feat = new StreetFeature(GeometryUtils.getGeometryFactory().createPoint(transitStop.getCoordinate()));
-            bus_stop_feat.addPropertie("title", transitStop.getName());
+            bus_stop_feat.addPropertie("title", transitStop.getName() + "(" + transitStop.getStopId().getId() + ")");
             bus_stop_feat.addPropertie("label", transitStop.getLabel());
             //bus_stop_feat.addPropertie("stop_index", transitStop.getIndex());
             bus_stop_feat.addPropertie("edge_label", wantedPath.getLabel());
