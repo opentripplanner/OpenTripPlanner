@@ -68,6 +68,7 @@ public class ProfileResource {
             @QueryParam("minBikeTime") @DefaultValue("1")     int minBikeTime,
             @QueryParam("orderBy")     @DefaultValue("AVG")   Option.SortOrder orderBy,
             @QueryParam("limit")       @DefaultValue("10")    int limit,
+            @QueryParam("suboptimal")  @DefaultValue("5")     int suboptimalMinutes,
             @QueryParam("modes")       @DefaultValue("WALK,TRANSIT") TraverseModeSet modes)
             throws Exception {
 
@@ -81,6 +82,7 @@ public class ProfileResource {
         QueryParameter.checkRangeInclusive(maxCarTime,  1, 480);
         QueryParameter.checkRangeInclusive(minBikeTime, 0, maxBikeTime);
         QueryParameter.checkRangeInclusive(minCarTime,  0, maxCarTime);
+        QueryParameter.checkRangeInclusive(suboptimalMinutes, 0, 30);
 
         ProfileRequest req = new ProfileRequest();
         req.from       = from;
@@ -101,6 +103,7 @@ public class ProfileResource {
         req.maxCarTime  = maxCarTime;
         req.minBikeTime = minBikeTime;
         req.minCarTime  = minCarTime;
+        req.suboptimalMinutes = suboptimalMinutes;
 
         ProfileRouter router = new ProfileRouter(graph, req);
         try {

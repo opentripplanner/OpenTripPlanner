@@ -300,7 +300,7 @@ public class ProfileRouter {
     /** Check whether a new ride has too long a duration relative to existing rides at the same location or global time limit. */
     public boolean addIfNondominated(Ride newRide) {
         StopCluster cluster = newRide.to;
-        if (cluster == null) { // if ride is unfinished, calculate time to its from cluster based on previous ride
+        if (cluster == null) { // if ride is unfinished, calculate time to its from-cluster based on previous ride
             cluster = newRide.from;
             newRide = newRide.previous;
         }
@@ -317,7 +317,7 @@ public class ProfileRouter {
             }
             // State is not strictly dominated. Perhaps it has the same number of transfers.
             // In this case we want to keep it as long as it's sometimes better than all the others (time ranges overlap).
-            if (newRide.durationLowerBound() > oldRide.durationUpperBound()) {
+            if (newRide.durationLowerBound() > oldRide.durationUpperBound() + request.suboptimalMinutes) {
                 return false;
             }
         }
@@ -339,7 +339,7 @@ public class ProfileRouter {
     public Map<TripPattern, StopAtDistance> findClosestPatterns(Multimap<StopCluster, StopAtDistance> stopClusters) {
         SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closest = new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
         // Iterate over all StopAtDistance for all Stops. The fastest mode will win at each stop.
-        for (StopAtDistance stopDist : stopClusters.values()) {
+        for (StopAtDistance stopDist : stopClusters.values()) {http://dev.opentripplanner.org/jars/
             for (Stop stop : stopDist.stop.children) {
                 for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
                     closest.putMin(pattern, stopDist);
