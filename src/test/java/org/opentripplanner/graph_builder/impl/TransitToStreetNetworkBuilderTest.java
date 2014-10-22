@@ -222,7 +222,7 @@ public class TransitToStreetNetworkBuilderTest {
                                StreetEdge se = (StreetEdge) con_edge;
                                if (se.getLabel().equals(wantedEdgeLabel)) {
                                    //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getLabel());
-                                   collector.checkThat(sb.toString(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                                   collector.checkThat(se.getLabel(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                    transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
                                    foundConnection = true;
                                    break;
@@ -239,7 +239,7 @@ public class TransitToStreetNetworkBuilderTest {
                                        StreetEdge se = (StreetEdge) con_edge;
                                        if (se.getLabel().equals(wantedEdgeLabel)) {
                                            //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getLabel());
-                                           collector.checkThat(sb.toString(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                                           collector.checkThat(se.getLabel(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                            transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
                                            foundConnection = true;
                                            break;
