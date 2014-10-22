@@ -81,6 +81,13 @@ public class TransitToStreetNetworkBuilderTest {
         extra = new HashMap<Class<?>, Object>();
     }
     
+    /**
+     * Creates graph from OSM and GTFS data and runs {@link TransitToTaggedStopsGraphBuilderImpl} and {@link TransitToStreetNetworkGraphBuilderImpl}.
+     * @param osm_filename filename for OSM (in resource folder of class)
+     * @param gtfs_filename filename for GTFS (in resource folder of class)
+     * @param wanted_con_filename filename for saved connections (in resource folder of class)
+     * @throws Exception 
+     */
     private Graph loadGraph(String osm_filename, String gtfs_filename,
             boolean taggedBuilder, boolean normalBuilder) throws Exception{
 
@@ -185,6 +192,18 @@ public class TransitToStreetNetworkBuilderTest {
         return hasAWalkPathNear;
     }
     
+    /**
+     * Reads saved transitStop -> streetEdge connections and compares them with 
+     * connections in generated Graph.
+     * 
+     * Graph is generated with loadGraph function
+     * 
+     * 
+     * @param osm_filename filename for OSM (in resource folder of class)
+     * @param gtfs_filename filename for GTFS (in resource folder of class)
+     * @param wanted_con_filename filename for saved connections (in resource folder of class)
+     * @throws Exception 
+     */
     private void testBus(String osm_filename, String gtfs_filename, String wanted_con_filename) throws Exception {
         Graph gg = loadGraph(osm_filename, gtfs_filename, true, true);
         assertNotNull(gg);
@@ -352,8 +371,15 @@ public class TransitToStreetNetworkBuilderTest {
         writeSerial("wanted_transit.ser", TransitToStreetConnection.toSuper(transitConnections));
     }
     
+    /**
+     * Writes saved transit to street connections
+     * @param filepath
+     * @param transitToStreetConnections
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     private void writeSerial(String filepath,
-            List<TransitStopConnToWantedEdge> transitToStreetConnections) throws FileNotFoundException, IOException {
+        List<TransitStopConnToWantedEdge> transitToStreetConnections) throws FileNotFoundException, IOException {
         FileOutputStream fileOutputStream = new FileOutputStream(filepath);
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
         objectOutputStream.writeObject(transitToStreetConnections);
@@ -370,7 +396,7 @@ public class TransitToStreetNetworkBuilderTest {
      * @throws IOException 
      */
     private void writeGeoJson(String filePath,
-            StreetFeatureCollection streetFeatureCollection) throws FileNotFoundException, IOException {
+        StreetFeatureCollection streetFeatureCollection) throws FileNotFoundException, IOException {
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);
         PrintStream out = new PrintStream(fileOutputStream);
         ObjectMapper mapper = SerializerUtils.getMapper();
