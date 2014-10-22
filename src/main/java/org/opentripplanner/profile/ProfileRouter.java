@@ -109,6 +109,7 @@ public class ProfileRouter {
             toStops = findClosestPatterns(toStopPaths);
             // Also look for options connecting origin to destination with no transit.
             for (TraverseMode mode : ACCESS_MODES) {
+                LOG.info("Finding non-transit path for mode {}", mode);
                 if (request.modes.contains(mode)) findStreetOption(mode);
             }
         }
