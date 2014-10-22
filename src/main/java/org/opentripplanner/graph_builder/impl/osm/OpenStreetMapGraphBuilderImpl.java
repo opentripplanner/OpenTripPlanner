@@ -211,7 +211,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         handler.buildGraph(extra);
     }
 
-    @SuppressWarnings("unchecked")
     private <T> T unique(T value) {
         if (!_uniques.contains(value)) {
             _uniques.add(value);
