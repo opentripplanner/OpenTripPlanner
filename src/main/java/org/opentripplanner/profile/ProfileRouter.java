@@ -415,13 +415,14 @@ public class ProfileRouter {
         rr.walkSpeed = request.walkSpeed;
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
-        int minAccessTime = 0, maxAccessTime = 0;
-        if (mode == TraverseMode.WALK) {
-            maxAccessTime = request.maxWalkTime;
-        } else if (mode == TraverseMode.BICYCLE) {
+        int minAccessTime = 0;
+        int maxAccessTime = request.maxWalkTime;
+        if (mode == TraverseMode.BICYCLE) {
+            rr.bikeSpeed = request.bikeSpeed;
             minAccessTime = request.minBikeTime;
             maxAccessTime = request.maxBikeTime;
         } else if (mode == TraverseMode.CAR) {
+            rr.carSpeed = request.carSpeed;
             minAccessTime = request.minCarTime;
             maxAccessTime = request.maxCarTime;
         } else {
