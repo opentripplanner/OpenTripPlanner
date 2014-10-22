@@ -339,7 +339,7 @@ public class ProfileRouter {
     public Map<TripPattern, StopAtDistance> findClosestPatterns(Multimap<StopCluster, StopAtDistance> stopClusters) {
         SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closest = new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
         // Iterate over all StopAtDistance for all Stops. The fastest mode will win at each stop.
-        for (StopAtDistance stopDist : stopClusters.values()) {http://dev.opentripplanner.org/jars/
+        for (StopAtDistance stopDist : stopClusters.values()) {
             for (Stop stop : stopDist.stop.children) {
                 for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
                     closest.putMin(pattern, stopDist);
