@@ -2089,7 +2089,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return String.format(levelnodeLabelFormat, node.getId(), level.shortName);
         }
 
-        public void secondPhase() {
+        @Override
+        public void doneFirstPhaseRelations() {
+            // nothing to do here
+        }
+
+        @Override
+        public void doneSecondPhaseWays() {
             // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
             // the way purging keeps the needed way around.
             // Multipolygons may be processed more than once, which may be needed since
@@ -2107,7 +2113,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * After all relations, ways, and nodes are loaded, handle areas.
          */
-        public void nodesLoaded() {
+        @Override
+        public void doneThirdPhaseNodes() {
             processMultipolygonRelations();
             AREA:
             for (OSMWay way : _singleWayAreas) {
@@ -2831,11 +2838,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 endpoints.add(iv);
             }
             return iv;
-        }
-
-        @Override
-        public void doneRelations() {
-            // nothing to do here
         }
     }
 
