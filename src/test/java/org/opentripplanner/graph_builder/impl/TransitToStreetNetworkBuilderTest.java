@@ -201,12 +201,15 @@ public class TransitToStreetNetworkBuilderTest {
         fis.close();
         
         List<TransitToStreetConnection> transitConnections = new ArrayList<>();
+        int allStops = 0;
+        int correctlyLinkedStops = 0;
         //For each transit stop in current graph check if transitStop is correctly connected
         for(Vertex v: gg.getVertices()) {
             if (v instanceof TransitStop
                     && extent.contains(v.getCoordinate())) {
                  for (Edge e : v.getOutgoing()) {
                     if (e instanceof StreetTransitLink) {
+                        allStops++;
                         TransitStop ts = (TransitStop) v;
                         TransitStopConnToWantedEdge wanted_con = stop_id_toEdge.get(ts.getLabel());
                         if (wanted_con == null) {
@@ -225,6 +228,7 @@ public class TransitToStreetNetworkBuilderTest {
                                    collector.checkThat(se.getLabel(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                    transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
                                    foundConnection = true;
+                                   correctlyLinkedStops++;
                                    break;
                                } else {
                                    sb.append(se.getLabel());
@@ -242,6 +246,7 @@ public class TransitToStreetNetworkBuilderTest {
                                            collector.checkThat(se.getLabel(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                            transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
                                            foundConnection = true;
+                                           correctlyLinkedStops++;
                                            break;
                                        } else {
                                            sb.append(se.getLabel());
@@ -261,6 +266,8 @@ public class TransitToStreetNetworkBuilderTest {
                 }
             }
         }
+        
+        LOG.info("Correctly linked {}/{} ({}%) stations for {}", correctlyLinkedStops, allStops, Math.round((double)correctlyLinkedStops/(double)allStops*100), osm_filename);
         
         writeGeoJson("correct_maribor.geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
     }
