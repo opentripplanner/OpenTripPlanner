@@ -55,42 +55,58 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
-    private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
+    /* Map of all nodes keyed by their OSM ID */
+    private Map<Long, OSMNode> nodesById = new HashMap<Long, OSMNode>();
 
-    private HashSet<OSMNode> _bikeRentalNodes = new HashSet<OSMNode>();
+    /* All bike-rental nodes */
+    private HashSet<OSMNode> bikeRentalNodes = new HashSet<OSMNode>();
 
-    private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
+    /* Map of all non-area ways keyed by their OSM ID */
+    private Map<Long, OSMWay> waysById = new HashMap<Long, OSMWay>();
 
-    private List<Area> _walkableAreas = new ArrayList<Area>();
+    /* Map of all area ways keyed by their OSM ID */
+    private Map<Long, OSMWay> areaWaysById = new HashMap<Long, OSMWay>();
 
-    private List<Area> _parkAndRideAreas = new ArrayList<Area>();
+    /* Map of all relations keyed by their OSM ID */
+    private Map<Long, OSMRelation> relationsById = new HashMap<Long, OSMRelation>();
 
-    private Set<Long> _areaWayIds = new HashSet<Long>();
+    /* All walkable areas */
+    private List<Area> walkableAreas = new ArrayList<Area>();
 
-    private Map<Long, OSMWay> _areaWaysById = new HashMap<Long, OSMWay>();
+    /* All P+R areas */
+    private List<Area> parkAndRideAreas = new ArrayList<Area>();
 
-    private Map<Long, Set<OSMWay>> _areasForNode = new HashMap<Long, Set<OSMWay>>();
+    /* Map of all area OSMWay for a given node */
+    private Map<Long, Set<OSMWay>> areasForNode = new HashMap<Long, Set<OSMWay>>();
 
-    private List<OSMWay> _singleWayAreas = new ArrayList<OSMWay>();
+    /* Map of all area OSMWay for a given node */
+    private List<OSMWay> singleWayAreas = new ArrayList<OSMWay>();
 
-    private Map<Long, OSMRelation> _relations = new HashMap<Long, OSMRelation>();
+    private Set<OSMWithTags> processedAreas = new HashSet<OSMWithTags>();
 
-    private Set<OSMWithTags> _processedAreas = new HashSet<OSMWithTags>();
+    /* Set of area way IDs */
+    private Set<Long> areaWayIds = new HashSet<Long>();
 
-    private Set<Long> _nodesWithNeighbors = new HashSet<Long>();
+    /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
+    private Set<Long> waysNodeIds = new HashSet<Long>();
 
-    private Set<Long> _areaNodes = new HashSet<Long>();
+    /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
+    private Set<Long> areaNodeIds = new HashSet<Long>();
 
     /* Track which vertical level each OSM way belongs to, for building elevators etc. */
     private Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<OSMWithTags, OSMLevel>();
 
+    /* Set of turn restrictions for each turn "from" way ID */
     private Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
             .create();
 
+    /* Set of turn restrictions for each turn "to" way ID */
     private Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
 
+    /* */
     private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
 
+    /* List of graph annotations registered during building, to add to the graph. */
     private List<GraphBuilderAnnotation> annotations = new ArrayList<>();
 
     /**
@@ -100,23 +116,23 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     public boolean noZeroLevels = true;
 
     public OSMNode getNode(Long nodeId) {
-        return _nodes.get(nodeId);
+        return nodesById.get(nodeId);
     }
 
     public Collection<OSMWay> getWays() {
-        return Collections.unmodifiableCollection(_ways.values());
+        return Collections.unmodifiableCollection(waysById.values());
     }
 
     public Collection<OSMNode> getBikeRentalNodes() {
-        return Collections.unmodifiableCollection(_bikeRentalNodes);
+        return Collections.unmodifiableCollection(bikeRentalNodes);
     }
 
     public Collection<Area> getWalkableAreas() {
-        return Collections.unmodifiableCollection(_walkableAreas);
+        return Collections.unmodifiableCollection(walkableAreas);
     }
 
     public Collection<Area> getParkAndRideAreas() {
-        return Collections.unmodifiableCollection(_parkAndRideAreas);
+        return Collections.unmodifiableCollection(parkAndRideAreas);
     }
 
     public Collection<Long> getTurnRestrictionWayIds() {
@@ -140,7 +156,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     }
 
     public boolean isNodeSharedByMultipleAreas(Long nodeId) {
-        Set<OSMWay> areas = _areasForNode.get(nodeId);
+        Set<OSMWay> areas = areasForNode.get(nodeId);
         if (areas == null) {
             return false;
         }
@@ -148,7 +164,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     }
 
     public boolean isNodeBelongsToWay(Long nodeId) {
-        return _nodesWithNeighbors.contains(nodeId);
+        return waysNodeIds.contains(nodeId);
     }
 
     public Collection<GraphBuilderAnnotation> getAnnotations() {
@@ -158,31 +174,31 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     @Override
     public void addNode(OSMNode node) {
         if (node.isTag("amenity", "bicycle_rental")) {
-            _bikeRentalNodes.add(node);
+            bikeRentalNodes.add(node);
             return;
         }
-        if (!(_nodesWithNeighbors.contains(node.getId()) || _areaNodes.contains(node.getId()) || node
+        if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
                 .isStop()))
             return;
 
-        if (_nodes.containsKey(node.getId()))
+        if (nodesById.containsKey(node.getId()))
             return;
 
-        _nodes.put(node.getId(), node);
+        nodesById.put(node.getId(), node);
 
-        if (_nodes.size() % 100000 == 0)
-            LOG.debug("nodes=" + _nodes.size());
+        if (nodesById.size() % 100000 == 0)
+            LOG.debug("nodes=" + nodesById.size());
     }
 
     @Override
     public void addWay(OSMWay way) {
         /* only add ways once */
         long wayId = way.getId();
-        if (_ways.containsKey(wayId) || _areaWaysById.containsKey(wayId))
+        if (waysById.containsKey(wayId) || areaWaysById.containsKey(wayId))
             return;
 
-        if (_areaWayIds.contains(wayId)) {
-            _areaWaysById.put(wayId, way);
+        if (areaWayIds.contains(wayId)) {
+            areaWaysById.put(wayId, way);
         }
 
         getLevelsForWay(way);
@@ -196,26 +212,26 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 && way.getNodeRefs().size() > 2) {
             // this is an area that's a simple polygon. So we can just add it straight
             // to the areas, if it's not part of a relation.
-            if (!_areaWayIds.contains(wayId)) {
-                _singleWayAreas.add(way);
-                _areaWaysById.put(wayId, way);
-                _areaWayIds.add(wayId);
+            if (!areaWayIds.contains(wayId)) {
+                singleWayAreas.add(way);
+                areaWaysById.put(wayId, way);
+                areaWayIds.add(wayId);
                 for (Long node : way.getNodeRefs()) {
-                    MapUtils.addToMapSet(_areasForNode, node, way);
+                    MapUtils.addToMapSet(areasForNode, node, way);
                 }
             }
             return;
         }
 
-        _ways.put(wayId, way);
+        waysById.put(wayId, way);
 
-        if (_ways.size() % 10000 == 0)
-            LOG.debug("ways=" + _ways.size());
+        if (waysById.size() % 10000 == 0)
+            LOG.debug("ways=" + waysById.size());
     }
 
     @Override
     public void addRelation(OSMRelation relation) {
-        if (_relations.containsKey(relation.getId()))
+        if (relationsById.containsKey(relation.getId()))
             return;
 
         if (relation.isTag("type", "multipolygon") && OSMFilter.isOsmEntityRoutable(relation)) {
@@ -227,7 +243,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 return;
             }
             for (OSMRelationMember member : relation.getMembers()) {
-                _areaWayIds.add(member.getRef());
+                areaWayIds.add(member.getRef());
             }
             getLevelsForWay(relation);
         } else if (!(relation.isTag("type", "restriction"))
@@ -240,10 +256,10 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             return;
         }
 
-        _relations.put(relation.getId(), relation);
+        relationsById.put(relation.getId(), relation);
 
-        if (_relations.size() % 100 == 0)
-            LOG.debug("relations=" + _relations.size());
+        if (relationsById.size() % 100 == 0)
+            LOG.debug("relations=" + relationsById.size());
 
     }
 
@@ -264,8 +280,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         // only 2 steps -- ways+relations, followed by used nodes.
         // Ways can be tag-filtered in phase 1.
 
-        markNodesForKeeping(_ways.values(), _nodesWithNeighbors);
-        markNodesForKeeping(_areaWaysById.values(), _areaNodes);
+        markNodesForKeeping(waysById.values(), waysNodeIds);
+        markNodesForKeeping(areaWaysById.values(), areaNodeIds);
     }
 
     /**
@@ -274,23 +290,24 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     @Override
     public void doneThirdPhaseNodes() {
         processMultipolygonRelations();
-        AREA: for (OSMWay way : _singleWayAreas) {
-            if (_processedAreas.contains(way)) {
+        AREA: for (OSMWay way : singleWayAreas) {
+            if (processedAreas.contains(way)) {
                 continue;
             }
             for (Long nodeRef : way.getNodeRefs()) {
-                if (!_nodes.containsKey(nodeRef)) {
+                if (!nodesById.containsKey(nodeRef)) {
                     continue AREA;
                 }
             }
             try {
-                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(), _nodes));
+                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(),
+                        nodesById));
             } catch (Area.AreaConstructionException e) {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
                 // the area; we'll mark it as processed so that we don't retry.
             }
-            _processedAreas.add(way);
+            processedAreas.add(way);
         }
     }
 
@@ -303,9 +320,10 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         processRelations();
 
         // Remove all simple islands
-        HashSet<Long> _keep = new HashSet<Long>(_nodesWithNeighbors);
-        _keep.addAll(_areaNodes);
-        _nodes.keySet().retainAll(_keep);
+        // TODO Is this necessary?
+        HashSet<Long> _keep = new HashSet<Long>(waysNodeIds);
+        _keep.addAll(areaNodeIds);
+        nodesById.keySet().retainAll(_keep);
     }
 
     private void getLevelsForWay(OSMWithTags way) {
@@ -350,8 +368,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      * the used ways.
      */
     private void processMultipolygonRelations() {
-        RELATION: for (OSMRelation relation : _relations.values()) {
-            if (_processedAreas.contains(relation)) {
+        RELATION: for (OSMRelation relation : relationsById.values()) {
+            if (processedAreas.contains(relation)) {
                 continue;
             }
             if (!(relation.isTag("type", "multipolygon") && (OSMFilter
@@ -363,18 +381,18 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             ArrayList<OSMWay> outerWays = new ArrayList<OSMWay>();
             for (OSMRelationMember member : relation.getMembers()) {
                 String role = member.getRole();
-                OSMWay way = _areaWaysById.get(member.getRef());
+                OSMWay way = areaWaysById.get(member.getRef());
                 if (way == null) {
                     // relation includes way which does not exist in the data. Skip.
                     continue RELATION;
                 }
                 for (Long nodeId : way.getNodeRefs()) {
-                    if (!_nodes.containsKey(nodeId)) {
+                    if (!nodesById.containsKey(nodeId)) {
                         // this area is missing some nodes, perhaps because it is on
                         // the edge of the region, so we will simply not route on it.
                         continue RELATION;
                     }
-                    MapUtils.addToMapSet(_areasForNode, nodeId, way);
+                    MapUtils.addToMapSet(areasForNode, nodeId, way);
                 }
                 if (role.equals("inner")) {
                     innerWays.add(way);
@@ -384,20 +402,20 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     LOG.warn("Unexpected role " + role + " in multipolygon");
                 }
             }
-            _processedAreas.add(relation);
+            processedAreas.add(relation);
             try {
-                newArea(new Area(relation, outerWays, innerWays, _nodes));
+                newArea(new Area(relation, outerWays, innerWays, nodesById));
             } catch (Area.AreaConstructionException e) {
                 continue;
             }
 
             for (OSMRelationMember member : relation.getMembers()) {
                 // multipolygons for attribute mapping
-                if (!("way".equals(member.getType()) && _ways.containsKey(member.getRef()))) {
+                if (!("way".equals(member.getType()) && waysById.containsKey(member.getRef()))) {
                     continue;
                 }
 
-                OSMWithTags way = _ways.get(member.getRef());
+                OSMWithTags way = waysById.get(member.getRef());
                 if (way == null) {
                     continue;
                 }
@@ -428,10 +446,10 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
         if (OSMFilter.isOsmEntityRoutable(area.parent)
                 && permissions != StreetTraversalPermission.NONE) {
-            _walkableAreas.add(area);
+            walkableAreas.add(area);
         }
         if (area.parent.isParkAndRide()) {
-            _parkAndRideAreas.add(area);
+            parkAndRideAreas.add(area);
         }
     }
 
@@ -441,7 +459,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     private void processRelations() {
         LOG.debug("Processing relations...");
 
-        for (OSMRelation relation : _relations.values()) {
+        for (OSMRelation relation : relationsById.values()) {
             if (relation.isTag("type", "restriction")) {
                 processRestriction(relation);
             } else if (relation.isTag("type", "level_map")) {
@@ -539,8 +557,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"),
                 Source.LEVEL_MAP, true);
         for (OSMRelationMember member : relation.getMembers()) {
-            if ("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
-                OSMWay way = _ways.get(member.getRef());
+            if ("way".equals(member.getType()) && waysById.containsKey(member.getRef())) {
+                OSMWay way = waysById.get(member.getRef());
                 if (way != null) {
                     String role = member.getRole();
                     // if the level map relation has a role:xyz tag, this way is something
@@ -564,11 +582,11 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      */
     private void processRoad(OSMRelation relation) {
         for (OSMRelationMember member : relation.getMembers()) {
-            if (!("way".equals(member.getType()) && _ways.containsKey(member.getRef()))) {
+            if (!("way".equals(member.getType()) && waysById.containsKey(member.getRef()))) {
                 continue;
             }
 
-            OSMWithTags way = _ways.get(member.getRef());
+            OSMWithTags way = waysById.get(member.getRef());
             if (way == null) {
                 continue;
             }
@@ -610,19 +628,19 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         Set<OSMNode> platformsNodes = new HashSet<>();
         for (OSMRelationMember member : relation.getMembers()) {
             if ("way".equals(member.getType()) && "platform".equals(member.getRole())
-                    && _areaWayIds.contains(member.getRef())) {
+                    && areaWayIds.contains(member.getRef())) {
                 if (platformArea == null)
-                    platformArea = _areaWaysById.get(member.getRef());
+                    platformArea = areaWaysById.get(member.getRef());
                 else
                     LOG.warn("Too many areas in relation " + relation.getId());
             } else if ("relation".equals(member.getType()) && "platform".equals(member.getRole())
-                    && _relations.containsKey(member.getRef())) {
+                    && relationsById.containsKey(member.getRef())) {
                 if (platformArea == null)
-                    platformArea = _relations.get(member.getRef());
+                    platformArea = relationsById.get(member.getRef());
                 else
                     LOG.warn("Too many areas in relation " + relation.getId());
-            } else if ("node".equals(member.getType()) && _nodes.containsKey(member.getRef())) {
-                platformsNodes.add(_nodes.get(member.getRef()));
+            } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
+                platformsNodes.add(nodesById.get(member.getRef()));
             }
         }
         if (platformArea != null && !platformsNodes.isEmpty())
