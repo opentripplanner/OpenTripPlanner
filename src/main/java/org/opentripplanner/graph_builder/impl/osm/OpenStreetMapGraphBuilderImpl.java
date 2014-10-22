@@ -272,68 +272,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             } else {
                 buildWalkableAreas();
             }
+
             if (staticParkAndRide) {
                 buildParkAndRideAreas();
             }
 
             buildElevatorEdges(graph);
 
-            /* unify turn restrictions */
-            // Note that usually when the from or to way is not found, it's because OTP has already filtered that way.
-            // So many of these are not really problems worth issuing warnings on.
-            for (Long fromWay : osmdb.getTurnRestrictionWayIds()) {
-                for (TurnRestrictionTag restrictionTag : osmdb.getFromWayTurnRestrictions(fromWay)) {
-                    if (restrictionTag.possibleFrom.isEmpty()) {
-                        LOG.warn("No from edge found for " + restrictionTag);
-                        continue;
-                    }
-                    if (restrictionTag.possibleTo.isEmpty()) {
-                        LOG.warn("No to edge found for " + restrictionTag);
-                        continue;
-                    }
-                    for (StreetEdge from : restrictionTag.possibleFrom) {
-                        if (from == null) {
-                            LOG.warn("from-edge is null in turn " + restrictionTag);
-                            continue;
-                        }
-                        for (StreetEdge to : restrictionTag.possibleTo) {
-                            if (from == null || to == null) {
-                                continue;
-                            }
-                            int angleDiff = from.getOutAngle() - to.getInAngle();
-                            if (angleDiff < 0) {
-                                angleDiff += 360;
-                            }
-                            switch (restrictionTag.direction) {
-                                case LEFT:
-                                    if (angleDiff >= 160) {
-                                        continue; // not a left turn
-                                    }
-                                    break;
-                                case RIGHT:
-                                    if (angleDiff <= 200)
-                                        continue; // not a right turn
-                                    break;
-                                case U:
-                                    if ((angleDiff <= 150 || angleDiff > 210))
-                                        continue; // not a U turn
-                                    break;
-                                case STRAIGHT:
-                                    if (angleDiff >= 30 && angleDiff < 330)
-                                        continue; // not straight
-                                    break;
-                            }
-                            TurnRestriction restriction = new TurnRestriction();
-                            restriction.from = from;
-                            restriction.to = to;
-                            restriction.type = restrictionTag.type;
-                            restriction.modes = restrictionTag.modes;
-                            restriction.time = restrictionTag.time;
-                            from.addTurnRestriction(restriction);
-                        }
-                    }
-                }
-            }
+            unifyTurnRestrictions();
 
             if (customNamer != null) {
                 customNamer.postprocess(graph);
@@ -1290,6 +1236,65 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     backEdge.wheelchairAccessible = wheelchairAccessible;
                 }
             } // END elevator edge loop
+        }
+
+        private void unifyTurnRestrictions() {
+            // Note that usually when the from or to way is not found, it's because OTP has already
+            // filtered that way.
+            // So many of these are not really problems worth issuing warnings on.
+            for (Long fromWay : osmdb.getTurnRestrictionWayIds()) {
+                for (TurnRestrictionTag restrictionTag : osmdb.getFromWayTurnRestrictions(fromWay)) {
+                    if (restrictionTag.possibleFrom.isEmpty()) {
+                        LOG.warn("No from edge found for " + restrictionTag);
+                        continue;
+                    }
+                    if (restrictionTag.possibleTo.isEmpty()) {
+                        LOG.warn("No to edge found for " + restrictionTag);
+                        continue;
+                    }
+                    for (StreetEdge from : restrictionTag.possibleFrom) {
+                        if (from == null) {
+                            LOG.warn("from-edge is null in turn " + restrictionTag);
+                            continue;
+                        }
+                        for (StreetEdge to : restrictionTag.possibleTo) {
+                            if (from == null || to == null) {
+                                continue;
+                            }
+                            int angleDiff = from.getOutAngle() - to.getInAngle();
+                            if (angleDiff < 0) {
+                                angleDiff += 360;
+                            }
+                            switch (restrictionTag.direction) {
+                            case LEFT:
+                                if (angleDiff >= 160) {
+                                    continue; // not a left turn
+                                }
+                                break;
+                            case RIGHT:
+                                if (angleDiff <= 200)
+                                    continue; // not a right turn
+                                break;
+                            case U:
+                                if ((angleDiff <= 150 || angleDiff > 210))
+                                    continue; // not a U turn
+                                break;
+                            case STRAIGHT:
+                                if (angleDiff >= 30 && angleDiff < 330)
+                                    continue; // not straight
+                                break;
+                            }
+                            TurnRestriction restriction = new TurnRestriction();
+                            restriction.from = from;
+                            restriction.to = to;
+                            restriction.type = restrictionTag.type;
+                            restriction.modes = restrictionTag.modes;
+                            restriction.time = restrictionTag.time;
+                            from.addTurnRestriction(restriction);
+                        }
+                    }
+                }
+            }
         }
 
         private void applyEdgesToTurnRestrictions(OSMWay way, long startNode, long endNode,
