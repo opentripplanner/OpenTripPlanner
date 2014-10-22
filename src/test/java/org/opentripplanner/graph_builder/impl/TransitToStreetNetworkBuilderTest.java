@@ -190,7 +190,7 @@ public class TransitToStreetNetworkBuilderTest {
         assertNotNull(gg);
         
         //Reads saved correct transit stop -> Street edge connections
-        FileInputStream fis = new FileInputStream(wanted_con_filename);
+        FileInputStream fis = new FileInputStream(getClass().getResource(wanted_con_filename).getFile());
         ObjectInputStream ois = new ObjectInputStream(fis);
         List<TransitStopConnToWantedEdge> outList = (List<TransitStopConnToWantedEdge>) ois.readObject();
         Map<String, TransitStopConnToWantedEdge> stop_id_toEdge = new HashMap<>(outList.size());
@@ -277,7 +277,7 @@ public class TransitToStreetNetworkBuilderTest {
     
     @Test
     public void testMariborBus() throws Exception {
-        testBus("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "/home/mabu/programiranje/forotp/OpenTripPlanner/wanted_transit.ser");
+        testBus("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor_transit.ser");
     }
     
     //Creates wanted connections for Maribor
