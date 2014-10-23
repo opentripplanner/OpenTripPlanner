@@ -9,6 +9,10 @@ import models.fieldtrip.GroupItinerary;
 import models.fieldtrip.GTFSTrip;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import static controllers.Application.checkLogin;
 import static controllers.Calltaker.checkAccess;
 import play.*;
@@ -23,6 +27,9 @@ import play.data.binding.As;
 
 import net.tanesha.recaptcha.*;
 
+import javax.ws.rs.core.MediaType;
+import com.sun.jersey.api.client.*;
+import org.apache.commons.codec.digest.DigestUtils;
 
 public class FieldTrip extends Application {
     
@@ -169,6 +176,79 @@ public class FieldTrip extends Application {
         renderJSON(gson.toJson(gtfsTrips));
     }
 
+    public static void getGTFSTripHash(String agencyId, String tripId, Long tripTime) {
+        String url = "http://maps8.trimet.org/call_otp/ws/transit/variantForTrip";
+        
+        Client client = Client.create();
+ 
+        // Get response as String
+        WebResource resource = client.resource("http://maps8.trimet.org/call_otp/ws/transit/variantForTrip");
+        String json = resource//path("variantForTrip?tripAgency=TriMet&tripId=4741791")
+            .queryParam("tripAgency", agencyId)
+            .queryParam("tripId", tripId)
+            .accept(MediaType.APPLICATION_JSON) //APPLICATION_XML)
+                .get(String.class);
+        //System.out.println(json);
+
+        
+        // parse the response
+        JsonElement jelement = new JsonParser().parse(json);
+        JsonObject  variant = jelement.getAsJsonObject();
+        JsonArray stops = variant.getAsJsonArray("stops");
+        
+        JsonObject stopId = stops.get(0).getAsJsonObject().getAsJsonObject("id");
+        String firstStopAgency = stopId.get("agencyId").getAsString();
+        String firstStopId = stopId.get("id").getAsString();
+
+        // make the stopTimesForStop query
+        resource = client.resource("http://maps8.trimet.org/call_otp/ws/transit/stopTimesForStop");
+        json = resource
+            .queryParam("agency", firstStopAgency)
+            .queryParam("id", firstStopId)
+            .queryParam("startTime", Long.toString(tripTime - 21600000))
+            .queryParam("endTime", tripTime.toString())
+            .accept(MediaType.APPLICATION_JSON)
+                .get(String.class);
+    
+        String time = null;
+        JsonElement stopTimesElement = new JsonParser().parse(json);
+        JsonObject stopTimes = stopTimesElement.getAsJsonObject();
+        JsonArray stopTimesArr = stopTimes.getAsJsonArray("stopTimes");
+        for(int i = 0; i < stopTimesArr.size(); i++) {
+            JsonObject stopTime = stopTimesArr.get(i).getAsJsonObject();
+            JsonObject stopTripId = stopTime.getAsJsonObject("trip").getAsJsonObject("id");
+            if(stopTripId.get("agencyId").getAsString().equals(agencyId) &&
+                    stopTripId.get("id").getAsString().equals(tripId)) {
+                time = stopTime.get("time").getAsString();
+                break;
+            }
+        }
+        
+        String tripStr = time + "_";
+        
+        for(int i = 0; i < stops.size(); i++) {
+            stopId = stops.get(i).getAsJsonObject().getAsJsonObject("id");
+            //String id = stopId.get("agencyId").getAsString() + ":" + stopId.get("id").getAsString();
+            tripStr += stopId.get("agencyId").getAsString() + ":" + 
+                    stopId.get("id").getAsString() + (i < stops.size() -1 ? "," : "");
+        }
+        
+        
+        String hash = DigestUtils.shaHex(tripStr);
+        System.out.println("hash="+hash);
+        Gson gson = new GsonBuilder()
+          .create();
+        renderJSON(gson.toJson(new TripHashResponse(hash)));
+    }
+    
+
+    public static class TripHashResponse {
+        String hash;
+
+        public TripHashResponse(String hash) {
+            this.hash = hash;
+        }
+    }    
     
     public static void newTrip(long requestId, ScheduledFieldTrip trip, GroupItinerary[] itins, GTFSTrip[][] gtfsTrips) {
         TrinetUser user = checkLogin();        
@@ -329,9 +409,9 @@ public class FieldTrip extends Application {
         
         Calendar now = Calendar.getInstance();
         
-        if(cal.after(now)) return true;
+        //if(cal.after(now)) return true;
         
-        return false;
+        return true;	
     }
 
     public static void getRequest(long requestId) {
@@ -551,5 +631,5 @@ public class FieldTrip extends Application {
             render(req);
         }
     }
-    
+
 }
