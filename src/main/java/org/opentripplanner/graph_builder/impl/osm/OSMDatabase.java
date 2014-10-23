@@ -26,6 +26,8 @@ import java.util.Set;
 
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
 import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
@@ -50,6 +52,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 public class OSMDatabase implements OpenStreetMapContentHandler {
 
@@ -108,6 +115,12 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     /* List of graph annotations registered during building, to add to the graph. */
     private List<GraphBuilderAnnotation> annotations = new ArrayList<>();
+
+    /*
+     * ID of the next virtual node we create during building phase. Negative to prevent conflicts
+     * with existing ones.
+     */
+    private long virtualNodeId = -100000;
 
     /**
      * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done
@@ -317,6 +330,162 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         // handle turn restrictions, road names, and level maps in relations
         processRelations();
+
+        // intersect non connected areas with ways
+        processUnconnectedAreas();
+    }
+
+    /**
+     * Connect areas with ways when unconnected (areas outer rings crossing with ways at the same
+     * level, but with no common nodes). Currently process P+R areas only, but could easily be
+     * extended to others areas as well.
+     */
+    private void processUnconnectedAreas() {
+        LOG.info("Intersecting unconnected areas...");
+
+        // Simple holder for the spatial index
+        class RingSegment {
+            Area area;
+
+            Ring ring;
+
+            OSMNode nA;
+
+            OSMNode nB;
+        }
+
+        /*
+         * Create a spatial index for each segment of area outer rings. Note: The spatial index is
+         * temporary and store only areas, so it should not take that much memory.
+         */
+        HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
+        for (Area area : parkAndRideAreas) {
+            for (Ring ring : area.outermostRings) {
+                for (int j = 0; j < ring.nodes.size(); j++) {
+                    RingSegment ringSegment = new RingSegment();
+                    ringSegment.area = area;
+                    ringSegment.ring = ring;
+                    ringSegment.nA = ring.nodes.get(j);
+                    ringSegment.nB = ring.nodes.get((j + 1) % ring.nodes.size());
+                    Envelope env = new Envelope(ringSegment.nA.lon, ringSegment.nB.lon,
+                            ringSegment.nA.lat, ringSegment.nB.lat);
+                    spndx.insert(env, ringSegment);
+                }
+            }
+        }
+
+        // For each way, intersect with areas
+        int nCreatedNodes = 0;
+        for (OSMWay way : waysById.values()) {
+            OSMLevel wayLevel = getLevelForWay(way);
+
+            // For each segment of the way
+            for (int i = 0; i < way.getNodeRefs().size() - 1; i++) {
+
+                OSMNode nA = nodesById.get(way.getNodeRefs().get(i));
+                OSMNode nB = nodesById.get(way.getNodeRefs().get(i + 1));
+                if (nA == null || nB == null) {
+                    continue;
+                }
+
+                Envelope env = new Envelope(nA.lon, nB.lon, nA.lat, nB.lat);
+                List<RingSegment> ringSegments = spndx.query(env);
+                if (ringSegments.size() == 0)
+                    continue;
+                LineString seg = GeometryUtils.makeLineString(nA.lon, nA.lat, nB.lon, nB.lat);
+
+                for (RingSegment ringSegment : ringSegments) {
+
+                    // Skip if both segments share a common node
+                    if (ringSegment.nA.getId() == nA.getId()
+                            || ringSegment.nA.getId() == nB.getId()
+                            || ringSegment.nB.getId() == nA.getId()
+                            || ringSegment.nB.getId() == nB.getId())
+                        continue;
+
+                    // Check for real intersection
+                    LineString seg2 = GeometryUtils.makeLineString(ringSegment.nA.lon,
+                            ringSegment.nA.lat, ringSegment.nB.lon, ringSegment.nB.lat);
+                    Geometry intersection = seg2.intersection(seg);
+                    Point p = null;
+                    if (intersection.isEmpty()) {
+                        continue;
+                    } else if (intersection instanceof Point) {
+                        p = (Point) intersection;
+                    } else {
+                        /*
+                         * This should never happen (intersection between two lines should be a
+                         * point or a multi-point).
+                         */
+                        LOG.error("Alien intersection type between {} ({}--{}) and {} ({}--{}): ",
+                                way, nA, nB, ringSegment.area.parent, ringSegment.nA,
+                                ringSegment.nB, intersection);
+                        continue;
+                    }
+
+                    // Skip if area and way are from "incompatible" levels
+                    OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
+                    if (!wayLevel.equals(areaLevel))
+                        continue;
+
+                    // Create a virtual node and insert it in both the way and the ring
+                    OSMNode virtualNode = createVirtualNode(p.getCoordinate());
+                    nCreatedNodes++;
+                    LOG.debug(
+                            "Adding virtual {}, intersection of {} ({}--{}) and area {} ({}--{}) at {}.",
+                            virtualNode, way, nA, nB, ringSegment.area.parent, ringSegment.nA,
+                            ringSegment.nB, p);
+                    way.addNodeRef(virtualNode.getId(), i + 1);
+                    /*
+                     * The line below is O(n^2) but we do not insert often and ring size should be
+                     * rather small.
+                     */
+                    int j = ringSegment.ring.nodes.indexOf(ringSegment.nA);
+                    ringSegment.ring.nodes.add(j, virtualNode);
+
+                    /*
+                     * Update spatial index as we just split a ring segment. Note: we do not update
+                     * the first segment envelope, but as the new envelope is smaller than the
+                     * previous one this is harmless, apart from increasing a bit false positives
+                     * count.
+                     */
+                    RingSegment ringSegment2 = new RingSegment();
+                    ringSegment2.area = ringSegment.area;
+                    ringSegment2.ring = ringSegment.ring;
+                    ringSegment2.nA = virtualNode;
+                    ringSegment2.nB = ringSegment.nB;
+                    Envelope env2 = new Envelope(ringSegment2.nA.lon, ringSegment2.nB.lon,
+                            ringSegment2.nA.lat, ringSegment2.nB.lat);
+                    spndx.insert(env2, ringSegment2);
+                    ringSegment.nB = virtualNode;
+
+                    /*
+                     * If we split, re-start the way segments loop as the newly created segments
+                     * could be intersecting again (in case one segment cut many others).
+                     */
+                    i--;
+                    break;
+                }
+            }
+        }
+        LOG.info("Created {} virtual intersection nodes.", nCreatedNodes);
+    }
+
+    /**
+     * Create a virtual OSM node, using a negative unique ID.
+     * 
+     * @param c The location of the node to create.
+     * @return The created node.
+     */
+    private OSMNode createVirtualNode(Coordinate c) {
+        OSMNode node = new OSMNode();
+        node.lon = c.x;
+        node.lat = c.y;
+        node.setId(virtualNodeId);
+        virtualNodeId--;
+        waysNodeIds.add(node.getId());
+        nodesById.put(node.getId(), node);
+        return node;
     }
 
     private void getLevelsForWay(OSMWithTags way) {
