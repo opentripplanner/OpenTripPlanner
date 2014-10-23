@@ -337,7 +337,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             }
             if (level == null || (!level.reliable)) {
                 LOG.warn(addBuilderAnnotation(new LevelAmbiguous(levelName, way.getId())));
-                // TODO store a set of annotations?
                 level = OSMLevel.DEFAULT;
             }
             wayLevels.put(way, level);
