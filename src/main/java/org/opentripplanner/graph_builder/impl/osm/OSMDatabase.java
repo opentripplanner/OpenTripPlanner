@@ -317,12 +317,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         // handle turn restrictions, road names, and level maps in relations
         processRelations();
-
-        // Remove all simple islands
-        // TODO Is this necessary?
-        HashSet<Long> _keep = new HashSet<Long>(waysNodeIds);
-        _keep.addAll(areaNodeIds);
-        nodesById.keySet().retainAll(_keep);
     }
 
     private void getLevelsForWay(OSMWithTags way) {
