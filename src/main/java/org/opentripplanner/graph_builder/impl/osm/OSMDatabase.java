@@ -302,25 +302,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     @Override
     public void doneThirdPhaseNodes() {
         processMultipolygonRelations();
-        AREA: for (OSMWay way : singleWayAreas) {
-            if (processedAreas.contains(way)) {
-                continue;
-            }
-            for (Long nodeRef : way.getNodeRefs()) {
-                if (!nodesById.containsKey(nodeRef)) {
-                    continue AREA;
-                }
-            }
-            try {
-                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(),
-                        nodesById));
-            } catch (Area.AreaConstructionException e) {
-                // this area cannot be constructed, but we already have all the
-                // necessary nodes to construct it. So, something must be wrong with
-                // the area; we'll mark it as processed so that we don't retry.
-            }
-            processedAreas.add(way);
-        }
+        processSingleWayAreas();
     }
 
     /**
@@ -520,6 +502,31 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             if (nodes.size() > 1) {
                 nodeSet.addAll(nodes);
             }
+        }
+    }
+
+    /**
+     * Create areas from single ways.
+     */
+    private void processSingleWayAreas() {
+        AREA: for (OSMWay way : singleWayAreas) {
+            if (processedAreas.contains(way)) {
+                continue;
+            }
+            for (Long nodeRef : way.getNodeRefs()) {
+                if (!nodesById.containsKey(nodeRef)) {
+                    continue AREA;
+                }
+            }
+            try {
+                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(),
+                        nodesById));
+            } catch (Area.AreaConstructionException e) {
+                // this area cannot be constructed, but we already have all the
+                // necessary nodes to construct it. So, something must be wrong with
+                // the area; we'll mark it as processed so that we don't retry.
+            }
+            processedAreas.add(way);
         }
     }
 
