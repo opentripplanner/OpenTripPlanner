@@ -55,11 +55,11 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
-    /* Map of all nodes keyed by their OSM ID */
+    /* Map of all nodes used in ways/areas keyed by their OSM ID */
     private Map<Long, OSMNode> nodesById = new HashMap<Long, OSMNode>();
 
-    /* All bike-rental nodes */
-    private HashSet<OSMNode> bikeRentalNodes = new HashSet<OSMNode>();
+    /* Map of all bike-rental nodes, keyed by their OSM ID */
+    private Map<Long, OSMNode> bikeRentalNodes = new HashMap<Long, OSMNode>();
 
     /* Map of all non-area ways keyed by their OSM ID */
     private Map<Long, OSMWay> waysById = new HashMap<Long, OSMWay>();
@@ -124,7 +124,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     }
 
     public Collection<OSMNode> getBikeRentalNodes() {
-        return Collections.unmodifiableCollection(bikeRentalNodes);
+        return Collections.unmodifiableCollection(bikeRentalNodes.values());
     }
 
     public Collection<Area> getWalkableAreas() {
@@ -173,8 +173,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     @Override
     public void addNode(OSMNode node) {
-        if (node.isTag("amenity", "bicycle_rental")) {
-            bikeRentalNodes.add(node);
+        if (node.isBikeRental()) {
+            bikeRentalNodes.put(node.getId(), node);
             return;
         }
         if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
@@ -260,7 +260,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         if (relationsById.size() % 100 == 0)
             LOG.debug("relations=" + relationsById.size());
-
     }
 
     @Override
