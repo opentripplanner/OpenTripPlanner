@@ -247,7 +247,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         if (relationsById.containsKey(relation.getId()))
             return;
 
-        if (relation.isTag("type", "multipolygon") && OSMFilter.isOsmEntityRoutable(relation)) {
+        if (relation.isTag("type", "multipolygon")
+                && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide())) {
             // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
             // without reference to the ways that compose them. Accordingly, we will merely
             // mark the ways for preservation here, and deal with the details once we have
