@@ -244,6 +244,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 processBikeRentalNodes();
             }
 
+            for (Area area : Iterables
+                    .concat(osmdb.getWalkableAreas(), osmdb.getParkAndRideAreas()))
+                setWayName(area.parent);
+
             // figure out which nodes that are actually intersections
             initIntersectionNodes();
 
