@@ -39,9 +39,8 @@ class Area {
         private static final long serialVersionUID = 1L;
     }
 
-    OSMWithTags parent; // this is the way or relation that has the relevant tags for the
-
-    // area
+    // This is the way or relation that has the relevant tags for the area
+    OSMWithTags parent;
 
     List<Ring> outermostRings = new ArrayList<Ring>();
 
