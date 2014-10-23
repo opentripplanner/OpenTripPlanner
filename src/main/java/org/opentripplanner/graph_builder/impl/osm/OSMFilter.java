@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -183,6 +184,48 @@ public class OSMFilter {
         }
 
         return permissions;
+    }
+
+    /**
+     * Check OSM tags for various one-way and one-way-by-mode tags and return a pair of permissions
+     * for travel along and against the way.
+     */
+    public static P2<StreetTraversalPermission> getPermissions(
+            StreetTraversalPermission permissions, OSMWay way) {
+
+        StreetTraversalPermission permissionsFront = permissions;
+        StreetTraversalPermission permissionsBack = permissions;
+
+        // Check driving direction restrictions.
+        if (way.isOneWayForwardDriving() || way.isRoundabout()) {
+            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_DRIVING);
+        }
+        if (way.isOneWayReverseDriving()) {
+            permissionsFront = permissionsFront
+                    .remove(StreetTraversalPermission.BICYCLE_AND_DRIVING);
+        }
+
+        // Check bike direction restrictions.
+        if (way.isOneWayForwardBicycle()) {
+            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
+        }
+        if (way.isOneWayReverseBicycle()) {
+            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+        }
+
+        // TODO(flamholz): figure out what this is for.
+        String oneWayBicycle = way.getTag("oneway:bicycle");
+        if (OSMWithTags.isFalse(oneWayBicycle) || way.isTagTrue("bicycle:backwards")) {
+            if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
+                permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
+                permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+            }
+        }
+
+        if (way.isOpposableCycleway()) {
+            permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+        }
+        return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
     }
 
     public static int getStreetClasses(OSMWithTags way) {
