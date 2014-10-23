@@ -14,16 +14,23 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -35,7 +42,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * A group of possibly-contiguous areas sharing the same level
  */
 class AreaGroup {
-    
+
     private static Logger LOG = LoggerFactory.getLogger(AreaGroup.class);
 
     /*
@@ -91,6 +98,52 @@ class AreaGroup {
         } else {
             LOG.warn("Unexpected non-polygon when merging areas: " + u);
         }
+    }
+
+    public static List<AreaGroup> groupAreas(Map<Area, OSMLevel> areasLevels) {
+        DisjointSet<Area> groups = new DisjointSet<Area>();
+        Multimap<OSMNode, Area> areasForNode = LinkedListMultimap.create();
+        for (Area area : areasLevels.keySet()) {
+            for (Ring ring : area.outermostRings) {
+                for (Ring inner : ring.holes) {
+                    for (OSMNode node : inner.nodes) {
+                        areasForNode.put(node, area);
+                    }
+                }
+                for (OSMNode node : ring.nodes) {
+                    areasForNode.put(node, area);
+                }
+            }
+        }
+
+        // areas that can be joined must share nodes and levels
+        for (OSMNode osmNode : areasForNode.keySet()) {
+            for (Area area1 : areasForNode.get(osmNode)) {
+                OSMLevel level1 = areasLevels.get(area1);
+                for (Area area2 : areasForNode.get(osmNode)) {
+                    OSMLevel level2 = areasLevels.get(area2);
+                    if ((level1 == null && level2 == null)
+                            || (level1 != null && level1.equals(level2))) {
+                        groups.union(area1, area2);
+                    }
+                }
+            }
+        }
+
+        List<AreaGroup> out = new ArrayList<AreaGroup>();
+        for (Set<Area> areaSet : groups.sets()) {
+            try {
+                out.add(new AreaGroup(areaSet));
+            } catch (AreaGroup.RingConstructionException e) {
+                for (Area area : areaSet) {
+                    LOG.debug("Failed to create merged area for "
+                            + area
+                            + ".  This area might not be at fault; it might be one of the other areas in this list.");
+                    out.add(new AreaGroup(Arrays.asList(area)));
+                }
+            }
+        }
+        return out;
     }
 
     public class RingConstructionException extends RuntimeException {

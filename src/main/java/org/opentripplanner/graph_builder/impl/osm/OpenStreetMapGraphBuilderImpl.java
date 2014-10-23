@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -80,8 +79,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -428,49 +425,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private List<AreaGroup> groupAreas(Collection<Area> areas) {
-            DisjointSet<Area> groups = new DisjointSet<Area>();
-            Multimap<OSMNode, Area> areasForNode = LinkedListMultimap.create();
+            Map<Area, OSMLevel> areasLevels = new HashMap<>(areas.size());
             for (Area area : areas) {
-                for (Ring ring : area.outermostRings) {
-                    for (Ring inner : ring.holes) {
-                        for (OSMNode node : inner.nodes) {
-                            areasForNode.put(node, area);
-                        }
-                    }
-                    for (OSMNode node : ring.nodes) {
-                        areasForNode.put(node, area);
-                    }
-                }
+                areasLevels.put(area, osmdb.getLevelForWay(area.parent));
             }
-
-            // areas that can be joined must share nodes and levels
-            for (OSMNode osmNode : areasForNode.keySet()) {
-                for (Area area1 : areasForNode.get(osmNode)) {
-                    OSMLevel level1 = osmdb.getLevelForWay(area1.parent);
-                    for (Area area2 : areasForNode.get(osmNode)) {
-                        OSMLevel level2 = osmdb.getLevelForWay(area2.parent);
-                        if ((level1 == null && level2 == null)
-                                || (level1 != null && level1.equals(level2))) {
-                            groups.union(area1, area2);
-                        }
-                    }
-                }
-            }
-
-            List<AreaGroup> out = new ArrayList<AreaGroup>();
-            for (Set<Area> areaSet : groups.sets()) {
-                try {
-                    out.add(new AreaGroup(areaSet));
-                } catch (AreaGroup.RingConstructionException e) {
-                    for (Area area : areaSet) {
-                        LOG.debug("Failed to create merged area for "
-                                + area
-                                + ".  This area might not be at fault; it might be one of the other areas in this list.");
-                        out.add(new AreaGroup(Arrays.asList(area)));
-                    }
-                }
-            }
-            return out;
+            return AreaGroup.groupAreas(areasLevels);
         }
 
         private void buildBasicGraph() {
