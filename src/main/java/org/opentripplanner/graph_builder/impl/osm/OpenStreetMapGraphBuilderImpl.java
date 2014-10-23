@@ -196,6 +196,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         handler.buildGraph(extra);
     }
 
+    /*
+     * TODO: What this function is supposed to do? Please comment or remove.
+     */
     private <T> T unique(T value) {
         if (!_uniques.contains(value)) {
             _uniques.add(value);
