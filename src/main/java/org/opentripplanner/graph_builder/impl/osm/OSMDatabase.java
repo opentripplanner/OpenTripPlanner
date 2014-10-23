@@ -214,7 +214,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             areaWaysById.put(wayId, way);
         }
 
-        getLevelsForWay(way);
+        applyLevelsForWay(way);
 
         /* filter out ways that are not relevant for routing */
         if (!(OSMFilter.isWayRoutable(way) || way.isParkAndRide())) {
@@ -258,7 +258,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             for (OSMRelationMember member : relation.getMembers()) {
                 areaWayIds.add(member.getRef());
             }
-            getLevelsForWay(relation);
+            applyLevelsForWay(relation);
         } else if (!(relation.isTag("type", "restriction"))
                 && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
                 && !(relation.isTag("type", "multipolygon") && OSMFilter
@@ -488,7 +488,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         return node;
     }
 
-    private void getLevelsForWay(OSMWithTags way) {
+    private void applyLevelsForWay(OSMWithTags way) {
         /* Determine OSM level for each way, if it was not already set */
         if (!wayLevels.containsKey(way)) {
             // if this way is not a key in the wayLevels map, a level map was not
