@@ -110,7 +110,10 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     /* Set of turn restrictions for each turn "to" way ID */
     private Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
 
-    /* */
+    /*
+     * Map of all transit stop nodes that lie within an area and which are connected to the area by
+     * a relation. Keyed by the area's OSM way.
+     */
     private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
 
     /* List of graph annotations registered during building, to add to the graph. */
