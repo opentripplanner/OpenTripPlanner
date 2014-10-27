@@ -50,6 +50,7 @@ import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.model.json_serialization.SerializerUtils;
+import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -95,7 +96,7 @@ public class TransitToStreetNetworkBuilderTest {
 
         OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+        AnyFileBasedOpenStreetMapProviderImpl provider = new AnyFileBasedOpenStreetMapProviderImpl();
         loader.skipVisibility = true;
         loader.staticParkAndRide = true;
         
