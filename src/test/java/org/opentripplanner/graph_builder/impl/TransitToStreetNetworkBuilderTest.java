@@ -308,6 +308,13 @@ public class TransitToStreetNetworkBuilderTest {
         testBus("washington_station.osm", "portland_gtfs.zip", "portland1.ser", "portland");
     }
     
+    @Test
+    public void testMilano() throws Exception {
+        testBus("milan_italy.osm.pbf", "Export_OpenDataTPL_Current.zip", "milano.ser", "milano");
+    }
+    
+    
+    
     //Creates wanted connections for Maribor
     public void makeTestMariborBus() throws Exception {
         Graph gg = loadGraph("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", true, true);
