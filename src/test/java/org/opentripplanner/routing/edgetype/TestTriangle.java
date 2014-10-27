@@ -57,7 +57,7 @@ public class TestTriangle extends TestCase {
 
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
         double trueLength = costs.lengthMultiplier * length;
-        double slopeWorkLength = testStreet.getWorkCost();
+        double slopeWorkLength = testStreet.getSlopeWorkCostEffectiveLength();
         double slopeSpeedLength = testStreet.getSlopeSpeedEffectiveLength();
 
         RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);

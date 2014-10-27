@@ -48,7 +48,6 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -61,7 +60,6 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
@@ -557,11 +555,7 @@ public class PlanGenerator {
             if (!(edge instanceof StreetEdge)) continue;
 
             StreetEdge edgeWithElevation = (StreetEdge) edge;
-            ElevationProfileSegment profileSegment = edgeWithElevation.getElevationProfileSegment();
-
-            if (profileSegment == null) continue;
-
-            PackedCoordinateSequence coordinates = profileSegment.getElevationProfile();
+            PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
 
             if (coordinates == null) continue;
             // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.

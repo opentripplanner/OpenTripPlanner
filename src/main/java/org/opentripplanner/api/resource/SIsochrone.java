@@ -717,7 +717,7 @@ public class SIsochrone extends RoutingResource {
             // we may have slope effects
             if (edge instanceof StreetEdge) {
                 StreetEdge pe = (StreetEdge) edge;
-                double maxSlope = pe.getElevationProfileSegment().getMaxSlope();
+                double maxSlope = pe.getMaxSlope();
                 // if we are over the slope limit, then we should use the slower speed
                 if (maxSlope > 0.06) { // limit 6m/100m = 3.4 degree
                     userSpeed = originalTravelSpeed;

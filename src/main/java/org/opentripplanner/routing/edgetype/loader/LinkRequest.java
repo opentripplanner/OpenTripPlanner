@@ -39,6 +39,7 @@ import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -292,16 +293,20 @@ public class LinkRequest {
             }
             backward1.setBicycleSafetyFactor(e2.getBicycleSafetyFactor());
             backward2.setBicycleSafetyFactor(e2.getBicycleSafetyFactor());
-            backward1.setElevationProfile(e2.getElevationProfile(0, lengthOut), false);
-            backward2.setElevationProfile(e2.getElevationProfile(lengthIn, totalGeomLength), false);
+            backward1.setElevationProfile(ElevationUtils.getPartialElevationProfile(
+                    e2.getElevationProfile(), 0, lengthOut), false);
+            backward2.setElevationProfile(ElevationUtils.getPartialElevationProfile(
+                    e2.getElevationProfile(), lengthIn, totalGeomLength), false);
             addEdges(backward1, backward2);
         }
 
         forward1.setBicycleSafetyFactor(e1.getBicycleSafetyFactor());
         forward2.setBicycleSafetyFactor(e1.getBicycleSafetyFactor());
 
-        forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn), false);
-        forward2.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength), false);
+        forward1.setElevationProfile(ElevationUtils.getPartialElevationProfile(
+                e1.getElevationProfile(), 0, lengthIn), false);
+        forward2.setElevationProfile(ElevationUtils.getPartialElevationProfile(
+                e1.getElevationProfile(), lengthOut, totalGeomLength), false);
 
         // swap the new split edge into the replacements list, and remove the old ones
         ListIterator<P2<StreetEdge>> it = replacement.listIterator();
