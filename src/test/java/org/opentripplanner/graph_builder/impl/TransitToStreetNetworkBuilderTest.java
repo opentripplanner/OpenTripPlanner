@@ -221,6 +221,7 @@ public class TransitToStreetNetworkBuilderTest {
         
         List<TransitToStreetConnection> transitConnections = new ArrayList<>();
         int allStops = 0;
+        int unknownStops = 0;
         int correctlyLinkedStops = 0;
         //For each transit stop in current graph check if transitStop is correctly connected
         for(Vertex v: gg.getVertices()) {
@@ -232,7 +233,8 @@ public class TransitToStreetNetworkBuilderTest {
                         TransitStop ts = (TransitStop) v;
                         TransitStopConnToWantedEdge wanted_con = stop_id_toEdge.get(ts.getLabel());
                         if (wanted_con == null) {
-                            LOG.warn("Stop {} wasn't found in saved stops", ts.getLabel());
+                            LOG.debug("Stop {} wasn't found in saved stops", ts.getLabel());
+                            unknownStops++;
                         } else {
                            Vertex connected_vertex = e.getToVertex();
                            String wantedEdgeLabel = wanted_con.getStreetEdge().getLabel();
@@ -286,7 +288,8 @@ public class TransitToStreetNetworkBuilderTest {
             }
         }
         
-        LOG.info("Correctly linked {}/{} ({}%) stations for {}", correctlyLinkedStops, allStops, Math.round((double)correctlyLinkedStops/(double)allStops*100), osm_filename);
+        LOG.info("Correctly linked {}/{} ({}%) stations for {}", correctlyLinkedStops, allStops-unknownStops, Math.round((double)correctlyLinkedStops/(double)(allStops-unknownStops)*100), osm_filename);
+        LOG.info("Not checked: {} stations.", unknownStops);
         
         writeGeoJson("correct_" + name +".geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
     }
