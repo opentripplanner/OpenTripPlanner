@@ -47,6 +47,7 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -431,7 +432,7 @@ public class PlanGenerator {
                             leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(state);
                         }
                     }
-                    if (!route.equals(leg.route)) {
+                    if (backEdge instanceof PatternInterlineDwell) {
                         // interline dwell
                         finalizeLeg(leg, state, null, -1, -1, coordinates, itinerary, false);
                         leg = makeLeg(itinerary, state);
