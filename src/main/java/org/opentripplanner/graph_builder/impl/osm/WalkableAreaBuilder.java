@@ -387,6 +387,14 @@ public class WalkableAreaBuilder {
                     length, areaPermissions, false, edgeList);
             street.setCarSpeed(carSpeed);
 
+            if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
+                street.setHasBogusName(true);
+            }
+
+            if (areaEntity.isTagFalse("wheelchair")) {
+                street.setWheelchairAccessible(false);
+            }
+
             street.setStreetClass(cls);
             edges.add(street);
 
@@ -397,6 +405,14 @@ public class WalkableAreaBuilder {
             AreaEdge backStreet = edgeFactory.createAreaEdge(endEndpoint, startEndpoint,
                     (LineString) line.reverse(), name, length, areaPermissions, true, edgeList);
             backStreet.setCarSpeed(carSpeed);
+
+            if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
+                backStreet.setHasBogusName(true);
+            }
+
+            if (areaEntity.isTagFalse("wheelchair")) {
+                street.setWheelchairAccessible(false);
+            }
 
             backStreet.setStreetClass(cls);
             edges.add(backStreet);
