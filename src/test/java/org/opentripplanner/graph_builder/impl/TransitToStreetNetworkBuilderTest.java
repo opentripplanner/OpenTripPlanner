@@ -204,7 +204,7 @@ public class TransitToStreetNetworkBuilderTest {
      * @param wanted_con_filename filename for saved connections (in resource folder of class)
      * @throws Exception 
      */
-    private void testBus(String osm_filename, String gtfs_filename, String wanted_con_filename) throws Exception {
+    private void testBus(String osm_filename, String gtfs_filename, String wanted_con_filename, String name) throws Exception {
         Graph gg = loadGraph(osm_filename, gtfs_filename, true, true);
         assertNotNull(gg);
         
@@ -288,7 +288,7 @@ public class TransitToStreetNetworkBuilderTest {
         
         LOG.info("Correctly linked {}/{} ({}%) stations for {}", correctlyLinkedStops, allStops, Math.round((double)correctlyLinkedStops/(double)allStops*100), osm_filename);
         
-        writeGeoJson("correct_maribor.geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
+        writeGeoJson("correct_" + name +".geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
     }
     
     @Rule
@@ -296,7 +296,7 @@ public class TransitToStreetNetworkBuilderTest {
     
     @Test
     public void testMariborBus() throws Exception {
-        testBus("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor_transit.ser");
+        testBus("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor_transit.ser", "maribor");
     }
     
     //Creates wanted connections for Maribor
