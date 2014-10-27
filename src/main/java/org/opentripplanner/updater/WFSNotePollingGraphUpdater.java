@@ -41,7 +41,7 @@ import java.util.prefs.Preferences;
  *
  * An example implementation can be found in
  * https://github.com/hannesj/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/updater/WinkkiPollingGraphUpdater.java
- * for which geoserver.hel.fi/geoserver/hkr/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=hkr:winkki_works&srsName=EPSG:4326
+ * for which http://geoserver.hel.fi/geoserver/hkr/ows?Service=wfs&Version=1.1.0&Request=GetCapabilities
  * can be used as the WFS URL.
  *
  * @author hannesj
