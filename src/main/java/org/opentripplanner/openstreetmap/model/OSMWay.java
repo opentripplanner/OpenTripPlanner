@@ -31,6 +31,10 @@ public class OSMWay extends OSMWithTags {
         _nodes.add(nodeRef);
     }
 
+    public void addNodeRef(long nodeRef, int index) {
+        _nodes.add(index, nodeRef);
+    }
+
     public List<Long> getNodeRefs() {
         return _nodes;
     }

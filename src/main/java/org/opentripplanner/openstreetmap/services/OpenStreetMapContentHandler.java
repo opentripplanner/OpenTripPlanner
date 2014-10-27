@@ -28,11 +28,6 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 public interface OpenStreetMapContentHandler {
 
   /**
-   * Notifes the handler to expect the second stage of parsing (ie. nodes).
-   */
-  public void secondPhase();
-
-  /**
    * Stores a node.
    */
   public void addNode(OSMNode node);
@@ -48,12 +43,17 @@ public interface OpenStreetMapContentHandler {
   public void addRelation(OSMRelation relation);
 
   /**
-   * Called when the relation-processing phase is complete 
+   * Called after the first phase, when all relations are loaded.
    */
-  public void doneRelations();
+  public void doneFirstPhaseRelations();
 
   /**
-   * Called after the final phase, when all nodes are loaded
+   * Called after the second phase, when all ways are loaded.
    */
-  public void nodesLoaded();
+  public void doneSecondPhaseWays();
+
+  /**
+   * Called after the third and final phase, when all nodes are loaded.
+   */
+  public void doneThirdPhaseNodes();
 }
