@@ -88,7 +88,9 @@ public class ProfileRouter {
             Arrays.fill(mins, TimeSurface.UNREACHABLE);
             Arrays.fill(maxs, TimeSurface.UNREACHABLE);
         }
-        LOG.info("modes: {}", request.modes);
+        LOG.info("access modes: {}", request.accessModes);
+        LOG.info("egress modes: {}", request.egressModes);
+        LOG.info("direct modes: {}", request.directModes);
 
         // Establish search timeouts
         long searchBeginTime = System.currentTimeMillis();
@@ -110,7 +112,7 @@ public class ProfileRouter {
             // Also look for options connecting origin to destination with no transit.
             for (TraverseMode mode : ACCESS_MODES) {
                 LOG.info("Finding non-transit path for mode {}", mode);
-                if (request.modes.contains(mode)) findStreetOption(mode);
+                if (request.directModes.contains(mode)) findStreetOption(mode); // TODO rename function
             }
         }
         LOG.info("Done finding access/egress paths.");
@@ -122,7 +124,7 @@ public class ProfileRouter {
         for (Entry<TripPattern, StopAtDistance> entry : fromStops.entrySet()) {
             TripPattern pattern = entry.getKey();
             StopAtDistance sd = entry.getValue();
-            if ( ! request.modes.contains(pattern.mode)) {
+            if ( ! request.transitModes.contains(pattern.mode)) {
                 continue; // FIXME why are we even storing these patterns?
             }
             /* Loop over stop clusters in case stop cluster appears more than once in the same pattern. */
@@ -212,7 +214,7 @@ public class ProfileRouter {
                 // Invariant: r1.to should be the same as r1's key in rides
                 // TODO benchmark, this is so not efficient
                 for (ProfileTransfer tr : graph.index.transfersFromStopCluster.get(r1.to)) {
-                    if ( ! request.modes.contains(tr.tp2.mode)) continue;
+                    if ( ! request.transitModes.contains(tr.tp2.mode)) continue;
                     if (r1.containsPattern(tr.tp1)) {
                         // Prune loopy or repetitive paths.
                         if (r1.pathContainsRoute(tr.tp2.route)) continue;
@@ -383,7 +385,7 @@ public class ProfileRouter {
     private Multimap<StopCluster, StopAtDistance> findClosestStops(boolean dest) {
         Multimap<StopCluster, StopAtDistance> pathsByStop = ArrayListMultimap.create();
         for (TraverseMode mode: (dest ? EGRESS_MODES : ACCESS_MODES)) {
-            if (request.modes.contains(mode)) {
+            if ((dest ? request.egressModes : request.accessModes).contains(mode)) {
                 LOG.info("{} mode {}", dest ? "egress" : "access", mode);
                 for (StopAtDistance sd : findClosestStops(mode, dest)) {
                     pathsByStop.put(sd.stop, sd);

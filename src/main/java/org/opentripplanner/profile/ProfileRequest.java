@@ -33,7 +33,7 @@ public class ProfileRequest {
     public LocalDate date;
     public Option.SortOrder orderBy;
     public int limit;
-    public TraverseModeSet modes;
+    public TraverseModeSet accessModes, egressModes, directModes, transitModes;
     public boolean analyst = false; // if true, propagate travel times out to street network
 
     /*
