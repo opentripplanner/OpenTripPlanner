@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.services;
 
+import java.io.InputStream;
+
 import org.opentripplanner.routing.graph.Graph;
 
 /**
@@ -20,6 +22,31 @@ import org.opentripplanner.routing.graph.Graph;
  * 
  */
 public interface GraphSource {
+
+    /**
+     * Factory of GraphSource. It's used for the Jersey API to be able to map GraphSource to
+     * external routerID, for operations such as registering new graph, or saving graph data from
+     * binary data upload. If the API need to perform other type of operation one can replace the
+     * default factory in GraphService.
+     * 
+     * @see GraphService
+     */
+    public interface Factory {
+
+        public GraphSource createGraphSource(String routerId);
+
+        /**
+         * Save the graph data, but don't load it in memory. The file location is based on the
+         * router id. If the graph already exists, the graph will be overwritten. The relationship
+         * between router IDs and paths in the filesystem is determined by the graphService
+         * implementation.
+         * 
+         * @param routerId the routerId of the graph
+         * @param is graph data as input stream
+         * @return
+         */
+        public boolean save(String routerId, InputStream is);
+    }
 
     /** @return The graph object */
     public Graph getGraph();

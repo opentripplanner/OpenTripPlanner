@@ -138,7 +138,7 @@ public class GraphServiceImplTest extends TestCase {
 
         // Create a GraphService and a GraphSourceFactory
         GraphServiceImpl graphService = new GraphServiceImpl();
-        FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
+        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory();
         graphSourceFactory.basePath = basePath;
 
         graphSourceFactory.save("A", new ByteArrayInputStream(emptyGraphData));
@@ -211,7 +211,7 @@ public class GraphServiceImplTest extends TestCase {
 
         System.out.println("------------------------------------------");
         // Add a single default graph
-        FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
+        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory();
         graphSourceFactory.basePath = basePath;
         graphSourceFactory.save("", new ByteArrayInputStream(smallGraphData));
 

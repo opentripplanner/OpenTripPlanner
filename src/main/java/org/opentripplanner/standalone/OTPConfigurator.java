@@ -40,9 +40,9 @@ import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderI
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.impl.FileGraphSourceFactory;
 import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.updater.PropertiesPreferences;
@@ -82,7 +82,7 @@ public class OTPConfigurator {
     public void makeGraphService(Graph graph) {
         GraphServiceImpl graphService = new GraphServiceImpl(params.autoReload);
         this.graphService = graphService;
-        FileGraphSourceFactory graphSourceFactory = new FileGraphSourceFactory();
+        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory();
         graphService.graphSourceFactory = graphSourceFactory;
         if (params.graphDirectory != null) {
             graphSourceFactory.basePath = new File(params.graphDirectory);

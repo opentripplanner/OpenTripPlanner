@@ -31,7 +31,6 @@ import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.GraphSource;
-import org.opentripplanner.routing.services.GraphSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,7 @@ public class GraphServiceImpl implements GraphService {
 
     private String defaultRouterId = "";
 
-    public GraphSourceFactory graphSourceFactory;
+    public GraphSource.Factory graphSourceFactory;
 
     private ScheduledExecutorService scanExecutor;
 
@@ -213,7 +212,7 @@ public class GraphServiceImpl implements GraphService {
     }
 
     @Override
-    public GraphSourceFactory getGraphSourceFactory() {
+    public GraphSource.Factory getGraphSourceFactory() {
         return graphSourceFactory;
     }
 
