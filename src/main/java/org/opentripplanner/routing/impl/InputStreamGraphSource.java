@@ -62,7 +62,7 @@ public class InputStreamGraphSource implements GraphSource {
     // TODO Why do we need a factory? There is a single one implementation.
     private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
 
-    private GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
+    private GraphUpdaterConfigurator configurator = new GraphUpdaterConfigurator();
 
     public static InputStreamGraphSource newFileGraphSource(String routerId, File path,
             LoadLevel loadLevel) {
@@ -106,7 +106,7 @@ public class InputStreamGraphSource implements GraphSource {
             if (preEvict) {
                 synchronized (preEvictMutex) {
                     if (graph != null)
-                        decorator.shutdownGraph(graph);
+                        configurator.shutdownGraph(graph);
                     /*
                      * Forcing graph to null here should remove any references to the graph once all
                      * current requests are done. So the next reload is supposed to have more
@@ -120,14 +120,14 @@ public class InputStreamGraphSource implements GraphSource {
                 if (newGraph != null) {
                     // Load OK
                     if (graph != null)
-                        decorator.shutdownGraph(graph);
+                        configurator.shutdownGraph(graph);
                     graph = newGraph; // Assignment in java is atomic
                 } else {
                     // Load failed
                     if (force || graph == null) {
                         LOG.warn("Unable to load data for router '{}'.", routerId);
                         if (graph != null)
-                            decorator.shutdownGraph(graph);
+                            configurator.shutdownGraph(graph);
                         graph = null;
                     } else {
                         // No shutdown, since we keep current one.
@@ -168,7 +168,7 @@ public class InputStreamGraphSource implements GraphSource {
     public void evict() {
         synchronized (this) {
             if (graph != null) {
-                decorator.shutdownGraph(graph);
+                configurator.shutdownGraph(graph);
             }
         }
     }
@@ -199,7 +199,7 @@ public class InputStreamGraphSource implements GraphSource {
         try {
             is = graphInputStream.getConfigInputStream();
             Preferences config = is == null ? null : new PropertiesPreferences(is);
-            decorator.setupGraph(graph, config);
+            configurator.setupGraph(graph, config);
         } catch (IOException e) {
             LOG.error("Can't read config file", e);
         }
