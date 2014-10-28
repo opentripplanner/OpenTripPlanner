@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.opentripplanner.routing.impl.GraphServiceFileImpl;
+import org.opentripplanner.routing.impl.GraphServiceImpl;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
@@ -69,8 +70,8 @@ public class CommandLineParameters {
  
     @Parameter(names = { "--preFlight"},
     description = "pass the graph to the server in-memory after building it, and saving to disk")
-
     boolean preFlight;
+
     @Parameter(names = {"--noTransit"},
     description = "skip all transit input files (GTFS)")
     boolean noTransit;
@@ -126,8 +127,11 @@ public class CommandLineParameters {
             description = "path to graph directory")
     String graphDirectory;
 
-    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs in graph directory. Also activate auto-reload.")
+    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs to register in graph directory.")
     boolean autoScan = false;
+
+    @Parameter(names = { "--autoReload" }, description = "auto-reload registered graphs when source data is modified.")
+    boolean autoReload = false;
 
     @Parameter( names = { "-l", "--longDistance"}, 
             description = "use an algorithm tailored for long-distance routing")
@@ -161,7 +165,12 @@ public class CommandLineParameters {
     public void infer () {
         server |= ( inMemory || preFlight || port != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
-        if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
+        if (routerIds == null) {
+            if (autoScan || inMemory || preFlight)
+                routerIds = Collections.emptyList();
+            else
+                routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
+        }
         if (cacheDirectory == null) cacheDirectory = DEFAULT_CACHE_DIRECTORY;
         if (pointSetDirectory == null) pointSetDirectory = DEFAULT_POINTSET_DIRECTORY;
         if (server && port == null) {
@@ -264,7 +273,7 @@ public class CommandLineParameters {
     public static class RouterId implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
-            Pattern routerIdPattern = GraphServiceFileImpl.routerIdPattern;
+            Pattern routerIdPattern = GraphServiceImpl.routerIdPattern;
             Matcher m = routerIdPattern.matcher(value);
             if ( ! m.matches()) {
                 String msg = String.format("%s: '%s' is not a valid router ID.", name, value);

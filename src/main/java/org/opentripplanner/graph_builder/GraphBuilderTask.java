@@ -146,7 +146,6 @@ public class GraphBuilderTask implements Runnable {
             }
         } else {
             LOG.info("Not saving graph to disk, as requested.");
-            graph.index(new DefaultStreetVertexIndexFactory());
         }
         
     }
