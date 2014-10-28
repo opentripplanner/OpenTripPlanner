@@ -45,6 +45,11 @@ public class InputStreamGraphSource implements GraphSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputStreamGraphSource.class);
 
+    /**
+     * Delay before starting to load a graph after the last modification time. In case of writing,
+     * we expect graph last modification time to be updated at at least that frequency. If not, you
+     * can either increase this value, or use an atomic move when copying the file.
+     * */
     private static final long LOAD_DELAY_SEC = 10;
 
     private Graph graph;
@@ -57,6 +62,9 @@ public class InputStreamGraphSource implements GraphSource {
 
     private Object preEvictMutex = new Boolean(false);
 
+    /**
+     * The current used input stream implementation for getting graph data source.
+     */
     private GraphInputStream graphInputStream;
 
     // TODO Why do we need a factory? There is a single one implementation.
@@ -64,11 +72,24 @@ public class InputStreamGraphSource implements GraphSource {
 
     private GraphUpdaterConfigurator configurator = new GraphUpdaterConfigurator();
 
+    /**
+     * @param routerId
+     * @param path
+     * @param loadLevel
+     * @return A GraphSource loading graph from the file system under a base path.
+     */
     public static InputStreamGraphSource newFileGraphSource(String routerId, File path,
             LoadLevel loadLevel) {
         return new InputStreamGraphSource(routerId, loadLevel, new FileGraphInputStream(path));
     }
 
+    /**
+     * @param routerId
+     * @param path
+     * @param loadLevel
+     * @return A GraphSource loading graph from an embedded classpath resources (a graph bundled
+     *         inside a pre-packaged WAR for example).
+     */
     public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path,
             LoadLevel loadLevel) {
         return new InputStreamGraphSource(routerId, loadLevel, new ClasspathGraphInputStream(path));
@@ -149,6 +170,12 @@ public class InputStreamGraphSource implements GraphSource {
         }
     }
 
+    /**
+     * Check if a graph has been modified since the last time it has been loaded.
+     * 
+     * @param lastModified Time of last modification of current loaded data.
+     * @return True if the input data has been modified and need to be reloaded.
+     */
     private boolean checkAutoReload(long lastModified) {
         // We check only for graph file modification, not config
         long validEndTime = System.currentTimeMillis() - LOAD_DELAY_SEC * 1000;
@@ -173,6 +200,12 @@ public class InputStreamGraphSource implements GraphSource {
         }
     }
 
+    /**
+     * Do the actual operation of graph loading. Load configuration if present, and configure the
+     * graph with dynamic updaters.
+     * 
+     * @return
+     */
     private Graph loadGraph() {
 
         InputStream is;
@@ -206,6 +239,10 @@ public class InputStreamGraphSource implements GraphSource {
         return graph;
     }
 
+    /**
+     * InputStreamGraphSource delegates to some actual implementation the fact of getting the input
+     * stream and checking the last modification timestamp for a given routerId.
+     */
     private interface GraphInputStream {
         public abstract InputStream getGraphInputStream() throws IOException;
 
@@ -271,6 +308,10 @@ public class InputStreamGraphSource implements GraphSource {
                     .getResourceAsStream(configFile.getPath());
         }
 
+        /**
+         * For a packaged classpath resources we assume the data won't change, so returning always
+         * 0L basically disable auto-reload in that case.
+         */
         @Override
         public long getLastModified() {
             return 0L;

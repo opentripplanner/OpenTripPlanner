@@ -33,6 +33,10 @@ public interface GraphSource {
      */
     public interface Factory {
 
+        /**
+         * @param routerId
+         * @return a new GraphSource for the given routerId.
+         */
         public GraphSource createGraphSource(String routerId);
 
         /**
@@ -43,7 +47,7 @@ public interface GraphSource {
          * 
          * @param routerId the routerId of the graph
          * @param is graph data as input stream
-         * @return
+         * @return true if the operation succedded, false otherwise (will catch IOExceptions).
          */
         public boolean save(String routerId, InputStream is);
     }
