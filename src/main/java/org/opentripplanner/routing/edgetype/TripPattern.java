@@ -640,13 +640,19 @@ public class TripPattern implements Serializable {
      * An example application is avoiding double-booking of a particular bus trip for school field trips.
      *
      * All the semantically relevant elements of the given Trip are hashed using the given Guava hasher.
+     * @param trip a trip object within this pattern, or null to hash the pattern itself independent any specific trip.
      * TODO deal with frequency-based trips.
      */
     private void semanticHash(Hasher hasher, Trip trip) {
-        TripTimes tripTimes = scheduledTimetable.getTripTimes(trip);
-        for (int s = 0; s < tripTimes.getNumStops(); s++) {
-            hasher.putInt(tripTimes.getScheduledArrivalTime(s));
-            hasher.putInt(tripTimes.getScheduledDepartureTime(s));
+        TripTimes tripTimes = null;
+        if (trip != null) {
+            tripTimes = scheduledTimetable.getTripTimes(trip);
+        }
+        if (tripTimes != null) {
+            for (int s = 0; s < tripTimes.getNumStops(); s++) {
+                hasher.putInt(tripTimes.getScheduledArrivalTime(s));
+                hasher.putInt(tripTimes.getScheduledDepartureTime(s));
+            }
         }
         stopPattern.semanticHash(hasher);
     }

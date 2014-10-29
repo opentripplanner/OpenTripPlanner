@@ -385,7 +385,7 @@ public class IndexAPI {
    @GET
    @Path("/patterns/{patternId}/stops")
    public Response getStopsForPattern (@PathParam("patternId") String patternIdString) {
-       // Pattern names are graph-unique because we made them up.
+       // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
        TripPattern pattern = index.patternForId.get(patternIdString);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
@@ -394,6 +394,19 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
+
+    @GET
+    @Path("/patterns/{patternId}/semanticHash")
+    public Response getSemanticHashForPattern (@PathParam("patternId") String patternIdString) {
+        // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
+        TripPattern pattern = index.patternForId.get(patternIdString);
+        if (pattern != null) {
+            String semanticHash = pattern.semanticHashString(null);
+            return Response.status(Status.OK).entity(semanticHash).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
 
     /** List basic information about all service IDs. */
     @GET
