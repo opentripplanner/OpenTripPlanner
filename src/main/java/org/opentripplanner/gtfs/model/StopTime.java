@@ -1,27 +1,63 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.gtfs.model;
 
 import org.mapdb.Fun;
 
-/**
- * Ordering of stoptimes will be provided by the keys, which are a tuple of (string, int).
- */
-public class StopTime extends GtfsEntity {
+import java.io.IOException;
+import java.io.Serializable;
 
-    private static final long serialVersionUID = 1L;
-    
-    @Required public String trip_id;
-    @Required public String arrival_time;
-    @Required public String departure_time;
-    @Required public String stop_id;
-    @Required public String stop_sequence;
+public class StopTime extends Entity implements Serializable {
+
+    public String trip_id;
+    public int    arrival_time;
+    public int    departure_time;
+    public String stop_id;
+    public int    stop_sequence;
     public String stop_headsign;
-    public String pickup_type;
-    public String drop_off_type;
-    public String shape_dist_traveled;
+    public int    pickup_type;
+    public int    drop_off_type;
+    public double shape_dist_traveled;
 
     @Override
-    public Object getKey() {
-        return Fun.t2(trip_id, Integer.parseInt(stop_sequence));
+    public Fun.Tuple2 getKey() {
+        return new Fun.Tuple2(trip_id, stop_sequence);
     }
+
+    public static class Factory extends Entity.Factory<StopTime> {
+
+        public Factory() {
+            tableName = "stop_times";
+            requiredColumns = new String[] {"trip_id", "stop_sequence"};
+        }
+
+        @Override
+        public StopTime fromCsv() throws IOException {
+            StopTime st = new StopTime();
+            st.trip_id        = getStringField("trip_id");
+            st.arrival_time   = getTimeField("arrival_time");
+            st.departure_time = getTimeField("departure_time");
+            st.stop_id        = getStringField("stop_id");
+            st.stop_sequence  = getIntField("stop_sequence");
+            st.stop_headsign  = getStringField("stop_headsign");
+            st.pickup_type    = getIntField("pickup_type");
+            st.drop_off_type  = getIntField("drop_off_type");
+            st.shape_dist_traveled = getDoubleField("shape_dist_traveled");
+            return st;
+        }
+
+    }
+
 
 }
