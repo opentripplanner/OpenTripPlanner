@@ -61,6 +61,7 @@ public class QualifiedModeSetSequence {
         for (QualifiedMode qMode : qModes) {
             if (qMode.mode == TraverseMode.BICYCLE) {
                 if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                    req.modes.setMode(TraverseMode.WALK, true); // turn on WALK for bike rental mode
                     req.allowBikeRental = true;
                 }
                 if (req.modes.isTransit()) { // this is ugly, using both kinds of modeset at once
