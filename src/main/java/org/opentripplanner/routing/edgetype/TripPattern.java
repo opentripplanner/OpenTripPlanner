@@ -27,6 +27,11 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
+import com.google.common.primitives.Longs;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -625,5 +630,34 @@ public class TripPattern implements Serializable {
 		}
 		return this.trips.get(0);
 	}
+
+    /**
+     * In most cases we want to use identity equality for Trips.
+     * However, in some cases we want a way to consistently identify trips across versions of a GTFS feed, when the
+     * feed publisher cannot ensure stable trip IDs. Therefore we define some additional hash functions.
+     * Hash collisions are theoretically possible, so these identifiers should only be used to detect when two
+     * trips are the same with a high degree of probability.
+     * An example application is avoiding double-booking of a particular bus trip for school field trips.
+     *
+     * All the semantically relevant elements of the given Trip are hashed using the given Guava hasher.
+     * TODO deal with frequency-based trips.
+     */
+    private void semanticHash(Hasher hasher, Trip trip) {
+        TripTimes tripTimes = scheduledTimetable.getTripTimes(trip);
+        for (int s = 0; s < tripTimes.getNumStops(); s++) {
+            hasher.putInt(tripTimes.getScheduledArrivalTime(s));
+            hasher.putInt(tripTimes.getScheduledDepartureTime(s));
+        }
+        stopPattern.semanticHash(hasher);
+    }
+
+    /** Return the semantic hash of a Trip in this pattern as a string that is safe for use in filenames and URLs. */
+    public String semanticHashString(Trip trip) {
+        Hasher hasher = Hashing.goodFastHash(64).newHasher();
+        this.semanticHash(hasher, trip);
+        HashCode hashCode = hasher.hash();
+        String encodedHash = BaseEncoding.base64Url().omitPadding().encode(hashCode.asBytes());
+        return encodedHash;
+    }
 
 }

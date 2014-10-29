@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 
@@ -116,4 +120,23 @@ public class StopPattern implements Serializable {
         for (Stop stop : stops) if (stopId.equals(stop.getId().toString())) return true;
         return false;
     }
+
+    /**
+     * In most cases we want to use identity equality for StopPatterns. There is a single StopPattern instance for each
+     * semantic StopPattern, and we don't want to calculate complicated hashes or equality values during normal
+     * execution. However, in some cases we want a way to consistently identify trips across versions of a GTFS feed, when the
+     * feed publisher cannot ensure stable trip IDs. Therefore we define some additional hash functions.
+     * A Guava Hasher is passed in, and all the semantically relevant elements of this StopPattern are sent into it.
+     */
+    public void semanticHash(Hasher hasher) {
+        for (int s = 0; s < size; s++) {
+            Stop stop = stops[s];
+            // Truncate the lat and lon to 6 decimal places in case they move slightly between feed versions
+            hasher.putLong((long)(stop.getLat() * 1000000));
+            hasher.putLong((long)(stop.getLon() * 1000000));
+            hasher.putInt(pickups[s]);
+            hasher.putInt(dropoffs[s]);
+        }
+    }
+
 }

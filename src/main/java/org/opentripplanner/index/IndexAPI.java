@@ -28,6 +28,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -43,12 +45,14 @@ import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
@@ -320,7 +324,21 @@ public class IndexAPI {
        }
    }
 
-   @GET
+    @GET
+    @Path("/trips/{tripId}/semanticHash")
+    public Response getSemanticHashForTrip (@PathParam("tripId") String tripIdString) {
+        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+        Trip trip = index.tripForId.get(tripId);
+        if (trip != null) {
+            TripPattern pattern = index.patternForTrip.get(trip);
+            String hashString = pattern.semanticHashString(trip);
+            return Response.status(Status.OK).entity(hashString).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+
+    @GET
    @Path("/trips/{tripId}/stoptimes")
    public Response getStoptimesForTrip (@PathParam("tripId") String tripIdString) {
        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);

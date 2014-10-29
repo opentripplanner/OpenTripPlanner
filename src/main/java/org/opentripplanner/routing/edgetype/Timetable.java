@@ -314,6 +314,13 @@ public class Timetable implements Serializable {
         return tripTimes.get(tripIndex);
     }
 
+    public TripTimes getTripTimes(Trip trip) {
+        for (TripTimes tt : tripTimes) {
+            if (tt.trip == trip) return tt;
+        }
+        return null;
+    }
+
     /**
      * Apply the TripUpdate to the appropriate TripTimes from this Timetable.
      * The existing TripTimes must not be modified directly because they may be shared with
