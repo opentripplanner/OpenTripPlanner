@@ -126,9 +126,9 @@ public class StopPattern implements Serializable {
      * semantic StopPattern, and we don't want to calculate complicated hashes or equality values during normal
      * execution. However, in some cases we want a way to consistently identify trips across versions of a GTFS feed, when the
      * feed publisher cannot ensure stable trip IDs. Therefore we define some additional hash functions.
-     * A Guava Hasher is passed in, and all the semantically relevant elements of this StopPattern are sent into it.
      */
-    public void semanticHash(Hasher hasher) {
+    public HashCode semanticHash(HashFunction hashFunction) {
+        Hasher hasher = hashFunction.newHasher();
         for (int s = 0; s < size; s++) {
             Stop stop = stops[s];
             // Truncate the lat and lon to 6 decimal places in case they move slightly between feed versions
@@ -137,6 +137,7 @@ public class StopPattern implements Serializable {
             hasher.putInt(pickups[s]);
             hasher.putInt(dropoffs[s]);
         }
+        return hasher.hash();
     }
 
 }

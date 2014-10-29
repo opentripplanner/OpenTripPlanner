@@ -18,6 +18,10 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
@@ -403,5 +407,17 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */
     public boolean isTimepoint(int stopIndex) {
         return timepoints.get(stopIndex);
+    }
+
+    /**
+     * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS feed versions.
+     */
+    public HashCode semanticHash(HashFunction hashFunction) {
+        Hasher hasher = hashFunction.newHasher();
+        for (int s = 0; s < scheduledArrivalTimes.length; s++) {
+            hasher.putInt(getScheduledArrivalTime(s));
+            hasher.putInt(getScheduledDepartureTime(s));
+        }
+        return hasher.hash();
     }
 }

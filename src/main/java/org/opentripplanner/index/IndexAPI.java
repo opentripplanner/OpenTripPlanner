@@ -408,6 +408,8 @@ public class IndexAPI {
         }
     }
 
+    // TODO include pattern ID for each trip in responses
+
     /** List basic information about all service IDs. */
     @GET
     @Path("/services")

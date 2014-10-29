@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
@@ -638,33 +639,25 @@ public class TripPattern implements Serializable {
      * Hash collisions are theoretically possible, so these identifiers should only be used to detect when two
      * trips are the same with a high degree of probability.
      * An example application is avoiding double-booking of a particular bus trip for school field trips.
+     * Using Murmur hash function. see http://programmers.stackexchange.com/a/145633 for comparison.
      *
-     * All the semantically relevant elements of the given Trip are hashed using the given Guava hasher.
      * @param trip a trip object within this pattern, or null to hash the pattern itself independent any specific trip.
-     * TODO deal with frequency-based trips.
+     * @return the semantic hash of a Trip in this pattern as a printable String.
+     *
+     * TODO deal with frequency-based trips
      */
-    private void semanticHash(Hasher hasher, Trip trip) {
-        TripTimes tripTimes = null;
-        if (trip != null) {
-            tripTimes = scheduledTimetable.getTripTimes(trip);
-        }
-        if (tripTimes != null) {
-            for (int s = 0; s < tripTimes.getNumStops(); s++) {
-                hasher.putInt(tripTimes.getScheduledArrivalTime(s));
-                hasher.putInt(tripTimes.getScheduledDepartureTime(s));
-            }
-        }
-        stopPattern.semanticHash(hasher);
-    }
-
-    /** Return the semantic hash of a Trip in this pattern as a string that is safe for use in filenames and URLs. */
     public String semanticHashString(Trip trip) {
-        // Using Murmur hash function. see http://programmers.stackexchange.com/a/145633 for comparison.
-        Hasher hasher = Hashing.murmur3_128().newHasher();
-        this.semanticHash(hasher, trip);
-        HashCode hashCode = hasher.hash();
-        String encodedHash = BaseEncoding.base64Url().omitPadding().encode(hashCode.asBytes());
-        return encodedHash;
+        HashFunction murmur = Hashing.murmur3_32();
+        BaseEncoding encoder = BaseEncoding.base64Url().omitPadding();
+        StringBuilder sb = new StringBuilder(50);
+        sb.append(encoder.encode(stopPattern.semanticHash(murmur).asBytes()));
+        if (trip != null) {
+            TripTimes tripTimes = scheduledTimetable.getTripTimes(trip);
+            if (tripTimes == null) return null;
+            sb.append(':');
+            sb.append(encoder.encode(tripTimes.semanticHash(murmur).asBytes()));
+        }
+        return sb.toString();
     }
 
 }
