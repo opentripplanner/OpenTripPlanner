@@ -653,7 +653,8 @@ public class TripPattern implements Serializable {
 
     /** Return the semantic hash of a Trip in this pattern as a string that is safe for use in filenames and URLs. */
     public String semanticHashString(Trip trip) {
-        Hasher hasher = Hashing.goodFastHash(64).newHasher();
+        // Using Murmur hash function. see http://programmers.stackexchange.com/a/145633 for comparison.
+        Hasher hasher = Hashing.murmur3_128().newHasher();
         this.semanticHash(hasher, trip);
         HashCode hashCode = hasher.hash();
         String encodedHash = BaseEncoding.base64Url().omitPadding().encode(hashCode.asBytes());
