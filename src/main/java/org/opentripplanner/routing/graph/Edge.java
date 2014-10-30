@@ -100,28 +100,6 @@ public abstract class Edge implements Serializable {
                 this.getToVertex() == e.getFromVertex());
     }
     
-    public void attachFrom(Vertex fromv) {
-        detachFrom();
-        if (fromv == null)
-            throw new IllegalStateException("attaching to fromv null");
-        this.fromv = fromv;
-        fromv.addOutgoing(this);
-    }
-
-    public void attachTo(Vertex tov) {
-        detachTo();
-        if (tov == null)
-            throw new IllegalStateException("attaching to tov null");
-        this.tov = tov;
-        tov.addIncoming(this);
-    }
-
-    /** Attach this edge to new endpoint vertices, keeping edgelists coherent */
-    public void attach(Vertex fromv, Vertex tov) {
-        attachFrom(fromv);
-        attachTo(tov);
-    }
-
     /**
      * Get a direction on paths where it matters, or null
      * 
@@ -131,7 +109,7 @@ public abstract class Edge implements Serializable {
         return null;
     }
 
-    protected boolean detachFrom() {
+    protected boolean detachFrom(Graph graph) {
         boolean detached = false;
         if (fromv != null) {
             detached = fromv.removeOutgoing(this);
@@ -140,7 +118,7 @@ public abstract class Edge implements Serializable {
         return detached;
     }
 
-    protected boolean detachTo() {
+    protected boolean detachTo(Graph graph) {
         boolean detached = false;
         if (tov != null) {
             detached = tov.removeIncoming(this);
@@ -154,12 +132,12 @@ public abstract class Edge implements Serializable {
      * 
      * @return
      */
-    public int detach() {
+    public int detach(Graph graph) {
         int nDetached = 0;
-        if (detachFrom()) {
+        if (detachFrom(graph)) {
             ++nDetached;
         }
-        if (detachTo()) {
+        if (detachTo(graph)) {
             ++nDetached;
         }
         return nDetached;

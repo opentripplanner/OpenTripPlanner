@@ -246,11 +246,6 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public List<TurnRestriction> getTurnRestrictions() {
-            return Collections.emptyList();
-        }
-
-        @Override
         public float getCarSpeed() {
             return 11.2f;
         }
