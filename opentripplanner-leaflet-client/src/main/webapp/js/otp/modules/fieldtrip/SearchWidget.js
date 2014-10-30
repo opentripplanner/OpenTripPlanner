@@ -144,5 +144,14 @@ otp.modules.fieldtrip.SearchWidget =
             });
 
         }, this);
+    },
+
+    onClose : function(requests) {
+        this.mainDiv.find('.schoolInput').val('');
+        this.mainDiv.find('.teacherInput').val('');
+        this.mainDiv.find('.dateInput1').val('');
+        this.mainDiv.find('.dateInput2').val('');
+        this.mainDiv.find('.resultsArea').html('');
+        this.mainDiv.find('.searchTabs').tabs('select', 0);
     }
 });
