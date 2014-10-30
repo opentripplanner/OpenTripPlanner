@@ -61,4 +61,7 @@ public interface TileRenderer {
     /** Implementation of the tile rendering */
     public abstract void renderTile(TileRenderContext context);
 
+    /** Gets descriptive name of this Tile Render */
+    public abstract String getName();
+
 }

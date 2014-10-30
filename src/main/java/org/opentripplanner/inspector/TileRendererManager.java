@@ -104,4 +104,14 @@ public class TileRendererManager {
         return image;
     }
 
+    /**
+     * Gets all renderers
+     * 
+     * Used to return list of renderers to client.
+     * Could be also used to show legend.
+     * @return 
+     */
+    public Map<String, TileRenderer> getRenderers() {
+        return renderers;
+    }
 }
