@@ -57,6 +57,8 @@ public class Stop extends Entity {
             s.parent_station = getStringField("parent_station", false);
             s.stop_timezone  = getStringField("stop_timezone", false);
             s.wheelchair_boarding = getStringField("wheelchair_boarding", false);
+            checkRangeInclusive(-90, 90, s.stop_lat);
+            checkRangeInclusive(-180, 180, s.stop_lon); // TODO check more ranges
             return s;
         }
 

@@ -42,9 +42,19 @@ public abstract class Entity {
 
         CsvReader reader;
         long row;
+        // TODO "String column" that is set before any calls to avoid passing around the column name
         List<GTFSError> errorList = Lists.newArrayList(); // TODO collapse empty field errors when the column is entirely missing
 
-        public String getStringField(String column, boolean required) throws IOException {
+        /** @return whether the number actual is in the range [min, max] */
+        protected boolean checkRangeInclusive(int min, int max, double actual) {
+            if (actual < min || actual > max) {
+                errorList.add(new RangeError(tableName, row, null, min, max, actual));
+                return false;
+            }
+            return true;
+        }
+
+        protected String getStringField(String column, boolean required) throws IOException {
             // TODO deduplicate strings
             String str = reader.get(column);
             if (required && (str == null || str.isEmpty())) {
@@ -53,7 +63,7 @@ public abstract class Entity {
             return str;
         }
 
-        public int getIntField(String column, boolean required) throws IOException {
+        protected int getIntField(String column, boolean required) throws IOException {
             String str = null;
             int val = INT_MISSING;
             try {
@@ -68,12 +78,12 @@ public abstract class Entity {
                     val = Integer.parseInt(str);
                 }
             } catch (NumberFormatException nfe) {
-                errorList.add(new IntParseError(tableName, row, column));
+                errorList.add(new NumberParseError(tableName, row, column));
             }
             return val;
         }
 
-        public int getTimeField(String column) throws IOException {
+        protected int getTimeField(String column) throws IOException {
             String str = null;
             int val = -1;
             try {
@@ -94,7 +104,7 @@ public abstract class Entity {
         }
 
         // TODO add range checking parameters, with private function that can record out-of-range errors
-        public double getDoubleField(String column, boolean required) throws IOException {
+        protected double getDoubleField(String column, boolean required) throws IOException {
             String str = null;
             double val = 0;
             try {
@@ -106,12 +116,12 @@ public abstract class Entity {
                     val = Double.parseDouble(str);
                 }
             } catch (NumberFormatException nfe) {
-                errorList.add(new DoubleParseError(tableName, row, column));
+                errorList.add(new NumberParseError(tableName, row, column));
             }
             return val;
         }
 
-        private boolean checkRequiredColumns() throws IOException {
+        protected boolean checkRequiredColumns() throws IOException {
             boolean missing = false;
             for (String column : requiredColumns) {
                 if (reader.getIndex(column) == -1) {
@@ -122,7 +132,7 @@ public abstract class Entity {
             return missing;
         }
 
-        public abstract E fromCsv() throws IOException;
+        protected abstract E fromCsv() throws IOException;
 
         // New parameter K inferred from map. Parameter E is the entity type from the containing class.
         public <K> void loadTable(ZipFile zip, List<GTFSError> errorList, Map<K, E> targetMap) throws IOException {
@@ -153,8 +163,8 @@ public abstract class Entity {
         }
 
         private static String human (long n) {
-            if (n > 1000000) return String.format("%.1fM", n/1000000.0);
-            if (n > 1000) return String.format("%.1fk", n/1000.0);
+            if (n >= 1000000) return String.format("%.1fM", n/1000000.0);
+            if (n >= 1000) return String.format("%.1fk", n/1000.0);
             else return String.format("%d", n);
         }
 

@@ -13,6 +13,8 @@
 
 package org.opentripplanner.gtfs.model;
 
+import com.beust.jcommander.internal.Sets;
+
 import java.io.IOException;
 
 public class FareAttribute extends Entity {
@@ -33,7 +35,7 @@ public class FareAttribute extends Entity {
 
         public Factory() {
             tableName = "fare_attributes";
-            requiredColumns = new String[] {"fare_id"};
+            requiredColumns = new String[] {"fare_id", "price", "transfers"}; // TODO this is kind of redundant
         }
 
         @Override
@@ -43,7 +45,7 @@ public class FareAttribute extends Entity {
             fa.price             = getDoubleField("price", true);
             fa.currency_type     = getStringField("currency_type", true);
             fa.payment_method    = getIntField("payment_method", true);
-            fa.transfers         = getIntField("transfers", true);
+            fa.transfers         = getIntField("transfers", false); // TODO missing means "unlimited" in this case (rather than 0), supply default value
             fa.transfer_duration = getIntField("transfer_duration", false);
             return fa;
         }

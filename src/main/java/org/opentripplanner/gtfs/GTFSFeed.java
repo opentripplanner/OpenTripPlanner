@@ -12,6 +12,8 @@ import org.mapdb.Fun.Tuple2;
 import org.opentripplanner.gtfs.error.GTFSError;
 import org.opentripplanner.gtfs.error.GeneralError;
 import org.opentripplanner.gtfs.model.*;
+import org.opentripplanner.gtfs.validator.DefaultValidator;
+import org.opentripplanner.gtfs.validator.GTFSValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +93,11 @@ public class GTFSFeed {
             LOG.info("{}", error);
         }
     }
-    
+
+    public void validate (GTFSValidator validator) {
+        validator.validate(this, false);
+    }
+
     public static GTFSFeed fromFile(String file) {
         GTFSFeed feed = new GTFSFeed();
         ZipFile zip;
@@ -99,6 +105,7 @@ public class GTFSFeed {
             zip = new ZipFile(file);
             feed.loadFromFile(zip);
             zip.close();
+            feed.validate(new DefaultValidator());
             return feed;
         } catch (Exception e) {
             LOG.error("Error loading GTFS: {}", e.getMessage());
@@ -135,5 +142,7 @@ public class GTFSFeed {
         }
         LOG.info("Total patterns: {}", tripsForPattern.keySet().size());
     }
+
+    // TODO augment with unrolled calendar, patterns, etc. before validation
 
 }

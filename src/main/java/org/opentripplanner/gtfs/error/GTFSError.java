@@ -24,17 +24,17 @@ public abstract class GTFSError {
         sb.append(file);
         sb.append(' ');
         if (line >= 0) {
-            sb.append('L');
+            sb.append("line ");
             sb.append(line);
         } else {
             sb.append("(no line)");
         }
         if (field != null) {
-            sb.append(" field '");
+            sb.append(", field '");
             sb.append(field);
             sb.append('\'');
         }
-        sb.append(' ');
+        sb.append(": ");
         sb.append(getMessage());
         return sb.toString();
     }
