@@ -139,6 +139,19 @@ public class TransitToStreetNetworkBuilderTest {
         return gg;
     }
     
+    /**
+     * Finds useful streets to link to
+     * 
+     * It is used for bootstrapping correct transitStop to StreetLink.
+     * It prefers non-drivable streets and service ways.
+     * Idea is to visually check all this connections in vizgui to have a list of
+     * correct connections for testing
+     * @param ts TransitStop vertex
+     * @param stl Link between this vertex and street made with transitToStopLinker (used only to add parameter to {@link TransitToStreetConnection})
+     * @param neighbourType Which neighbour to search
+     * @param transitConnections Found neighbours are added to this list
+     * @return true if neighbour is found false otherwise
+     */
     public boolean findNeighbours(Vertex ts, StreetTransitLink stl, org.opentripplanner.util.StreetType neighbourType, List<TransitToStreetConnection> transitConnections) {
         Envelope envelope = new Envelope(ts.getCoordinate());
         double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
@@ -221,8 +234,11 @@ public class TransitToStreetNetworkBuilderTest {
         fis.close();
         
         List<TransitToStreetConnection> transitConnections = new ArrayList<>();
+        //All found stops
         int allStops = 0;
+        //Stops for which there is no correct connection
         int unknownStops = 0;
+        //Stops which aren't linked to the same street as in correct connection
         int correctlyLinkedStops = 0;
         //For each transit stop in current graph check if transitStop is correctly connected
         for(Vertex v: gg.getVertices()) {

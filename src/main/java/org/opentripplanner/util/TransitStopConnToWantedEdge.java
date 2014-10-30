@@ -22,11 +22,17 @@ import org.opentripplanner.routing.vertextype.TransitStop;
  * @author mabu
  */
 
-
+/**
+ * Class which has data for saving TransitStop -> StreetEdge connection
+ * @author mabu
+ */
 public class TransitStopConnToWantedEdge implements Serializable {
     protected final TransitStop transitStop;
     protected final StreetEdge wantedPath;
+    //Type of street connection used in vizualization
     protected StreetType streetType;
+    //Used in VizGui when checking correctness of connection
+    //Roads that are checked are appeared as green
     protected transient boolean checked = false;
     
     private static final long serialVersionUID = 7526472295622776147L;

@@ -24,8 +24,15 @@ import org.opentripplanner.util.TransitStopConnToWantedEdge;
 public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
     
     private transient StreetTransitLink streetTransitLink;
+    //Is transitStop linked to the same edge as in correctly linked edges
     private Boolean correctlyLinked;
 
+    /**
+     * Converts to {@link TransitStopConnToWantedEdge} which is used in serialization
+     * 
+     * @return new {@link TransitStopConnToWantedEdge} with same data as current
+     * @see #toSuper(java.util.List) 
+     */
     private TransitStopConnToWantedEdge toSuper() {
         return new TransitStopConnToWantedEdge(transitStop, wantedPath, streetType);
     }
@@ -48,6 +55,16 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         this.correctlyLinked = correctlyLinked;
     }
     
+    /**
+     * Generates {@link StreetFeatureCollection} which can be easily serialized to Geojson Feature collection
+     * 
+     * Uses {@link #toStreetFeature(org.opentripplanner.graph_builder.impl.TransitToStreetConnection.CollectionType)} 
+     * @param transitToStreetConnections List of connections
+     * @param collectionType Type of featureCollection
+     * @return
+     * @throws Exception 
+     * @see #toStreetFeature(org.opentripplanner.graph_builder.impl.TransitToStreetConnection.CollectionType) 
+     */
     public static StreetFeatureCollection toFeatureCollection(List<TransitToStreetConnection> transitToStreetConnections, CollectionType collectionType) throws Exception {
         List<StreetFeature> streetFeatures = new ArrayList<>(transitToStreetConnections.size());
         for(TransitToStreetConnection transitToStreetConnection: transitToStreetConnections) {
@@ -56,28 +73,62 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         return new StreetFeatureCollection(streetFeatures);
     }
     
+    /**
+     * Sets color of Geojson Feature based on {@link StreetType}
+     * 
+     * Colors are:
+     * - green for walkable/bikable ways
+     * - orange for service ways
+     * - red for everything else
+     * 
+     * @param sf to which {@link StreetFeature} should color be set
+     * @param propertyName for which property should color be set (stroke,marker-color,etc)
+     */
     private void addColorStreetType(StreetFeature sf, String propertyName) {
         switch (streetType) {
                 case WALK_BIKE:
+                    //green for connections which are connected to walkable/bikable ways
                     sf.addPropertie(propertyName, "#00ff00");
                     break;
                 case NORMAL:
+                    //red for everything else
                     sf.addPropertie(propertyName, "#ff0000");
                     break;
                 case SERVICE:
+                    //orange for connections to service ways
                     sf.addPropertie(propertyName, "#ff7f00");
                     break;
             }
     }
     
+    /**
+     * Sets color of Geojson Feature based on correctlyLinked
+     * 
+     * Colors are: (green - correct, red - incorect)
+     * 
+     * @param sf to which {@link StreetFeature} should color be set
+     * @param propertyName for which property should color be set (stroke,marker-color,etc)
+     */
     private void addColorCoretness(StreetFeature sf, String propertyName) {
         if (correctlyLinked) {
+            //green
             sf.addPropertie(propertyName, "#00ff00");
         } else {
+            //red
             sf.addPropertie(propertyName, "#ff0000");
         }
     }
     
+    /**
+     * Returns list of {@link TransitStopConnToWantedEdge} with same info
+     * as current list sorted according to stop name
+     * 
+     * Used when saving list of connections for checking them in vizGui
+     * 
+     * @param transitToStreetConnections List to be saved
+     * @return
+     * @see #toSuper() 
+     */
     public static List<TransitStopConnToWantedEdge> toSuper(List<TransitToStreetConnection> transitToStreetConnections) {
         List <TransitStopConnToWantedEdge> toWantedEdges = new ArrayList<>(transitToStreetConnections.size());
         //Sort according to stop name
@@ -94,6 +145,19 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         return toWantedEdges;
     }
 
+    /**
+     * Generates {@link StreetFeature} from this to be serialized into GeojsonFeature
+     * 
+     * There are 3 types of Features that can be generated:
+     * - TRANSIT_LINK (outputs line {@link StreetTransitLink} with color {@link #addColorStreetType(org.opentripplanner.graph_builder.impl.StreetFeature, java.lang.String) }
+     * - WANTED_LINK (outputs point TransitStop and line wantedEdge both with color {@link #addColorStreetType(org.opentripplanner.graph_builder.impl.StreetFeature, java.lang.String) } 
+     * - CORRECT_LINK (outputs point TransitStop and line wantedEdge both with color {@link #addColorCoretness(org.opentripplanner.graph_builder.impl.StreetFeature, java.lang.String) }
+     * @param collectionType Type of streetFeature
+     * @return List of StreetFeatures
+     * @throws Exception 
+     * @see #addColorCoretness(org.opentripplanner.graph_builder.impl.StreetFeature, java.lang.String) 
+     * @see #addColorStreetType(org.opentripplanner.graph_builder.impl.StreetFeature, java.lang.String) 
+     */
     private List<StreetFeature> toStreetFeature(CollectionType collectionType) throws Exception {
         List <StreetFeature> curFeatures = new ArrayList<>(3);
         if (collectionType == CollectionType.TRANSIT_LINK) {
