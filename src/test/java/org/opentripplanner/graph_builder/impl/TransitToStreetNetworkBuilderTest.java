@@ -218,7 +218,7 @@ public class TransitToStreetNetworkBuilderTest {
      * @param wanted_con_filename filename for saved connections (in resource folder of class)
      * @throws Exception 
      */
-    private void testBus(String osm_filename, String gtfs_filename, String wanted_con_filename, String name) throws Exception {
+    private void testTransitStreetConnections(String osm_filename, String gtfs_filename, String wanted_con_filename, String name) throws Exception {
         Graph gg = loadGraph(osm_filename, gtfs_filename, true, true);
         assertNotNull(gg);
         
@@ -316,23 +316,25 @@ public class TransitToStreetNetworkBuilderTest {
     
     @Test
     public void testMariborBus() throws Exception {
-        testBus("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor_transit.ser", "maribor");
+        testTransitStreetConnections("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor_transit.ser", "maribor");
     }
     
+    /*
+    // Commented for now, because I need to lower size of OSM and GTFS before adding it to Git
     @Test
     public void testPortland() throws Exception {
-        testBus("washington_station.osm", "portland_gtfs.zip", "portland1.ser", "portland");
+        testTransitStreetConnections("washington_station.osm", "portland_gtfs.zip", "portland1.ser", "portland");
     }
     
     @Test
     public void testMilano() throws Exception {
-        testBus("milan_italy.osm.pbf", "Export_OpenDataTPL_Current.zip", "milano.ser", "milano");
-    }
+        testTransitStreetConnections("milan_italy.osm.pbf", "Export_OpenDataTPL_Current.zip", "milano.ser", "milano");
+    }*/
     
     
     
-    //Creates wanted connections for Maribor
-    public void makeTestMariborBus() throws Exception {
+    //Creates wanted connections
+    public void bootstrapWantedConnections() throws Exception {
         Graph gg = loadGraph("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", true, true);
         //Graph gg = loadGraph("maribor_clean.osm.gz", "small.zip", true, true);
         gg.summarizeBuilderAnnotations();
