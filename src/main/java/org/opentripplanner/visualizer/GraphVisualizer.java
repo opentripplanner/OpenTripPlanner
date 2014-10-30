@@ -999,7 +999,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             public void intervalAdded(ListDataEvent e) {
                 clear_station_button.setEnabled(!stationStreetLinkModel.isEmpty());
                 boolean isComplete = stationStreetLinkModel.hasVertexAndStreet();
-                show_cur_station_button.setEnabled(isComplete);
+                //show_cur_station_button.setEnabled(isComplete);
                 add_stations_button.setEnabled(isComplete);
                 
             }
@@ -1007,7 +1007,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             @Override
             public void intervalRemoved(ListDataEvent e) {
                 clear_station_button.setEnabled(!stationStreetLinkModel.isEmpty());
-                show_cur_station_button.setEnabled(false);
+                //show_cur_station_button.setEnabled(false);
                 add_stations_button.setEnabled(false);
             }
 
@@ -1026,7 +1026,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
         });
         
-        show_cur_station_button.addActionListener(new ActionListener() {
+        //zooming and highlighting doesn't work because of a bug #1559
+        //After zooming you are unable to select Vertexes.
+        /*show_cur_station_button.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1045,7 +1047,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                     show_cur_station_button.setText("hide");
                 }
             }
-        });
+        });*/
         
         check_station_button.addActionListener(new ActionListener() {
 
