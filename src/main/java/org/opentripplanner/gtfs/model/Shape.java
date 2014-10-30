@@ -38,11 +38,11 @@ public class Shape extends Entity {
         @Override
         public Shape fromCsv() throws IOException {
             Shape s = new Shape();
-            s.shape_id = getStringField("shape_id");
-            s.shape_pt_lat = getDoubleField("shape_pt_lat");
-            s.shape_pt_lon = getDoubleField("shape_pt_lon");
-            s.shape_pt_sequence = getIntField("shape_pt_sequence");
-            s.shape_dist_traveled = getDoubleField("shape_dist_traveled");
+            s.shape_id = getStringField("shape_id", true);
+            s.shape_pt_lat = getDoubleField("shape_pt_lat", true);
+            s.shape_pt_lon = getDoubleField("shape_pt_lon", true);
+            s.shape_pt_sequence = getIntField("shape_pt_sequence", true);
+            s.shape_dist_traveled = getDoubleField("shape_dist_traveled", false);
             return s;
         }
 

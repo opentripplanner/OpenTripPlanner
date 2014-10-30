@@ -38,11 +38,11 @@ public class FareRule extends Entity {
         @Override
         public FareRule fromCsv() throws IOException {
             FareRule fr = new FareRule();
-            fr.fare_id = getStringField("fare_id");
-            fr.route_id = getStringField("route_id");
-            fr.origin_id = getStringField("origin_id");
-            fr.destination_id = getStringField("destination_id");
-            fr.contains_id = getStringField("contains_id");
+            fr.fare_id = getStringField("fare_id", true);
+            fr.route_id = getStringField("route_id", false);
+            fr.origin_id = getStringField("origin_id", false);
+            fr.destination_id = getStringField("destination_id", false);
+            fr.contains_id = getStringField("contains_id", false);
             return fr;
         }
 

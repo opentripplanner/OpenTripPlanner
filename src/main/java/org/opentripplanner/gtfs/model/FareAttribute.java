@@ -18,11 +18,11 @@ import java.io.IOException;
 public class FareAttribute extends Entity {
 
     public String fare_id;
-    public String price;
+    public double price;
     public String currency_type;
-    public String payment_method;
-    public String transfers;
-    public String transfer_duration;
+    public int payment_method;
+    public int transfers;
+    public int transfer_duration;
 
     @Override
     public String getKey() {
@@ -39,12 +39,12 @@ public class FareAttribute extends Entity {
         @Override
         public FareAttribute fromCsv() throws IOException {
             FareAttribute fa = new FareAttribute();
-            fa.fare_id        = getStringField("fare_id");
-            fa.price          = getStringField("price");
-            fa.currency_type  = getStringField("currency_type");
-            fa.payment_method = getStringField("payment_method");
-            fa.transfers      = getStringField("transfers");
-            fa.transfer_duration = getStringField("transfer_duration");
+            fa.fare_id           = getStringField("fare_id", true);
+            fa.price             = getDoubleField("price", true);
+            fa.currency_type     = getStringField("currency_type", true);
+            fa.payment_method    = getIntField("payment_method", true);
+            fa.transfers         = getIntField("transfers", true);
+            fa.transfer_duration = getIntField("transfer_duration", false);
             return fa;
         }
 

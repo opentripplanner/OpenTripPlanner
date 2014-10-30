@@ -45,15 +45,15 @@ public class StopTime extends Entity implements Serializable {
         @Override
         public StopTime fromCsv() throws IOException {
             StopTime st = new StopTime();
-            st.trip_id        = getStringField("trip_id");
+            st.trip_id        = getStringField("trip_id", true);
             st.arrival_time   = getTimeField("arrival_time");
             st.departure_time = getTimeField("departure_time");
-            st.stop_id        = getStringField("stop_id");
-            st.stop_sequence  = getIntField("stop_sequence");
-            st.stop_headsign  = getStringField("stop_headsign");
-            st.pickup_type    = getIntField("pickup_type");
-            st.drop_off_type  = getIntField("drop_off_type");
-            st.shape_dist_traveled = getDoubleField("shape_dist_traveled");
+            st.stop_id        = getStringField("stop_id", true);
+            st.stop_sequence  = getIntField("stop_sequence", true);
+            st.stop_headsign  = getStringField("stop_headsign", false);
+            st.pickup_type    = getIntField("pickup_type", false);
+            st.drop_off_type  = getIntField("drop_off_type", false);
+            st.shape_dist_traveled = getDoubleField("shape_dist_traveled", false);
             return st;
         }
 

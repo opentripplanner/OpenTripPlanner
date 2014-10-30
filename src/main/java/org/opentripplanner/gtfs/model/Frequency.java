@@ -18,10 +18,10 @@ import java.io.IOException;
 public class Frequency extends Entity {
 
     public String trip_id;
-    public String start_time;
-    public String end_time;
-    public String headway_secs;
-    public String exact_times;
+    public int start_time;
+    public int end_time;
+    public int headway_secs;
+    public int exact_times;
 
     @Override
     public Object getKey() {
@@ -38,11 +38,11 @@ public class Frequency extends Entity {
         @Override
         public Frequency fromCsv() throws IOException {
             Frequency f = new Frequency();
-            f.trip_id = getStringField("trip_id");
-            f.start_time = getStringField("start_time");
-            f.end_time = getStringField("end_time");
-            f.headway_secs = getStringField("headway_secs");
-            f.exact_times = getStringField("exact_times");
+            f.trip_id = getStringField("trip_id", true);
+            f.start_time = getTimeField("start_time");
+            f.end_time = getTimeField("end_time");
+            f.headway_secs = getIntField("headway_secs", true);
+            f.exact_times = getIntField("exact_times", false);
             return f;
         }
 

@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs.model;
 
 import com.beust.jcommander.internal.Lists;
 import com.csvreader.CsvReader;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.gtfs.error.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +15,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * A class that represents a row in a GTFS table, e.g. a Stop, Trip, or Agency.
- * Created by abyrd on 2014-10-12
+ * An abstract base class that represents a row in a GTFS table, e.g. a Stop, Trip, or Agency.
+ * One concrete subclass is defined for each table in a GTFS feed.
  */
 // TODO K is the key type for this table
 public abstract class Entity {
@@ -26,6 +26,7 @@ public abstract class Entity {
 
     public abstract Object getKey();
 
+    public static final int INT_MISSING = Integer.MIN_VALUE;
 
     /* A class that can produce Entities from CSV, and record errors that occur in the process. */
     // This is almost a GTFSTable... rename?
@@ -37,27 +38,37 @@ public abstract class Entity {
 
         String   tableName; // name of corresponding table without .txt
         String[] requiredColumns;
-        boolean  required = false;
+        boolean required = false;
 
         CsvReader reader;
-        List<Error> errorList = Lists.newArrayList();
+        long row;
+        List<GTFSError> errorList = Lists.newArrayList(); // TODO collapse empty field errors when the column is entirely missing
 
-        public String getStringField(String column) throws IOException {
+        public String getStringField(String column, boolean required) throws IOException {
             // TODO deduplicate strings
             String str = reader.get(column);
+            if (required && (str == null || str.isEmpty())) {
+                errorList.add(new EmptyFieldError(tableName, row, column));
+            }
             return str;
         }
 
-        public int getIntField(String column) throws IOException {
+        public int getIntField(String column, boolean required) throws IOException {
             String str = null;
-            int val = -1;
+            int val = INT_MISSING;
             try {
                 str = reader.get(column);
-                val = Integer.parseInt(str);
+                if (str == null || str.isEmpty()) {
+                    if (required) {
+                        errorList.add(new EmptyFieldError(tableName, row, column));
+                    } else {
+                        val = 0; // TODO && emptyMeansZero
+                    }
+                } else {
+                    val = Integer.parseInt(str);
+                }
             } catch (NumberFormatException nfe) {
-                String msg = String.format("Error parsing int from string '%s' from column '%s' at line number X. " +
-                        "This does not look like an integer.", str, column);
-                errorList.add(new Error(msg));
+                errorList.add(new IntParseError(tableName, row, column));
             }
             return val;
         }
@@ -69,7 +80,7 @@ public abstract class Entity {
                 str = reader.get(column);
                 String[] fields = str.split(":");
                 if (fields.length != 3) {
-                    errorList.add(new Error("Wrong number of subfields in time."));
+                    errorList.add(new TimeParseError(tableName, row, column));
                 } else {
                     int hours = Integer.parseInt(fields[0]);
                     int minutes = Integer.parseInt(fields[1]);
@@ -77,23 +88,25 @@ public abstract class Entity {
                     val = (hours * 60 * 60) + minutes * 60 + seconds;
                 }
             } catch (NumberFormatException nfe) {
-                String msg = String.format("Error parsing int from time subfield in '%s' from column '%s' " +
-                        "at line number X. This does not look like an integer.", str, column);
-                errorList.add(new Error(msg));
+                errorList.add(new TimeParseError(tableName, row, column));
             }
             return val;
         }
 
-        public double getDoubleField(String column) throws IOException {
+        // TODO add range checking parameters, with private function that can record out-of-range errors
+        public double getDoubleField(String column, boolean required) throws IOException {
             String str = null;
             double val = 0;
             try {
                 str = reader.get(column);
-                val = Double.parseDouble(str);
+                if (required && (str == null || str.isEmpty())) {
+                    errorList.add(new EmptyFieldError(tableName, row, column));
+                    val = -1;
+                } else {
+                    val = Double.parseDouble(str);
+                }
             } catch (NumberFormatException nfe) {
-                String msg = String.format("Error parsing double from string '%s' from column '%s' at line number X. " +
-                        "This does not look like an double.", str, column);
-                errorList.add(new Error(msg));
+                errorList.add(new DoubleParseError(tableName, row, column));
             }
             return val;
         }
@@ -102,7 +115,7 @@ public abstract class Entity {
             boolean missing = false;
             for (String column : requiredColumns) {
                 if (reader.getIndex(column) == -1) {
-                    errorList.add(new Error(String.format("Missing required column '%s' in table X.", column)));
+                    errorList.add(new MissingColumnError(tableName, column));
                     missing = true;
                 }
             }
@@ -112,14 +125,14 @@ public abstract class Entity {
         public abstract E fromCsv() throws IOException;
 
         // New parameter K inferred from map. Parameter E is the entity type from the containing class.
-        public <K> void loadTable(ZipFile zip, List<Error> errorList, Map<K, E> targetMap) throws IOException {
+        public <K> void loadTable(ZipFile zip, List<GTFSError> errorList, Map<K, E> targetMap) throws IOException {
             this.errorList = errorList;
             ZipEntry entry = zip.getEntry(tableName + ".txt");
             if (entry == null) {
                 /* This GTFS table did not exist in the zip. */
                 if (required) {
                     String msg = String.format("Required table '%s' was not present.", tableName);
-                    errorList.add(new Error(msg));
+                    errorList.add(new MissingTableError(tableName));
                 }
                 return;
             }
@@ -129,17 +142,17 @@ public abstract class Entity {
             this.reader = reader;
             reader.readHeaders();
             checkRequiredColumns();
-            int rec = 0;
             while (reader.readRecord()) {
-                if (++rec % 500000 == 0) {
-                    LOG.info("Record number {}", human(rec));
+                // reader.getCurrentRecord() is zero-based and does not include the header line, keep our own row count
+                if (++row % 500000 == 0) {
+                    LOG.info("Record number {}", human(row));
                 }
                 E entity = fromCsv(); // Call subclass method to produce an entity from the current row.
                 targetMap.put((K)(entity.getKey()), entity);
             }
         }
 
-        private static String human (int n) {
+        private static String human (long n) {
             if (n > 1000000) return String.format("%.1fM", n/1000000.0);
             if (n > 1000) return String.format("%.1fk", n/1000.0);
             else return String.format("%d", n);

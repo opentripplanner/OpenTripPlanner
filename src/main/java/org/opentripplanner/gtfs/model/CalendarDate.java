@@ -36,9 +36,9 @@ public class CalendarDate extends Entity {
         @Override
         public CalendarDate fromCsv() throws IOException {
             CalendarDate cd = new CalendarDate();
-            cd.service_id  = getStringField("service_id");
-            cd.date = getStringField("date");
-            cd.exception_type = getIntField("exception_type");
+            cd.service_id  = getStringField("service_id", true);
+            cd.date = getStringField("date", true);
+            cd.exception_type = getIntField("exception_type", true);
             return cd;
         }
 

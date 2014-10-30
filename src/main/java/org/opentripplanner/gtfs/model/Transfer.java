@@ -22,8 +22,8 @@ public class Transfer extends Entity {
 
     public String from_stop_id;
     public String to_stop_id;
-    public String transfer_type;
-    public String min_transfer_time;
+    public int    transfer_type;
+    public int    min_transfer_time;
 
     @Override
     public String getKey() {
@@ -40,10 +40,10 @@ public class Transfer extends Entity {
         @Override
         public Transfer fromCsv() throws IOException {
             Transfer tr = new Transfer();
-            tr.from_stop_id      = getStringField("from_stop_id");
-            tr.to_stop_id        = getStringField("to_stop_id");
-            tr.transfer_type     = getStringField("transfer_type");
-            tr.min_transfer_time = getStringField("min_transfer_time");
+            tr.from_stop_id      = getStringField("from_stop_id", true);
+            tr.to_stop_id        = getStringField("to_stop_id", true);
+            tr.transfer_type     = getIntField("transfer_type", true);
+            tr.min_transfer_time = getIntField("min_transfer_time", false);
             return tr;
         }
 

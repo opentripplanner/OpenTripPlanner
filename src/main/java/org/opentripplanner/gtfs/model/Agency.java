@@ -40,13 +40,13 @@ public class Agency extends Entity {
         @Override
         public Agency fromCsv() throws IOException {
             Agency a = new Agency();
-            a.agency_id    = getStringField("agency_id");
-            a.agency_name  = getStringField("agency_name");
-            a.agency_url   = getStringField("agency_url");
-            a.agency_lang  = getStringField("agency_lang");
-            a.agency_phone = getStringField("agency_phone");
-            a.agency_timezone = getStringField("agency_timezone");
-            a.agency_fare_url = getStringField("agency_fare_url");
+            a.agency_id    = getStringField("agency_id", false); // can only be absent if there is a single agency -- requires a special validator.
+            a.agency_name  = getStringField("agency_name", true);
+            a.agency_url   = getStringField("agency_url", true);
+            a.agency_lang  = getStringField("agency_lang", false);
+            a.agency_phone = getStringField("agency_phone", false);
+            a.agency_timezone = getStringField("agency_timezone", true);
+            a.agency_fare_url = getStringField("agency_fare_url", false);
             return a;
         }
 

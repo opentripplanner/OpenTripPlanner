@@ -18,15 +18,15 @@ import java.io.IOException;
 public class Calendar extends Entity {
 
     public String service_id;
-    public String monday;
-    public String tuesday;
-    public String wednesday;
-    public String thursday;
-    public String friday;
-    public String saturday;
-    public String sunday;
-    public String start_date;
-    public String end_date;
+    public int monday;
+    public int tuesday;
+    public int wednesday;
+    public int thursday;
+    public int friday;
+    public int saturday;
+    public int sunday;
+    public int start_date;
+    public int end_date;
 
     @Override
     public String getKey() {
@@ -43,16 +43,16 @@ public class Calendar extends Entity {
         @Override
         public Calendar fromCsv() throws IOException {
             Calendar c = new Calendar();
-            c.service_id = getStringField("service_id");
-            c.monday     = getStringField("monday");
-            c.tuesday    = getStringField("tuesday");
-            c.wednesday  = getStringField("wednesday");
-            c.thursday   = getStringField("thursday");
-            c.friday     = getStringField("friday");
-            c.saturday   = getStringField("saturday");
-            c.sunday     = getStringField("sunday");
-            c.start_date = getStringField("start_date");
-            c.end_date   = getStringField("end_date");
+            c.service_id = getStringField("service_id", true);
+            c.monday     = getIntField("monday", true);
+            c.tuesday    = getIntField("tuesday", true);
+            c.wednesday  = getIntField("wednesday", true);
+            c.thursday   = getIntField("thursday", true);
+            c.friday     = getIntField("friday", true);
+            c.saturday   = getIntField("saturday", true);
+            c.sunday     = getIntField("sunday", true);
+            c.start_date = getIntField("start_date", true);
+            c.end_date   = getIntField("end_date", true);
             return c;
         }
 

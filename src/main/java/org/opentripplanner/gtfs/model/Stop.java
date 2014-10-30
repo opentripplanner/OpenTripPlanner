@@ -45,18 +45,18 @@ public class Stop extends Entity {
         @Override
         public Stop fromCsv() throws IOException {
             Stop s = new Stop();
-            s.stop_id   = getStringField("stop_id");
-            s.stop_code = getStringField("stop_code");
-            s.stop_name = getStringField("stop_name");
-            s.stop_desc = getStringField("stop_desc");
-            s.stop_lat  = getDoubleField("stop_lat");
-            s.stop_lon  = getDoubleField("stop_lon");
-            s.zone_id   = getStringField("zone_id");
-            s.stop_url  = getStringField("stop_url");
-            s.location_type  = getIntField("location_type");
-            s.parent_station = getStringField("parent_station");
-            s.stop_timezone  = getStringField("stop_timezone");
-            s.wheelchair_boarding = getStringField("wheelchair_boarding");
+            s.stop_id   = getStringField("stop_id", true);
+            s.stop_code = getStringField("stop_code", false);
+            s.stop_name = getStringField("stop_name", true);
+            s.stop_desc = getStringField("stop_desc", false);
+            s.stop_lat  = getDoubleField("stop_lat", true);
+            s.stop_lon  = getDoubleField("stop_lon", true);
+            s.zone_id   = getStringField("zone_id", false);
+            s.stop_url  = getStringField("stop_url", false);
+            s.location_type  = getIntField("location_type", false);
+            s.parent_station = getStringField("parent_station", false);
+            s.stop_timezone  = getStringField("stop_timezone", false);
+            s.wheelchair_boarding = getStringField("wheelchair_boarding", false);
             return s;
         }
 

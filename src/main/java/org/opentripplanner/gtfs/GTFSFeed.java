@@ -1,8 +1,7 @@
-package org.opentripplanner.gtfs.model;
+package org.opentripplanner.gtfs;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.zip.ZipFile;
 
@@ -10,6 +9,9 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.opentripplanner.gtfs.error.GTFSError;
+import org.opentripplanner.gtfs.error.GeneralError;
+import org.opentripplanner.gtfs.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +32,9 @@ public class GTFSFeed {
             .transactionDisable()
             .asyncWriteEnable()
             .compressionEnable()
-            .make(); // db.close();
+            .make(); // TODO db.close();
 
-    String feedId;
+    String feedId = null;
 
     /* Some of these should be multimaps since they don't have an obvious unique key. */
     public final Map<String, Agency>        agency         = Maps.newHashMap();
@@ -43,7 +45,7 @@ public class GTFSFeed {
     public final Map<String, FeedInfo>      feedInfo       = Maps.newHashMap();
     public final Map<String, Frequency>     frequencies    = Maps.newHashMap();
     public final Map<String, Route>         routes         = Maps.newHashMap();
-    public final Map<String, Shape>         shapes         = Maps.newHashMap();
+    public final Map<String, Shape>         shapes         = db.getHashMap("shapes"); // Shapes table is often one of the two big ones
     public final Map<String, Stop>          stops          = Maps.newHashMap();
     public final Map<String, Transfer>      transfers      = Maps.newHashMap();
     public final Map<String, Trip>          trips          = Maps.newHashMap();
@@ -52,22 +54,24 @@ public class GTFSFeed {
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
 
     /* A place to accumulate errors while the feed is loaded. The objective is to tolerate as many errors as possible and keep on going. */
-    public List<Error> errors = Lists.newArrayList();
+    public List<GTFSError> errors = Lists.newArrayList();
 
     /* Set the feed_id from feed_info. Call only after feed_info has been loaded. */
     private void setFeedId() {
         if (feedInfo.size() == 0) {
-            LOG.info("feed_info not supplied.");
+            feedId = null;
+            LOG.info("feed_info missing, feed ID is undefined."); // TODO log an error, ideally feeds should include a feedID
             return;
         } else if (feedInfo.size() > 1) {
-            errors.add(new Error("More than one feed_info entry. Using only the first one."));
+            errors.add(new GeneralError("feed_info", 2, null, "More than one entry in this table. Using only the first one."));
         }
         feedId = feedInfo.values().iterator().next().feed_id;
         LOG.info("Feed ID is '{}'.", feedId);
     }
 
     private void loadFromFile(ZipFile zip) throws Exception {
-        new FeedInfo.Factory().loadTable(zip, errors, feedInfo); // pass in GtfsFeed, which contains these params as fields.
+        // maybe pass in GtfsFeed, which contains the three params to loadTable as fields.
+        new FeedInfo.Factory().loadTable(zip, errors, feedInfo);
         setFeedId();
         new Agency.Factory().loadTable(zip, errors, agency);
         new Calendar.Factory().loadTable(zip, errors, calendars);
@@ -81,7 +85,11 @@ public class GTFSFeed {
         new Transfer.Factory().loadTable(zip, errors, transfers);
         new Trip.Factory().loadTable(zip, errors, trips);
         new StopTime.Factory().loadTable(zip, errors, stop_times);
-        LOG.info("Errors: {}", errors);
+
+        LOG.info("{} errors", errors.size());
+        for (GTFSError error : errors) {
+            LOG.info("{}", error);
+        }
     }
     
     public static GTFSFeed fromFile(String file) {

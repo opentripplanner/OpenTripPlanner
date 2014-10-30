@@ -22,11 +22,11 @@ public class Trip extends Entity {
     public String trip_id;
     public String trip_headsign;
     public String trip_short_name;
-    public String direction_id;
+    public int    direction_id;
     public String block_id;
     public String shape_id;
-    public String bikes_allowed;
-    public String wheelchair_accessible;
+    public int    bikes_allowed;
+    public int    wheelchair_accessible;
 
     @Override
     public Object getKey() {
@@ -43,16 +43,16 @@ public class Trip extends Entity {
         @Override
         public Trip fromCsv() throws IOException {
             Trip t = new Trip();
-            t.route_id        = getStringField("route_id");
-            t.service_id      = getStringField("service_id");
-            t.trip_id         = getStringField("trip_id");
-            t.trip_headsign   = getStringField("trip_headsign");
-            t.trip_short_name = getStringField("trip_short_name");
-            t.direction_id    = getStringField("direction_id");
-            t.block_id        = getStringField("block_id");
-            t.shape_id        = getStringField("shape_id");
-            t.bikes_allowed   = getStringField("bikes_allowed");
-            t.wheelchair_accessible = getStringField("wheelchair_accessible");
+            t.route_id        = getStringField("route_id", true);
+            t.service_id      = getStringField("service_id", true);
+            t.trip_id         = getStringField("trip_id", true);
+            t.trip_headsign   = getStringField("trip_headsign", false);
+            t.trip_short_name = getStringField("trip_short_name", false);
+            t.direction_id    = getIntField("direction_id", false);
+            t.block_id        = getStringField("block_id", false);
+            t.shape_id        = getStringField("shape_id", false);
+            t.bikes_allowed   = getIntField("bikes_allowed", false);
+            t.wheelchair_accessible = getIntField("wheelchair_accessible", false);
             return t;
         }
 

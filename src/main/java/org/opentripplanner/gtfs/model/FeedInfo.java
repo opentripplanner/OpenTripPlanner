@@ -41,13 +41,13 @@ public class FeedInfo extends Entity {
         @Override
         public FeedInfo fromCsv() throws IOException {
             FeedInfo fi = new FeedInfo();
-            fi.feed_id = getStringField("feed_id");
-            fi.feed_publisher_name = getStringField("feed_publisher_name");
-            fi.feed_publisher_url = getStringField("feed_publisher_url");
-            fi.feed_lang = getStringField("feed_lang");
-            fi.feed_start_date = getStringField("feed_start_date");
-            fi.feed_end_date = getStringField("feed_end_date");
-            fi.feed_version = getStringField("feed_version");
+            fi.feed_id = getStringField("feed_id", false);
+            fi.feed_publisher_name = getStringField("feed_publisher_name", true);
+            fi.feed_publisher_url = getStringField("feed_publisher_url", true);
+            fi.feed_lang = getStringField("feed_lang", true);
+            fi.feed_start_date = getStringField("feed_start_date", false); // TODO getDateField
+            fi.feed_end_date = getStringField("feed_end_date", false);
+            fi.feed_version = getStringField("feed_version", false);
             // Note that like all other Entity subclasses, this also has a feedId field.
             return fi;
         }
