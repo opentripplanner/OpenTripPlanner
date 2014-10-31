@@ -28,14 +28,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.google.common.collect.Iterables;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
 import lombok.Setter;
 
 import org.codehaus.jettison.json.JSONException;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.ServiceCalendarDate;
-import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.*;
 import org.opentripplanner.api.model.error.TransitError;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.CalendarData;
@@ -47,9 +48,14 @@ import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTime;
 import org.opentripplanner.api.model.transit.StopTimeList;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -63,6 +69,7 @@ import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarDateTyp
 import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarType;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -820,6 +827,67 @@ public class TransitIndex {
         }
 
         return response;
+    }
+
+    /** Backport of semanticHash from master to 0.10.x: use the same hash function as in master. */
+    @GET
+    @Path("/semanticHash")
+    public String getSemanticHashForTrip (@QueryParam("tripId")   String tripIdString,
+                                          @QueryParam("routerId") String routerId) {
+
+        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+        //AgencyAndId trip = new AgencyAndId(tripAgency, tripId);
+        TransitIndexService transitIndexService = getGraph(routerId).getService(TransitIndexService.class);
+        if (transitIndexService == null) {
+             return "No transit index found. Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.";
+        }
+        RouteVariant variant = transitIndexService.getVariantForTrip(tripId);
+        List<Stop> stops = variant.getStops();
+
+        /* Jump through hoops to get the trip pattern. This is why we have restructured the transit index for 1.0. */
+        Stop firstStop = stops.get(0);
+        PreBoardEdge pbe = transitIndexService.getPreBoardEdge(firstStop.getId());
+        TableTripPattern pattern = null;
+        TripTimes tripTimes = null;
+        for (TransitBoardAlight tba : Iterables.filter(pbe.getToVertex().getOutgoing(), TransitBoardAlight.class)) {
+            pattern = tba.getPattern();
+            int tripIndex = pattern.getTripIndex(tripId);
+            if (tripIndex >= 0) {
+                tripTimes = pattern.getTripTimes(tripIndex).getScheduledTripTimes();
+                break;
+            }
+        }
+        if (pattern == null || tripTimes == null) return "Pattern not found for trip.";
+
+        /* Backport of semanticHash from master to 0.10.x: use the same hash function as in master. */
+        HashFunction murmur = Hashing.murmur3_32();
+        BaseEncoding encoder = BaseEncoding.base64Url().omitPadding();
+        StringBuilder sb = new StringBuilder(50);
+
+        /* First hash the pattern (coords and pick/drop types for all stops). */
+        Hasher hasher = murmur.newHasher();
+        Trip trip = tripTimes.getTrip();
+        int nStops = pattern.getStops().size();
+        for (int s = 0; s < nStops; s++) {
+            Stop stop = pattern.getStops().get(s);
+            // Truncate the lat and lon to 6 decimal places in case they move slightly between feed versions
+            hasher.putLong((long)(stop.getLat() * 1000000));
+            hasher.putLong((long)(stop.getLon() * 1000000));
+            hasher.putInt(pattern.getBoardType(s));
+            hasher.putInt(pattern.getAlightType(s));
+        }
+        sb.append(encoder.encode(hasher.hash().asBytes()));
+
+        /* Second, hash the stop times of this particular trip. */
+        hasher = murmur.newHasher();
+        for (int hop = 0; hop < tripTimes.getNumHops(); hop++) {
+            hasher.putInt(tripTimes.getDepartureTime(hop));
+            hasher.putInt(tripTimes.getArrivalTime(hop));
+        }
+        sb.append(':');
+        sb.append(encoder.encode(hasher.hash().asBytes()));
+        return sb.toString();
+
     }
 
 }
