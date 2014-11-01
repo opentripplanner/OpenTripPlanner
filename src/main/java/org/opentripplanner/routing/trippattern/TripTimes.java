@@ -411,12 +411,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     /**
      * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS feed versions.
+     * Use hops rather than stops because:
+     * a) arrival at stop zero and departure from last stop are irrelevant
+     * b) this hash function needs to stay stable when users switch from 0.10.x to 1.0
      */
     public HashCode semanticHash(HashFunction hashFunction) {
         Hasher hasher = hashFunction.newHasher();
-        for (int s = 0; s < scheduledArrivalTimes.length; s++) {
-            hasher.putInt(getScheduledArrivalTime(s));
-            hasher.putInt(getScheduledDepartureTime(s));
+        for (int hop = 0; hop < getNumStops() - 1; hop++) {
+            hasher.putInt(getScheduledDepartureTime(hop));
+            hasher.putInt(getScheduledArrivalTime(hop + 1));
         }
         return hasher.hash();
     }
