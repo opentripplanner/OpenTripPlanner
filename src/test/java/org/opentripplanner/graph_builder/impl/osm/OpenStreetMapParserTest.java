@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.io.File;
 import java.util.zip.GZIPInputStream;
+import java.net.URLDecoder;
 
 import org.junit.Test;
 
@@ -42,7 +43,7 @@ public class OpenStreetMapParserTest {
     public void testAFBinaryParser() throws Exception {
         AnyFileBasedOpenStreetMapProviderImpl pr = new AnyFileBasedOpenStreetMapProviderImpl();
         OSMMap map = new OSMMap();
-        pr.setPath(new File(getClass().getResource("map.osm.pbf").getPath()));
+        pr.setPath(new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), "UTF-8")));
         pr.readOSM(map);
         testParser(map);
     }
@@ -51,7 +52,7 @@ public class OpenStreetMapParserTest {
     public void testAFXMLParser() throws Exception {
         AnyFileBasedOpenStreetMapProviderImpl pr = new AnyFileBasedOpenStreetMapProviderImpl();
         OSMMap map = new OSMMap();
-        pr.setPath(new File(getClass().getResource("map.osm.gz").getPath()));
+        pr.setPath(new File(URLDecoder.decode(getClass().getResource("map.osm.gz").getPath(), "UTF-8")));
         pr.readOSM(map);
         testParser(map);
     }
@@ -60,7 +61,7 @@ public class OpenStreetMapParserTest {
     public void testBinaryParser() throws Exception {
         BinaryFileBasedOpenStreetMapProviderImpl pr = new BinaryFileBasedOpenStreetMapProviderImpl();
         OSMMap map = new OSMMap();
-        pr.setPath(new File(getClass().getResource("map.osm.pbf").getPath()));
+        pr.setPath(new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), "UTF-8")));
         pr.readOSM(map);
         testParser(map);
     }
@@ -69,7 +70,7 @@ public class OpenStreetMapParserTest {
     public void testXMLParser() throws Exception {
         FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
         OSMMap map = new OSMMap();
-        pr.setPath(new File(getClass().getResource("map.osm.gz").getPath()));
+        pr.setPath(new File(URLDecoder.decode(getClass().getResource("map.osm.gz").getPath(), "UTF-8")));
         pr.readOSM(map);
         testParser(map);
     }
@@ -78,7 +79,7 @@ public class OpenStreetMapParserTest {
     public void testStreamedXMLParser() throws Exception {
         StreamedFileBasedOpenStreetMapProviderImpl pr = new StreamedFileBasedOpenStreetMapProviderImpl();
         OSMMap map = new OSMMap();
-        pr.setPath(new File(getClass().getResource("map.osm.gz").getPath()));
+        pr.setPath(new File(URLDecoder.decode(getClass().getResource("map.osm.gz").getPath(), "UTF-8")));
         pr.readOSM(map);
         testParser(map);
     }
