@@ -89,7 +89,10 @@ public class GraphBuilderTask implements Runnable {
     }
 
     public void run() {
-        
+
+        /* Record how long it takes to build the graph, purely for informational purposes. */
+        long startTime = System.currentTimeMillis();
+
         if (graphFile == null) {
             throw new RuntimeException("graphBuilderTask has no attribute graphFile.");
         }
@@ -146,8 +149,9 @@ public class GraphBuilderTask implements Runnable {
             }
         } else {
             LOG.info("Not saving graph to disk, as requested.");
-            graph.index(new DefaultStreetVertexIndexFactory());
         }
-        
+
+        long endTime = System.currentTimeMillis();
+        LOG.info(String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0));
     }
 }

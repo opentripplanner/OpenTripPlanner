@@ -51,11 +51,11 @@ public class OpenStreetMapParser {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.parse(in);
             processDocument(doc, map, 1);
-            map.doneRelations();
+            map.doneFirstPhaseRelations();
             processDocument(doc, map, 2);
-            map.secondPhase();
+            map.doneSecondPhaseWays();
             processDocument(doc, map, 3);
-            map.nodesLoaded();
+            map.doneThirdPhaseNodes();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         }

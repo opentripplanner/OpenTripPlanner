@@ -24,6 +24,7 @@ import com.google.common.collect.Iterables;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -37,6 +38,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdge;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,12 +216,13 @@ public class StreetLocation extends StreetVertex {
         StreetWithElevationEdge newRight = new PartialStreetEdge(street, base, tov,
                 geometries.second, name, lengthOut);
 
-        newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
+        newLeft.setElevationProfile(ElevationUtils.getPartialElevationProfile(
+                street.getElevationProfile(), 0, lengthIn), false);
         newLeft.setNoThruTraffic(street.isNoThruTraffic());
         newLeft.setStreetClass(street.getStreetClass());
 
-        newRight.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut),
-                false);
+        newRight.setElevationProfile(ElevationUtils.getPartialElevationProfile(
+                street.getElevationProfile(), lengthIn, lengthIn + lengthOut), false);
         newRight.setStreetClass(street.getStreetClass());
         newRight.setNoThruTraffic(street.isNoThruTraffic());
         

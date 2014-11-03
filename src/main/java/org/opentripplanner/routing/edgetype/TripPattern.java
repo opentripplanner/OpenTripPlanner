@@ -27,13 +27,15 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.gtfs.model.Agency;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -625,5 +627,33 @@ public class TripPattern implements Serializable {
 		}
 		return this.trips.get(0);
 	}
+
+    /**
+     * In most cases we want to use identity equality for Trips.
+     * However, in some cases we want a way to consistently identify trips across versions of a GTFS feed, when the
+     * feed publisher cannot ensure stable trip IDs. Therefore we define some additional hash functions.
+     * Hash collisions are theoretically possible, so these identifiers should only be used to detect when two
+     * trips are the same with a high degree of probability.
+     * An example application is avoiding double-booking of a particular bus trip for school field trips.
+     * Using Murmur hash function. see http://programmers.stackexchange.com/a/145633 for comparison.
+     *
+     * @param trip a trip object within this pattern, or null to hash the pattern itself independent any specific trip.
+     * @return the semantic hash of a Trip in this pattern as a printable String.
+     *
+     * TODO deal with frequency-based trips
+     */
+    public String semanticHashString(Trip trip) {
+        HashFunction murmur = Hashing.murmur3_32();
+        BaseEncoding encoder = BaseEncoding.base64Url().omitPadding();
+        StringBuilder sb = new StringBuilder(50);
+        sb.append(encoder.encode(stopPattern.semanticHash(murmur).asBytes()));
+        if (trip != null) {
+            TripTimes tripTimes = scheduledTimetable.getTripTimes(trip);
+            if (tripTimes == null) return null;
+            sb.append(':');
+            sb.append(encoder.encode(tripTimes.semanticHash(murmur).asBytes()));
+        }
+        return sb.toString();
+    }
 
 }

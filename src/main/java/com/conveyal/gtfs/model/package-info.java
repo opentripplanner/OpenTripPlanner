@@ -4,4 +4,4 @@
  * The intent is to eliminate the need for AgencyAndIds, using feed IDs and keeping each feed in its own
  * separate data structure.
  */
-package org.opentripplanner.gtfs.model;
+package com.conveyal.gtfs.model;

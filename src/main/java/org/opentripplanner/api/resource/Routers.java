@@ -37,8 +37,10 @@ import javax.ws.rs.core.Response.Status;
 
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
+import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,16 +157,22 @@ public class Routers {
     public Response putGraphId(
             @PathParam("routerId") String routerId, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        if (preEvict) {
-            LOG.debug("pre-evicting graph");
-            server.graphService.evictGraph(routerId);
+        LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
+        try {
+            server.graphService.getGraph(routerId);
+            return Response.status(404).entity("graph already registered.\n").build();
+        } catch (GraphNotFoundException e) {
+            if (preEvict) {
+                LOG.debug("Pre-evicting graph '{}'", routerId);
+                server.graphService.evictGraph(routerId);
+            }
+            boolean success = server.graphService.registerGraph(routerId, server.graphService
+                    .getGraphSourceFactory().createGraphSource(routerId));
+            if (success)
+                return Response.status(201).entity("graph registered.\n").build();
+            else
+                return Response.status(404).entity("graph not found or other error.\n").build();
         }
-        LOG.debug("attempting to load graph from server's local filesystem.\n");
-        boolean success = server.graphService.registerGraph(routerId, preEvict);
-        if (success)
-            return Response.status(201).entity("graph registered.\n").build();
-        else
-            return Response.status(404).entity("graph not found or other error.\n").build();
     }
 
     /** 
@@ -187,7 +195,7 @@ public class Routers {
         Graph graph;
         try {
             graph = Graph.load(is, level);
-            server.graphService.registerGraph(routerId, graph);
+            server.graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
             return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
@@ -206,7 +214,7 @@ public class Routers {
             InputStream is) {
         LOG.debug("save graph from POST data stream...");
         try {
-            boolean success = server.graphService.save(routerId, is);
+            boolean success = server.graphService.getGraphSourceFactory().save(routerId, is);
             if (success) {
                 return Response.status(201).entity("graph saved.\n").build();
             } else {

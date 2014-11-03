@@ -19,7 +19,9 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import com.vividsolutions.jts.geom.LineString;
+
 import junit.framework.TestCase;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -50,7 +52,6 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.RoutingRequestTest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopMatcher;
 import org.opentripplanner.routing.core.StopTransfer;
@@ -62,12 +63,12 @@ import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -94,69 +95,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-/*
- * This class is in the process of being eliminated, so it's no longer necessary to keep it neat and
- * tidy. Not that it was ever neat and tidy in the first place...
- */
-
-class SimpleGraphServiceImpl implements GraphService {
-    private HashMap<String, Graph> graphs = new HashMap<String, Graph>();
-
-    @Override
-    public void setLoadLevel(LoadLevel level) {
-    }
-
-    @Override
-    public Graph getGraph() {
-        return graphs.get(null);
-    }
-
-    @Override
-    public Graph getGraph(String routerId) {
-        return graphs.get(routerId);
-    }
-
-    @Override
-    public Collection<String> getRouterIds() {
-        return graphs.keySet();
-    }
-
-    public void putGraph(String graphId, Graph graph) {
-        graphs.put(graphId, graph);
-        graph.routerId = (graphId);
-    }
-
-    @Override
-    public boolean registerGraph(String graphId, boolean preEvict) {
-        return false;
-    }
-
-    @Override
-    public boolean registerGraph(String graphId, Graph graph) {
-        return false;
-    }
-
-    @Override
-    public boolean evictGraph(String graphId) {
-        return false;
-    }
-
-    @Override
-    public int evictAll() {
-        return 0;
-    }
-
-    @Override
-    public boolean reloadGraphs(boolean preEvict) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean save(String routerId, InputStream is) {
-        return false;
-    }
-}
-
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
     /**
@@ -166,7 +104,7 @@ class Context {
 
     public Graph graph = spy(new Graph());
 
-    public SimpleGraphServiceImpl graphService = new SimpleGraphServiceImpl();
+    public GraphServiceImpl graphService = new GraphServiceImpl();
 
     public CommandLineParameters commandLineParameters = new CommandLineParameters();
 
@@ -182,8 +120,8 @@ class Context {
     }
 
     public Context() {
-        graphService.putGraph(null, makeSimpleGraph()); // default graph is tiny test graph
-        graphService.putGraph("portland", graph);
+        graphService.registerGraph("", new MemoryGraphSource("", makeSimpleGraph())); // default graph is tiny test graph
+        graphService.registerGraph("portland", new MemoryGraphSource("portland", graph));
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File(
                 "src/test/resources/portland/Streets_pdx.shp"));

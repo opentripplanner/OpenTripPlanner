@@ -57,18 +57,15 @@ public class StreamedOpenStreetMapParser {
 
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(path));
         parseMap(in, map, 1);
-
-        map.doneRelations();
+        map.doneFirstPhaseRelations();
 
         in = new BufferedInputStream(new FileInputStream(path));
         parseMap(in, map, 2);
-
-        map.secondPhase();
+        map.doneSecondPhaseWays();
 
         in = new BufferedInputStream(new FileInputStream(path));
         parseMap(in, map, 3);
-
-        map.nodesLoaded();
+        map.doneThirdPhaseNodes();
     }
 
     public static void parseMap(final InputStream in, OpenStreetMapContentHandler map, int phase) throws IOException,

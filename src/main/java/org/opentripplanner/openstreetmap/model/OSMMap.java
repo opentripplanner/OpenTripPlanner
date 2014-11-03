@@ -76,12 +76,15 @@ public class OSMMap implements OpenStreetMapContentHandler {
     _relations.put(relation.getId(), relation);
   }
 
-  public void secondPhase() {
+  @Override
+  public void doneFirstPhaseRelations() {
   }
 
-  public void doneRelations() {
+  @Override
+  public void doneSecondPhaseWays() {
   }
 
-  public void nodesLoaded() {
+  @Override
+  public void doneThirdPhaseNodes() {
   }
 }
