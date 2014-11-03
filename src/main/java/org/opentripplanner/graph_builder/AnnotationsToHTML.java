@@ -58,6 +58,8 @@ public class AnnotationsToHTML {
     private Graph graph;
 
     private HTMLWriter writer;
+    
+    private boolean fromStandalone;
 
     public static void main(String[] args) throws IOException {
         // FIXME turn off all logging to avoid mixing log entries and HTML
@@ -73,6 +75,7 @@ public class AnnotationsToHTML {
     }
 
     public AnnotationsToHTML(String[] args) {
+        fromStandalone = false;
         jc = new JCommander(this);
         jc.addCommand(annotationEndpoints);
 
@@ -89,18 +92,27 @@ public class AnnotationsToHTML {
             System.exit(0);
         }
     }
+    
+    public AnnotationsToHTML(Graph graph, File outpath) {
+        this.graph = graph;
+        this.outPath = outpath.toString();
+        fromStandalone = true;
+    }
 
 
-    private void run() {
+    public void run() {
 
         try {
-            graph = Graph.load(new File(graphPath), Graph.LoadLevel.DEBUG);
+            if (graph == null) {
+                graph = Graph.load(new File(graphPath), Graph.LoadLevel.DEBUG);
+                LOG.info("done loading graph.");
+            }
         } catch (Exception e) {
             LOG.error("Exception while loading graph from " + graphPath);
             e.printStackTrace();
             return;
         }
-        LOG.info("done loading graph.");
+        
 
         if (outPath != null) {
             try {
@@ -114,13 +126,17 @@ public class AnnotationsToHTML {
             writer = new HTMLWriter(System.out);
         }
 
-        String command = jc.getParsedCommand();
-        if (command.equals("annotate")) {
+        if (fromStandalone) {
             annotationEndpoints.run();
+        } else {
+            String command = jc.getParsedCommand();
+            if (command.equals("annotate")) {
+                annotationEndpoints.run();
+            }
         }
 
         if (outPath != null) {
-            LOG.info("HTML is in {}", outPath);
+            LOG.info("Annotated log is in {}", outPath);
         }
 
         writer.close();

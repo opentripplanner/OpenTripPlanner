@@ -49,6 +49,10 @@ public class CommandLineParameters {
     @Parameter(names = { "-v", "--verbose" }, 
     description = "Verbose output")
     boolean verbose;
+    
+    @Parameter(names = {"--report" },
+    description = "Nice HTML report of Graph errors/warnings (annotations)")
+    boolean report = false;
    
     /* Options for the graph builder sub-task. */
 
