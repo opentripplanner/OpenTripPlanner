@@ -23,16 +23,16 @@ public class LevelAmbiguous extends GraphBuilderAnnotation {
     
     final String layerName;
 
-    final long osmNode;
+    final long osmWayId;
     
-    public LevelAmbiguous(String layerName, long osmNode){
+    public LevelAmbiguous(String layerName, long osmWayId){
     	this.layerName = layerName;
-    	this.osmNode = osmNode;
+    	this.osmWayId = osmWayId;
     }
     
     @Override
     public String getMessage() {
-        return String.format(FMT, layerName, osmNode);
+        return String.format(FMT, layerName, osmWayId);
     }
 
 }
