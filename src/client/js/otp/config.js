@@ -110,7 +110,7 @@ otp.config = {
      * Site name / description / branding display options
      */
 
-    siteName            : "My OTP Instancer",
+    siteName            : "My OTP Instance",
     siteUrl            : "",
     siteDescription     : "An OpenTripPlanner deployment.",
     logoGraphic : 'images/otp_logo_darkbg_40px.png',
@@ -322,22 +322,25 @@ otp.config.modes = {
     //Options widgets)
     //    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle')
     };
+
+// default activity is to include all these
 otp.config.widgetFlags={
 	TripOptionsWidget_Exclude : {
-		WheelChairSelector : true,
-		MaxDistanceSelector : true,
-		PreferredRoutes : true,
-		BannedRoutes : true
+		WheelChairSelector : false,
+		MaxDistanceSelector : false,
+		PreferredRoutes : false,
+		BannedRoutes : false
 	}
 };
+
 otp.config.defaultModeColours={
 	WALK:'#808080',
         BICYCLE:'#0073e5',
         SUBWAY:'#f00',
-        RAIL: '#ff0000',
+        RAIL: '#b00',
         BUS:'#080',
         TRAM:'#800',
-        CAR:'#FFA500',
+        CAR:'#444',
 	DEFAULT:'#aaa'
 };
 otp.config.defaultTripWeight=8;
