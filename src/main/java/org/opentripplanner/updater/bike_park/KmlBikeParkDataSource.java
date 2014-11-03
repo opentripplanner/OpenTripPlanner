@@ -37,7 +37,6 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
 
     private String url;
 
-    @Setter
     private String namePrefix = null;
 
     private XmlDataListDownloader<BikePark> xmlDownloader;
@@ -74,6 +73,10 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public void setNamePrefix(String namePrefix) {
+        this.namePrefix = namePrefix;
     }
 
     /**
