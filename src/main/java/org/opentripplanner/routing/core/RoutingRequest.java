@@ -399,8 +399,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
 
-    public boolean bikeParkAndRide = false;
-	
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */
