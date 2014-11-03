@@ -20,6 +20,9 @@ public class LevelAmbiguous extends GraphBuilderAnnotation {
     public static final String FMT = "Could not infer floor number for layer called '%s' at %s. " +
     		"Vertical movement will still be possible, but elevator cost might be incorrect. " +
     		"Consider an OSM level map.";
+    public static final String HTMLFMT = "Could not infer floor number for layer called <a href='http://www.openstreetmap.org/way/%d'>'%s' (%d)</a>" +
+    		"Vertical movement will still be possible, but elevator cost might be incorrect. " +
+    		"Consider an OSM level map.";
     
     final String layerName;
 
@@ -35,4 +38,8 @@ public class LevelAmbiguous extends GraphBuilderAnnotation {
         return String.format(FMT, layerName, osmWayId);
     }
 
+    @Override
+    public String getHTMLMessage() {
+        return String.format(HTMLFMT, osmWayId, layerName, osmWayId);
+    }
 }
