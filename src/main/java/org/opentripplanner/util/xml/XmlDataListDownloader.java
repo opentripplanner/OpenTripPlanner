@@ -29,8 +29,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import lombok.Setter;
-
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +51,6 @@ public class XmlDataListDownloader<T> {
 
     private XPathExpression xpathExpr;
 
-    @Setter
     private XmlDataFactory<T> dataFactory;
 
     public void setPath(String path) {
@@ -65,6 +62,10 @@ public class XmlDataListDownloader<T> {
         } catch (XPathExpressionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setDataFactory(XmlDataFactory<T> dataFactory) {
+        this.dataFactory = dataFactory;
     }
 
     public List<T> download(String url) {
