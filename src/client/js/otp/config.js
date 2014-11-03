@@ -38,13 +38,13 @@ otp.config = {
     /**
      * The OTP web service locations
      */
-    hostname : "http://www.chalo.org.uk",
+    hostname : "",
     //municoderHostname : "http://localhost:8080",
     //datastoreUrl : 'http://localhost:9000',
     // In the 0.10.x API the base path is "otp-rest-servlet/ws"
     // From 0.11.x onward the routerId is a required part of the base path.
     // If using a servlet container, the OTP WAR should be deployed to context path /otp
-    restService: "/myanmar/otp/routers/default",
+    restService: "/laos/otp/routers/default",
 
     /**
      * Base layers: the base map tile layers available for use by all modules.
@@ -108,10 +108,10 @@ otp.config = {
      * Site name / description / branding display options
      */
 
-    siteName            : "Myanmar Route Planner",
+    siteName            : "Laos Route Planner",
     siteUrl            : "http://www.chalo.org.uk/",
     siteDescription     : "An OpenTripPlanner deployment.",
-    logoGraphic         : 'images/cow-icon.png',
+    logoGraphic : 'images/otp_logo_darkbg_40px.png',
     // bikeshareName    : "",
     //Enable this if you want to show frontend language chooser
     showLanguageChooser : true,
@@ -119,7 +119,7 @@ otp.config = {
     showLogo            : true,
     showTitle           : true,
     showModuleSelector  : true,
-    metric              : true,
+    metric              : false,
 
 
     /**
@@ -138,7 +138,7 @@ otp.config = {
         {
             id : 'planner',
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
-            defaultBaseLayer : 'OSM Transport',
+            defaultBaseLayer : 'MapQuest OSM',
             isDefault: true
         },
         {
@@ -161,13 +161,8 @@ otp.config = {
 
     geocoders : [
         {
-        'name': 'geocoder',
-        'className': 'otp.core.Geocoder',
-        'url': 'http://www.chalo.org.uk:8090/geocoder/geocode-test',
-	'port':8090,
-        'addressParam': 'address'
-        //    name: 'OTP built-in geocoder',
-        //    className: 'otp.core.GeocoderBuiltin'
+            name: 'OTP built-in geocoder',
+            className: 'otp.core.GeocoderBuiltin'
             // URL and query parameter do not need to be set for built-in geocoder.
         }
     ],
@@ -347,7 +342,7 @@ otp.config.defaultTripWeight=8;
 otp.config.defaultTripOpacity=1;
 
 otp.config.GeoJson={};
-otp.config.GeoJson.active='myanmar';
+otp.config.GeoJson.active='laos';
 otp.config.GeoJson.regions=[
      		{
     			label:'thailand',	
@@ -372,5 +367,11 @@ otp.config.GeoJson.regions=[
     			name:'Bangladesh',	
     			geojson:'geojson/bangladesh.geojson',
 			url:"http://www.chalo.org.uk/bangladesh"	
+    		},
+    		{
+    			label:'laos',	
+    			name:'Laos',	
+    			geojson:'geojson/laos.geojson',
+			url:"http://www.chalo.org.uk/laos"	
     		}
 ];
