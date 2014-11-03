@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
-import lombok.Setter;
-
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.PreferencesConfigurable;
@@ -36,7 +34,6 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
 
     private static final Logger LOG = LoggerFactory.getLogger(KmlBikeParkDataSource.class);
 
-    @Setter
     private String url;
 
     private XmlDataListDownloader<BikePark> xmlDownloader;
@@ -68,6 +65,10 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
                 return bikePark;
             }
         });
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     /**
