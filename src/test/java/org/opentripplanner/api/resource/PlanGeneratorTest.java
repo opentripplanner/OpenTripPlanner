@@ -544,8 +544,7 @@ public class PlanGeneratorTest {
                 v50, v52);
         StreetEdge e53p = new StreetEdge(v52, v54, l53, "Edge 53", 1.0,
                 StreetTraversalPermission.ALL, false);
-        PartialStreetEdge e53 = new PartialStreetEdge(e53p, v52, v54, l53, "Edge 53",
-                1.0, StreetTraversalPermission.ALL, false);
+        PartialStreetEdge e53 = new PartialStreetEdge(e53p, v52, v54, l53, "Edge 53", 1.0);
         StreetBikeRentalLink e55 = new StreetBikeRentalLink(
                 v54, v56);
         RentABikeOffEdge e57 = new RentABikeOffEdge(

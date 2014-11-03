@@ -36,7 +36,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
-public class PartialPlainStreetEdgeTest {
+public class PartialStreetEdgeTest {
     
     private Graph _graph;
     private IntersectionVertex v1, v2, v3, v4;
@@ -60,22 +60,8 @@ public class PartialPlainStreetEdgeTest {
 
     @Test
     public void testConstruction() {
-        StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
         PartialStreetEdge pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getDistance(), perm, true);
-
-        assertTrue(pEdge.isEquivalentTo(e1));
-        assertTrue(pEdge.isPartial());
-        assertTrue(pEdge.isBack());
-        assertFalse(pEdge.isReverseOf(e1));
-        assertTrue(pEdge.isReverseOf(e1Reverse));
-        assertEquals(e1.getId(), pEdge.getId());
-        assertEquals(perm, pEdge.getPermission());
-        assertEquals(e1.getCarSpeed(), pEdge.getCarSpeed(), 0.0);
-
-        // Simpler constructor - copies permission from parent edge and sets back to true.
-        pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(), "partial e1",
-                e1.getDistance());
+                "partial e1", e1.getDistance());
 
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
