@@ -44,7 +44,7 @@ public class BikeParkEdge extends Edge {
     @Override
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
-        if (options.isArriveBy()) {
+        if (options.arriveBy) {
             return traverseUnpark(s0);
         } else {
             return traversePark(s0);
@@ -56,8 +56,8 @@ public class BikeParkEdge extends Edge {
         /*
          * To unpark a bike, we need to be walking, be allowed to bike and to unpark a bike.
          */
-        if (s0.getNonTransitMode() != TraverseMode.WALK || !options.isBikeParkAndRide()
-                || !options.getModes().getBicycle())
+        if (s0.getNonTransitMode() != TraverseMode.WALK || !options.bikeParkAndRide
+                || !options.modes.getBicycle())
             return null;
 
         StateEditor s1 = s0.edit(this);
@@ -74,8 +74,8 @@ public class BikeParkEdge extends Edge {
          * To park a bike, we need to be riding one, (not rented) and be allowed to walk and to park
          * it.
          */
-        if (s0.getNonTransitMode() != TraverseMode.BICYCLE || !options.isBikeParkAndRide()
-                || !options.getModes().getWalk() || s0.isBikeRenting())
+        if (s0.getNonTransitMode() != TraverseMode.BICYCLE || !options.bikeParkAndRide
+                || !options.modes.getWalk() || s0.isBikeRenting())
             return null;
         BikeParkVertex bikeParkVertex = (BikeParkVertex) tov;
         if (bikeParkVertex.getSpacesAvailable() == 0) {

@@ -78,7 +78,7 @@ public class StreetBikeParkLink extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest options) {
-        return options.getModes().contains(TraverseMode.BICYCLE) ? 0 : Double.POSITIVE_INFINITY;
+        return options.modes.contains(TraverseMode.BICYCLE) ? 0 : Double.POSITIVE_INFINITY;
     }
 
     public Vertex getFromVertex() {
