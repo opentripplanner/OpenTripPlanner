@@ -86,6 +86,8 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
             return false;
         if (thisState.isCarParked() != other.isCarParked())
             return false;
+        if (thisState.isBikeParked() != other.isBikeParked())
+            return false;
 
         if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof StreetEdge)
                 && (!((StreetEdge) thisState.backEdge).getTurnRestrictions().isEmpty())))
