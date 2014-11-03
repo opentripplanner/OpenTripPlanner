@@ -18,9 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.Setter;
-
-import org.opentripplanner.gbannotation.BikeParkUnlinked;
+import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -36,8 +34,11 @@ public class BikeParkGraphBuilder implements GraphBuilder {
 
     private static Logger LOG = LoggerFactory.getLogger(BikeParkGraphBuilder.class);
 
-    @Setter
     private BikeParkDataSource dataSource;
+
+    public void setDataSource(BikeParkDataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
