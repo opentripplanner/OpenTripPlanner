@@ -11,21 +11,22 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.gbannotation;
-
-import lombok.AllArgsConstructor;
+package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 
-@AllArgsConstructor
 public class BikeParkUnlinked extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
     public static final String FMT = "Bike park %s not near any streets; it will not be usable.";
-    
+
     final BikeParkVertex bikeParkVertex;
-    
+
+    public BikeParkUnlinked(BikeParkVertex bikeParkVertex) {
+        this.bikeParkVertex = bikeParkVertex;
+    }
+
     @Override
     public String getMessage() {
         return String.format(FMT, bikeParkVertex);
