@@ -44,7 +44,7 @@ otp.config = {
     // In the 0.10.x API the base path is "otp-rest-servlet/ws"
     // From 0.11.x onward the routerId is a required part of the base path.
     // If using a servlet container, the OTP WAR should be deployed to context path /otp
-    restService: "/laos/otp/routers/default",
+    restService: "otp/routers/default",
 
     /**
      * Base layers: the base map tile layers available for use by all modules.
@@ -61,6 +61,7 @@ otp.config = {
      */
      
     baseLayers: [
+/*
         {
             name: 'OSM Standard',
             tileUrl: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -72,7 +73,8 @@ otp.config = {
             tileUrl: 'http://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png',
 //            subdomains : ['a','b','c'],
             attribution : 'Map provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-        },           
+        },   
+*/        
 
         {
             name: 'MapQuest OSM',
@@ -108,8 +110,8 @@ otp.config = {
      * Site name / description / branding display options
      */
 
-    siteName            : "Laos Route Planner",
-    siteUrl            : "http://www.chalo.org.uk/",
+    siteName            : "My OTP Instancer",
+    siteUrl            : "",
     siteDescription     : "An OpenTripPlanner deployment.",
     logoGraphic : 'images/otp_logo_darkbg_40px.png',
     // bikeshareName    : "",
@@ -342,6 +344,7 @@ otp.config.defaultTripWeight=8;
 otp.config.defaultTripOpacity=1;
 
 otp.config.GeoJson={};
+/*
 otp.config.GeoJson.active='laos';
 otp.config.GeoJson.regions=[
      		{
@@ -375,3 +378,4 @@ otp.config.GeoJson.regions=[
 			url:"http://www.chalo.org.uk/laos"	
     		}
 ];
+*/
