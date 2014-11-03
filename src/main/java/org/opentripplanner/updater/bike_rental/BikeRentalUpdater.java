@@ -112,9 +112,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up bike rental updater.");
         this.graph = graph;
         this.source = source;
-        setNetwork(preferences.get("networks", DEFAULT_NETWORK_LIST));
-        LOG.info("Creating bike-rental updater running every {} seconds : {}", getFrequencySec(),
-                source);
+        this.network = preferences.get("networks", DEFAULT_NETWORK_LIST);
+        LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec, source);
     }
 
     @Override
