@@ -207,30 +207,26 @@ public class InputStreamGraphSource implements GraphSource {
      * @return
      */
     private Graph loadGraph() {
+        final Graph graph;
+        try (InputStream is = graphInputStream.getGraphInputStream()) {
+            LOG.info("Loading graph...");
+            try {
+                graph = Graph.load(new ObjectInputStream(is), loadLevel, streetVertexIndexFactory);
+            } catch (Exception ex) {
+                LOG.error("Exception while loading graph '{}'.", routerId);
+                ex.printStackTrace();
+                return null;
+            }
 
-        InputStream is;
-        try {
-            is = graphInputStream.getGraphInputStream();
+            graph.routerId = (routerId);
         } catch (IOException e) {
             LOG.warn("Graph file not found or not openable for routerId '{}': {}", routerId, e);
             return null;
         }
-        LOG.info("Loading graph...");
-        Graph graph = null;
-        try {
-            graph = Graph.load(new ObjectInputStream(is), loadLevel, streetVertexIndexFactory);
-        } catch (Exception ex) {
-            LOG.error("Exception while loading graph '{}'.", routerId);
-            ex.printStackTrace();
-            return null;
-        }
-
-        graph.routerId = (routerId);
 
         // Decorate the graph. Even if a config file is not present
         // one could be bundled inside.
-        try {
-            is = graphInputStream.getConfigInputStream();
+        try (InputStream is = graphInputStream.getConfigInputStream()) {
             Preferences config = is == null ? null : new PropertiesPreferences(is);
             configurator.setupGraph(graph, config);
         } catch (IOException e) {
@@ -364,8 +360,9 @@ public class InputStreamGraphSource implements GraphSource {
                 }
 
                 // Store the stream
-                FileOutputStream os = new FileOutputStream(sourceFile);
-                ByteStreams.copy(is, os);
+                try (FileOutputStream os = new FileOutputStream(sourceFile)) {
+                    ByteStreams.copy(is, os);
+                }
 
                 // And delete the backup file
                 sourceFile = new File(sourceFile.getPath() + ".bak");
