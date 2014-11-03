@@ -37,10 +37,11 @@ public class GraphConnectivity extends GraphBuilderAnnotation {
 
     @Override
     public String getHTMLMessage() {
-        try {
-            String osmNodeId = vertex.getLabel().split(":")[2];
+        String label = vertex.getLabel();
+        if (label.startsWith("osm:")) {
+            String osmNodeId = label.split(":")[2];
             return String.format(HTMLFMT, osmNodeId, osmNodeId, size);
-        } catch (ArrayIndexOutOfBoundsException iex) {
+        } else {
             return this.getMessage();
         }
     }
