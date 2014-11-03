@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
-import lombok.AllArgsConstructor;
-
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
@@ -69,6 +67,9 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private BikeRentalStationService bikeService;
 
+    public BikeParkUpdater() {
+    }
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -94,8 +95,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         // Configure updater
         this.graph = graph;
         this.source = source;
-        LOG.info("Creating bike-park updater running every {} seconds : {}", getFrequencySec(),
-                source);
+        LOG.info("Creating bike-park updater running every {} seconds : {}", frequencySec, source);
     }
 
     @Override
@@ -131,10 +131,13 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     public void teardown() {
     }
 
-    @AllArgsConstructor
     private class BikeParkGraphWriterRunnable implements GraphWriterRunnable {
 
         private List<BikePark> bikeParks;
+
+        private BikeParkGraphWriterRunnable(List<BikePark> bikeParks) {
+            this.bikeParks = bikeParks;
+        }
 
         @Override
         public void run(Graph graph) {
