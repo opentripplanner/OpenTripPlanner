@@ -509,8 +509,8 @@ otp.modules.planner.PlannerModule =
             if(otp.util.Itin.isTransit(leg.mode)) {
                 this.drawStartBubble(leg, false);
             }
-            else if(leg.mode === 'BICYCLE') {
-                if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
+            else if(leg.mode === 'BICYCLE_RENT') {
+                if(queryParams.mode === 'WALK,BICYCLE_RENT') { // bikeshare trip
                         //TRANSLATORS: shown when clicked on route on map
                 	polyline.bindPopup(_tr('Your %(bike_share_name)s route', {'bike_share_name': otp.config.bikeshareName}));
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
@@ -523,7 +523,7 @@ otp.modules.planner.PlannerModule =
                 }	
             }
             else if(leg.mode === 'WALK') {
-                if(queryParams.mode === 'WALK,BICYCLE') { 
+                if(queryParams.mode === 'WALK,BICYCLE_RENT') { 
                     if(i == 0) {
                         //TRANSLATORS:Shown in map when clicking on a route 
                     	polyline.bindPopup(_tr('Walk to the %(bike_share_name)s dock.', {'bike_share_name': otp.config.bikeshareName}));
@@ -586,7 +586,7 @@ otp.modules.planner.PlannerModule =
 	}
 
         if(mode === "WALK") return otp.config.defaultModeColours.WALK || '#444';
-        if(mode === "BICYCLE") return otp.config.defaultModeColours.BICYCLE || '#0073e5';
+        if(mode === "BICYCLE_RENT") return otp.config.defaultModeColours.BICYCLE_RENT || '#0073e5';
         if(mode === "SUBWAY") return otp.config.defaultModeColours.SUBWAY || '#f00';
         if(mode === "RAIL") return otp.config.defaultModeColours.RAIL || '#b00';
         if(mode === "BUS") return otp.config.defaultModeColours.BUS || '#080';
