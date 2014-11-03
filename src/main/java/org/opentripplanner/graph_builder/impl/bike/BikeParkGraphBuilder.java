@@ -35,12 +35,15 @@ public class BikeParkGraphBuilder implements GraphBuilder {
     private static Logger LOG = LoggerFactory.getLogger(BikeParkGraphBuilder.class);
 
     private BikeParkDataSource dataSource;
-    
-    @Setter
+
     private String namePrefix;
 
     public void setDataSource(BikeParkDataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public void setNamePrefix(String namePrefix) {
+        this.namePrefix = namePrefix;
     }
 
     @Override
