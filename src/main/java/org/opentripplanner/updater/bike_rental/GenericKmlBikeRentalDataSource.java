@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
-import lombok.Setter;
-
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -35,10 +33,17 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericKmlBikeRentalDataSource.class);
 
-    @Setter
     private String namePrefix = null;
 
     private Set<String> networks = null;
+
+    /**
+     * @param namePrefix A string to prefix all station names coming from this source (for example:
+     *        "OV-fietspunt "). Please add a space at the end if needed.
+     */
+    public void setNamePrefix(String namePrefix) {
+        this.namePrefix = namePrefix;
+    }
 
     /**
      * @param networks A network, or a comma-separated list of networks, to set to all stations from
