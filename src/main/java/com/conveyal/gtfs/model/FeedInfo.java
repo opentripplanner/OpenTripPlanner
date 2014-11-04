@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class FeedInfo extends Entity {
@@ -32,9 +34,8 @@ public class FeedInfo extends Entity {
 
     public static class Factory extends Entity.Factory<FeedInfo> {
 
-        public Factory() {
-            tableName = "feed_info";
-            requiredColumns = new String[] { };
+        public Factory(GTFSFeed feed) {
+            super(feed, "feed_info");
         }
 
         @Override

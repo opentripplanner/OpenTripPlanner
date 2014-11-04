@@ -55,7 +55,8 @@ public class GTFSFeed {
     // Map from 2-tuples of (trip_id, stop_sequence) to stoptimes.
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
 
-    /* A place to accumulate errors while the feed is loaded. The objective is to tolerate as many errors as possible and keep on going. */
+    /* A place to accumulate errors while the feed is loaded.
+       The objective is to tolerate as many errors as possible and keep on going. */
     public List<GTFSError> errors = Lists.newArrayList();
 
     /* Set the feed_id from feed_info. Call only after feed_info has been loaded. */
@@ -71,31 +72,43 @@ public class GTFSFeed {
         LOG.info("Feed ID is '{}'.", feedId);
     }
 
+    /**
+     * The order in which we load the tables is important for two reasons.
+     * 1. We must load feed_info first so we know the feed ID before loading any other entities. This could be relaxed
+     * by having entities point to the feed object rather than its ID String.
+     * 2. Referenced entities must be loaded before any entities that reference them. This is because we check
+     * referential integrity while the files are being loaded. This is done on the fly during loading because it allows
+     * us to associate a line number with errors in objects that don't have any other clear identifier.
+     *
+     * Interestingly, all references are resolvable when tables are loaded in alphabetical order.
+     */
     private void loadFromFile(ZipFile zip) throws Exception {
-        // maybe pass in GtfsFeed, which contains the three params to loadTable as fields.
-        new FeedInfo.Factory().loadTable(zip, errors, feedInfo);
-        setFeedId();
-        new Agency.Factory().loadTable(zip, errors, agency);
-        new Calendar.Factory().loadTable(zip, errors, calendars);
-        new CalendarDate.Factory().loadTable(zip, errors, calendarDates);
-        new FareAttribute.Factory().loadTable(zip, errors, fareAttributes);
-        new FareRule.Factory().loadTable(zip, errors, fareRules);
-        new Frequency.Factory().loadTable(zip, errors, frequencies);
-        new Route.Factory().loadTable(zip, errors, routes);
-        new Shape.Factory().loadTable(zip, errors, shapes);
-        new Stop.Factory().loadTable(zip, errors, stops);
-        new Transfer.Factory().loadTable(zip, errors, transfers);
-        new Trip.Factory().loadTable(zip, errors, trips);
-        new StopTime.Factory().loadTable(zip, errors, stop_times);
-
+        new FeedInfo.Factory(this).loadTable(zip, feedInfo);
+        setFeedId(); // maybe we should just point to the feed object itself, and null out its stoptimes map after loading
+        new Agency.Factory(this).loadTable(zip, agency);
+        new Calendar.Factory(this).loadTable(zip, calendars);
+        new CalendarDate.Factory(this).loadTable(zip, calendarDates);
+        new FareAttribute.Factory(this).loadTable(zip, fareAttributes);
+        new FareRule.Factory(this).loadTable(zip, fareRules);
+        new Frequency.Factory(this).loadTable(zip, frequencies);
+        new Route.Factory(this).loadTable(zip, routes);
+        new Shape.Factory(this).loadTable(zip, shapes);
+        new Stop.Factory(this).loadTable(zip, stops);
+        new Transfer.Factory(this).loadTable(zip, transfers);
+        new Trip.Factory(this).loadTable(zip, trips);
+        new StopTime.Factory(this).loadTable(zip, stop_times);
+        // TODO make the target map a field of the Entity.Factory, and set it on construction of a specific factory.
+        // This will eliminate the redundancy in the above calls, but causes some havoc with generics.
         LOG.info("{} errors", errors.size());
         for (GTFSError error : errors) {
             LOG.info("{}", error);
         }
     }
 
-    public void validate (GTFSValidator validator) {
-        validator.validate(this, false);
+    public void validate (GTFSValidator... validators) {
+        for (GTFSValidator validator : validators) {
+            validator.validate(this, false);
+        }
     }
 
     public static GTFSFeed fromFile(String file) {
@@ -105,7 +118,6 @@ public class GTFSFeed {
             zip = new ZipFile(file);
             feed.loadFromFile(zip);
             zip.close();
-            feed.validate(new DefaultValidator());
             return feed;
         } catch (Exception e) {
             LOG.error("Error loading GTFS: {}", e.getMessage());

@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class Frequency extends Entity {
@@ -30,8 +32,8 @@ public class Frequency extends Entity {
 
     public static class Factory extends Entity.Factory<Frequency> {
 
-        public Factory() {
-            tableName = "frequencies";
+        public Factory(GTFSFeed feed) {
+            super(feed, "frequencies");
             requiredColumns = new String[] {"trip_id"};
         }
 
@@ -43,6 +45,10 @@ public class Frequency extends Entity {
             f.end_time = getTimeField("end_time");
             f.headway_secs = getIntField("headway_secs", true);
             f.exact_times = getIntField("exact_times", false);
+
+            /* Ref integrity */
+            getRefField("trip_id", true, feed.trips);
+
             return f;
         }
 

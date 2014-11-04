@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class FareAttribute extends Entity {
@@ -31,8 +33,8 @@ public class FareAttribute extends Entity {
 
     public static class Factory extends Entity.Factory<FareAttribute> {
 
-        public Factory() {
-            tableName = "fare_attributes";
+        public Factory(GTFSFeed feed) {
+            super(feed, "fare_attributes");
             requiredColumns = new String[] {"fare_id", "price", "transfers"}; // TODO this is kind of redundant
         }
 

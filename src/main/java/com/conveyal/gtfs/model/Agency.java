@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class Agency extends Entity {
@@ -32,8 +34,8 @@ public class Agency extends Entity {
 
     public static class Factory extends Entity.Factory<Agency> {
 
-        public Factory() {
-            tableName = "agency";
+        public Factory(GTFSFeed feed) {
+            super(feed, "agency");
             requiredColumns = new String[] {"agency_name", "agency_timezone"};
         }
 

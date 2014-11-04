@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class FareRule extends Entity {
@@ -30,8 +32,8 @@ public class FareRule extends Entity {
 
     public static class Factory extends Entity.Factory<FareRule> {
 
-        public Factory() {
-            tableName = "fare_rules";
+        public Factory(GTFSFeed feed) {
+            super(feed, "fare_rules");
             requiredColumns = new String[] {"fare_id"};
         }
 
@@ -43,6 +45,10 @@ public class FareRule extends Entity {
             fr.origin_id = getStringField("origin_id", false);
             fr.destination_id = getStringField("destination_id", false);
             fr.contains_id = getStringField("contains_id", false);
+
+            /* Check referential integrity. */
+            getRefField("fare_id", true, feed.fareAttributes); // fare_rules add information to existing fare_attributes
+
             return fr;
         }
 

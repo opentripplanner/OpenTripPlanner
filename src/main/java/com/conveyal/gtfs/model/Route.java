@@ -13,6 +13,9 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+import com.conveyal.gtfs.error.ReferentialIntegrityError;
+
 import java.io.IOException;
 
 public class Route extends Entity { // implements Entity.Factory<Route>
@@ -36,8 +39,8 @@ public class Route extends Entity { // implements Entity.Factory<Route>
 
     public static class Factory extends Entity.Factory<Route> {
 
-        public Factory() {
-            tableName = "routes";
+        public Factory(GTFSFeed feed) {
+            super(feed, "routes");
             requiredColumns = new String[] {"route_id", "route_type"};
         }
 
@@ -45,7 +48,7 @@ public class Route extends Entity { // implements Entity.Factory<Route>
         public Route fromCsv() throws IOException {
             Route r = new Route();
             r.route_id         = getStringField("route_id", true);
-            r.agency_id        = getStringField("agency_id", false);
+            r.agency_id        = getStringField("agency_id", false); // TODO automatically associate with agency when there is only one agency in the feed
             r.route_short_name = getStringField("route_short_name", false); // one or the other required, needs a special avalidator
             r.route_long_name  = getStringField("route_long_name", false);
             r.route_desc       = getStringField("route_desc", false);
@@ -54,6 +57,10 @@ public class Route extends Entity { // implements Entity.Factory<Route>
             r.route_color      = getStringField("route_color", false);
             r.route_text_color = getStringField("route_text_color", false);
             r.feedId = "FEED";
+
+            /* Check referential integrity */
+            getRefField("agency_id", false, feed.agency);
+
             return r;
         }
 

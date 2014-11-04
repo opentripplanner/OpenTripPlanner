@@ -1,6 +1,7 @@
 package com.conveyal.gtfs.model;
 
 import com.beust.jcommander.internal.Lists;
+import com.conveyal.gtfs.GTFSFeed;
 import com.csvreader.CsvReader;
 import com.conveyal.gtfs.error.*;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,7 @@ import java.util.zip.ZipFile;
  * One concrete subclass is defined for each table in a GTFS feed.
  */
 // TODO K is the key type for this table
-public abstract class Entity {
+public abstract class Entity implements Serializable {
 
     /* The ID of the feed from which this entity was loaded. */
     String feedId;
@@ -36,19 +38,25 @@ public abstract class Entity {
 
         // TODO private static final StringDeduplicator;
 
-        String   tableName; // name of corresponding table without .txt
-        String[] requiredColumns;
+        final GTFSFeed feed;    // the feed into which we are loading the entities
+        final String tableName; // name of corresponding table without .txt
+        String[] requiredColumns = new String[] { };
         boolean required = false;
 
         CsvReader reader;
         long row;
         // TODO "String column" that is set before any calls to avoid passing around the column name
-        List<GTFSError> errorList = Lists.newArrayList(); // TODO collapse empty field errors when the column is entirely missing
+        // TODO collapse empty field errors when the column is entirely missing -- store a Set<String> of missing fields
+
+        public Factory(GTFSFeed feed, String tableName) {
+            this.feed = feed;
+            this.tableName = tableName;
+        }
 
         /** @return whether the number actual is in the range [min, max] */
         protected boolean checkRangeInclusive(int min, int max, double actual) {
             if (actual < min || actual > max) {
-                errorList.add(new RangeError(tableName, row, null, min, max, actual));
+                feed.errors.add(new RangeError(tableName, row, null, min, max, actual));
                 return false;
             }
             return true;
@@ -58,7 +66,7 @@ public abstract class Entity {
             // TODO deduplicate strings
             String str = reader.get(column);
             if (required && (str == null || str.isEmpty())) {
-                errorList.add(new EmptyFieldError(tableName, row, column));
+                feed.errors.add(new EmptyFieldError(tableName, row, column));
             }
             return str;
         }
@@ -70,7 +78,7 @@ public abstract class Entity {
                 str = reader.get(column);
                 if (str == null || str.isEmpty()) {
                     if (required) {
-                        errorList.add(new EmptyFieldError(tableName, row, column));
+                        feed.errors.add(new EmptyFieldError(tableName, row, column));
                     } else {
                         val = 0; // TODO && emptyMeansZero
                     }
@@ -78,7 +86,7 @@ public abstract class Entity {
                     val = Integer.parseInt(str);
                 }
             } catch (NumberFormatException nfe) {
-                errorList.add(new NumberParseError(tableName, row, column));
+                feed.errors.add(new NumberParseError(tableName, row, column));
             }
             return val;
         }
@@ -90,7 +98,7 @@ public abstract class Entity {
                 str = reader.get(column);
                 String[] fields = str.split(":");
                 if (fields.length != 3) {
-                    errorList.add(new TimeParseError(tableName, row, column));
+                    feed.errors.add(new TimeParseError(tableName, row, column));
                 } else {
                     int hours = Integer.parseInt(fields[0]);
                     int minutes = Integer.parseInt(fields[1]);
@@ -98,7 +106,7 @@ public abstract class Entity {
                     val = (hours * 60 * 60) + minutes * 60 + seconds;
                 }
             } catch (NumberFormatException nfe) {
-                errorList.add(new TimeParseError(tableName, row, column));
+                feed.errors.add(new TimeParseError(tableName, row, column));
             }
             return val;
         }
@@ -110,13 +118,32 @@ public abstract class Entity {
             try {
                 str = reader.get(column);
                 if (required && (str == null || str.isEmpty())) {
-                    errorList.add(new EmptyFieldError(tableName, row, column));
+                    feed.errors.add(new EmptyFieldError(tableName, row, column));
                     val = -1;
                 } else {
                     val = Double.parseDouble(str);
                 }
             } catch (NumberFormatException nfe) {
-                errorList.add(new NumberParseError(tableName, row, column));
+                feed.errors.add(new NumberParseError(tableName, row, column));
+            }
+            return val;
+        }
+
+        /**
+         * Used to check referential integrity.
+         * TODO Return value is not yet used, but could allow entities to point to each other directly rather than
+         * using indirection through string-keyed maps.
+         */
+        protected <K, V> V getRefField(String column, boolean required, Map<K, V> target) throws IOException {
+            V val = null;
+            String str = reader.get(column);
+            if (required && (str == null || str.isEmpty())) {
+                feed.errors.add(new EmptyFieldError(tableName, row, column));
+            } else {
+                val = target.get(str);
+                if (val == null) {
+                    feed.errors.add(new ReferentialIntegrityError(tableName, row, column, str));
+                }
             }
             return val;
         }
@@ -125,7 +152,7 @@ public abstract class Entity {
             boolean missing = false;
             for (String column : requiredColumns) {
                 if (reader.getIndex(column) == -1) {
-                    errorList.add(new MissingColumnError(tableName, column));
+                    feed.errors.add(new MissingColumnError(tableName, column));
                     missing = true;
                 }
             }
@@ -135,14 +162,14 @@ public abstract class Entity {
         protected abstract E fromCsv() throws IOException;
 
         // New parameter K inferred from map. Parameter E is the entity type from the containing class.
-        public <K> void loadTable(ZipFile zip, List<GTFSError> errorList, Map<K, E> targetMap) throws IOException {
-            this.errorList = errorList;
+        public <K> void loadTable(ZipFile zip, Map<K, E> targetMap) throws IOException {
             ZipEntry entry = zip.getEntry(tableName + ".txt");
             if (entry == null) {
                 /* This GTFS table did not exist in the zip. */
                 if (required) {
-                    String msg = String.format("Required table '%s' was not present.", tableName);
-                    errorList.add(new MissingTableError(tableName));
+                    feed.errors.add(new MissingTableError(tableName));
+                } else {
+                    LOG.info("Table {} was missing but it is not required.", tableName);
                 }
                 return;
             }
@@ -158,7 +185,7 @@ public abstract class Entity {
                     LOG.info("Record number {}", human(row));
                 }
                 E entity = fromCsv(); // Call subclass method to produce an entity from the current row.
-                targetMap.put((K)(entity.getKey()), entity);
+                targetMap.put((K) (entity.getKey()), entity);
             }
         }
 

@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class Stop extends Entity {
@@ -37,8 +39,8 @@ public class Stop extends Entity {
 
     public static class Factory extends Entity.Factory<Stop> {
 
-        public Factory() {
-            tableName = "stops";
+        public Factory(GTFSFeed feed) {
+            super(feed, "stops");
             requiredColumns = new String[] {"stop_id"};
         }
 
@@ -59,6 +61,7 @@ public class Stop extends Entity {
             s.wheelchair_boarding = getStringField("wheelchair_boarding", false);
             checkRangeInclusive(-90, 90, s.stop_lat);
             checkRangeInclusive(-180, 180, s.stop_lon); // TODO check more ranges
+            /* TODO check ref integrity later, this table self-references via parent_station */
             return s;
         }
 

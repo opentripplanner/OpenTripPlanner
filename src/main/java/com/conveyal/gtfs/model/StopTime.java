@@ -13,6 +13,7 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
 import org.mapdb.Fun;
 
 import java.io.IOException;
@@ -37,8 +38,8 @@ public class StopTime extends Entity implements Serializable {
 
     public static class Factory extends Entity.Factory<StopTime> {
 
-        public Factory() {
-            tableName = "stop_times";
+        public Factory(GTFSFeed feed) {
+            super(feed, "stop_times");
             requiredColumns = new String[] {"trip_id", "stop_sequence"};
         }
 
@@ -51,9 +52,14 @@ public class StopTime extends Entity implements Serializable {
             st.stop_id        = getStringField("stop_id", true);
             st.stop_sequence  = getIntField("stop_sequence", true);
             st.stop_headsign  = getStringField("stop_headsign", false);
-            st.pickup_type    = getIntField("pickup_type", false);
+            st.pickup_type    = getIntField("pickup_type", false); // TODO add ranges as parameters
             st.drop_off_type  = getIntField("drop_off_type", false);
             st.shape_dist_traveled = getDoubleField("shape_dist_traveled", false);
+
+            /* Check referential integrity. */
+            getRefField("trip_id", true, feed.trips);
+            getRefField("stop_id", true, feed.stops);
+
             return st;
         }
 

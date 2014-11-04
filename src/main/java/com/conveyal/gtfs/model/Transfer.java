@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class Transfer extends Entity {
@@ -29,8 +31,8 @@ public class Transfer extends Entity {
 
     public static class Factory extends Entity.Factory<Transfer> {
 
-        public Factory() {
-            tableName = "transfers";
+        public Factory(GTFSFeed feed) {
+            super(feed, "transfers");
             requiredColumns = new String[] {"from_stop_id", "to_stop_id", "transfer_type"};
         }
 
@@ -41,6 +43,11 @@ public class Transfer extends Entity {
             tr.to_stop_id        = getStringField("to_stop_id", true);
             tr.transfer_type     = getIntField("transfer_type", true);
             tr.min_transfer_time = getIntField("min_transfer_time", false);
+
+            /* Check referential integrity. */
+            getRefField("from_stop_id", true, feed.stops);
+            getRefField("to_stop_id", true, feed.stops);
+
             return tr;
         }
 

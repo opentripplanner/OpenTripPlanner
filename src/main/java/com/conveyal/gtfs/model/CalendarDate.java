@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class CalendarDate extends Entity {
@@ -23,13 +25,13 @@ public class CalendarDate extends Entity {
 
     @Override
     public String getKey() {
-        return ""; // TODO auto-increment, list not map type (overload load function to take list types)
+        return service_id; // TODO auto-increment, list not map type (overload load function to take list types)
     }
 
     public static class Factory extends Entity.Factory<CalendarDate> {
 
-        public Factory() {
-            tableName = "calendar_dates";
+        public Factory(GTFSFeed feed) {
+            super(feed, "calendar_dates");
             requiredColumns = new String[] {"service_id", "date", "exception_type"};
         }
 

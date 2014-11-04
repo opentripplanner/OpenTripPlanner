@@ -13,6 +13,8 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
 
 public class Calendar extends Entity {
@@ -30,13 +32,13 @@ public class Calendar extends Entity {
 
     @Override
     public String getKey() {
-        return ""; // TODO auto-increment
+        return service_id; // TODO auto-increment
     }
 
     public static class Factory extends Entity.Factory<Calendar> {
 
-        public Factory() {
-            tableName = "calendars";
+        public Factory(GTFSFeed feed) {
+            super(feed, "calendars");
             requiredColumns = new String[] {"service_id"};
         }
 
@@ -53,6 +55,8 @@ public class Calendar extends Entity {
             c.sunday     = getIntField("sunday", true);
             c.start_date = getIntField("start_date", true);
             c.end_date   = getIntField("end_date", true);
+
+            /* Check referential integrity. TODO service_id can reference either calendar or calendar_dates. */
             return c;
         }
 
