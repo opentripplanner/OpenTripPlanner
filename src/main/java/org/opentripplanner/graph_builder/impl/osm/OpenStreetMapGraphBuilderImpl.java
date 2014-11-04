@@ -304,7 +304,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (networkSet.isEmpty()) {
                     LOG.warn("Bike rental station at osm node " + node.getId() + " ("
                             + creativeName + ") with no network; including as compatible-with-all.");
-                    networkSet.add("*"); // Special "catch-all" value
+                    networkSet = null; // Special "catch-all" value
                 }
                 BikeRentalStation station = new BikeRentalStation();
                 station.id = "" + node.getId();
