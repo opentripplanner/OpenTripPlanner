@@ -31,20 +31,15 @@ public class StopTime extends Entity implements Serializable {
     public int    drop_off_type;
     public double shape_dist_traveled;
 
-    @Override
-    public Fun.Tuple2 getKey() {
-        return new Fun.Tuple2(trip_id, stop_sequence);
-    }
+    public static class Loader extends Entity.Loader<StopTime> {
 
-    public static class Factory extends Entity.Factory<StopTime> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "stop_times");
             requiredColumns = new String[] {"trip_id", "stop_sequence"};
         }
 
         @Override
-        public StopTime fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             StopTime st = new StopTime();
             st.trip_id        = getStringField("trip_id", true);
             st.arrival_time   = getTimeField("arrival_time");
@@ -60,7 +55,7 @@ public class StopTime extends Entity implements Serializable {
             getRefField("trip_id", true, feed.trips);
             getRefField("stop_id", true, feed.stops);
 
-            return st;
+            feed.stop_times.put(new Fun.Tuple2(st.trip_id, st.stop_sequence), st);
         }
 
     }

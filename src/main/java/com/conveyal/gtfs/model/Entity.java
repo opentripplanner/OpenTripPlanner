@@ -1,6 +1,5 @@
 package com.conveyal.gtfs.model;
 
-import com.beust.jcommander.internal.Lists;
 import com.conveyal.gtfs.GTFSFeed;
 import com.csvreader.CsvReader;
 import com.conveyal.gtfs.error.*;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -26,29 +24,27 @@ public abstract class Entity implements Serializable {
     /* The ID of the feed from which this entity was loaded. */
     String feedId;
 
-    public abstract Object getKey();
-
     public static final int INT_MISSING = Integer.MIN_VALUE;
 
     /* A class that can produce Entities from CSV, and record errors that occur in the process. */
     // This is almost a GTFSTable... rename?
-    public static abstract class Factory<E extends Entity> {
+    public static abstract class Loader<E extends Entity> {
 
-        private static final Logger LOG = LoggerFactory.getLogger(Factory.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Loader.class);
 
         // TODO private static final StringDeduplicator;
 
         final GTFSFeed feed;    // the feed into which we are loading the entities
-        final String tableName; // name of corresponding table without .txt
-        String[] requiredColumns = new String[] { };
-        boolean required = false;
+        final String   tableName; // name of corresponding table without .txt
+        String[] requiredColumns = new String[]{}; // TODO remove and infer from field-loading calls
+        boolean  required        = false;
 
         CsvReader reader;
-        long row;
+        long      row;
         // TODO "String column" that is set before any calls to avoid passing around the column name
         // TODO collapse empty field errors when the column is entirely missing -- store a Set<String> of missing fields
 
-        public Factory(GTFSFeed feed, String tableName) {
+        public Loader(GTFSFeed feed, String tableName) {
             this.feed = feed;
             this.tableName = tableName;
         }
@@ -159,10 +155,11 @@ public abstract class Entity implements Serializable {
             return missing;
         }
 
-        protected abstract E fromCsv() throws IOException;
+        /** Implemented by subclasses to read one row and produce one GTFS entity. */
+        protected abstract void loadOneRow() throws IOException;
 
         // New parameter K inferred from map. Parameter E is the entity type from the containing class.
-        public <K> void loadTable(ZipFile zip, Map<K, E> targetMap) throws IOException {
+        public <K> void loadTable(ZipFile zip) throws IOException {
             ZipEntry entry = zip.getEntry(tableName + ".txt");
             if (entry == null) {
                 /* This GTFS table did not exist in the zip. */
@@ -184,8 +181,7 @@ public abstract class Entity implements Serializable {
                 if (++row % 500000 == 0) {
                     LOG.info("Record number {}", human(row));
                 }
-                E entity = fromCsv(); // Call subclass method to produce an entity from the current row.
-                targetMap.put((K) (entity.getKey()), entity);
+                loadOneRow(); // Call subclass method to produce an entity from the current row.
             }
         }
 

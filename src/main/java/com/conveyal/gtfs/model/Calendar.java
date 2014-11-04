@@ -30,20 +30,15 @@ public class Calendar extends Entity {
     public int start_date;
     public int end_date;
 
-    @Override
-    public String getKey() {
-        return service_id; // TODO auto-increment
-    }
+    public static class Loader extends Entity.Loader<Calendar> {
 
-    public static class Factory extends Entity.Factory<Calendar> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "calendars");
             requiredColumns = new String[] {"service_id"};
         }
 
         @Override
-        public Calendar fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Calendar c = new Calendar();
             c.service_id = getStringField("service_id", true);
             c.monday     = getIntField("monday", true);
@@ -57,7 +52,8 @@ public class Calendar extends Entity {
             c.end_date   = getIntField("end_date", true);
 
             /* Check referential integrity. TODO service_id can reference either calendar or calendar_dates. */
-            return c;
+
+            feed.calendars.put(c.service_id, c);
         }
 
     }

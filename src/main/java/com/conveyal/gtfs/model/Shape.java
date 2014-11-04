@@ -25,27 +25,23 @@ public class Shape extends Entity {
     public int    shape_pt_sequence;
     public double shape_dist_traveled;
 
-    @Override
-    public Object getKey() {
-        return shape_id;
-    }
+    public static class Loader extends Entity.Loader<Shape> {
 
-    public static class Factory extends Entity.Factory<Shape> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "shapes");
             requiredColumns = new String[] {"shape_id"};
         }
 
         @Override
-        public Shape fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Shape s = new Shape();
             s.shape_id = getStringField("shape_id", true);
             s.shape_pt_lat = getDoubleField("shape_pt_lat", true);
             s.shape_pt_lon = getDoubleField("shape_pt_lon", true);
             s.shape_pt_sequence = getIntField("shape_pt_sequence", true);
             s.shape_dist_traveled = getDoubleField("shape_dist_traveled", false);
-            return s;
+
+            feed.shapes.put(s.shape_id, s);
         }
 
     }

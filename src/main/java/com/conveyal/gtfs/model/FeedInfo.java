@@ -14,6 +14,7 @@
 package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
+import com.conveyal.gtfs.error.GeneralError;
 
 import java.io.IOException;
 
@@ -27,19 +28,14 @@ public class FeedInfo extends Entity {
     public String feed_end_date;
     public String feed_version;
 
-    @Override
-    public String getKey() {
-        return null;
-    }
+    public static class Loader extends Entity.Loader<FeedInfo> {
 
-    public static class Factory extends Entity.Factory<FeedInfo> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "feed_info");
         }
 
         @Override
-        public FeedInfo fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             FeedInfo fi = new FeedInfo();
             fi.feed_id = getStringField("feed_id", false);
             fi.feed_publisher_name = getStringField("feed_publisher_name", true);
@@ -49,7 +45,12 @@ public class FeedInfo extends Entity {
             fi.feed_end_date = getStringField("feed_end_date", false);
             fi.feed_version = getStringField("feed_version", false);
             // Note that like all other Entity subclasses, this also has a feedId field.
-            return fi;
+            if (feed.feedInfo.isEmpty()) {
+                feed.feedInfo.put("ZERO", fi);
+                feed.feedId = fi.feed_id;
+            } else {
+                feed.errors.add(new GeneralError(tableName, row, null, "FeedInfo contains more than one record."));
+            }
         }
 
     }

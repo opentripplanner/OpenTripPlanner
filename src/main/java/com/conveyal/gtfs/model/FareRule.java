@@ -25,20 +25,15 @@ public class FareRule extends Entity {
     public String destination_id;
     public String contains_id;
 
-    @Override
-    public String getKey() {
-        return fare_id;
-    }
+    public static class Loader extends Entity.Loader<FareRule> {
 
-    public static class Factory extends Entity.Factory<FareRule> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "fare_rules");
             requiredColumns = new String[] {"fare_id"};
         }
 
         @Override
-        public FareRule fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             FareRule fr = new FareRule();
             fr.fare_id = getStringField("fare_id", true);
             fr.route_id = getStringField("route_id", false);
@@ -49,7 +44,7 @@ public class FareRule extends Entity {
             /* Check referential integrity. */
             getRefField("fare_id", true, feed.fareAttributes); // fare_rules add information to existing fare_attributes
 
-            return fr;
+            feed.fareRules.put(fr.fare_id, fr);
         }
 
     }

@@ -32,20 +32,15 @@ public class Stop extends Entity {
     public String stop_timezone;
     public String wheelchair_boarding;
 
-    @Override
-    public String getKey() {
-        return stop_id;
-    }
+    public static class Loader extends Entity.Loader<Stop> {
 
-    public static class Factory extends Entity.Factory<Stop> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "stops");
             requiredColumns = new String[] {"stop_id"};
         }
 
         @Override
-        public Stop fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Stop s = new Stop();
             s.stop_id   = getStringField("stop_id", true);
             s.stop_code = getStringField("stop_code", false);
@@ -62,7 +57,8 @@ public class Stop extends Entity {
             checkRangeInclusive(-90, 90, s.stop_lat);
             checkRangeInclusive(-180, 180, s.stop_lon); // TODO check more ranges
             /* TODO check ref integrity later, this table self-references via parent_station */
-            return s;
+
+            feed.stops.put(s.stop_id, s);
         }
 
     }

@@ -14,7 +14,6 @@
 package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
-import com.conveyal.gtfs.error.ReferentialIntegrityError;
 
 import java.io.IOException;
 
@@ -31,20 +30,15 @@ public class Trip extends Entity {
     public int    bikes_allowed;
     public int    wheelchair_accessible;
 
-    @Override
-    public Object getKey() {
-        return trip_id;
-    }
+    public static class Loader extends Entity.Loader<Trip> {
 
-    public static class Factory extends Entity.Factory<Trip> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "trips");
             requiredColumns = new String[] {"trip_id"};
         }
 
         @Override
-        public Trip fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Trip t = new Trip();
             t.route_id        = getStringField("route_id", true);
             t.service_id      = getStringField("service_id", true);
@@ -62,7 +56,7 @@ public class Trip extends Entity {
             getRefField("service_id", true, feed.calendarDates); // TODO special case, allow varargs for reference targets?
             getRefField("shape_id", false, feed.shapes);
 
-            return t;
+            feed.trips.put(t.trip_id, t);
         }
 
     }

@@ -24,20 +24,15 @@ public class Transfer extends Entity {
     public int    transfer_type;
     public int    min_transfer_time;
 
-    @Override
-    public String getKey() {
-        return null;
-    }
+    public static class Loader extends Entity.Loader<Transfer> {
 
-    public static class Factory extends Entity.Factory<Transfer> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "transfers");
             requiredColumns = new String[] {"from_stop_id", "to_stop_id", "transfer_type"};
         }
 
         @Override
-        public Transfer fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Transfer tr = new Transfer();
             tr.from_stop_id      = getStringField("from_stop_id", true);
             tr.to_stop_id        = getStringField("to_stop_id", true);
@@ -48,7 +43,7 @@ public class Transfer extends Entity {
             getRefField("from_stop_id", true, feed.stops);
             getRefField("to_stop_id", true, feed.stops);
 
-            return tr;
+            feed.transfers.put(Long.toString(row), tr);
         }
 
     }

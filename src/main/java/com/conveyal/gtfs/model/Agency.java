@@ -27,20 +27,15 @@ public class Agency extends Entity {
     public String agency_phone;
     public String agency_fare_url;
 
-    @Override
-    public String getKey() {
-        return agency_id;
-    }
+    public static class Loader extends Entity.Loader<Agency> {
 
-    public static class Factory extends Entity.Factory<Agency> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "agency");
             requiredColumns = new String[] {"agency_name", "agency_timezone"};
         }
 
         @Override
-        public Agency fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Agency a = new Agency();
             a.agency_id    = getStringField("agency_id", false); // can only be absent if there is a single agency -- requires a special validator.
             a.agency_name  = getStringField("agency_name", true);
@@ -49,7 +44,7 @@ public class Agency extends Entity {
             a.agency_phone = getStringField("agency_phone", false);
             a.agency_timezone = getStringField("agency_timezone", true);
             a.agency_fare_url = getStringField("agency_fare_url", false);
-            return a;
+            feed.agency.put(a.agency_id, a);
         }
 
     }

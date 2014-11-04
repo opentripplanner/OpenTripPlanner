@@ -26,20 +26,15 @@ public class FareAttribute extends Entity {
     public int transfers;
     public int transfer_duration;
 
-    @Override
-    public String getKey() {
-        return fare_id;
-    }
+    public static class Loader extends Entity.Loader<FareAttribute> {
 
-    public static class Factory extends Entity.Factory<FareAttribute> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "fare_attributes");
             requiredColumns = new String[] {"fare_id", "price", "transfers"}; // TODO this is kind of redundant
         }
 
         @Override
-        public FareAttribute fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             FareAttribute fa = new FareAttribute();
             fa.fare_id           = getStringField("fare_id", true);
             fa.price             = getDoubleField("price", true);
@@ -47,7 +42,8 @@ public class FareAttribute extends Entity {
             fa.payment_method    = getIntField("payment_method", true);
             fa.transfers         = getIntField("transfers", false); // TODO missing means "unlimited" in this case (rather than 0), supply default value
             fa.transfer_duration = getIntField("transfer_duration", false);
-            return fa;
+
+            feed.fareAttributes.put(fa.fare_id, fa);
         }
 
     }

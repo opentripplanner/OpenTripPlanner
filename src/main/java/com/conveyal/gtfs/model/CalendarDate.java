@@ -23,25 +23,20 @@ public class CalendarDate extends Entity {
     public String date;
     public int    exception_type;
 
-    @Override
-    public String getKey() {
-        return service_id; // TODO auto-increment, list not map type (overload load function to take list types)
-    }
+    public static class Loader extends Entity.Loader<CalendarDate> {
 
-    public static class Factory extends Entity.Factory<CalendarDate> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "calendar_dates");
             requiredColumns = new String[] {"service_id", "date", "exception_type"};
         }
 
         @Override
-        public CalendarDate fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             CalendarDate cd = new CalendarDate();
             cd.service_id  = getStringField("service_id", true);
             cd.date = getStringField("date", true);
             cd.exception_type = getIntField("exception_type", true);
-            return cd;
+            feed.calendarDates.put(cd.service_id, cd);
         }
 
     }

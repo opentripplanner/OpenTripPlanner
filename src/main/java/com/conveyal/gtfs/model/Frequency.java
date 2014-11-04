@@ -25,20 +25,15 @@ public class Frequency extends Entity {
     public int headway_secs;
     public int exact_times;
 
-    @Override
-    public Object getKey() {
-        return trip_id;
-    }
+    public static class Loader extends Entity.Loader<Frequency> {
 
-    public static class Factory extends Entity.Factory<Frequency> {
-
-        public Factory(GTFSFeed feed) {
+        public Loader(GTFSFeed feed) {
             super(feed, "frequencies");
             requiredColumns = new String[] {"trip_id"};
         }
 
         @Override
-        public Frequency fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Frequency f = new Frequency();
             f.trip_id = getStringField("trip_id", true);
             f.start_time = getTimeField("start_time");
@@ -49,7 +44,7 @@ public class Frequency extends Entity {
             /* Ref integrity */
             getRefField("trip_id", true, feed.trips);
 
-            return f;
+            feed.frequencies.put(f.trip_id, f);
         }
 
     }
