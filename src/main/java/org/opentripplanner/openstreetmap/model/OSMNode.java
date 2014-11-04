@@ -76,4 +76,12 @@ public class OSMNode extends OSMWithTags {
     public boolean isBikeRental() {
         return isTag("amenity", "bicycle_rental");
     }
+
+    /**
+     * @return True if this node is a bike P+R.
+     */
+    public boolean isBikeParkAndRide() {
+        return isTag("amenity", "bicycle_parking") && !isTag("access", "private")
+                && !isTag("access", "no");
+    }
 }

@@ -45,6 +45,7 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -52,6 +53,7 @@ import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.BikeParkEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -68,6 +70,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -130,11 +133,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
      */
     public boolean staticBikeRental = false;
-    
+
     /**
-     * Whether we should create P+R stations from OSM data. 
+     * Whether we should create car P+R stations from OSM data.
      */
     public boolean staticParkAndRide = true;
+
+    /**
+     * Whether we should create bike P+R stations from OSM data.
+     */
+    public boolean staticBikeParkAndRide = false;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -244,6 +252,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 processBikeRentalNodes();
             }
 
+            if (staticBikeParkAndRide) {
+                processBikeParkAndRideNodes();
+            }
+
             for (Area area : Iterables
                     .concat(osmdb.getWalkableAreas(), osmdb.getParkAndRideAreas()))
                 setWayName(area.parent);
@@ -323,6 +335,29 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
             }
             LOG.info("Created " + n + " bike rental stations.");
+        }
+
+        private void processBikeParkAndRideNodes() {
+            LOG.info("Processing bike P+R nodes...");
+            int n = 0;
+            BikeRentalStationService bikeRentalService = graph.getService(
+                    BikeRentalStationService.class, true);
+            graph.putService(BikeRentalStationService.class, bikeRentalService);
+            for (OSMNode node : osmdb.getBikeParkAndRideNodes()) {
+                n++;
+                String creativeName = wayPropertySet.getCreativeNameForWay(node);
+                if (creativeName == null)
+                    creativeName = "P+R";
+                BikePark bikePark = new BikePark();
+                bikePark.id = "" + node.getId();
+                bikePark.name = creativeName;
+                bikePark.x = node.lon;
+                bikePark.y = node.lat;
+                bikeRentalService.addBikePark(bikePark);
+                BikeParkVertex parkVertex = new BikeParkVertex(graph, bikePark);
+                new BikeParkEdge(parkVertex);
+            }
+            LOG.info("Created " + n + " bike P+R.");
         }
 
         private void buildWalkableAreas() {
