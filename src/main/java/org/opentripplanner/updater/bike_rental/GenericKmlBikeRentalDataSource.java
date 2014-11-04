@@ -36,8 +36,7 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
     private String namePrefix = null;
 
     private Set<String> networks = null;
-    
-    @Setter
+
     private boolean allowDropoff = true;
 
     /**
@@ -55,6 +54,14 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
     public void setNetworks(String networks) {
         this.networks = new HashSet<String>();
         this.networks.addAll(Arrays.asList(networks.split(",")));
+    }
+
+    /**
+     * @param allowDropoff True if the bike rental stations coming from this source allows bike
+     *        dropoff. True by default.
+     */
+    public void setAllowDropoff(boolean allowDropoff) {
+        this.allowDropoff = allowDropoff;
     }
 
     public GenericKmlBikeRentalDataSource() {
