@@ -3,10 +3,9 @@ package com.conveyal.gtfs.error;
 /** Indicates that a number is out of the acceptable range. */
 public class RangeError extends GTFSError {
 
-    int min, max;
-    double actual;
+    double min, max, actual;
 
-    public RangeError(String file, long line, String field, int min, int max, double actual) {
+    public RangeError(String file, long line, String field, double min, double max, double actual) {
         super(file, line, field);
         this.min = min;
         this.max = max;

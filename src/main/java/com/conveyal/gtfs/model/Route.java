@@ -46,7 +46,7 @@ public class Route extends Entity { // implements Entity.Factory<Route>
             r.route_short_name = getStringField("route_short_name", false); // one or the other required, needs a special avalidator
             r.route_long_name  = getStringField("route_long_name", false);
             r.route_desc       = getStringField("route_desc", false);
-            r.route_type       = getIntField("route_type", true);
+            r.route_type       = getIntField("route_type", true, 0, 7);
             r.route_url        = getStringField("route_url", false);
             r.route_color      = getStringField("route_color", false);
             r.route_text_color = getStringField("route_text_color", false);

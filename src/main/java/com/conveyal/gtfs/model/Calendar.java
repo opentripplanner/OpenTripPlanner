@@ -41,15 +41,15 @@ public class Calendar extends Entity {
         public void loadOneRow() throws IOException {
             Calendar c = new Calendar();
             c.service_id = getStringField("service_id", true);
-            c.monday     = getIntField("monday", true);
-            c.tuesday    = getIntField("tuesday", true);
-            c.wednesday  = getIntField("wednesday", true);
-            c.thursday   = getIntField("thursday", true);
-            c.friday     = getIntField("friday", true);
-            c.saturday   = getIntField("saturday", true);
-            c.sunday     = getIntField("sunday", true);
-            c.start_date = getIntField("start_date", true);
-            c.end_date   = getIntField("end_date", true);
+            c.monday     = getIntField("monday", true, 0, 1);
+            c.tuesday    = getIntField("tuesday", true, 0, 1);
+            c.wednesday  = getIntField("wednesday", true, 0, 1);
+            c.thursday   = getIntField("thursday", true, 0, 1);
+            c.friday     = getIntField("friday", true, 0, 1);
+            c.saturday   = getIntField("saturday", true, 0, 1);
+            c.sunday     = getIntField("sunday", true, 0, 1);
+            c.start_date = getIntField("start_date", true, 0, 1);
+            c.end_date   = getIntField("end_date", true, 0, 1);
 
             /* Check referential integrity. TODO service_id can reference either calendar or calendar_dates. */
 

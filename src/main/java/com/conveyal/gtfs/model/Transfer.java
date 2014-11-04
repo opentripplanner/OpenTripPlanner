@@ -36,8 +36,8 @@ public class Transfer extends Entity {
             Transfer tr = new Transfer();
             tr.from_stop_id      = getStringField("from_stop_id", true);
             tr.to_stop_id        = getStringField("to_stop_id", true);
-            tr.transfer_type     = getIntField("transfer_type", true);
-            tr.min_transfer_time = getIntField("min_transfer_time", false);
+            tr.transfer_type     = getIntField("transfer_type", true, 0, 3);
+            tr.min_transfer_time = getIntField("min_transfer_time", false, 0, Integer.MAX_VALUE);
 
             /* Check referential integrity. */
             getRefField("from_stop_id", true, feed.stops);

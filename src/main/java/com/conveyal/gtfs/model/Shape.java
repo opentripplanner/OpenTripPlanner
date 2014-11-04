@@ -36,10 +36,10 @@ public class Shape extends Entity {
         public void loadOneRow() throws IOException {
             Shape s = new Shape();
             s.shape_id = getStringField("shape_id", true);
-            s.shape_pt_lat = getDoubleField("shape_pt_lat", true);
-            s.shape_pt_lon = getDoubleField("shape_pt_lon", true);
-            s.shape_pt_sequence = getIntField("shape_pt_sequence", true);
-            s.shape_dist_traveled = getDoubleField("shape_dist_traveled", false);
+            s.shape_pt_lat = getDoubleField("shape_pt_lat", true, -90D, 90D);
+            s.shape_pt_lon = getDoubleField("shape_pt_lon", true, -180D, 180D);
+            s.shape_pt_sequence = getIntField("shape_pt_sequence", true, 0, Integer.MAX_VALUE);
+            s.shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
 
             feed.shapes.put(s.shape_id, s);
         }

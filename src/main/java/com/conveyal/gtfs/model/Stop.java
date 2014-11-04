@@ -46,16 +46,14 @@ public class Stop extends Entity {
             s.stop_code = getStringField("stop_code", false);
             s.stop_name = getStringField("stop_name", true);
             s.stop_desc = getStringField("stop_desc", false);
-            s.stop_lat  = getDoubleField("stop_lat", true);
-            s.stop_lon  = getDoubleField("stop_lon", true);
+            s.stop_lat  = getDoubleField("stop_lat", true, -90D, 90D);
+            s.stop_lon  = getDoubleField("stop_lon", true, -180D, 180D);
             s.zone_id   = getStringField("zone_id", false);
             s.stop_url  = getStringField("stop_url", false);
-            s.location_type  = getIntField("location_type", false);
+            s.location_type  = getIntField("location_type", false, 0, 1);
             s.parent_station = getStringField("parent_station", false);
             s.stop_timezone  = getStringField("stop_timezone", false);
             s.wheelchair_boarding = getStringField("wheelchair_boarding", false);
-            checkRangeInclusive(-90, 90, s.stop_lat);
-            checkRangeInclusive(-180, 180, s.stop_lon); // TODO check more ranges
             /* TODO check ref integrity later, this table self-references via parent_station */
 
             feed.stops.put(s.stop_id, s);

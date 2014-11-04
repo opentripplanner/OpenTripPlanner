@@ -38,8 +38,8 @@ public class Frequency extends Entity {
             f.trip_id = getStringField("trip_id", true);
             f.start_time = getTimeField("start_time");
             f.end_time = getTimeField("end_time");
-            f.headway_secs = getIntField("headway_secs", true);
-            f.exact_times = getIntField("exact_times", false);
+            f.headway_secs = getIntField("headway_secs", true, 1, 24 * 60 * 60);
+            f.exact_times = getIntField("exact_times", false, 0, 1);
 
             /* Ref integrity */
             getRefField("trip_id", true, feed.trips);

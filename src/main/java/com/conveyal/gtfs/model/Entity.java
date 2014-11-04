@@ -50,9 +50,9 @@ public abstract class Entity implements Serializable {
         }
 
         /** @return whether the number actual is in the range [min, max] */
-        protected boolean checkRangeInclusive(int min, int max, double actual) {
+        protected boolean checkRangeInclusive(double min, double max, double actual) {
             if (actual < min || actual > max) {
-                feed.errors.add(new RangeError(tableName, row, null, min, max, actual));
+                feed.errors.add(new RangeError(tableName, row, null, min, max, actual)); // TODO set column name in loader so it's available in methods
                 return false;
             }
             return true;
@@ -67,7 +67,7 @@ public abstract class Entity implements Serializable {
             return str;
         }
 
-        protected int getIntField(String column, boolean required) throws IOException {
+        protected int getIntField(String column, boolean required, int min, int max) throws IOException {
             String str = null;
             int val = INT_MISSING;
             try {
@@ -80,6 +80,7 @@ public abstract class Entity implements Serializable {
                     }
                 } else {
                     val = Integer.parseInt(str);
+                    checkRangeInclusive(min, max, val);
                 }
             } catch (NumberFormatException nfe) {
                 feed.errors.add(new NumberParseError(tableName, row, column));
@@ -108,7 +109,7 @@ public abstract class Entity implements Serializable {
         }
 
         // TODO add range checking parameters, with private function that can record out-of-range errors
-        protected double getDoubleField(String column, boolean required) throws IOException {
+        protected double getDoubleField(String column, boolean required, double min, double max) throws IOException {
             String str = null;
             double val = 0;
             try {
@@ -118,6 +119,7 @@ public abstract class Entity implements Serializable {
                     val = -1;
                 } else {
                     val = Double.parseDouble(str);
+                    checkRangeInclusive(min, max, val);
                 }
             } catch (NumberFormatException nfe) {
                 feed.errors.add(new NumberParseError(tableName, row, column));

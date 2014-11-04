@@ -37,11 +37,11 @@ public class FareAttribute extends Entity {
         public void loadOneRow() throws IOException {
             FareAttribute fa = new FareAttribute();
             fa.fare_id           = getStringField("fare_id", true);
-            fa.price             = getDoubleField("price", true);
+            fa.price             = getDoubleField("price", true, 0, Integer.MAX_VALUE);
             fa.currency_type     = getStringField("currency_type", true);
-            fa.payment_method    = getIntField("payment_method", true);
-            fa.transfers         = getIntField("transfers", false); // TODO missing means "unlimited" in this case (rather than 0), supply default value
-            fa.transfer_duration = getIntField("transfer_duration", false);
+            fa.payment_method    = getIntField("payment_method", true, 0, 1);
+            fa.transfers         = getIntField("transfers", false, 0, 10); // TODO missing means "unlimited" in this case (rather than 0), supply default value
+            fa.transfer_duration = getIntField("transfer_duration", false, 0, 24 * 60 * 60);
 
             feed.fareAttributes.put(fa.fare_id, fa);
         }

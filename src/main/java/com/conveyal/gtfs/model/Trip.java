@@ -45,11 +45,11 @@ public class Trip extends Entity {
             t.trip_id         = getStringField("trip_id", true);
             t.trip_headsign   = getStringField("trip_headsign", false);
             t.trip_short_name = getStringField("trip_short_name", false);
-            t.direction_id    = getIntField("direction_id", false);
+            t.direction_id    = getIntField("direction_id", false, 0, 1);
             t.block_id        = getStringField("block_id", false);
             t.shape_id        = getStringField("shape_id", false);
-            t.bikes_allowed   = getIntField("bikes_allowed", false);
-            t.wheelchair_accessible = getIntField("wheelchair_accessible", false);
+            t.bikes_allowed   = getIntField("bikes_allowed", false, 0, 2);
+            t.wheelchair_accessible = getIntField("wheelchair_accessible", false, 0, 2);
 
             /* Check referential integrity. */
             getRefField("route_id", true, feed.routes);
