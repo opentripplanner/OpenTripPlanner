@@ -64,7 +64,16 @@ public class LinkRequest {
     private List<Edge> edgesAdded = new ArrayList<Edge>();
 
     private DistanceLibrary distanceLibrary;
-    
+
+    /**
+     * A generic factory of street link to link a particular type of vertex to the street network
+     * during linking stage.
+     */
+    public interface StreetLinkFactory<V extends Vertex> {
+
+        public Collection<? extends Edge> connect(StreetVertex sv, V v);
+    }
+
     public LinkRequest(NetworkLinkerLibrary linker) {
         this.linker = linker;
         this.distanceLibrary = linker.getDistanceLibrary();

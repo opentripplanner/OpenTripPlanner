@@ -95,7 +95,7 @@ public class NetworkLinkerLibrary {
     public LinkRequest connectVertexToStreets(BikeRentalStationVertex v) {
         LinkRequest request = new LinkRequest(this);
         request.connectVertexToStreets(v, new TraverseModeSet(TraverseMode.WALK,
-                TraverseMode.BICYCLE), new StreetLinkFactory<BikeRentalStationVertex>() {
+                TraverseMode.BICYCLE), new LinkRequest.StreetLinkFactory<BikeRentalStationVertex>() {
             @Override
             public Collection<? extends Edge> connect(StreetVertex sv, BikeRentalStationVertex v) {
                 return Arrays.asList(new StreetBikeRentalLink(sv, v), new StreetBikeRentalLink(v,
@@ -113,7 +113,7 @@ public class NetworkLinkerLibrary {
     public LinkRequest connectVertexToStreets(BikeParkVertex v) {
         LinkRequest request = new LinkRequest(this);
         request.connectVertexToStreets(v, new TraverseModeSet(TraverseMode.WALK,
-                TraverseMode.BICYCLE), new StreetLinkFactory<BikeParkVertex>() {
+                TraverseMode.BICYCLE), new LinkRequest.StreetLinkFactory<BikeParkVertex>() {
             @Override
             public Collection<? extends Edge> connect(StreetVertex sv, BikeParkVertex v) {
                 return Arrays.asList(new StreetBikeParkLink(sv, v), new StreetBikeParkLink(v, sv));
