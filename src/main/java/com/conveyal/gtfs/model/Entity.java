@@ -32,9 +32,8 @@ public abstract class Entity implements Serializable {
 
     public static final int INT_MISSING = Integer.MIN_VALUE;
 
-    /* The ID of the feed from which this entity was loaded. */
+    /* The feed from which this entity was loaded. */
     GTFSFeed feed;
-
 
     /* A class that can produce Entities from CSV, and record errors that occur in the process. */
     // This is almost a GTFSTable... rename?
