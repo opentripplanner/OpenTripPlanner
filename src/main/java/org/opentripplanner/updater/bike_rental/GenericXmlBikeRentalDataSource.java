@@ -21,7 +21,6 @@ import java.util.prefs.Preferences;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.PreferencesConfigurable;
-import org.opentripplanner.util.xml.XmlDataFactory;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     public GenericXmlBikeRentalDataSource(String path) {
         xmlDownloader = new XmlDataListDownloader<BikeRentalStation>();
         xmlDownloader.setPath(path);
-        xmlDownloader.setDataFactory(new XmlDataFactory<BikeRentalStation>() {
+        xmlDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<BikeRentalStation>() {
             @Override
             public BikeRentalStation build(Map<String, String> attributes) {
                 /* TODO Do not make this class abstract, but instead make the client

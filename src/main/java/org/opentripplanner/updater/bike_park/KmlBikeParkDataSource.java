@@ -21,7 +21,6 @@ import java.util.prefs.Preferences;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.PreferencesConfigurable;
-import org.opentripplanner.util.xml.XmlDataFactory;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
         xmlDownloader = new XmlDataListDownloader<BikePark>();
         xmlDownloader
                 .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']");
-        xmlDownloader.setDataFactory(new XmlDataFactory<BikePark>() {
+        xmlDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<BikePark>() {
             @Override
             public BikePark build(Map<String, String> attributes) {
                 BikePark bikePark = new BikePark();

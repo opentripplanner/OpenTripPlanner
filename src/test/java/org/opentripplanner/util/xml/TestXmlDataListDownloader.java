@@ -31,7 +31,7 @@ public class TestXmlDataListDownloader extends TestCase {
     public void testKML() {
         XmlDataListDownloader<DataTest> xmlDataListDownloader = new XmlDataListDownloader<DataTest>();
         xmlDataListDownloader.setPath("//document/data/element");
-        xmlDataListDownloader.setDataFactory(new XmlDataFactory<DataTest>() {
+        xmlDataListDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<DataTest>() {
             @Override
             public DataTest build(Map<String, String> attributes) {
                 DataTest t = new DataTest();

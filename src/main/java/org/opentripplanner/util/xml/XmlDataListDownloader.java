@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,6 +45,10 @@ import org.xml.sax.SAXException;
  * @param <T> The class of the data elements that will be built.
  */
 public class XmlDataListDownloader<T> {
+
+    public interface XmlDataFactory<T> {
+        public T build(Map<String, String> attributes);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlDataListDownloader.class);
 
