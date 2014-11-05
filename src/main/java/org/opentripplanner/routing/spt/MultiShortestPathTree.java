@@ -87,24 +87,32 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
         if (thisState.isCarParked() != other.isCarParked())
             return false;
 
-        if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof StreetEdge)
-                && (!((StreetEdge) thisState.backEdge).getTurnRestrictions().isEmpty())))
-            return false;
+//        if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof StreetEdge)
+//                && (!((StreetEdge) thisState.backEdge).getTurnRestrictions().isEmpty())))
+//            return false;
 
-        if (thisState.routeSequenceSubset(other)) {
-            // TODO subset is not really the right idea
-            return thisState.weight <= other.weight &&
-            		thisState.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds();
-            // && this.getNumBoardings() <= other.getNumBoardings();
-        }
+//        if (thisState.routeSequenceSubset(other)) {
+//            // TODO subset is not really the right idea
+//            return thisState.weight <= other.weight &&
+//            		thisState.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds();
+//            // && this.getNumBoardings() <= other.getNumBoardings();
+//        }
 
         // If returning more than one result from GenericAStar, the search can be very slow
         // unless you replace the following code with:
         // return false;
-        boolean walkDistanceBetter = thisState.walkDistance <= other.getWalkDistance() * 1.05;
+        
+        // is thisState's walkdist at least not that much larger than other's walkDist?
+        boolean walkDistanceBetter = thisState.walkDistance / other.getWalkDistance() < 1.05;
+        
+        // TODO it's looking like the _larger_ walkdist is winning!?
         double weightRatio = thisState.weight / other.weight;
         boolean weightBetter = (weightRatio < 1.02 && thisState.weight - other.weight < 30);
-        boolean timeBetter = thisState.getElapsedTimeSeconds() - other.getElapsedTimeSeconds() <= 30;
+        
+        double t1 = (double)thisState.getElapsedTimeSeconds();
+        double t2 = (double)other.getElapsedTimeSeconds();
+        double timeRatio = t1/t2;
+        boolean timeBetter = (timeRatio < 1.02) && (t1 - t2 <= 30);
         
         return walkDistanceBetter && weightBetter && timeBetter;
 //    	return this.weight < other.weight;

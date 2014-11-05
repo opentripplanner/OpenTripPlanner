@@ -549,6 +549,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				State s2 = secondComparePathStates.getSelectedValue();
 				
 				System.out.println("s1 dominates s2:"+MultiShortestPathTree.dominates(s1,s2));
+				System.out.println("s2 dominates s1:"+MultiShortestPathTree.dominates(s2,s1));
 			}
         });
         pane.add(dominateButton);
