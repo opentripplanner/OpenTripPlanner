@@ -17,10 +17,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.prefs.Preferences;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.InputFileType;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
@@ -242,25 +241,4 @@ public class OTPConfigurator {
             return visualizer;
         } else return null;
     }
-
-    private static enum InputFileType {
-        GTFS, OSM, CONFIG, OTHER;
-        public static InputFileType forFile(File file) {
-            String name = file.getName();
-            if (name.endsWith(".zip")) {
-                try {
-                    ZipFile zip = new ZipFile(file);
-                    ZipEntry stopTimesEntry = zip.getEntry("stop_times.txt");
-                    zip.close();
-                    if (stopTimesEntry != null) return GTFS;
-                } catch (Exception e) { /* fall through */ }
-            }
-            if (name.endsWith(".pbf")) return OSM;
-            if (name.endsWith(".osm")) return OSM;
-            if (name.endsWith(".osm.xml")) return OSM;
-            if (name.equals("Embed.properties")) return CONFIG;
-            return OTHER;
-        }
-    }
-
 }

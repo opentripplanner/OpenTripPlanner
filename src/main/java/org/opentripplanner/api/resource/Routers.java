@@ -15,7 +15,15 @@ package org.opentripplanner.api.resource;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipInputStream;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -37,13 +45,35 @@ import javax.ws.rs.core.Response.Status;
 
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.InputFileType;
+import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
+import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
+import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.TransitToTaggedStopsGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
+import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
+import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
+import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
+import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 /**
  * This REST API endpoint allows remotely loading, reloading, and evicting graphs on a running server.
@@ -200,6 +230,208 @@ public class Routers {
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
         }
+    }
+    
+    /**
+     * Build a graph from data in the ZIP file posted over the wire, associating it with the given router ID.
+     * This method will be selected when the Content-Type is application/zip.
+     */
+    @RolesAllowed({ "ROUTERS" })
+    @POST @Path("{routerId}") @Consumes({"application/zip"})
+    @Produces({ MediaType.TEXT_PLAIN })
+    public Response buildGraphOverWire (
+            @PathParam("routerId") String routerId,
+            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict,
+            InputStream input) {
+        // TODO: async processing
+        
+        if (preEvict) {
+            LOG.debug("Pre-evicting graph with routerId {} before building new graph", routerId);
+            server.graphService.evictGraph(routerId);
+        }
+        
+        // get a temporary directory, using Google Guava
+        File tempDir = Files.createTempDir();
+        
+        // set up the task
+        GraphBuilderTask graphBuilder = new GraphBuilderTask();
+        List<File> gtfsFiles = Lists.newArrayList();
+        List<File> osmFiles =  Lists.newArrayList();
+        File configFile = null;
+        
+        graphBuilder.setPath(tempDir);
+        
+        // extract the zip file to the temp dir
+        ZipInputStream zis = new ZipInputStream(input);
+        
+        ZipEntry next;
+        
+        while (true) {
+            try {
+                next = zis.getNextEntry();
+            } catch (ZipException e) {
+                return Response.status(Status.BAD_REQUEST).entity("Could not read ZIP file").build();
+            } catch (IOException e) {
+                return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Internal error saving ZIP file").build();
+            }
+            
+            if (next == null)
+                break;
+            
+            // get the output file
+            File outfile = new File(tempDir, next.getName());
+            FileOutputStream out;
+            try {
+                out = new FileOutputStream(outfile);
+            } catch (FileNotFoundException e1) {
+                return Response.status(Status.INTERNAL_SERVER_ERROR)
+                        .entity("Could not save member " + next.getName()).build();
+            }
+            
+            // extract data 10k at a time
+            int bufSize = 10 * 1024;
+            byte[] buff = new byte[bufSize];
+            
+            int readBytes;
+
+            while (true) {
+                try {
+                    readBytes = zis.read(buff, 0, bufSize);
+                } catch (ZipException e) {
+                    try {
+                        out.close();
+                    } catch (IOException e1) {
+                        // do nothing
+                    }
+                    return Response.status(Status.BAD_REQUEST)
+                            .entity("Could not read ZIP entry " + next.getName()).build();
+                } catch (IOException e) {
+                    try {
+                        out.close();
+                    } catch (IOException e1) {
+                        // do nothing
+                    }
+                    return Response.status(Status.INTERNAL_SERVER_ERROR)
+                            .entity("Internal error reading ZIP entry " + next.getName()).build();
+                }
+                
+                if (readBytes == -1)
+                    // done with this file
+                    break;
+                
+                try {
+                    out.write(buff, 0, readBytes);
+                } catch (IOException e) {
+                    try {
+                        out.close();
+                    } catch (IOException e1) {
+                        // do nothing
+                    }
+                    return Response.status(Status.INTERNAL_SERVER_ERROR)
+                            .entity("Internal error copying ZIP entry " + next.getName()).build();
+                }
+            }
+            
+            try {
+                out.close();
+            } catch (IOException e1) {
+                // no reason to do anything; if we can't close it we can't close it.
+                // but no reason to block build
+            }
+            
+            // figure out what type of file we have, and add it to the build
+            switch (InputFileType.forFile(outfile)) {
+            case GTFS:
+                gtfsFiles.add(outfile);
+                break;
+            case OSM:
+                osmFiles.add(outfile);
+                break;
+            case CONFIG:
+                 configFile = outfile;
+                break;
+            case OTHER:
+                LOG.debug("Skipping file '{}'", next.getName());
+            }
+        }
+        
+        // do some error checks
+        if (osmFiles.isEmpty() && gtfsFiles.isEmpty())
+            return Response.status(Status.BAD_REQUEST).entity("Found no files with which to build a graph").build();
+        
+        if (osmFiles.isEmpty())
+            LOG.warn("No OSM files provided in graph bundle; building a streetless graph.");
+        
+        if (gtfsFiles.isEmpty())
+            LOG.warn("No GTFS files provided in graph bundle; building a graph without transit.");
+        
+        // configure builder
+        // OSM
+        if (!osmFiles.isEmpty()) {
+            List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
+            for (File osmFile : osmFiles) {
+                osmProviders.add(new AnyFileBasedOpenStreetMapProviderImpl(osmFile));
+            }
+            
+            // TODO: elevation (needs to come out of bundle . . . wait for new config file format)
+            OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders);
+            osmBuilder.edgeFactory = new DefaultStreetEdgeFactory();
+            osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+            graphBuilder.addGraphBuilder(osmBuilder);
+            graphBuilder.addGraphBuilder(new PruneFloatingIslands());
+        }
+
+        if (!gtfsFiles.isEmpty()) {
+            List<GtfsBundle> gtfs = Lists.newArrayList();
+            
+            for (File gtfsFile : gtfsFiles) {
+                gtfs.add(new GtfsBundle(gtfsFile));
+            }
+            
+            GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfs);
+            // fares
+            gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
+            graphBuilder.addGraphBuilder(gtfsBuilder);
+            
+            // if we have OSM, use it
+            if (!osmFiles.isEmpty()) {
+                graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
+                graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
+                // Assume long-distance mode (TODO: make configurable . . . wait for new config file format)
+                graphBuilder.addGraphBuilder(new StreetfulStopLinker());
+            }
+            
+            // link stops directly by distance if no OSM
+            // TODO: transfers.txt?
+            else {
+                graphBuilder.addGraphBuilder(new StreetlessStopLinker());
+            }
+        }
+        
+        if (configFile != null) {
+            EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
+            embeddedConfigBuilder.propertiesFile = configFile;
+            graphBuilder.addGraphBuilder(embeddedConfigBuilder);
+        }
+        
+        graphBuilder.serializeGraph = false;
+        
+        graphBuilder.run();
+        
+        // remove the temporary directory
+        // this doesn't work for nested directories, but the extract doesn't either,
+        // so we'll crash long before we get here . . .
+        for (File file : tempDir.listFiles()) {
+            file.delete();
+        }
+        
+        tempDir.delete();
+        
+        Graph graph = graphBuilder.getGraph();
+        graph.index(new DefaultStreetVertexIndexFactory());
+        
+        server.graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
+        return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
     }
     
     /** 
