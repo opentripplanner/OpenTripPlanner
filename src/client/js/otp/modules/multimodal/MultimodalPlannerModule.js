@@ -82,6 +82,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         
         // add stops layer
         this.stopsLayer = new otp.layers.StopsLayer(this);
+	// add GeoJson layer 
+        this.geoJsonLayer = new otp.layers.GeoJsonLayer(this);
+
     },
     
     routesLoaded : function() {

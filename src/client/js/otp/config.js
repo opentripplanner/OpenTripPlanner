@@ -305,3 +305,22 @@ otp.config.modes = {
     //Options widgets)
     //    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle')
     };
+
+otp.config.GeoJson={};
+/*
+otp.config.GeoJson.active='myanmar';
+otp.config.GeoJson.regions=[
+     		{
+    			label:'thailand',	
+    			name:'Thailand',	
+    			geojson:'geojson/thailand.geojson',
+			url:"http://www.chalo.org.uk/thailand"
+    		},
+    		{
+    			label:'srilanka',	
+    			name:'Sri Lanka',	
+    			geojson:'geojson/srilanka.geojson',
+			url:"http://www.chalo.org.uk/srilanka"	
+    		},
+];
+*/
