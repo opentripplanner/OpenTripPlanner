@@ -15,18 +15,19 @@ package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.error.GeneralError;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 
 public class FeedInfo extends Entity {
 
-    public String feed_id = "NONE";
-    public String feed_publisher_name;
-    public String feed_publisher_url;
-    public String feed_lang;
-    public String feed_start_date;
-    public String feed_end_date;
-    public String feed_version;
+    public String   feed_id = "NONE";
+    public String   feed_publisher_name;
+    public String   feed_publisher_url;
+    public String   feed_lang;
+    public DateTime feed_start_date;
+    public DateTime feed_end_date;
+    public String   feed_version;
 
     public static class Loader extends Entity.Loader<FeedInfo> {
 
@@ -41,8 +42,8 @@ public class FeedInfo extends Entity {
             fi.feed_publisher_name = getStringField("feed_publisher_name", true);
             fi.feed_publisher_url = getStringField("feed_publisher_url", true);
             fi.feed_lang = getStringField("feed_lang", true);
-            fi.feed_start_date = getStringField("feed_start_date", false); // TODO getDateField
-            fi.feed_end_date = getStringField("feed_end_date", false);
+            fi.feed_start_date = getDateField("feed_start_date", false);
+            fi.feed_end_date = getDateField("feed_end_date", false);
             fi.feed_version = getStringField("feed_version", false);
             // Note that like all other Entity subclasses, this also has a feedId field.
             if (feed.feedInfo.isEmpty()) {

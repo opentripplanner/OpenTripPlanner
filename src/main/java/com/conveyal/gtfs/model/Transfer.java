@@ -28,7 +28,6 @@ public class Transfer extends Entity {
 
         public Loader(GTFSFeed feed) {
             super(feed, "transfers");
-            requiredColumns = new String[] {"from_stop_id", "to_stop_id", "transfer_type"};
         }
 
         @Override

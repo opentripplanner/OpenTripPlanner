@@ -31,7 +31,6 @@ public class Agency extends Entity {
 
         public Loader(GTFSFeed feed) {
             super(feed, "agency");
-            requiredColumns = new String[] {"agency_name", "agency_timezone"};
         }
 
         @Override

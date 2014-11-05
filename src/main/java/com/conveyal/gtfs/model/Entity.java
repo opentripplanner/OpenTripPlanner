@@ -1,8 +1,13 @@
 package com.conveyal.gtfs.model;
 
+import com.beust.jcommander.internal.Sets;
 import com.conveyal.gtfs.GTFSFeed;
 import com.csvreader.CsvReader;
 import com.conveyal.gtfs.error.*;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +16,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -32,17 +38,16 @@ public abstract class Entity implements Serializable {
 
         private static final Logger LOG = LoggerFactory.getLogger(Loader.class);
 
-        // TODO private static final StringDeduplicator;
+        private static final Deduplicator deduplicator = new Deduplicator();
 
         final GTFSFeed feed;    // the feed into which we are loading the entities
-        final String   tableName; // name of corresponding table without .txt
-        String[] requiredColumns = new String[]{}; // TODO remove and infer from field-loading calls
-        boolean  required        = false;
+        final String tableName; // name of corresponding table without .txt
+        boolean required = false;
+        Set<String> missingRequiredColumns = Sets.newHashSet();
 
         CsvReader reader;
         long      row;
         // TODO "String column" that is set before any calls to avoid passing around the column name
-        // TODO collapse empty field errors when the column is entirely missing -- store a Set<String> of missing fields
 
         public Loader(GTFSFeed feed, String tableName) {
             this.feed = feed;
@@ -58,69 +63,100 @@ public abstract class Entity implements Serializable {
             return true;
         }
 
-        protected String getStringField(String column, boolean required) throws IOException {
-            // TODO deduplicate strings
+        /**
+         * Fetch the value from the given column of the current row. Record an error the first time a column is
+         * seen to be missing, and whenever empty values are encountered.
+         * I was originally just calling getStringField from the other getXField functions as a first step to get
+         * the missing-field check. But we don't want deduplication performed on strings that aren't being retained.
+         * Therefore the missing-field behavior is this separate function.
+         * @return null if column was missing or field is empty
+         */
+        private String getFieldCheckRequired(String column, boolean required) throws IOException {
             String str = reader.get(column);
-            if (required && (str == null || str.isEmpty())) {
-                feed.errors.add(new EmptyFieldError(tableName, row, column));
+            if (str == null) {
+                if (!missingRequiredColumns.contains(column)) {
+                    feed.errors.add(new MissingColumnError(tableName, column));
+                    missingRequiredColumns.add(column);
+                }
+            } else if (str.isEmpty()) {
+                if (required) {
+                    feed.errors.add(new EmptyFieldError(tableName, row, column));
+                }
+                str = null;
             }
             return str;
         }
 
+        /** @return the given column from the current row as a deduplicated String. */
+        protected String getStringField(String column, boolean required) throws IOException {
+            String str = getFieldCheckRequired(column, required);
+            str = deduplicator.deduplicateString(str);
+            return str;
+        }
+
         protected int getIntField(String column, boolean required, int min, int max) throws IOException {
-            String str = null;
+            String str = getFieldCheckRequired(column, required);
             int val = INT_MISSING;
-            try {
-                str = reader.get(column);
-                if (str == null || str.isEmpty()) {
-                    if (required) {
-                        feed.errors.add(new EmptyFieldError(tableName, row, column));
-                    } else {
-                        val = 0; // TODO && emptyMeansZero
-                    }
-                } else {
-                    val = Integer.parseInt(str);
-                    checkRangeInclusive(min, max, val);
-                }
+            if (str == null) {
+                val = 0; // TODO boolean emptyMeansZero (in one case this is not true)
+            } else try {
+                val = Integer.parseInt(str);
+                checkRangeInclusive(min, max, val);
             } catch (NumberFormatException nfe) {
                 feed.errors.add(new NumberParseError(tableName, row, column));
             }
             return val;
         }
 
+        /**
+         * Fetch the given column of the current row, and interpret it as a time in the format HH:MM:SS.
+         * @return the time value in seconds since midnight
+         */
         protected int getTimeField(String column) throws IOException {
-            String str = null;
-            int val = -1;
-            try {
-                str = reader.get(column);
-                String[] fields = str.split(":");
-                if (fields.length != 3) {
-                    feed.errors.add(new TimeParseError(tableName, row, column));
-                } else {
+            String str = getFieldCheckRequired(column, true); // All time fields are required fields
+            int val = INT_MISSING;
+            String[] fields = str.split(":");
+            if (fields.length != 3) {
+                feed.errors.add(new TimeParseError(tableName, row, column));
+            } else {
+                try {
                     int hours = Integer.parseInt(fields[0]);
                     int minutes = Integer.parseInt(fields[1]);
                     int seconds = Integer.parseInt(fields[2]);
+                    checkRangeInclusive(0, 72, hours); // GTFS hours can go past midnight. Some trains run for 3 days.
+                    checkRangeInclusive(0, 59, minutes);
+                    checkRangeInclusive(0, 59, seconds);
                     val = (hours * 60 * 60) + minutes * 60 + seconds;
+                } catch (NumberFormatException nfe) {
+                    feed.errors.add(new TimeParseError(tableName, row, column));
                 }
-            } catch (NumberFormatException nfe) {
-                feed.errors.add(new TimeParseError(tableName, row, column));
             }
             return val;
         }
 
-        // TODO add range checking parameters, with private function that can record out-of-range errors
+        /**
+         * Fetch the given column of the current row, and interpret it as a date in the format YYYYMMDD.
+         * @return the date value as Joda DateTime, or null if it could not be parsed.
+         */
+        protected DateTime getDateField(String column, boolean required) throws IOException {
+            String str = getFieldCheckRequired(column, required);
+            DateTime dateTime = null;
+            if (str != null) try {
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
+                dateTime = formatter.parseDateTime(str);
+                checkRangeInclusive(2000, 2100, dateTime.getYear());
+            } catch (IllegalArgumentException iae) {
+                feed.errors.add(new DateParseError(tableName, row, column));
+            }
+            return dateTime;
+        }
+
         protected double getDoubleField(String column, boolean required, double min, double max) throws IOException {
-            String str = null;
-            double val = 0;
-            try {
-                str = reader.get(column);
-                if (required && (str == null || str.isEmpty())) {
-                    feed.errors.add(new EmptyFieldError(tableName, row, column));
-                    val = -1;
-                } else {
-                    val = Double.parseDouble(str);
-                    checkRangeInclusive(min, max, val);
-                }
+            String str = getFieldCheckRequired(column, required);
+            double val = Double.NaN;
+            if (str != null) try {
+                val = Double.parseDouble(str);
+                checkRangeInclusive(min, max, val);
             } catch (NumberFormatException nfe) {
                 feed.errors.add(new NumberParseError(tableName, row, column));
             }
@@ -133,11 +169,9 @@ public abstract class Entity implements Serializable {
          * using indirection through string-keyed maps.
          */
         protected <K, V> V getRefField(String column, boolean required, Map<K, V> target) throws IOException {
+            String str = getFieldCheckRequired(column, required);
             V val = null;
-            String str = reader.get(column);
-            if (required && (str == null || str.isEmpty())) {
-                feed.errors.add(new EmptyFieldError(tableName, row, column));
-            } else {
+            if (str != null) {
                 val = target.get(str);
                 if (val == null) {
                     feed.errors.add(new ReferentialIntegrityError(tableName, row, column, str));
@@ -146,22 +180,10 @@ public abstract class Entity implements Serializable {
             return val;
         }
 
-        protected boolean checkRequiredColumns() throws IOException {
-            boolean missing = false;
-            for (String column : requiredColumns) {
-                if (reader.getIndex(column) == -1) {
-                    feed.errors.add(new MissingColumnError(tableName, column));
-                    missing = true;
-                }
-            }
-            return missing;
-        }
-
-        /** Implemented by subclasses to read one row and produce one GTFS entity. */
+        /** Implemented by subclasses to read one row, produce one GTFS entity, and store that entity in a map. */
         protected abstract void loadOneRow() throws IOException;
 
-        // New parameter K inferred from map. Parameter E is the entity type from the containing class.
-        public <K> void loadTable(ZipFile zip) throws IOException {
+        public void loadTable(ZipFile zip) throws IOException {
             ZipEntry entry = zip.getEntry(tableName + ".txt");
             if (entry == null) {
                 /* This GTFS table did not exist in the zip. */
@@ -177,7 +199,6 @@ public abstract class Entity implements Serializable {
             CsvReader reader = new CsvReader(zis, ',', Charset.forName("UTF8"));
             this.reader = reader;
             reader.readHeaders();
-            checkRequiredColumns();
             while (reader.readRecord()) {
                 // reader.getCurrentRecord() is zero-based and does not include the header line, keep our own row count
                 if (++row % 500000 == 0) {

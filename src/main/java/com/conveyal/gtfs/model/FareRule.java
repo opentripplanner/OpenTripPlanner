@@ -29,7 +29,6 @@ public class FareRule extends Entity {
 
         public Loader(GTFSFeed feed) {
             super(feed, "fare_rules");
-            requiredColumns = new String[] {"fare_id"};
         }
 
         @Override

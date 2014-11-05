@@ -35,7 +35,6 @@ public class StopTime extends Entity implements Serializable {
 
         public Loader(GTFSFeed feed) {
             super(feed, "stop_times");
-            requiredColumns = new String[] {"trip_id", "stop_sequence"};
         }
 
         @Override

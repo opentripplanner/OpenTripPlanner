@@ -8,7 +8,7 @@ public class DateParseError extends GTFSError {
     }
 
     @Override public String getMessage() {
-        return "";
+        return "Could not parse date (format should be YYYYMMDD).";
     }
 
 }

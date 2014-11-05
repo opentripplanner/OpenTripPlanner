@@ -29,7 +29,6 @@ public class Frequency extends Entity {
 
         public Loader(GTFSFeed feed) {
             super(feed, "frequencies");
-            requiredColumns = new String[] {"trip_id"};
         }
 
         @Override

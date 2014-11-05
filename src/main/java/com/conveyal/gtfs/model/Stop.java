@@ -36,7 +36,6 @@ public class Stop extends Entity {
 
         public Loader(GTFSFeed feed) {
             super(feed, "stops");
-            requiredColumns = new String[] {"stop_id"};
         }
 
         @Override

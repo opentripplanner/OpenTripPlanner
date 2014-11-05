@@ -8,7 +8,7 @@ public class TimeParseError extends GTFSError {
     }
 
     @Override public String getMessage() {
-        return "";
+        return "Could not parse time (format should be HH:MM:SS).";
     }
 
 }

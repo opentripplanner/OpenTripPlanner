@@ -30,7 +30,6 @@ public class FareAttribute extends Entity {
 
         public Loader(GTFSFeed feed) {
             super(feed, "fare_attributes");
-            requiredColumns = new String[] {"fare_id", "price", "transfers"}; // TODO this is kind of redundant
         }
 
         @Override

@@ -35,7 +35,6 @@ public class Route extends Entity { // implements Entity.Factory<Route>
 
         public Loader(GTFSFeed feed) {
             super(feed, "routes");
-            requiredColumns = new String[] {"route_id", "route_type"};
         }
 
         @Override

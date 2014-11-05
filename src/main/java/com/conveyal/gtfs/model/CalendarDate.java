@@ -14,27 +14,28 @@
 package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
+import com.sun.org.apache.xerces.internal.impl.dv.xs.DateTimeDV;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 
 public class CalendarDate extends Entity {
 
-    public String service_id;
-    public String date;
-    public int    exception_type;
+    public String   service_id;
+    public DateTime date;
+    public int      exception_type;
 
     public static class Loader extends Entity.Loader<CalendarDate> {
 
         public Loader(GTFSFeed feed) {
             super(feed, "calendar_dates");
-            requiredColumns = new String[] {"service_id", "date", "exception_type"};
         }
 
         @Override
         public void loadOneRow() throws IOException {
             CalendarDate cd = new CalendarDate();
-            cd.service_id  = getStringField("service_id", true);
-            cd.date = getStringField("date", true);
+            cd.service_id = getStringField("service_id", true);
+            cd.date = getDateField("date", true);
             cd.exception_type = getIntField("exception_type", true, 0, 1);
             feed.calendarDates.put(cd.service_id, cd);
         }

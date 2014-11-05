@@ -29,7 +29,6 @@ public class Shape extends Entity {
 
         public Loader(GTFSFeed feed) {
             super(feed, "shapes");
-            requiredColumns = new String[] {"shape_id"};
         }
 
         @Override

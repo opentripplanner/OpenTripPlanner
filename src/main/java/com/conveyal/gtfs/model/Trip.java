@@ -34,7 +34,6 @@ public class Trip extends Entity {
 
         public Loader(GTFSFeed feed) {
             super(feed, "trips");
-            requiredColumns = new String[] {"trip_id"};
         }
 
         @Override
