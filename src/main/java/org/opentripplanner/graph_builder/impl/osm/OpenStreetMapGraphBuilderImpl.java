@@ -431,7 +431,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private boolean buildParkAndRideAreasForGroup(AreaGroup group) {
-            Envelope2D envelope = null;
+            Envelope envelope = new Envelope();
             // Process all nodes from outer rings
             List<IntersectionVertex> accessVertexes = new ArrayList<IntersectionVertex>();
             String creativeName = null;
@@ -442,12 +442,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
                 for (Ring ring : area.outermostRings) {
                     for (OSMNode node : ring.nodes) {
-                        // We need to lazy create the envelope as the default
-                        // constructor include (0,0) in the bounds...
-                        if (envelope == null)
-                            envelope = new Envelope2D(null, node.lon, node.lat, 0, 0);
-                        else
-                            envelope.add(node.lon, node.lat);
+                        envelope.expandToInclude(new Coordinate(node.lon, node.lat));
                         IntersectionVertex accessVertex = getVertexForOsmNode(node, area.parent);
                         if (accessVertex.getIncoming().isEmpty()
                                 || accessVertex.getOutgoing().isEmpty())
@@ -497,8 +492,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 // but this is an issue with OSM data.
             }
             // Place the P+R at the center of the envelope
-            ParkAndRideVertex parkAndRideVertex = new ParkAndRideVertex(graph, "P+R" + osmId, "P+R_"
-                    + osmId, envelope.getCenterX(), envelope.getCenterY(), creativeName);
+            ParkAndRideVertex parkAndRideVertex = new ParkAndRideVertex(graph, "P+R" + osmId,
+                    "P+R_" + osmId, (envelope.getMinX() + envelope.getMaxX()) / 2,
+                    (envelope.getMinY() + envelope.getMaxY()) / 2, creativeName);
             new ParkAndRideEdge(parkAndRideVertex);
             for (IntersectionVertex accessVertex : accessVertexes) {
                 new ParkAndRideLinkEdge(parkAndRideVertex, accessVertex);
