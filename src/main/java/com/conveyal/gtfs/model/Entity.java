@@ -14,11 +14,14 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import java.net.URL;
 
 /**
  * An abstract base class that represents a row in a GTFS table, e.g. a Stop, Trip, or Agency.
@@ -149,6 +152,21 @@ public abstract class Entity implements Serializable {
                 feed.errors.add(new DateParseError(tableName, row, column));
             }
             return dateTime;
+        }
+
+        /**
+         * Fetch the given column of the current row, and interpret it as a URL.
+         * @return the URL, or null if the field was missing or empty.
+         */
+        protected URL getUrlField(String column, boolean required) throws IOException {
+            String str = getFieldCheckRequired(column, required);
+            URL url = null;
+            if (str != null) try {
+                url = new URL(str);
+            } catch (MalformedURLException mue) {
+                feed.errors.add(new URLParseError(tableName, row, column));
+            }
+            return url;
         }
 
         protected double getDoubleField(String column, boolean required, double min, double max) throws IOException {

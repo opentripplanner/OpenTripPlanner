@@ -16,6 +16,7 @@ package com.conveyal.gtfs.model;
 import com.conveyal.gtfs.GTFSFeed;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class Stop extends Entity {
 
@@ -26,7 +27,7 @@ public class Stop extends Entity {
     public double stop_lat;
     public double stop_lon;
     public String zone_id;
-    public String stop_url;
+    public URL    stop_url;
     public int    location_type;
     public String parent_station;
     public String stop_timezone;
@@ -48,7 +49,7 @@ public class Stop extends Entity {
             s.stop_lat  = getDoubleField("stop_lat", true, -90D, 90D);
             s.stop_lon  = getDoubleField("stop_lon", true, -180D, 180D);
             s.zone_id   = getStringField("zone_id", false);
-            s.stop_url  = getStringField("stop_url", false);
+            s.stop_url  = getUrlField("stop_url", false);
             s.location_type  = getIntField("location_type", false, 0, 1);
             s.parent_station = getStringField("parent_station", false);
             s.stop_timezone  = getStringField("stop_timezone", false);

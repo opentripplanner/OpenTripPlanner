@@ -18,12 +18,13 @@ import com.conveyal.gtfs.error.GeneralError;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.net.URL;
 
 public class FeedInfo extends Entity {
 
-    public String   feed_id = "NONE";
+    public String feed_id = "NONE";
     public String   feed_publisher_name;
-    public String   feed_publisher_url;
+    public URL      feed_publisher_url;
     public String   feed_lang;
     public DateTime feed_start_date;
     public DateTime feed_end_date;
@@ -40,7 +41,7 @@ public class FeedInfo extends Entity {
             FeedInfo fi = new FeedInfo();
             fi.feed_id = getStringField("feed_id", false);
             fi.feed_publisher_name = getStringField("feed_publisher_name", true);
-            fi.feed_publisher_url = getStringField("feed_publisher_url", true);
+            fi.feed_publisher_url = getUrlField("feed_publisher_url", true);
             fi.feed_lang = getStringField("feed_lang", true);
             fi.feed_start_date = getDateField("feed_start_date", false);
             fi.feed_end_date = getDateField("feed_end_date", false);
