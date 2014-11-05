@@ -37,6 +37,7 @@ public class CalendarDate extends Entity {
             cd.service_id = getStringField("service_id", true);
             cd.date = getDateField("date", true);
             cd.exception_type = getIntField("exception_type", true, 0, 1);
+            cd.feed = feed;
             feed.calendarDates.put(cd.service_id, cd);
         }
 

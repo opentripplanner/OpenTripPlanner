@@ -19,10 +19,10 @@ import java.io.IOException;
 
 public class Transfer extends Entity {
 
-    public String from_stop_id;
-    public String to_stop_id;
-    public int    transfer_type;
-    public int    min_transfer_time;
+    public Stop from_stop;
+    public Stop to_stop;
+    public int  transfer_type;
+    public int  min_transfer_time;
 
     public static class Loader extends Entity.Loader<Transfer> {
 
@@ -33,15 +33,11 @@ public class Transfer extends Entity {
         @Override
         public void loadOneRow() throws IOException {
             Transfer tr = new Transfer();
-            tr.from_stop_id      = getStringField("from_stop_id", true);
-            tr.to_stop_id        = getStringField("to_stop_id", true);
+            tr.from_stop         = getRefField("from_stop_id", true, feed.stops);
+            tr.to_stop           = getRefField("to_stop_id", true, feed.stops);
             tr.transfer_type     = getIntField("transfer_type", true, 0, 3);
             tr.min_transfer_time = getIntField("min_transfer_time", false, 0, Integer.MAX_VALUE);
-
-            /* Check referential integrity. */
-            getRefField("from_stop_id", true, feed.stops);
-            getRefField("to_stop_id", true, feed.stops);
-
+            tr.feed = feed;
             feed.transfers.put(Long.toString(row), tr);
         }
 

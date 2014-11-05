@@ -39,8 +39,8 @@ public class Shape extends Entity {
             s.shape_pt_lon = getDoubleField("shape_pt_lon", true, -180D, 180D);
             s.shape_pt_sequence = getIntField("shape_pt_sequence", true, 0, Integer.MAX_VALUE);
             s.shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
-
-            feed.shapes.put(s.shape_id, s);
+            s.feed = feed;
+            feed.shapes.put(s.shape_id, s); // TODO this should be a multimap
         }
 
     }

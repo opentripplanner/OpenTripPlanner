@@ -19,7 +19,7 @@ import java.io.IOException;
 
 public class FareRule extends Entity {
 
-    public String fare_id;
+    public FareAttribute fare_id;
     public String route_id;
     public String origin_id;
     public String destination_id;
@@ -34,16 +34,13 @@ public class FareRule extends Entity {
         @Override
         public void loadOneRow() throws IOException {
             FareRule fr = new FareRule();
-            fr.fare_id = getStringField("fare_id", true);
+            fr.fare_id = getRefField("fare_id", true, feed.fareAttributes); // fare_rules add information to existing fare_attributes
             fr.route_id = getStringField("route_id", false);
             fr.origin_id = getStringField("origin_id", false);
             fr.destination_id = getStringField("destination_id", false);
             fr.contains_id = getStringField("contains_id", false);
-
-            /* Check referential integrity. */
-            getRefField("fare_id", true, feed.fareAttributes); // fare_rules add information to existing fare_attributes
-
-            feed.fareRules.put(fr.fare_id, fr);
+            fr.feed = feed;
+            feed.fareRules.put(fr.fare_id.fare_id, fr); // TODO like calendars, this is a case where we should merge two tables
         }
 
     }

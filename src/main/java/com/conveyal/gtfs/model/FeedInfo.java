@@ -46,9 +46,9 @@ public class FeedInfo extends Entity {
             fi.feed_start_date = getDateField("feed_start_date", false);
             fi.feed_end_date = getDateField("feed_end_date", false);
             fi.feed_version = getStringField("feed_version", false);
-            // Note that like all other Entity subclasses, this also has a feedId field.
+            fi.feed = feed;
             if (feed.feedInfo.isEmpty()) {
-                feed.feedInfo.put("ZERO", fi);
+                feed.feedInfo.put("NONE", fi);
                 feed.feedId = fi.feed_id;
             } else {
                 feed.errors.add(new GeneralError(tableName, row, null, "FeedInfo contains more than one record."));

@@ -23,7 +23,7 @@ public class Route extends Entity { // implements Entity.Factory<Route>
     public static final int BUS = 0;
 
     public String route_id;
-    public String agency_id;
+    public Agency agency;
     public String route_short_name;
     public String route_long_name;
     public String route_desc;
@@ -42,7 +42,7 @@ public class Route extends Entity { // implements Entity.Factory<Route>
         public void loadOneRow() throws IOException {
             Route r = new Route();
             r.route_id = getStringField("route_id", true);
-            r.agency_id = getStringField("agency_id", false); // TODO automatically associate with agency when there is only one agency in the feed
+            r.agency = getRefField("agency_id", false, feed.agency); // TODO automatically associate with agency when there is only one agency in the feed
             r.route_short_name = getStringField("route_short_name", false); // one or the other required, needs a special avalidator
             r.route_long_name = getStringField("route_long_name", false);
             r.route_desc = getStringField("route_desc", false);
@@ -50,11 +50,7 @@ public class Route extends Entity { // implements Entity.Factory<Route>
             r.route_url = getUrlField("route_url", false);
             r.route_color = getStringField("route_color", false);
             r.route_text_color = getStringField("route_text_color", false);
-            r.feedId = "FEED";
-
-            /* Check referential integrity */
-            getRefField("agency_id", false, feed.agency);
-
+            r.feed = feed;
             feed.routes.put(r.route_id, r);
         }
 

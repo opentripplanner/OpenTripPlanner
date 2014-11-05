@@ -45,16 +45,21 @@ public class GTFSFeed {
     public final Map<String, FeedInfo>      feedInfo       = Maps.newHashMap();
     public final Map<String, Frequency>     frequencies    = Maps.newHashMap();
     public final Map<String, Route>         routes         = Maps.newHashMap();
-    public final Map<String, Shape>         shapes         = db.getHashMap("shapes"); // Shapes table is often one of the two big ones
+    public final Map<String, Shape>         shapes         = Maps.newHashMap();
     public final Map<String, Stop>          stops          = Maps.newHashMap();
     public final Map<String, Transfer>      transfers      = Maps.newHashMap();
     public final Map<String, Trip>          trips          = Maps.newHashMap();
 
-    // Map from 2-tuples of (trip_id, stop_sequence) to stoptimes.
+    /* Map from 2-tuples of (trip_id, stop_sequence) to stoptimes. */
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
 
-    /* A place to accumulate errors while the feed is loaded.
-       The objective is to tolerate as many errors as possible and keep on going. */
+    /* A fare is a fare_attribute and all fare_rules that reference that fare_attribute. */
+    public final Map<String, Fare> fares = Maps.newHashMap();
+
+    /* A service is a calendar entry and all calendar_dates that modify that calendar entry. */
+    public final Map<String, Service> services = Maps.newHashMap();
+
+    /* A place to accumulate errors while the feed is loaded. Tolerate as many errors as possible and keep on loading. */
     public List<GTFSError> errors = Lists.newArrayList();
 
     /**
@@ -86,8 +91,6 @@ public class GTFSFeed {
         new Transfer.Loader(this).loadTable(zip);
         new Trip.Loader(this).loadTable(zip);
         new StopTime.Loader(this).loadTable(zip);
-        // TODO make the target map a field of the Entity.Factory, and set it on construction of a specific factory.
-        // This will eliminate the redundancy in the above calls, but causes some havoc with generics.
         LOG.info("{} errors", errors.size());
         for (GTFSError error : errors) {
             LOG.info("{}", error);
@@ -142,6 +145,24 @@ public class GTFSFeed {
             trips.add(trip_id);
         }
         LOG.info("Total patterns: {}", tripsForPattern.keySet().size());
+    }
+
+    public Service getOrCreateService(String serviceId) {
+        Service service = services.get(serviceId);
+        if (service == null) {
+            service = new Service(serviceId);
+            services.put(serviceId, service);
+        }
+        return service;
+    }
+
+    public Fare getOrCreateFare(String fareId) {
+        Fare fare = fares.get(fareId);
+        if (fare == null) {
+            fare = new Fare(fareId);
+            fares.put(fareId, fare);
+        }
+        return fare;
     }
 
     // TODO augment with unrolled calendar, patterns, etc. before validation

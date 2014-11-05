@@ -41,7 +41,7 @@ public class FareAttribute extends Entity {
             fa.payment_method    = getIntField("payment_method", true, 0, 1);
             fa.transfers         = getIntField("transfers", false, 0, 10); // TODO missing means "unlimited" in this case (rather than 0), supply default value
             fa.transfer_duration = getIntField("transfer_duration", false, 0, 24 * 60 * 60);
-
+            fa.feed = feed;
             feed.fareAttributes.put(fa.fare_id, fa);
         }
 

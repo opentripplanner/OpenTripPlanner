@@ -19,7 +19,7 @@ import java.io.IOException;
 
 public class Frequency extends Entity {
 
-    public String trip_id;
+    public Trip trip;
     public int start_time;
     public int end_time;
     public int headway_secs;
@@ -34,16 +34,13 @@ public class Frequency extends Entity {
         @Override
         public void loadOneRow() throws IOException {
             Frequency f = new Frequency();
-            f.trip_id = getStringField("trip_id", true);
+            f.trip = getRefField("trip_id", true, feed.trips);
             f.start_time = getTimeField("start_time");
             f.end_time = getTimeField("end_time");
             f.headway_secs = getIntField("headway_secs", true, 1, 24 * 60 * 60);
             f.exact_times = getIntField("exact_times", false, 0, 1);
-
-            /* Ref integrity */
-            getRefField("trip_id", true, feed.trips);
-
-            feed.frequencies.put(f.trip_id, f);
+            f.feed = feed;
+            feed.frequencies.put(f.trip.trip_id, f); // TODO this should be a multimap
         }
 
     }

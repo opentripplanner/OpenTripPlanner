@@ -30,26 +30,26 @@ import java.net.URL;
 // TODO K is the key type for this table
 public abstract class Entity implements Serializable {
 
-    /* The ID of the feed from which this entity was loaded. */
-    String feedId;
-
     public static final int INT_MISSING = Integer.MIN_VALUE;
+
+    /* The ID of the feed from which this entity was loaded. */
+    GTFSFeed feed;
+
 
     /* A class that can produce Entities from CSV, and record errors that occur in the process. */
     // This is almost a GTFSTable... rename?
     public static abstract class Loader<E extends Entity> {
 
         private static final Logger LOG = LoggerFactory.getLogger(Loader.class);
-
         private static final Deduplicator deduplicator = new Deduplicator();
 
-        final GTFSFeed feed;    // the feed into which we are loading the entities
-        final String tableName; // name of corresponding table without .txt
-        boolean required = false;
-        Set<String> missingRequiredColumns = Sets.newHashSet();
+        protected final GTFSFeed feed;    // the feed into which we are loading the entities
+        protected final String tableName; // name of corresponding table without .txt
+        protected final Set<String> missingRequiredColumns = Sets.newHashSet();
+        public boolean required = false;
 
-        CsvReader reader;
-        long      row;
+        protected CsvReader reader;
+        protected long      row;
         // TODO "String column" that is set before any calls to avoid passing around the column name
 
         public Loader(GTFSFeed feed, String tableName) {
@@ -201,6 +201,13 @@ public abstract class Entity implements Serializable {
         /** Implemented by subclasses to read one row, produce one GTFS entity, and store that entity in a map. */
         protected abstract void loadOneRow() throws IOException;
 
+        /**
+         * The main entry point into an Entity.Loader. Interprets each row of a CSV file within a zip file as a sinle
+         * GTFS entity, and loads them into a table.
+         *
+         * @param zip the zip file from which to read a table
+         * @throws IOException
+         */
         public void loadTable(ZipFile zip) throws IOException {
             ZipEntry entry = zip.getEntry(tableName + ".txt");
             if (entry == null) {

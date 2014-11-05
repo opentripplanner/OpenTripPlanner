@@ -44,6 +44,7 @@ public class Agency extends Entity {
             a.agency_phone = getStringField("agency_phone", false);
             a.agency_timezone = getStringField("agency_timezone", true);
             a.agency_fare_url = getUrlField("agency_fare_url", false);
+            a.feed = feed;
             feed.agency.put(a.agency_id, a);
         }
 

@@ -21,6 +21,7 @@ import java.io.Serializable;
 
 public class StopTime extends Entity implements Serializable {
 
+    /* StopTime cannot directly reference Trips or Stops because they would be serialized into the MapDB. */
     public String trip_id;
     public int    arrival_time;
     public int    departure_time;
@@ -49,15 +50,17 @@ public class StopTime extends Entity implements Serializable {
             st.pickup_type    = getIntField("pickup_type", false, 0, 3); // TODO add ranges as parameters
             st.drop_off_type  = getIntField("drop_off_type", false, 0, 3);
             st.shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
+            st.feed = null; // this could circular-serialize the whole feed
+            feed.stop_times.put(new Fun.Tuple2(st.trip_id, st.stop_sequence), st);
 
-            /* Check referential integrity. */
+            /*
+              Check referential integrity without storing references. StopTime cannot directly reference Trips or
+              Stops because they would be serialized into the MapDB.
+            */
             getRefField("trip_id", true, feed.trips);
             getRefField("stop_id", true, feed.stops);
-
-            feed.stop_times.put(new Fun.Tuple2(st.trip_id, st.stop_sequence), st);
         }
 
     }
-
 
 }
