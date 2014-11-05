@@ -28,6 +28,12 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
+	
+	private static final double WALK_DIST_EPSILON = 0.05;
+	private static final double WEIGHT_EPSILON = 0.02;
+	private static final int WEIGHT_DIFF_MARGIN = 30;
+	private static final double TIME_EPSILON = 0.02;
+	private static final int TIME_DIFF_MARGIN = 30;
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
@@ -87,30 +93,30 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
         if (thisState.isCarParked() != other.isCarParked())
             return false;
 
-//        if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof StreetEdge)
-//                && (!((StreetEdge) thisState.backEdge).getTurnRestrictions().isEmpty())))
-//            return false;
+        if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof StreetEdge)
+                && (!((StreetEdge) thisState.backEdge).getTurnRestrictions().isEmpty())))
+            return false;
 
-//        if (thisState.routeSequenceSubset(other)) {
-//            // TODO subset is not really the right idea
-//            return thisState.weight <= other.weight &&
-//            		thisState.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds();
-//            // && this.getNumBoardings() <= other.getNumBoardings();
-//        }
+        if (thisState.routeSequenceSubset(other)) {
+            // TODO subset is not really the right idea
+            return thisState.weight <= other.weight &&
+            		thisState.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds();
+            // && this.getNumBoardings() <= other.getNumBoardings();
+        }
 
         // If returning more than one result from GenericAStar, the search can be very slow
         // unless you replace the following code with:
         // return false;
         
-        boolean walkDistanceIsHopeful = thisState.walkDistance / other.getWalkDistance() < 1.05;
+        boolean walkDistanceIsHopeful = thisState.walkDistance / other.getWalkDistance() < 1+WALK_DIST_EPSILON;
         
         double weightRatio = thisState.weight / other.weight;
-        boolean weightIsHopeful = (weightRatio < 1.02 && thisState.weight - other.weight < 30);
+        boolean weightIsHopeful = (weightRatio < 1+WEIGHT_EPSILON && thisState.weight - other.weight < WEIGHT_DIFF_MARGIN);
         
         double t1 = (double)thisState.getElapsedTimeSeconds();
         double t2 = (double)other.getElapsedTimeSeconds();
         double timeRatio = t1/t2;
-        boolean timeIsHopeful = (timeRatio < 1.02) && (t1 - t2 <= 30);
+        boolean timeIsHopeful = (timeRatio < 1+TIME_EPSILON) && (t1 - t2 <= TIME_DIFF_MARGIN);
         
         // only dominate if everything is at least hopeful
         return walkDistanceIsHopeful && weightIsHopeful && timeIsHopeful;
