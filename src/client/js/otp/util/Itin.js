@@ -45,7 +45,22 @@ otp.util.Itin = {
         return locationStr.indexOf("::") != -1 ? 
             locationStr.split("::")[0] : null;
     },
-    
+
+    /** 
+     * Extracts the "lat,lng" from an OTP "name::lat,lng" or just "lat,lng"  if "name::" not present
+     *
+     * @param {string} locationStr an OTP GenericLocation string
+     * @return {{lat,lng}} the "lat" and "lng" component of an OTP location string "[name::]lat,lng". returns null if not present 
+     */
+    getLocationLatLng : function(locationStr) {
+        var location = locationStr.indexOf("::") != -1 ? 
+            locationStr.split("::")[1] : locationStr;
+	if (locationStr.indexOf(",") == -1) return null;
+
+        var [lat,lng]=location.split(",");
+	return {lat:lat,lng:lng};
+    },
+
     /**
      * Extracts the unqualified mode from an OTP "mode_qualifier" string
      *
