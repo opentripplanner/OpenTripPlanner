@@ -305,3 +305,19 @@ otp.config.modes = {
     //Options widgets)
     //    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle')
     };
+
+otp.config.defaultModeColours={
+       WALK:'#444',
+         BICYCLE:'#0073e5',
+         SUBWAY:'#f00',
+         RAIL: '#ff0000',
+         BUS:'#080',
+         TRAM:'#800',
+         CAR:'#FFA500',
+       DEFAULT:'#aaa'
+ };
+otp.config.defaultTripWeight=8;
+otp.config.defaultTripHighlightWeight=16;
+otp.config.defaultTripOpacity=0.3;
+otp.config.defaultTripHighlightColor = "yellow";
+
