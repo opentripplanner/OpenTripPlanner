@@ -220,6 +220,8 @@ otp.modules.planner.PlannerModule =
             this.startMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.startLatLng = this.startMarker.getLatLng();
+                // start flag has beenpicked up, clear any name that was set  
+		this.startName=null;
                 this.invokeHandlers("startChanged", [this.startLatLng]);
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
                 this.planTripFunction.apply(this);//planTrip();
@@ -251,6 +253,8 @@ otp.modules.planner.PlannerModule =
             this.endMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.endLatLng = this.endMarker.getLatLng();
+                // end flag has beenpicked up, clear any name that was set  
+		this.endName=null;
                 this.invokeHandlers("endChanged", [this.endLatLng]);
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
                 this.planTripFunction.apply(this);//this_.planTrip();
@@ -288,10 +292,10 @@ otp.modules.planner.PlannerModule =
     
     restoreMarkers : function(queryParams) {
       	this.startLatLng = otp.util.Geo.stringToLatLng(otp.util.Itin.getLocationPlace(queryParams.fromPlace));
-    	this.setStartPoint(this.startLatLng, false);
+    	this.setStartPoint(this.startLatLng, false,this.startName);
     	
       	this.endLatLng = otp.util.Geo.stringToLatLng(otp.util.Itin.getLocationPlace(queryParams.toPlace));
-    	this.setEndPoint(this.endLatLng, false);
+    	this.setEndPoint(this.endLatLng, false,this.endName);
     },
     
     planTrip : function(existingQueryParams, apiMethod) {
@@ -611,10 +615,10 @@ otp.modules.planner.PlannerModule =
     restorePlan : function(data){
     	
     	this.startLatLng = new L.LatLng(data.startLat, data.startLon);
-    	this.setStartPoint(this.startLatLng, false);
+    	this.setStartPoint(this.startLatLng, false,this.startName);
     	
     	this.endLatLng = new L.LatLng(data.endLat, data.endLon);
-    	this.setEndPoint(this.endLatLng, false);
+    	this.setEndPoint(this.endLatLng, false,this.endName);
     	
     	this.webapp.setBounds(new L.LatLngBounds([this.startLatLng, this.endLatLng]));
     	

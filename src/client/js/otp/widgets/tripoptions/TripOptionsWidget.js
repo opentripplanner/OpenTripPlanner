@@ -268,7 +268,11 @@ otp.widgets.tripoptions.LocationsSelector =
         if(data.queryParams.fromPlace) {
             console.log("rP: "+data.queryParams.fromPlace);
             var fromName = otp.util.Itin.getLocationName(data.queryParams.fromPlace);
+            var fromPlace = otp.util.Itin.getLocationPlace(data.queryParams.fromPlace);
+            var fromLatLng = otp.util.Itin.getLocationLatLng(data.queryParams.fromPlace);
+
             if(fromName) {
+		this.tripWidget.module.setStartPoint(fromLatLng,true,fromName);
                 $("#"+this.id+"-start").val(fromName);
                 this.tripWidget.module.startName = fromName;
             }
@@ -280,6 +284,9 @@ otp.widgets.tripoptions.LocationsSelector =
         
         if(data.queryParams.toPlace) {
             var toName = otp.util.Itin.getLocationName(data.queryParams.toPlace);
+            var toPlace = otp.util.Itin.getLocationPlace(data.queryParams.toPlace);
+            var toLatLng = otp.util.Itin.getLocationLatLng(data.queryParams.toPlace);
+
             if(toName) {
                 $("#"+this.id+"-end").val(toName);
                 this.tripWidget.module.endName = toName;
