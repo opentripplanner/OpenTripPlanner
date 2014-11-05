@@ -291,9 +291,9 @@ public class OSMWithTags {
     }
 
     /**
-     * @return True if this node / area is a bike P+R.
+     * @return True if this node / area is a bike parking.
      */
-    public boolean isBikeParkAndRide() {
+    public boolean isBikeParking() {
         return isTag("amenity", "bicycle_parking") && !isTag("access", "private")
                 && !isTag("access", "no");
     }

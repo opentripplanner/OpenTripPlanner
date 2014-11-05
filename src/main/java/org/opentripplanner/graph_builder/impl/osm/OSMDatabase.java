@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -68,8 +69,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     /* Map of all bike-rental nodes, keyed by their OSM ID */
     private Map<Long, OSMNode> bikeRentalNodes = new HashMap<Long, OSMNode>();
 
-    /* Map of all bike P+R nodes, keyed by their OSM ID */
-    private Map<Long, OSMNode> bikeParkAndRideNodes = new HashMap<Long, OSMNode>();
+    /* Map of all bike parking nodes, keyed by their OSM ID */
+    private Map<Long, OSMNode> bikeParkingNodes = new HashMap<Long, OSMNode>();
 
     /* Map of all non-area ways keyed by their OSM ID */
     private Map<Long, OSMWay> waysById = new HashMap<Long, OSMWay>();
@@ -85,6 +86,9 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     /* All P+R areas */
     private List<Area> parkAndRideAreas = new ArrayList<Area>();
+
+    /* All bike parking areas */
+    private List<Area> bikeParkingAreas = new ArrayList<Area>();
 
     /* Map of all area OSMWay for a given node */
     private Map<Long, Set<OSMWay>> areasForNode = new HashMap<Long, Set<OSMWay>>();
@@ -146,8 +150,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         return Collections.unmodifiableCollection(bikeRentalNodes.values());
     }
 
-    public Collection<OSMNode> getBikeParkAndRideNodes() {
-        return Collections.unmodifiableCollection(bikeParkAndRideNodes.values());
+    public Collection<OSMNode> getBikeParkingNodes() {
+        return Collections.unmodifiableCollection(bikeParkingNodes.values());
     }
 
     public Collection<Area> getWalkableAreas() {
@@ -156,6 +160,10 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     public Collection<Area> getParkAndRideAreas() {
         return Collections.unmodifiableCollection(parkAndRideAreas);
+    }
+
+    public Collection<Area> getBikeParkingAreas() {
+        return Collections.unmodifiableCollection(bikeParkingAreas);
     }
 
     public Collection<Long> getTurnRestrictionWayIds() {
@@ -200,8 +208,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             bikeRentalNodes.put(node.getId(), node);
             return;
         }
-        if (node.isBikeParkAndRide()) {
-            bikeParkAndRideNodes.put(node.getId(), node);
+        if (node.isBikeParking()) {
+            bikeParkingNodes.put(node.getId(), node);
             return;
         }
         if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
@@ -231,12 +239,12 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         applyLevelsForWay(way);
 
         /* filter out ways that are not relevant for routing */
-        if (!(OSMFilter.isWayRoutable(way) || way.isParkAndRide())) {
+        if (!(OSMFilter.isWayRoutable(way) || way.isParkAndRide() || way.isBikeParking())) {
             return;
         }
         /* An area can be specified as such, or be one by default as an amenity */
-        if ((way.isTag("area", "yes") || way.isTag("amenity", "parking"))
-                && way.getNodeRefs().size() > 2) {
+        if ((way.isTag("area", "yes") || way.isTag("amenity", "parking") || way.isTag("amenity",
+                "bicycle_parking")) && way.getNodeRefs().size() > 2) {
             // this is an area that's a simple polygon. So we can just add it straight
             // to the areas, if it's not part of a relation.
             if (!areaWayIds.contains(wayId)) {
@@ -356,7 +364,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
          * temporary and store only areas, so it should not take that much memory.
          */
         HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
-        for (Area area : parkAndRideAreas) {
+        for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
             for (Ring ring : area.outermostRings) {
                 for (int j = 0; j < ring.nodes.size(); j++) {
                     RingSegment ringSegment = new RingSegment();
@@ -631,8 +639,12 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 && permissions != StreetTraversalPermission.NONE) {
             walkableAreas.add(area);
         }
+        // Please note: the same area can be both car P+R AND bike park.
         if (area.parent.isParkAndRide()) {
             parkAndRideAreas.add(area);
+        }
+        if (area.parent.isBikeParking()) {
+            bikeParkingAreas.add(area);
         }
     }
 
