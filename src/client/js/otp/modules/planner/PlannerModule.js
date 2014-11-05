@@ -471,7 +471,11 @@ otp.modules.planner.PlannerModule =
 
             // draw the polyline
             var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
-            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: otp.config.defaultTripWeight || 8});
+            polyline.setStyle({ 
+                   color : this.getModeColor(leg.mode), 
+                   weight: otp.config.defaultTripWeight || 8,
+                   opacity: otp.config.defaultTripOpacity || 0.3
+		});
             this.pathLayer.addLayer(polyline);
             polyline.leg = leg;
             polyline.bindPopup("("+leg.routeShortName+") "+leg.routeLongName);
@@ -548,7 +552,7 @@ otp.modules.planner.PlannerModule =
         polyline.setStyle({ 
 			color : otp.config.defaultTripHighlightColor|| "yellow", 
 			weight: otp.config.defaultTripHighlightWeight || 16, 
-			opacity: otp.config.defaultTripOpacity || 0.3 
+			opacity: otp.config.defaultTripHighlightOpacity || 1 
 		});
         this.highlightLayer.addLayer(polyline);
     },
