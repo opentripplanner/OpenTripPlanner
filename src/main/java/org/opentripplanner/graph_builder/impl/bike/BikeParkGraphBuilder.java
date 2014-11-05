@@ -18,12 +18,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.updater.bike_park.BikeParkDataSource;
@@ -44,7 +42,6 @@ public class BikeParkGraphBuilder implements GraphBuilder {
 
     private static Logger LOG = LoggerFactory.getLogger(BikeParkGraphBuilder.class);
 
-
     private BikeParkDataSource dataSource;
 
     public void setDataSource(BikeParkDataSource dataSource) {
@@ -55,7 +52,6 @@ public class BikeParkGraphBuilder implements GraphBuilder {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 
         LOG.info("Building bike parks from static source...");
-        NetworkLinkerLibrary networkLinkerLibrary = new NetworkLinkerLibrary(graph, extra);
         BikeRentalStationService service = graph.getService(BikeRentalStationService.class, true);
         if (!dataSource.update()) {
             LOG.warn("No bike parks found from the data source.");
@@ -67,9 +63,6 @@ public class BikeParkGraphBuilder implements GraphBuilder {
             service.addBikePark(bikePark);
             BikeParkVertex bikeParkVertex = new BikeParkVertex(graph, bikePark);
             new BikeParkEdge(bikeParkVertex);
-            if (!networkLinkerLibrary.connectVertexToStreets(bikeParkVertex).getResult()) {
-                LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked(bikeParkVertex)));
-            }
         }
         LOG.info("Created " + bikeParks.size() + " bike parks.");
     }

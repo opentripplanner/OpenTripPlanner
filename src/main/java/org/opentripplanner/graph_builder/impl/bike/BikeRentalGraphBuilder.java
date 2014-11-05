@@ -18,15 +18,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.loader.LinkRequest;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
@@ -52,7 +48,6 @@ public class BikeRentalGraphBuilder implements GraphBuilder {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 
         LOG.info("Building bike rental stations from static source...");
-        NetworkLinkerLibrary networkLinkerLibrary = new NetworkLinkerLibrary(graph, extra);
         BikeRentalStationService service = graph.getService(BikeRentalStationService.class, true);
         if (!dataSource.update()) {
             LOG.warn("No bike rental found from the data source.");
@@ -63,13 +58,6 @@ public class BikeRentalGraphBuilder implements GraphBuilder {
         for (BikeRentalStation station : stations) {
             service.addBikeRentalStation(station);
             BikeRentalStationVertex vertex = new BikeRentalStationVertex(graph, station);
-            if (!networkLinkerLibrary.connectVertexToStreets(vertex).getResult()) {
-                LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(vertex)));
-            }
-            LinkRequest request = networkLinkerLibrary.connectVertexToStreets(vertex);
-            for (Edge e : request.getEdgesAdded()) {
-                graph.addTemporaryEdge(e);
-            }
             new RentABikeOnEdge(vertex, vertex, station.networks);
             if (station.allowDropoff)
                 new RentABikeOffEdge(vertex, vertex, station.networks);
