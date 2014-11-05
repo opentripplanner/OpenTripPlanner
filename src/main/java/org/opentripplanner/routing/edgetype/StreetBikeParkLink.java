@@ -29,6 +29,11 @@ import com.vividsolutions.jts.geom.LineString;
 /**
  * This represents the connection between a street vertex and a bike park vertex.
  * 
+ * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
+ * (https://goabout.com/).
+ * 
+ * @author laurent
+ * @author GoAbout
  */
 public class StreetBikeParkLink extends Edge {
 

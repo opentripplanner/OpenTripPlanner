@@ -32,6 +32,11 @@ import com.vividsolutions.jts.geom.LineString;
  * 
  * Cost is the time to park a bike, estimated.
  * 
+ * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
+ * (https://goabout.com/).
+ * 
+ * @author laurent
+ * @author GoAbout
  */
 public class BikeParkEdge extends Edge {
 

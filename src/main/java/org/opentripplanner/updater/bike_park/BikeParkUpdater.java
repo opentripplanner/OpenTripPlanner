@@ -50,6 +50,12 @@ import org.slf4j.LoggerFactory;
  * fietsstalling.sourceType = kml-placemarks
  * fietsstalling.url = http://host.tld/fietsstalling.kml
  * </pre>
+ * 
+ * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
+ * (https://goabout.com/).
+ * 
+ * @author laurent
+ * @author GoAbout
  */
 public class BikeParkUpdater extends PollingGraphUpdater {
 

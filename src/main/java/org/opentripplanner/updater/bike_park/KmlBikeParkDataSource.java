@@ -30,6 +30,11 @@ import org.slf4j.LoggerFactory;
  * Load bike park from a KML placemarks. Use name as bike park name and point coordinates. Rely on:
  * 1) bike park to be KML Placemarks, 2) geometry to be Point.
  * 
+ * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
+ * (https://goabout.com/).
+ * 
+ * @author laurent
+ * @author GoAbout
  */
 public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesConfigurable {
 

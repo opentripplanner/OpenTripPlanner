@@ -24,7 +24,11 @@ import org.opentripplanner.routing.graph.Vertex;
  * Connected to streets by StreetBikeParkLink. Transition for parking the bike is handled by
  * BikeParkEdge.
  * 
+ * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
+ * (https://goabout.com/).
+ * 
  * @author laurent
+ * @author GoAbout
  * 
  */
 public class BikeParkVertex extends Vertex {

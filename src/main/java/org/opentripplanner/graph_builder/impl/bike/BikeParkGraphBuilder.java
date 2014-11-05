@@ -33,6 +33,12 @@ import org.slf4j.LoggerFactory;
 /**
  * This graph builder allow one to statically build bike park using the same source as the dynamic
  * bike park updater.
+ * 
+ * Bike park-and-ride and "OV-fiets mode" development has been funded by GoAbout
+ * (https://goabout.com/).
+ * 
+ * @author laurent
+ * @author GoAbout
  */
 public class BikeParkGraphBuilder implements GraphBuilder {
 
