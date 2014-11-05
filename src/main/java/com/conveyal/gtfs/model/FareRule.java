@@ -14,12 +14,13 @@
 package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
+import com.conveyal.gtfs.error.DuplicateKeyError;
 
 import java.io.IOException;
 
 public class FareRule extends Entity {
 
-    public FareAttribute fare_id;
+    public Fare fare;
     public String route_id;
     public String origin_id;
     public String destination_id;
@@ -33,14 +34,19 @@ public class FareRule extends Entity {
 
         @Override
         public void loadOneRow() throws IOException {
+
+            /* Calendars and Fares are special: they are stored as joined tables rather than simple maps. */
+            String fareId = getStringField("fare_id", true);
+            Fare fare = feed.getOrCreateFare(fareId);
             FareRule fr = new FareRule();
-            fr.fare_id = getRefField("fare_id", true, feed.fareAttributes); // fare_rules add information to existing fare_attributes
+            fr.fare = fare;
             fr.route_id = getStringField("route_id", false);
             fr.origin_id = getStringField("origin_id", false);
             fr.destination_id = getStringField("destination_id", false);
             fr.contains_id = getStringField("contains_id", false);
             fr.feed = feed;
-            feed.fareRules.put(fr.fare_id.fare_id, fr); // TODO like calendars, this is a case where we should merge two tables
+            fare.fare_rules.add(fr);
+
         }
 
     }

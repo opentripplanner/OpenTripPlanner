@@ -14,6 +14,7 @@
 package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
+import com.conveyal.gtfs.error.DuplicateKeyError;
 import com.sun.org.apache.xerces.internal.impl.dv.xs.DateTimeDV;
 import org.joda.time.DateTime;
 
@@ -21,7 +22,7 @@ import java.io.IOException;
 
 public class CalendarDate extends Entity {
 
-    public String   service_id;
+    public Service  service;
     public DateTime date;
     public int      exception_type;
 
@@ -33,14 +34,21 @@ public class CalendarDate extends Entity {
 
         @Override
         public void loadOneRow() throws IOException {
-            CalendarDate cd = new CalendarDate();
-            cd.service_id = getStringField("service_id", true);
-            cd.date = getDateField("date", true);
-            cd.exception_type = getIntField("exception_type", true, 0, 1);
-            cd.feed = feed;
-            feed.calendarDates.put(cd.service_id, cd);
+            /* Calendars and Fares are special: they are stored as joined tables rather than simple maps. */
+            String service_id = getStringField("service_id", true);
+            Service service = feed.getOrCreateService(service_id);
+            DateTime date = getDateField("date", true);
+            if (service.calendar_dates.containsKey(date)) {
+                feed.errors.add(new DuplicateKeyError(tableName, row, "(service_id, date)"));
+            } else {
+                CalendarDate cd = new CalendarDate();
+                cd.service = service;
+                cd.date = date;
+                cd.exception_type = getIntField("exception_type", true, 0, 1);
+                cd.feed = feed;
+                service.calendar_dates.put(date, cd);
+            }
         }
-
     }
 
 }

@@ -38,10 +38,6 @@ public class GTFSFeed {
 
     /* Some of these should be multimaps since they don't have an obvious unique key. */
     public final Map<String, Agency>        agency         = Maps.newHashMap();
-    public final Map<String, Calendar>      calendars      = Maps.newHashMap();
-    public final Map<String, CalendarDate>  calendarDates  = Maps.newHashMap();
-    public final Map<String, FareAttribute> fareAttributes = Maps.newHashMap();
-    public final Map<String, FareRule>      fareRules      = Maps.newHashMap();
     public final Map<String, FeedInfo>      feedInfo       = Maps.newHashMap();
     public final Map<String, Frequency>     frequencies    = Maps.newHashMap();
     public final Map<String, Route>         routes         = Maps.newHashMap();
@@ -90,7 +86,7 @@ public class GTFSFeed {
         new Stop.Loader(this).loadTable(zip);
         new Transfer.Loader(this).loadTable(zip);
         new Trip.Loader(this).loadTable(zip);
-        new StopTime.Loader(this).loadTable(zip);
+        new StopTime.Loader(this).loadTable(zip); // comment out this line for quick testing using NL feed
         LOG.info("{} errors", errors.size());
         for (GTFSError error : errors) {
             LOG.info("{}", error);

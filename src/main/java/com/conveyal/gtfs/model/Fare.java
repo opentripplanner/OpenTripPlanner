@@ -14,7 +14,7 @@ import java.util.Map;
 public class Fare {
 
     String         fare_id;
-    FareAttribute  fare_attributes;
+    FareAttribute  fare_attribute;
     List<FareRule> fare_rules = Lists.newArrayList();
 
     public Fare(String fare_id) {
