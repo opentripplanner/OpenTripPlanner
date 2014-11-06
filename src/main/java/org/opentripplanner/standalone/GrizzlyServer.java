@@ -52,7 +52,7 @@ public class GrizzlyServer {
 
         /* Configure SSL */
         SSLContextConfigurator sslConfig = new SSLContextConfigurator();
-        sslConfig.setKeyStoreFile("/var/otp/ssh/keystore_server");
+        sslConfig.setKeyStoreFile("/var/otp/keystore");
         sslConfig.setKeyStorePass("opentrip");
 
         /* OTP is CPU-bound, so we want only as many worker threads as we have cores. */
