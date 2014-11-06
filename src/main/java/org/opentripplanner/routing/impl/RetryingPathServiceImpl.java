@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Context;
 
+import jj2000.j2k.NotImplementedError;
+
 public class RetryingPathServiceImpl implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RetryingPathServiceImpl.class);
@@ -219,5 +221,10 @@ public class RetryingPathServiceImpl implements PathService {
     public void setSptService(SPTService sptService) {
         this.sptService = sptService;
     }
+
+	@Override
+	public void setSPTVisitor(SPTVisitor vis) {
+		throw new NotImplementedError();
+	}
 
 }

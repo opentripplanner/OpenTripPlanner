@@ -22,6 +22,8 @@ import static org.opentripplanner.routing.automata.Nonterminal.star;
 import java.util.Collections;
 import java.util.List;
 
+import jj2000.j2k.NotImplementedError;
+
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -226,5 +228,10 @@ public class LongDistancePathService implements PathService {
         }
 
     }
+
+	@Override
+	public void setSPTVisitor(SPTVisitor vis) {
+		throw new NotImplementedError();
+	}
     
 }

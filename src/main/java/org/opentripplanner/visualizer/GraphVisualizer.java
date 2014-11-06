@@ -84,8 +84,11 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.ParetoPathService;
+import org.opentripplanner.routing.impl.SPTVisitor;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -369,7 +372,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JList<GraphBuilderAnnotation> annotationMatches;
     
-    private ParetoPathService pathservice;
+    private PathService pathservice;
         
     private GenericAStar sptService = new GenericAStar();
 
@@ -459,6 +462,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         this.graph = graphService.getGraph();
         this.pathservice = new ParetoPathService(graphService, sptService);
+        //this.pathservice = new LongDistancePathService(graphService, sptService);
         setTitle("GraphVisualizer");
         
         init();
@@ -1454,7 +1458,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         }
         
         // set up a visitor to the path service so we can get the SPT as it's generated
-        ParetoPathService.SPTVisitor vis = pathservice.new SPTVisitor();
+        SPTVisitor vis = new SPTVisitor();
         pathservice.setSPTVisitor(vis);
         
         long t0 = System.currentTimeMillis();

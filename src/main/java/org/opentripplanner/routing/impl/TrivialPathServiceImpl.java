@@ -16,6 +16,8 @@ package org.opentripplanner.routing.impl;
 import java.util.Collections;
 import java.util.List;
 
+import jj2000.j2k.NotImplementedError;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -41,4 +43,9 @@ public class TrivialPathServiceImpl implements PathService {
         }
         return spt.getPaths();
     }
+
+	@Override
+	public void setSPTVisitor(SPTVisitor vis) {
+		throw new NotImplementedError();
+	}
 }
