@@ -26,13 +26,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Iterables;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
+
 import lombok.Setter;
 
 import org.codehaus.jettison.json.JSONException;
@@ -832,7 +835,8 @@ public class TransitIndex {
     /** Backport of semanticHash from master to 0.10.x: use the same hash function as in master. */
     @GET
     @Path("/semanticHash")
-    public String getSemanticHashForTrip (@QueryParam("tripId")   String tripIdString,
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getSemanticHashForTrip (@QueryParam("tripId")   String tripIdString,
                                           @QueryParam("routerId") String routerId) {
 
         AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
@@ -890,8 +894,19 @@ public class TransitIndex {
         }
         sb.append(':');
         sb.append(encoder.encode(hasher.hash().asBytes()));
-        return sb.toString();
+        
+        HashResponse response = new HashResponse();
+        response.hash = sb.toString();
+        return response;
 
+    }
+    
+    @XmlRootElement(name="SemanticHash")
+    public static class HashResponse {
+    	
+        @XmlAttribute
+        @JsonSerialize
+    	String hash;
     }
 
 }
