@@ -56,14 +56,18 @@ public class OTPApplication extends Application {
     }
 
     public final OTPServer server;
+    private final boolean secure;
 
     /**
      * The OTPServer provides entry points to OTP routing functionality for a collection of OTPRouters.
      * It provides a Java API, not an HTTP API.
      * The OTPApplication wraps an OTPServer in a Jersey (JAX-RS) Application, configuring an HTTP API.
+     * @param server The OTP server to wrap
+     * @param secure Should this server require authentication over HTTPS to access secure resources, e.g. /routers? 
      */
-    public OTPApplication (OTPServer server) {
+    public OTPApplication (OTPServer server, boolean secure) {
         this.server = server;
+        this.secure = secure;
     }
 
     /**
@@ -102,11 +106,16 @@ public class OTPApplication extends Application {
             PointSetResource.class,
             GraphInspectorTileResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
-            AuthFilter.class,
-            CorsFilter.class,
-            // Enforce roles annotations defined by JSR-250
-            RolesAllowedDynamicFeature.class
+            CorsFilter.class
         ));
+        
+        if (this.secure) {
+            // process authentication
+            classes.add(AuthFilter.class);
+            // Enforce roles annotations defined by JSR-250
+            classes.add(RolesAllowedDynamicFeature.class);
+        }
+        
         return classes;
     }
 

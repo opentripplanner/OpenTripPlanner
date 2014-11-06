@@ -88,7 +88,7 @@ public class GrizzlyServer {
         /* Add a few handlers (~= servlets) to the Grizzly server. */
 
         /* 1. A Grizzly wrapper around the Jersey Application. */
-        Application app = new OTPApplication(server);
+        Application app = new OTPApplication(server, !params.insecure);
         HttpHandler dynamicHandler = ContainerFactory.createContainer(HttpHandler.class, app);
         httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 
