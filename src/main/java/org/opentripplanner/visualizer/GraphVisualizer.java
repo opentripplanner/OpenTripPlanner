@@ -456,13 +456,17 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	protected State lastStateClicked=null;
 
+	private JCheckBox longDistanceModeCheckbox;
+
+	private GraphService graphService;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
         
+        this.graphService = graphService;
         this.graph = graphService.getGraph();
         this.pathservice = new ParetoPathService(graphService, sptService);
-        //this.pathservice = new LongDistancePathService(graphService, sptService);
         setTitle("GraphVisualizer");
         
         init();
@@ -757,9 +761,31 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         pane.add(optimizeTypePane);
         
+        // long distance mode
+        ItemListener onChangeLongDistanceMode = new ItemListener(){
+        	@Override
+        	public void itemStateChanged(ItemEvent e) {
+        		JCheckBox item = (JCheckBox) e.getItem();
+        		setLongDistanceMode( item.isSelected() );
+        	}
+        };
+        longDistanceModeCheckbox = new JCheckBox("long distance mode");
+        longDistanceModeCheckbox.setSelected(false);
+        longDistanceModeCheckbox.addItemListener( onChangeLongDistanceMode );
+        pane.add(longDistanceModeCheckbox);
+        
 		return pane;
 	}
 	
+	protected void setLongDistanceMode(boolean selected) {
+		if( selected ){
+			this.pathservice = new LongDistancePathService(graphService, sptService);
+		} else {
+			this.pathservice = new ParetoPathService(graphService, sptService);
+		}
+		
+	}
+
 	OptimizeType getSelectedOptimizeType(){
 		if(opQuick.isSelected()){
 			return OptimizeType.QUICK;
