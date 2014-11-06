@@ -160,6 +160,10 @@ public class CommandLineParameters {
     @Parameter( validateWith = ReadableFile.class, // the remaining parameters in one array
     description = "files") 
     List<File> files = new ArrayList<File>();
+    
+    @Parameter( names = {"--insecure"},
+            description = "allow unauthenticated access to sensitive resources, e.g. /routers")
+    boolean insecure = false;
 
     /** Set some convenience parameters based on other parameters' values. */
     public void infer () {

@@ -52,7 +52,7 @@ public class GrizzlyServer {
 
         /* Configure SSL */
         SSLContextConfigurator sslConfig = new SSLContextConfigurator();
-        sslConfig.setKeyStoreFile("/var/otp/ssh/keystore_server");
+        sslConfig.setKeyStoreFile("/var/otp/keystore");
         sslConfig.setKeyStorePass("opentrip");
 
         /* OTP is CPU-bound, so we want only as many worker threads as we have cores. */
@@ -88,7 +88,7 @@ public class GrizzlyServer {
         /* Add a few handlers (~= servlets) to the Grizzly server. */
 
         /* 1. A Grizzly wrapper around the Jersey Application. */
-        Application app = new OTPApplication(server);
+        Application app = new OTPApplication(server, !params.insecure);
         HttpHandler dynamicHandler = ContainerFactory.createContainer(HttpHandler.class, app);
         httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 

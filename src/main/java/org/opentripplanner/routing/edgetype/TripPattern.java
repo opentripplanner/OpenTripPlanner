@@ -178,7 +178,8 @@ public class TripPattern implements Serializable {
         arriveVertices = new PatternArriveVertex[size];
         boardEdges     = new TransitBoardAlight[size];
         alightEdges    = new TransitBoardAlight[size];
-        hopEdges       = new PatternHop[size];
+        // one less hop than stops
+        hopEdges       = new PatternHop[size - 1];
         dwellEdges     = new PatternDwell[size];
     }
 
