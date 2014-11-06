@@ -397,8 +397,6 @@ public class Routers {
             if (!osmFiles.isEmpty()) {
                 graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
-                // Assume long-distance mode (TODO: make configurable . . . wait for new config file format)
-                graphBuilder.addGraphBuilder(new StreetfulStopLinker());
             }
             
             // link stops directly by distance if no OSM
