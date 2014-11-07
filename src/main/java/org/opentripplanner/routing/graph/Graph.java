@@ -147,8 +147,6 @@ public class Graph implements Serializable {
 
     private Collection<Agency> agencies = new HashSet<Agency>();
 
-    private transient Set<Edge> temporaryEdges;
-
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
     private transient TimeZone timeZone = null;
@@ -197,7 +195,6 @@ public class Graph implements Serializable {
 
     public Graph() {
         this.vertices = new ConcurrentHashMap<String, Vertex>();
-        this.temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
         this.edgeById = new ConcurrentHashMap<Integer, Edge>();
         this.vertexById = new ConcurrentHashMap<Integer, Vertex>();
     }
@@ -443,12 +440,6 @@ public class Graph implements Serializable {
         if (!containsVertex(vertex)) {
             throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
-        for (Edge e : vertex.getIncoming()) {
-            temporaryEdges.remove(e);
-        }
-        for (Edge e : vertex.getOutgoing()) {
-            temporaryEdges.remove(e);
-        }
         vertex.removeAllEdges();
         this.remove(vertex);
     }
@@ -635,7 +626,6 @@ public class Graph implements Serializable {
      * TODO: do we really need a factory for different street vertex indexes?
      */
     public void index(StreetVertexIndexFactory indexFactory) {
-        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
         streetIndex = indexFactory.newIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
@@ -838,29 +828,6 @@ public class Graph implements Serializable {
     public void addAgency(Agency agency) {
         agencies.add(agency);
         agenciesIds.add(agency.getId());
-    }
-
-    public void addTemporaryEdge(Edge edge) {
-        temporaryEdges.add(edge);
-    }
-
-    public void removeTemporaryEdge(Edge edge) {
-        if (edge.getFromVertex() == null || edge.getToVertex() == null) {
-            return;
-        }
-        temporaryEdges.remove(edge);
-    }
-
-    public Collection<Edge> getTemporaryEdges() {
-        return temporaryEdges;
-    }
-
-    public VertexComparatorFactory getVertexComparatorFactory() {
-        return vertexComparatorFactory;
-    }
-
-    public void setVertexComparatorFactory(VertexComparatorFactory vertexComparatorFactory) {
-        this.vertexComparatorFactory = vertexComparatorFactory;
     }
 
     /**

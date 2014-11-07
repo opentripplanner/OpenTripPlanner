@@ -18,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -30,7 +29,6 @@ import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -41,6 +39,7 @@ import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
+import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
@@ -61,7 +60,6 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopMatcher;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
@@ -75,7 +73,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
-import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -298,7 +295,6 @@ public class TestRequest extends TestCase {
         Vertex v3 = getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST").getOutgoing().iterator()
                 .next().getToVertex();
         Vertex v4 = getVertexByCrossStreets("SE 92ND AVE", "SE FLAVEL ST");
-        Vertex[] vertices = { v1, v3, v2, v4 };
         assertNotNull(v1);
         assertNotNull(v2);
         assertNotNull(v3);
@@ -306,17 +302,30 @@ public class TestRequest extends TestCase {
 
         TestPlanner planner = new TestPlanner("portland", v1.getLabel(), v4.getLabel(),
                 Arrays.asList(v2.getLabel(), v3.getLabel()));
-        List<GraphPath> paths = planner.getPaths();
+        TripPlan plan = planner.getItineraries().getPlan();
+        Itinerary itinerary = plan.itinerary.get(0);
+        assertTrue(itinerary.legs.size() == 3);
+        Leg legs[] = itinerary.legs.toArray(new Leg[3]);
 
-        assertTrue(paths.size() > 0);
-        GraphPath path = paths.get(0);
-        int curVertex = 0;
-        for (State s : path.states) {
-            if (s.getVertex().equals(vertices[curVertex])) {
-                curVertex += 1;
-            }
-        }
-        assertEquals(4, curVertex); // found all four, in the correct order (1, 3, 2, 4)
+        assertEquals(v1.getLat(), plan.from.lat);
+        assertEquals(v1.getLon(), plan.from.lon);
+        assertEquals(v1.getLat(), legs[0].from.lat);
+        assertEquals(v1.getLon(), legs[0].from.lon);
+
+        assertEquals(v2.getLon(), legs[0].to.lon);
+        assertEquals(v2.getLat(), legs[0].to.lat);
+        assertEquals(v2.getLat(), legs[1].from.lat);
+        assertEquals(v2.getLon(), legs[1].from.lon);
+
+        assertEquals(v3.getLon(), legs[1].to.lon);
+        assertEquals(v3.getLat(), legs[1].to.lat);
+        assertEquals(v3.getLat(), legs[2].from.lat);
+        assertEquals(v3.getLon(), legs[2].from.lon);
+
+        assertEquals(v4.getLon(), legs[2].to.lon);
+        assertEquals(v4.getLat(), legs[2].to.lat);
+        assertEquals(v4.getLon(), plan.to.lon);
+        assertEquals(v4.getLat(), plan.to.lat);
     }
 
     private Vertex getVertexByCrossStreets(String s1, String s2) {
@@ -865,10 +874,6 @@ public class TestRequest extends TestCase {
      * from HTTP Query string.
      */
     private static class TestPlanner extends Planner {
-        // TODO Shouldn't we use the Router pathService instead?
-        // And why do we need a TravelingSalesmanPathService btw?
-        private TravelingSalesmanPathService tsp;
-
         public TestPlanner(String routerId, String v1, String v2) {
             super();
             this.fromPlace = Arrays.asList(v1);
@@ -895,8 +900,6 @@ public class TestRequest extends TestCase {
             this(routerId, v1, v2);
             this.modes = Arrays.asList(new QualifiedModeSetSequence("WALK"));
             this.intermediatePlaces = intermediates;
-            Router router = otpServer.getRouter(routerId);
-            tsp = new TravelingSalesmanPathService(router.graph, router.pathService);
         }
 
         public void setBannedTrips(List<String> bannedTrips) {
@@ -925,17 +928,6 @@ public class TestRequest extends TestCase {
 
         public RoutingRequest buildRequest() throws ParameterException {
             return super.buildRequest();
-        }
-
-        public List<GraphPath> getPaths() {
-            try {
-                RoutingRequest options = this.buildRequest();
-                options.intermediatePlacesOrdered = false;
-                return tsp.getPaths(options);
-            } catch (ParameterException e) {
-                e.printStackTrace();
-                return null;
-            }
         }
 
         public Response getItineraries() {

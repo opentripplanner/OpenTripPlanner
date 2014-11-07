@@ -430,8 +430,7 @@ public class PlanGeneratorTest {
                 graph, enterDropoffStation);
         BikeRentalStationVertex v58 = new BikeRentalStationVertex(
                 graph, exitDropoffStation);
-        StreetLocation v60 = new StreetLocation(
-                graph, "Vertex 60", new Coordinate(0, 90), "Vertex 60");
+        StreetLocation v60 = new StreetLocation("Vertex 60", new Coordinate(0, 90), "Vertex 60");
 
         // Vertex initialization that can't be done using the constructor
         v0.setExitName("Ausfahrt");
@@ -664,7 +663,6 @@ public class PlanGeneratorTest {
         forwardOptions.dateTime = 0L;
         forwardOptions.bikeRentalPickupTime = 4;
         forwardOptions.bikeRentalDropoffTime = 2;
-        e53.visibleTo = forwardContext;
 
         // Forward traversal of all edges
         State s0Forward = new State(forwardOptions);
@@ -711,7 +709,6 @@ public class PlanGeneratorTest {
         backwardOptions.bikeRentalPickupTime = 4;
         backwardOptions.bikeRentalDropoffTime = 2;
         backwardOptions.setArriveBy(true);
-        e53.visibleTo = backwardContext;
 
         // Backward traversal of all edges
         State s60Backward = new State(backwardOptions);
@@ -758,7 +755,6 @@ public class PlanGeneratorTest {
         onboardOptions.dateTime = 6L;
         onboardOptions.bikeRentalPickupTime = 4;
         onboardOptions.bikeRentalDropoffTime = 2;
-        e53.visibleTo = onboardContext;
 
         // Onboard traversal of all edges
         State s10Onboard = new State(onboardOptions);

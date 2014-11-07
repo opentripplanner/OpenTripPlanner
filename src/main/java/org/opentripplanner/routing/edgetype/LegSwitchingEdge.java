@@ -24,11 +24,16 @@ import com.vividsolutions.jts.geom.LineString;
 /* This edge, because it has no mode, initiates another leg.
  */
 public class LegSwitchingEdge extends Edge {
-
 	private static final long serialVersionUID = 1L;
 
+    private static final Vertex dummy = new Vertex(null, null, 0.0, 0.0) {};
+
 	public LegSwitchingEdge(Vertex v1, Vertex v2) {
-		super(v1, v2);
+		super(dummy, dummy);
+        dummy.removeAllEdges();
+        fromv = v1;
+        tov = v2;
+        // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
 	}
 
 	@Override
@@ -52,5 +57,4 @@ public class LegSwitchingEdge extends Edge {
 	public String getName() {
 		return null;
 	}
-
 }
