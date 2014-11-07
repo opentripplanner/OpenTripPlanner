@@ -471,8 +471,8 @@ public class TestPatternHopFactory extends TestCase {
         options.setRoutingContext(graph, near_a, near_e);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(near_c, false);
-        assertNull(path);
+        path = spt.getPath(near_e, false);
+        assertNotNull(path);
 
         // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
         // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
