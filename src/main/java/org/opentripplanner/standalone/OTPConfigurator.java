@@ -246,7 +246,7 @@ public class OTPConfigurator {
     /**
      * Represents the different types of input files for a graph build.
      */
-    public enum InputFileType {
+    private static enum InputFileType {
         GTFS, OSM, CONFIG, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
