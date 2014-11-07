@@ -241,8 +241,17 @@ public class Routers {
         
         try {
             for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
-                if (entry.isDirectory()) continue; // expect flat zip files or create directories
+                if (entry.isDirectory())
+                    // we only support flat ZIP files
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("ZIP files containing directories are not supported").build();
+                    
                 File file = new File(tempDir, entry.getName());
+                
+                if (!file.getParentFile().equals(tempDir))
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("ZIP files containing directories are not supported").build();
+                    
                 OutputStream os = new FileOutputStream(file);
                 ByteStreams.copy(zis, os);
                 os.close();
