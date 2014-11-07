@@ -111,7 +111,7 @@ public class CommandLineParameters {
     boolean analyst;
 
     @Parameter( names = {"--bindAddress"},
-            description = "enable OTP Analyst extensions")
+            description = "the address of the network interface to bind to. defaults to all interfaces.")
     String bindAddress = "0.0.0.0";
 
     @Parameter( names = { "--securePort"}, validateWith = AvailablePort.class,
