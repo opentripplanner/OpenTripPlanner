@@ -16,14 +16,10 @@ package org.opentripplanner.api.resource;
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 
 import javax.annotation.security.PermitAll;
@@ -47,29 +43,11 @@ import javax.ws.rs.core.Response.Status;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
-import org.opentripplanner.graph_builder.InputFileType;
-import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
-import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
-import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
-import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.TransitToTaggedStopsGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
@@ -261,14 +239,12 @@ public class Routers {
         // extract the zip file to the temp dir
         ZipInputStream zis = new ZipInputStream(input);
         
-        ZipEntry next;
-
         try {
             for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                 if (entry.isDirectory()) continue; // expect flat zip files or create directories
                 File file = new File(tempDir, entry.getName());
                 OutputStream os = new FileOutputStream(file);
-                long bytesExtracted = ByteStreams.copy(zis, os);
+                ByteStreams.copy(zis, os);
                 os.close();
             }
         } catch (Exception ex) {
