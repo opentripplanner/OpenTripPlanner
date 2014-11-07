@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jersey.repackaged.com.google.common.collect.Lists;
+
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 
 import com.beust.jcommander.IParameterValidator;
@@ -31,7 +33,7 @@ import com.beust.jcommander.ParameterException;
  * 
  * @author abyrd
  */
-public class CommandLineParameters {
+public class CommandLineParameters implements Cloneable {
 
     private static final int DEFAULT_PORT = 8080;
     private static final int DEFAULT_SECURE_PORT = 8081;
@@ -66,7 +68,7 @@ public class CommandLineParameters {
     
     @Parameter(names = { "-m", "--inMemory"},
     description = "pass the graph to the server in-memory after building it, without saving to disk")
-    boolean inMemory;
+    public boolean inMemory;
  
     @Parameter(names = { "--preFlight"},
     description = "pass the graph to the server in-memory after building it, and saving to disk")
@@ -187,6 +189,27 @@ public class CommandLineParameters {
         }
     }
 
+    public CommandLineParameters clone () {
+        CommandLineParameters ret;
+        try {
+            ret = (CommandLineParameters) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+        
+        if (this.build != null) {
+            ret.build = Lists.newArrayList();
+            ret.build.addAll(this.build);
+        }
+        
+        if (this.routerIds != null) {
+            ret.routerIds = Lists.newArrayList();
+            ret.routerIds.addAll(this.routerIds);
+        }
+        
+        return ret;
+    }
+    
     public static class ReadableFile implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
