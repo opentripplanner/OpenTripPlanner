@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -58,6 +59,7 @@ import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
+import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.error.GraphNotFoundException;
@@ -68,11 +70,14 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
 /**
@@ -253,166 +258,31 @@ public class Routers {
         // get a temporary directory, using Google Guava
         File tempDir = Files.createTempDir();
         
-        // set up the task
-        GraphBuilderTask graphBuilder = new GraphBuilderTask();
-        List<File> gtfsFiles = Lists.newArrayList();
-        List<File> osmFiles =  Lists.newArrayList();
-        File configFile = null;
-        
-        graphBuilder.setPath(tempDir);
-        
         // extract the zip file to the temp dir
         ZipInputStream zis = new ZipInputStream(input);
         
         ZipEntry next;
-        
-        while (true) {
-            try {
-                next = zis.getNextEntry();
-            } catch (ZipException e) {
-                return Response.status(Status.BAD_REQUEST).entity("Could not read ZIP file").build();
-            } catch (IOException e) {
-                return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Internal error saving ZIP file").build();
-            }
-            
-            if (next == null)
-                break;
-            
-            // get the output file
-            File outfile = new File(tempDir, next.getName());
-            FileOutputStream out;
-            try {
-                out = new FileOutputStream(outfile);
-            } catch (FileNotFoundException e1) {
-                return Response.status(Status.INTERNAL_SERVER_ERROR)
-                        .entity("Could not save member " + next.getName()).build();
-            }
-            
-            // extract data 10k at a time
-            int bufSize = 10 * 1024;
-            byte[] buff = new byte[bufSize];
-            
-            int readBytes;
 
-            while (true) {
-                try {
-                    readBytes = zis.read(buff, 0, bufSize);
-                } catch (ZipException e) {
-                    try {
-                        out.close();
-                    } catch (IOException e1) {
-                        // do nothing
-                    }
-                    return Response.status(Status.BAD_REQUEST)
-                            .entity("Could not read ZIP entry " + next.getName()).build();
-                } catch (IOException e) {
-                    try {
-                        out.close();
-                    } catch (IOException e1) {
-                        // do nothing
-                    }
-                    return Response.status(Status.INTERNAL_SERVER_ERROR)
-                            .entity("Internal error reading ZIP entry " + next.getName()).build();
-                }
-                
-                if (readBytes == -1)
-                    // done with this file
-                    break;
-                
-                try {
-                    out.write(buff, 0, readBytes);
-                } catch (IOException e) {
-                    try {
-                        out.close();
-                    } catch (IOException e1) {
-                        // do nothing
-                    }
-                    return Response.status(Status.INTERNAL_SERVER_ERROR)
-                            .entity("Internal error copying ZIP entry " + next.getName()).build();
-                }
+        try {
+            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+                if (entry.isDirectory()) continue; // expect flat zip files or create directories
+                File file = new File(tempDir, entry.getName());
+                OutputStream os = new FileOutputStream(file);
+                long bytesExtracted = ByteStreams.copy(zis, os);
+                os.close();
             }
-            
-            try {
-                out.close();
-            } catch (IOException e1) {
-                // no reason to do anything; if we can't close it we can't close it.
-                // but no reason to block build
-            }
-            
-            // figure out what type of file we have, and add it to the build
-            switch (InputFileType.forFile(outfile)) {
-            case GTFS:
-                gtfsFiles.add(outfile);
-                break;
-            case OSM:
-                osmFiles.add(outfile);
-                break;
-            case CONFIG:
-                 configFile = outfile;
-                break;
-            case OTHER:
-                LOG.debug("Skipping file '{}'", next.getName());
-            }
-        }
-        
-        // do some error checks
-        if (osmFiles.isEmpty() && gtfsFiles.isEmpty())
-            return Response.status(Status.BAD_REQUEST).entity("Found no files with which to build a graph").build();
-        
-        if (osmFiles.isEmpty())
-            LOG.warn("No OSM files provided in graph bundle; building a streetless graph.");
-        
-        if (gtfsFiles.isEmpty())
-            LOG.warn("No GTFS files provided in graph bundle; building a graph without transit.");
-        
-        // configure builder
-        // OSM
-        if (!osmFiles.isEmpty()) {
-            List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
-            for (File osmFile : osmFiles) {
-                osmProviders.add(new AnyFileBasedOpenStreetMapProviderImpl(osmFile));
-            }
-            
-            // TODO: elevation (needs to come out of bundle . . . wait for new config file format)
-            OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders);
-            osmBuilder.edgeFactory = new DefaultStreetEdgeFactory();
-            osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-            graphBuilder.addGraphBuilder(osmBuilder);
-            graphBuilder.addGraphBuilder(new PruneFloatingIslands());
+        } catch (Exception ex) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Could not extract zip file: " + ex.getMessage()).build();
         }
 
-        if (!gtfsFiles.isEmpty()) {
-            List<GtfsBundle> gtfs = Lists.newArrayList();
-            
-            for (File gtfsFile : gtfsFiles) {
-                gtfs.add(new GtfsBundle(gtfsFile));
-            }
-            
-            GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfs);
-            // fares
-            gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
-            graphBuilder.addGraphBuilder(gtfsBuilder);
-            
-            // if we have OSM, use it
-            if (!osmFiles.isEmpty()) {
-                graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
-                graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
-            }
-            
-            // link stops directly by distance if no OSM
-            // TODO: transfers.txt?
-            else {
-                graphBuilder.addGraphBuilder(new StreetlessStopLinker());
-            }
-        }
+           
+        // set up the build, using default parameters
+        // this is basically simulating calling otp -b on the command line
+        CommandLineParameters params = new CommandLineParameters();
+        params.build = Lists.newArrayList();
+        params.build.add(tempDir);
         
-        if (configFile != null) {
-            EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
-            embeddedConfigBuilder.propertiesFile = configFile;
-            graphBuilder.addGraphBuilder(embeddedConfigBuilder);
-        }
-        
-        graphBuilder.serializeGraph = false;
+        GraphBuilderTask graphBuilder = new OTPConfigurator(params).builderFromParameters();
         
         graphBuilder.run();
         
