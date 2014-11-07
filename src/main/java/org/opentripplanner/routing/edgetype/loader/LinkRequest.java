@@ -288,6 +288,12 @@ public class LinkRequest {
                     e2.getElevationProfile(), 0, lengthOut), false);
             backward2.setElevationProfile(ElevationUtils.getPartialElevationProfile(
                     e2.getElevationProfile(), lengthIn, totalGeomLength), false);
+            backward1.setHasBogusName(e2.hasBogusName());
+            backward2.setHasBogusName(e2.hasBogusName());
+            backward1.setStairs(e2.isStairs());
+            backward2.setStairs(e2.isStairs());
+            backward1.setWheelchairAccessible(e2.isWheelchairAccessible());
+            backward2.setWheelchairAccessible(e2.isWheelchairAccessible());
             addEdges(backward1, backward2);
         }
 
@@ -298,6 +304,13 @@ public class LinkRequest {
                 e1.getElevationProfile(), 0, lengthIn), false);
         forward2.setElevationProfile(ElevationUtils.getPartialElevationProfile(
                 e1.getElevationProfile(), lengthOut, totalGeomLength), false);
+
+        forward1.setHasBogusName(e1.hasBogusName());
+        forward2.setHasBogusName(e1.hasBogusName());
+        forward1.setStairs(e1.isStairs());
+        forward2.setStairs(e1.isStairs());
+        forward1.setWheelchairAccessible(e1.isWheelchairAccessible());
+        forward2.setWheelchairAccessible(e1.isWheelchairAccessible());
 
         // swap the new split edge into the replacements list, and remove the old ones
         ListIterator<P2<StreetEdge>> it = replacement.listIterator();
