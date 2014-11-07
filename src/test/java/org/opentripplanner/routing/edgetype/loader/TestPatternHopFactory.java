@@ -438,6 +438,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex near_a = graph.getVertex("near_1_agency_A");
         Vertex near_b = graph.getVertex("near_1_agency_B");
         Vertex near_c = graph.getVertex("near_1_agency_C");
+        Vertex near_e = graph.getVertex("near_1_agency_E");
 
         Vertex stop_d = graph.getVertex("agency:D");
         Vertex split_d = null;
@@ -461,6 +462,13 @@ public class TestPatternHopFactory extends TestCase {
 
         // stop C is not accessible, so there should be no path.
         options.setRoutingContext(graph, near_a, near_c);
+        spt = aStar.getShortestPathTree(options);
+
+        path = spt.getPath(near_c, false);
+        assertNull(path);
+        
+        // stop E has no accessibility information, but we should still be able to route to it.
+        options.setRoutingContext(graph, near_a, near_e);
         spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(near_c, false);
