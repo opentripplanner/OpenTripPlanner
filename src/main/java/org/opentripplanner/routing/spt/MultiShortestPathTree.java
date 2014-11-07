@@ -15,17 +15,22 @@ package org.opentripplanner.routing.spt;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
 	
@@ -35,9 +40,32 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 	private static final double TIME_EPSILON = 0.02;
 	private static final int TIME_DIFF_MARGIN = 30;
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final Logger LOG = LoggerFactory.getLogger(MultiShortestPathTree.class);
 
     private Map<Vertex, List<State>> stateSets;
+
+    public void dump() {
+        Multiset<Integer> histogram = HashMultiset.create();
+        int statesCount = 0;
+        int maxSize = 0;
+        for (Map.Entry<Vertex, List<State>> kv : stateSets.entrySet()) {
+            List<State> states = kv.getValue();
+            int size = states.size();
+            histogram.add(size);
+            statesCount += size;
+            if (size > maxSize) {
+                maxSize = size;
+            }
+        }
+        LOG.info("SPT: vertices: " + stateSets.size() + " states: total: "
+                + statesCount + " per vertex max: " + maxSize + " avg: "
+                + (statesCount * 1.0 / stateSets.size()));
+        List<Integer> nStates = new ArrayList<Integer>(histogram.elementSet());
+        Collections.sort(nStates);
+        for (Integer nState : nStates) {
+            LOG.info(nState + " states: " + histogram.count(nState) + " vertices.");
+        }
+    }
 
     public MultiShortestPathTree(RoutingRequest options) {
         super(options);
@@ -91,6 +119,8 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
         if (thisState.isBikeRenting() != other.isBikeRenting())
             return false;
         if (thisState.isCarParked() != other.isCarParked())
+            return false;
+        if (thisState.isBikeParked() != other.isBikeParked())
             return false;
 
         if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof StreetEdge)

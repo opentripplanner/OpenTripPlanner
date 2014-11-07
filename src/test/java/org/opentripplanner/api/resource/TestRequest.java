@@ -79,11 +79,9 @@ import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.SimpleTimeZone;
@@ -194,7 +192,7 @@ class Context {
     }
 
     private void initBikeRental() {
-        BikeRentalStationService service = new BikeRentalStationService();
+        BikeRentalStationService service = graph.getService(BikeRentalStationService.class, true);
         BikeRentalStation station = new BikeRentalStation();
         station.x = -122.637634;
         station.y = 45.513084;
@@ -202,9 +200,7 @@ class Context {
         station.spacesAvailable = 4;
         station.id = "1";
         station.name = "bike rental station";
-
-        service.addStation(station);
-        graph.putService(BikeRentalStationService.class, service);
+        service.addBikeRentalStation(station);
     }
 
     private Graph makeSimpleGraph() {

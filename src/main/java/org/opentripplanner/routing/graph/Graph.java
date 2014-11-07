@@ -349,7 +349,7 @@ public class Graph implements Serializable {
     public <T> T getService(Class<T> serviceType, boolean autoCreate) {
         @SuppressWarnings("unchecked")
         T t = (T) _services.get(serviceType);
-        if (t == null) {
+        if (t == null && autoCreate) {
             try {
                 t = (T)serviceType.newInstance();
             } catch (InstantiationException e) {

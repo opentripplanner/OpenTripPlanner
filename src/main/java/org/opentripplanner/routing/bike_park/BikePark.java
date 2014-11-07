@@ -11,60 +11,54 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.bike_rental;
+package org.opentripplanner.routing.bike_park;
 
 import java.io.Serializable;
-import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-public class BikeRentalStation implements Serializable {
+public class BikePark implements Serializable {
     private static final long serialVersionUID = 8311460609708089384L;
 
-    @XmlAttribute
-    @JsonSerialize
-    public String id;
-    @XmlAttribute
-    @JsonSerialize
-    public String name;
-    @XmlAttribute
-    @JsonSerialize
-    public double x, y; //longitude, latitude
-    @XmlAttribute
-    @JsonSerialize
-    public int bikesAvailable = Integer.MAX_VALUE;
-    @XmlAttribute
-    @JsonSerialize
-    public int spacesAvailable = Integer.MAX_VALUE;
-    @XmlAttribute
-    @JsonSerialize
-    public boolean allowDropoff = true;
-
     /**
-     * List of compatible network names. Null (default) to be compatible with all.
+     * Unique ID of the bike park. Creator should ensure the ID is unique server-wide (prefix by a
+     * source ID if there are several sources)
      */
     @XmlAttribute
     @JsonSerialize
-    public Set<String> networks = null;
-    
+    public String id;
+
+    @XmlAttribute
+    @JsonSerialize
+    public String name;
+
+    /** Note: x = Longitude, y = Latitude */
+    @XmlAttribute
+    @JsonSerialize
+    public double x, y;
+
+    @XmlAttribute
+    @JsonSerialize
+    public int spacesAvailable = Integer.MAX_VALUE;
+
     /**
-     * Whether this station is static (usually coming from OSM data) or a real-time source. If no real-time data, users should take
-     * bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity divided by two. Only the total is meaningful.
+     * Whether this station has space available information updated in real-time. If no real-time
+     * data, users should take spacesAvailable with a pinch of salt, as they are a crude estimate.
      */
     @XmlAttribute
     @JsonSerialize
     public boolean realTimeData = true;
 
     public boolean equals(Object o) {
-        if (!(o instanceof BikeRentalStation)) {
+        if (!(o instanceof BikePark)) {
             return false;
         }
-        BikeRentalStation other = (BikeRentalStation) o;
+        BikePark other = (BikePark) o;
         return other.id.equals(id);
     }
-    
+
     public int hashCode() {
         return id.hashCode() + 1;
     }

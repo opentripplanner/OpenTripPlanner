@@ -93,7 +93,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      */
     
     @Override
-    public void initialize(State s, Vertex target, long abortTime) {
+    public void initialize(RoutingRequest options, Vertex origin, Vertex target, long abortTime) {
         if (target == this.target) {
             LOG.debug("reusing existing heuristic");
             return;
@@ -103,8 +103,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // int nVertices = AbstractVertex.getMaxIndex(); // will be ever increasing?
         int nVertices = graph.countVertices();
         weights = Maps.newHashMapWithExpectedSize(((int)Math.log(nVertices)) + 1);
-        this.options = s.getOptions();
-        this.origin = s.getVertex();
+        this.options = options;
+        this.origin = origin;
         // do not use soft limiting in long-distance mode
         options.softWalkLimiting = false;
         options.softPreTransitLimiting = false;
@@ -129,7 +129,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         options.setMaxWalkDistance(Double.POSITIVE_INFINITY);
         options.setMaxPreTransitTime(Integer.MAX_VALUE);
         LOG.debug("initialized SSSP");
-        s.getOptions().rctx.debugOutput.finishedPrecalculating();
+        options.rctx.debugOutput.finishedPrecalculating();
     }
 
     /** Do up to N iterations as long as the queue is not empty */
