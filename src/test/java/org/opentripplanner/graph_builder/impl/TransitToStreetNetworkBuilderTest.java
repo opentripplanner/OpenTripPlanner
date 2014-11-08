@@ -7,6 +7,7 @@ package org.opentripplanner.graph_builder.impl;
 
 import org.opentripplanner.util.StreetType;
 import com.bedatadriven.geojson.GeoJsonModule;
+import com.csvreader.CsvWriter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +43,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
@@ -76,6 +79,7 @@ public class TransitToStreetNetworkBuilderTest {
     private double searchRadiusM = 10;
     private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);    
     private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkBuilderTest.class);
+    private static final boolean transit_stats = false;
     
     @Before
     public void setUp() {
@@ -221,14 +225,32 @@ public class TransitToStreetNetworkBuilderTest {
     private void testTransitStreetConnections(String osm_filename, String gtfs_filename, String wanted_con_filename, String name) throws Exception {
         Graph gg = loadGraph(osm_filename, gtfs_filename, true, true);
         assertNotNull(gg);
-        
+        CsvWriter writer = null;
+        if (transit_stats) {
+            writer = new CsvWriter("transit_stats_" + name + ".csv", ':', Charset.forName("UTF8"));
+            writer.writeRecord(new String[]{"stop_modes", "distance", "street_type", "street_modes", "stop_id", "stop_name"});
+        }
         //Reads saved correct transit stop -> Street edge connections
         FileInputStream fis = new FileInputStream(getClass().getResource(wanted_con_filename).getFile());
         ObjectInputStream ois = new ObjectInputStream(fis);
         List<TransitStopConnToWantedEdge> outList = (List<TransitStopConnToWantedEdge>) ois.readObject();
         Map<String, TransitStopConnToWantedEdge> stop_id_toEdge = new HashMap<>(outList.size());
+        DistanceLibrary distanceLibrary = null;
+        if (transit_stats) {
+            distanceLibrary = SphericalDistanceLibrary.getInstance();
+        }
         for (TransitStopConnToWantedEdge stop_edge_con: outList) {
+            if (transit_stats) {
+                String mode = stop_edge_con.getTransitStop().getModes().toString();
+                String street_modes = stop_edge_con.getStreetEdge().getPermission().toString();
+                String dist = Double.toString(distanceLibrary.fastDistance(stop_edge_con.getTransitStop().getCoordinate(), stop_edge_con.getStreetEdge().getGeometry()));
+                String type = stop_edge_con.getStreetType().toString();
+                writer.writeRecord(new String[]{mode, dist, type, street_modes, stop_edge_con.getStopID(), stop_edge_con.getTransitStop().getName()});
+            }
             stop_id_toEdge.put(stop_edge_con.getStopID(), stop_edge_con);
+        }
+        if (transit_stats) {
+            writer.close();
         }
         ois.close();
         fis.close();
