@@ -274,4 +274,24 @@ otp.core.TransitIndex = otp.Class({
             }
         });
     },    
+
+
+    getTripHash : function(agencyAndId, callbackTarget, callback) {
+        var params = {
+            tripId: agencyAndId
+        };
+        if(typeof otp.config.routerId !== 'undefined') {
+            params.routerId = otp.config.routerId;
+        }
+
+        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/semanticHash';
+        $.ajax(url, {
+            data:       params,
+            dataType:   'jsonp',
+
+            success: function(data) {
+                callback.call(callbackTarget, data);
+            }
+        });
+    },
 });

@@ -52,6 +52,8 @@ otp.modules.fieldtrip.FieldTripModule =
         this.geocoderWidgets = {};
         this.geocodedOrigins = {};
         this.geocodedDestinations = {};
+
+        this.tripHashLookup = {} // maps agencyAndId to tripHash
     },
 
     activate : function() {
@@ -134,7 +136,7 @@ otp.modules.fieldtrip.FieldTripModule =
                     }
                 }
             }
-            
+
             // kick off the main planTrip request
             this.itinCapacity = null;
             this.planTrip();
@@ -143,7 +145,41 @@ otp.modules.fieldtrip.FieldTripModule =
 
         this.setBannedTrips();
     },
-    
+
+    preprocessPlan : function(tripPlan, queryParams, callback) {
+        var hashQueryLegs = [];
+
+        _.each(tripPlan.itineraries, function(itin) {
+            _.each(itin.legs, function(leg) {
+                if(leg.agencyId && leg.tripId) {
+                    var agencyAndId = leg.agencyId + '_' + leg.tripId;
+                    if(!(agencyAndId in this.tripHashLookup)) {
+                        hashQueryLegs.push(leg);
+                    }
+                }
+            }, this);
+        }, this);
+
+        if(hashQueryLegs.length === 0) {
+            callback.call(this);
+        }
+        else {
+            var queriesFinished = 0;
+            for(var i =0; i < hashQueryLegs.length; i++) {
+                var leg = hashQueryLegs[i];
+                var agencyAndId = leg.agencyId + '_' + leg.tripId;
+
+                this.webapp.transitIndex.getTripHash(agencyAndId, this, _.bind(function(data) {
+                    this.ftmodule.tripHashLookup[this.agencyAndId] = data.hash;
+                    queriesFinished++;
+                    if(queriesFinished == hashQueryLegs.length) {
+                        callback.call(this);
+                    }
+                }, { ftmodule: this, agencyAndId : agencyAndId}));
+            }
+        }
+    },
+
     processPlan : function(tripPlan, restoring) {
         if(this.updateActiveOnly) {
             var itinIndex = this.itinWidget.activeIndex;
@@ -255,14 +291,17 @@ otp.modules.fieldtrip.FieldTripModule =
             data['itins['+i+'].timeOffset'] = otp.config.timeOffset || 0;
 
             var legs = itin.getTransitLegs();
-            
+
             for(var l = 0; l < legs.length; l++) {
                 var leg = legs[l];
-                var routeName = (leg.routeShortName !== null ? ('(' + leg.routeShortName + ') ') : '') + (leg.routeLongName || ""); 
+                var routeName = (leg.routeShortName !== null ? ('(' + leg.routeShortName + ') ') : '') + (leg.routeLongName || "");
+                var agencyAndId = leg.agencyId + "_" + leg.tripId;
+                var tripHash = this.tripHashLookup[agencyAndId];
 
-                data['gtfsTrips['+i+']['+l+'].depart'] = moment(leg.startTime).format("HH:mm:ss"); 
-                data['gtfsTrips['+i+']['+l+'].arrive'] = moment(leg.endTime).format("HH:mm:ss"); 
-                data['gtfsTrips['+i+']['+l+'].agencyAndId'] = leg.agencyId + "_" + leg.tripId;
+                data['gtfsTrips['+i+']['+l+'].depart'] = moment(leg.startTime).format("HH:mm:ss");
+                data['gtfsTrips['+i+']['+l+'].arrive'] = moment(leg.endTime).format("HH:mm:ss");
+                data['gtfsTrips['+i+']['+l+'].agencyAndId'] = agencyAndId;
+                data['gtfsTrips['+i+']['+l+'].tripHash'] = tripHash;
                 data['gtfsTrips['+i+']['+l+'].routeName'] = routeName;
                 data['gtfsTrips['+i+']['+l+'].fromStopIndex'] = leg.from.stopIndex;
                 data['gtfsTrips['+i+']['+l+'].toStopIndex'] = leg.to.stopIndex;
@@ -273,7 +312,7 @@ otp.modules.fieldtrip.FieldTripModule =
                 if(leg.tripBlockId) data['gtfsTrips['+i+']['+l+'].blockId'] = leg.tripBlockId;
             }
         }
-        
+
         this.serverRequest('/fieldtrip/newTrip', 'POST', data, _.bind(function(data) {
             if(data === -1) {
                 otp.widgets.Dialogs.showOkDialog("This plan could not be saved due to a lack of capacity on one or more vehicles. Please re-plan your trip.", "Cannot Save Plan");
@@ -284,15 +323,23 @@ otp.modules.fieldtrip.FieldTripModule =
 
     checkTripValidity : function(tripId, leg, itin) {
         var capacityInUse = 0;
+        //console.log('checkTripValidity ' + tripId + ' from ' + leg.from.stopIndex + ' to ' + leg.to.stopIndex);
         for(var i = 0; i < this.tripsInUse.length; i++) {
             var tripInUse  = this.tripsInUse[i];
-            
+
             // first test: are these the same vehicle trip? if not, we're ok
-            if(tripId !== tripInUse.agencyAndId) continue;
-            
+            var sameVehicleTrip = false;
+            if(tripId in this.tripHashLookup && tripInUse.tripHash) { // use the trip hashes if available
+                sameVehicleTrip = (this.tripHashLookup[tripId] === tripInUse.tripHash);
+            }
+            else { // as fallback, compare the agencyAndId strings
+                sameVehicleTrip = (tripId === tripInUse.agencyAndId);
+            }
+            if(!sameVehicleTrip) continue;
+
             // second test: do the stop ranges overlap? if not, we're ok
             if(leg.from.stopIndex > tripInUse.toStopIndex || leg.to.stopIndex < tripInUse.fromStopIndex) continue;
-            
+
             // if ranges overlap, calculate remaining capacity
             capacityInUse += tripInUse.passengers;
         }

@@ -343,58 +343,23 @@ otp.modules.planner.PlannerModule =
         this.currentRequest = $.ajax(url, {
             data:       queryParams,
             dataType:   'jsonp',
-                
+
             success: function(data) {
                 $('#otp-spinner').hide();
-                
+
                 if (otp.config.debug) {
                     otp.debug.processRequest(data)
                 }
 
                 if(data.plan) {
-                    // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
-                    otp.config.timeOffset = (otp.config.timeOffset) ||
-                        (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
-
-                    var tripPlan = new otp.modules.planner.TripPlan(data.plan, queryParams);
-                    
-                    var invalidTrips = [];
-                    
-                    // check trip validity
-                    if(typeof this_.checkTripValidity == 'function') {
-                        for(var i = 0; i < tripPlan.itineraries.length; i++) {
-                            var itin = tripPlan.itineraries[i];
-                            for(var l = 0; l < itin.itinData.legs.length; l++) {
-                                var leg = itin.itinData.legs[l];
-                                if(otp.util.Itin.isTransit(leg.mode)) {
-                                    var tripId = leg.agencyId + "_"+leg.tripId;
-                                    if(!this_.checkTripValidity(tripId, leg, itin)) {
-                                        //console.log("INVALID TRIP");
-                                        invalidTrips.push(tripId);
-                                    }
-                                } 
-                            }
-                        }
+                    if(typeof this_.preprocessPlan == 'function') {
+                        this_.preprocessPlan(data.plan, queryParams, function() {
+                            this_.planReceived(data.plan, url, queryParams, successCallback);
+                        });
                     }
-
-                    if(invalidTrips.length == 0) { // all trips are valid; proceed with this tripPlan
-                        successCallback.call(this_, tripPlan);
+                    else {
+                        this_.planReceived(data.plan, url, queryParams, successCallback);
                     }
-                    else { // run planTrip again w/ invalid trips banned
-                        this_.planTripRequestCount++;
-                        if(this_.planTripRequestCount > 10) {
-                            this_.noTripFound({ 'msg' : 'Number of trip requests exceeded without valid results'});
-                        }
-                        else {
-                            if(queryParams.bannedTrips && queryParams.bannedTrips.length > 0) {
-                                queryParams.bannedTrips += ',' + invalidTrips.join(',');
-                            }
-                            else {
-                                queryParams.bannedTrips = invalidTrips.join(',');
-                            }
-                            this_.planTripRequest(url, queryParams, successCallback);
-                        }
-                    }                    
                 }
                 else {
                     this_.noTripFound(data.error);
@@ -405,7 +370,53 @@ otp.modules.planner.PlannerModule =
         });
 
     },
-    
+
+    planReceived : function(plan, url, queryParams, successCallback) {
+        // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
+        otp.config.timeOffset = (otp.config.timeOffset) ||
+            (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(plan.date))/3600000;
+
+        var tripPlan = new otp.modules.planner.TripPlan(plan, queryParams);
+
+        var invalidTrips = [];
+
+        // check trip validity
+        if(typeof this.checkTripValidity == 'function') {
+            for(var i = 0; i < tripPlan.itineraries.length; i++) {
+                var itin = tripPlan.itineraries[i];
+                for(var l = 0; l < itin.itinData.legs.length; l++) {
+                    var leg = itin.itinData.legs[l];
+                    if(otp.util.Itin.isTransit(leg.mode)) {
+                        var tripId = leg.agencyId + "_"+leg.tripId;
+                        if(!this.checkTripValidity(tripId, leg, itin)) {
+                            //console.log("INVALID TRIP");
+                            invalidTrips.push(tripId);
+                        }
+                    }
+                }
+            }
+        }
+
+        if(invalidTrips.length == 0) { // all trips are valid; proceed with this tripPlan
+            successCallback.call(this, tripPlan);
+        }
+        else { // run planTrip again w/ invalid trips banned
+            this.planTripRequestCount++;
+            if(this.planTripRequestCount > 10) {
+                this.noTripFound({ 'msg' : 'Number of trip requests exceeded without valid results'});
+            }
+            else {
+                if(queryParams.bannedTrips && queryParams.bannedTrips.length > 0) {
+                    queryParams.bannedTrips += ',' + invalidTrips.join(',');
+                }
+                else {
+                    queryParams.bannedTrips = invalidTrips.join(',');
+                }
+                this.planTripRequest(url, queryParams, successCallback);
+            }
+        }
+    },
+
     getExtendedQueryParams : function() {
         return { };
     },

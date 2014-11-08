@@ -53,7 +53,10 @@ public class GTFSTrip extends Model {
 
     @Expose
     public Integer capacity;
-        
+
+    @Expose
+    public String tripHash;
+
     /*@ManyToOne
     @Expose
     private Trip trip;*/
