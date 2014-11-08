@@ -532,6 +532,22 @@ public class FieldTrip extends Application {
         note.delete();
         renderJSON(noteId);
     }
+
+    public static void editSubmitterNotes(String notes, long requestId) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            req.submitterNotes = notes;
+            req.save();
+            
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }
+    }
     
     public static void searchRequests(String query, String teacherValue, String schoolValue, @As("MM/dd/yyyy") Date date1, @As("MM/dd/yyyy") Date date2) {
         TrinetUser user = checkLogin();        

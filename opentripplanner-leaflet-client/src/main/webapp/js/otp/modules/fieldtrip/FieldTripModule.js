@@ -575,6 +575,15 @@ otp.modules.fieldtrip.FieldTripModule =
         }, this));
     },
 
+    editTeacherNotes: function(request, notes) {
+        this.serverRequest('/fieldtrip/editSubmitterNotes', 'POST', {
+            requestId : request.id,
+            notes : notes
+        }, _.bind(function(data) {
+            this.loadRequests();
+        }, this));
+    },
+
     deleteNote: function(note) {
         this.serverRequest('/fieldtrip/deleteNote', 'POST', {
             noteId : note.id
