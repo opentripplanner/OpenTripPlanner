@@ -46,7 +46,7 @@ public class TransitStop extends TransitStationStop {
 
     public TransitStop(Graph graph, Stop stop) {
         super(graph, stop);
-        this.wheelchairEntrance = stop.getWheelchairBoarding() == 1;
+        this.wheelchairEntrance = stop.getWheelchairBoarding() != 2;
         isEntrance = stop.getLocationType() == 2;
     }
 

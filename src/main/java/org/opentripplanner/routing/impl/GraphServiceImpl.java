@@ -13,92 +13,87 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
+import org.geotools.referencing.factory.DeferredAuthorityFactory;
+import org.geotools.util.WeakCollectionCleaner;
+import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+import org.opentripplanner.routing.services.GraphSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The primary implementation of the GraphService interface. It can handle multiple graphs, each
- * with its own routerId. These graphs are loaded from serialized graph files in subdirectories
- * immediately under the specified base resource/filesystem path.
+ * with its own routerId.
  * 
- * Delegate the file loading implementation details to the GraphServiceFileImpl.
+ * Delegate the graph creation/loading details to the GraphSource implementations.
  * 
- * @see GraphServiceFileImpl
+ * @see GraphSource
  */
 public class GraphServiceImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
-    private GraphServiceFileImpl decorated = new GraphServiceFileImpl();
-
-    /** A list of routerIds to automatically register and load at startup */
-    public List<String> autoRegister;
-
-    /** If true, on startup register the graph in the location defaultRouterId. */
-    private boolean attemptRegisterDefault = true;
+    /** Poll period for auto-reload scan. */
+    private static final int AUTORELOAD_PERIOD_SEC = 10;
 
     /**
-     * @param indexFactory
+     * Should we pre-evict in auto-reload mode? False is more memory consuming but safer in case of
+     * problems.
      */
-    public void setIndexFactory(StreetVertexIndexFactory indexFactory) {
-        decorated.indexFactory = (indexFactory);
+    private static final boolean AUTORELOAD_PREEVICT = false;
+
+    private Map<String, GraphSource> graphSources = new HashMap<>();
+
+    /**
+     * Router IDs may contain alphanumeric characters, underscores, and dashes only. This prevents
+     * any confusion caused by the presence of special characters that might have a meaning for the
+     * filesystem.
+     */
+    public static final Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
+
+    private String defaultRouterId = "";
+
+    public GraphSource.Factory graphSourceFactory;
+
+    private ScheduledExecutorService scanExecutor;
+
+    public GraphServiceImpl() {
+        this(false);
+    }
+
+    public GraphServiceImpl(boolean autoReload) {
+        if (autoReload) {
+            scanExecutor = Executors.newSingleThreadScheduledExecutor();
+            scanExecutor.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    autoReloadScan();
+                }
+            }, AUTORELOAD_PERIOD_SEC, AUTORELOAD_PERIOD_SEC, TimeUnit.SECONDS);
+        }
     }
 
     /**
      * @param defaultRouterId
      */
+    @Override
     public void setDefaultRouterId(String defaultRouterId) {
-        decorated.defaultRouterId = (defaultRouterId);
+        this.defaultRouterId = defaultRouterId;
     }
 
-    /**
-     * Sets a base path for graph loading from the filesystem. Serialized graph files will be
-     * retrieved from sub-directories immediately below this directory. The routerId of a graph is
-     * the same as the name of its sub-directory. This does the same thing as setResource, except
-     * the parameter is interpreted as a file path.
-     */
-    public void setPath(String path) {
-        decorated.basePath = (path);
-    }
-
-    /**
-     * Based on the autoRegister list, automatically register all routerIds for which we can find a
-     * graph file in a subdirectory of the resourceBase path. Also register and load the graph for
-     * the defaultRouterId and warn if no routerIds are registered.
-     */
-    public void startup() {
-        if (autoRegister != null && !autoRegister.isEmpty()) {
-            LOG.info("attempting to automatically register routerIds {}", autoRegister);
-            LOG.info("graph files will be sought in paths relative to {}",
-                    decorated.basePath);
-            for (String routerId : autoRegister) {
-                registerGraph(routerId, true);
-            }
-        } else {
-            LOG.info("no list of routerIds was provided for automatic registration.");
-        }
-        if (attemptRegisterDefault
-                && !decorated.getRouterIds().contains(decorated.defaultRouterId)) {
-            LOG.info("Attempting to load graph for default routerId '{}'.",
-                    decorated.defaultRouterId);
-            registerGraph(decorated.defaultRouterId, true);
-        }
-        if (this.getRouterIds().isEmpty()) {
-            LOG.warn("No graphs have been loaded/registered. "
-                    + "You must use the routers API to register one or more graphs before routing.");
-        }
-    }
-    
     /**
      * This is called when the bean gets deleted, that is mainly in case of webapp container
      * application stop or reload. We teardown all loaded graph to stop their background real-time
@@ -108,56 +103,147 @@ public class GraphServiceImpl implements GraphService {
     private void teardown() {
         LOG.info("Cleaning-up graphs...");
         evictAll();
-        decorated.cleanupWebapp();
+        cleanupWebapp();
     }
 
     @Override
-    public Graph getGraph() {
-        return decorated.getGraph();
+    public Graph getGraph() throws GraphNotFoundException {
+        return getGraph(null);
     }
 
     @Override
-    public Graph getGraph(String routerId) {
-        return decorated.getGraph(routerId);
-    }
-
-    @Override
-    public void setLoadLevel(LoadLevel level) {
-        decorated.setLoadLevel(level);
+    public Graph getGraph(String routerId) throws GraphNotFoundException {
+        if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
+            routerId = defaultRouterId;
+            LOG.debug("routerId not specified, set to default of '{}'", routerId);
+        }
+        /*
+         * Here we should not synchronize on graphSource as it may block for a while (during
+         * reload/autoreload). For normal operations a simple get do not need to be synchronized so
+         * we should be safe.
+         */
+        GraphSource graphSource = graphSources.get(routerId);
+        if (graphSource == null) {
+            LOG.error("no graph registered with the routerId '{}'", routerId);
+            throw new GraphNotFoundException();
+        }
+        Graph graph = graphSource.getGraph();
+        if (graph == null) {
+            evictGraph(routerId);
+            throw new GraphNotFoundException();
+        }
+        return graph;
     }
 
     @Override
     public boolean reloadGraphs(boolean preEvict) {
-        return decorated.reloadGraphs(preEvict);
+        boolean allSucceeded = true;
+        synchronized (graphSources) {
+            Collection<String> routerIds = getRouterIds();
+            for (String routerId : routerIds) {
+                GraphSource graphSource = graphSources.get(routerId);
+                boolean success = graphSource.reload(true, preEvict);
+                if (!success) {
+                    evictGraph(routerId);
+                }
+                allSucceeded &= success;
+            }
+        }
+        return allSucceeded;
     }
 
     @Override
     public Collection<String> getRouterIds() {
-        return decorated.getRouterIds();
+        return new ArrayList<String>(graphSources.keySet());
     }
 
     @Override
-    public boolean registerGraph(String routerId, boolean preEvict) {
-        return decorated.registerGraph(routerId, preEvict);
-    }
-
-    @Override
-    public boolean registerGraph(String routerId, Graph graph) {
-        return decorated.registerGraph(routerId, graph);
+    public boolean registerGraph(String routerId, GraphSource graphSource) {
+        LOG.info("Registering new graph '{}'", routerId);
+        if (!routerIdLegal(routerId)) {
+            LOG.error(
+                    "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
+                    routerId);
+            return false;
+        }
+        if (graphSource.getGraph() == null) {
+            LOG.warn("Can't register router ID '{}', null graph.", routerId);
+            return false;
+        }
+        synchronized (graphSources) {
+            GraphSource oldSource = graphSources.get(routerId);
+            if (oldSource != null) {
+                LOG.info("Graph '{}' already registered. Nothing to do.", routerId);
+                return false;
+            }
+            graphSources.put(routerId, graphSource);
+            return true;
+        }
     }
 
     @Override
     public boolean evictGraph(String routerId) {
-        return decorated.evictGraph(routerId);
+        LOG.info("Evicting graph '{}'", routerId);
+        synchronized (graphSources) {
+            GraphSource graphSource = graphSources.get(routerId);
+            graphSources.remove(routerId);
+            if (graphSource != null) {
+                graphSource.evict();
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     @Override
     public int evictAll() {
-        return decorated.evictAll();
+        LOG.info("Evincting all graphs.");
+        synchronized (graphSources) {
+            int n = 0;
+            Collection<String> routerIds = new ArrayList<String>(getRouterIds());
+            for (String routerId : routerIds) {
+                if (evictGraph(routerId)) {
+                    n++;
+                }
+            }
+            return n;
+        }
     }
 
     @Override
-    public boolean save(String routerId, InputStream is) {
-    	return decorated.save(routerId, is);
+    public GraphSource.Factory getGraphSourceFactory() {
+        return graphSourceFactory;
+    }
+
+    /**
+     * Hook to cleanup various stuff of some used libraries (org.geotools), which depend on the
+     * external client to call them for cleaning-up.
+     */
+    private void cleanupWebapp() {
+        LOG.info("Web application shutdown: cleaning various stuff");
+        WeakCollectionCleaner.DEFAULT.exit();
+        DeferredAuthorityFactory.exit();
+    }
+
+    /**
+     * Check whether a router ID is legal or not.
+     */
+    private boolean routerIdLegal(String routerId) {
+        Matcher m = routerIdPattern.matcher(routerId);
+        return m.matches();
+    }
+
+    private void autoReloadScan() {
+        synchronized (graphSources) {
+            Collection<String> routerIds = getRouterIds();
+            for (String routerId : routerIds) {
+                GraphSource graphSource = graphSources.get(routerId);
+                boolean success = graphSource.reload(false, AUTORELOAD_PREEVICT);
+                if (!success) {
+                    evictGraph(routerId);
+                }
+            }
+        }
     }
 }

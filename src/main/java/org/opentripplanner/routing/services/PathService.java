@@ -16,11 +16,14 @@ package org.opentripplanner.routing.services;
 import java.util.List;
 
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.impl.SPTVisitor;
 import org.opentripplanner.routing.spt.GraphPath;
 
 public interface PathService {
 
     public List<GraphPath> getPaths(RoutingRequest options);
+
+	public void setSPTVisitor(SPTVisitor vis);
 
     /**
      * In the case of "arrive-by" routing, the origin state is actually the user's end location and

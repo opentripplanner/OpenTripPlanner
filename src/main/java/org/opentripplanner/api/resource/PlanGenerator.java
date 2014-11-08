@@ -110,7 +110,7 @@ public class PlanGenerator {
                 tooSloped = true;
             }
         } catch (VertexNotFoundException e) {
-            LOG.info("Vertex not found: " + options.from + " : " + options.to, e);
+            LOG.info("Vertex not found: " + options.from + " : " + options.to);
             throw e;
         }
         options.rctx.debugOutput.finishedCalculating();

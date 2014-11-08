@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Lists;
-import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -45,25 +44,30 @@ public class QualifiedModeSetSequence {
      */
     public void applyToRequest(RoutingRequest req) {
         /* Start with an empty mode set. */
-        req.modes = new TraverseModeSet();
+        TraverseModeSet modes = new TraverseModeSet();
         /* Use only the first set of qualified modes for now. */
         if (sets.isEmpty()) return;
         Set<QualifiedMode> qModes = sets.get(0);
         // First, copy over all the modes
         for (QualifiedMode qMode : qModes) {
-            req.modes.setMode(qMode.mode, true);
+            modes.setMode(qMode.mode, true);
         }
-        req.modes.setMode(TraverseMode.WALK, true); // always turn on WALK. TODO: why do we even need a walk mode?
+
+        // We used to always set WALK to true, but this forced walking when someone wanted to use a bike.
+        // We also want it to be possible to force biking-only (e.g. this is done in some consistency tests).
+        // TODO clearly define mode semantics: does presence of mode mean it is allowable, preferred... ?
+
         for (QualifiedMode qMode : qModes) {
             if (qMode.mode == TraverseMode.BICYCLE) {
                 if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                    modes.setMode(TraverseMode.WALK, true); // turn on WALK for bike rental mode
                     req.allowBikeRental = true;
                 }
-                if (req.modes.isTransit()) { // this is ugly, using both kinds of modeset at once
+                if (modes.isTransit()) { // this is ugly, using both kinds of modeset at once
                     req.bikeParkAndRide = qMode.qualifiers.contains(Qualifier.PARK);
                 }
             }
-            if (qMode.mode == TraverseMode.CAR && req.modes.isTransit()) { // this is ugly, using both kinds of modeset at once
+            if (qMode.mode == TraverseMode.CAR && modes.isTransit()) { // this is ugly, using both kinds of modeset at once
                 if (qMode.qualifiers.contains(Qualifier.PARK)) {
                     req.parkAndRide = true;
                 } else {
@@ -71,6 +75,7 @@ public class QualifiedModeSetSequence {
                 }
             }
         }
+        req.setModes(modes);
     }
 
 }

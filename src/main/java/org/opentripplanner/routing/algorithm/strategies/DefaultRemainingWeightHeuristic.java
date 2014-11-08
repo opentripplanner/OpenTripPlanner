@@ -56,8 +56,8 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     private double requiredWalkDistance;
 
     @Override
-    public void initialize(State s, Vertex target, long abortTime) {
-        RoutingRequest req = s.getOptions();
+    public void initialize(RoutingRequest options, Vertex origin, Vertex target, long abortTime) {
+        RoutingRequest req = options;
         this.transit = req.modes.isTransit();
         maxStreetSpeed = req.getStreetSpeedUpperBound();
         maxTransitSpeed = req.getTransitSpeedUpperBound();

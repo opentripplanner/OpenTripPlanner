@@ -31,11 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ParetoPathService implements PathService {
-	
-	public class SPTVisitor{
-		public ShortestPathTree spt;
-	}
-		 
 
     private static final Logger LOG = LoggerFactory.getLogger(ParetoPathService.class);
 

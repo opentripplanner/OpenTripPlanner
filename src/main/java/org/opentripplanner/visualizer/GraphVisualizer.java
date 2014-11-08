@@ -84,8 +84,11 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.ParetoPathService;
+import org.opentripplanner.routing.impl.SPTVisitor;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -369,7 +372,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JList<GraphBuilderAnnotation> annotationMatches;
     
-    private ParetoPathService pathservice;
+    private PathService pathservice;
         
     private GenericAStar sptService = new GenericAStar();
 
@@ -453,10 +456,15 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	protected State lastStateClicked=null;
 
+	private JCheckBox longDistanceModeCheckbox;
+
+	private GraphService graphService;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
         
+        this.graphService = graphService;
         this.graph = graphService.getGraph();
         this.pathservice = new ParetoPathService(graphService, sptService);
         setTitle("GraphVisualizer");
@@ -549,6 +557,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 				State s2 = secondComparePathStates.getSelectedValue();
 				
 				System.out.println("s1 dominates s2:"+MultiShortestPathTree.dominates(s1,s2));
+				System.out.println("s2 dominates s1:"+MultiShortestPathTree.dominates(s2,s1));
 			}
         });
         pane.add(dominateButton);
@@ -752,9 +761,31 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         pane.add(optimizeTypePane);
         
+        // long distance mode
+        ItemListener onChangeLongDistanceMode = new ItemListener(){
+        	@Override
+        	public void itemStateChanged(ItemEvent e) {
+        		JCheckBox item = (JCheckBox) e.getItem();
+        		setLongDistanceMode( item.isSelected() );
+        	}
+        };
+        longDistanceModeCheckbox = new JCheckBox("long distance mode");
+        longDistanceModeCheckbox.setSelected(false);
+        longDistanceModeCheckbox.addItemListener( onChangeLongDistanceMode );
+        pane.add(longDistanceModeCheckbox);
+        
 		return pane;
 	}
 	
+	protected void setLongDistanceMode(boolean selected) {
+		if( selected ){
+			this.pathservice = new LongDistancePathService(graphService, sptService);
+		} else {
+			this.pathservice = new ParetoPathService(graphService, sptService);
+		}
+		
+	}
+
 	OptimizeType getSelectedOptimizeType(){
 		if(opQuick.isSelected()){
 			return OptimizeType.QUICK;
@@ -1453,7 +1484,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         }
         
         // set up a visitor to the path service so we can get the SPT as it's generated
-        ParetoPathService.SPTVisitor vis = pathservice.new SPTVisitor();
+        SPTVisitor vis = new SPTVisitor();
         pathservice.setSPTVisitor(vis);
         
         long t0 = System.currentTimeMillis();

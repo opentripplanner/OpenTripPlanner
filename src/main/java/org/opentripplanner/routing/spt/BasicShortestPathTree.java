@@ -20,7 +20,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -35,8 +34,6 @@ import org.opentripplanner.routing.graph.Vertex;
  * @author andrewbyrd
  */
 public class BasicShortestPathTree extends AbstractShortestPathTree {
-    
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     
     private static final int DEFAULT_CAPACITY = 500;
 

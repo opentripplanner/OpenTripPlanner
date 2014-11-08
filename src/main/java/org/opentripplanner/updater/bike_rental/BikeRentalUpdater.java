@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
@@ -112,9 +112,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         LOG.info("Setting up bike rental updater.");
         this.graph = graph;
         this.source = source;
-        this.network = (preferences.get("networks", DEFAULT_NETWORK_LIST));
-        LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec,
-                source);
+        this.network = preferences.get("networks", DEFAULT_NETWORK_LIST);
+        LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec, source);
     }
 
     @Override
@@ -127,11 +126,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         updaterManager.executeBlocking(new GraphWriterRunnable() {
             @Override
             public void run(Graph graph) {
-                service = graph.getService(BikeRentalStationService.class);
-                if (service == null) {
-                    service = new BikeRentalStationService();
-                    graph.putService(BikeRentalStationService.class, service);
-                }
+                service = graph.getService(BikeRentalStationService.class, true);
             }
         });
     }
@@ -173,7 +168,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     /* API did not provide a network list, use default */
                     station.networks = defaultNetworks;
                 }
-                service.addStation(station);
+                service.addBikeRentalStation(station);
                 stationSet.add(station);
                 BikeRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
@@ -184,7 +179,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     }
                     verticesByStation.put(station, vertex);
                     new RentABikeOnEdge(vertex, vertex, station.networks);
-                    new RentABikeOffEdge(vertex, vertex, station.networks);
+                    if (station.allowDropoff)
+                        new RentABikeOffEdge(vertex, vertex, station.networks);
                 } else {
                     vertex.setBikesAvailable(station.bikesAvailable);
                     vertex.setSpacesAvailable(station.spacesAvailable);
@@ -201,7 +197,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                     graph.removeVertexAndEdges(vertex);
                 }
                 toRemove.add(station);
-                service.removeStation(station);
+                service.removeBikeRentalStation(station);
                 // TODO: need to unsplit any streets that were split
             }
             for (BikeRentalStation station : toRemove) {

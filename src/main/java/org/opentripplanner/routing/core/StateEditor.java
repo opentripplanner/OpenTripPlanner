@@ -372,6 +372,16 @@ public class StateEditor {
         }
     }
 
+    public void setBikeParked(boolean bikeParked) {
+        cloneStateDataAsNeeded();
+        child.stateData.bikeParked = bikeParked;
+        if (bikeParked) {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
+        }
+    }
+
     public void setPreviousStop(Stop previousStop) {
         cloneStateDataAsNeeded();
         child.stateData.previousStop = previousStop;
@@ -409,6 +419,7 @@ public class StateEditor {
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
         child.stateData.carParked = state.stateData.carParked;
+        child.stateData.bikeParked = state.stateData.bikeParked;
     }
 
     /* PUBLIC GETTER METHODS */

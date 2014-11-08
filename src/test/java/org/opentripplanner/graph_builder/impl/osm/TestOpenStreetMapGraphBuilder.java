@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.net.URLDecoder;
 
 import junit.framework.TestCase;
 
@@ -53,7 +54,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 
-        File file = new File(getClass().getResource("map.osm.gz").getFile());
+        File file = new File(URLDecoder.decode(getClass().getResource("map.osm.gz").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);
@@ -111,7 +112,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 
-        File file = new File(getClass().getResource("NYC_small.osm.gz").getFile());
+        File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.gz").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);

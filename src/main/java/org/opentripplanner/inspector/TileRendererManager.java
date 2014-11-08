@@ -54,6 +54,7 @@ public class TileRendererManager {
         renderers.put("bike-safety", new EdgeVertexTileRenderer(new BikeSafetyEdgeRenderer()));
         renderers.put("traversal", new EdgeVertexTileRenderer(
                 new TraversalPermissionsEdgeRenderer()));
+        renderers.put("wheelchair", new EdgeVertexTileRenderer(new WheelchairEdgeRenderer()));
     }
 
     public void registerRenderer(String layer, TileRenderer tileRenderer) {

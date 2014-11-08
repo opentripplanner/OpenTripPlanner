@@ -262,11 +262,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
-                <configuration>
-                    <links>
-                        <link>http://developer.onebusaway.org/modules/onebusaway-gtfs-modules/1.3.3/apidocs/</link>
-                    </links>
-                </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -293,16 +288,6 @@
             <id>download.java.net</id>
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/2/</url>
-        </repository>
-        <repository>
-            <id>releases.onebusaway.org</id>
-            <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </repository>
         <repository>
             <id>osgeo</id>
