@@ -59,4 +59,9 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
         }
         return true;
     }
+
+    @Override
+    public String getName() {
+        return "Wheelchair access";
+    }
 }
