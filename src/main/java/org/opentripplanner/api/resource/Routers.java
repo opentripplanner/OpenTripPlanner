@@ -263,9 +263,10 @@ public class Routers {
            
         // set up the build, using default parameters
         // this is basically simulating calling otp -b on the command line
-        CommandLineParameters params = new CommandLineParameters();
+        CommandLineParameters params = server.params.clone();
         params.build = Lists.newArrayList();
         params.build.add(tempDir);
+        params.inMemory = true;
         
         GraphBuilderTask graphBuilder = new OTPConfigurator(params).builderFromParameters();
         

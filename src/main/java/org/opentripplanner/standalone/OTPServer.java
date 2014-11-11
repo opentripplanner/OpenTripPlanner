@@ -59,6 +59,8 @@ public class OTPServer {
     public PointSetCache pointSetCache;
 
     public TileRendererManager tileRendererManager;
+    
+    public CommandLineParameters params;
 
     public Router getRouter(String routerId) {
         return routers.get(routerId);
@@ -67,6 +69,8 @@ public class OTPServer {
     public OTPServer (CommandLineParameters params, GraphService gs) {
         LOG.info("Wiring up and configuring server.");
 
+        this.params = params; 
+        
         // Core OTP modules
         graphService = gs;
         routingRequest = new RoutingRequest();
