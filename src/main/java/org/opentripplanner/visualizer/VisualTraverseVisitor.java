@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 
 public class VisualTraverseVisitor implements TraverseVisitor {
 

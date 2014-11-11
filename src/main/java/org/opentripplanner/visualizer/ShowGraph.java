@@ -1158,4 +1158,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	public void setSPT(ShortestPathTree spt) {
 		this.spt = spt;
 	}
+
+	public void addNewSPTEdge(Edge e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -15,6 +15,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import com.fasterxml.jackson.jaxrs.json.annotation.JSONP;
 import com.google.common.collect.Maps;
+
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.profile.StopAtDistance;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.visualizer.VisualTraverseVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,5 +146,11 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
 
     @Override
     public void doSomeWork() {}
+
+	@Override
+	public void setTraverseVisitor(VisualTraverseVisitor heuristicTraverseVisitor) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

@@ -17,6 +17,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
+import org.opentripplanner.visualizer.VisualTraverseVisitor;
 
 /**
  * A trivial heuristic that always returns 0, which is always admissible. 
@@ -57,4 +58,10 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
     
     @Override
     public void doSomeWork() {}
+
+	@Override
+	public void setTraverseVisitor(VisualTraverseVisitor heuristicTraverseVisitor) {
+		// TODO Auto-generated method stub
+		
+	}
 }

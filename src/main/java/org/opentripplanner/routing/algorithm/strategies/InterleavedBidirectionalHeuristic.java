@@ -31,6 +31,7 @@ import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
+import org.opentripplanner.visualizer.VisualTraverseVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +71,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     BinHeap<Vertex> q;
 
     boolean finished = false;
+
+	private VisualTraverseVisitor traverseVisitor;
     
     public InterleavedBidirectionalHeuristic(Graph graph) {
         this.graph = graph;
@@ -144,6 +147,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
             double uw = q.peek_min_key();
             Vertex u = q.extract_min();
+            
             //LOG.info("dequeued weight {} at {}", uw, u);
 //            // Ignore vertices that could be rekeyed (but are not rekeyed in this implementation).
 //            if (uw > weights.get(u)) continue;
@@ -158,6 +162,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 // Do not enter streets in this phase.
                 if (e instanceof StreetTransitLink) continue;
                 Vertex v = options.arriveBy ? e.getToVertex() : e.getFromVertex();
+                
+                if(this.traverseVisitor != null){
+                	this.traverseVisitor.visitEdge( e, null );
+                }
+                
                 double ew = e.weightLowerBound(options);
                 // INF heuristic value indicates unreachable (e.g. non-running transit service)
                 // this saves time by not reverse-exploring those routes and avoids maxFound of INF.
@@ -315,5 +324,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
         }
     }
+
+	@Override
+	public void setTraverseVisitor(VisualTraverseVisitor visitor) {
+		this.traverseVisitor = visitor;
+	}
 
 }

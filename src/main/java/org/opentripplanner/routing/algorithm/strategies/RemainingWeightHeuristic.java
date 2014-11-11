@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.visualizer.VisualTraverseVisitor;
 
 /**
  * Interface for classes that provides an admissible estimate of (lower bound on) 
@@ -42,6 +43,8 @@ public interface RemainingWeightHeuristic extends Serializable {
      * estimate. Avoids thread synchronization evil by interleaving forward and backward searches. 
      */
     public void doSomeWork();
+
+	public void setTraverseVisitor(VisualTraverseVisitor heuristicTraverseVisitor);
     
 }
 

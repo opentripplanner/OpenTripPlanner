@@ -33,6 +33,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
+import org.opentripplanner.visualizer.VisualTraverseVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +80,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
     
     private RunState runState;
+	private VisualTraverseVisitor heuristicTraverseVisitor;
     
     /**
      * Compute SPT using default timeout and termination strategy.
@@ -120,6 +122,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             runState = null; // Search timed out
             return;
         }
+        
+        runState.heuristic.setTraverseVisitor(this.heuristicTraverseVisitor);
+        
         runState.spt.add(initialState);
 
         // Priority Queue.
@@ -340,4 +345,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
     }
+
+	public void setHeuristicTraverseVisitor(VisualTraverseVisitor visitor) {
+		this.heuristicTraverseVisitor = visitor;
+	}
 }
