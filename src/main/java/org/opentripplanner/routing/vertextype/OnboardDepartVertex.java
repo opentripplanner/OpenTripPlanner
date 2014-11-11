@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -31,11 +32,11 @@ public class OnboardDepartVertex extends Vertex {
     }
 
     @Override
-    public int removeTemporaryEdges() {
+    public int removeTemporaryEdges(Graph graph) {
         // We can remove all
         int nRemoved = 0;
         for (Edge e : getOutgoing()) {
-            if (e.detach() != 0)
+            if (e.detach(graph) != 0)
                 nRemoved += 1;
         }
         if (!getIncoming().isEmpty())

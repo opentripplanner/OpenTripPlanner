@@ -37,9 +37,6 @@ public class CandidateEdge {
     /** Number of coordinates on the edge. */
     private final int numEdgeCoords;
 
-    /** Whether point is located at a platform. */
-    private final int platform;
-
     /** Preference value passed in. */
     private final double preference;
 
@@ -100,7 +97,6 @@ public class CandidateEdge {
         edge = e;
         edgeCoords = e.getGeometry().getCoordinateSequence();
         numEdgeCoords = edgeCoords.size();
-        platform = calcPlatform(mode);
         nearestPointOnEdge = new Coordinate();
 
         // Initializes nearestPointOnEdge, nearestSegmentIndex,
@@ -126,7 +122,7 @@ public class CandidateEdge {
         }
 
         // Calculate the score last so it can use all other data.
-        score = calcScore();
+        score = calcScore(mode);
     }
 
     /** Construct CandidateEdge based on a Coordinate. */
@@ -212,7 +208,9 @@ public class CandidateEdge {
     }
 
     /** Internal calculator for the score. Assumes that edge, platform and distance are initialized. */
-    private double calcScore() {
+    private double calcScore(TraverseModeSet modes) {
+        /** Whether point is located at a platform. */
+        int platform = calcPlatform(modes);
         double myScore = 0;
         // why is this being scaled by 1/360th of the radius of the earth?
         myScore = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M / 360.0;
@@ -225,8 +223,9 @@ public class CandidateEdge {
             // this is a hack, but there's not really a better way to do it
             myScore /= SIDEWALK_PREFERENCE;
         }
-        // apply strong preference to car edges and to platforms for the specified modes 
-        if (edge.getPermission().allows(StreetTraversalPermission.CAR)
+        // apply strong preference to car edges and to platforms for the specified modes
+        // only apply for car modes -- TODO Check this.
+        if (modes.getDriving() && edge.getPermission().allows(StreetTraversalPermission.CAR)
                 || (edge.getStreetClass() & platform) != 0) {
             // we're subtracting here because no matter how close we are to a
             // good non-car non-platform edge, we really want to avoid it in

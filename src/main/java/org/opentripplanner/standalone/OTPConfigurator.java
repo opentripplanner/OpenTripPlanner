@@ -242,7 +242,10 @@ public class OTPConfigurator {
             return visualizer;
         } else return null;
     }
-
+    
+    /**
+     * Represents the different types of input files for a graph build.
+     */
     private static enum InputFileType {
         GTFS, OSM, CONFIG, OTHER;
         public static InputFileType forFile(File file) {
@@ -262,5 +265,4 @@ public class OTPConfigurator {
             return OTHER;
         }
     }
-
 }

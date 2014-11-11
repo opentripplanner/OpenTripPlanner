@@ -54,6 +54,7 @@ public class TileRendererManager {
         renderers.put("bike-safety", new EdgeVertexTileRenderer(new BikeSafetyEdgeRenderer()));
         renderers.put("traversal", new EdgeVertexTileRenderer(
                 new TraversalPermissionsEdgeRenderer()));
+        renderers.put("wheelchair", new EdgeVertexTileRenderer(new WheelchairEdgeRenderer()));
     }
 
     public void registerRenderer(String layer, TileRenderer tileRenderer) {
@@ -104,4 +105,14 @@ public class TileRendererManager {
         return image;
     }
 
+    /**
+     * Gets all renderers
+     * 
+     * Used to return list of renderers to client.
+     * Could be also used to show legend.
+     * @return 
+     */
+    public Map<String, TileRenderer> getRenderers() {
+        return renderers;
+    }
 }

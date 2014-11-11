@@ -45,6 +45,7 @@ public class PlainStreetEdgeTest {
         v2 = vertex("maple_2nd", 1.0, 2.0);
         
         proto = new RoutingRequest();
+        proto.setDummyRoutingContext(_graph);
         proto.carSpeed = 15.0f;
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 5.0f;
@@ -278,7 +279,7 @@ public class PlainStreetEdgeTest {
         State state = new State(v2, 0, proto.clone());
 
         state.getOptions().setArriveBy(true);
-        e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
+        _graph.addTurnRestriction(e1, new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
 
         assertNotNull(e0.traverse(e1.traverse(state)));
     }

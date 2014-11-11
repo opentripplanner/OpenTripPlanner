@@ -199,6 +199,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Cost of dropping-off a rented bike */
     public int bikeRentalDropoffCost = 30;
 
+    /** Time to park a bike */
+    public int bikeParkTime = 60;
+
+    /** Cost of parking a bike. */
+    public int bikeParkCost = 120;
+
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)

@@ -40,6 +40,13 @@ public class BikeRentalStation implements Serializable {
     public int spacesAvailable = Integer.MAX_VALUE;
     @XmlAttribute
     @JsonSerialize
+    public boolean allowDropoff = true;
+
+    /**
+     * List of compatible network names. Null (default) to be compatible with all.
+     */
+    @XmlAttribute
+    @JsonSerialize
     public Set<String> networks = null;
     
     /**
@@ -49,7 +56,7 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public boolean realTimeData = true;
-    
+
     public boolean equals(Object o) {
         if (!(o instanceof BikeRentalStation)) {
             return false;
