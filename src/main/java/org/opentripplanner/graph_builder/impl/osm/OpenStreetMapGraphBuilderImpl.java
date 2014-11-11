@@ -830,7 +830,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             restriction.type = restrictionTag.type;
                             restriction.modes = restrictionTag.modes;
                             restriction.time = restrictionTag.time;
-                            from.addTurnRestriction(restriction);
+                            graph.addTurnRestriction(from, restriction);
                         }
                     }
                 }

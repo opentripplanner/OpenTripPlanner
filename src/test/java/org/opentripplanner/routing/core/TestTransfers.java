@@ -581,7 +581,7 @@ public class TestTransfers extends TestCase {
         applyUpdateToTripPattern(pattern, "4.2", "F", 1, 82800, 82800,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
         // Remove the timed transfer from the graph
-        timedTransferEdge.detach();
+        timedTransferEdge.detach(graph);
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }

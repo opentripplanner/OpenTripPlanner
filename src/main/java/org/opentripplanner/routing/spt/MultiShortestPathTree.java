@@ -25,6 +25,7 @@ import java.util.Set;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,8 +124,9 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
         if (thisState.isBikeParked() != other.isBikeParked())
             return false;
 
+        Graph graph = thisState.getOptions().rctx.graph;
         if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof StreetEdge)
-                && (!((StreetEdge) thisState.backEdge).getTurnRestrictions().isEmpty())))
+                && (!graph.getTurnRestrictions(thisState.backEdge).isEmpty())))
             return false;
 
         if (thisState.routeSequenceSubset(other)) {

@@ -275,6 +275,7 @@ public class WalkableAreaBuilder {
             mode = TraverseMode.CAR;
         }
         RoutingRequest options = new RoutingRequest(mode);
+        options.setDummyRoutingContext(graph);
         GenericDijkstra search = new GenericDijkstra(options);
         search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
         Set<Edge> usedEdges = new HashSet<Edge>();
@@ -293,7 +294,7 @@ public class WalkableAreaBuilder {
         for (Edge edge : edges) {
             if (!usedEdges.contains(edge)) {
                 graph.streetNotesService.removeStaticNotes(edge);
-                edge.detach();
+                edge.detach(graph);
             }
         }
     }

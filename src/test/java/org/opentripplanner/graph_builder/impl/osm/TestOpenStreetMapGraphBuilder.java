@@ -159,7 +159,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
             // Check turn restriction consistency.
             // NOTE(flamholz): currently there don't appear to be any turn restrictions
             // in the OSM file we are loading.
-            for (TurnRestriction tr : se.getTurnRestrictions()) {                
+            for (TurnRestriction tr : gg.getTurnRestrictions(se)) {
                 // All turn restrictions should apply equally to
                 // CAR and CUSTOM_MOTOR_VEHICLE.
                 TraverseModeSet modes = tr.modes;
