@@ -81,6 +81,18 @@ otp.core.Webapp = otp.Class({
             otp.debug.disable();
         }
 
+        // Enables/disables showing of debug layers overlays
+        if (this.urlParams.debug_layers === 'false') {
+            delete window.localStorage['otpDebugLayers']; // Reset the debug value
+        } else if (otp.config.debug_layers || this.urlParams.debug_layers === 'true' || window.localStorage["otpDebugLayers"] === 'true') {
+            console.info('Debug layers enabled (persistent).');
+            console.info('    To disable put debug_layers=false in the url parameters');
+            window.localStorage['otpDebugLayers'] = 'true'; // Save in localstorage to make it persistant!
+            otp.config.debug_layers = true;
+        }
+
+
+
         // set the logo & title
         
         if(otp.config.showLogo) {

@@ -75,4 +75,8 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
         return true;
     }
 
+    @Override
+    public String getName() {
+        return "Bike safety";
+    }
 }
