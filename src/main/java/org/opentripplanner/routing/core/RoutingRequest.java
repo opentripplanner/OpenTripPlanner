@@ -398,6 +398,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
+    
+	private List<AgencyAndId> bannedTripPattern = null;
 
     /* CONSTRUCTORS */
 
@@ -802,6 +804,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedTripPattern = bannedTripPattern;
             clone.bannedStops = bannedStops.clone();
             clone.bannedStopsHard = bannedStopsHard.clone();
             if (this.bikeWalkingOptions != this)
@@ -917,6 +920,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && bikeBoardCost == other.bikeBoardCost
                 && bannedRoutes.equals(other.bannedRoutes)
                 && bannedTrips.equals(other.bannedTrips)
+                && bannedTripPattern.equals(other.bannedTripPattern)
                 && preferredRoutes.equals(other.preferredRoutes)
                 && unpreferredRoutes.equals(other.unpreferredRoutes)
                 && transferSlack == other.transferSlack
@@ -1193,5 +1197,9 @@ public class RoutingRequest implements Cloneable, Serializable {
         // Considering that buses can travel on highways, return the same max speed for all other transit.
         return 40; // TODO find accurate max speeds
     }
+
+	public void banTripPattern(List<AgencyAndId> trips) {
+		this.bannedTripPattern  = trips;
+	}
 
 }

@@ -306,10 +306,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      */
     public boolean tripAcceptable(State state0, int stopIndex) {
         RoutingRequest options = state0.getOptions();
+        
         BannedStopSet banned = options.bannedTrips.get(trip.getId());
         if (banned != null && banned.contains(stopIndex)) {
             return false;
         }
+        
+        // TODO check if this is concludes a banned sequence
+        
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
             return false;
         }

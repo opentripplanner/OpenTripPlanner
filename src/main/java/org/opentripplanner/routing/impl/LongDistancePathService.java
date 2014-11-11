@@ -19,11 +19,13 @@ import static org.opentripplanner.routing.automata.Nonterminal.plus;
 import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import jj2000.j2k.NotImplementedError;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -117,25 +119,41 @@ public class LongDistancePathService implements PathService {
          * the whole graph walkable. */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
+        
+        List<GraphPath> allPaths = new ArrayList<GraphPath>();
 
-        long searchBeginTime = System.currentTimeMillis();
-        LOG.debug("BEGIN SEARCH");
-        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
-        LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        
-        if (spt == null) { // timeout or other fail
-            LOG.warn("SPT was null.");
-            return null;
+        List<AgencyAndId> bannedTripPattern = null;
+        for(int i=0; i<3; i++){
+	        long searchBeginTime = System.currentTimeMillis();
+	        LOG.debug("BEGIN SEARCH");
+	        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+	        LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
+	        
+	        if (spt == null) { // timeout or other fail
+	            LOG.warn("SPT was null.");
+	            return null;
+	        }
+	        
+	        if( this.sptVisitor!=null ){
+	        	this.sptVisitor.spt = spt;
+	        }
+	        
+	        //spt.getPaths().get(0).dump();
+	        List<GraphPath> paths = spt.getPaths();
+	        
+	        //get a trip pattern to ban
+	        if(paths.size()==0){
+	        	continue;
+	        }
+	        
+	        GraphPath gp = paths.get(0);
+	        bannedTripPattern = gp.getTrips();
+	        
+	        allPaths.addAll( paths );
         }
         
-        if( this.sptVisitor!=null ){
-        	this.sptVisitor.spt = spt;
-        }
-        
-        //spt.getPaths().get(0).dump();
-        List<GraphPath> paths = spt.getPaths();
-        Collections.sort(paths, new PathWeightComparator());
-        return paths;
+        Collections.sort(allPaths, new PathWeightComparator());
+        return allPaths;
     }
 
     public static class Parser extends PathParser {
