@@ -858,4 +858,8 @@ public class State implements Cloneable {
     public double getOptimizedElapsedTimeSeconds() {
         return getElapsedTimeSeconds() - stateData.initialWaitTime;
     }
+
+	public AgencyAndId[] getRouteSequence() {
+		return this.stateData.routeSequence;
+	}
 }

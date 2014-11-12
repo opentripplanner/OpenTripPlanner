@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.trippattern;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
@@ -22,6 +23,8 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
+
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
@@ -312,7 +315,18 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
             return false;
         }
         
-        // TODO check if this is concludes a banned sequence
+        //  check if this trip concludes a banned route sequence
+        for( List<AgencyAndId> bannedRouteSequence : options.getBannedRouteSequences()) {
+	        List<AgencyAndId> prospectiveSeq = new ArrayList<AgencyAndId>(Arrays.asList( state0.getRouteSequence() ));
+	        for(AgencyAndId agency : state0.getRouteSequence() ){ prospectiveSeq.add( agency ); }
+	        prospectiveSeq.add( trip.getRoute().getId() );
+	        
+	        // see if the banned route sequence occurs inside of the prospective sequence
+	        if( isSubsequence(bannedRouteSequence, prospectiveSeq) ){
+	        	return false;
+	        }
+        }
+        
         
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1) {
             return false;
@@ -325,7 +339,29 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return true;
     }
 
-    /** Cancel this entire trip */
+    private boolean isSubsequence(List<AgencyAndId> smaller, List<AgencyAndId> larger) {
+		int nComps = larger.size()-smaller.size()+1;
+		
+		if( nComps < 1 ){
+			return false;
+		}
+		
+		for(int i=0; i<nComps; i++){
+			try{
+			List<AgencyAndId> aa = larger.subList(i, i+smaller.size());
+			if( aa.equals( smaller ) ){
+				return true;
+			}
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
+
+		}
+		
+		return false;
+	}
+
+	/** Cancel this entire trip */
     public void cancel() {
         cancelled = true;
         arrivalTimes = new int[getNumStops()];

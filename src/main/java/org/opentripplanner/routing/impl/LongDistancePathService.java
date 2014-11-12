@@ -21,6 +21,7 @@ import static org.opentripplanner.routing.automata.Nonterminal.star;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import jj2000.j2k.NotImplementedError;
@@ -122,8 +123,8 @@ public class LongDistancePathService implements PathService {
         
         List<GraphPath> allPaths = new ArrayList<GraphPath>();
 
-        List<AgencyAndId> bannedTripPattern = null;
-        for(int i=0; i<3; i++){
+        for(int i=0; i<options.numItineraries; i++){
+        	
 	        long searchBeginTime = System.currentTimeMillis();
 	        LOG.debug("BEGIN SEARCH");
 	        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
@@ -141,15 +142,37 @@ public class LongDistancePathService implements PathService {
 	        //spt.getPaths().get(0).dump();
 	        List<GraphPath> paths = spt.getPaths();
 	        
+	        Collections.sort( paths, new Comparator<GraphPath>() {
+
+				@Override
+				public int compare(GraphPath o1, GraphPath o2) {
+					if( o1.getWeight() < o2.getWeight() ){
+						return -1;
+					}
+					if( o1.getWeight() > o2.getWeight() ){
+						return 1;
+					}
+					return 0;
+				}
+	        	
+	        });
+	        
 	        //get a trip pattern to ban
 	        if(paths.size()==0){
 	        	continue;
 	        }
 	        
+	        // though the long distance planner can in principle get multiple paths from a single run as a result
+	        // of pareto optimal planning, they're almost always nearly exactly identical, so we just grab the one with the lowest
+	        // weight
 	        GraphPath gp = paths.get(0);
-	        bannedTripPattern = gp.getTrips();
+	        if(gp.states.size()!=0){
+	        	AgencyAndId[] bannedRouteSequence = gp.states.getLast().getRouteSequence();
+	        	options.addBannedRouteSequence( bannedRouteSequence );
+	        }
 	        
-	        allPaths.addAll( paths );
+	        
+	        allPaths.add( gp );
         }
         
         Collections.sort(allPaths, new PathWeightComparator());
