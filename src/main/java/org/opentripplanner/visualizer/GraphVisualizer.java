@@ -84,6 +84,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.ParetoPathService;
 import org.opentripplanner.routing.impl.SPTVisitor;
@@ -374,7 +375,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     
     private PathService pathservice;
         
-    private GenericAStar sptService = new GenericAStar();
+    private GenericAStarFactory sptServiceFactory = new GenericAStarFactory();
 
     private DefaultListModel<String> metadataModel;
 
@@ -466,7 +467,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         this.graphService = graphService;
         this.graph = graphService.getGraph();
-        this.pathservice = new ParetoPathService(graphService, sptService);
+        this.pathservice = new ParetoPathService(graphService, sptServiceFactory);
         setTitle("GraphVisualizer");
         
         init();
@@ -591,7 +592,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // init center graphical panel
         showGraph = new ShowGraph(this, getGraph());
         pane.add(showGraph, BorderLayout.CENTER);
-        sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
+        sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
 
         // init left panel
         leftPanel = new JPanel();
@@ -779,9 +780,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	protected void setLongDistanceMode(boolean selected) {
 		if( selected ){
-			this.pathservice = new LongDistancePathService(graphService, sptService);
+			this.pathservice = new LongDistancePathService(graphService, sptServiceFactory);
 		} else {
-			this.pathservice = new ParetoPathService(graphService, sptService);
+			this.pathservice = new ParetoPathService(graphService, sptServiceFactory);
 		}
 		
 	}
@@ -1478,9 +1479,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         // apply callback if the options call for it
         if( dontUseGraphicalCallbackCheckBox.isSelected() ){
-        	sptService.setTraverseVisitor(null);
+        	sptServiceFactory.setTraverseVisitor(null);
         } else {
-        	sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
+        	sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
         }
         
         // set up a visitor to the path service so we can get the SPT as it's generated

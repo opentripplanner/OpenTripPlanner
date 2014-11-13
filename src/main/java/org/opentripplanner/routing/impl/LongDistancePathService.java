@@ -68,11 +68,11 @@ public class LongDistancePathService implements PathService {
     private static final double CLAMP_MAX_WALK = 15000;
 
     private GraphService graphService;
-    private SPTService sptService;
+    private SPTServiceFactory sptServiceFactory;
 
-    public LongDistancePathService(GraphService graphService, SPTService sptService) {
+    public LongDistancePathService(GraphService graphService, SPTServiceFactory sptServiceFactory) {
         this.graphService = graphService;
-        this.sptService = sptService;
+        this.sptServiceFactory = sptServiceFactory;
     }
 
     public double timeout = 0; // seconds
@@ -86,6 +86,8 @@ public class LongDistancePathService implements PathService {
             LOG.error("PathService was passed a null routing request.");
             return null;
         }
+        
+        SPTService sptService = this.sptServiceFactory.instantiate();
 
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.routerId));

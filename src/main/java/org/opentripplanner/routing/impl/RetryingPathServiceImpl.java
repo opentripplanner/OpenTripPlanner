@@ -46,13 +46,15 @@ public class RetryingPathServiceImpl implements PathService {
     private static final double MAX_WALK_MULTIPLE = 16;
 
     private GraphService graphService;
+    
+    private SPTServiceFactory sptServiceFactory;
 
-    public RetryingPathServiceImpl(GraphService graphService, SPTService sptService) {
+    public RetryingPathServiceImpl(GraphService graphService, SPTServiceFactory sptServiceFactory) {
         this.graphService = graphService;
-        this.sptService = sptService;
+        this.sptServiceFactory = sptServiceFactory;
     }
 
-    private SPTService sptService;
+    
 
     private double firstPathTimeout = 0; // seconds
     private double multiPathTimeout = 0; // seconds
@@ -108,6 +110,9 @@ public class RetryingPathServiceImpl implements PathService {
         double initialMaxWalk = maxWalk;
         long maxTime = options.arriveBy ? 0 : Long.MAX_VALUE;
         RoutingRequest currOptions;
+        
+        SPTService sptService = this.sptServiceFactory.instantiate();
+        
         while (paths.size() < options.numItineraries) {
             currOptions = optionQueue.poll();
             if (currOptions == null) {
@@ -214,12 +219,12 @@ public class RetryingPathServiceImpl implements PathService {
         this.graphService = graphService;
     }
 
-    public SPTService getSptService() {
-        return sptService;
+    public SPTServiceFactory getSptServiceFactory() {
+        return sptServiceFactory;
     }
 
-    public void setSptService(SPTService sptService) {
-        this.sptService = sptService;
+    public void setSptServiceFactory(SPTServiceFactory sptServiceFactory) {
+        this.sptServiceFactory = sptServiceFactory;
     }
 
 	@Override
