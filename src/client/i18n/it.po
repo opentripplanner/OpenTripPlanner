@@ -23,21 +23,21 @@ msgstr ""
 #: src/client/js/otp/config.js:268
 #, fuzzy
 msgid "Transit"
-msgstr "Trasporto pubblico"
+msgstr "Mezzi pubblici"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: src/client/js/otp/config.js:271
 #, fuzzy
 msgid "Bus Only"
-msgstr "Utilizza solo Bus"
+msgstr "Solo Bus"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: src/client/js/otp/config.js:274
 #, fuzzy
 msgid "Rail Only"
-msgstr "Utilizza solo Treno"
+msgstr "Solo Treno"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
@@ -51,7 +51,7 @@ msgstr "In bici"
 #: src/client/js/otp/config.js:280
 #, fuzzy
 msgid "Bicycle &amp; Transit"
-msgstr "Bici &amp; trasporto pubblico"
+msgstr "Bici &amp; mezzi pubblici"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
@@ -102,7 +102,7 @@ msgstr "Bike sharing & Ride"
 #: src/client/js/otp/core/MapContextMenu.js:36
 #, fuzzy
 msgid "Recenter Map Here"
-msgstr "Centra la mappa qui"
+msgstr "Centra"
 
 #. Context menu
 #: src/client/js/otp/core/MapContextMenu.js:39
@@ -464,7 +464,7 @@ msgstr "Parti da"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:538
 msgid "<b>Board</b> at "
-msgstr "Sali a bordo da"
+msgstr "<b>Parti</b> da "
 
 #. Public transport <Stop> (stop name)
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:557
@@ -1228,7 +1228,7 @@ msgstr "Percorso accessibile:"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474
 #, fuzzy
 msgid "Travel by"
-msgstr "Viaggia in"
+msgstr "Modalità"
 
 #. default value for preset values of maximum walk
 #. distances in Trip Options
