@@ -362,9 +362,9 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         /*
          * Create a spatial index for each segment of area outer rings. Note: The spatial index is
-         * temporary and store only areas, so it should not take that much memory. Note 2: For common
-         * nodes shared by different ways of different areas we only add them once, otherwise we could
-         * end-up looping on creating new intersections.
+         * temporary and store only areas, so it should not take that much memory. Note 2: For
+         * common nodes shared by different ways of different areas we only add them once, otherwise
+         * we could end-up looping on creating new intersections.
          */
         Set<P2<Long>> commonSegments = new HashSet<P2<Long>>();
         HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
@@ -410,6 +410,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 LineString seg = GeometryUtils.makeLineString(nA.lon, nA.lat, nB.lon, nB.lat);
 
                 for (RingSegment ringSegment : ringSegments) {
+
                     // Skip if both segments share a common node
                     if (ringSegment.nA.getId() == nA.getId()
                             || ringSegment.nA.getId() == nB.getId()
