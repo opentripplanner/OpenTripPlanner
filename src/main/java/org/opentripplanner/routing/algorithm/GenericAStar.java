@@ -25,9 +25,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
-import org.opentripplanner.routing.spt.EarliestArrivalShortestPathTree;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.DateUtils;
@@ -41,7 +38,7 @@ import com.beust.jcommander.internal.Lists;
 /**
  * Find the shortest path between graph vertices using A*.
  */
-public class GenericAStar implements SPTService { // maybe this should be wrapped in a component SPT service 
+public class GenericAStar { // maybe this should be wrapped in a component SPT service
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
@@ -83,7 +80,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /**
      * Compute SPT using default timeout and termination strategy.
      */
-    @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
         return getShortestPathTree(req, -1, null); // negative timeout means no timeout
     }
@@ -91,7 +87,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /**
      * Compute SPT using default termination strategy.
      */
-    @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
         return this.getShortestPathTree(req, timeoutSeconds, null);
     }

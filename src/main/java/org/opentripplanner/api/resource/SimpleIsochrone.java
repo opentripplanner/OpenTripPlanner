@@ -57,7 +57,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -94,8 +93,6 @@ import com.vividsolutions.jts.geom.Point;
 public class SimpleIsochrone extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(SimpleIsochrone.class);
-
-    private static final SPTService sptService = new EarliestArrivalSPTService();
 
     /* Parameters shared between all methods. */
     @QueryParam("requestSpacingMinutes") @DefaultValue("30") 
@@ -185,7 +182,7 @@ public class SimpleIsochrone extends RoutingResource {
         for (int r = 0; r < nRequests; r++) {
             request.dateTime = date.getTime() / 1000 + r * requestSpacingMinutes * 60;
             LOG.debug("date: {} {}", new Date(request.dateTime), request.dateTime);
-            ShortestPathTree spt = sptService.getShortestPathTree(request, 10);
+            ShortestPathTree spt = new EarliestArrivalSPTService().getShortestPathTree(request, 10);
             /* This could even be a good use for a generic SPT merging function */
             for (State s : spt.getAllStates()) {
                 if ( stopsOnly && ! (s.getVertex() instanceof TransitStop)) continue;

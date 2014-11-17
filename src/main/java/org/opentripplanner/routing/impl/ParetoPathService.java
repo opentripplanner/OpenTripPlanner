@@ -24,7 +24,6 @@ import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
@@ -35,15 +34,13 @@ public class ParetoPathService implements PathService {
     private static final Logger LOG = LoggerFactory.getLogger(ParetoPathService.class);
 
     private GraphService graphService;
-    private SPTServiceFactory sptServiceFactory;
-    
+
     private SPTVisitor sptVisitor = null;
 
     private double timeout = 0; // seconds
     
-    public ParetoPathService(GraphService gs, SPTServiceFactory spts) {
+    public ParetoPathService(GraphService gs) {
 		this.graphService = gs;
-		this.sptServiceFactory = spts;
 	}
 
 	/** Give up on searching for itineraries after this many seconds have elapsed. */
@@ -58,8 +55,6 @@ public class ParetoPathService implements PathService {
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
     	
-    	SPTService sptService = this.sptServiceFactory.instantiate();
-
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         // make sure the options has a routing context *before* cloning it (otherwise you get
@@ -72,7 +67,7 @@ public class ParetoPathService implements PathService {
 
         long searchBeginTime = System.currentTimeMillis();
         
-        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+        ShortestPathTree spt = new GenericAStar().getShortestPathTree(options, timeout);
         
         if(sptVisitor!=null){
         	System.out.println( "setting spt" );
@@ -114,14 +109,6 @@ public class ParetoPathService implements PathService {
 
     public void setGraphService(GraphService graphService) {
         this.graphService = graphService;
-    }
-
-    public SPTServiceFactory getSptServiceFactory() {
-        return sptServiceFactory;
-    }
-
-    public void setSptServiceFactory(SPTServiceFactory sptServiceFactory) {
-        this.sptServiceFactory = sptServiceFactory;
     }
 
 }

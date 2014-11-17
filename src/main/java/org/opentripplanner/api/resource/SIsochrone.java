@@ -30,6 +30,7 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.ReversibleLineStringWrapper;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.algorithm.EarliestArrivalSPTService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -38,7 +39,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,9 +77,6 @@ public class SIsochrone extends RoutingResource {
 
     @Context // FIXME inject Application context
     GraphService graphService;
-
-    @Context // FIXME inject Application context
-    private SPTService sptService;
 
     @Context // FIXME inject Application context
     private GeometryIndex index;
@@ -249,7 +246,7 @@ public class SIsochrone extends RoutingResource {
             sptRequestA.setMode(TraverseMode.WALK); // fall back to walk mode
             sptRequestA.setRoutingContext(graphService.getGraph());
         }
-        ShortestPathTree sptA = sptService.getShortestPathTree(sptRequestA);
+        ShortestPathTree sptA = new EarliestArrivalSPTService().getShortestPathTree(sptRequestA);
         StreetLocation origin = (StreetLocation) sptRequestA.rctx.fromVertex;
         sptRequestA.cleanup(); // remove inserted points
 

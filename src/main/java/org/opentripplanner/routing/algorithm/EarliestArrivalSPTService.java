@@ -21,7 +21,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.EarliestArrivalShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
@@ -33,18 +32,16 @@ import org.slf4j.LoggerFactory;
  * 
  * Note that walk limiting must be turned off -- resource limiting is not algorithmically correct.
  */
-public class EarliestArrivalSPTService implements SPTService { 
+public class EarliestArrivalSPTService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EarliestArrivalSPTService.class);
 
     public int maxDuration = 60 * 60 * 2;
 
-    @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
         return getShortestPathTree(req, -1, null); // negative timeout means no timeout
     }
     
-    @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
         return this.getShortestPathTree(req, timeoutSeconds, null);
     }

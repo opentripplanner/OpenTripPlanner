@@ -18,26 +18,24 @@ import java.util.List;
 
 import jj2000.j2k.NotImplementedError;
 
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class TrivialPathServiceImpl implements PathService {
 
     GraphService graphService;
-    SPTServiceFactory sptServiceFactory;
 
-    public TrivialPathServiceImpl(GraphService graphService, SPTServiceFactory sptServiceFactory) {
+    public TrivialPathServiceImpl(GraphService graphService) {
         this.graphService = graphService;
-        this.sptServiceFactory = sptServiceFactory;
     }
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
-        ShortestPathTree spt = sptServiceFactory.instantiate().getShortestPathTree(options);
+        ShortestPathTree spt = new GenericAStar().getShortestPathTree(options);
         if (spt == null) {
             return Collections.emptyList();
         }

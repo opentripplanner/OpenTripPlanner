@@ -24,6 +24,7 @@ import java.util.List;
 
 import jj2000.j2k.NotImplementedError;
 
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -44,7 +45,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -68,11 +68,9 @@ public class LongDistancePathService implements PathService {
     private static final double CLAMP_MAX_WALK = 15000;
 
     private GraphService graphService;
-    private SPTServiceFactory sptServiceFactory;
 
-    public LongDistancePathService(GraphService graphService, SPTServiceFactory sptServiceFactory) {
+    public LongDistancePathService(GraphService graphService) {
         this.graphService = graphService;
-        this.sptServiceFactory = sptServiceFactory;
     }
 
     public double timeout = 0; // seconds
@@ -87,7 +85,7 @@ public class LongDistancePathService implements PathService {
             return null;
         }
         
-        SPTService sptService = this.sptServiceFactory.instantiate();
+        GenericAStar aStar = new GenericAStar();
 
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.routerId));
@@ -122,7 +120,7 @@ public class LongDistancePathService implements PathService {
 
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
-        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+        ShortestPathTree spt = aStar.getShortestPathTree(options, timeout);
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         
         if (spt == null) { // timeout or other fail

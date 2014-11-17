@@ -22,11 +22,11 @@ import org.opentripplanner.analyst.core.SampleSource;
 import org.opentripplanner.common.geometry.RecursiveGridIsolineBuilder;
 import org.opentripplanner.common.geometry.RecursiveGridIsolineBuilder.ZFunc;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
@@ -45,12 +45,10 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
             .getLogger(IsoChroneSPTRendererRecursiveGrid.class);
 
     private GraphService graphService;
-    private SPTService sptService;
     private SampleSource sampleSource;
 
-    public IsoChroneSPTRendererRecursiveGrid(GraphService graphService, SPTService sptService, SampleSource sampleSource) {
+    public IsoChroneSPTRendererRecursiveGrid(GraphService graphService, SampleSource sampleSource) {
         this.graphService = graphService;
-        this.sptService = sptService;
         this.sampleSource = sampleSource;
     }
 
@@ -73,7 +71,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
                 + (sptRequest.arriveBy ? -isoChroneRequest.maxCutoffSec : isoChroneRequest.maxCutoffSec));
         sptRequest.batch = true;
         sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));
-        final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
+        final ShortestPathTree spt = new GenericAStar().getShortestPathTree(sptRequest);
         sptRequest.cleanup();
 
         // 2. Compute the set of initial points

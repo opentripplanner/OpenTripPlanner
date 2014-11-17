@@ -84,7 +84,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.ParetoPathService;
 import org.opentripplanner.routing.impl.SPTVisitor;
@@ -375,8 +374,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     
     private PathService pathservice;
         
-    private GenericAStarFactory sptServiceFactory = new GenericAStarFactory();
-
     private DefaultListModel<String> metadataModel;
 
     private HashSet<Vertex> closed;
@@ -467,7 +464,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         this.graphService = graphService;
         this.graph = graphService.getGraph();
-        this.pathservice = new ParetoPathService(graphService, sptServiceFactory);
+        this.pathservice = new ParetoPathService(graphService);
         setTitle("GraphVisualizer");
         
         init();
@@ -592,7 +589,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // init center graphical panel
         showGraph = new ShowGraph(this, getGraph());
         pane.add(showGraph, BorderLayout.CENTER);
-        sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
 
         // init left panel
         leftPanel = new JPanel();

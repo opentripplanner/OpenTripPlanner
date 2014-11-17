@@ -20,21 +20,19 @@ import java.util.List;
 import java.util.Queue;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Context;
-
-import jj2000.j2k.NotImplementedError;
 
 public class RetryingPathServiceImpl implements PathService {
 
@@ -47,11 +45,8 @@ public class RetryingPathServiceImpl implements PathService {
 
     private GraphService graphService;
     
-    private SPTServiceFactory sptServiceFactory;
-
-    public RetryingPathServiceImpl(GraphService graphService, SPTServiceFactory sptServiceFactory) {
+    public RetryingPathServiceImpl(GraphService graphService) {
         this.graphService = graphService;
-        this.sptServiceFactory = sptServiceFactory;
     }
 
     
@@ -111,8 +106,6 @@ public class RetryingPathServiceImpl implements PathService {
         long maxTime = options.arriveBy ? 0 : Long.MAX_VALUE;
         RoutingRequest currOptions;
         
-        SPTService sptService = this.sptServiceFactory.instantiate();
-        
         while (paths.size() < options.numItineraries) {
             currOptions = optionQueue.poll();
             if (currOptions == null) {
@@ -129,7 +122,7 @@ public class RetryingPathServiceImpl implements PathService {
             long subsearchBeginTime = System.currentTimeMillis();
             
             LOG.debug("BEGIN SUBSEARCH");
-            ShortestPathTree spt = sptService.getShortestPathTree(currOptions, timeout);
+            ShortestPathTree spt = new GenericAStar().getShortestPathTree(currOptions, timeout);
             if (spt == null) {
                 // Serious failure, no paths provided. This could be signaled with an exception.
                 LOG.warn("Aborting search. {} paths found, elapsed time {} sec", 
@@ -219,17 +212,9 @@ public class RetryingPathServiceImpl implements PathService {
         this.graphService = graphService;
     }
 
-    public SPTServiceFactory getSptServiceFactory() {
-        return sptServiceFactory;
-    }
-
-    public void setSptServiceFactory(SPTServiceFactory sptServiceFactory) {
-        this.sptServiceFactory = sptServiceFactory;
-    }
-
 	@Override
 	public void setSPTVisitor(SPTVisitor vis) {
-		throw new NotImplementedError();
+		throw new UnsupportedOperationException("NOT IMPLEMENTED");
 	}
 
 }
