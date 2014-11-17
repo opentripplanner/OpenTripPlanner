@@ -6,7 +6,7 @@
     <url>http://opentripplanner.org/</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.13.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <scm>

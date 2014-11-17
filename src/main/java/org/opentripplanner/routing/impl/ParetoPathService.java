@@ -35,15 +35,15 @@ public class ParetoPathService implements PathService {
     private static final Logger LOG = LoggerFactory.getLogger(ParetoPathService.class);
 
     private GraphService graphService;
-    private SPTService sptService;
+    private SPTServiceFactory sptServiceFactory;
     
     private SPTVisitor sptVisitor = null;
 
     private double timeout = 0; // seconds
     
-    public ParetoPathService(GraphService gs, GenericAStar spts) {
+    public ParetoPathService(GraphService gs, SPTServiceFactory spts) {
 		this.graphService = gs;
-		this.sptService = spts;
+		this.sptServiceFactory = spts;
 	}
 
 	/** Give up on searching for itineraries after this many seconds have elapsed. */
@@ -57,6 +57,8 @@ public class ParetoPathService implements PathService {
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
+    	
+    	SPTService sptService = this.sptServiceFactory.instantiate();
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
@@ -114,12 +116,12 @@ public class ParetoPathService implements PathService {
         this.graphService = graphService;
     }
 
-    public SPTService getSptService() {
-        return sptService;
+    public SPTServiceFactory getSptServiceFactory() {
+        return sptServiceFactory;
     }
 
-    public void setSptService(SPTService sptService) {
-        this.sptService = sptService;
+    public void setSptServiceFactory(SPTServiceFactory sptServiceFactory) {
+        this.sptServiceFactory = sptServiceFactory;
     }
 
 }

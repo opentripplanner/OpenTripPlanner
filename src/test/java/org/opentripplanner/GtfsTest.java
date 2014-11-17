@@ -38,6 +38,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.services.PathService;
@@ -55,7 +56,7 @@ public abstract class GtfsTest extends TestCase {
     AlertsUpdateHandler alertsUpdateHandler;
     PlanGenerator planGenerator;
     PathService pathService;
-    GenericAStar genericAStar;
+    GenericAStarFactory genericAStar;
     TimetableSnapshotSource timetableSnapshotSource;
     AlertPatchServiceImpl alertPatchServiceImpl;
 
@@ -101,7 +102,7 @@ public abstract class GtfsTest extends TestCase {
             alertsUpdateHandler.update(feedMessage);
         } catch (Exception exception) {}
 
-        genericAStar = new GenericAStar();
+        genericAStar = new GenericAStarFactory();
         if (isLongDistance()) {
             pathService = new LongDistancePathService(null, genericAStar);
         } else {

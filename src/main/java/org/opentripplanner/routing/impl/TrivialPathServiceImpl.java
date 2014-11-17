@@ -28,16 +28,16 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 public class TrivialPathServiceImpl implements PathService {
 
     GraphService graphService;
-    SPTService sptService;
+    SPTServiceFactory sptServiceFactory;
 
-    public TrivialPathServiceImpl(GraphService graphService, SPTService sptService) {
+    public TrivialPathServiceImpl(GraphService graphService, SPTServiceFactory sptServiceFactory) {
         this.graphService = graphService;
-        this.sptService = sptService;
+        this.sptServiceFactory = sptServiceFactory;
     }
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
-        ShortestPathTree spt = sptService.getShortestPathTree(options);
+        ShortestPathTree spt = sptServiceFactory.instantiate().getShortestPathTree(options);
         if (spt == null) {
             return Collections.emptyList();
         }

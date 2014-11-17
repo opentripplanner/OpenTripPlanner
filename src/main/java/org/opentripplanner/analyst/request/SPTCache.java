@@ -16,6 +16,7 @@ package org.opentripplanner.analyst.request;
 import javax.annotation.PostConstruct;
 
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.impl.SPTServiceFactory;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -30,12 +31,12 @@ public class SPTCache extends CacheLoader<RoutingRequest, ShortestPathTree> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SPTCache.class);
 
-    private SPTService sptService;
+    private SPTServiceFactory sptServiceFactory;
     
     private GraphService graphService;
 
-    public SPTCache(SPTService sptService, GraphService graphService) {
-        this.sptService = sptService;
+    public SPTCache(SPTServiceFactory sptServiceFactory, GraphService graphService) {
+        this.sptServiceFactory = sptServiceFactory;
         this.graphService = graphService;
         this.sptCache = CacheBuilder.newBuilder()
                 .concurrencyLevel(concurrency)
@@ -53,7 +54,7 @@ public class SPTCache extends CacheLoader<RoutingRequest, ShortestPathTree> {
         LOG.debug("spt cache miss : {}", req);
         req.setRoutingContext(graphService.getGraph());
         long t0 = System.currentTimeMillis();
-        ShortestPathTree spt = sptService.getShortestPathTree(req);
+        ShortestPathTree spt = sptServiceFactory.instantiate().getShortestPathTree(req);
         long t1 = System.currentTimeMillis();
         LOG.debug("calculated spt in {}msec", (int) (t1 - t0));
         req.cleanup();
