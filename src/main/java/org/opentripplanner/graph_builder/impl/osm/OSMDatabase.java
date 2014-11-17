@@ -28,6 +28,7 @@ import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
 import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
@@ -361,8 +362,11 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         /*
          * Create a spatial index for each segment of area outer rings. Note: The spatial index is
-         * temporary and store only areas, so it should not take that much memory.
+         * temporary and store only areas, so it should not take that much memory. Note 2: For
+         * common nodes shared by different ways of different areas we only add them once, otherwise
+         * we could end-up looping on creating new intersections.
          */
+        Set<P2<Long>> commonSegments = new HashSet<P2<Long>>();
         HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
         for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
             for (Ring ring : area.outermostRings) {
@@ -374,7 +378,13 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     ringSegment.nB = ring.nodes.get((j + 1) % ring.nodes.size());
                     Envelope env = new Envelope(ringSegment.nA.lon, ringSegment.nB.lon,
                             ringSegment.nA.lat, ringSegment.nB.lat);
-                    spndx.insert(env, ringSegment);
+                    P2<Long> key1 = new P2<>(ringSegment.nA.getId(), ringSegment.nB.getId());
+                    P2<Long> key2 = new P2<>(ringSegment.nB.getId(), ringSegment.nA.getId());
+                    if (!commonSegments.contains(key1) && !commonSegments.contains(key2)) {
+                        spndx.insert(env, ringSegment);
+                        commonSegments.add(key1);
+                        commonSegments.add(key2);
+                    }
                 }
             }
         }
