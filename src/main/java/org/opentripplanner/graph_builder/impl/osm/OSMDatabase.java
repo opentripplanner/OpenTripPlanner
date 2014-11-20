@@ -395,8 +395,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             OSMLevel wayLevel = getLevelForWay(way);
 
             // For each segment of the way
-            for (int i = 0; i < way.getNodeRefs().size() - 1; i++) {
-
+            for (int i = 0; i < way.getNodeRefs().size() - 1; i++) {                
                 OSMNode nA = nodesById.get(way.getNodeRefs().get(i));
                 OSMNode nB = nodesById.get(way.getNodeRefs().get(i + 1));
                 if (nA == null || nB == null) {
@@ -408,7 +407,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 if (ringSegments.size() == 0)
                     continue;
                 LineString seg = GeometryUtils.makeLineString(nA.lon, nA.lat, nB.lon, nB.lat);
-
+                
                 for (RingSegment ringSegment : ringSegments) {
 
                     // Skip if both segments share a common node
@@ -442,21 +441,60 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
                     if (!wayLevel.equals(areaLevel))
                         continue;
+                    
+                    // if the intersection is extremely close to one of the nodes of the way, just use that node
+                    // rather than splitting anything. See issue 1605.
+                    OSMNode splitNode;
+                    double epsilon = 0.0000001;
+                    
+                    // this will be set to true if there were nodes that were exactly coincident, rather than just a point on a way that is coincident
+                    // with a node in a ring segment.
+                    boolean wasNodeIdentical = false;
+                    
+                    if (checkIntersectionDistance(p, nA, epsilon)) {
+                    	// insert node A into the ring segment
+                        splitNode = nA;
+                        
+                        if (ringSegment.ring.nodes.contains(splitNode))
+                        	// This node is already a part of this ring (perhaps we inserted it previously). No need to connect again.
+                        	// Note that this may not be a safe assumption to make in all cases; suppose a way were to cross exactly over a node *twice*,
+                        	// we would only add it the first time.
+                        	continue;
+                        
+                        wasNodeIdentical = checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nB, nA, epsilon);
+                    }
+                    else if (checkIntersectionDistance(p, nB, epsilon)) {
+                    	// insert node B into the ring segment
+                        splitNode = nB;
+                        
+                        if (ringSegment.ring.nodes.contains(splitNode))
+                        	continue;
+                        
+                        wasNodeIdentical = checkDistance(ringSegment.nA, nB, epsilon) || checkDistance(ringSegment.nB, nB, epsilon);
+                    }
+                    else {
+                    	// create a node
+                    	splitNode = createVirtualNode(p.getCoordinate());
+                        nCreatedNodes++;
+                        LOG.debug(
+                                "Adding virtual {}, intersection of {} ({}--{}) and area {} ({}--{}) at {}.",
+                                splitNode, way, nA, nB, ringSegment.area.parent, ringSegment.nA,
+                                ringSegment.nB, p);
+                        way.addNodeRef(splitNode.getId(), i + 1);
+                        
+                        /*
+                         * If we split the way, re-start the way segments loop as the newly created segments
+                         * could be intersecting again (in case one segment cut many others).
+                         */
+                        i--;
+                    }
 
-                    // Create a virtual node and insert it in both the way and the ring
-                    OSMNode virtualNode = createVirtualNode(p.getCoordinate());
-                    nCreatedNodes++;
-                    LOG.debug(
-                            "Adding virtual {}, intersection of {} ({}--{}) and area {} ({}--{}) at {}.",
-                            virtualNode, way, nA, nB, ringSegment.area.parent, ringSegment.nA,
-                            ringSegment.nB, p);
-                    way.addNodeRef(virtualNode.getId(), i + 1);
                     /*
                      * The line below is O(n^2) but we do not insert often and ring size should be
                      * rather small.
                      */
-                    int j = ringSegment.ring.nodes.indexOf(ringSegment.nA);
-                    ringSegment.ring.nodes.add(j, virtualNode);
+                    int j = ringSegment.ring.nodes.indexOf(ringSegment.nB);
+                    ringSegment.ring.nodes.add(j, splitNode);
 
                     /*
                      * Update spatial index as we just split a ring segment. Note: we do not update
@@ -467,18 +505,16 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     RingSegment ringSegment2 = new RingSegment();
                     ringSegment2.area = ringSegment.area;
                     ringSegment2.ring = ringSegment.ring;
-                    ringSegment2.nA = virtualNode;
+                    ringSegment2.nA = splitNode;
                     ringSegment2.nB = ringSegment.nB;
                     Envelope env2 = new Envelope(ringSegment2.nA.lon, ringSegment2.nB.lon,
                             ringSegment2.nA.lat, ringSegment2.nB.lat);
                     spndx.insert(env2, ringSegment2);
-                    ringSegment.nB = virtualNode;
+                    ringSegment.nB = splitNode;
 
-                    /*
-                     * If we split, re-start the way segments loop as the newly created segments
-                     * could be intersecting again (in case one segment cut many others).
-                     */
-                    i--;
+                    if (wasNodeIdentical)
+                        LOG.info("Node {} in way {} is coincident but disconnected with area {}",
+                        	splitNode.getId(), way.getId(), ringSegment.area.parent.getId());
                     break;
                 }
             }
@@ -486,7 +522,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         LOG.info("Created {} virtual intersection nodes.", nCreatedNodes);
     }
 
-    /**
+	/**
      * Create a virtual OSM node, using a negative unique ID.
      * 
      * @param c The location of the node to create.
@@ -868,5 +904,26 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         annotations.add(annotation);
         return annotation.getMessage();
     }
-
+    
+    /**
+     * Check if a point is within an epsilon of a node.
+     * @param p
+     * @param n
+     * @param epsilon
+     * @return
+     */
+    private static boolean checkIntersectionDistance(Point p, OSMNode n, double epsilon) {
+    	return Math.abs(p.getY() - n.lat) < epsilon && Math.abs(p.getX() - n.lon) < epsilon;
+    }
+    
+    /**
+     * Check if two nodes are within an epsilon.
+     * @param a
+     * @param b
+     * @param epsilon
+     * @return
+     */
+    private static boolean checkDistance(OSMNode a, OSMNode b, double epsilon) {
+    	return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;
+	}
 }
