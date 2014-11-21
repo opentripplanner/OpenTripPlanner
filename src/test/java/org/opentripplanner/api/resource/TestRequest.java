@@ -884,8 +884,7 @@ public class TestRequest extends TestCase {
             this.modes = Arrays.asList(new QualifiedModeSetSequence("WALK"));
             this.intermediatePlaces = intermediates;
             Router router = otpServer.getRouter(routerId);
-            // TODO replace graphService below by router.graph
-            tsp = new TravelingSalesmanPathService(otpServer.getGraphService(), router.pathService);
+            tsp = new TravelingSalesmanPathService(router.graph, router.pathService);
         }
 
         public void setBannedTrips(List<String> bannedTrips) {
