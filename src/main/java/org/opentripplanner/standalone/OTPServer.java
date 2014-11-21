@@ -20,7 +20,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.impl.SPTServiceFactory;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,6 @@ public class OTPServer {
      * needed.
      */
     public RoutingRequest routingRequest;
-    public SPTServiceFactory sptServiceFactory;
 
     // Optional Analyst global modules (caches)
     public SurfaceCache surfaceCache;
@@ -63,7 +61,6 @@ public class OTPServer {
         // Core OTP modules
         graphService = gs;
         routingRequest = new RoutingRequest();
-        sptServiceFactory = new GenericAStarFactory();
 
         // Optional Analyst Modules.
         if (params.analyst) {
@@ -72,10 +69,17 @@ public class OTPServer {
         }
     }
 
+    /**
+     * @return The GraphService. Please use it only when the GraphService itself is necessary. To
+     *         get Graph instances, use getRouter().
+     */
     public GraphService getGraphService() {
         return graphService;
     }
 
+    /**
+     * @return A list of all router IDs currently available.
+     */
     public Collection<String> getRouterIds() {
         return graphService.getRouterIds();
     }
@@ -111,13 +115,16 @@ public class OTPServer {
     private Router createRouter(String routerId, Graph graph) {
         Router router = new Router(routerId, graph);
 
+        router.sptServiceFactory = new GenericAStarFactory();
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
         if (params.longDistance) {
-            LongDistancePathService pathService = new LongDistancePathService(graphService, sptServiceFactory);
+            LongDistancePathService pathService = new LongDistancePathService(graphService,
+                    router.sptServiceFactory);
             pathService.timeout = 10;
             router.pathService = pathService;
         } else {
-            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(graphService, sptServiceFactory);
+            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(graphService,
+                    router.sptServiceFactory);
             pathService.setFirstPathTimeout(10.0);
             pathService.setMultiPathTimeout(1.0);
             router.pathService = pathService;
@@ -130,9 +137,10 @@ public class OTPServer {
         // Optional Analyst Modules.
         if (params.analyst) {
             router.tileCache = new TileCache(router.graph);
-            router.sptCache = new SPTCache(sptServiceFactory, graph);
+            router.sptCache = new SPTCache(router.sptServiceFactory, graph);
             router.renderer = new Renderer(router.tileCache, router.sptCache);
-            router.sampleGridRenderer = new SampleGridRenderer(router.graph, sptServiceFactory);
+            router.sampleGridRenderer = new SampleGridRenderer(router.graph,
+                    router.sptServiceFactory);
             router.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(
                     router.sampleGridRenderer);
         }

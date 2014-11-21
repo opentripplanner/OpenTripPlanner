@@ -8,6 +8,7 @@ import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.SPTServiceFactory;
 import org.opentripplanner.routing.services.PathService;
 
 /**
@@ -22,6 +23,7 @@ public class Router {
     // Core services
     public PlanGenerator planGenerator;
     public PathService pathService;
+    public SPTServiceFactory sptServiceFactory;
 
     // Inspector/debug services
     public TileRendererManager tileRendererManager;

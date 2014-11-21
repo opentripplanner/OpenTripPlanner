@@ -238,7 +238,7 @@ public class SIsochrone extends RoutingResource {
             sptRequestA.setMode(TraverseMode.WALK); // fall back to walk mode
             sptRequestA.setRoutingContext(router.graph);
         }
-        ShortestPathTree sptA = otpServer.sptServiceFactory.instantiate().getShortestPathTree(
+        ShortestPathTree sptA = router.sptServiceFactory.instantiate().getShortestPathTree(
                 sptRequestA);
         StreetLocation origin = (StreetLocation) sptRequestA.rctx.fromVertex;
         sptRequestA.cleanup(); // remove inserted points
