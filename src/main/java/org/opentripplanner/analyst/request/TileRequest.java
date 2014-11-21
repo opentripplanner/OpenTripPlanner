@@ -20,7 +20,8 @@ public class TileRequest {
     public final Envelope2D bbox; // includes CRS
     public final int width; 
     public final int height; 
-    
+
+    // TODO Remove this once Router encapsulation complete
     public final String routerId;
 
     public TileRequest(String routerId, Envelope2D bbox, Integer width, Integer height) {

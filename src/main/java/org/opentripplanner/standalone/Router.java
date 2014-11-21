@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone;
 
 import org.opentripplanner.api.resource.PlanGenerator;
+import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.PathService;
 
@@ -15,6 +16,8 @@ public class Router {
 
     public PlanGenerator planGenerator;
     public PathService pathService;
+
+    public TileRendererManager tileRendererManager;
 
     public Router(String id, Graph graph) {
         this.id = id;

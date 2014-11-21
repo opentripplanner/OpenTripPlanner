@@ -22,7 +22,6 @@ import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.SPTServiceFactory;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.PathService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ public class OTPServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPServer.class);
 
-    // will replace graphService
+    // Map router ID -> active Routers
     private final Map<String, Router> routers = Maps.newHashMap();
 
     // Core OTP modules
@@ -59,8 +58,6 @@ public class OTPServer {
     public SurfaceCache surfaceCache;
     public PointSetCache pointSetCache;
 
-    public TileRendererManager tileRendererManager;
-    
     public CommandLineParameters params;
 
     public Router getRouter(String routerId) {
@@ -98,8 +95,6 @@ public class OTPServer {
         routingRequest = new RoutingRequest();
         sptServiceFactory = new GenericAStarFactory();
 
-        tileRendererManager = new TileRendererManager(graphService);
-
         // Optional Analyst Modules.
         if (params.analyst) {
             tileCache = new TileCache(graphService);
@@ -132,6 +127,7 @@ public class OTPServer {
             //        new DefaultRemainingWeightHeuristicFactoryImpl());
         }
         router.planGenerator = new PlanGenerator(graph, router.pathService);
+        router.tileRendererManager = new TileRendererManager(graph);
 
         return router;
     }
