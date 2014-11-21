@@ -474,24 +474,11 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     spndx.insert(env2, ringSegment2);
                     ringSegment.nB = virtualNode;
 
-                    // We used to backtrack on way segments here (i--) here so that, if a single way segment crossed
-                    // multiple park and rides, we would link to all of them. However, this turned out to be a problem
-                    // when nodes were coincident with edges, because the code would repeatedly split the way and ring segment
-                    // ad infinitum. So now we no longer do this, instead assuming that this (admittedly improbable) situation
-                    // doesn't exist. If it were to exist, one park and ride would be left unlinked, which wouldn't be the end
-                    // of the world, as there is another one to send users to nearby (although capacity would be incorrect).
-                    
-                    // Suppose there were two parking lots next to to but disjoint from each other, and a way piercing both.
-                    // To a human, this is pretty simple: the two lots represent one facility. However, even if we did link both,
-                    // you would only be able to exit from the one that you entered, because otherwise you would be using P+R link
-                    // edges in the lot of the second part as a shortcut, without switching modes.
-                    
-                    // Any issues caused by this can be corrected by drawing parking aisles in OSM and making sure that they share nodes
-                    // with the lots. Then all of this intersection code is not needed.
-                   
-                    // So, long story short: we now finish this way segment and also skip the next one (i.e. the one we just created).
-                    // -mattwigway (thanks Laurent for the suggestion and Andrew for brainstorming assistance).
-                    i++;
+                    /*
+                     * If we split, re-start the way segments loop as the newly created segments
+                     * could be intersecting again (in case one segment cut many others).
+                     */
+                    i--;
                     break;
                 }
             }
