@@ -409,6 +409,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 LineString seg = GeometryUtils.makeLineString(nA.lon, nA.lat, nB.lon, nB.lat);
                 
                 for (RingSegment ringSegment : ringSegments) {
+                	boolean wayWasSplit = false;
 
                     // Skip if both segments share a common node
                     if (ringSegment.nA.getId() == nA.getId()
@@ -447,43 +448,11 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     OSMNode splitNode;
                     double epsilon = 0.0000001;
                     
-                    if (checkIntersectionDistance(p, ringSegment.nA, epsilon)) {
-                    	// insert node A into the road, if it's not already there
-                    	
-                    	// don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
-                    	// but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
-                    	if (way.getNodeRefs().contains(ringSegment.nA.getId()))
-                    		continue;
-                    	
-                    	way.addNodeRef(ringSegment.nA.getId(), i + 1);
-                    	
-                        if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nA, nB, epsilon))
-                            LOG.info("Node {} in area {} is coincident but disconnected with way {}",
-                                	ringSegment.nA.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
-                    	
-                    	// restart loop over way segments as we may have more intersections
-                    	i--;
-                    	break;
-                    }
-                    else if (checkIntersectionDistance(p, ringSegment.nB, epsilon)) {
-                    	// insert node A into the road, if it's not already there
-                    	
-                    	// don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
-                    	// but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
-                    	if (way.getNodeRefs().contains(ringSegment.nB.getId()))
-                    		continue;
-                    	
-                    	way.addNodeRef(ringSegment.nB.getId(), i + 1);
-                    	
-                        if (checkDistance(ringSegment.nB, nA, epsilon) || checkDistance(ringSegment.BA, nB, epsilon))
-                            LOG.info("Node {} in area {} is coincident but disconnected with way {}",
-                                	ringSegment.nB.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
-                    	
-                    	// restart loop over way segments as we may have more intersections
-                    	i--;
-                    	break;
-                    }
-                    else if (checkIntersectionDistance(p, nA, epsilon)) {
+                    // note that the if . . . else if structure of this means that if a node at one end of a (way|ring) segment is snapped,
+                    // the node at the other end cannot be, which is fine because the only time that could happen anyhow
+                    // would be if the nodes were duplicates.
+                    // prefer inserting into the ring segment to inserting into the way, so as to reduce graph complexity
+                    if (checkIntersectionDistance(p, nA, epsilon)) {
                     	// insert node A into the ring segment
                         splitNode = nA;
                         
@@ -506,7 +475,44 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                         
                         if (checkDistance(ringSegment.nA, nB, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
                             LOG.info("Node {} in way {} is coincident but disconnected with area {}",
-                                	nB.getId(), way.getId(), ringSegment.area.parent.getId());                    }
+                                	nB.getId(), way.getId(), ringSegment.area.parent.getId());
+                    }
+                    else if (checkIntersectionDistance(p, ringSegment.nA, epsilon)) {
+                    	// insert node A into the road, if it's not already there
+                    	
+                    	// don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
+                    	// but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
+                    	if (way.getNodeRefs().contains(ringSegment.nA.getId()))
+                    		continue;
+                    	
+                    	way.addNodeRef(ringSegment.nA.getId(), i + 1);
+                    	
+                        if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nA, nB, epsilon))
+                            LOG.info("Node {} in area {} is coincident but disconnected with way {}",
+                                	ringSegment.nA.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
+                    	
+                    	// restart loop over way segments as we may have more intersections
+                    	i--;
+                    	break;
+                    }
+                    else if (checkIntersectionDistance(p, ringSegment.nB, epsilon)) {
+                    	// insert node B into the road, if it's not already there
+                    	
+                    	// don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
+                    	// but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
+                    	if (way.getNodeRefs().contains(ringSegment.nB.getId()))
+                    		continue;
+                    	
+                    	way.addNodeRef(ringSegment.nB.getId(), i + 1);
+                    	
+                        if (checkDistance(ringSegment.nB, nA, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
+                            LOG.info("Node {} in area {} is coincident but disconnected with way {}",
+                                	ringSegment.nB.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
+                    	
+                    	// restart loop over way segments as we may have more intersections
+                    	i--;
+                    	break;
+                    }
                     else {
                     	// create a node
                     	splitNode = createVirtualNode(p.getCoordinate());
@@ -521,7 +527,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                          * If we split the way, re-start the way segments loop as the newly created segments
                          * could be intersecting again (in case one segment cut many others).
                          */
-                        i--;
+                        wayWasSplit = true;
                     }
 
                     /*
@@ -547,7 +553,11 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     spndx.insert(env2, ringSegment2);
                     ringSegment.nB = splitNode;
 
-                    break;
+                    // if we split the way, backtrack over it again to check for additional splits
+                    if (wayWasSplit) {
+                    	i--;
+                    	break;
+                    }
                 }
             }
         }
