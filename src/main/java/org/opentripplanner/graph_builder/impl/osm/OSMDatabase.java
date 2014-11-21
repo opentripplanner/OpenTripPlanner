@@ -450,11 +450,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 
                 List<T2<Point, RingSegment>> intersections = new ArrayList<T2<Point, RingSegment>>();
                 
-                // note that if we have previously split the ring segment, we will find the split version(s).
-                // and will split again. This is usually desired behavior; however, if there are two nodes directly on top
-                // of each other but distinct, both the ring segment and the way segment will get split multiple times.
-                // (see the Hackettstown example). This is invalid OSM, so should be fixed on a data side. These extra
-                // splits do not have any ill effects except a small increase in graph size.
                 for (RingSegment ringSegment : ringSegments) {
 
                     // Skip if both segments share a common node
