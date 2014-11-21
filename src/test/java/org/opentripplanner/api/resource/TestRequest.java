@@ -328,7 +328,7 @@ public class TestRequest extends TestCase {
 
     public void testBikeRental() {
         BikeRental bikeRental = new BikeRental();
-        bikeRental.server = Context.getInstance().otpServer;
+        bikeRental.otpServer = Context.getInstance().otpServer;
         // no stations in graph
         BikeRentalStationList stations = bikeRental.getBikeRentalStations(null, null, null);
         assertEquals(0, stations.stations.size());
@@ -884,7 +884,8 @@ public class TestRequest extends TestCase {
             this.modes = Arrays.asList(new QualifiedModeSetSequence("WALK"));
             this.intermediatePlaces = intermediates;
             Router router = otpServer.getRouter(routerId);
-            tsp = new TravelingSalesmanPathService(otpServer.graphService, router.pathService);
+            // TODO replace graphService below by router.graph
+            tsp = new TravelingSalesmanPathService(otpServer.getGraphService(), router.pathService);
         }
 
         public void setBannedTrips(List<String> bannedTrips) {

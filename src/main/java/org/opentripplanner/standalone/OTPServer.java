@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -37,7 +38,7 @@ public class OTPServer {
     private final Map<String, Router> routers = Maps.newHashMap();
 
     // Core OTP modules
-    public GraphService graphService;
+    private GraphService graphService;
 
     /*
      * The prototype routing request which establishes default parameter values. Note: this need to
@@ -69,6 +70,14 @@ public class OTPServer {
             surfaceCache = new SurfaceCache(30);
             pointSetCache = new DiskBackedPointSetCache(100, new File(params.pointSetDirectory));
         }
+    }
+
+    public GraphService getGraphService() {
+        return graphService;
+    }
+
+    public Collection<String> getRouterIds() {
+        return graphService.getRouterIds();
     }
 
     public Router getRouter(String routerId) {

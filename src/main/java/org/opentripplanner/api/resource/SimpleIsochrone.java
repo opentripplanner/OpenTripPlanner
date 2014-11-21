@@ -62,6 +62,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,7 +160,8 @@ public class SimpleIsochrone extends RoutingResource {
     private Map<Vertex, Double> makePoints () throws Exception {
         rangeCheckParameters();
         request = buildRequest(0);
-        Graph graph = otpServer.graphService.getGraph();
+        Router router = otpServer.getRouter(routerId);
+        Graph graph = router.graph;
         //double speed = request.getWalkSpeed();
         Coordinate originCoord = request.from.getCoordinate();
         if (originCoord == null) return null;

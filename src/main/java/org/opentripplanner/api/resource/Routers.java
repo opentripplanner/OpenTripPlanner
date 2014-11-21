@@ -103,7 +103,7 @@ public class Routers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Routers.class);
 
-    @Context OTPServer server;
+    @Context OTPServer otpServer;
 
     /** 
      * Returns a list of routers and their bounds. 
@@ -114,7 +114,7 @@ public class Routers {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public RouterList getRouterIds() {
         RouterList routerList = new RouterList();
-        for (String id : server.graphService.getRouterIds()) {
+        for (String id : otpServer.getRouterIds()) {
             routerList.routerInfo.add(getRouterInfo(id));
         }
         return routerList;
@@ -137,7 +137,7 @@ public class Routers {
     }
     
     private RouterInfo getRouterInfo(String routerId) {
-        Graph graph = server.graphService.getGraph(routerId);
+        Graph graph = otpServer.getGraphService().getGraph(routerId);
         if (graph == null) return null;
         RouterInfo routerInfo = new RouterInfo();
         routerInfo.routerId = routerId;
@@ -153,7 +153,7 @@ public class Routers {
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        server.graphService.reloadGraphs(preEvict);
+        otpServer.getGraphService().reloadGraphs(preEvict);
         return Response.status(Status.OK).build();
     }
 
@@ -172,15 +172,18 @@ public class Routers {
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
         LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
         try {
-            server.graphService.getGraph(routerId);
+            otpServer.getGraphService().getGraph(routerId);
             return Response.status(404).entity("graph already registered.\n").build();
         } catch (GraphNotFoundException e) {
             if (preEvict) {
                 LOG.debug("Pre-evicting graph '{}'", routerId);
-                server.graphService.evictGraph(routerId);
+                otpServer.getGraphService().evictGraph(routerId);
             }
-            boolean success = server.graphService.registerGraph(routerId, server.graphService
-                    .getGraphSourceFactory().createGraphSource(routerId));
+            boolean success = otpServer.getGraphService()
+                    .registerGraph(
+                            routerId,
+                            otpServer.getGraphService().getGraphSourceFactory()
+                                    .createGraphSource(routerId));
             if (success)
                 return Response.status(201).entity("graph registered.\n").build();
             else
@@ -202,13 +205,13 @@ public class Routers {
             InputStream is) {
         if (preEvict) {
             LOG.debug("pre-evicting graph");
-            server.graphService.evictGraph(routerId);
+            otpServer.getGraphService().evictGraph(routerId);
         }
         LOG.debug("deserializing graph from POST data stream...");
         Graph graph;
         try {
             graph = Graph.load(is, level);
-            server.graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
+            otpServer.getGraphService().registerGraph(routerId, new MemoryGraphSource(routerId, graph));
             return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
@@ -230,7 +233,7 @@ public class Routers {
         
         if (preEvict) {
             LOG.debug("Pre-evicting graph with routerId {} before building new graph", routerId);
-            server.graphService.evictGraph(routerId);
+            otpServer.getGraphService().evictGraph(routerId);
         }
         
         // get a temporary directory, using Google Guava
@@ -263,7 +266,7 @@ public class Routers {
            
         // set up the build, using default parameters
         // this is basically simulating calling otp -b on the command line
-        CommandLineParameters params = server.params.clone();
+        CommandLineParameters params = otpServer.params.clone();
         params.build = Lists.newArrayList();
         params.build.add(tempDir);
         params.inMemory = true;
@@ -284,7 +287,7 @@ public class Routers {
         Graph graph = graphBuilder.getGraph();
         graph.index(new DefaultStreetVertexIndexFactory());
         
-        server.graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
+        otpServer.getGraphService().registerGraph(routerId, new MemoryGraphSource(routerId, graph));
         return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
     }
     
@@ -300,7 +303,7 @@ public class Routers {
             InputStream is) {
         LOG.debug("save graph from POST data stream...");
         try {
-            boolean success = server.graphService.getGraphSourceFactory().save(routerId, is);
+            boolean success = otpServer.getGraphService().getGraphSourceFactory().save(routerId, is);
             if (success) {
                 return Response.status(201).entity("graph saved.\n").build();
             } else {
@@ -315,7 +318,7 @@ public class Routers {
     @RolesAllowed({ "ROUTERS" })
     @DELETE @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteAll() {
-        int nEvicted = server.graphService.evictAll();
+        int nEvicted = otpServer.getGraphService().evictAll();
         String message = String.format("%d graphs evicted.\n", nEvicted);
         return Response.status(200).entity(message).build();
     }
@@ -328,7 +331,7 @@ public class Routers {
     @RolesAllowed({ "ROUTERS" })
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
-        boolean existed = server.graphService.evictGraph(routerId);
+        boolean existed = otpServer.getGraphService().evictGraph(routerId);
         if (existed)
             return Response.status(200).entity("graph evicted.\n").build();
         else
