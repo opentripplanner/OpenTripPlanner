@@ -42,7 +42,7 @@ public class OTPServer {
     /*
      * The prototype routing request which establishes default parameter values. Note: this need to
      * be server-wide as we build the request before knowing which router it will be resolved to.
-     * This prevent from having default request values per router instance. TODO Fix this if this is
+     * This prevent from having default request values per router instance. Fix this if this is
      * needed.
      */
     public RoutingRequest routingRequest;
