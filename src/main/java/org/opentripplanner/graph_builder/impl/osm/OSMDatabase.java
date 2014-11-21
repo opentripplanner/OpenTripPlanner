@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,7 +29,6 @@ import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
 import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
@@ -343,55 +341,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         processUnconnectedAreas();
     }
 
-    // Simple holder for the spatial index
-    private static class RingSegment {
-        Area area;
-
-        Ring ring;
-
-        OSMNode nA;
-
-        OSMNode nB;
-    }
-    
-    /**
-     * Sort intersections by their distance from the start node of the way.
-     * @author mattwigway
-     *
-     */
-    private static class IntersectionComparator implements Comparator<T2<Point, RingSegment>> {
-    	private OSMNode origin;
-    	
-    	public IntersectionComparator (OSMNode node) {
-    		origin = node;
-    	}
-
-		public int compare(T2<Point, RingSegment> int0,
-				T2<Point, RingSegment> int1) {
-			
-			Point p0 = int0.first;
-			Point p1 = int1.first;
-			
-			// These are latitudes and longitudes, but because they're layed out along a line the
-			// manhattan distance will be monotonically increasing with the the geographic distance and
-			// euclidean distance, so no need to overcomplicate things
-			double dist0 = Math.abs(origin.lat - p0.getY()) + Math.abs(origin.lon - p0.getX());
-			double dist1 = Math.abs(origin.lat - p1.getY()) + Math.abs(origin.lon - p1.getX());
-			
-			// list returned sorted closest to furthest.
-			double difference = dist0 - dist1;
-			
-			if (difference > 0)
-				return 1;
-			else if (difference < 0)
-				return -1;
-			else
-				// rounding errors will generally prevent this. it doesn't matter if sortings near zero are nondeterministic,
-				// because exchanging two points that are tiny fractions of a degree apart is harmless.
-				return 0;
-		}
-    }
-    
     /**
      * Connect areas with ways when unconnected (areas outer rings crossing with ways at the same
      * level, but with no common nodes). Currently process P+R areas only, but could easily be
@@ -399,6 +348,17 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      */
     private void processUnconnectedAreas() {
         LOG.info("Intersecting unconnected areas...");
+
+        // Simple holder for the spatial index
+        class RingSegment {
+            Area area;
+
+            Ring ring;
+
+            OSMNode nA;
+
+            OSMNode nB;
+        }
 
         /*
          * Create a spatial index for each segment of area outer rings. Note: The spatial index is
@@ -448,8 +408,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     continue;
                 LineString seg = GeometryUtils.makeLineString(nA.lon, nA.lat, nB.lon, nB.lat);
                 
-                List<T2<Point, RingSegment>> intersections = new ArrayList<T2<Point, RingSegment>>();
-                
                 for (RingSegment ringSegment : ringSegments) {
 
                     // Skip if both segments share a common node
@@ -458,12 +416,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                             || ringSegment.nB.getId() == nA.getId()
                             || ringSegment.nB.getId() == nB.getId())
                         continue;
-                    
-
-                    // Skip if area and way are from "incompatible" levels
-                    OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
-                    if (!wayLevel.equals(areaLevel))
-                    	continue;
 
                     // Check for real intersection
                     LineString seg2 = GeometryUtils.makeLineString(ringSegment.nA.lon,
@@ -484,57 +436,119 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                                 ringSegment.nB, intersection);
                         continue;
                     }
+
+                    // Skip if area and way are from "incompatible" levels
+                    OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
+                    if (!wayLevel.equals(areaLevel))
+                        continue;
                     
-                    intersections.add(new T2<Point, RingSegment> (p, ringSegment));
+                    // if the intersection is extremely close to one of the nodes of the road or the parking lot, just use that node
+                    // rather than splitting anything. See issue 1605.
+                    OSMNode splitNode;
+                    double epsilon = 0.0000001;
+                    
+                    if (checkIntersectionDistance(p, ringSegment.nA, epsilon)) {
+                    	// insert node A into the road, if it's not already there
+                    	
+                    	// don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
+                    	// but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
+                    	if (way.getNodeRefs().contains(ringSegment.nA.getId()))
+                    		continue;
+                    	
+                    	way.addNodeRef(ringSegment.nA.getId(), i + 1);
+                    	
+                        if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nA, nB, epsilon))
+                            LOG.info("Node {} in area {} is coincident but disconnected with way {}",
+                                	ringSegment.nA.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
+                    	
+                    	// restart loop over way segments as we may have more intersections
+                    	i--;
+                    	break;
+                    }
+                    else if (checkIntersectionDistance(p, ringSegment.nB, epsilon)) {
+                    	// insert node A into the road, if it's not already there
+                    	
+                    	// don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
+                    	// but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
+                    	if (way.getNodeRefs().contains(ringSegment.nB.getId()))
+                    		continue;
+                    	
+                    	way.addNodeRef(ringSegment.nB.getId(), i + 1);
+                    	
+                        if (checkDistance(ringSegment.nB, nA, epsilon) || checkDistance(ringSegment.BA, nB, epsilon))
+                            LOG.info("Node {} in area {} is coincident but disconnected with way {}",
+                                	ringSegment.nB.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
+                    	
+                    	// restart loop over way segments as we may have more intersections
+                    	i--;
+                    	break;
+                    }
+                    else if (checkIntersectionDistance(p, nA, epsilon)) {
+                    	// insert node A into the ring segment
+                        splitNode = nA;
+                        
+                        if (ringSegment.ring.nodes.contains(splitNode))
+                        	// This node is already a part of this ring (perhaps we inserted it previously). No need to connect again.
+                        	// Note that this may not be a safe assumption to make in all cases; suppose a way were to cross exactly over a node *twice*,
+                        	// we would only add it the first time.
+                        	continue;
+                        
+                        if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nB, nA, epsilon))
+                                LOG.info("Node {} in way {} is coincident but disconnected with area {}",
+                                    	nA.getId(), way.getId(), ringSegment.area.parent.getId());
+                    }
+                    else if (checkIntersectionDistance(p, nB, epsilon)) {
+                    	// insert node B into the ring segment
+                        splitNode = nB;
+                        
+                        if (ringSegment.ring.nodes.contains(splitNode))
+                        	continue;
+                        
+                        if (checkDistance(ringSegment.nA, nB, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
+                            LOG.info("Node {} in way {} is coincident but disconnected with area {}",
+                                	nB.getId(), way.getId(), ringSegment.area.parent.getId());                    }
+                    else {
+                    	// create a node
+                    	splitNode = createVirtualNode(p.getCoordinate());
+                        nCreatedNodes++;
+                        LOG.debug(
+                                "Adding virtual {}, intersection of {} ({}--{}) and area {} ({}--{}) at {}.",
+                                splitNode, way, nA, nB, ringSegment.area.parent, ringSegment.nA,
+                                ringSegment.nB, p);
+                        way.addNodeRef(splitNode.getId(), i + 1);
+                        
+                        /*
+                         * If we split the way, re-start the way segments loop as the newly created segments
+                         * could be intersecting again (in case one segment cut many others).
+                         */
+                        i--;
+                    }
+
+                    /*
+                     * The line below is O(n^2) but we do not insert often and ring size should be
+                     * rather small.
+                     */
+                    int j = ringSegment.ring.nodes.indexOf(ringSegment.nB);
+                    ringSegment.ring.nodes.add(j, splitNode);
+
+                    /*
+                     * Update spatial index as we just split a ring segment. Note: we do not update
+                     * the first segment envelope, but as the new envelope is smaller than the
+                     * previous one this is harmless, apart from increasing a bit false positives
+                     * count.
+                     */
+                    RingSegment ringSegment2 = new RingSegment();
+                    ringSegment2.area = ringSegment.area;
+                    ringSegment2.ring = ringSegment.ring;
+                    ringSegment2.nA = splitNode;
+                    ringSegment2.nB = ringSegment.nB;
+                    Envelope env2 = new Envelope(ringSegment2.nA.lon, ringSegment2.nB.lon,
+                            ringSegment2.nA.lat, ringSegment2.nB.lat);
+                    spndx.insert(env2, ringSegment2);
+                    ringSegment.nB = splitNode;
+
+                    break;
                 }
-                
-                // sort the list by distance from the start node, so that new nodes
-                // get inserted into the way in the correct order
-                
-                Collections.sort(intersections, new IntersectionComparator(nA));
-                
-                int insertions = 0;
-                
-                for (T2<Point, RingSegment> intersection : intersections) {
-                	// insert a virtual node
-                	
-                	Point p = intersection.first;
-                	RingSegment ringSegment = intersection.second;
-                	
-                	 // Create a virtual node and insert it in both the way and the ring
-                	OSMNode virtualNode = createVirtualNode(p.getCoordinate());
-                	nCreatedNodes++;
-                	LOG.debug(
-                	"Adding virtual {}, intersection of {} ({}--{}) and area {} ({}--{}) at {}.",
-                	virtualNode, way, nA, nB, ringSegment.area.parent, ringSegment.nA,
-                	ringSegment.nB, p);
-                	way.addNodeRef(virtualNode.getId(), i + insertions + 1);
-                	insertions++;
-                	/*
-                	* The line below is O(n^2) but we do not insert often and ring size should be
-                	* rather small.
-                	*/
-                	int j = ringSegment.ring.nodes.indexOf(ringSegment.nB);
-                	ringSegment.ring.nodes.add(j, virtualNode);
-                	/*
-                	* Update spatial index as we just split a ring segment. Note: we do not update
-                	* the first segment envelope, but as the new envelope is smaller than the
-                	* previous one this is harmless, apart from increasing a bit false positives
-                	* count.
-                	*/
-                	RingSegment ringSegment2 = new RingSegment();
-                	ringSegment2.area = ringSegment.area;
-                	ringSegment2.ring = ringSegment.ring;
-                	ringSegment2.nA = virtualNode;
-                	ringSegment2.nB = ringSegment.nB;
-                	Envelope env2 = new Envelope(ringSegment2.nA.lon, ringSegment2.nB.lon,
-                	ringSegment2.nA.lat, ringSegment2.nB.lat);
-                	spndx.insert(env2, ringSegment2);
-                	ringSegment.nB = virtualNode;
-                }
-                
-                // skip the appropriate number of newly-created way segments.
-                i += insertions;
             }
         }
         LOG.info("Created {} virtual intersection nodes.", nCreatedNodes);
@@ -922,4 +936,26 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         annotations.add(annotation);
         return annotation.getMessage();
     }
+    
+    /**
+     * Check if a point is within an epsilon of a node.
+     * @param p
+     * @param n
+     * @param epsilon
+     * @return
+     */
+    private static boolean checkIntersectionDistance(Point p, OSMNode n, double epsilon) {
+    	return Math.abs(p.getY() - n.lat) < epsilon && Math.abs(p.getX() - n.lon) < epsilon;
+    }
+    
+    /**
+     * Check if two nodes are within an epsilon.
+     * @param a
+     * @param b
+     * @param epsilon
+     * @return
+     */
+    private static boolean checkDistance(OSMNode a, OSMNode b, double epsilon) {
+    	return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;
+	}
 }
