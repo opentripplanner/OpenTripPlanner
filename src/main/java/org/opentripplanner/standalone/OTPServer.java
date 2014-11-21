@@ -40,8 +40,14 @@ public class OTPServer {
 
     // Core OTP modules
     public GraphService graphService;
-    public PathService pathService;
-    public RoutingRequest routingRequest; // the prototype routing request which establishes default parameter values
+
+    /*
+     * The prototype routing request which establishes default parameter values. Note: this need to
+     * be server-wide as we build the request before knowing which router it will be resolved to.
+     * This prevent from having default request values per router instance. TODO Fix this if this is
+     * needed.
+     */
+    public RoutingRequest routingRequest;
     public SPTServiceFactory sptServiceFactory;
 
     // Optional Analyst Modules
@@ -92,20 +98,6 @@ public class OTPServer {
         routingRequest = new RoutingRequest();
         sptServiceFactory = new GenericAStarFactory();
 
-        // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
-        if (params.longDistance) {
-            LongDistancePathService pathService = new LongDistancePathService(graphService, sptServiceFactory);
-            pathService.timeout = 10;
-            this.pathService = pathService;
-        } else {
-            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(graphService, sptServiceFactory);
-            pathService.setFirstPathTimeout(10.0);
-            pathService.setMultiPathTimeout(1.0);
-            this.pathService = pathService;
-            // cpf.bind(RemainingWeightHeuristicFactory.class,
-            //        new DefaultRemainingWeightHeuristicFactoryImpl());
-        }
-
         tileRendererManager = new TileRendererManager(graphService);
 
         // Optional Analyst Modules.
@@ -125,8 +117,22 @@ public class OTPServer {
      */
     private Router createRouter(String routerId, Graph graph) {
         Router router = new Router(routerId, graph);
-        // TODO Move other services to Router
-        router.planGenerator = new PlanGenerator(graph, pathService);
+
+        // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
+        if (params.longDistance) {
+            LongDistancePathService pathService = new LongDistancePathService(graphService, sptServiceFactory);
+            pathService.timeout = 10;
+            router.pathService = pathService;
+        } else {
+            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(graphService, sptServiceFactory);
+            pathService.setFirstPathTimeout(10.0);
+            pathService.setMultiPathTimeout(1.0);
+            router.pathService = pathService;
+            // cpf.bind(RemainingWeightHeuristicFactory.class,
+            //        new DefaultRemainingWeightHeuristicFactoryImpl());
+        }
+        router.planGenerator = new PlanGenerator(graph, router.pathService);
+
         return router;
     }
 

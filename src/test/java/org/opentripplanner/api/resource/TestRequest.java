@@ -75,6 +75,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
 import java.io.File;
@@ -852,6 +853,8 @@ public class TestRequest extends TestCase {
      * from HTTP Query string.
      */
     private static class TestPlanner extends Planner {
+        // TODO Shouldn't we use the Router pathService instead?
+        // And why do we need a TravelingSalesmanPathService btw?
         private TravelingSalesmanPathService tsp;
 
         public TestPlanner(String routerId, String v1, String v2) {
@@ -880,7 +883,8 @@ public class TestRequest extends TestCase {
             this(routerId, v1, v2);
             this.modes = Arrays.asList(new QualifiedModeSetSequence("WALK"));
             this.intermediatePlaces = intermediates;
-            tsp = new TravelingSalesmanPathService(otpServer.graphService, otpServer.pathService);
+            Router router = otpServer.getRouter(routerId);
+            tsp = new TravelingSalesmanPathService(otpServer.graphService, router.pathService);
         }
 
         public void setBannedTrips(List<String> bannedTrips) {
