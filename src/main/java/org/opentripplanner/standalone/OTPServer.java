@@ -54,6 +54,23 @@ public class OTPServer {
 
     public CommandLineParameters params;
 
+    public OTPServer (CommandLineParameters params, GraphService gs) {
+        LOG.info("Wiring up and configuring server.");
+
+        this.params = params;
+
+        // Core OTP modules
+        graphService = gs;
+        routingRequest = new RoutingRequest();
+        sptServiceFactory = new GenericAStarFactory();
+
+        // Optional Analyst Modules.
+        if (params.analyst) {
+            surfaceCache = new SurfaceCache(30);
+            pointSetCache = new DiskBackedPointSetCache(100, new File(params.pointSetDirectory));
+        }
+    }
+
     public Router getRouter(String routerId) {
         /*
          * TODO Maybe Router should be owned by GraphService? Here we have two routerId mapping: one
@@ -76,23 +93,6 @@ public class OTPServer {
                 routers.put(routerId, router);
             }
             return router;
-        }
-    }
-
-    public OTPServer (CommandLineParameters params, GraphService gs) {
-        LOG.info("Wiring up and configuring server.");
-
-        this.params = params; 
-
-        // Core OTP modules
-        graphService = gs;
-        routingRequest = new RoutingRequest();
-        sptServiceFactory = new GenericAStarFactory();
-
-        // Optional Analyst Modules.
-        if (params.analyst) {
-            surfaceCache = new SurfaceCache(30);
-            pointSetCache = new DiskBackedPointSetCache(100, new File(params.pointSetDirectory));
         }
     }
 
