@@ -780,7 +780,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	protected void setLongDistanceMode(boolean selected) {
 		if( selected ){
-			this.pathservice = new LongDistancePathService(graphService, sptServiceFactory);
+			this.pathservice = new LongDistancePathService(graph, sptServiceFactory);
 		} else {
 			this.pathservice = new ParetoPathService(graphService, sptServiceFactory);
 		}

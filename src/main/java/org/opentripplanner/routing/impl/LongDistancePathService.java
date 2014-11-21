@@ -22,8 +22,6 @@ import static org.opentripplanner.routing.automata.Nonterminal.star;
 import java.util.Collections;
 import java.util.List;
 
-import jj2000.j2k.NotImplementedError;
-
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -41,8 +39,8 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -67,11 +65,11 @@ public class LongDistancePathService implements PathService {
     private static final double DEFAULT_MAX_WALK = 2000;
     private static final double CLAMP_MAX_WALK = 15000;
 
-    private GraphService graphService;
+    private Graph graph;
     private SPTServiceFactory sptServiceFactory;
 
-    public LongDistancePathService(GraphService graphService, SPTServiceFactory sptServiceFactory) {
-        this.graphService = graphService;
+    public LongDistancePathService(Graph graph, SPTServiceFactory sptServiceFactory) {
+        this.graph = graph;
         this.sptServiceFactory = sptServiceFactory;
     }
 
@@ -90,7 +88,7 @@ public class LongDistancePathService implements PathService {
         SPTService sptService = this.sptServiceFactory.instantiate();
 
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.routerId));
+            options.setRoutingContext(graph);
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 

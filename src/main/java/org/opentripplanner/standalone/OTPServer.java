@@ -118,12 +118,12 @@ public class OTPServer {
         router.sptServiceFactory = new GenericAStarFactory();
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
         if (params.longDistance) {
-            LongDistancePathService pathService = new LongDistancePathService(graphService,
+            LongDistancePathService pathService = new LongDistancePathService(router.graph,
                     router.sptServiceFactory);
             pathService.timeout = 10;
             router.pathService = pathService;
         } else {
-            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(graphService,
+            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(router.graph,
                     router.sptServiceFactory);
             pathService.setFirstPathTimeout(10.0);
             pathService.setMultiPathTimeout(1.0);
