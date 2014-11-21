@@ -50,9 +50,6 @@ public class OTPServer {
     public SPTServiceFactory sptServiceFactory;
 
     // Optional Analyst Modules
-    public Renderer renderer;
-    public SPTCache sptCache;
-    public TileCache tileCache;
     public IsoChroneSPTRenderer isoChroneSPTRenderer;
     public SampleGridRenderer sampleGridRenderer;
     public SurfaceCache surfaceCache;
@@ -97,9 +94,6 @@ public class OTPServer {
 
         // Optional Analyst Modules.
         if (params.analyst) {
-            tileCache = new TileCache(graphService);
-            sptCache = new SPTCache(sptServiceFactory, graphService);
-            renderer = new Renderer(tileCache, sptCache);
             sampleGridRenderer = new SampleGridRenderer(graphService, sptServiceFactory);
             isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(graphService, sptServiceFactory, sampleGridRenderer);
             surfaceCache = new SurfaceCache(30);
@@ -128,6 +122,13 @@ public class OTPServer {
         }
         router.planGenerator = new PlanGenerator(graph, router.pathService);
         router.tileRendererManager = new TileRendererManager(graph);
+
+        // Optional Analyst Modules.
+        if (params.analyst) {
+            router.tileCache = new TileCache(router.graph);
+            router.sptCache = new SPTCache(sptServiceFactory, graph);
+            router.renderer = new Renderer(router.tileCache, router.sptCache);
+        }
 
         return router;
     }

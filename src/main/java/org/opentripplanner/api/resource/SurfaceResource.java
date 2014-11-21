@@ -52,6 +52,7 @@ import org.opentripplanner.routing.spt.SPTWalker;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
@@ -87,9 +88,6 @@ public class SurfaceResource extends RoutingResource {
     private static final Logger LOG = LoggerFactory.getLogger(TimeSurface.class);
 
     @Context
-    OTPServer server;
-
-    @Context
     UriInfo uriInfo;
 
     @POST
@@ -101,16 +99,9 @@ public class SurfaceResource extends RoutingResource {
         try {
             RoutingRequest req = buildRequest(0); // batch must be true
            
-            Graph graph;
-            
             // routerId is optional -- select default graph if not set
-        	if(routerId == null || routerId.isEmpty()) {
-        		graph = server.graphService.getGraph();
-        	}
-        	else
-        		graph = server.graphService.getGraph(routerId);
-            
-        	req.setRoutingContext(graph);
+            Router router = otpServer.getRouter(routerId);
+            req.setRoutingContext(router.graph);
         	
             EarliestArrivalSPTService sptService = new EarliestArrivalSPTService();
             sptService.maxDuration = (60 * cutoffMinutes);
@@ -124,7 +115,7 @@ public class SurfaceResource extends RoutingResource {
                     surface.params.put(e.getKey(), e.getValue().get(0));
                 }
                 surface.cutoffMinutes = cutoffMinutes;
-                server.surfaceCache.add(surface);
+                otpServer.surfaceCache.add(surface);
                 return Response.ok().entity(new TimeSurfaceShort(surface)).build(); // .created(URI)
             } else {
                 return Response.noContent().entity("NO SPT").build();
@@ -138,13 +129,13 @@ public class SurfaceResource extends RoutingResource {
     /** List all the available surfaces. */
     @GET
     public Response getTimeSurfaceList () {
-        return Response.ok().entity(TimeSurfaceShort.list(server.surfaceCache.cache.asMap().values())).build();
+        return Response.ok().entity(TimeSurfaceShort.list(otpServer.surfaceCache.cache.asMap().values())).build();
     }
 
     /** Describe a specific surface. */
     @GET @Path("/{surfaceId}")
     public Response getTimeSurfaceList (@PathParam("surfaceId") Integer surfaceId) {
-        TimeSurface surface = server.surfaceCache.get(surfaceId);
+        TimeSurface surface = otpServer.surfaceCache.get(surfaceId);
         if (surface == null) return Response.status(Response.Status.NOT_FOUND).entity("Invalid surface ID.").build();
         return Response.ok().entity(new TimeSurfaceShort(surface)).build();
         // DEBUG return Response.ok().entity(surface).build();
@@ -157,19 +148,17 @@ public class SurfaceResource extends RoutingResource {
                                   @QueryParam("origins")  String  originPointSetId,
                                   @QueryParam("detail")   boolean detail) {
 
+        final TimeSurface surf = otpServer.surfaceCache.get(surfaceId);
 
-    	final TimeSurface surf = server.surfaceCache.get(surfaceId);
-    	
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
-        final PointSet pset = server.pointSetCache.get(targetPointSetId);
+        final PointSet pset = otpServer.pointSetCache.get(targetPointSetId);
         if (pset == null) return badRequest("Missing or invalid target PointSet ID.");
-        
-        //TODO cache this sampleset
-        Graph gg = server.graphService.getGraph(surf.routerId);
-        SampleSet samples = pset.getSampleSet( gg );
-        
+
+        Router router = otpServer.getRouter(surf.routerId);
+        // TODO cache this sampleset
+        SampleSet samples = pset.getSampleSet(router.graph);
+
         final ResultFeature indicator = new ResultFeature(samples, surf);
-        if (indicator == null) return badServer("Could not compute indicator as requested.");
         return Response.ok().entity(new StreamingOutput() {
             @Override
             public void write(OutputStream output) throws IOException, WebApplicationException {
@@ -184,7 +173,7 @@ public class SurfaceResource extends RoutingResource {
     public Response getIsochrone (
             @PathParam("surfaceId") Integer surfaceId,
             @QueryParam("spacing") int spacing) {
-        final TimeSurface surf = server.surfaceCache.get(surfaceId);
+        final TimeSurface surf = otpServer.surfaceCache.get(surfaceId);
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
         if (spacing < 1) spacing = 5;
         List<IsochroneData> isochrones = getIsochronesAccumulative(surf, spacing);
@@ -206,7 +195,7 @@ public class SurfaceResource extends RoutingResource {
                             @PathParam("z") int z) throws Exception {
 
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
-        TimeSurface surfA = server.surfaceCache.get(surfaceId);
+        TimeSurface surfA = otpServer.surfaceCache.get(surfaceId);
         if (surfA == null) return badRequest("Unrecognized surface ID.");
         	
         TileRequest tileRequest = new TileRequest(surfA.routerId, env, 256, 256);
@@ -215,7 +204,8 @@ public class SurfaceResource extends RoutingResource {
         RenderRequest renderRequest =
                 new RenderRequest(imageFormat, Layer.TRAVELTIME, Style.COLOR30, true, false);
         // TODO why can't the renderer be static?
-        return server.renderer.getResponse(tileRequest, surfA, null, renderRequest);
+        Router router = otpServer.getRouter(surfA.routerId);
+        return router.renderer.getResponse(tileRequest, surfA, null, renderRequest);
     }
 
     private Response badRequest(String message) {
