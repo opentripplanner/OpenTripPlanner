@@ -1,7 +1,9 @@
 package org.opentripplanner.standalone;
 
+import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
+import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.inspector.TileRendererManager;
@@ -28,6 +30,8 @@ public class Router {
     public SPTCache sptCache;
     public TileCache tileCache;
     public Renderer renderer;
+    public IsoChroneSPTRenderer isoChroneSPTRenderer;
+    public SampleGridRenderer sampleGridRenderer;
 
     public Router(String id, Graph graph) {
         this.id = id;

@@ -22,9 +22,6 @@ import org.opentripplanner.common.geometry.DelaunayIsolineBuilder;
 import org.opentripplanner.common.geometry.IsolineBuilder.ZMetric;
 import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.impl.SPTServiceFactory;
-import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.SPTService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +35,9 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
     private static final Logger LOG = LoggerFactory
             .getLogger(IsoChroneSPTRendererAccSampling.class);
 
-    private GraphService graphService;
-    private SPTServiceFactory sptServiceFactory;
     private SampleGridRenderer sampleGridRenderer;
 
-    public IsoChroneSPTRendererAccSampling(GraphService graphService, SPTServiceFactory sptServiceFactory, SampleGridRenderer sampleGridRenderer) {
-        this.graphService = graphService;
-        this.sptServiceFactory = sptServiceFactory;
+    public IsoChroneSPTRendererAccSampling(SampleGridRenderer sampleGridRenderer) {
         this.sampleGridRenderer = sampleGridRenderer;
     }
 

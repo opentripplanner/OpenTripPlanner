@@ -7,7 +7,6 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.opentripplanner.analyst.DiskBackedPointSetCache;
 import org.opentripplanner.analyst.PointSetCache;
 import org.opentripplanner.analyst.SurfaceCache;
-import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
@@ -49,9 +48,7 @@ public class OTPServer {
     public RoutingRequest routingRequest;
     public SPTServiceFactory sptServiceFactory;
 
-    // Optional Analyst Modules
-    public IsoChroneSPTRenderer isoChroneSPTRenderer;
-    public SampleGridRenderer sampleGridRenderer;
+    // Optional Analyst global modules (caches)
     public SurfaceCache surfaceCache;
     public PointSetCache pointSetCache;
 
@@ -94,8 +91,6 @@ public class OTPServer {
 
         // Optional Analyst Modules.
         if (params.analyst) {
-            sampleGridRenderer = new SampleGridRenderer(graphService, sptServiceFactory);
-            isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(graphService, sptServiceFactory, sampleGridRenderer);
             surfaceCache = new SurfaceCache(30);
             pointSetCache = new DiskBackedPointSetCache(100, new File(params.pointSetDirectory));
         }
@@ -128,6 +123,9 @@ public class OTPServer {
             router.tileCache = new TileCache(router.graph);
             router.sptCache = new SPTCache(sptServiceFactory, graph);
             router.renderer = new Renderer(router.tileCache, router.sptCache);
+            router.sampleGridRenderer = new SampleGridRenderer(router.graph, sptServiceFactory);
+            router.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(
+                    router.sampleGridRenderer);
         }
 
         return router;
