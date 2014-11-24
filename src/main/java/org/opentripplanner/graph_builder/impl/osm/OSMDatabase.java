@@ -417,6 +417,11 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                             || ringSegment.nB.getId() == nA.getId()
                             || ringSegment.nB.getId() == nB.getId())
                         continue;
+                    
+                    // Skip if area and way are from "incompatible" levels
+                    OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
+                    if (!wayLevel.equals(areaLevel))
+                        continue;
 
                     // Check for real intersection
                     LineString seg2 = GeometryUtils.makeLineString(ringSegment.nA.lon,
@@ -437,11 +442,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                                 ringSegment.nB, intersection);
                         continue;
                     }
-
-                    // Skip if area and way are from "incompatible" levels
-                    OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
-                    if (!wayLevel.equals(areaLevel))
-                        continue;
                     
                     // if the intersection is extremely close to one of the nodes of the road or the parking lot, just use that node
                     // rather than splitting anything. See issue 1605.
@@ -492,14 +492,13 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                                 	ringSegment.nA.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
                     	
                     	// restart loop over way segments as we may have more intersections
+                        // as we haven't modified the ring, there is no need to modify the spatial index, so breaking here is fine 
                     	i--;
                     	break;
                     }
                     else if (checkIntersectionDistance(p, ringSegment.nB, epsilon)) {
                     	// insert node B into the road, if it's not already there
                     	
-                    	// don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
-                    	// but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
                     	if (way.getNodeRefs().contains(ringSegment.nB.getId()))
                     		continue;
                     	
@@ -509,7 +508,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                             LOG.info("Node {} in area {} is coincident but disconnected with way {}",
                                 	ringSegment.nB.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
                     	
-                    	// restart loop over way segments as we may have more intersections
                     	i--;
                     	break;
                     }
@@ -554,6 +552,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     ringSegment.nB = splitNode;
 
                     // if we split the way, backtrack over it again to check for additional splits
+                    // otherwise, we just continue the loop over ring segments
                     if (wayWasSplit) {
                     	i--;
                     	break;
