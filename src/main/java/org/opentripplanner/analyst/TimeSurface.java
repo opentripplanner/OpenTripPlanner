@@ -126,7 +126,7 @@ public class TimeSurface implements Serializable {
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
         sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16, spt.getVertexCount(), dX, dY, coordinateOrigin);
-        SampleGridRenderer.sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0, spt.getOptions().getMaxWalkDistance(), cosLat);
+        SampleGridRenderer.sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0, spt.getOptions().getMaxWalkDistance(), Integer.MAX_VALUE, cosLat);
         long t1 = System.currentTimeMillis();
         LOG.info("Made SampleGrid from SPT in {} msec.", (int) (t1 - t0));
     }
