@@ -81,6 +81,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     
     private RunState runState;
 	private VisualTraverseVisitor heuristicTraverseVisitor;
+	private boolean running = true;
     
     /**
      * Compute SPT using default timeout and termination strategy.
@@ -107,7 +108,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // null checks on origin and destination vertices are already performed in setRoutingContext
         // options.rctx.check();
 
-        runState.spt = new MultiShortestPathTree(runState.options);
+        runState.spt = new EarliestArrivalShortestPathTree(runState.options);
         //runState.spt = new EarliestArrivalShortestPathTree(options); //MultiShortestPathTree(runState.options);
 
         runState.heuristic = options.batch ? 
@@ -267,7 +268,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
              * of this is that the algorithm is always left in a restartable state, which is useful for debugging or
              * potential future variations.
              */
-            if(!iterate()){
+            if(!iterate() && running ){
                 continue;
             }
             
@@ -290,10 +291,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
                 //new GraphPath(runState.u, false).dump();
-                if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
-                    LOG.debug("total vertices visited {}", runState.nVisited);
-                    break;
-                }
+                
+                break;
             }
 
         }
