@@ -67,6 +67,13 @@ otp.config = {
      */
      
     baseLayers: [
+	{
+	   name: 'OSM',
+	   //tileUrl : 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+	   tileUrl : 'http://{s}.mz.5t.torino.it/hot/{z}/{x}/{y}.png',
+	   subdomains : ['a','b','c'],
+	   attribution : 'Data, imagery and map information provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+	},
         {
             name: 'MapQuest OSM',
             tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
