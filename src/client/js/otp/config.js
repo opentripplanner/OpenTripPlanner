@@ -9,7 +9,7 @@ otp.config = {
 
     //This is default locale when wanted locale isn't found
     //Locale language is set based on wanted language in url >
-    //user cookie > language set in browser (Not accept-language) 
+    //user cookie > language set in browser (Not accept-language)
     locale: otp.locale.English,
 
     //All avalible locales
@@ -44,17 +44,18 @@ otp.config = {
     /**
      * The OTP web service locations
      */
-    hostname : "",
+    hostname : "http://www.5t.torino.it",
     //municoderHostname : "http://localhost:8080",
     //datastoreUrl : 'http://localhost:9000',
     // In the 0.10.x API the base path is "otp-rest-servlet/ws"
     // From 0.11.x onward the routerId is a required part of the base path.
     // If using a servlet container, the OTP WAR should be deployed to context path /otp
-    restService: "otp/routers/default",
+    //raf restService: "otp/routers/default",
+    restService: "otpws/routers/default",
 
     /**
      * Base layers: the base map tile layers available for use by all modules.
-     * Expressed as an array of objects, where each object has the following 
+     * Expressed as an array of objects, where each object has the following
      * fields:
      *   - name: <string> a unique name for this layer, used for both display
      *       and internal reference purposes
@@ -63,9 +64,9 @@ otp.config = {
      *   - attribution: <string> the attribution text for the map tile data
      *   - [subdomains]: <array of strings> a list of tileUrl subdomains, if
      *       applicable
-     *       
+     *
      */
-     
+
     baseLayers: [
 	{
 	   name: 'OSM',
@@ -85,21 +86,21 @@ otp.config = {
             tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
             subdomains : ['otile1','otile2','otile3','otile4'],
             attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-        },           
+        },
     ],
-    
+
 
     /**
      * Map start location and zoom settings: by default, the client uses the
      * OTP metadata API call to center and zoom the map. The following
      * properties, when set, override that behavioir.
      */
-     
+
     // initLatLng : new L.LatLng(<lat>, <lng>),
     // initZoom : 14,
     // minZoom : 10,
     // maxZoom : 20,
-    
+
     /* Whether the map should be moved to contain the full itinerary when a result is received. */
     zoomToFitResults    : false,
 
@@ -131,7 +132,7 @@ otp.config = {
      *   - [isDefault]: <boolean> whether this module is shown by default;
      *       should only be 'true' for one module
      */
-    
+
     modules : [
         {
             id : 'planner',
@@ -144,8 +145,8 @@ otp.config = {
             className : 'otp.modules.analyst.AnalystModule'
         }
     ],
-    
-    
+
+
     /**
      * Geocoders: a list of supported geocoding services available for use in
      * address resolution. Expressed as an array of objects, where each object
@@ -165,19 +166,19 @@ otp.config = {
         }
     ],
 
-    
+
 
     //This is shown if showLanguageChooser is true
     infoWidgetLangChooser : {
-        title: '<img src="/images/language_icon.svg" onerror="this.onerror=\'\';this.src=\'/images/language_icon.png\'" width="30px" height="30px"/>', 
+        title: '<img src="/images/language_icon.svg" onerror="this.onerror=\'\';this.src=\'/images/language_icon.png\'" width="30px" height="30px"/>',
         languages: true
     },
-    
-    
+
+
     /**
      * Support for the "AddThis" display for sharing to social media sites, etc.
      */
-     
+
     showAddThis     : false,
     //addThisPubId    : 'your-addthis-id',
     //addThisTitle    : 'Your title for AddThis sharing messages',
@@ -185,8 +186,8 @@ otp.config = {
 
     /**
      * Formats to use for date and time displays, expressed as ISO-8601 strings.
-     */    
-     
+     */
+
     timeFormat  : "h:mma",
     dateFormat  : "MMM Do YYYY"
 
@@ -221,7 +222,7 @@ i18n.init(options, function(t) {
         otp.config.locale = otp.config.locales[i18n.lng()];
         otp.config.metric = otp.config.locale.config.metric;
         //Conditionally load datepicker-lang.js?
-    } 
+    }
 
     //Use infoWidgets from locale
     //Default locale is English which has infoWidgets
@@ -246,7 +247,7 @@ i18n.init(options, function(t) {
         //Only key
         if (arg_length == 1) {
             key = arguments[0];
-            return t(key); 
+            return t(key);
         //key with sprintf values
         } else if (arg_length > 1) {
             key = arguments[0];
@@ -254,7 +255,7 @@ i18n.init(options, function(t) {
             for(var i = 1; i < arg_length; i++) {
                 values.push(arguments[i]);
             }
-            return t(key, {postProcess: 'sprintf', sprintf: values}); 
+            return t(key, {postProcess: 'sprintf', sprintf: values});
         } else {
             console.error("_tr function doesn't have an argument");
             return "";
@@ -278,13 +279,13 @@ i18n.init(options, function(t) {
 otp.config.modes = {
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
-        "TRANSIT,WALK"        : _tr("Transit"), 
+        "TRANSIT,WALK"        : _tr("Transit"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
-        "BUSISH,WALK"         : _tr("Bus Only"), 
+        "BUSISH,WALK"         : _tr("Bus Only"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
-        "TRAINISH,WALK"       : _tr("Rail Only"), 
+        "TRAINISH,WALK"       : _tr("Rail Only"),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel
     //Options widgets)
         "BICYCLE"             : _tr('Bicycle Only'),
