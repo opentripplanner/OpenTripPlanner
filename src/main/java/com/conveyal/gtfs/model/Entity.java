@@ -3,7 +3,9 @@ package com.conveyal.gtfs.model;
 import com.beust.jcommander.internal.Sets;
 import com.conveyal.gtfs.GTFSFeed;
 import com.csvreader.CsvReader;
+import com.csvreader.CsvWriter;
 import com.conveyal.gtfs.error.*;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -16,11 +18,12 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
+import java.util.zip.ZipOutputStream;
 import java.net.URL;
 
 /**
@@ -232,12 +235,89 @@ public abstract class Entity implements Serializable {
             }
         }
 
-        private static String human (long n) {
-            if (n >= 1000000) return String.format("%.1fM", n/1000000.0);
-            if (n >= 1000) return String.format("%.1fk", n/1000.0);
-            else return String.format("%d", n);
-        }
+    }
+    
+    public static abstract class Writer<E extends Entity> {
+        private static final Logger LOG = LoggerFactory.getLogger(Writer.class);
 
+        protected final GTFSFeed feed;    // the feed into which we are loading the entities
+        protected final String tableName; // name of corresponding table without .txt
+        
+        protected CsvWriter writer;
+        
+        /**
+         * one-based to match reader.
+         */
+        protected long row;
+        
+        public Writer(GTFSFeed feed, String tableName) {
+            this.feed = feed;
+            this.tableName = tableName;
+        }
+        
+        /**
+         * Write the CSV header.
+         * @throws IOException 
+         */
+        public abstract void writeHeaders() throws IOException;
+        
+        /**
+         * Write one row of the CSV from the passed-in object.
+         * @throws IOException 
+         */
+        public abstract void writeOneRow(E obj) throws IOException;
+        
+        /**
+         * Get an iterator over objects of this type.
+         */
+        public abstract Iterator<E> iterator();
+        
+        public void writeTable (ZipOutputStream zip) throws IOException {
+        	LOG.info("Writing GTFS table {}", tableName);
+        	
+        	ZipEntry zipEntry = new ZipEntry(tableName + ".txt");
+        	zip.putNextEntry(zipEntry);
+        	this.writer = new CsvWriter(zip, ',', Charset.forName("UTF8"));
+        	
+        	this.writeHeaders();
+
+        	// write rows until there are none left.
+        	row = 0;        	
+        	Iterator<E> iter = this.iterator();
+        	while (iter.hasNext()) {
+                if (++row % 500000 == 0) {
+                    LOG.info("Record number {}", human(row));
+                }
+        		writeOneRow(iter.next());
+        	}
+        	
+        	this.writer.close();
+        	
+        	LOG.info("Wrote {} rows", human(row));
+        }
+        
+        public void writeStringField(String str) throws IOException {
+        	writer.write(str);
+        }
+        
+        public void writeUrlField(URL obj) throws IOException {
+        	writeStringField(obj.toString());
+        }
+        
+        /**
+         * End a row.
+         * This is just a proxy to the writer, but could be used for hooks in the future.
+         */
+        public void endRecord () throws IOException {
+        	writer.endRecord();
+        }
     }
 
+    
+    // shared code between reading and writing
+    private static final String human (long n) {
+        if (n >= 1000000) return String.format("%.1fM", n/1000000.0);
+        if (n >= 1000) return String.format("%.1fk", n/1000.0);
+        else return String.format("%d", n);
+    }
 }

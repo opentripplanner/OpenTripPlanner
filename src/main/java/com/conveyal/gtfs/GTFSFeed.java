@@ -1,17 +1,23 @@
 package com.conveyal.gtfs;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+
 import com.conveyal.gtfs.error.GTFSError;
 import com.conveyal.gtfs.model.*;
 import com.conveyal.gtfs.validator.GTFSValidator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +99,23 @@ public class GTFSFeed {
         for (GTFSError error : errors) {
             LOG.info("{}", error);
         }
+    }
+    
+    public void toFile (String file) {
+    	try {
+    		File out = new File(file);
+    		OutputStream os = new FileOutputStream(out);
+    		ZipOutputStream zip = new ZipOutputStream(os);
+    		
+    		// write everything
+    		new Agency.Writer(this).writeTable(zip);
+    		
+    		zip.close();
+    		os.close();
+    	} catch (Exception e) {
+            LOG.error("Error saving GTFS: {}", e.getMessage());
+            throw new RuntimeException(e);
+    	}
     }
 
     public void validate (GTFSValidator... validators) {
