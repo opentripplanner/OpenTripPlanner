@@ -238,7 +238,7 @@ public class OTPConfigurator {
         if (params.visualize) {
             // FIXME get OTPServer into visualizer.
             getServer();
-            GraphVisualizer visualizer = new GraphVisualizer(getGraphService());
+            GraphVisualizer visualizer = new GraphVisualizer(getGraphService().getGraph());
             return visualizer;
         } else return null;
     }
