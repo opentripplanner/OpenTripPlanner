@@ -467,7 +467,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         this.graphService = graphService;
         this.graph = graphService.getGraph();
-        this.pathservice = new ParetoPathService(graphService, sptServiceFactory);
+        this.pathservice = new ParetoPathService(graph, sptServiceFactory);
         setTitle("GraphVisualizer");
         
         init();
@@ -782,9 +782,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		if( selected ){
 			this.pathservice = new LongDistancePathService(graph, sptServiceFactory);
 		} else {
-			this.pathservice = new ParetoPathService(graphService, sptServiceFactory);
+			this.pathservice = new ParetoPathService(graph, sptServiceFactory);
 		}
-		
 	}
 
 	OptimizeType getSelectedOptimizeType(){
