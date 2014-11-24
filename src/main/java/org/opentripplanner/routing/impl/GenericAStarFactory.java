@@ -13,6 +13,7 @@ public class GenericAStarFactory implements SPTServiceFactory{
 		GenericAStar ret = new GenericAStar();
 		if(traverseVisitor!=null){
 			ret.setTraverseVisitor(traverseVisitor);
+			//ret.setHeuristicTraverseVisitor(traverseVisitor); //sort of kills the animation
 		}
 		return ret;
 	}
