@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.collect.*;
@@ -90,9 +91,11 @@ public class Graph implements Serializable {
     
     public String routerId;
 
-    private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
+    private final Map<Edge, Set<AlertPatch>> alertPatches =
+            new WeakHashMap<Edge, Set<AlertPatch>>(0);
 
-    private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
+    private final Map<Edge, List<TurnRestriction>> turnRestrictions =
+            new WeakHashMap<Edge, List<TurnRestriction>>(0);
 
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
