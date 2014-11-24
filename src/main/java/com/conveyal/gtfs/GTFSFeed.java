@@ -30,8 +30,10 @@ public class GTFSFeed {
 
     DB db = DBMaker.newTempFileDB()
             .transactionDisable()
+            .mmapFileEnable()
             .asyncWriteEnable()
             .compressionEnable()
+            .cacheSize(200 * 1024 * 1024)
             .make(); // TODO db.close();
 
     public String feedId = null;
