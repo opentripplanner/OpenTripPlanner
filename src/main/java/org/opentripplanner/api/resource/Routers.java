@@ -51,6 +51,7 @@ import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +116,11 @@ public class Routers {
     public RouterList getRouterIds() {
         RouterList routerList = new RouterList();
         for (String id : otpServer.getRouterIds()) {
-            routerList.routerInfo.add(getRouterInfo(id));
+            RouterInfo routerInfo = getRouterInfo(id);
+            if (routerInfo != null) {
+                // Router could have been evicted in the meantime
+                routerList.routerInfo.add(routerInfo);
+            }
         }
         return routerList;
     }
@@ -137,13 +142,17 @@ public class Routers {
     }
     
     private RouterInfo getRouterInfo(String routerId) {
-        Graph graph = otpServer.getGraphService().getGraph(routerId);
-        if (graph == null) return null;
-        RouterInfo routerInfo = new RouterInfo();
-        routerInfo.routerId = routerId;
-        routerInfo.polygon = graph.getHull();
-        routerInfo.buildTime = graph.buildTime;
-        return routerInfo;
+        try {
+            Router router = otpServer.getRouter(routerId);
+            Graph graph = router.graph;
+            RouterInfo routerInfo = new RouterInfo();
+            routerInfo.routerId = routerId;
+            routerInfo.polygon = graph.getHull();
+            routerInfo.buildTime = graph.buildTime;
+            return routerInfo;
+        } catch (GraphNotFoundException e) {
+            return null;
+        }
     }
 
     /** 
