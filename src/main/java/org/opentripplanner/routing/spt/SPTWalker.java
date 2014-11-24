@@ -55,7 +55,7 @@ public class SPTWalker {
          * @param e The edge being visited (filtered from a previous call to accept)
          * @param c The coordinate of the point alongside the edge geometry.
          * @param s0 The state at the begin vertex of this edge
-         * @param s1 The sate at the end vertex of this edge
+         * @param s1 The state at the end vertex of this edge
          * @param d0 Curvilinear coordinate of c on [s0-s1], in meters
          * @param d1 Curvilinear coordinate of c on [s1-s0], in meters
          * @param speed The assumed speed on the edge
