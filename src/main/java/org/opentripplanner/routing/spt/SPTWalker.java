@@ -125,7 +125,6 @@ public class SPTWalker {
                          */
                         if (speed > avgSpeed)
                             speed = avgSpeed;
-                        speed = avgSpeed;
                     }
 
                     // Length of linestring
