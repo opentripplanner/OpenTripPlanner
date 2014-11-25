@@ -12,9 +12,9 @@ import java.util.Map;
  */
 public class Service {
 
-    String   service_id;
-    Calendar calendar;
-    Map<DateTime, CalendarDate> calendar_dates = Maps.newHashMap();
+    public String   service_id;
+    public Calendar calendar;
+    public Map<DateTime, CalendarDate> calendar_dates = Maps.newHashMap();
 
     public Service(String service_id) {
         this.service_id = service_id;
