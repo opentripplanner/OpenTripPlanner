@@ -82,10 +82,9 @@ otp.config = {
             attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
         },
         {
-            name: 'MapQuest Aerial',
-            tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
-            subdomains : ['otile1','otile2','otile3','otile4'],
-            attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+            name: 'Mappa Rete TPL',
+            tileUrl: 'http://185.27.252.211/tilegen/{z}/{x}/{y}.png',
+            attribution : 'Lines map courtesy of <a href="http://www.öpnvkarte.de" target="_blank">ÖPNV Karte</a>. Data, imagery and map information provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors. '
         },
     ],
 
@@ -137,7 +136,7 @@ otp.config = {
         {
             id : 'planner',
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
-            defaultBaseLayer : 'MapQuest OSM',
+            defaultBaseLayer : 'OSM',
             isDefault: true
         },
         {
