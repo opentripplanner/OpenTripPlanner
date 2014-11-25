@@ -1481,9 +1481,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         if( dontUseGraphicalCallbackCheckBox.isSelected() ){
         	sptServiceFactory.setTraverseVisitor(null);
         } else {
-
         	sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
-
         }
         
         // set up a visitor to the path service so we can get the SPT as it's generated
