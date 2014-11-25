@@ -6,7 +6,7 @@
     <url>http://opentripplanner.org/</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>0.13.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <scm>
@@ -20,14 +20,30 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <distributionManagement>
+        <!--
+        <site>
+            <id>opentripplanner-docs</id>
+            <name>OpenTripPlanner Documentation</name>
+            <url>s3://docs.opentripplanner.org/</url>
+        </site>
+        -->
+        <repository>
+            <!-- Also used as snapshotRepository by default -->
+            <id>conveyal-maven-repo</id>
+            <name>Conveyal Maven Repository</name>
+            <url>s3://maven.conveyal.com/</url>
+        </repository>
+    </distributionManagement>
+
     <build>
 
-        <!-- Necessary for uploading/deploying artifacts to Maven repos via WebDAV. -->
+        <!-- "Wagon" necessary for uploading/deploying artifacts to the Conveyal Maven repo on Amazon S3. -->
         <extensions>
             <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav</artifactId>
-                <version>1.0-beta-2</version>
+                <groupId>org.springframework.build</groupId>
+                <artifactId>aws-maven</artifactId>
+                <version>5.0.0.RELEASE</version>
             </extension>
         </extensions>
 
@@ -195,7 +211,8 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>otp</finalName>
+                            <!-- The shaded JAR will be the main artifact for the project -->
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                             <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
                               We have eliminated most Jersey auto-scanning, but there is still some need for include
                               filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
@@ -204,14 +221,6 @@
                               <filters> <filter> <artifact>com.sun.jersey:*</artifact> <includes> <include>**</include>
                               </includes> </filter> <filter> <artifact>org.opentripplanner:*</artifact>
                               <includes> <include>**</include> </includes> </filter> </filters> -->
-                            <artifactSet>
-                                <excludes>
-			            <!-- Do not explode the client WAR. -->
-                                    <!-- Actually, shade seems to skip the WAR even without this exclusion (verify) -->
-                                    <exclude>org.opentripplanner:otp-leaflet-client</exclude>
-                                    --&gt;
-                                </excludes>
-                            </artifactSet>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
