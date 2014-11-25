@@ -22,26 +22,36 @@ import org.mapdb.Fun.Tuple2;
 
 public class Shape extends Entity {
 
-    public String shape_id;
-    public double shape_pt_lat;
-    public double shape_pt_lon;
-    public int    shape_pt_sequence;
-    public double shape_dist_traveled;
+    public final String shape_id;
+    public final double shape_pt_lat;
+    public final double shape_pt_lon;
+    public final int    shape_pt_sequence;
+    public final double shape_dist_traveled;
 
+    // Similar to stoptime, we have to have a constructor, because fields are final so as to be immutable for storage in MapDB.
+    public Shape(String shape_id, double shape_pt_lat, double shape_pt_lon, int shape_pt_sequence, double shape_dist_traveled) {
+    	this.shape_id = shape_id;
+    	this.shape_pt_lat = shape_pt_lat;
+    	this.shape_pt_lon = shape_pt_lon;
+    	this.shape_pt_sequence = shape_pt_sequence;
+    	this.shape_dist_traveled = shape_dist_traveled;
+    }
+    
     public static class Loader extends Entity.Loader<Shape> {
 
         public Loader(GTFSFeed feed) {
             super(feed, "shapes");
         }
-
+        
         @Override
         public void loadOneRow() throws IOException {
-            Shape s = new Shape();
-            s.shape_id = getStringField("shape_id", true);
-            s.shape_pt_lat = getDoubleField("shape_pt_lat", true, -90D, 90D);
-            s.shape_pt_lon = getDoubleField("shape_pt_lon", true, -180D, 180D);
-            s.shape_pt_sequence = getIntField("shape_pt_sequence", true, 0, Integer.MAX_VALUE);
-            s.shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
+            String shape_id = getStringField("shape_id", true);
+            double shape_pt_lat = getDoubleField("shape_pt_lat", true, -90D, 90D);
+            double shape_pt_lon = getDoubleField("shape_pt_lon", true, -180D, 180D);
+            int shape_pt_sequence = getIntField("shape_pt_sequence", true, 0, Integer.MAX_VALUE);
+            double shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
+            
+            Shape s = new Shape(shape_id, shape_pt_lat, shape_pt_lon, shape_pt_sequence, shape_dist_traveled);
             s.feed = null; // since we're putting this into MapDB, we don't want circular serialization
             feed.shapePoints.put(new Tuple2<String, Integer>(s.shape_id, s.shape_pt_sequence), s);
             
