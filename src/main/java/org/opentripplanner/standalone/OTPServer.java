@@ -2,7 +2,6 @@ package org.opentripplanner.standalone;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Map;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.opentripplanner.analyst.DiskBackedPointSetCache;
@@ -24,17 +23,12 @@ import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
-
 /**
  * This is replacing a Spring application context.
  */
 public class OTPServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPServer.class);
-
-    // Map router ID -> active Routers
-    private final Map<String, Router> routers = Maps.newHashMap();
 
     // Core OTP modules
     private GraphService graphService;
@@ -86,24 +80,23 @@ public class OTPServer {
 
     public Router getRouter(String routerId) {
         /*
-         * TODO Maybe Router should be owned by GraphService? Here we have two routerId mapping: one
-         * for graph, one for router.
+         * Note: We store the router "owning" the Graph in the graph itself, as a service. This
+         * seems to be a bit hackish, but it seems to be the simplest solution to solve graph
+         * ownership / management conflicts between OTPServer and GraphService. Anyway, we still
+         * have to decide if a Router is appropriate for storing graph-related services (we store
+         * some services in Graph, some other in Router). Is the distinction based on wether a
+         * service is serialized?
          */
+
         Graph graph = graphService.getGraph(routerId);
+        /* Note: if graph does not exists, a GraphNotFoundException will be thrown. */
+
         /* Performance impact of the synchronized below should be OK. */
-        synchronized(routers) {
-            if (graph == null) {
-                routers.remove(routerId);
-                return null;
-            }
-            Router router = routers.get(routerId);
-            /*
-             * Note: We re-create a new Router if none exists or if graph instance changed
-             * since we created the first router. Note that we use pointer compare, not equals.
-             */
-            if (router == null || router.graph != graph) {
+        synchronized (graph) {
+            Router router = graph.getService(Router.class);
+            if (router == null) {
                 router = createRouter(routerId, graph);
-                routers.put(routerId, router);
+                graph.putService(Router.class, router);
             }
             return router;
         }
