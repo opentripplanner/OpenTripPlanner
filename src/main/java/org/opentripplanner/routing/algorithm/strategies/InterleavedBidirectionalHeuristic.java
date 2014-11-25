@@ -32,6 +32,7 @@ import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,16 +112,17 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         options.softPreTransitLimiting = false;
         // make sure distance table is initialized before starting thread
         LOG.debug("initializing heuristic computation thread");
-        // forward street search first, sets values around origin to 0
+        // Forward street search first, mark street vertices around the origin so H evaluates to 0
         List<State> search = streetSearch(options, false, abortTime); // ~30 msec
         if (search == null) return; // Search timed out
         LOG.debug("end foreward street search {} ms", System.currentTimeMillis() - start);
         // create a new priority queue
         q = new BinHeap<Vertex>();
-        // enqueue states for each stop within walking distance of the destination
+        // Save weight to reach street vertices around the destination.
+        // Also enqueue states for each stop within walking distance of the destination.
         search = streetSearch(options, true, abortTime);
         if (search == null) return; // Search timed out
-        for (State stopState : search) { // backward street search
+        for (State stopState : search) {
             q.insert(stopState.getVertex(), stopState.getWeight());
         }
         LOG.debug("end backward street search {} ms", System.currentTimeMillis() - start);
@@ -198,20 +200,22 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // but many transit vertices may not yet be explored when the search starts.
         // TODO: verify that StreetVertex includes all vertices of interest.
         if (v instanceof StreetVertex) {
-            // If we are near the origin but have not boarded transit return zero.
             // If we are near the origin but not near the destination, do not alight from transit.
-            // If we are near the origin and the destination always return zero.
             if (weight == -1 && s.isEverBoarded()) return Double.POSITIVE_INFINITY;
-            else if (weight < 0) return 0;
-            else return weight; // defaults to +INF when the vertex was not touched in walk searches.
-        } else if (weight == Double.POSITIVE_INFINITY) {
+            // If we are near the origin return zero, remaining distance is unknown.
+            // We could also use the Euclidean heuristic here.
+            if (weight < 0) return 0;
+            // Return stored weight. Defaults to +INF when this street vertex was not touched in walk searches.
+            return weight;
+        }
+        if (weight == Double.POSITIVE_INFINITY) {
             // A non-street vertex that was not yet touched by the reverse heuristic search.
             // Return the maximum of the Euclidean heuristic or the highest weight yet found by the heuristic search.
             double dist = distanceLibrary.fastDistance(v.getY(), v.getX(), target.getY(), target.getX());
             double time = dist / MAX_TRANSIT_SPEED;
             return Math.max(maxFound, time);
         }
-        else return weight;
+        return weight;
     }
 
     @Override
@@ -279,23 +283,27 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             State s = pq.extract_min();
             double w = s.getWeight();
             Vertex v = s.getVertex();
-            if (v instanceof TransitStationStop) {
-                stopStates.add(s);
-                // Prune street search upon reaching TransitStationStops.
-                // Do not save weights at transit stops. Since they may be reached by 
-                // SimpleTransfer their weights will be recorded during the main heuristic search.
+            if (v instanceof TransitVertex) {
+                if (v instanceof TransitStationStop) {
+                    stopStates.add(s);
+                    // Prune street search upon reaching TransitStationStops.
+                }
+                // Do not save weights at transit stops (or any other Transit Vertices). Since stops may be reached
+                // by SimpleTransfer their weights will be recorded during the main heuristic search.
                 continue;
             }
             // at this point the vertex is closed (pulled off heap).
             // on reverse search save measured weights.
-            // on forward search set heuristic to 0 -- we have no idea how far to the destination, 
             // the optimal path may use transit.
             if (!fromTarget) {
-                weights.put(v, -1); // Mark vertex as being near origin.
+                // Mark vertex as being near origin. We have no idea how far it is to the destination.
+                weights.put(v, -1);
             } else {
                 double old_weight = weights.get(v);
                 if (old_weight == -1) {
-                    weights.put(v, -2); // Mark vertex as near both origin and destination.
+                    // Mark vertex as near both origin and destination.
+                    // Because of potential transit use we still don't know how far to the destination.
+                    weights.put(v, -2);
                 } else if (w < old_weight) {
                     // When new weight is better than old, or old weight is +INF because vertex is as yet unreached.
                     // This will not touch -1 values around the origin, their values are unknown until we use transit.
