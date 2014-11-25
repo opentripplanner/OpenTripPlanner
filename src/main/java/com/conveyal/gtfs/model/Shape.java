@@ -16,6 +16,9 @@ package com.conveyal.gtfs.model;
 import com.conveyal.gtfs.GTFSFeed;
 
 import java.io.IOException;
+import java.util.Iterator;
+
+import org.mapdb.Fun.Tuple2;
 
 public class Shape extends Entity {
 
@@ -39,9 +42,41 @@ public class Shape extends Entity {
             s.shape_pt_lon = getDoubleField("shape_pt_lon", true, -180D, 180D);
             s.shape_pt_sequence = getIntField("shape_pt_sequence", true, 0, Integer.MAX_VALUE);
             s.shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
-            s.feed = feed;
-            feed.shapes.put(s.shape_id, s); // TODO this should be a multimap
+            s.feed = null; // since we're putting this into MapDB, we don't want circular serialization
+            feed.shapePoints.put(new Tuple2<String, Integer>(s.shape_id, s.shape_pt_sequence), s);
+            
+            if (!feed.shapes.containsKey(s.shape_id)) {
+            	feed.shapes.put(s.shape_id, new ShapeMap(feed.shapePoints, s.shape_id));
+            }
         }
 
+    }
+    
+    public static class Writer extends Entity.Writer<Shape> {
+    	public Writer (GTFSFeed feed) {
+    		super(feed, "shapes");
+    	}
+
+		@Override
+		protected void writeHeaders() throws IOException {
+			writer.writeRecord(new String[] {"shape_id", "shape_pt_lat", "shape_pt_lon", "shape_pt_sequence", "shape_dist_traveled"});
+		}
+
+		@Override
+		protected void writeOneRow(Shape s) throws IOException {
+			writeStringField(s.shape_id);
+			writeDoubleField(s.shape_pt_lat);
+			writeDoubleField(s.shape_pt_lon);
+			writeIntField(s.shape_pt_sequence);
+			writeDoubleField(s.shape_dist_traveled);
+			endRecord();
+		}
+
+		@Override
+		protected Iterator<Shape> iterator() {
+			return feed.shapePoints.values().iterator();
+		}
+    	
+    	
     }
 }

@@ -17,6 +17,7 @@ import com.conveyal.gtfs.GTFSFeed;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Trip extends Entity {
 
@@ -27,7 +28,8 @@ public class Trip extends Entity {
     public String trip_short_name;
     public int    direction_id;
     public String block_id;
-    public Shape  shape;
+    public Map<Integer, Shape>  shape_points;
+    public String shape_id;
     public int    bikes_allowed;
     public int    wheelchair_accessible;
 
@@ -47,7 +49,8 @@ public class Trip extends Entity {
             t.trip_short_name = getStringField("trip_short_name", false);
             t.direction_id    = getIntField("direction_id", false, 0, 1);
             t.block_id        = getStringField("block_id", false); // make a blocks multimap
-            t.shape           = getRefField("shape_id", false, feed.shapes);
+            t.shape_points    = getRefField("shape_id", false, feed.shapes);
+            t.shape_id        = getStringField("shape_id", false);
             t.bikes_allowed   = getIntField("bikes_allowed", false, 0, 2);
             t.wheelchair_accessible = getIntField("wheelchair_accessible", false, 0, 2);
             t.feed = feed;
@@ -65,7 +68,7 @@ public class Trip extends Entity {
 		protected void writeHeaders() throws IOException {
 			// TODO: export shapes
 			writer.writeRecord(new String[] {"route_id", "trip_id", "trip_headsign", "trip_short_name", "direction_id", "block_id",
-					/*"shape_id",*/ "bikes_allowed", "wheelchair_accessible", "service_id"});
+					"shape_id", "bikes_allowed", "wheelchair_accessible", "service_id"});
 		}
 
 		@Override
@@ -76,7 +79,7 @@ public class Trip extends Entity {
 			writeStringField(t.trip_short_name);
 			writeIntField(t.direction_id);
 			writeStringField(t.block_id);
-			//writeStringField(t.shape.shape_id);
+			writeStringField(t.shape_id);
 			writeIntField(t.bikes_allowed);
 			writeIntField(t.wheelchair_accessible);
 			writeStringField(t.service.service_id);

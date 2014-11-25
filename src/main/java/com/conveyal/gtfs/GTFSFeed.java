@@ -51,11 +51,16 @@ public class GTFSFeed {
     public final Map<String, FeedInfo>      feedInfo       = Maps.newHashMap();
     public final Map<String, Frequency>     frequencies    = Maps.newHashMap();
     public final Map<String, Route>         routes         = Maps.newHashMap();
-    public final Map<String, Shape>         shapes         = Maps.newHashMap();
     public final Map<String, Stop>          stops          = Maps.newHashMap();
     public final Map<String, Transfer>      transfers      = Maps.newHashMap();
     public final Map<String, Trip>          trips          = Maps.newHashMap();
 
+    /* Map from 2-tuples of (shape_id, shape_pt_sequence) to shape points */
+    public final ConcurrentNavigableMap<Tuple2<String, Integer>, Shape> shapePoints = db.getTreeMap("shapes");
+    
+    /* This represents a bunch of views of the previous, one for each shape */
+    public final Map<String, Map<Integer, Shape>> shapes = Maps.newHashMap();
+    
     /* Map from 2-tuples of (trip_id, stop_sequence) to stoptimes. */
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
     
@@ -117,6 +122,7 @@ public class GTFSFeed {
     		new Frequency.Writer(this).writeTable(zip);
     		new Route.Writer(this).writeTable(zip);
     		new Stop.Writer(this).writeTable(zip);
+    		new Shape.Writer(this).writeTable(zip);
     		new Transfer.Writer(this).writeTable(zip);
     		new Trip.Writer(this).writeTable(zip);
     		new StopTime.Writer(this).writeTable(zip);
@@ -199,5 +205,4 @@ public class GTFSFeed {
     }
 
     // TODO augment with unrolled calendar, patterns, etc. before validation
-
 }
