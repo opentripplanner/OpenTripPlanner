@@ -5,6 +5,7 @@ import com.conveyal.gtfs.GTFSFeed;
 import com.csvreader.CsvReader;
 import com.csvreader.CsvWriter;
 import com.conveyal.gtfs.error.*;
+import com.google.common.io.ByteStreams;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -13,8 +14,10 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
@@ -237,6 +240,25 @@ public abstract class Entity implements Serializable {
 
     }
     
+    /**
+     * An output stream that cannot be closed. CSVWriters try to close their output streams when they are garbage-collected,
+     * which breaks if another CSV writer is still writing to the ZIP file.
+   	 *
+   	 * Apache Commons has something similar but it seemed silly to import another large dependency. Eventually Guava will have this,
+   	 * see Guava issue 1367. At that point we should switch to using Guava.
+     */
+    private static class UncloseableOutputStream extends FilterOutputStream {
+		public UncloseableOutputStream(OutputStream out) {
+			super(out);
+		}
+    	
+		@Override
+		public void close () {
+			// no-op
+			return;
+		}
+    }
+    
     public static abstract class Writer<E extends Entity> {
         private static final Logger LOG = LoggerFactory.getLogger(Writer.class);
 
@@ -250,7 +272,7 @@ public abstract class Entity implements Serializable {
          */
         protected long row;
         
-        public Writer(GTFSFeed feed, String tableName) {
+        protected Writer(GTFSFeed feed, String tableName) {
             this.feed = feed;
             this.tableName = tableName;
         }
@@ -259,25 +281,28 @@ public abstract class Entity implements Serializable {
          * Write the CSV header.
          * @throws IOException 
          */
-        public abstract void writeHeaders() throws IOException;
+        protected abstract void writeHeaders() throws IOException;
         
         /**
          * Write one row of the CSV from the passed-in object.
          * @throws IOException 
          */
-        public abstract void writeOneRow(E obj) throws IOException;
+        protected abstract void writeOneRow(E obj) throws IOException;
         
         /**
          * Get an iterator over objects of this type.
          */
-        public abstract Iterator<E> iterator();
+        protected abstract Iterator<E> iterator();
         
         public void writeTable (ZipOutputStream zip) throws IOException {
         	LOG.info("Writing GTFS table {}", tableName);
         	
         	ZipEntry zipEntry = new ZipEntry(tableName + ".txt");
         	zip.putNextEntry(zipEntry);
-        	this.writer = new CsvWriter(zip, ',', Charset.forName("UTF8"));
+        	
+        	// don't let CSVWriter close the stream when it is garbage-collected
+        	OutputStream protectedOut = new UncloseableOutputStream(zip);
+        	this.writer = new CsvWriter(protectedOut, ',', Charset.forName("UTF8"));
         	
         	this.writeHeaders();
 
@@ -288,20 +313,60 @@ public abstract class Entity implements Serializable {
                 if (++row % 500000 == 0) {
                     LOG.info("Record number {}", human(row));
                 }
+                
         		writeOneRow(iter.next());
         	}
         	
-        	this.writer.close();
+        	// closing the writer closes the underlying output stream, so we don't do that.
+        	writer.flush();
+        	zip.closeEntry();
         	
         	LOG.info("Wrote {} rows", human(row));
         }
         
-        public void writeStringField(String str) throws IOException {
+        protected void writeStringField(String str) throws IOException {
         	writer.write(str);
         }
         
-        public void writeUrlField(URL obj) throws IOException {
-        	writeStringField(obj.toString());
+        protected void writeUrlField(URL obj) throws IOException {
+        	writeStringField(obj != null ? obj.toString() : "");
+        }
+        
+        protected void writeDateField (DateTime d) throws IOException {
+        	writeStringField(String.format("%04d%02d%02d", d.getYear(), d.getMonthOfYear(), d.getDayOfMonth()));
+        }
+        
+        /**
+         * Take a time expressed in seconds since noon - 12h (midnight, usually) and write it in HH:MM:SS format.
+         */
+        protected void writeTimeField (int secsSinceMidnight) throws IOException {
+        	int seconds = secsSinceMidnight % 60;
+        	secsSinceMidnight -= seconds;
+        	// note that the minute and hour values are still expressed in seconds until we write it out, to avoid unnecessary division.
+        	int minutes = (secsSinceMidnight % 3600);
+        	// secsSinceMidnight now represents hours
+        	secsSinceMidnight -= minutes;
+        	
+        	// integer divide is fine as we've subtracted off remainders
+        	writeStringField(String.format("%02d:%02d:%02d", secsSinceMidnight / 3600, minutes / 60, seconds));
+        }
+        
+        protected void writeIntField (Integer val) throws IOException {
+        	if (val.equals(INT_MISSING))
+        		writeStringField("");
+        	else
+        		writeStringField(val.toString());
+        }
+        
+        /**
+         * Write a double value, with precision 10^-7.
+         */
+        protected void writeDoubleField (double val) throws IOException {
+        	// control file size: don't use unnecessary precision
+        	// This is usually used for coordinates; one ten-millionth of a degree at the equator is 1.1cm,
+        	// and smaller elsewhere on earth, plenty precise enough.
+        	// On Jupiter, however, it's a different story.
+        	writeStringField(String.format("%.7f", val));
         }
         
         /**

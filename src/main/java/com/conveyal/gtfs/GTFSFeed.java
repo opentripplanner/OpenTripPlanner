@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
@@ -56,7 +58,7 @@ public class GTFSFeed {
 
     /* Map from 2-tuples of (trip_id, stop_sequence) to stoptimes. */
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
-
+    
     /* A fare is a fare_attribute and all fare_rules that reference that fare_attribute. */
     public final Map<String, Fare> fares = Maps.newHashMap();
 
@@ -108,10 +110,20 @@ public class GTFSFeed {
     		ZipOutputStream zip = new ZipOutputStream(os);
     		
     		// write everything
+    		// TODO: fare attributes, fare rules, shapes
     		new Agency.Writer(this).writeTable(zip);
+    		new Calendar.Writer(this).writeTable(zip);
+    		new CalendarDate.Writer(this).writeTable(zip);
+    		new Frequency.Writer(this).writeTable(zip);
+    		new Route.Writer(this).writeTable(zip);
+    		new Stop.Writer(this).writeTable(zip);
+    		new Transfer.Writer(this).writeTable(zip);
+    		new Trip.Writer(this).writeTable(zip);
+    		new StopTime.Writer(this).writeTable(zip);
     		
     		zip.close();
-    		os.close();
+    		
+    		LOG.info("GTFS file written");
     	} catch (Exception e) {
             LOG.error("Error saving GTFS: {}", e.getMessage());
             throw new RuntimeException(e);

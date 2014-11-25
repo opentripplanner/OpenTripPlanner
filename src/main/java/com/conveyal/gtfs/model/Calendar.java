@@ -17,6 +17,8 @@ import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.error.DuplicateKeyError;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class Calendar extends Entity {
 
@@ -61,8 +63,66 @@ public class Calendar extends Entity {
                 service.calendar = c;
             }
 
+        }    
+    }
+    
+    /**
+     * An iterator over calendars from the joined service table.
+     * Just wrap an iterator over services.
+     */
+    public static class CalendarServiceIterator implements Iterator<Calendar> {
+    	private Iterator<Service> wrapped;
+    	
+    	public CalendarServiceIterator(Iterator<Service> services) {
+    		wrapped = services;
+    	}
+    	
+    	@Override
+    	public boolean hasNext() {
+    		return wrapped.hasNext();
+    	}
+
+		@Override
+		public Calendar next() {
+			return wrapped.next().calendar;
+		}
+
+		@Override
+		public void remove() {
+			wrapped.remove();
+		}
+    }
+    
+    public static class Writer extends Entity.Writer<Calendar> {
+        public Writer(GTFSFeed feed) {
+        	super(feed, "calendar");
         }
 
-    }
+		@Override
+		protected void writeHeaders() throws IOException {
+			writer.writeRecord(new String[] {"service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date", "end_date"});
+		}
 
+		@Override
+		protected void writeOneRow(Calendar c) throws IOException {
+			writeStringField(c.service.service_id);
+			writeIntField(c.monday);
+			writeIntField(c.tuesday);
+			writeIntField(c.wednesday);
+			writeIntField(c.thursday);
+			writeIntField(c.friday);
+			writeIntField(c.saturday);
+			writeIntField(c.sunday);
+			writeIntField(c.start_date);
+			writeIntField(c.end_date);
+			endRecord();
+		}
+
+		@Override
+		protected Iterator<Calendar> iterator() {
+			return new CalendarServiceIterator(feed.services.values().iterator());
+		}
+        
+        
+    }
 }

@@ -17,6 +17,7 @@ import com.conveyal.gtfs.GTFSFeed;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 
 public class Route extends Entity { // implements Entity.Factory<Route>
 
@@ -55,5 +56,52 @@ public class Route extends Entity { // implements Entity.Factory<Route>
         }
 
     }
+    
+    public static class Writer extends Entity.Writer<Route> {
+    	private boolean writeAgencyIds;
+    	
+    	public Writer (GTFSFeed feed) {
+    		super(feed, "routes");
+    		// we don't write agency IDs if there is only a single agency.
+    		writeAgencyIds = feed.agency.size() > 1;
+    		
+    	}
 
+		@Override
+		public void writeHeaders() throws IOException {
+			if (writeAgencyIds)
+				writeStringField("agency_id");
+			
+			writeStringField("route_id");
+			writeStringField("route_short_name");
+			writeStringField("route_long_name");
+			writeStringField("route_desc");
+			writeStringField("route_type");
+			writeStringField("route_url");
+			writeStringField("route_color");
+			writeStringField("route_text_color");
+			endRecord();
+		}
+
+		@Override
+		public void writeOneRow(Route r) throws IOException {
+			if (writeAgencyIds)
+				writeStringField(r.agency.agency_id);
+			
+			writeStringField(r.route_id);
+			writeStringField(r.route_short_name);
+			writeStringField(r.route_long_name);
+			writeStringField(r.route_desc);
+			writeIntField(r.route_type);
+			writeUrlField(r.route_url);
+			writeStringField(r.route_color);
+			writeStringField(r.route_text_color);
+			endRecord();
+		}
+
+		@Override
+		public Iterator<Route> iterator() {
+			return feed.routes.values().iterator();
+		}   	
+    }
 }

@@ -14,10 +14,12 @@
 package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
+
 import org.mapdb.Fun;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Iterator;
 
 public class StopTime extends Entity implements Serializable {
 
@@ -62,5 +64,37 @@ public class StopTime extends Entity implements Serializable {
         }
 
     }
+    
+    public static class Writer extends Entity.Writer<StopTime> {
+    	public Writer (GTFSFeed feed) {
+    		super(feed, "stop_times");
+    	}
 
+		@Override
+		protected void writeHeaders() throws IOException {
+			writer.writeRecord(new String[] {"trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "stop_headsign",
+					"pickup_type", "drop_off_type", "shape_dist_traveled"});
+		}
+
+		@Override
+		protected void writeOneRow(StopTime st) throws IOException {
+			writeStringField(st.trip_id);
+			writeTimeField(st.arrival_time);
+			writeTimeField(st.departure_time);
+			writeStringField(st.stop_id);
+			writeIntField(st.stop_sequence);
+			writeStringField(st.stop_headsign);
+			writeIntField(st.pickup_type);
+			writeIntField(st.drop_off_type);
+			writeDoubleField(st.shape_dist_traveled);
+			endRecord();
+		}
+
+		@Override
+		protected Iterator<StopTime> iterator() {
+			return feed.stop_times.values().iterator();
+		}
+    	
+    	
+    }
 }
