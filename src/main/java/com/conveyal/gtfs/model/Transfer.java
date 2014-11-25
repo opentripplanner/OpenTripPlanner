@@ -51,7 +51,7 @@ public class Transfer extends Entity {
 
 		@Override
 		protected void writeHeaders() throws IOException {
-			writer.writeRecord(new String[] {"from_stop_od", "to_stop_id", "transfer_type", "min_transfer_time"});
+			writer.writeRecord(new String[] {"from_stop_id", "to_stop_id", "transfer_type", "min_transfer_time"});
 		}
 
 		@Override
