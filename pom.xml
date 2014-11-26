@@ -21,13 +21,11 @@
     </properties>
 
     <distributionManagement>
-        <!--
         <site>
             <id>opentripplanner-docs</id>
             <name>OpenTripPlanner Documentation</name>
             <url>s3://docs.opentripplanner.org/</url>
         </site>
-        -->
         <repository>
             <!-- Also used as snapshotRepository by default -->
             <id>conveyal-maven-repo</id>
@@ -40,10 +38,23 @@
 
         <!-- "Wagon" necessary for uploading/deploying artifacts to the Conveyal Maven repo on Amazon S3. -->
         <extensions>
+            <!--
             <extension>
                 <groupId>org.springframework.build</groupId>
                 <artifactId>aws-maven</artifactId>
                 <version>5.0.0.RELEASE</version>
+            </extension>
+            -->
+            <!--
+              The Spring S3 Wagon throws ResourceDoesNotExistException when it is asked to put a directory.
+              The site contains a lot of subdirectories, so use the kuali s3 wagon which handles directories.
+              This is only important if you're deploying the OTP site to an S3 bucket as a static web site,
+              which is not a bad idea.
+            -->
+            <extension>
+                <groupId>org.kuali.maven.wagons</groupId>
+                <artifactId>maven-s3-wagon</artifactId>
+                <version>1.2.1</version>
             </extension>
         </extensions>
 
@@ -122,15 +133,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <!-- by default, release:prepare runs goals 'clean' and 'verify'. Javadoc generation
-                    in release:perform requires the new release versions of our artifacts to already be
-                    installed in the local repository. -->
-                    <preparationGoals>clean install</preparationGoals>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
                     <!-- The site generation step can fail. Run it in release:prepare to make sure it
-                    works before tagging the release. Enunciate model validation is currently failing,
-                    apparently due to a problem in enunciate.
-                    <preparationGoals>clean install site</preparationGoals> -->
+                    works before tagging the release. -->
+                    <preparationGoals>clean verify site</preparationGoals>
                 </configuration>
             </plugin>
             <plugin>
