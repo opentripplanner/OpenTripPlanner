@@ -15,6 +15,9 @@ package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.error.DuplicateKeyError;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -66,33 +69,6 @@ public class Calendar extends Entity {
         }    
     }
 
-    /**
-     * An iterator over calendars from the joined service table.
-     * Just wrap an iterator over services.
-     */
-    public static class CalendarServiceIterator implements Iterator<Calendar> {
-        private Iterator<Service> wrapped;
-
-        public CalendarServiceIterator(Iterator<Service> services) {
-            wrapped = services;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return wrapped.hasNext();
-        }
-
-        @Override
-        public Calendar next() {
-            return wrapped.next().calendar;
-        }
-
-        @Override
-        public void remove() {
-            wrapped.remove();
-        }
-    }
-
     public static class Writer extends Entity.Writer<Calendar> {
         public Writer(GTFSFeed feed) {
             super(feed, "calendar");
@@ -120,9 +96,23 @@ public class Calendar extends Entity {
 
         @Override
         protected Iterator<Calendar> iterator() {
-            return new CalendarServiceIterator(feed.services.values().iterator());
+            // wrap an iterator over services
+            Iterator<Calendar> calIt = Iterators.transform(feed.services.values().iterator(), new Function<Service, Calendar> () {
+                @Override
+                public Calendar apply (Service s) {
+                    return s.calendar;
+                }
+            });
+            
+            // not every service has a calendar (e.g. TriMet has no calendars, just calendar dates).
+            // This is legal GTFS, so skip services with no calendar
+            return Iterators.filter(calIt, new Predicate<Calendar> () {
+                @Override
+                public boolean apply(Calendar c) {
+                    return c != null;
+                }
+            });
+            
         }
-
-
     }
 }
