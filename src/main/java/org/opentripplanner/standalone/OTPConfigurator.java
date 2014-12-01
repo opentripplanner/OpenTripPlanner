@@ -181,7 +181,7 @@ public class OTPConfigurator {
             }
             OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
-            streetEdgeFactory.useElevationData = params.elevation;
+            streetEdgeFactory.useElevationData = params.elevation || (demFile != null);
             osmBuilder.edgeFactory = streetEdgeFactory;
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
             osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
