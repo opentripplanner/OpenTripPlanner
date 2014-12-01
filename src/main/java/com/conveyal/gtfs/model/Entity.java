@@ -259,6 +259,18 @@ public abstract class Entity implements Serializable {
 		}
     }
     
+    /**
+     * Write this entity to a CSV file. This should be subclassed in subclasses of Entity.
+     * The following (abstract) methods should be overridden in a subclass:
+     * 
+     * writeHeaders(): write the headers to the CsvWriter writer.
+     * writeRow(E): write the passed-in object to the CsvWriter writer, potentially using the write*Field methods.
+     * iterator(): return an iterator over objects of this class (note that the feed is available at this.feed
+     * public Writer (GTFSFeed feed): this should super to Writer(GTFSFeed feed, String tableName), with the table name
+     * defined. 
+     * 
+     * @author mattwigway
+     */
     public static abstract class Writer<E extends Entity> {
         private static final Logger LOG = LoggerFactory.getLogger(Writer.class);
 
