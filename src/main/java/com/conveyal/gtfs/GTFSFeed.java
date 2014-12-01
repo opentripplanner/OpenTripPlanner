@@ -57,13 +57,13 @@ public class GTFSFeed {
 
     /* Map from 2-tuples of (shape_id, shape_pt_sequence) to shape points */
     public final ConcurrentNavigableMap<Tuple2<String, Integer>, Shape> shapePoints = db.getTreeMap("shapes");
-    
+
     /* This represents a bunch of views of the previous, one for each shape */
     public final Map<String, Map<Integer, Shape>> shapes = Maps.newHashMap();
-    
+
     /* Map from 2-tuples of (trip_id, stop_sequence) to stoptimes. */
     public final ConcurrentNavigableMap<Tuple2, StopTime> stop_times = db.getTreeMap("stop_times");
-    
+
     /* A fare is a fare_attribute and all fare_rules that reference that fare_attribute. */
     public final Map<String, Fare> fares = Maps.newHashMap();
 
@@ -107,33 +107,33 @@ public class GTFSFeed {
             LOG.info("{}", error);
         }
     }
-    
+
     public void toFile (String file) {
-    	try {
-    		File out = new File(file);
-    		OutputStream os = new FileOutputStream(out);
-    		ZipOutputStream zip = new ZipOutputStream(os);
-    		
-    		// write everything
-    		// TODO: fare attributes, fare rules, shapes
-    		new Agency.Writer(this).writeTable(zip);
-    		new Calendar.Writer(this).writeTable(zip);
-    		new CalendarDate.Writer(this).writeTable(zip);
-    		new Frequency.Writer(this).writeTable(zip);
-    		new Route.Writer(this).writeTable(zip);
-    		new Stop.Writer(this).writeTable(zip);
-    		new Shape.Writer(this).writeTable(zip);
-    		new Transfer.Writer(this).writeTable(zip);
-    		new Trip.Writer(this).writeTable(zip);
-    		new StopTime.Writer(this).writeTable(zip);
-    		
-    		zip.close();
-    		
-    		LOG.info("GTFS file written");
-    	} catch (Exception e) {
+        try {
+            File out = new File(file);
+            OutputStream os = new FileOutputStream(out);
+            ZipOutputStream zip = new ZipOutputStream(os);
+
+            // write everything
+            // TODO: fare attributes, fare rules, shapes
+            new Agency.Writer(this).writeTable(zip);
+            new Calendar.Writer(this).writeTable(zip);
+            new CalendarDate.Writer(this).writeTable(zip);
+            new Frequency.Writer(this).writeTable(zip);
+            new Route.Writer(this).writeTable(zip);
+            new Stop.Writer(this).writeTable(zip);
+            new Shape.Writer(this).writeTable(zip);
+            new Transfer.Writer(this).writeTable(zip);
+            new Trip.Writer(this).writeTable(zip);
+            new StopTime.Writer(this).writeTable(zip);
+
+            zip.close();
+
+            LOG.info("GTFS file written");
+        } catch (Exception e) {
             LOG.error("Error saving GTFS: {}", e.getMessage());
             throw new RuntimeException(e);
-    	}
+        }
     }
 
     public void validate (GTFSValidator... validators) {
@@ -166,10 +166,10 @@ public class GTFSFeed {
                 LOG.info("trip {}", human(n));
             }
             Map<Fun.Tuple2, StopTime> tripStopTimes =
-                stop_times.subMap(
-                    Fun.t2(trip_id, null),
-                    Fun.t2(trip_id, Fun.HI)
-                );
+                    stop_times.subMap(
+                            Fun.t2(trip_id, null),
+                            Fun.t2(trip_id, Fun.HI)
+                            );
             List<String> stops = Lists.newArrayList();
             // In-order traversal of StopTimes within this trip. The 2-tuple keys determine ordering.
             for (StopTime stopTime : tripStopTimes.values()) {

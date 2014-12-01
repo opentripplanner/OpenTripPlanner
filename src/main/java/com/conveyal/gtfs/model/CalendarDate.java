@@ -52,7 +52,7 @@ public class CalendarDate extends Entity {
             }
         }
     }
-    
+
     /**
      * Calendar dates are stored inside services, each of which can have multiple calendar dates.
      * So this iterator wraps an iterator over services and returns each calendar date.
@@ -63,70 +63,70 @@ public class CalendarDate extends Entity {
      * @author mattwigway
      */
     private static class CalendarDateServiceIterator implements Iterator<CalendarDate> {
-    	private Iterator<Service> services;
-    	private Iterator<CalendarDate> currentService;
-    	
-    	public CalendarDateServiceIterator(Iterator<Service> services) {
-    		this.services = services;
-    		currentService = null;
-    	}
+        private Iterator<Service> services;
+        private Iterator<CalendarDate> currentService;
 
-    	private void findNext() {
-    		
-    	}
-    	
-		@Override
-		public boolean hasNext() {
-			// scan through the services
-			while (currentService == null || !currentService.hasNext()) {
-				if (!services.hasNext())
-					return false;
-				
-				currentService = services.next().calendar_dates.values().iterator();
-			}
-			
-			return true;
-		}
+        public CalendarDateServiceIterator(Iterator<Service> services) {
+            this.services = services;
+            currentService = null;
+        }
 
-		@Override
-		public CalendarDate next() {
-			// we call hasNext to position ourselves at the next item.
-			if (!hasNext())
-				return null;
-			else
-				return currentService.next();
-		}
+        private void findNext() {
 
-		@Override
-		public void remove() {
-			throw new UnsupportedOperationException("Cannot remove calendar dates during iteration.");
-		}
-    	
+        }
+
+        @Override
+        public boolean hasNext() {
+            // scan through the services
+            while (currentService == null || !currentService.hasNext()) {
+                if (!services.hasNext())
+                    return false;
+
+                currentService = services.next().calendar_dates.values().iterator();
+            }
+
+            return true;
+        }
+
+        @Override
+        public CalendarDate next() {
+            // we call hasNext to position ourselves at the next item.
+            if (!hasNext())
+                return null;
+            else
+                return currentService.next();
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Cannot remove calendar dates during iteration.");
+        }
+
     }
-    
+
     public static class Writer extends Entity.Writer<CalendarDate> {
-    	public Writer (GTFSFeed feed) {
-    		super(feed, "calendar_dates");
-    	}
+        public Writer (GTFSFeed feed) {
+            super(feed, "calendar_dates");
+        }
 
-		@Override
-		protected void writeHeaders() throws IOException {
-			writer.writeRecord(new String[] {"service_id", "date", "exception_type"});
-		}
+        @Override
+        protected void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"service_id", "date", "exception_type"});
+        }
 
-		@Override
-		protected void writeOneRow(CalendarDate d) throws IOException {
-			writeStringField(d.service.service_id);
-			writeDateField(d.date);
-			writeIntField(d.exception_type);
-			endRecord();
-		}
+        @Override
+        protected void writeOneRow(CalendarDate d) throws IOException {
+            writeStringField(d.service.service_id);
+            writeDateField(d.date);
+            writeIntField(d.exception_type);
+            endRecord();
+        }
 
-		@Override
-		protected Iterator<CalendarDate> iterator() {
-			return new CalendarDateServiceIterator(feed.services.values().iterator());
-		}
-    	
-    	
+        @Override
+        protected Iterator<CalendarDate> iterator() {
+            return new CalendarDateServiceIterator(feed.services.values().iterator());
+        }
+
+
     }
 }

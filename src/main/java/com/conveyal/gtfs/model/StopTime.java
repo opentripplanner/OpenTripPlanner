@@ -33,19 +33,19 @@ public class StopTime extends Entity implements Serializable {
     public final int    pickup_type;
     public final int    drop_off_type;
     public final double shape_dist_traveled;
-    
+
     // we have a constructor because StopTimes need to be immutable for use in MapDB
     public StopTime (String trip_id, int arrival_time, int departure_time, String stop_id, int stop_sequence,
-    		String stop_headsign, int pickup_type, int drop_off_type, double shape_dist_traveled) {
-    	this.trip_id = trip_id;
-    	this.arrival_time = arrival_time;
-    	this.departure_time = departure_time;
-    	this.stop_id = stop_id;
-    	this.stop_sequence = stop_sequence;
-    	this.stop_headsign = stop_headsign;
-    	this.pickup_type = pickup_type;
-    	this.drop_off_type = drop_off_type;
-    	this.shape_dist_traveled = shape_dist_traveled;
+            String stop_headsign, int pickup_type, int drop_off_type, double shape_dist_traveled) {
+        this.trip_id = trip_id;
+        this.arrival_time = arrival_time;
+        this.departure_time = departure_time;
+        this.stop_id = stop_id;
+        this.stop_sequence = stop_sequence;
+        this.stop_headsign = stop_headsign;
+        this.pickup_type = pickup_type;
+        this.drop_off_type = drop_off_type;
+        this.shape_dist_traveled = shape_dist_traveled;
     }
 
     public static class Loader extends Entity.Loader<StopTime> {
@@ -66,50 +66,50 @@ public class StopTime extends Entity implements Serializable {
             int drop_off_type  = getIntField("drop_off_type", false, 0, 3);
             double shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
             StopTime st = new StopTime(trip_id, arrival_time, departure_time, stop_id, stop_sequence,
-            		stop_headsign, pickup_type, drop_off_type, shape_dist_traveled);
+                    stop_headsign, pickup_type, drop_off_type, shape_dist_traveled);
             st.feed = null; // this could circular-serialize the whole feed
             feed.stop_times.put(new Fun.Tuple2(st.trip_id, st.stop_sequence), st);
 
             /*
               Check referential integrity without storing references. StopTime cannot directly reference Trips or
               Stops because they would be serialized into the MapDB.
-            */
+             */
             getRefField("trip_id", true, feed.trips);
             getRefField("stop_id", true, feed.stops);
         }
 
     }
-    
+
     public static class Writer extends Entity.Writer<StopTime> {
-    	public Writer (GTFSFeed feed) {
-    		super(feed, "stop_times");
-    	}
+        public Writer (GTFSFeed feed) {
+            super(feed, "stop_times");
+        }
 
-		@Override
-		protected void writeHeaders() throws IOException {
-			writer.writeRecord(new String[] {"trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "stop_headsign",
-					"pickup_type", "drop_off_type", "shape_dist_traveled"});
-		}
+        @Override
+        protected void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "stop_headsign",
+                    "pickup_type", "drop_off_type", "shape_dist_traveled"});
+        }
 
-		@Override
-		protected void writeOneRow(StopTime st) throws IOException {
-			writeStringField(st.trip_id);
-			writeTimeField(st.arrival_time);
-			writeTimeField(st.departure_time);
-			writeStringField(st.stop_id);
-			writeIntField(st.stop_sequence);
-			writeStringField(st.stop_headsign);
-			writeIntField(st.pickup_type);
-			writeIntField(st.drop_off_type);
-			writeDoubleField(st.shape_dist_traveled);
-			endRecord();
-		}
+        @Override
+        protected void writeOneRow(StopTime st) throws IOException {
+            writeStringField(st.trip_id);
+            writeTimeField(st.arrival_time);
+            writeTimeField(st.departure_time);
+            writeStringField(st.stop_id);
+            writeIntField(st.stop_sequence);
+            writeStringField(st.stop_headsign);
+            writeIntField(st.pickup_type);
+            writeIntField(st.drop_off_type);
+            writeDoubleField(st.shape_dist_traveled);
+            endRecord();
+        }
 
-		@Override
-		protected Iterator<StopTime> iterator() {
-			return feed.stop_times.values().iterator();
-		}
-    	
-    	
+        @Override
+        protected Iterator<StopTime> iterator() {
+            return feed.stop_times.values().iterator();
+        }
+
+
     }
 }

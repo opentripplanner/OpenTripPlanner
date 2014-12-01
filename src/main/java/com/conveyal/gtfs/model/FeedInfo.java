@@ -57,36 +57,36 @@ public class FeedInfo extends Entity {
             }
         }
     }
-    
+
     public static class Writer extends Entity.Writer<FeedInfo> {
 
-		public Writer(GTFSFeed feed) {
-			super(feed, "feed_info");
-		}
+        public Writer(GTFSFeed feed) {
+            super(feed, "feed_info");
+        }
 
-		@Override
-		public void writeHeaders() throws IOException {
-			writer.writeRecord(new String[] {"feed_id", "feed_publisher_name", "feed_publisher_url", "feed_lang",
-					"feed_start_date", "feed_end_date", "feed_version"});
-		}
+        @Override
+        public void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"feed_id", "feed_publisher_name", "feed_publisher_url", "feed_lang",
+                    "feed_start_date", "feed_end_date", "feed_version"});
+        }
 
-		@Override
-		public void writeOneRow(FeedInfo i) throws IOException {
-			writeStringField(i.feed_id.equals("NONE") ? "" : i.feed_id);
-			writeStringField(i.feed_publisher_name);
-			writeUrlField(i.feed_publisher_url);
-			writeStringField(i.feed_lang);
-			writeDateField(i.feed_start_date);
-			writeDateField(i.feed_end_date);
-			writeStringField(i.feed_version);
-			endRecord();
-		}
+        @Override
+        public void writeOneRow(FeedInfo i) throws IOException {
+            writeStringField(i.feed_id.equals("NONE") ? "" : i.feed_id);
+            writeStringField(i.feed_publisher_name);
+            writeUrlField(i.feed_publisher_url);
+            writeStringField(i.feed_lang);
+            writeDateField(i.feed_start_date);
+            writeDateField(i.feed_end_date);
+            writeStringField(i.feed_version);
+            endRecord();
+        }
 
-		@Override
-		public Iterator<FeedInfo> iterator() {
-			return feed.feedInfo.values().iterator();
-		}
-    	
+        @Override
+        public Iterator<FeedInfo> iterator() {
+            return feed.feedInfo.values().iterator();
+        }
+
     }
 
 }
