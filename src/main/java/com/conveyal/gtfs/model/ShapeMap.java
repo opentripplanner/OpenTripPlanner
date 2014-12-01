@@ -18,6 +18,8 @@ import org.mapdb.Fun.Tuple2;
  */
 public class ShapeMap implements Map<Integer, Shape> {
     private String shapeId;
+    
+    /** A map from (shape_id, shape_pt_sequence) to shapes */
     private Map<Tuple2<String, Integer>, Shape> wrapped; 
 
     public ShapeMap (ConcurrentNavigableMap<Tuple2<String, Integer>, Shape> allShapes, String shapeId) {
