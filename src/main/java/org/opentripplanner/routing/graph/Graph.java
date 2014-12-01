@@ -855,7 +855,7 @@ public class Graph implements Serializable {
             Collection<String> agencyIds = this.getAgencyIds();
             if (agencyIds.size() == 0) {
                 timeZone = TimeZone.getTimeZone("GMT");
-                LOG.warn("graph contains no agencies; API request times will be interpreted as GMT.");
+                LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
             } else {
                 CalendarService cs = this.getCalendarService();
                 for (String agencyId : agencyIds) {
@@ -870,6 +870,14 @@ public class Graph implements Serializable {
             }
         }
         return timeZone;
+    }
+    
+    /**
+     * The timezone is cached by the graph. If you've done something to the graph that has the
+     * potential to change the time zone, you should call this to ensure it is reset. 
+     */
+    public void clearTimeZone () {
+        this.timeZone = null;
     }
 
     public void summarizeBuilderAnnotations() {
