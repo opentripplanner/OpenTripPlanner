@@ -86,7 +86,5 @@ public class Shape extends Entity {
         protected Iterator<Shape> iterator() {
             return feed.shapePoints.values().iterator();
         }
-
-
     }
 }
