@@ -15,6 +15,8 @@ package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.error.DuplicateKeyError;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterators;
 import com.sun.org.apache.xerces.internal.impl.dv.xs.DateTimeDV;
 
 import org.joda.time.DateTime;
@@ -53,57 +55,6 @@ public class CalendarDate extends Entity {
         }
     }
 
-    /**
-     * Calendar dates are stored inside services, each of which can have multiple calendar dates.
-     * So this iterator wraps an iterator over services and returns each calendar date.
-     * Calendar dates can only be associated with a single service, so we need not worry much about duplicates.
-     * 
-     * The behavior of this iterator is undefined if the underlying map changes during iteration.
-     * 
-     * @author mattwigway
-     */
-    private static class CalendarDateServiceIterator implements Iterator<CalendarDate> {
-        private Iterator<Service> services;
-        private Iterator<CalendarDate> currentService;
-
-        public CalendarDateServiceIterator(Iterator<Service> services) {
-            this.services = services;
-            currentService = null;
-        }
-
-        private void findNext() {
-
-        }
-
-        @Override
-        public boolean hasNext() {
-            // scan through the services
-            while (currentService == null || !currentService.hasNext()) {
-                if (!services.hasNext())
-                    return false;
-
-                currentService = services.next().calendar_dates.values().iterator();
-            }
-
-            return true;
-        }
-
-        @Override
-        public CalendarDate next() {
-            // we call hasNext to position ourselves at the next item.
-            if (!hasNext())
-                return null;
-            else
-                return currentService.next();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Cannot remove calendar dates during iteration.");
-        }
-
-    }
-
     public static class Writer extends Entity.Writer<CalendarDate> {
         public Writer (GTFSFeed feed) {
             super(feed, "calendar_dates");
@@ -124,9 +75,13 @@ public class CalendarDate extends Entity {
 
         @Override
         protected Iterator<CalendarDate> iterator() {
-            return new CalendarDateServiceIterator(feed.services.values().iterator());
+            Iterator<Service> serviceIterator = feed.services.values().iterator();
+            return Iterators.concat(Iterators.transform(serviceIterator, new Function<Service, Iterator<CalendarDate>> () {
+                @Override
+                public Iterator<CalendarDate> apply(Service service) {
+                    return service.calendar_dates.values().iterator();
+                }
+            }));
         }
-
-
     }
 }
