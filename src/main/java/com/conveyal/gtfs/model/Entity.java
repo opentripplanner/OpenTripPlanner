@@ -211,7 +211,6 @@ public abstract class Entity implements Serializable {
          * GTFS entity, and loads them into a table.
          *
          * @param zip the zip file from which to read a table
-         * @throws IOException
          */
         public void loadTable(ZipFile zip) throws IOException {
             ZipEntry entry = zip.getEntry(tableName + ".txt");
@@ -291,13 +290,11 @@ public abstract class Entity implements Serializable {
 
         /**
          * Write the CSV header.
-         * @throws IOException 
          */
         protected abstract void writeHeaders() throws IOException;
 
         /**
          * Write one row of the CSV from the passed-in object.
-         * @throws IOException 
          */
         protected abstract void writeOneRow(E obj) throws IOException;
 
