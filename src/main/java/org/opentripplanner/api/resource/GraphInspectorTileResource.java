@@ -91,7 +91,7 @@ public class GraphInspectorTileResource extends RoutingResource {
 
         // Re-use analyst
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
-        TileRequest tileRequest = new TileRequest(routerId, env, 256, 256);
+        TileRequest tileRequest = new TileRequest(env, 256, 256);
 
         Router router = otpServer.getRouter(routerId);
         BufferedImage image = router.tileRendererManager.renderTile(tileRequest, layer);

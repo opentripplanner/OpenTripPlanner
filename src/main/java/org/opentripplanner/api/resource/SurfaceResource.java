@@ -198,7 +198,7 @@ public class SurfaceResource extends RoutingResource {
         TimeSurface surfA = otpServer.surfaceCache.get(surfaceId);
         if (surfA == null) return badRequest("Unrecognized surface ID.");
         	
-        TileRequest tileRequest = new TileRequest(surfA.routerId, env, 256, 256);
+        TileRequest tileRequest = new TileRequest(env, 256, 256);
        
         MIMEImageFormat imageFormat = new MIMEImageFormat("image/png");
         RenderRequest renderRequest =
