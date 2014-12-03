@@ -105,8 +105,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // null checks on origin and destination vertices are already performed in setRoutingContext
         // options.rctx.check();
 
-        runState.spt = new MultiShortestPathTree(runState.options);
-        //runState.spt = new EarliestArrivalShortestPathTree(runState.options); //
+        //runState.spt = new MultiShortestPathTree(runState.options);
+        runState.spt = new EarliestArrivalShortestPathTree(runState.options);
 
         runState.heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
@@ -285,10 +285,11 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
                 //new GraphPath(runState.u, false).dump();
-                if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
-                    LOG.debug("total vertices visited {}", runState.nVisited);
-                    break;
-                }
+                break;
+//                if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
+//                    LOG.debug("total vertices visited {}", runState.nVisited);
+//                    break;
+//                }
             }
 
         }

@@ -54,8 +54,6 @@ public class RetryingPathServiceImpl implements PathService {
         this.sptServiceFactory = sptServiceFactory;
     }
 
-    
-
     private double firstPathTimeout = 0; // seconds
     private double multiPathTimeout = 0; // seconds
     
