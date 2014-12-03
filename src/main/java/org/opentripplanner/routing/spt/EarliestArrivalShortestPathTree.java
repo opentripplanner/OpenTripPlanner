@@ -73,15 +73,15 @@ public class EarliestArrivalShortestPathTree extends AbstractShortestPathTree {
      * {@link ShortestPathTree} Interface
      ****/
 
-    private boolean earlier (State s0, State s1) {
-        return s0.getActiveTime() < s1.getActiveTime();
+    private boolean lighterWeight (State s0, State s1) {
+        return s0.getWeight() < s1.getWeight();
     }
     
     @Override
     public boolean add(State state) {
         Vertex here = state.getVertex();
         State existing = states.get(here);
-        if (existing == null || earlier (state, existing)) {
+        if (existing == null || lighterWeight (state, existing)) {
             states.put(here, state);
             return true;
         } else {
