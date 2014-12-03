@@ -111,7 +111,7 @@ public class LongDistancePathService implements PathService {
          * search times on the LongDistancePathService, so we set it to the maximum we ever expect
          * to see. Because people may use either the traditional path services or the 
          * LongDistancePathService, we do not change the global default but override it here. */
-        options.setMaxTransfers(10);
+        options.setMaxTransfers(4);
 
         /* In long distance mode, maxWalk has a different meaning. It's the radius around the origin or destination
          * within which you can walk on the streets. If no value is provided, max walk defaults to the largest
