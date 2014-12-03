@@ -106,7 +106,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // options.rctx.check();
 
         runState.spt = new MultiShortestPathTree(runState.options);
-        //runState.spt = new EarliestArrivalShortestPathTree(runState.options);
+        //runState.spt = new EarliestArrivalShortestPathTree(runState.options); //
 
         runState.heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
