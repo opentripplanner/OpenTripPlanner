@@ -2,14 +2,14 @@
    modify it under the terms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
    the License, or (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 otp.namespace("otp.locale");
@@ -26,7 +26,7 @@ otp.locale.Italian = {
         name: 'Italiano',
         //FALSE-imperial units are used
         //TRUE-Metric units are used
-        metric : true, 
+        metric : true,
         //Name of localization file (*.po file) in src/client/i18n
         locale_short : "it",
         //Name of datepicker localization in
@@ -38,8 +38,30 @@ otp.locale.Italian = {
         //into src/client/js/lib/jquery-ui/i18n
         //and add it in index.html after other localizations
         //It will be used automatically when UI is switched to this locale
-        datepicker_locale_short: "it" 
+        datepicker_locale_short: "it"
     },
+
+    /**
+     * Info Widgets: a list of the non-module-specific "information widgets"
+     * that can be accessed from the top bar of the client display. Expressed as
+     * an array of objects, where each object has the following fields:
+     * - content: <string> the HTML content of the widget
+     * - [title]: <string> the title of the widget
+     * - [cssClass]: <string> the name of a CSS class to apply to the widget.
+     * If not specified, the default styling is used.
+     */
+    infoWidgets : [
+            {
+                title: 'Progetto',
+                content: '<p>Informazioni sul progetto</p>',
+                //cssClass: 'otp-contactWidget',
+            },
+            {
+                title: 'Contatti',
+                content: '<p>Commenti? Contattaci  su...</p>'
+            },
+    ],
+
 
 
     time:
@@ -53,4 +75,3 @@ otp.locale.Italian = {
 
     CLASS_NAME : "otp.locale.Italian"
 };
-
