@@ -21,7 +21,6 @@ import java.util.List;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
@@ -109,10 +108,17 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     private final int[] stopSequences;
 
     /**
+    * Is this trip circular?
+    */
+    private boolean circularTrip = false;
+    
+    /**
      * Is this trip cancelled?
      */
     private boolean cancelled = false;
-
+    
+    public String vehicleID = null;
+    
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
     private final BitSet timepoints;
 
@@ -129,6 +135,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         BitSet timepoints = new BitSet(nStops);
         // Times are always shifted to zero. This is essential for frequencies and deduplication.
         timeShift = stopTimes.get(0).getArrivalTime();
+        
+    	if (stopTimes.get(0).getStop() != null && stopTimes.get(nStops-1).getStop() != null)
+	        if(stopTimes.get(0).getStop().equals(stopTimes.get(nStops-1).getStop()))      	
+	        	circularTrip = true;
+        
         int s = 0;
         for (StopTime st : stopTimes) {
             departures[s] = st.getDepartureTime() - timeShift;
@@ -227,7 +238,29 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         if (arrivalTimes == null) return getScheduledArrivalTime(stop);
         else return arrivalTimes[stop]; // updated times are not time shifted.
     }
+    
 
+    /** backpropagate the delay. */
+    public void backPropagateDelay(int stop) {   
+    	int dt;
+    	dt = this.scheduledDepartureTimes[stop+1] - this.scheduledDepartureTimes[stop];
+    	arrivalTimes[stop] = getArrivalTime(stop+1) - dt;
+    }
+    
+    /** estimate arrival time for missing realtime updates.For stops in the tail of the queue.*/
+    public void estimateArrivaltime(int stop) {   
+    	int dt;
+    	int currentStop;
+    	if (stop != 0){
+    		currentStop = stop;
+    	}else{
+    		currentStop = this.getNumStops()-1;
+    	}
+    	 
+    	dt = this.scheduledDepartureTimes[currentStop] - this.scheduledDepartureTimes[currentStop-1];
+    	arrivalTimes[stop] = getArrivalTime(currentStop-1) + dt;
+		
+    	}
     /** @return the amount of time in seconds that the vehicle waits at the stop. */
     public int getDepartureTime(int stop) {
         if (departureTimes == null) return getScheduledDepartureTime(stop);
@@ -240,20 +273,34 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return getDepartureTime(stop) - getArrivalTime(stop);
     }
 
+    public String getVehicleID(){
+    	return vehicleID;
+    }
+    public void setVehicleID(String currentVehicleID){
+    	vehicleID = currentVehicleID;
+    }
     /** @return the amount of time in seconds that the vehicle takes to reach the following stop. */
     public int getRunningTime(int stop) {
-        // timeShift is not relevant since this involves updated times and is relative.
-        return getArrivalTime(stop + 1) - getDepartureTime(stop);
+    	if(!circularTrip)    	       
+	        return getArrivalTime(stop + 1) - getDepartureTime(stop);
+    	else{
+    		
+	        int dt = getArrivalTime(0) - getDepartureTime(stop);
+	        if (dt < 0)
+	        	dt = this.scheduledDepartureTimes[stop+1] - this.scheduledDepartureTimes[stop];
+	        	return dt;
+    	}
+    		
     }
 
     /** @return the difference between the scheduled and actual arrival times at this stop. */
     public int getArrivalDelay(int stop) {
-        return getArrivalTime(stop) - (scheduledArrivalTimes[stop] + timeShift);
+    	return getArrivalTime(stop) - (scheduledArrivalTimes[stop] + timeShift);
     }
 
     /** @return the difference between the scheduled and actual departure times at this stop. */
     public int getDepartureDelay(int stop) {
-        return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
+    	return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
     }
 
     /**
@@ -285,7 +332,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         for (int s = 0; s < nStops; s++) {
             int arr = getArrivalTime(s);
             int dep = getDepartureTime(s);
-
             if (dep < arr) {
                 LOG.error("Negative dwell time in TripTimes at stop index {}.", s);
                 return false;

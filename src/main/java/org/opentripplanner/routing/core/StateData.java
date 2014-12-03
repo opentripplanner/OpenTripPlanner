@@ -31,7 +31,10 @@ public class StateData implements Cloneable {
 
     // the time at which the search started
     protected long startTime;
-
+    
+    // indicate the type of frequency Based trip
+    protected Boolean isNonExactFrequency;
+    
     // which trip index inside a pattern
     protected TripTimes tripTimes;
 

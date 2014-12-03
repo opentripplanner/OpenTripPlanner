@@ -27,6 +27,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 // this is only currently in edgetype because that's where Trippattern is.
@@ -44,7 +45,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
  */
 public class TimetableResolver {
 
-    protected static class SortedTimetableComparator implements Comparator<Timetable> {
+	protected static class SortedTimetableComparator implements Comparator<Timetable> {
         @Override
         public int compare(Timetable t1, Timetable t2) {
             return t1.serviceDate.compareTo(t2.serviceDate);
@@ -57,7 +58,7 @@ public class TimetableResolver {
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
     // The SortedSet members are copy-on-write
     // FIXME: this could be made into a flat hashtable with compound keys.
-    private HashMap<TripPattern, SortedSet<Timetable>> timetables =
+    public HashMap<TripPattern, SortedSet<Timetable>> timetables =
             new HashMap<TripPattern, SortedSet<Timetable>>();
 
     /** A set of all timetables which have been modified and are waiting to be indexed. */
@@ -113,7 +114,10 @@ public class TimetableResolver {
                 dirty.add(tt);
             }
             // Assume all trips in a pattern are from the same feed, which should be the case.
-            return tt.update(tripUpdate, timeZone, serviceDate);
+            if (tripUpdate.getTrip().getScheduleRelationship() == ScheduleRelationship.UNSCHEDULED)
+            	return tt.updateFreqTrip(tripUpdate, timeZone, serviceDate);
+            else
+            	return tt.update(tripUpdate, timeZone, serviceDate);
         }
     }
 
