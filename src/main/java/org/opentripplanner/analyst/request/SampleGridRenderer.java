@@ -29,7 +29,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.impl.SPTServiceFactory;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.SPTWalker;
 import org.opentripplanner.routing.spt.SPTWalker.SPTVisitor;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -55,6 +54,7 @@ public class SampleGridRenderer {
     private static final Logger LOG = LoggerFactory.getLogger(SampleGridRenderer.class);
 
     private GraphService graphService;
+
     private SPTServiceFactory sptServiceFactory;
 
     public SampleGridRenderer(GraphService graphService, SPTServiceFactory sptServiceFactory) {
@@ -75,11 +75,12 @@ public class SampleGridRenderer {
         // 1. Compute the Shortest Path Tree.
         long t0 = System.currentTimeMillis();
         long tOvershot = (long) (2 * D0 / V0);
-        sptRequest.worstTime = (sptRequest.dateTime
-                + (sptRequest.arriveBy ? -spgRequest.maxTimeSec - tOvershot : spgRequest.maxTimeSec + tOvershot));
+        sptRequest.worstTime = (sptRequest.dateTime + (sptRequest.arriveBy ? -spgRequest.maxTimeSec
+                - tOvershot : spgRequest.maxTimeSec + tOvershot));
         sptRequest.batch = (true);
         sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));
-        final ShortestPathTree spt = sptServiceFactory.instantiate().getShortestPathTree(sptRequest);
+        final ShortestPathTree spt = sptServiceFactory.instantiate()
+                .getShortestPathTree(sptRequest);
 
         // 3. Create a sample grid based on the SPT.
         long t1 = System.currentTimeMillis();
@@ -94,7 +95,7 @@ public class SampleGridRenderer {
         SparseMatrixZSampleGrid<WTWD> sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16,
                 spt.getVertexCount(), dX, dY, coordinateOrigin);
         sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0,
-                sptRequest.getMaxWalkDistance(), cosLat);
+                sptRequest.getMaxWalkDistance(), spgRequest.maxTimeSec, cosLat);
         sptRequest.cleanup();
 
         long t2 = System.currentTimeMillis();
@@ -110,9 +111,9 @@ public class SampleGridRenderer {
      * @param spt
      * @return
      */
-    public static void sampleSPT(ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid, final double d0,
-            final double gridSizeMeters, final double v0, final double maxWalkDistance,
-            final double cosLat) {
+    public static void sampleSPT(final ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid,
+            final double d0, final double gridSizeMeters, final double v0,
+            final double maxWalkDistance, final int maxTimeSec, final double cosLat) {
 
         final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -125,13 +126,14 @@ public class SampleGridRenderer {
          */
         AccumulativeMetric<WTWD> accMetric = new AccumulativeMetric<WTWD>() {
             @Override
-            public WTWD cumulateSample(Coordinate C0, Coordinate Cs, WTWD z, WTWD zS) {
+            public WTWD cumulateSample(Coordinate C0, Coordinate Cs, WTWD z, WTWD zS,
+                    double offRoadSpeed) {
                 double t = z.wTime / z.w;
                 double b = z.wBoardings / z.w;
                 double wd = z.wWalkDist / z.w;
                 double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
                 // additionnal time
-                double dt = d / v0;
+                double dt = d / offRoadSpeed;
                 // t weight
                 double w = 1 / ((d + d0) * (d + d0));
                 if (zS == null) {
@@ -201,27 +203,30 @@ public class SampleGridRenderer {
             }
 
             @Override
-            public final void visit(Coordinate c, State s0, State s1, double d0, double d1) {
+            public final void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1,
+                    double speed) {
                 double wd0 = s0.getWalkDistance() + d0;
                 double wd1 = s0.getWalkDistance() + d1;
                 double t0 = wd0 > maxWalkDistance ? Double.POSITIVE_INFINITY : s0.getActiveTime()
-                        + d0 / v0;
+                        + d0 / speed;
                 double t1 = wd1 > maxWalkDistance ? Double.POSITIVE_INFINITY : s1.getActiveTime()
-                        + d1 / v0;
-                if (!Double.isInfinite(t0) || !Double.isInfinite(t1)) {
-                    WTWD z = new WTWD();
-                    z.w = 1.0;
-                    z.d = 0.0;
-                    if (t0 < t1) {
-                        z.wTime = t0;
-                        z.wBoardings = s0.getNumBoardings();
-                        z.wWalkDist = s0.getWalkDistance();
-                    } else {
-                        z.wTime = t1;
-                        z.wBoardings = s1.getNumBoardings();
-                        z.wWalkDist = s1.getWalkDistance();
+                        + d1 / speed;
+                if (t0 < maxTimeSec || t1 < maxTimeSec) {
+                    if (!Double.isInfinite(t0) || !Double.isInfinite(t1)) {
+                        WTWD z = new WTWD();
+                        z.w = 1.0;
+                        z.d = 0.0;
+                        if (t0 < t1) {
+                            z.wTime = t0;
+                            z.wBoardings = s0.getNumBoardings();
+                            z.wWalkDist = s0.getWalkDistance() + d0;
+                        } else {
+                            z.wTime = t1;
+                            z.wBoardings = s1.getNumBoardings();
+                            z.wWalkDist = s1.getWalkDistance() + d1;
+                        }
+                        gridSampler.addSamplingPoint(c, z, speed);
                     }
-                    gridSampler.addSamplingPoint(c, z);
                 }
             }
         }, d0);
@@ -280,6 +285,7 @@ public class SampleGridRenderer {
                     return -1;
                 return 0;
             }
+
             @Override
             public double interpolate(WTWD zA, WTWD zB, WTWD z0) {
                 if (zA.d > z0.d || zB.d > z0.d) {

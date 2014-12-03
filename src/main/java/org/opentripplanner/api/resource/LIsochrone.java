@@ -186,7 +186,7 @@ public class LIsochrone extends RoutingResource {
 
         List<IsochroneData> isochrones;
         if (algorithm == null || "accSampling".equals(algorithm)) {
-            isochrones = accSamplingRenderer.getIsochrones(isoChroneRequest, sptRequest);
+            isochrones = otpServer.isoChroneSPTRenderer.getIsochrones(isoChroneRequest, sptRequest);
         } else if ("recursiveGrid".equals(algorithm)) {
             isochrones = recursiveGridRenderer.getIsochrones(isoChroneRequest, sptRequest);
         } else {
