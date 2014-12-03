@@ -85,7 +85,7 @@ public class EarliestArrivalShortestPathTree extends AbstractShortestPathTree {
             states.put(here, state);
             return true;
         } else {
-            // !! turn restriction code removed
+            // FIXME !! turn restriction code removed
             return false;
         }
     }
