@@ -184,6 +184,8 @@ public class EdgeVertexTileRenderer implements TileRenderer {
                     bufParams);
             Coordinate[] coords = offsetBuilder.getOffsetCurve(midLineGeom.getCoordinates(),
                     lineWidth * 0.4);
+            if (coords.length < 2)
+                continue; // Can happen for very small edges (<1mm)
             LineString offsetLine = geomFactory.createLineString(coords);
             Shape midLineShape = shapeWriter.toShape(midLineGeom);
             Shape offsetShape = shapeWriter.toShape(offsetLine);

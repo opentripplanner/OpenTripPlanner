@@ -69,11 +69,11 @@ public class ElevationUtils {
         double[] lengths = getLengthsFromElevation(elev);
         double trueLength = lengths[0];
         double flatLength = lengths[1];
-        double lengthMultiplier = flatLength == 0 ? 0 : trueLength / flatLength;
-        if (Double.isNaN(lengthMultiplier)) {
-            log.error("lengthMultiplier from elevation profile is NaN, setting to 1");
-            lengthMultiplier = 1;
+        if (flatLength < 1e-3) {
+            log.error("Too small edge, returning neutral slope costs.");
+            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false);
         }
+        double lengthMultiplier = trueLength / flatLength;
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
