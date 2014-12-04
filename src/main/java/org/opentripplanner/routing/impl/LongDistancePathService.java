@@ -122,6 +122,7 @@ public class LongDistancePathService implements PathService {
 
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
+        // TODO LOOP HERE banning routes and keeping heuristic
         ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         
