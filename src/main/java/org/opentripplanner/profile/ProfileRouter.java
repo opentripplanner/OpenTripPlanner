@@ -485,7 +485,7 @@ public class ProfileRouter {
         rr.bikeSpeed = request.bikeSpeed;
         GenericAStar astar = new GenericAStar();
         rr.setNumItineraries(1);
-        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
+        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000); // FIXME timeout is absolute and in seconds ?
         State state = spt.getState(rr.rctx.target);
         if (state != null) {
             LOG.info("Found non-transit option for mode {}", mode);

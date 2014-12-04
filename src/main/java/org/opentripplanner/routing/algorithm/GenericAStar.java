@@ -92,8 +92,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
      * Compute SPT using default termination strategy.
      */
     @Override
-    public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
-        return this.getShortestPathTree(req, timeoutSeconds, null);
+    public ShortestPathTree getShortestPathTree(RoutingRequest req, double relTimeoutSeconds) {
+        return this.getShortestPathTree(req, relTimeoutSeconds, null);
     }
     
     public void startSearch(RoutingRequest options,
