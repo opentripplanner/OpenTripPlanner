@@ -89,20 +89,12 @@ public class LongDistancePathService implements PathService {
 
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.routerId));
-            options.rctx.pathParsers = new PathParser[] { new Parser() };
+            //options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 
         LOG.debug("rreq={}", options);
         
-        RemainingWeightHeuristic heuristic;
-        if (options.disableRemainingWeightHeuristic) {
-            heuristic = new TrivialRemainingWeightHeuristic();
-        } else if (options.modes.isTransit()) {
-            // Only use the BiDi heuristic for transit.
-            heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
-        } else {
-            heuristic = new DefaultRemainingWeightHeuristic();
-        }
+        RemainingWeightHeuristic heuristic = new DefaultRemainingWeightHeuristic();
         options.rctx.remainingWeightHeuristic = heuristic;
         /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see 
          * itineraries with far more transfers. We do not expect transfer limiting to improve
@@ -123,6 +115,7 @@ public class LongDistancePathService implements PathService {
         Set<AgencyAndId> bannedTrips = Sets.newHashSet();
         while (paths.size() < options.numItineraries && paths.size() < timeouts.length) {
             double timeout = searchBeginTime + (timeouts[paths.size()] * 1000) - System.currentTimeMillis();
+            // if (timeout <= 0) break; ADD THIS LINE TO MAKE TIMEOUTS ACTUALLY WORK WHEN NEGATIVE
             ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
             if (spt == null) { // timeout or other fail
                 LOG.warn("SPT was null.");
