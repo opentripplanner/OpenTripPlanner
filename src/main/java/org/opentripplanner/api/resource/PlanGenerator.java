@@ -116,7 +116,8 @@ public class PlanGenerator {
         options.rctx.debugOutput.finishedCalculating();
 
         if (paths == null || paths.size() == 0) {
-            LOG.info("Path not found: " + options.from + " : " + options.to);
+            LOG.debug("Path not found: " + options.from + " : " + options.to);
+            options.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
             throw new PathNotFoundException();
         }
 
