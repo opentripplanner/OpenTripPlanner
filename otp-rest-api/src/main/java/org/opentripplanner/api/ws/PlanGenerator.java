@@ -47,6 +47,7 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
@@ -272,6 +273,7 @@ public class PlanGenerator {
                     leg = makeLeg(itinerary, state);
                     leg.from.orig = nextName;
                     leg.from.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex();
+
                     itinerary.transfers++;
                     startWalk = -1;
                 } else if (mode == TraverseMode.STL) {
@@ -427,6 +429,7 @@ public class PlanGenerator {
                          */
                         if (!(backEdge instanceof DwellEdge)) {
                             Place stop = makePlace(state.getBackState(), state.getBackState().getVertex().getName(), true);
+
                             leg.stop.add(stop);
                         } else if (leg.stop.size() > 0) {
                             leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(state);
@@ -606,7 +609,10 @@ public class PlanGenerator {
         } else {
             name = s.getVertex().getName();
         }
-        leg.from = makePlace(s.getBackState(), name, false);
+      	leg.from = makePlace(s.getBackState(), name, false);
+        if(s.getBackEdge() instanceof PatternInterlineDwell) {
+        	leg.from.stopIndex = 0;
+        }
         leg.mode = s.getBackMode().toString();
         if (s.isBikeRenting()) {
             leg.rentedBike = true; 
@@ -658,7 +664,14 @@ public class PlanGenerator {
         if (v instanceof TransitVertex) {
             TransitVertex transitVertex = (TransitVertex) v;
             Edge backEdge = state.getBackEdge();
-            if (backEdge instanceof OnBoardForwardEdge) {
+            if (backEdge instanceof PatternInterlineDwell) {
+            	Edge dwellBackEdge = state.getBackState().getBackEdge(); 
+            	if(dwellBackEdge instanceof PatternHop) {
+            		int stopCount = ((PatternHop) dwellBackEdge).getPattern().getStops().size();
+                	place.stopIndex = stopCount - 1;
+            	}
+            }
+            else if (backEdge instanceof OnBoardForwardEdge) {
                 place.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex() + 1;
             }
             place.stopId = transitVertex.getStopId();
