@@ -399,6 +399,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
 
+    /* Whether we are in "long-distance mode". This is currently a server-wide setting, but it could be made per-request. */
+    public boolean longDistance = false;
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */

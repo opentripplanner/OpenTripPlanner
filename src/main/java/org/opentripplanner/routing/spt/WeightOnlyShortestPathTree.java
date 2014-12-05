@@ -13,16 +13,11 @@
 
 package org.opentripplanner.routing.spt;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
+
+import java.util.*;
 
 /**
  * A ShortestPathTree implementation that corresponds to a basic Dijkstra search for the earliest 
@@ -38,8 +33,8 @@ import org.opentripplanner.routing.graph.Vertex;
  * 
  * @author andrewbyrd
  */
-public class EarliestArrivalShortestPathTree extends AbstractShortestPathTree {
-    
+public class WeightOnlyShortestPathTree extends AbstractShortestPathTree {
+
     private static final int DEFAULT_CAPACITY = 500;
 
     Map<Vertex, State> states;
@@ -48,18 +43,18 @@ public class EarliestArrivalShortestPathTree extends AbstractShortestPathTree {
      * Parameterless constructor that uses a default capacity for internal vertex-keyed data
      * structures.
      */
-    public EarliestArrivalShortestPathTree (RoutingRequest options) {
+    public WeightOnlyShortestPathTree(RoutingRequest options) {
         this(options, DEFAULT_CAPACITY);
     }
 
     /**
      * Constructor with a parameter indicating the initial capacity of the data structures holding
      * vertices. This can help avoid resizing and rehashing these objects during path searches.
-     * 
+     *
      * @param n
      *            - the initial size of vertex-keyed maps
      */
-    public EarliestArrivalShortestPathTree (RoutingRequest options, int n) {
+    public WeightOnlyShortestPathTree(RoutingRequest options, int n) {
         super(options);
         states = new IdentityHashMap<Vertex, State>(n);
     }
@@ -70,22 +65,22 @@ public class EarliestArrivalShortestPathTree extends AbstractShortestPathTree {
     }
 
     /****
-     * {@link ShortestPathTree} Interface
+     * {@link org.opentripplanner.routing.spt.ShortestPathTree} Interface
      ****/
 
-    private boolean earlier (State s0, State s1) {
-        return s0.getActiveTime() < s1.getActiveTime();
+    private boolean lighterWeight (State s0, State s1) {
+        return s0.getWeight() < s1.getWeight();
     }
     
     @Override
     public boolean add(State state) {
         Vertex here = state.getVertex();
         State existing = states.get(here);
-        if (existing == null || earlier (state, existing)) {
+        if (existing == null || lighterWeight (state, existing)) {
             states.put(here, state);
             return true;
         } else {
-            // !! turn restriction code removed
+            // FIXME !! turn restriction code removed
             return false;
         }
     }
