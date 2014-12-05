@@ -3,10 +3,12 @@
     <div>
         <div style="font-weight: bold; font-size: 16px;">
             {{#titleLink}}<a href="{{titleLink}}" target="_blank">{{/titleLink}}
-            {{stopName}}
+            {{name}}
             {{#titleLink}}</a>{{/titleLink}}
         </div>
+        <!-- to be provided by index api
         <div style="font-style: italic; font-size: 11px;">{{stopDesc}}</div>
+        -->
         <div style="font-size: 10px;">
             [
 			<a href="#" class="stopViewerLink">{{stop_viewer}}</a>
@@ -16,11 +18,12 @@
             ]
         </div>
 		<div style="margin-top: 6px;"><b>{{plan_trip}}</b>: [ <a href="#" class="planFromLink">{{from_stop}}</a> | <a href="#" class="planToLink">{{to_stop}}</a> ]</div>
-        
+        <!--  TODO: new index api will expose routeList
         <div style="margin-top: 6px;" >
 			<b>{{routes_on_stop}}</b>:
             <ul class="routeList"/>
         </div>
+        -->
     </div>
 </script>
 

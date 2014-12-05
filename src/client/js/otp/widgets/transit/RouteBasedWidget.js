@@ -48,8 +48,8 @@ otp.widgets.transit.RouteBasedWidget =
 
         _.each(module.webapp.indexApi.routes, function(route, key) {
             var optionHtml = '<option>';
-            if(route.routeData.routeShortName) optionHtml += '('+route.routeData.routeShortName+') ';
-            if(route.routeData.routeLongName) optionHtml += route.routeData.routeLongName;
+            if(route.routeData.shortName) optionHtml += '('+route.routeData.shortName+') ';
+            if(route.routeData.longName) optionHtml += route.routeData.longName;
             optionHtml += '</option>';
             this_.routeSelect.append($(optionHtml));
             this_.routeLookup.push(route);
@@ -72,7 +72,7 @@ otp.widgets.transit.RouteBasedWidget =
         this.agency_id = null;
         this.activeLeg = null;
         var route = this.routeLookup[this.routeSelect.prop("selectedIndex")]
-        this.agency_id = route.routeData.id.agencyId + "_" + route.routeData.id.id;
+        this.agency_id = route.routeData.id;
         this.variantSelect.empty();
         this.clear() //stopList.empty();
         this.checkAndLoadVariants();
@@ -80,10 +80,10 @@ otp.widgets.transit.RouteBasedWidget =
 
     newVariantSelected : function() {
         this.activeLeg = null;
-        var variantName = this.variantSelect.val();
-        //console.log("new variant selected: "+variantName);
+        var variantId = this.variantSelect.val();
+        //console.log("new variant selected: "+variantId);
         this.clear() //stopList.empty();
-        this.setActiveVariant(this.module.webapp.indexApi.routes[this.agency_id].variants[variantName]);
+        this.setActiveVariant(this.module.webapp.indexApi.routes[this.agency_id].variants[variantId]);
     },
 
     update : function(leg) {
@@ -116,18 +116,19 @@ otp.widgets.transit.RouteBasedWidget =
         var route = this.module.webapp.indexApi.routes[this.agency_id];
 
         if(!route.variants) {
-            console.log("ERROR: indexApi.routes.["+this.agency_id+"].variants null in StopViewerWidget.updateVariants()");
+            console.log("ERROR: indexApi.routes.["+this.agency_id+"].variants null in RouteBasedWidget.updateVariants()");
             return;
-        }
-
-        if(this.activeLeg) {
-            this.module.webapp.indexApi.readVariantForTrip(this.activeLeg.agencyId, this.activeLeg.tripId, this, this.setActiveVariant);
         }
 
         this.variantSelect.empty();
         _.each(route.variants, function(variant) {
-            $('<option>'+variant.name+'</option>').appendTo(this_.variantSelect);
+            $('<option value='+ variant.id +'>'+variant.desc+'</option>').appendTo(this_.variantSelect);
         });
+
+        if(this.activeLeg) {
+            this.module.webapp.indexApi.readVariantForTrip(this.activeLeg.agencyId,  this.activeLeg.routeId, this.activeLeg.tripId, this, this.setActiveVariant);
+        }
+
 
         if(!this.activeLeg) {
             this.newVariantSelected();
@@ -137,8 +138,8 @@ otp.widgets.transit.RouteBasedWidget =
     setActiveVariant : function(variantData) {
         var this_ = this;
         var route = this.module.webapp.indexApi.routes[this.agency_id];
-        this.activeVariant = route.variants[variantData.name];
-        $('#'+this.id+'-variantSelect option:eq('+(this.activeVariant.index)+')').prop('selected', true);
+        this.activeVariant = route.variants[variantData.id];
+        $('#'+this.id+'-variantSelect option:eq('+this.activeVariant.index+')').prop('selected', true);
 
         this.variantSelected(variantData);
     },

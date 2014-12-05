@@ -109,74 +109,69 @@ otp.core.IndexApi = otp.Class({
     loadVariants : function(agencyAndId, callbackTarget, callback) {
         var this_ = this;
         //console.log("loadVariants: "+agencyAndId);
-        var route = this.routes[agencyAndId];
+        var route = this_.routes[agencyAndId];
         if(route.variants) {
             if(callback) callback.call(callbackTarget, route.variants);
             return;
         }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/transit/routeData';
+        // load more details about route
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/routes/' + agencyAndId ;
         $.ajax(url, {
-            data: {
-                agency : route.routeData.id.agencyId,
-                id : route.routeData.id.id
+            success: function(data){
+                // index api does not return the mode yet...
+                routeMode = route.routeData.mode;
+                route.routeData = data;
+                route.routeData.mode = routeMode;
+            }
 
-            },
-            dataType:   'jsonp',
+        });
 
+        url += '/patterns';
+        $.ajax(url, {
             success: function(data) {
-                //console.log(data);
                 route.variants = {};
-                for(var i=0; i<data.routeData[0].variants.length; i++) {
-                    route.variants[data.routeData[0].variants[i].name] = data.routeData[0].variants[i];
-                    data.routeData[0].variants[i].index = i;
-                }
+                _.each(data,function(pattern, i) {
+                    route.variants[pattern.id] = pattern;
+                    this_.loadPattern(agencyAndId, pattern.id);
+                    route.variants[pattern.id].index = i;
+                    route.variants[pattern.id].route = route.routeData;
+                });
                 if(callback && callbackTarget) {
                     callback.call(callbackTarget, route.variants);
                 }
             }
         });
-
     },
 
-    readVariantForTrip : function(tripAgency, tripId, callbackTarget, callback) {
-
-        var url = otp.config.hostname + '/' + otp.config.restService + '/transit/variantForTrip';
+    loadPattern : function(routeId, patternId) {
+        var this_ = this;
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/patterns/' + patternId ;
         $.ajax(url, {
-            data: {
-                tripAgency : tripAgency,
-                tripId : tripId
-            },
-            dataType:   'jsonp',
-
+            async: false,
             success: function(data) {
-                //console.log("vFT result:");
-                //console.log(data);
-                callback.call(callbackTarget, data);
+                this_.routes[routeId].variants[patternId]=data;
             }
         });
+    },
 
-        /*var route = this.routes[agencyAndId];
-        console.log("looking for trip "+tripId+" in "+agencyAndId);
-
-        if(!route.variants) {
-            console.log("ERROR: transitIndex.routes.["+agencyAndId+"].variants null in TransitIndex.getVariantForTrip()");
-            return;
-        }
-
-        for(var vi=0; vi<route.variants.length; vi++) {
-            var variant = route.variants[vi];
-            console.log("searching variant "+vi);
-            //console.log(variant);
-            for(var ti=0; ti<variant.trips.length; ti++) {
-                var trip = variant.trips[ti];
-                console.log(" - "+trip.id)
-                if(trip.id == tripId) return variant;
+    readVariantForTrip : function(tripAgency, routeId, tripId, callbackTarget, callback) {
+        var this_ = this;
+        var agency_routeId = tripAgency + ':' + routeId;
+        var agency_Tripid = tripAgency + ':' + tripId;
+        var route = this_.routes[agency_routeId];
+        var variantData = {};
+        // since the new index api does not provide variant/pattern for trip (yet)
+        // we have to iterate on route's patterns searching for the current trip.
+        _.each(route.variants,function(pattern) {
+            var tripIds = _.pluck(pattern.trips, 'id');
+            if (_.contains(tripIds, agency_Tripid)) {
+                variantData = pattern;
             }
-        }
-
-        console.log("cound not find trip "+tripId);
-        return null;*/
+        });
+        //console.log("vFT result:");
+        //console.log(variantData);
+        callback.call(callbackTarget, variantData);
     },
 
 
@@ -186,22 +181,20 @@ otp.core.IndexApi = otp.Class({
             startTime *= 1000;
             endTime *= 1000;
         }
-
+        /*
         var params = {
-            agency: agencyId,
-            id: stopId,
-            startTime : startTime, //new TransitIndex API uses seconds
-            endTime : endTime, // new TransitIndex API uses seconds
+            startTime : startTime,
+            endTime : endTime,
             extended : true,
-        };
+        }; */
         if(otp.config.routerId !== undefined) {
             params.routerId = otp.config.routerId;
         }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/transit/stopTimesForStop';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' +stopId +'/stoptimes';
         $.ajax(url, {
-            data:       params,
-            dataType:   'jsonp',
+            //data:       params,
+            //dataType:   'jsonp',
 
             success: function(data) {
                 callback.call(callbackTarget, data);
@@ -211,30 +204,22 @@ otp.core.IndexApi = otp.Class({
 
     loadStopsInRectangle : function(agencyId, bounds, callbackTarget, callback) {
         var params = {
-            leftUpLat : bounds.getNorthWest().lat,
-            leftUpLon : bounds.getNorthWest().lng,
-            rightDownLat : bounds.getSouthEast().lat,
-            rightDownLon : bounds.getSouthEast().lng,
-            extended : true
+            maxLat : bounds.getNorthWest().lat,
+            minLon : bounds.getNorthWest().lng,
+            minLat : bounds.getSouthEast().lat,
+            maxLon : bounds.getSouthEast().lng,
         };
-        if(agencyId !== null) {
-            params.agency = agencyId;
-        }
-        if(typeof otp.config.routerId !== 'undefined') {
-            params.routerId = otp.config.routerId;
-        }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/transit/stopsInRectangle';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops';
         $.ajax(url, {
             data:       params,
-            dataType:   'jsonp',
 
             success: function(data) {
                 callback.call(callbackTarget, data);
             }
         });
     },
-
+/* to be implemented
     loadStopsById : function(agencyId, id, callbackTarget, callback) {
         var params = {
             id : id,
@@ -280,4 +265,5 @@ otp.core.IndexApi = otp.Class({
             }
         });
     },
+    */
 });
