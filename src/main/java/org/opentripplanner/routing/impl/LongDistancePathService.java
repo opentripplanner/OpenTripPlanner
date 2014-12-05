@@ -13,20 +13,8 @@
 
 package org.opentripplanner.routing.impl;
 
-import static org.opentripplanner.routing.automata.Nonterminal.choice;
-import static org.opentripplanner.routing.automata.Nonterminal.optional;
-import static org.opentripplanner.routing.automata.Nonterminal.plus;
-import static org.opentripplanner.routing.automata.Nonterminal.seq;
-import static org.opentripplanner.routing.automata.Nonterminal.star;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
-import jj2000.j2k.NotImplementedError;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
@@ -44,10 +32,15 @@ import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static org.opentripplanner.routing.automata.Nonterminal.*;
 
 /**
  * This PathService is intended to provide faster response times when routing over longer
@@ -89,12 +82,21 @@ public class LongDistancePathService implements PathService {
 
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.routerId));
-            //options.rctx.pathParsers = new PathParser[] { new Parser() };
+            /* Use a pathparser that constrains the search to use SimpleTransfers. */
+            options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 
         LOG.debug("rreq={}", options);
-        
-        RemainingWeightHeuristic heuristic = new DefaultRemainingWeightHeuristic();
+
+        RemainingWeightHeuristic heuristic;
+        if (options.disableRemainingWeightHeuristic) {
+            heuristic = new TrivialRemainingWeightHeuristic();
+        } else if (options.modes.isTransit()) {
+           // Only use the BiDi heuristic for transit.
+            heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
+        } else {
+            heuristic = new DefaultRemainingWeightHeuristic();
+        }
         options.rctx.remainingWeightHeuristic = heuristic;
         /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see 
          * itineraries with far more transfers. We do not expect transfer limiting to improve
