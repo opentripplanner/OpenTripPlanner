@@ -217,7 +217,12 @@ public class SurfaceResource extends RoutingResource {
         // TODO why can't the renderer be static?
         return server.renderer.getResponse(tileRequest, surfA, null, renderRequest);
     }
-
+    /**
+     * Renders a raster tile for showing the difference between two TimeSurfaces
+     * 
+     * @param surfaceId The id of the first surface
+     * @param compareToSurfaceId The id of of the surface, which is compared to the first surface
+    */
     @Path("/{surfaceId}/differencetiles/{compareToSurfaceId}/{z}/{x}/{y}.png")
     @GET @Produces("image/png")
     public Response differenceTileGet(@PathParam("surfaceId") Integer surfaceId,
