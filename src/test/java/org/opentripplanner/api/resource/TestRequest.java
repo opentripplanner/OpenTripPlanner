@@ -717,7 +717,7 @@ public class TestRequest extends TestCase {
         Itinerary itinerary = response.getPlan().itinerary.get(0);
 
 /* FIXME see similar problem in testTimedTripToTripTransfer
-       
+
         // Check the ids of the first two busses
         assertEquals("751W1320", itinerary.legs.get(1).tripId);
         assertEquals("91W1350", itinerary.legs.get(3).tripId);
