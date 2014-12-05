@@ -509,12 +509,16 @@ public class GTFSPatternHopFactory {
                     Stop fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
                     Stop toStop   = currPattern.getStop(0);
                     double teleportationDistance = distanceLibrary.fastDistance(
-                            fromStop.getLat(), fromStop.getLon(), toStop.getLat(), toStop.getLon());
-                    if (teleportationDistance > 250) {
-                        LOG.error(graph.addBuilderAnnotation(new InterliningTeleport(prev.trip, (int) teleportationDistance, block.blockId)));
-                        continue SERVICE_BLOCK;
+                                        fromStop.getLat(), fromStop.getLon(), toStop.getLat(), toStop.getLon());
+                    if (teleportationDistance > 200) {
+                        // FIXME Trimet data contains a lot of these -- in their data, two trips sharing a block ID just
+                        // means that they are served by the same vehicle, not that interlining is automatically allowed.
+                        // see #1654
+                        // LOG.error(graph.addBuilderAnnotation(new InterliningTeleport(prev.trip, block.blockId, (int)teleportationDistance)));
+                        // Only skip this particular interline edge; there may be other valid ones in the block.
+                    } else {
+                        interlines.put(new P2<TripPattern>(prevPattern, currPattern), new P2<Trip>(prev.trip, curr.trip));
                     }
-                    interlines.put(new P2<TripPattern>(prevPattern, currPattern), new P2<Trip>(prev.trip, curr.trip));
                 }
                 prev = curr;
             }

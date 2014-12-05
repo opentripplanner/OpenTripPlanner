@@ -19,21 +19,21 @@ public class InterliningTeleport extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Interlining trip '%s' implies teleportation of %d meters. Skipping block '%s'.";
+    public static final String FMT = "Interlining trip '%s' on block '%s' implies teleporting %d meters.";
 
     final Trip prevTrip;
-    final int distance;
     final String blockId;
+    final int distance;
 
-    public InterliningTeleport(Trip prevTrip, int distance, String blockId){
+    public InterliningTeleport(Trip prevTrip, String blockId, int distance){
     	this.prevTrip = prevTrip;
-    	this.distance = distance;
     	this.blockId = blockId;
+    	this.distance = distance;
     }
     
     @Override
     public String getMessage() {
-        return String.format(FMT, prevTrip, distance, blockId);
+        return String.format(FMT, prevTrip, blockId, distance);
     }
 
 }
