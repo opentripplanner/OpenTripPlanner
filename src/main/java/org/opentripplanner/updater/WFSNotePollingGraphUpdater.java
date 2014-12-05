@@ -75,7 +75,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
 
-    /*
+    /**
      * Here the updater can be configured using the properties in the file 'Graph.properties'.
      * The property frequencySec is already read and used by the abstract base class.
      */
@@ -89,7 +89,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
                 frequencySec, url.toString(), featureType);
     }
 
-    /*
+    /**
      * Here the updater gets to know its parent manager to execute GraphWriterRunnables.
      */
     @Override
@@ -97,7 +97,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    /*
+    /**
      * Setup the WFS data source and add the DynamicStreetNotesSource to the graph
      */
     @Override
@@ -118,7 +118,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         LOG.info("Teardown WFS polling updater");
     }
 
-    /*
+    /**
      * The function is run periodically by the update manager.
      * The extending class should provide the getNote method. It is not implemented here
      * as the requirements for different updaters can be vastly different dependent on the data source.
@@ -151,13 +151,13 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         updaterManager.execute(new WFSGraphWriter());
     }
 
-    /*
+    /**
      * Parses a SimpleFeature and returns an Alert if the feature should create one.
      * The alert should be based on the fields specific for the specific WFS feed.
      */
     protected abstract Alert getNote(SimpleFeature feature);
 
-    /*
+    /**
      * Changes the note source to use the newly generated notes
      */
     private class WFSGraphWriter implements GraphWriterRunnable {
@@ -166,11 +166,10 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         }
     }
 
-    /*
+    /**
      * Methods for writing into notesForEdge
      * TODO: Should these be extracted into somewhere?
      */
-
     private void addNote(Edge edge, Alert note, NoteMatcher matcher) {
         if (LOG.isDebugEnabled())
             LOG.debug("Adding note {} to {} with matcher {}", note, edge, matcher);
