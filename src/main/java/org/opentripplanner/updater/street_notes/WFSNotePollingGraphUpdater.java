@@ -1,4 +1,4 @@
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.street_notes;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -22,6 +22,9 @@ import org.opentripplanner.routing.services.notes.DynamicStreetNotesSource;
 import org.opentripplanner.routing.services.notes.MatcherAndAlert;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,15 +37,13 @@ import java.util.prefs.Preferences;
 
 /**
  * A graph updater that reads a WFS-interface and updates a DynamicStreetNotesSource.
+ * Useful when reading geodata from legacy/external sources, which are not based on OSM
+ * and where data has to be matched to the street network.
+ *
  * Classes that extend this class should provide getNote which parses the WFS features
- * into notes
+ * into notes. Also the implementing classes should be added to the GraphUpdaterConfigurator
  *
- * Also the implementing classes should be added to the GraphUpdaterConfigurator
- *
- * An example implementation can be found in
- * https://github.com/hannesj/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/updater/WinkkiPollingGraphUpdater.java
- * for which http://geoserver.hel.fi/geoserver/hkr/ows?Service=wfs&Version=1.1.0&Request=GetCapabilities
- * can be used as the WFS URL.
+ * @see WinkkiPollingGraphUpdater
  *
  * @author hannesj
  */
@@ -180,10 +181,6 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Create a MatcherAndAlert, interning it if the note and matcher pair is already created. Note:
      * we use the default Object.equals() for matchers, as they are mostly already singleton
      * instances.
-     *
-     * @param noteMatcher
-     * @param note
-     * @return
      */
     private MatcherAndAlert buildMatcherAndAlert(NoteMatcher noteMatcher, Alert note) {
         T2<NoteMatcher, Alert> key = new T2<>(noteMatcher, note);
