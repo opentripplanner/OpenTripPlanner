@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FareAttribute;
 import org.opentripplanner.common.model.P2;
 
 public class FareRuleSet implements Serializable {
@@ -27,8 +28,10 @@ public class FareRuleSet implements Serializable {
     private Set<AgencyAndId> routes;
     private Set<P2<String>> originDestinations;
     private Set<String> contains;
+    private FareAttribute fareAttribute;
     
-    public FareRuleSet() {
+    public FareRuleSet(FareAttribute fareAttribute) {
+        this.fareAttribute = fareAttribute;
         routes = new HashSet<AgencyAndId>();
         originDestinations= new HashSet<P2<String>>();
         contains = new HashSet<String>();
@@ -44,6 +47,10 @@ public class FareRuleSet implements Serializable {
     
     public void addRoute(AgencyAndId route) {
         routes.add(route);
+    }
+
+    public FareAttribute getFareAttribute() {
+        return fareAttribute;
     }
 
     public boolean matches(String startZone, String endZone, Set<String> zonesVisited,

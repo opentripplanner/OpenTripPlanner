@@ -116,12 +116,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     protected HashMap<AgencyAndId, FareRuleSet> fareRules;
 
-    protected HashMap<AgencyAndId, FareAttribute> fareAttributes;
-
-    public DefaultFareServiceImpl(HashMap<AgencyAndId, FareRuleSet>   fareRules,
-                                  HashMap<AgencyAndId, FareAttribute> fareAttributes) {
+    public DefaultFareServiceImpl(HashMap<AgencyAndId, FareRuleSet> fareRules) {
         this.fareRules = fareRules;
-        this.fareAttributes = fareAttributes;
     }
 
     public static List<Ride> createRides(GraphPath path) {
@@ -165,9 +161,9 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         // we assume that all tickets use the same currency
         Currency currency = null; 
         WrappedCurrency wrappedCurrency = null;
-        if (fareAttributes.size() > 0) {
-            currency = Currency.getInstance(
-                fareAttributes.values().iterator().next().getCurrencyType());
+        if (fareRules.size() > 0) {
+            currency = Currency.getInstance(fareRules.values().iterator().next().getFareAttribute()
+                    .getCurrencyType());
             wrappedCurrency = new WrappedCurrency(currency);
         }
         float lowestCost = getLowestCost(rides);
@@ -239,13 +235,13 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long tripTime = lastRideStartTime - startTime;
         long journeyTime = lastRideEndTime - startTime;
         // find the best fare that matches this set of rides
-        for (AgencyAndId fareId : fareAttributes.keySet()) {
+        for (AgencyAndId fareId : fareRules.keySet()) {
         	// fares also don't really have an agency id, they will have the per-feed default id
             if ( ! fareId.getAgencyId().equals(feedId))
                 continue;
             FareRuleSet ruleSet = fareRules.get(fareId);
             if (ruleSet == null || ruleSet.matches(startZone, endZone, zones, routes)) {
-                FareAttribute attribute = fareAttributes.get(fareId);
+                FareAttribute attribute = fareRules.get(fareId).getFareAttribute();
                 if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                     continue;
                 }

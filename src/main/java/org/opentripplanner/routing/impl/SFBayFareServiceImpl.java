@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FareAttribute;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
@@ -29,13 +28,12 @@ import org.slf4j.LoggerFactory;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
-    public SFBayFareServiceImpl(
-            HashMap<AgencyAndId, FareRuleSet>   fareRules,
-            HashMap<AgencyAndId, FareAttribute> fareAttributes) {
-        super(fareRules, fareAttributes);
+    public SFBayFareServiceImpl(HashMap<AgencyAndId, FareRuleSet> fareRules) {
+        super(fareRules);
     }
 
     private static final long serialVersionUID = 20120229L;
+    @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(SFBayFareServiceImpl.class);
 
     public static final int SFMTA_TRANSFER_DURATION = 60 * 90;
