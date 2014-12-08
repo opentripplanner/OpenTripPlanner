@@ -217,6 +217,35 @@ public class SurfaceResource extends RoutingResource {
         // TODO why can't the renderer be static?
         return server.renderer.getResponse(tileRequest, surfA, null, renderRequest);
     }
+    /**
+     * Renders a raster tile for showing the difference between two TimeSurfaces
+     * 
+     * @param surfaceId The id of the first surface
+     * @param compareToSurfaceId The id of of the surface, which is compared to the first surface
+    */
+    @Path("/{surfaceId}/differencetiles/{compareToSurfaceId}/{z}/{x}/{y}.png")
+    @GET @Produces("image/png")
+    public Response differenceTileGet(@PathParam("surfaceId") Integer surfaceId,
+                            @PathParam("compareToSurfaceId") Integer compareTosurfaceId,
+                            @PathParam("x") int x,
+                            @PathParam("y") int y,
+                            @PathParam("z") int z) throws Exception {
+
+        Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
+        TimeSurface surfA = server.surfaceCache.get(surfaceId);
+        if (surfA == null) return badRequest("Unrecognized surface ID.");
+
+        TimeSurface surfB = server.surfaceCache.get(compareTosurfaceId);
+        if (surfB == null) return badRequest("Unrecognized surface ID.");
+
+        TileRequest tileRequest = new TileRequest(surfA.routerId, env, 256, 256);
+
+        MIMEImageFormat imageFormat = new MIMEImageFormat("image/png");
+        RenderRequest renderRequest =
+                new RenderRequest(imageFormat, Layer.DIFFERENCE, Style.DIFFERENCE, true, false);
+        // TODO why can't the renderer be static?
+        return server.renderer.getResponse(tileRequest, surfA, surfB, renderRequest);
+    }
 
     private Response badRequest(String message) {
         return Response.status(Response.Status.BAD_REQUEST).entity("Bad request: " + message).build();
