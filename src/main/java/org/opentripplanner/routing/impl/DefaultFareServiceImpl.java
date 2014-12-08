@@ -106,7 +106,7 @@ class Ride {
  * For more interesting fare structures like New York's MTA, or cities with multiple
  * feeds and inter-feed transfer rules, you get to implement your own FareService. 
  * See this thread on gtfs-changes explaining the proper interpretation of fares.txt:
- * http://groups.google.com/group/gtfs-changes/browse_thread /thread/8a4a48ae1e742517/4f81b826cb732f3b
+ * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
 public class DefaultFareServiceImpl implements FareService, Serializable {
 
