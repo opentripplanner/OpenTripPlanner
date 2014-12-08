@@ -218,7 +218,16 @@ public class SurfaceResource extends RoutingResource {
         return server.renderer.getResponse(tileRequest, surfA, null, renderRequest);
     }
     /**
-     * Renders a raster tile for showing the difference between two TimeSurfaces
+     * Renders a raster tile for showing the difference between two TimeSurfaces.
+     * This service is included as a way to provide difference tiles using existing mechanisms in OTP.
+     * TODO However, there is some room for debate around how differences are expressed in URLs.
+     * We may want a more general purpose mechanism for combining time surfaces.
+     * For example you could make a web service request to create a time surface A-B or A+B, and the server would give
+     * you an ID for that surface, and then you could use that ID anywhere a surface ID is required. Perhaps internally
+     * there would be some sort of DifferenceTimeSurface subclass that could just drop in anywhere TimeSurface is used.
+     * This approach would be more stateful but more flexible.
+     *
+     * @author hannesj
      * 
      * @param surfaceId The id of the first surface
      * @param compareToSurfaceId The id of of the surface, which is compared to the first surface
@@ -226,7 +235,7 @@ public class SurfaceResource extends RoutingResource {
     @Path("/{surfaceId}/differencetiles/{compareToSurfaceId}/{z}/{x}/{y}.png")
     @GET @Produces("image/png")
     public Response differenceTileGet(@PathParam("surfaceId") Integer surfaceId,
-                            @PathParam("compareToSurfaceId") Integer compareTosurfaceId,
+                            @PathParam("compareToSurfaceId") Integer compareToSurfaceId,
                             @PathParam("x") int x,
                             @PathParam("y") int y,
                             @PathParam("z") int z) throws Exception {
@@ -235,7 +244,7 @@ public class SurfaceResource extends RoutingResource {
         TimeSurface surfA = server.surfaceCache.get(surfaceId);
         if (surfA == null) return badRequest("Unrecognized surface ID.");
 
-        TimeSurface surfB = server.surfaceCache.get(compareTosurfaceId);
+        TimeSurface surfB = server.surfaceCache.get(compareToSurfaceId);
         if (surfB == null) return badRequest("Unrecognized surface ID.");
 
         TileRequest tileRequest = new TileRequest(surfA.routerId, env, 256, 256);
