@@ -31,9 +31,12 @@ import org.opentripplanner.analyst.core.SlippyTile;
 import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
+
 import static org.opentripplanner.api.resource.ServerInfo.Q;
+
 import org.opentripplanner.inspector.TileRenderer;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
@@ -88,9 +91,10 @@ public class GraphInspectorTileResource extends RoutingResource {
 
         // Re-use analyst
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
-        TileRequest tileRequest = new TileRequest(routerId, env, 256, 256);
+        TileRequest tileRequest = new TileRequest(env, 256, 256);
 
-        BufferedImage image = otpServer.tileRendererManager.renderTile(tileRequest, layer);
+        Router router = otpServer.getRouter(routerId);
+        BufferedImage image = router.tileRendererManager.renderTile(tileRequest, layer);
 
         MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(image.getWidth() * image.getHeight() / 4);
@@ -111,7 +115,8 @@ public class GraphInspectorTileResource extends RoutingResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public InspectorLayersList getLayers() {
 
-        InspectorLayersList layersList = new InspectorLayersList(otpServer.tileRendererManager.getRenderers());
+        Router router = otpServer.getRouter(routerId);
+        InspectorLayersList layersList = new InspectorLayersList(router.tileRendererManager.getRenderers());
         return layersList;
     }
 

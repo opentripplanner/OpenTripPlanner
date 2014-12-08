@@ -15,7 +15,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -24,7 +23,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.geotools.referencing.GeodeticCalculator;
 import org.opensphere.geometry.algorithm.ConcaveHull;
-import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -37,9 +35,8 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,15 +71,6 @@ public class SIsochrone extends RoutingResource {
     private List debugGeoms = null;
 
     private List tooFastTraversedEdgeGeoms = null;
-
-    @Context // FIXME inject Application context
-    GraphService graphService;
-
-    @Context // FIXME inject Application context
-    private SPTService sptService;
-
-    @Context // FIXME inject Application context
-    private GeometryIndex index;
 
     /** Walkspeed between user indicated position and road 3000 m/h = 0.83333 m/sec */
     public double offRoadWalkspeed = 0.8333;
@@ -238,18 +226,20 @@ public class SIsochrone extends RoutingResource {
         // TODO: OTP prefers to snap to car-roads/ways, which is not so nice, when walking,
         // and a footpath is closer by. So far there is no option to switch that off
 
+        Router router = otpServer.getRouter(routerId);
         // create the ShortestPathTree
         try {
-            sptRequestA.setRoutingContext(graphService.getGraph());
+            sptRequestA.setRoutingContext(router.graph);
         } catch (Exception e) {
             // if we get an exception here, and in particular a VertexNotFoundException,
             // then it is likely that we chose a (transit) mode without having that (transit) modes data
             LOG.debug("cannot set RoutingContext: " + e.toString());
             LOG.debug("cannot set RoutingContext: setting mode=WALK");
             sptRequestA.setMode(TraverseMode.WALK); // fall back to walk mode
-            sptRequestA.setRoutingContext(graphService.getGraph());
+            sptRequestA.setRoutingContext(router.graph);
         }
-        ShortestPathTree sptA = sptService.getShortestPathTree(sptRequestA);
+        ShortestPathTree sptA = router.sptServiceFactory.instantiate().getShortestPathTree(
+                sptRequestA);
         StreetLocation origin = (StreetLocation) sptRequestA.rctx.fromVertex;
         sptRequestA.cleanup(); // remove inserted points
 

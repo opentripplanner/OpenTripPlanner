@@ -16,9 +16,6 @@ package org.opentripplanner.analyst.core;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
-import com.google.common.collect.Iterables;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.BoundingBox;
@@ -33,6 +30,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;

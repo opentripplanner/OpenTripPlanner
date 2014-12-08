@@ -27,8 +27,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.SPTServiceFactory;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.SPTWalker;
 import org.opentripplanner.routing.spt.SPTWalker.SPTVisitor;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -53,12 +53,11 @@ public class SampleGridRenderer {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleGridRenderer.class);
 
-    private GraphService graphService;
-
+    private Graph graph;
     private SPTServiceFactory sptServiceFactory;
 
-    public SampleGridRenderer(GraphService graphService, SPTServiceFactory sptServiceFactory) {
-        this.graphService = graphService;
+    public SampleGridRenderer(Graph graph, SPTServiceFactory sptServiceFactory) {
+        this.graph = graph;
         this.sptServiceFactory = sptServiceFactory;
     }
 
@@ -78,9 +77,8 @@ public class SampleGridRenderer {
         sptRequest.worstTime = (sptRequest.dateTime + (sptRequest.arriveBy ? -spgRequest.maxTimeSec
                 - tOvershot : spgRequest.maxTimeSec + tOvershot));
         sptRequest.batch = (true);
-        sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));
-        final ShortestPathTree spt = sptServiceFactory.instantiate()
-                .getShortestPathTree(sptRequest);
+        sptRequest.setRoutingContext(graph);
+        final ShortestPathTree spt = sptServiceFactory.instantiate().getShortestPathTree(sptRequest);
 
         // 3. Create a sample grid based on the SPT.
         long t1 = System.currentTimeMillis();

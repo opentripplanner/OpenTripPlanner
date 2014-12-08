@@ -3,6 +3,7 @@ package org.opentripplanner.index;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -24,7 +25,8 @@ public class GeocoderResource {
     private final LuceneIndex index;
 
     public GeocoderResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        GraphIndex graphIndex = otpServer.graphService.getGraph(routerId).index;
+        Router router = otpServer.getRouter(routerId);
+        GraphIndex graphIndex = router.graph.index;
         synchronized (graphIndex) {
             if (graphIndex.luceneIndex == null) {
                 // Synchronously lazy-initialize the Lucene index

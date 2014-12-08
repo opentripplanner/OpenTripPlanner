@@ -2,7 +2,6 @@ package org.opentripplanner.api.resource;
 
 import java.util.List;
 
-import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,24 +13,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import com.google.common.collect.Lists;
 import org.opentripplanner.analyst.SurfaceCache;
-import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.model.TimeSurfaceShort;
 import org.opentripplanner.api.param.HourMinuteSecond;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.QueryParameter;
 import org.opentripplanner.api.param.YearMonthDay;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.Option;
 import org.opentripplanner.profile.ProfileRequest;
 import org.opentripplanner.profile.ProfileResponse;
 import org.opentripplanner.profile.ProfileRouter;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
+
+import com.google.common.collect.Lists;
 
 /**
  * A Jersey resource class which exposes OTP profile routing functionality
@@ -44,7 +41,8 @@ public class ProfileResource {
     private SurfaceCache surfaceCache;
 
     public ProfileResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        graph = otpServer.graphService.getGraph(routerId);
+        Router router = otpServer.getRouter(routerId);
+        graph = router.graph;
         surfaceCache = otpServer.surfaceCache;
     }
 
