@@ -120,7 +120,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         this.fareRules = fareRules;
     }
 
-    public static List<Ride> createRides(GraphPath path) {
+    protected List<Ride> createRides(GraphPath path) {
         List<Ride> rides = new LinkedList<Ride>();
         Ride ride = null;
         for (State state : path.states) {
@@ -147,8 +147,6 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         return rides;
     }
 
-    // TODO: Overridable classify method for rides / make rides from list<state>
-    
     @Override
     public Fare getCost(GraphPath path) {
 
@@ -180,7 +178,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         }
     }
 
-    public float getLowestCost(List<Ride> rides) {
+    protected float getLowestCost(List<Ride> rides) {
         // Dynamic algorithm to calculate fare cost.
         // Cell [i,j] holds the best (lowest) cost for a trip from rides[i] to rides[j]
         float[][] resultTable = new float[rides.size()][rides.size()];

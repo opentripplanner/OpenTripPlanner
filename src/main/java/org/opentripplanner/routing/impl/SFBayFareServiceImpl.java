@@ -47,7 +47,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
     
     @Override
-    public float getLowestCost(List<Ride> rides) {
+    protected float getLowestCost(List<Ride> rides) {
         List<Ride> bartBlock = null;
         Long sfmtaTransferIssued = null;
         Long alightedBart = null;
