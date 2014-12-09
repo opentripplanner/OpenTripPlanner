@@ -15,12 +15,11 @@ package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
-    public SFBayFareServiceImpl(Map<AgencyAndId, FareRuleSet> fareRules) {
+    public SFBayFareServiceImpl(Collection<FareRuleSet> fareRules) {
         super(fareRules);
     }
 

@@ -14,11 +14,11 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -116,9 +116,9 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
 
-    protected Map<AgencyAndId, FareRuleSet> fareRules;
+    protected Collection<FareRuleSet> fareRules;
 
-    public DefaultFareServiceImpl(Map<AgencyAndId, FareRuleSet> fareRules) {
+    public DefaultFareServiceImpl(Collection<FareRuleSet> fareRules) {
         this.fareRules = fareRules;
     }
 
@@ -163,7 +163,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         Currency currency = null; 
         WrappedCurrency wrappedCurrency = null;
         if (fareRules.size() > 0) {
-            currency = Currency.getInstance(fareRules.values().iterator().next().getFareAttribute()
+            currency = Currency.getInstance(fareRules.iterator().next().getFareAttribute()
                     .getCurrencyType());
             wrappedCurrency = new WrappedCurrency(currency);
         }
@@ -238,14 +238,14 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long tripTime = lastRideStartTime - startTime;
         long journeyTime = lastRideEndTime - startTime;
         // find the best fare that matches this set of rides
-        for (AgencyAndId fareId : fareRules.keySet()) {
-            FareRuleSet ruleSet = fareRules.get(fareId);
+        for (FareRuleSet ruleSet : fareRules) {
+            FareAttribute attribute = ruleSet.getFareAttribute();
             // fares also don't really have an agency id, they will have the per-feed default id
             // check only if the fare is not mapped to an agency
-            if (!ruleSet.hasAgencyDefined() && !fareId.getAgencyId().equals(feedId))
+            if (!ruleSet.hasAgencyDefined() && !attribute.getId().getAgencyId().equals(feedId))
                 continue;
-            if (ruleSet == null || ruleSet.matches(agencies, startZone, endZone, zones, routes)) {
-                FareAttribute attribute = fareRules.get(fareId).getFareAttribute();
+            if (ruleSet.matches(agencies, startZone, endZone, zones, routes)) {
+                // TODO Maybe move the code below in FareRuleSet::matches() ?
                 if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                     continue;
                 }

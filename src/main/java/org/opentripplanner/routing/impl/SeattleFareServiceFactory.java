@@ -65,7 +65,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         // But zone are not defined in the GTFS data
         addMissingFare(fareRules, 2.00f, SeattleFareServiceImpl.CT_CT_AGENCY_ID);
 
-        return new SeattleFareServiceImpl(fareRules);
+        return new SeattleFareServiceImpl(fareRules.values());
     }
 
     private static int internalFareId = 0;
@@ -81,7 +81,6 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         internalFareId++;
         FareRuleSet mFareRules = new FareRuleSet(mFare);
         mFareRules.setAgency(agencyId);
-        mFareRules.setHasRule(true);
         fareRules.put(mFare.getId(), mFareRules);
     }
 

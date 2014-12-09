@@ -15,10 +15,9 @@ package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +49,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(SeattleFareServiceImpl.class);
 
-    public SeattleFareServiceImpl(Map<AgencyAndId, FareRuleSet> fareRules) {
+    public SeattleFareServiceImpl(Collection<FareRuleSet> fareRules) {
         super(fareRules);
     }
 

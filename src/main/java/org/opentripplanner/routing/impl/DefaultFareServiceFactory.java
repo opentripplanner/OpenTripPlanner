@@ -42,7 +42,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     protected Map<AgencyAndId, FareRuleSet> fareRules = new HashMap<AgencyAndId, FareRuleSet>();
 
     public FareService makeFareService() {
-        return new DefaultFareServiceImpl(fareRules);
+        return new DefaultFareServiceImpl(fareRules.values());
     }
 
     @Override
@@ -81,7 +81,6 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
                 LOG.error("Inexistant fare ID in fare rule: " + id);
                 continue;
             }
-            fareRule.setHasRule(true);
             String contains = rule.getContainsId();
             if (contains != null) {
                 fareRule.addContains(contains);

@@ -29,7 +29,6 @@ public class FareRuleSet implements Serializable {
     private Set<AgencyAndId> routes;
     private Set<P2<String>> originDestinations;
     private Set<String> contains;
-    private boolean hasRule = false;
     private FareAttribute fareAttribute;
     
     public FareRuleSet(FareAttribute fareAttribute) {
@@ -56,15 +55,6 @@ public class FareRuleSet implements Serializable {
         routes.add(route);
     }
 
-    /**
-     * @param hasRule Set that this rule set has at least one rule (even an empty one). Since the
-     *        semantics of having no rules and having one empty rule is different, we need this flag
-     *        as both will map to empty sets (routes, originDest, contains).
-     */
-    public void setHasRule(boolean hasRule) {
-        this.hasRule = hasRule;
-    }
-
     public FareAttribute getFareAttribute() {
         return fareAttribute;
     }
@@ -75,10 +65,6 @@ public class FareRuleSet implements Serializable {
 
     public boolean matches(Set<String> agencies, String startZone, String endZone, Set<String> zonesVisited,
             Set<AgencyAndId> routesVisited) {
-        //an empty rule should not match
-        if (!hasRule)
-            return false;
-
         //check for matching agency
         if (agency != null) {
             if (agencies.size() != 1 || !agencies.contains(agency))
