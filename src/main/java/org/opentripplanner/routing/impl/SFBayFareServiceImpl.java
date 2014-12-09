@@ -15,9 +15,9 @@ package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
-    public SFBayFareServiceImpl(HashMap<AgencyAndId, FareRuleSet> fareRules) {
+    public SFBayFareServiceImpl(Map<AgencyAndId, FareRuleSet> fareRules) {
         super(fareRules);
     }
 

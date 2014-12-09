@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
@@ -38,7 +39,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
 
-    protected HashMap<AgencyAndId, FareRuleSet> fareRules = new HashMap<AgencyAndId, FareRuleSet>();
+    protected Map<AgencyAndId, FareRuleSet> fareRules = new HashMap<AgencyAndId, FareRuleSet>();
 
     public FareService makeFareService() {
         return new DefaultFareServiceImpl(fareRules);
