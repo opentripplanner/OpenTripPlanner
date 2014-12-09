@@ -715,6 +715,9 @@ public class PointSet implements Serializable{
         jgen.writeEndObject();
     }
 
+    /**
+     * Get a subset of this point set containing only the specified point IDs.
+     */
     public PointSet slice(List<String> ids) {
 
         PointSet ret = new PointSet(ids.size());
