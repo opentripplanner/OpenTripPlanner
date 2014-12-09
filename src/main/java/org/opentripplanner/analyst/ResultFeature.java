@@ -46,9 +46,19 @@ public class ResultFeature implements Serializable{
         }
     }
 
-    public Long sum(Integer timeLimit) {
+    /**
+     * Sum the values of all categories at all time limits within the bounds of the search.
+     */
+    public long sum () {
+        return sum(null);
+    }
+    
+    /**
+     * Sum the values of all categories up to the time limit specified (in seconds).
+     */
+    public long sum(Integer timeLimit) {
 
-        Long value = 0l;
+        long value = 0l;
 
         int maxMinutes;
 
