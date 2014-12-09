@@ -11,7 +11,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.analyst.ResultFeature;
+import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
@@ -168,7 +168,7 @@ public class SurfaceResource extends RoutingResource {
         Graph gg = server.graphService.getGraph(surf.routerId);
         SampleSet samples = pset.getSampleSet( gg );
         
-        final ResultFeature indicator = new ResultFeature(samples, surf);
+        final ResultSet indicator = new ResultSet(samples, surf);
         if (indicator == null) return badServer("Could not compute indicator as requested.");
         return Response.ok().entity(new StreamingOutput() {
             @Override

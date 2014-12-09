@@ -15,20 +15,20 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ResultFeature implements Serializable{
+public class ResultSet implements Serializable{
 
     private static final long serialVersionUID = -6723127825189535112L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ResultFeature.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ResultSet.class);
 
     public String id;
     public Map<String,Histogram> histograms = new HashMap<String,Histogram>();
 
-    public ResultFeature() {
+    public ResultSet() {
 
     }
 
-    public ResultFeature(SampleSet samples, TimeSurface surface){
+    public ResultSet(SampleSet samples, TimeSurface surface){
         id = samples.pset.id + "_" + surface.id;
 
         PointSet targets = samples.pset;
