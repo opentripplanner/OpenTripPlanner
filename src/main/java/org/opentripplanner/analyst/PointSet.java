@@ -359,7 +359,7 @@ public class PointSet implements Serializable{
                 }
             }
         } catch (Exception ex) {			
-            LOG.error("GeoJSON parsing failure.");
+            LOG.error("GeoJSON parsing failure: {}", ex.toString());
             return null;
         }
         return ret;
@@ -409,8 +409,7 @@ public class PointSet implements Serializable{
     }
 
     /**
-<<<<<<< HEAD
-     * Adds a grpah service to allow for auto creation of SampleSets for a given
+     * Adds a graph service to allow for auto creation of SampleSets for a given
      * graph
      * 
      * @param reference
