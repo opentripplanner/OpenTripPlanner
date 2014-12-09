@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -39,26 +40,30 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
          */
 
         // EOS - Seattle Street Car
-        // Data within King Metro GTFS
         // http://www.seattlestreetcar.org/slu.htm
-        addMissingFare(fareRules, 2.50f, SeattleFareServiceImpl.EOS_AGENCY_ID);
+        // Data within King Metro GTFS
+        addMissingFare(fareRules, 2.50f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
 
         // Sound Transit Express Bus
-        // Data within King Metro GTFS and Pierce Transit GTFS
         // www.soundtransit.org/Fares-and-Passes/ST-Express-bus-fares
-        addMissingFare(fareRules, 2.50f, SeattleFareServiceImpl.ST_AGENCY_ID);
+        // Data within King Metro GTFS
+        addMissingFare(fareRules, 2.50f, SeattleFareServiceImpl.KCM_ST_AGENCY_ID);
+        // Data within Pierce Transit GTFS
+        // TODO Some lines crosses zone, fare should be higher in this case
+        // but we do not have zone info for each stops
+        addMissingFare(fareRules, 2.50f, SeattleFareServiceImpl.PT_ST_AGENCY_ID);
 
         // Pierce Transit
-        // Data within Pierce Transit GTFS
         // http://www.piercetransit.org/fares/
-        addMissingFare(fareRules, 2.00f, SeattleFareServiceImpl.PT_AGENCY_ID);
+        // Data within Pierce Transit GTFS
+        addMissingFare(fareRules, 2.00f, SeattleFareServiceImpl.PT_PT_AGENCY_ID);
 
         // Community Transit
-        // Data within Community Transit GTFS
         // http://www.communitytransit.org/reducedfare/
+        // Data within Community Transit GTFS
         // TODO Higher fare for buses Seattle area depending on zone.
         // But zone are not defined in the GTFS data
-        addMissingFare(fareRules, 2.00f, SeattleFareServiceImpl.COMMUNITY_AGENCY_ID);
+        addMissingFare(fareRules, 2.00f, SeattleFareServiceImpl.CT_CT_AGENCY_ID);
 
         return new SeattleFareServiceImpl(fareRules);
     }
@@ -71,7 +76,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         mFare.setTransferDuration(SeattleFareServiceImpl.TRANSFER_DURATION_SEC);
         mFare.setCurrencyType("USD");
         mFare.setPrice(price);
-        mFare.setId(new AgencyAndId(SeattleFareServiceImpl.EOS_AGENCY_ID, "internal_"
+        mFare.setId(new AgencyAndId(SeattleFareServiceImpl.KCM_EOS_AGENCY_ID, "internal_"
                 + internalFareId));
         internalFareId++;
         FareRuleSet mFareRules = new FareRuleSet(mFare);
@@ -82,39 +87,49 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
 
     @Override
     public void setDao(GtfsRelationalDao dao) {
-
-        String mainAgencyId = null;
+        /*
+         * Sort all fares based on their agency. TODO With the new GTFS library, this code may be
+         * removed. We should simply read fare attribute "agency" field (extention).
+         */
+        Map<String, Set<FareAttribute>> fareAttributesPerAgency = new HashMap<String, Set<FareAttribute>>();
+        Map<String, Set<FareRule>> fareRulesPerAgency = new HashMap<String, Set<FareRule>>();
         for (FareAttribute fareAttribute : dao.getAllFareAttributes()) {
-            mainAgencyId = fareAttribute.getId().getAgencyId();
-            break;
-        }
-
-        Set<FareAttribute> filteredFareAttributes = new HashSet<FareAttribute>();
-        Set<FareRule> filteredFareRules = new HashSet<FareRule>();
-        String fareAgencyId = null;
-        if (SeattleFareServiceImpl.EOS_AGENCY_ID.equals(mainAgencyId)) {
-            // For KCM, only read KCM fares
-            // TODO Remove with new GTFS lib, read fareAttribute.agency_id
-            for (FareAttribute fareAttribute : dao.getAllFareAttributes()) {
+            String fareAgencyId;
+            String mainAgencyId = fareAttribute.getId().getAgencyId();
+            if (SeattleFareServiceImpl.KCM_EOS_AGENCY_ID.equals(mainAgencyId)) {
+                // Split fare according to agency
                 int id = Integer.parseInt(fareAttribute.getId().getId());
                 if (id < 10) {
+                    fareAgencyId = SeattleFareServiceImpl.KCM_KCM_AGENCY_ID;
                     fareAttribute.setTransferDuration(SeattleFareServiceImpl.TRANSFER_DURATION_SEC);
-                    filteredFareAttributes.add(fareAttribute);
-                } // ST fare, skipped
+                } else {
+                    fareAgencyId = SeattleFareServiceImpl.KCM_ST_AGENCY_ID;
+                    // TODO Check this for ST
+                    fareAttribute.setTransferDuration(SeattleFareServiceImpl.TRANSFER_DURATION_SEC);
+                }
+                fareAgencyId = SeattleFareServiceImpl.KCM_KCM_AGENCY_ID;
+            } else {
+                fareAgencyId = mainAgencyId;
             }
-            fareAgencyId = SeattleFareServiceImpl.KCM_AGENCY_ID;
-        } else {
-            filteredFareAttributes.addAll(dao.getAllFareAttributes());
-            fareAgencyId = mainAgencyId;
+            Set<FareAttribute> fareAttributes = fareAttributesPerAgency.get(fareAgencyId);
+            if (fareAttributes == null) {
+                fareAttributes = new HashSet<>();
+                fareAttributesPerAgency.put(fareAgencyId, fareAttributes);
+            }
+            fareAttributes.add(fareAttribute);
+            for (FareRule fareRule : dao.getFareRulesForFareAttribute(fareAttribute)) {
+                Set<FareRule> fareRules = fareRulesPerAgency.get(fareAgencyId);
+                if (fareRules == null) {
+                    fareRules = new HashSet<>();
+                    fareRulesPerAgency.put(fareAgencyId, fareRules);
+                }
+                fareRules.add(fareRule);
+            }
         }
 
-        // Only process rules from filtered fares
-        for (FareRule fareRule : dao.getAllFareRules()) {
-            if (filteredFareAttributes.contains(fareRule.getFare())) {
-                filteredFareRules.add(fareRule);
-            }
+        for (Map.Entry<String, Set<FareAttribute>> kv : fareAttributesPerAgency.entrySet()) {
+            super.fillFareRules(kv.getKey(), kv.getValue(), fareRulesPerAgency.get(kv.getKey()),
+                    fareRules);
         }
-
-        super.fillFareRules(fareAgencyId, filteredFareAttributes, filteredFareRules, fareRules);
     }
 }

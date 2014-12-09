@@ -27,16 +27,16 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
     private static final long serialVersionUID = 1L;
 
     // Agency IDs defined in King Metro Transit GTFS
-    public static final String EOS_AGENCY_ID = "EOS";
+    public static final String KCM_EOS_AGENCY_ID = "EOS";
 
-    public static final String KCM_AGENCY_ID = "KCM";
+    public static final String KCM_KCM_AGENCY_ID = "KCM";
 
-    public static final String ST_AGENCY_ID = "ST";
+    public static final String KCM_ST_AGENCY_ID = "ST";
 
-    public static final String KMD_AGENCY_ID = "KMD";
+    public static final String KCM_KMD_AGENCY_ID = "KMD";
 
     // Agency IDs defined in Pierce Transit GTFS
-    public static final String PT_AGENCY_ID = "3";
+    public static final String PT_PT_AGENCY_ID = "3";
 
     public static final String PT_ST_AGENCY_ID = "40";
 
@@ -44,7 +44,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
     public static final String ST_ST_AGENCY_ID = "SoundTransit";
 
     // Agency IDs defined in Community Transit GTFS
-    public static final String COMMUNITY_AGENCY_ID = "29";
+    public static final String CT_CT_AGENCY_ID = "29";
 
     public static final int TRANSFER_DURATION_SEC = 7200;
 
@@ -59,10 +59,10 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
 
         // Remap agency ID, since Sound Transit Bus is split in 3 different GTFS
         // The master one has to match the one used for fares in SeattleFareServiceFactory
-        for (Ride ride : rides) {
-            if (ride.agency.equals(PT_ST_AGENCY_ID) || ride.agency.equals(ST_ST_AGENCY_ID))
-                ride.agency = ST_AGENCY_ID;
-        }
+        // for (Ride ride : rides) {
+        // if (ride.agency.equals(PT_ST_AGENCY_ID) || ride.agency.equals(ST_ST_AGENCY_ID))
+        // ride.agency = ST_AGENCY_ID;
+        // }
 
         // Split rides per agency
         List<List<Ride>> ridesPerAgency = new ArrayList<List<Ride>>();
