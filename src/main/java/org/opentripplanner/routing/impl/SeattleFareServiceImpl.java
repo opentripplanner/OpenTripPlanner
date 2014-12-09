@@ -56,13 +56,6 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
     @Override
     protected float getLowestCost(List<Ride> rides) {
 
-        // Remap agency ID, since Sound Transit Bus is split in 3 different GTFS
-        // The master one has to match the one used for fares in SeattleFareServiceFactory
-        // for (Ride ride : rides) {
-        // if (ride.agency.equals(PT_ST_AGENCY_ID) || ride.agency.equals(ST_ST_AGENCY_ID))
-        // ride.agency = ST_AGENCY_ID;
-        // }
-
         // Split rides per agency
         List<List<Ride>> ridesPerAgency = new ArrayList<List<Ride>>();
         String lastAgency = null;
