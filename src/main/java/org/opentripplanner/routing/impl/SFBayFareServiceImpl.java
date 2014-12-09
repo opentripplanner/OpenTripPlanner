@@ -22,13 +22,14 @@ import java.util.Set;
 
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
-    public SFBayFareServiceImpl(Collection<FareRuleSet> fareRules) {
-        super(fareRules);
+    public SFBayFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
+        addFareRules(FareType.regular, regularFareRules);
     }
 
     private static final long serialVersionUID = 20120229L;
@@ -46,7 +47,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
     
     @Override
-    protected float getLowestCost(List<Ride> rides) {
+    protected float getLowestCost(List<Ride> rides, Collection<FareRuleSet> fareRules) {
         List<Ride> bartBlock = null;
         Long sfmtaTransferIssued = null;
         Long alightedBart = null;
@@ -65,7 +66,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
             } else { // non-BART agency
                 if (bartBlock != null) {
                     // finalize outstanding bart block, if any
-                    cost += calculateCost(bartBlock);
+                    cost += calculateCost(bartBlock, fareRules);
                     bartBlock = null;
                 }
                 if (agencyId.equals("SFMTA")) {
@@ -98,7 +99,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
         }
         if (bartBlock != null) {
             // finalize outstanding bart block, if any
-            cost += calculateCost(bartBlock);
+            cost += calculateCost(bartBlock, fareRules);
         }        
         return cost;
     }

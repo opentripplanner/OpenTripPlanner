@@ -23,6 +23,7 @@ import org.onebusaway.gtfs.model.FareRule;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
@@ -39,15 +40,17 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
 
-    protected Map<AgencyAndId, FareRuleSet> fareRules = new HashMap<AgencyAndId, FareRuleSet>();
+    protected Map<AgencyAndId, FareRuleSet> regularFareRules = new HashMap<AgencyAndId, FareRuleSet>();
 
     public FareService makeFareService() {
-        return new DefaultFareServiceImpl(fareRules.values());
+        DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
+        fareService.addFareRules(FareType.regular, regularFareRules.values());
+        return fareService;
     }
 
     @Override
     public void setDao(GtfsRelationalDao dao) {
-        fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), fareRules);
+        fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), regularFareRules);
     }
 
     protected void fillFareRules(String agencyId, Collection<FareAttribute> fareAttributes,

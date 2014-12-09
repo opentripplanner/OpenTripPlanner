@@ -14,11 +14,14 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -116,10 +119,15 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
 
-    protected Collection<FareRuleSet> fareRules;
+    /** For each fare type (regular, student, etc...) the collection of rules that apply. */
+    protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
 
-    public DefaultFareServiceImpl(Collection<FareRuleSet> fareRules) {
-        this.fareRules = fareRules;
+    public DefaultFareServiceImpl() {
+        fareRulesPerType = new HashMap<>();
+    }
+
+    public void addFareRules(FareType fareType, Collection<FareRuleSet> fareRules) {
+        fareRulesPerType.put(fareType, new ArrayList<>(fareRules));
     }
 
     protected List<Ride> createRides(GraphPath path) {
@@ -158,30 +166,38 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         if (rides.size() == 0) {
             return null;
         }
-        // pick up a random currency from fareAttributes, 
-        // we assume that all tickets use the same currency
-        Currency currency = null; 
-        WrappedCurrency wrappedCurrency = null;
-        if (fareRules.size() > 0) {
-            currency = Currency.getInstance(fareRules.iterator().next().getFareAttribute()
-                    .getCurrencyType());
-            wrappedCurrency = new WrappedCurrency(currency);
+
+        Fare fare = new Fare();
+        boolean hasFare = false;
+        for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
+            FareType fareType = kv.getKey();
+            Collection<FareRuleSet> fareRules = kv.getValue();
+
+            // pick up a random currency from fareAttributes,
+            // we assume that all tickets use the same currency
+            Currency currency = null;
+            WrappedCurrency wrappedCurrency = null;
+            if (fareRules.size() > 0) {
+                currency = Currency.getInstance(fareRules.iterator().next().getFareAttribute()
+                        .getCurrencyType());
+                wrappedCurrency = new WrappedCurrency(currency);
+            }
+
+            float lowestCost = getLowestCost(rides, fareRules);
+
+            if (lowestCost != Float.POSITIVE_INFINITY) {
+                int fractionDigits = 2;
+                if (currency != null)
+                    fractionDigits = currency.getDefaultFractionDigits();
+                int cents = (int) Math.round(lowestCost * Math.pow(10, fractionDigits));
+                fare.addFare(fareType, wrappedCurrency, cents);
+                hasFare = true;
+            }
         }
-        float lowestCost = getLowestCost(rides);
-        if (lowestCost != Float.POSITIVE_INFINITY) {
-            int fractionDigits = 2;
-            if (currency != null)
-                fractionDigits = currency.getDefaultFractionDigits();
-            int cents = (int) Math.round(lowestCost * Math.pow(10, fractionDigits));
-            Fare fare = new Fare();
-            fare.addFare(FareType.regular, wrappedCurrency, cents);
-            return fare;
-        } else {
-            return null;
-        }
+        return hasFare ? fare : null;
     }
 
-    protected float getLowestCost(List<Ride> rides) {
+    protected float getLowestCost(List<Ride> rides, Collection<FareRuleSet> fareRules) {
         // Dynamic algorithm to calculate fare cost.
         // Cell [i,j] holds the best (lowest) cost for a trip from rides[i] to rides[j]
         float[][] resultTable = new float[rides.size()][rides.size()];
@@ -189,7 +205,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         for (int i = 0; i < rides.size(); i++) {
             // each diagonal
             for (int j = 0; j < rides.size() - i; j++) {
-                float cost = calculateCost(rides.subList(j, j + i + 1));
+                float cost = calculateCost(rides.subList(j, j + i + 1), fareRules);
                 if (cost < 0) {
                     LOG.error("negative cost for a ride sequence");
                     cost = Float.POSITIVE_INFINITY;
@@ -205,7 +221,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         return resultTable[0][rides.size() - 1];
     }
 
-    protected float calculateCost(List<Ride> rides) {
+    protected float calculateCost(List<Ride> rides, Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
         Set<String> agencies = new HashSet<String>();

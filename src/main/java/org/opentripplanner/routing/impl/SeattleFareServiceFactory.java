@@ -42,30 +42,32 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         // EOS - Seattle Street Car
         // http://www.seattlestreetcar.org/slu.htm
         // Data within King Metro GTFS
-        addMissingFare(fareRules, 2.50f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
+        addMissingFare(regularFareRules, 2.50f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
 
         // Sound Transit Express Bus
         // www.soundtransit.org/Fares-and-Passes/ST-Express-bus-fares
         // Data within King Metro GTFS
-        addMissingFare(fareRules, 2.50f, SeattleFareServiceImpl.KCM_ST_AGENCY_ID);
+        addMissingFare(regularFareRules, 2.50f, SeattleFareServiceImpl.KCM_ST_AGENCY_ID);
         // Data within Pierce Transit GTFS
         // TODO Some lines crosses zone, fare should be higher in this case
         // but we do not have zone info for each stops
-        addMissingFare(fareRules, 2.50f, SeattleFareServiceImpl.PT_ST_AGENCY_ID);
+        addMissingFare(regularFareRules, 2.50f, SeattleFareServiceImpl.PT_ST_AGENCY_ID);
 
         // Pierce Transit
         // http://www.piercetransit.org/fares/
         // Data within Pierce Transit GTFS
-        addMissingFare(fareRules, 2.00f, SeattleFareServiceImpl.PT_PT_AGENCY_ID);
+        addMissingFare(regularFareRules, 2.00f, SeattleFareServiceImpl.PT_PT_AGENCY_ID);
 
         // Community Transit
         // http://www.communitytransit.org/reducedfare/
         // Data within Community Transit GTFS
         // TODO Higher fare for buses Seattle area depending on zone.
         // But zone are not defined in the GTFS data
-        addMissingFare(fareRules, 2.00f, SeattleFareServiceImpl.CT_CT_AGENCY_ID);
+        addMissingFare(regularFareRules, 2.00f, SeattleFareServiceImpl.CT_CT_AGENCY_ID);
 
-        return new SeattleFareServiceImpl(fareRules.values());
+        // TODO Add reduced fares
+
+        return new SeattleFareServiceImpl(regularFareRules.values());
     }
 
     private static int internalFareId = 0;
@@ -128,7 +130,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
 
         for (Map.Entry<String, Set<FareAttribute>> kv : fareAttributesPerAgency.entrySet()) {
             super.fillFareRules(kv.getKey(), kv.getValue(), fareRulesPerAgency.get(kv.getKey()),
-                    fareRules);
+                    regularFareRules);
         }
     }
 }

@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +50,13 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(SeattleFareServiceImpl.class);
 
-    public SeattleFareServiceImpl(Collection<FareRuleSet> fareRules) {
-        super(fareRules);
+    public SeattleFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
+        super();
+        addFareRules(FareType.regular, regularFareRules);
     }
 
     @Override
-    protected float getLowestCost(List<Ride> rides) {
+    protected float getLowestCost(List<Ride> rides, Collection<FareRuleSet> fareRules) {
 
         // Split rides per agency
         List<List<Ride>> ridesPerAgency = new ArrayList<List<Ride>>();
@@ -81,7 +83,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
         for (List<Ride> ridesForAgency : ridesPerAgency) {
 
             long startSec = ridesForAgency.get(0).startTime; // seconds
-            float costForAgency = super.getLowestCost(ridesForAgency);
+            float costForAgency = super.getLowestCost(ridesForAgency, fareRules);
             LOG.info("Agency {} cost is {}", ridesForAgency.get(0).agency, costForAgency);
 
             // Check for transfer
