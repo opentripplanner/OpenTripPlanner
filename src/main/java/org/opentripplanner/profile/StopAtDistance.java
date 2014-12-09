@@ -29,7 +29,8 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     public StopAtDistance (State state) {
         this.state = state;
         etime = (int) state.getElapsedTimeSeconds();
-        mode = state.getNonTransitMode(); // not sure if this is reliable, reset in caller.
+        /* This mode is not reliable for drive to transit (which ends with walking), reset in caller. */
+        mode = state.getNonTransitMode();
         if (state.getVertex() instanceof TransitStop) {
             TransitStop tstop = (TransitStop) state.getVertex();
             stop = state.getOptions().rctx.graph.index.stopClusterForStop.get(tstop.getStop());

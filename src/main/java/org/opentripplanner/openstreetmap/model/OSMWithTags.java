@@ -289,4 +289,12 @@ public class OSMWithTags {
                 && (parkingType != null && parkingType.contains("park_and_ride"))
                 || (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"));
     }
+
+    /**
+     * @return True if this node / area is a bike parking.
+     */
+    public boolean isBikeParking() {
+        return isTag("amenity", "bicycle_parking") && !isTag("access", "private")
+                && !isTag("access", "no");
+    }
 }

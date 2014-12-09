@@ -18,21 +18,40 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.opentripplanner.routing.bike_park.BikePark;
+
 public class BikeRentalStationService implements Serializable {
     private static final long serialVersionUID = -1288992939159246764L;
 
-    private Set<BikeRentalStation> stations = new HashSet<BikeRentalStation>();
+    private Set<BikeRentalStation> bikeRentalStations = new HashSet<BikeRentalStation>();
 
-    public Collection<BikeRentalStation> getStations() {
-        return stations;
+    private Set<BikePark> bikeParks = new HashSet<BikePark>();
+
+    public Collection<BikeRentalStation> getBikeRentalStations() {
+        return bikeRentalStations;
     }
-    
-    public void addStation(BikeRentalStation station) {
-        stations.remove(station);
-        stations.add(station);
+
+    public void addBikeRentalStation(BikeRentalStation bikeRentalStation) {
+        // Remove old reference first, as adding will be a no-op if already present
+        bikeRentalStations.remove(bikeRentalStation);
+        bikeRentalStations.add(bikeRentalStation);
     }
-    
-    public void removeStation(BikeRentalStation station) {
-        stations.remove(station);
+
+    public void removeBikeRentalStation(BikeRentalStation bikeRentalStation) {
+        bikeRentalStations.remove(bikeRentalStation);
+    }
+
+    public Collection<BikePark> getBikeParks() {
+        return bikeParks;
+    }
+
+    public void addBikePark(BikePark bikePark) {
+        // Remove old reference first, as adding will be a no-op if already present
+        bikeParks.remove(bikePark);
+        bikeParks.add(bikePark);
+    }
+
+    public void removeBikePark(BikePark bikePark) {
+        bikeParks.remove(bikePark);
     }
 }

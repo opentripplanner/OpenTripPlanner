@@ -16,6 +16,8 @@ package org.opentripplanner.routing.impl;
 import java.util.Collections;
 import java.util.List;
 
+import jj2000.j2k.NotImplementedError;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -26,19 +28,24 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 public class TrivialPathServiceImpl implements PathService {
 
     GraphService graphService;
-    SPTService sptService;
+    SPTServiceFactory sptServiceFactory;
 
-    public TrivialPathServiceImpl(GraphService graphService, SPTService sptService) {
+    public TrivialPathServiceImpl(GraphService graphService, SPTServiceFactory sptServiceFactory) {
         this.graphService = graphService;
-        this.sptService = sptService;
+        this.sptServiceFactory = sptServiceFactory;
     }
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
-        ShortestPathTree spt = sptService.getShortestPathTree(options);
+        ShortestPathTree spt = sptServiceFactory.instantiate().getShortestPathTree(options);
         if (spt == null) {
             return Collections.emptyList();
         }
         return spt.getPaths();
     }
+
+	@Override
+	public void setSPTVisitor(SPTVisitor vis) {
+		throw new NotImplementedError();
+	}
 }

@@ -53,38 +53,63 @@ public class ProfileResource {
     public Response profileRoute (
             @QueryParam("from")  LatLon from,
             @QueryParam("to")    LatLon to,
-            @QueryParam("analyst")    @DefaultValue("false") boolean analyst,
-            @QueryParam("date")       @DefaultValue("today") YearMonthDay date,
-            @QueryParam("startTime")  @DefaultValue("07:00") HourMinuteSecond fromTime,
-            @QueryParam("endTime")    @DefaultValue("09:00") HourMinuteSecond toTime,
-            @QueryParam("walkSpeed")  @DefaultValue("1.4")   float walkSpeed, // m/sec
-            @QueryParam("bikeSpeed")  @DefaultValue("4.1")   float bikeSpeed, // m/sec
-            @QueryParam("streetTime") @DefaultValue("90")    int streetTime,  // max minutes to reach destination with no transit
-            @QueryParam("accessTime") @DefaultValue("15")    int accessTime,  // max minutes to reach transit
-            @QueryParam("orderBy")    @DefaultValue("AVG")   Option.SortOrder orderBy,
-            @QueryParam("limit")      @DefaultValue("10")    int limit,
-            @QueryParam("modes")      @DefaultValue("WALK,TRANSIT") TraverseModeSet modes)
+            @QueryParam("analyst")      @DefaultValue("false") boolean analyst,
+            @QueryParam("date")         @DefaultValue("today") YearMonthDay date,
+            @QueryParam("startTime")    @DefaultValue("07:00") HourMinuteSecond fromTime,
+            @QueryParam("endTime")      @DefaultValue("09:00") HourMinuteSecond toTime,
+            @QueryParam("walkSpeed")    @DefaultValue("1.4")   float walkSpeed, // m/sec
+            @QueryParam("bikeSpeed")    @DefaultValue("4.1")   float bikeSpeed, // m/sec
+            @QueryParam("carSpeed")     @DefaultValue("20")    float carSpeed,  // m/sec
+            @QueryParam("streetTime")   @DefaultValue("90")    int streetTime,  // max minutes to reach destination WITHOUT transit
+            @QueryParam("maxWalkTime")  @DefaultValue("15")    int maxWalkTime, // max minutes to reach transit on foot
+            @QueryParam("maxCarTime")   @DefaultValue("30")    int maxCarTime,
+            @QueryParam("maxBikeTime")  @DefaultValue("20")    int maxBikeTime,
+            @QueryParam("minCarTime")   @DefaultValue("1")     int minCarTime,
+            @QueryParam("minBikeTime")  @DefaultValue("1")     int minBikeTime,
+            @QueryParam("orderBy")      @DefaultValue("AVG")   Option.SortOrder orderBy,
+            @QueryParam("limit")        @DefaultValue("10")    int limit,
+            @QueryParam("suboptimal")   @DefaultValue("5")     int suboptimalMinutes,
+            @QueryParam("accessModes")  @DefaultValue("WALK,BICYCLE") TraverseModeSet accessModes,
+            @QueryParam("egressModes")  @DefaultValue("WALK")         TraverseModeSet egressModes,
+            @QueryParam("directModes")  @DefaultValue("WALK,BICYCLE") TraverseModeSet directModes,
+            @QueryParam("transitModes") @DefaultValue("TRANSIT")      TraverseModeSet transitModes)
             throws Exception {
 
         QueryParameter.checkRangeInclusive(limit, 0, Integer.MAX_VALUE);
-        QueryParameter.checkRangeInclusive(walkSpeed, 0, 7);
-        QueryParameter.checkRangeInclusive(bikeSpeed, 0, 21);
-        QueryParameter.checkRangeInclusive(streetTime, 1, 480);
-        QueryParameter.checkRangeInclusive(accessTime, 1, 480);
+        QueryParameter.checkRangeInclusive(walkSpeed, 1, 7);
+        QueryParameter.checkRangeInclusive(bikeSpeed, 1, 21);
+        QueryParameter.checkRangeInclusive(carSpeed,  1, 36);
+        QueryParameter.checkRangeInclusive(streetTime,  1, 480);
+        QueryParameter.checkRangeInclusive(maxWalkTime, 1, 480);
+        QueryParameter.checkRangeInclusive(maxBikeTime, 1, 480);
+        QueryParameter.checkRangeInclusive(maxCarTime,  1, 480);
+        QueryParameter.checkRangeInclusive(minBikeTime, 0, maxBikeTime);
+        QueryParameter.checkRangeInclusive(minCarTime,  0, maxCarTime);
+        QueryParameter.checkRangeInclusive(suboptimalMinutes, 0, 30);
+
         ProfileRequest req = new ProfileRequest();
-        req.from       = from;
-        req.to         = to;
-        req.fromTime   = fromTime.toSeconds();
-        req.toTime     = toTime.toSeconds();
-        req.walkSpeed  = walkSpeed;
-        req.bikeSpeed  = bikeSpeed;
-        req.streetTime = streetTime;
-        req.accessTime = accessTime;
-        req.date       = date.toJoda();
-        req.orderBy    = orderBy;
-        req.limit      = limit;
-        req.modes      = modes;
-        req.analyst    = analyst;
+        req.from         = from;
+        req.to           = to;
+        req.fromTime     = fromTime.toSeconds();
+        req.toTime       = toTime.toSeconds();
+        req.walkSpeed    = walkSpeed;
+        req.bikeSpeed    = bikeSpeed;
+        req.carSpeed     = carSpeed;
+        req.date         = date.toJoda();
+        req.orderBy      = orderBy;
+        req.limit        = limit;
+        req.accessModes  = accessModes;
+        req.egressModes  = egressModes;
+        req.directModes  = directModes;
+        req.transitModes = transitModes;
+        req.analyst      = analyst;
+        req.streetTime   = streetTime;
+        req.maxWalkTime  = maxWalkTime;
+        req.maxBikeTime  = maxBikeTime;
+        req.maxCarTime   = maxCarTime;
+        req.minBikeTime  = minBikeTime;
+        req.minCarTime   = minCarTime;
+        req.suboptimalMinutes = suboptimalMinutes;
 
         ProfileRouter router = new ProfileRouter(graph, req);
         try {

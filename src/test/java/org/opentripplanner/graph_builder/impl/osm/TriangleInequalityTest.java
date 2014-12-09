@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.HashMap;
+import java.net.URLDecoder;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -47,7 +48,7 @@ public class TriangleInequalityTest {
     private Vertex end;
 
     @BeforeClass
-    public static void onlyOnce() {
+    public static void onlyOnce() throws Exception {
 
         extra = new HashMap<Class<?>, Object>();
         _graph = new Graph();
@@ -56,7 +57,7 @@ public class TriangleInequalityTest {
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 
-        File file = new File(TriangleInequalityTest.class.getResource("NYC_small.osm.gz").getFile());
+        File file = new File(URLDecoder.decode(TriangleInequalityTest.class.getResource("NYC_small.osm.gz").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);

@@ -100,8 +100,8 @@ public class TurnRestrictionTest {
 
     @Test
     public void testHasExplicitTurnRestrictions() {
-        assertTrue(this.maple_main1.hasExplicitTurnRestrictions());
-        assertFalse(this.broad1_2.hasExplicitTurnRestrictions());
+        assertFalse(_graph.getTurnRestrictions(maple_main1).isEmpty());
+        assertTrue(_graph.getTurnRestrictions(broad1_2).isEmpty());
     }
     
     @Test
@@ -241,7 +241,7 @@ public class TurnRestrictionTest {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.CUSTOM_MOTOR_VEHICLE);
         TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-        from.addTurnRestriction(restrict);
+        _graph.addTurnRestriction(from, restrict);
     }
 
 }

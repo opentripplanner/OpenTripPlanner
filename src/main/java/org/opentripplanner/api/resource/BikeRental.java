@@ -59,7 +59,7 @@ public class BikeRental {
         } else {
             envelope = new Envelope(-180,180,-90,90); 
         }
-        Collection<BikeRentalStation> stations = bikeRentalService.getStations();
+        Collection<BikeRentalStation> stations = bikeRentalService.getBikeRentalStations();
         List<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
         for (BikeRentalStation station : stations) {
             if (envelope.contains(station.x, station.y)) {

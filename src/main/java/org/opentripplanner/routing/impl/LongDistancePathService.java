@@ -22,6 +22,8 @@ import static org.opentripplanner.routing.automata.Nonterminal.star;
 import java.util.Collections;
 import java.util.List;
 
+import jj2000.j2k.NotImplementedError;
+
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -66,14 +68,16 @@ public class LongDistancePathService implements PathService {
     private static final double CLAMP_MAX_WALK = 15000;
 
     private GraphService graphService;
-    private SPTService sptService;
+    private SPTServiceFactory sptServiceFactory;
 
-    public LongDistancePathService(GraphService graphService, SPTService sptService) {
+    public LongDistancePathService(GraphService graphService, SPTServiceFactory sptServiceFactory) {
         this.graphService = graphService;
-        this.sptService = sptService;
+        this.sptServiceFactory = sptServiceFactory;
     }
 
     public double timeout = 0; // seconds
+
+	private SPTVisitor sptVisitor;
     
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
@@ -82,6 +86,8 @@ public class LongDistancePathService implements PathService {
             LOG.error("PathService was passed a null routing request.");
             return null;
         }
+        
+        SPTService sptService = this.sptServiceFactory.instantiate();
 
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.routerId));
@@ -123,6 +129,11 @@ public class LongDistancePathService implements PathService {
             LOG.warn("SPT was null.");
             return null;
         }
+        
+        if( this.sptVisitor!=null ){
+        	this.sptVisitor.spt = spt;
+        }
+        
         //spt.getPaths().get(0).dump();
         List<GraphPath> paths = spt.getPaths();
         Collections.sort(paths, new PathWeightComparator());
@@ -226,5 +237,10 @@ public class LongDistancePathService implements PathService {
         }
 
     }
+
+	@Override
+	public void setSPTVisitor(SPTVisitor vis) {
+		this.sptVisitor = vis;
+	}
     
 }

@@ -421,11 +421,11 @@ public class RoutingContext implements Cloneable {
     public int destroy() {
         int nRemoved = 0;
         if (origin != null)
-            nRemoved += origin.removeTemporaryEdges();
+            nRemoved += origin.removeTemporaryEdges(graph);
         if (target != null)
-            nRemoved += target.removeTemporaryEdges();
+            nRemoved += target.removeTemporaryEdges(graph);
         for (Vertex v : intermediateVertices)
-            nRemoved += v.removeTemporaryEdges();
+            nRemoved += v.removeTemporaryEdges(graph);
         return nRemoved;
     }
 

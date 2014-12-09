@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.opentripplanner.routing.impl.GraphServiceFileImpl;
+import jersey.repackaged.com.google.common.collect.Lists;
+
+import org.opentripplanner.routing.impl.GraphServiceImpl;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
@@ -30,7 +33,7 @@ import com.beust.jcommander.ParameterException;
  * 
  * @author abyrd
  */
-public class CommandLineParameters {
+public class CommandLineParameters implements Cloneable {
 
     private static final int DEFAULT_PORT = 8080;
     private static final int DEFAULT_SECURE_PORT = 8081;
@@ -65,12 +68,12 @@ public class CommandLineParameters {
     
     @Parameter(names = { "-m", "--inMemory"},
     description = "pass the graph to the server in-memory after building it, without saving to disk")
-    boolean inMemory;
+    public boolean inMemory;
  
     @Parameter(names = { "--preFlight"},
     description = "pass the graph to the server in-memory after building it, and saving to disk")
-
     boolean preFlight;
+
     @Parameter(names = {"--noTransit"},
     description = "skip all transit input files (GTFS)")
     boolean noTransit;
@@ -110,7 +113,7 @@ public class CommandLineParameters {
     boolean analyst;
 
     @Parameter( names = {"--bindAddress"},
-            description = "enable OTP Analyst extensions")
+            description = "the address of the network interface to bind to. defaults to all interfaces.")
     String bindAddress = "0.0.0.0";
 
     @Parameter( names = { "--securePort"}, validateWith = AvailablePort.class,
@@ -126,8 +129,11 @@ public class CommandLineParameters {
             description = "path to graph directory")
     String graphDirectory;
 
-    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs in graph directory. Also activate auto-reload.")
+    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs to register in graph directory.")
     boolean autoScan = false;
+
+    @Parameter(names = { "--autoReload" }, description = "auto-reload registered graphs when source data is modified.")
+    boolean autoReload = false;
 
     @Parameter( names = { "-l", "--longDistance"}, 
             description = "use an algorithm tailored for long-distance routing")
@@ -156,12 +162,21 @@ public class CommandLineParameters {
     @Parameter( validateWith = ReadableFile.class, // the remaining parameters in one array
     description = "files") 
     List<File> files = new ArrayList<File>();
+    
+    @Parameter( names = {"--insecure"},
+            description = "allow unauthenticated access to sensitive resources, e.g. /routers")
+    boolean insecure = false;
 
     /** Set some convenience parameters based on other parameters' values. */
     public void infer () {
         server |= ( inMemory || preFlight || port != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
-        if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
+        if (routerIds == null) {
+            if (autoScan || inMemory || preFlight)
+                routerIds = Collections.emptyList();
+            else
+                routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
+        }
         if (cacheDirectory == null) cacheDirectory = DEFAULT_CACHE_DIRECTORY;
         if (pointSetDirectory == null) pointSetDirectory = DEFAULT_POINTSET_DIRECTORY;
         if (server && port == null) {
@@ -174,6 +189,27 @@ public class CommandLineParameters {
         }
     }
 
+    public CommandLineParameters clone () {
+        CommandLineParameters ret;
+        try {
+            ret = (CommandLineParameters) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+        
+        if (this.build != null) {
+            ret.build = Lists.newArrayList();
+            ret.build.addAll(this.build);
+        }
+        
+        if (this.routerIds != null) {
+            ret.routerIds = Lists.newArrayList();
+            ret.routerIds.addAll(this.routerIds);
+        }
+        
+        return ret;
+    }
+    
     public static class ReadableFile implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
@@ -264,7 +300,7 @@ public class CommandLineParameters {
     public static class RouterId implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
-            Pattern routerIdPattern = GraphServiceFileImpl.routerIdPattern;
+            Pattern routerIdPattern = GraphServiceImpl.routerIdPattern;
             Matcher m = routerIdPattern.matcher(value);
             if ( ! m.matches()) {
                 String msg = String.format("%s: '%s' is not a valid router ID.", name, value);

@@ -20,11 +20,11 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -35,8 +35,6 @@ import org.opentripplanner.routing.graph.Vertex;
  * @author andrewbyrd
  */
 public class BasicShortestPathTree extends AbstractShortestPathTree {
-    
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     
     private static final int DEFAULT_CAPACITY = 500;
 
@@ -73,6 +71,7 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
 
     @Override
     public boolean add(State state) {
+        Graph graph = state.getOptions().rctx.graph;
         Vertex here = state.getVertex();
         State existing = states.get(here);
         if (existing == null || state.betterThan(existing)) {
@@ -80,16 +79,11 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
             return true;
         } else {
             final Edge backEdge = existing.getBackEdge();
-            if (backEdge instanceof StreetEdge) {
-                StreetEdge pseBack = (StreetEdge) backEdge;
-                if (pseBack.hasExplicitTurnRestrictions()) {
-                    // If the previous back edge had turn restrictions, we need to continue
-                    // the search because the previous path may be prevented by from reaching the end by turn restrictions.
-                    return true;
-                }
-            }
+            // If the previous back edge had turn restrictions, we need to continue
+            // the search because the previous path may be prevented by from reaching the end by
+            // turn restrictions.
 
-            return false;
+            return !graph.getTurnRestrictions(backEdge).isEmpty();
         }
     }
 
@@ -109,15 +103,15 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
 
     @Override
     public boolean visit(State s) {
+        final Graph graph = s.getOptions().rctx.graph;
         final State existing = states.get(s.getVertex());
         final Edge backEdge = existing.getBackEdge();
-        if (backEdge instanceof StreetEdge) {
-            StreetEdge pseBack = (StreetEdge) backEdge;
-            if (pseBack.hasExplicitTurnRestrictions()) {
-                // If the previous back edge had turn restrictions, we need to continue
-                // the search because the previous path may be prevented by from reaching the end by turn restrictions.
-                return true;
-            }
+        if (!graph.getTurnRestrictions(backEdge).isEmpty()) {
+            // If the previous back edge had turn restrictions, we need to continue
+            // the search because the previous path may be prevented by from reaching the end by
+            // turn restrictions.
+
+            return true;
         }
         return (s == existing);
     }

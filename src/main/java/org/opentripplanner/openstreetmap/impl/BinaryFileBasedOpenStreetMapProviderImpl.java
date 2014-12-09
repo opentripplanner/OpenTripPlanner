@@ -41,21 +41,19 @@ public class BinaryFileBasedOpenStreetMapProviderImpl implements OpenStreetMapPr
             parser.setParseNodes(false);
             parser.setParseWays(false);
             (new BlockInputStream(input, parser)).process();
-
-            handler.doneRelations();
+            handler.doneFirstPhaseRelations();
 
             input = new FileInputStream(_path);
             parser.setParseRelations(false);
             parser.setParseWays(true);
             (new BlockInputStream(input, parser)).process();
-
-            handler.secondPhase();
+            handler.doneSecondPhaseWays();
 
             input = new FileInputStream(_path);
             parser.setParseNodes(true);
             parser.setParseWays(false);
             (new BlockInputStream(input, parser)).process();
-            handler.nodesLoaded();
+            handler.doneThirdPhaseNodes();
         } catch (Exception ex) {
             throw new IllegalStateException("error loading OSM from path " + _path, ex);        }
     }

@@ -165,7 +165,7 @@ public class StreetUtils {
                     if (permission == StreetTraversalPermission.NONE) {
                         // TODO Shouldn't we have a graph.removeEdge()?
                         graph.streetNotesService.removeStaticNotes(pse);
-                        pse.detach();
+                        pse.detach(graph);
                     } else {
                         pse.setPermission(permission);
                     }
@@ -186,7 +186,7 @@ public class StreetUtils {
             edges.addAll(v.getIncoming());
             for (Edge e : edges) {
                 if (e instanceof StreetTransitLink) {
-                    e.detach();
+                    e.detach(graph);
                 }
             }
         }

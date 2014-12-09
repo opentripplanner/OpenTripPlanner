@@ -55,7 +55,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         RUNNING, STOPPED
     }
 
-    /* TODO instead of having a separate class for state, we should just make one GenericAStar per request. */
+    /* TODO instead of having a separate class for search state, we should just make one GenericAStar per request. */
     class RunState {
 
         public State u;
@@ -111,15 +111,16 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         runState.heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
 
-        // heuristic calc could actually be done when states are constructed, inside state
-        State initialState = new State(options);
-        runState.heuristic.initialize(initialState, runState.rctx.target, abortTime);
+        // Since initial states can be multiple, heuristic cannot depend on the initial state.
+        runState.heuristic.initialize(runState.options, runState.rctx.origin, runState.rctx.target,
+                abortTime);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
             options.rctx.debugOutput.timedOut = true;
             runState = null; // Search timed out
             return;
         }
+        State initialState = new State(options);
         runState.spt.add(initialState);
 
         // Priority Queue.

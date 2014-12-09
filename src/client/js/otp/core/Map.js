@@ -65,9 +65,30 @@ otp.core.Map = otp.Class({
 
         this.lmap = new L.Map('map', mapProps);
 
-        L.control.layers(this.baseLayers).addTo(this.lmap);
+        this.layer_control = L.control.layers(this.baseLayers).addTo(this.lmap);
         L.control.zoom({ position : 'topright' }).addTo(this.lmap);
         //this.lmap.addControl(new L.Control.Zoom({ position : 'topright' }));
+       
+        //Adds debug inspector layers overlay to layers control
+        //It gets all the layers from inspector layers API
+        //debug layers can be enabled in config.js or as URL query:
+        //?debug_layers=true
+        if (otp.config.debug_layers === true) {
+            var url = otp.config.hostname + '/' + otp.config.restService + '/inspector/layers';
+            $.ajax(url, {
+                dataType: 'JSON',
+                success: function(data) {
+                    var layers = {};
+                    data.layers.map(function(layer) {
+                        this.layer_control.addOverlay(new L.TileLayer(
+                            otp.config.hostname + '/' + otp.config.restService + '/inspector/tile/' + layer.key + '/{z}/{x}/{y}.png',
+                            { maxZoom : 22}), layer.name);
+                    }, this_);
+
+                }
+            });
+        }
+
         
       
         if(!otp.config.initLatLng) {
