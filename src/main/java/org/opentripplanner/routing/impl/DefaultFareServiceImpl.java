@@ -15,20 +15,20 @@ package org.opentripplanner.routing.impl;
 
 import java.io.Serializable;
 import java.util.Currency;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.FareService;
@@ -114,9 +114,9 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
 
-    protected HashMap<AgencyAndId, FareRuleSet> fareRules;
+    protected Map<AgencyAndId, FareRuleSet> fareRules;
 
-    public DefaultFareServiceImpl(HashMap<AgencyAndId, FareRuleSet> fareRules) {
+    public DefaultFareServiceImpl(Map<AgencyAndId, FareRuleSet> fareRules) {
         this.fareRules = fareRules;
     }
 
