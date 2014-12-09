@@ -25,6 +25,7 @@ public class FareRuleSet implements Serializable {
 
     private static final long serialVersionUID = 7218355718876553028L;
 
+    private String agency = null;
     private Set<AgencyAndId> routes;
     private Set<P2<String>> originDestinations;
     private Set<String> contains;
@@ -36,6 +37,11 @@ public class FareRuleSet implements Serializable {
         routes = new HashSet<AgencyAndId>();
         originDestinations= new HashSet<P2<String>>();
         contains = new HashSet<String>();
+    }
+
+    public void setAgency(String agency) {
+        // TODO With new GTFS lib, read value from fareAttribute directly?
+        this.agency = agency;
     }
 
     public void addOriginDestination(String origin, String destination) {
@@ -63,7 +69,7 @@ public class FareRuleSet implements Serializable {
         return fareAttribute;
     }
 
-    public boolean matches(String startZone, String endZone, Set<String> zonesVisited,
+    public boolean matches(Set<String> agencies, String startZone, String endZone, Set<String> zonesVisited,
             Set<AgencyAndId> routesVisited) {
         //an empty rule should not match
         if (!hasRule)
@@ -95,6 +101,12 @@ public class FareRuleSet implements Serializable {
             if (!routes.containsAll(routesVisited)) {
                 return false;
             }
+        }
+
+        //check for matching agency
+        if (agency != null) {
+            if (agencies.size() != 1 || !agencies.contains(agency))
+                return false;
         }
 
         return true;

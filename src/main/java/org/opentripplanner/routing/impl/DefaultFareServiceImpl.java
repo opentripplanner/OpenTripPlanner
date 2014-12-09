@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 /** A set of edges on a single route, with associated information for calculating fares */
 class Ride {
     
+    String agency; // route agency
+
     AgencyAndId route;
 
     Set<String> zones;
@@ -133,6 +135,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 rides.add(ride);
                 ride.startZone = hEdge.getBeginStop().getZoneId();
                 ride.zones.add(ride.startZone);
+                ride.agency = state.getBackTrip().getRoute().getAgency().getId();
                 ride.route = state.getRoute();
                 ride.startTime = state.getBackState().getTimeSeconds();
                 ride.firstStop = hEdge.getBeginStop();
@@ -205,6 +208,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
     protected float calculateCost(List<Ride> rides) {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
+        Set<String> agencies = new HashSet<String>();
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);
@@ -223,6 +227,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             lastRideStartTime = ride.startTime;
             lastRideEndTime = ride.endTime;
             endZone = ride.endZone;
+            agencies.add(ride.agency);
             routes.add(ride.route);
             zones.addAll(ride.zones);
             transfersUsed += 1;
@@ -234,11 +239,11 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long journeyTime = lastRideEndTime - startTime;
         // find the best fare that matches this set of rides
         for (AgencyAndId fareId : fareRules.keySet()) {
-        	// fares also don't really have an agency id, they will have the per-feed default id
+            // fares also don't really have an agency id, they will have the per-feed default id
             if ( ! fareId.getAgencyId().equals(feedId))
                 continue;
             FareRuleSet ruleSet = fareRules.get(fareId);
-            if (ruleSet == null || ruleSet.matches(startZone, endZone, zones, routes)) {
+            if (ruleSet == null || ruleSet.matches(agencies, startZone, endZone, zones, routes)) {
                 FareAttribute attribute = fareRules.get(fareId).getFareAttribute();
                 if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                     continue;

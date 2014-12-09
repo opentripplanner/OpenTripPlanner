@@ -47,29 +47,35 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     @Override
     public void setDao(GtfsRelationalDao dao) {
+        fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), fareRules);
+    }
 
+    protected void fillFareRules(String agencyId, Collection<FareAttribute> fareAttributes,
+            Collection<FareRule> fareRules, Map<AgencyAndId, FareRuleSet> fareRuleSet) {
         /*
          * Create an empty FareRuleSet for each FareAttribute, as some FareAttribute may have no
          * rules attached to them.
          */
-        Collection<FareAttribute> fares = dao.getAllFareAttributes();
-        for (FareAttribute fare : fares) {
+        for (FareAttribute fare : fareAttributes) {
             AgencyAndId id = fare.getId();
-            FareRuleSet fareRule = fareRules.get(id);
+            FareRuleSet fareRule = fareRuleSet.get(id);
             if (fareRule == null) {
                 fareRule = new FareRuleSet(fare);
-                fareRules.put(id, fareRule);
+                fareRuleSet.put(id, fareRule);
+                if (agencyId != null) {
+                    // TODO With the new GTFS lib, use fareAttribute.agency_id directly
+                    fareRule.setAgency(agencyId);
+                }
             }
         }
 
         /*
          * For each fare rule, add it to the FareRuleSet of the fare.
          */
-        Collection<FareRule> rules = dao.getAllFareRules();
-        for (FareRule rule : rules) {
+        for (FareRule rule : fareRules) {
             FareAttribute fare = rule.getFare();
             AgencyAndId id = fare.getId();
-            FareRuleSet fareRule = fareRules.get(id);
+            FareRuleSet fareRule = fareRuleSet.get(id);
             if (fareRule == null) {
                 // Should never happen by design
                 LOG.error("Inexistant fare ID in fare rule: " + id);
