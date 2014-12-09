@@ -69,11 +69,21 @@ public class FareRuleSet implements Serializable {
         return fareAttribute;
     }
 
+    public boolean hasAgencyDefined() {
+        return agency != null;
+    }
+
     public boolean matches(Set<String> agencies, String startZone, String endZone, Set<String> zonesVisited,
             Set<AgencyAndId> routesVisited) {
         //an empty rule should not match
         if (!hasRule)
             return false;
+
+        //check for matching agency
+        if (agency != null) {
+            if (agencies.size() != 1 || !agencies.contains(agency))
+                return false;
+        }
 
         //check for matching origin/destination, if this ruleset has any origin/destination restrictions
         if (originDestinations.size() > 0) {
@@ -101,12 +111,6 @@ public class FareRuleSet implements Serializable {
             if (!routes.containsAll(routesVisited)) {
                 return false;
             }
-        }
-
-        //check for matching agency
-        if (agency != null) {
-            if (agencies.size() != 1 || !agencies.contains(agency))
-                return false;
         }
 
         return true;

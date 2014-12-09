@@ -204,7 +204,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         }
         return resultTable[0][rides.size() - 1];
     }
-    
+
     protected float calculateCost(List<Ride> rides) {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
@@ -239,10 +239,11 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long journeyTime = lastRideEndTime - startTime;
         // find the best fare that matches this set of rides
         for (AgencyAndId fareId : fareRules.keySet()) {
-            // fares also don't really have an agency id, they will have the per-feed default id
-            if ( ! fareId.getAgencyId().equals(feedId))
-                continue;
             FareRuleSet ruleSet = fareRules.get(fareId);
+            // fares also don't really have an agency id, they will have the per-feed default id
+            // check only if the fare is not mapped to an agency
+            if (!ruleSet.hasAgencyDefined() && !fareId.getAgencyId().equals(feedId))
+                continue;
             if (ruleSet == null || ruleSet.matches(agencies, startZone, endZone, zones, routes)) {
                 FareAttribute attribute = fareRules.get(fareId).getFareAttribute();
                 if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
