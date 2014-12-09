@@ -47,6 +47,10 @@ public class FareRuleSet implements Serializable {
         originDestinations.add(new P2<String>(origin, destination));
     }
 
+    public Set<P2<String>> getOriginDestinations() {
+        return originDestinations;
+    }
+
     public void addContains(String containsId) {
         contains.add(containsId);
     }
