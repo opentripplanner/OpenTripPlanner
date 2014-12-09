@@ -47,7 +47,8 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
     
     @Override
-    protected float getLowestCost(List<Ride> rides, Collection<FareRuleSet> fareRules) {
+    protected float getLowestCost(FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
         List<Ride> bartBlock = null;
         Long sfmtaTransferIssued = null;
         Long alightedBart = null;
@@ -66,7 +67,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
             } else { // non-BART agency
                 if (bartBlock != null) {
                     // finalize outstanding bart block, if any
-                    cost += calculateCost(bartBlock, fareRules);
+                    cost += calculateCost(fareType, bartBlock, fareRules);
                     bartBlock = null;
                 }
                 if (agencyId.equals("SFMTA")) {
@@ -99,7 +100,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
         }
         if (bartBlock != null) {
             // finalize outstanding bart block, if any
-            cost += calculateCost(bartBlock, fareRules);
+            cost += calculateCost(fareType, bartBlock, fareRules);
         }        
         return cost;
     }

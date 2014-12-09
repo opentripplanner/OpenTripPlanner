@@ -183,7 +183,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 wrappedCurrency = new WrappedCurrency(currency);
             }
 
-            float lowestCost = getLowestCost(rides, fareRules);
+            float lowestCost = getLowestCost(fareType, rides, fareRules);
 
             if (lowestCost != Float.POSITIVE_INFINITY) {
                 int fractionDigits = 2;
@@ -197,7 +197,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         return hasFare ? fare : null;
     }
 
-    protected float getLowestCost(List<Ride> rides, Collection<FareRuleSet> fareRules) {
+    protected float getLowestCost(FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
         // Dynamic algorithm to calculate fare cost.
         // Cell [i,j] holds the best (lowest) cost for a trip from rides[i] to rides[j]
         float[][] resultTable = new float[rides.size()][rides.size()];
@@ -205,7 +206,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         for (int i = 0; i < rides.size(); i++) {
             // each diagonal
             for (int j = 0; j < rides.size() - i; j++) {
-                float cost = calculateCost(rides.subList(j, j + i + 1), fareRules);
+                float cost = calculateCost(fareType, rides.subList(j, j + i + 1), fareRules);
                 if (cost < 0) {
                     LOG.error("negative cost for a ride sequence");
                     cost = Float.POSITIVE_INFINITY;
@@ -221,7 +222,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         return resultTable[0][rides.size() - 1];
     }
 
-    protected float calculateCost(List<Ride> rides, Collection<FareRuleSet> fareRules) {
+    protected float calculateCost(FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
         Set<String> agencies = new HashSet<String>();

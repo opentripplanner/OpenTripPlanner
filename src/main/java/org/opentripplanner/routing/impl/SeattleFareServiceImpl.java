@@ -16,10 +16,13 @@ package org.opentripplanner.routing.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,15 +51,26 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
 
     public static final int TRANSFER_DURATION_SEC = 7200;
 
+    // Fallback in case no rules apply for an agency
+    private Map<T2<FareType, String>, Float> defaultFares = new HashMap<>();
+
     private static final Logger LOG = LoggerFactory.getLogger(SeattleFareServiceImpl.class);
 
-    public SeattleFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
+    public SeattleFareServiceImpl(Collection<FareRuleSet> regularFareRules,
+            Collection<FareRuleSet> youthFareRules, Collection<FareRuleSet> seniorFareRules) {
         super();
         addFareRules(FareType.regular, regularFareRules);
+        addFareRules(FareType.youth, youthFareRules);
+        addFareRules(FareType.senior, seniorFareRules);
+    }
+
+    public void addDefaultFare(FareType fareType, String agencyId, float cost) {
+        defaultFares.put(new T2<FareType, String>(fareType, agencyId), cost);
     }
 
     @Override
-    protected float getLowestCost(List<Ride> rides, Collection<FareRuleSet> fareRules) {
+    protected float getLowestCost(FareType fareType, List<Ride> rides,
+            Collection<FareRuleSet> fareRules) {
 
         // Split rides per agency
         List<List<Ride>> ridesPerAgency = new ArrayList<List<Ride>>();
@@ -71,7 +85,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
             currentRides.add(ride);
         }
 
-        LOG.info("============ Rides per agency ====================");
+        LOG.info("============ Rides for fare class {} ====================", fareType);
         for (List<Ride> ridesForAgency : ridesPerAgency) {
             LOG.info("Ride for agency {} : {}", ridesForAgency.get(0).agency,
                     Arrays.toString(ridesForAgency.toArray()));
@@ -82,9 +96,20 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
         long lastStartSec = -1L;
         for (List<Ride> ridesForAgency : ridesPerAgency) {
 
+            String agencyId = ridesForAgency.get(0).agency;
             long startSec = ridesForAgency.get(0).startTime; // seconds
-            float costForAgency = super.getLowestCost(ridesForAgency, fareRules);
-            LOG.info("Agency {} cost is {}", ridesForAgency.get(0).agency, costForAgency);
+            float costForAgency = super.getLowestCost(fareType, ridesForAgency, fareRules);
+
+            if (costForAgency == Float.POSITIVE_INFINITY) {
+                Float def = defaultFares.get(new T2<FareType, String>(fareType, agencyId));
+                if (def == null) {
+                    LOG.error("No fares and no fallback for class {}, agency {}, rides {}",
+                            fareType, agencyId, ridesForAgency);
+                    return Float.POSITIVE_INFINITY;
+                }
+                costForAgency = def;
+            }
+            LOG.info("Agency {} cost is {}", agencyId, costForAgency);
 
             // Check for transfer
             if (lastStartSec == -1L || startSec < lastStartSec + TRANSFER_DURATION_SEC) {
