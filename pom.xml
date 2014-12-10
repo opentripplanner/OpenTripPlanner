@@ -398,6 +398,11 @@
             <artifactId>gt-geotiff</artifactId>
             <version>${geotools.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-wfs</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
         <!-- provides EPSG database for projections (shapefile loading) -->
         <dependency>
             <groupId>org.geotools</groupId>
