@@ -130,9 +130,8 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
                 currentCost = costForAgency;
                 totalCost += costForAgency;
                 LOG.debug("New ticket, cost is {}, total is {}", costForAgency, totalCost);
+                lastStartSec = startSec;
             }
-
-            lastStartSec = startSec;
         }
 
         return totalCost;
