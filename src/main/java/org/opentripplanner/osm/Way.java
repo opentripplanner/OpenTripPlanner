@@ -6,7 +6,7 @@ public class Way extends Tagged implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    long[] nodes;
+    public long[] nodes;
     
     @Override
     public String toString() {

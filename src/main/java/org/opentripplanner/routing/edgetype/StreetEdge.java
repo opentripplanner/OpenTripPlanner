@@ -483,7 +483,7 @@ public class StreetEdge extends Edge implements Cloneable {
     /**
      * Calculate the speed appropriately given the RoutingRequest and traverseMode.
      */
-    private double calculateSpeed(RoutingRequest options, TraverseMode traverseMode) {
+    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode) {
         if (traverseMode == null) {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {

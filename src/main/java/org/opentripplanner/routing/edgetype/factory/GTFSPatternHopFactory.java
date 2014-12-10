@@ -42,18 +42,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
-import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
-import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
-import org.opentripplanner.graph_builder.annotation.HopSpeedFast;
-import org.opentripplanner.graph_builder.annotation.HopSpeedSlow;
-import org.opentripplanner.graph_builder.annotation.HopZeroTime;
-import org.opentripplanner.graph_builder.annotation.NegativeDwellTime;
-import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
-import org.opentripplanner.graph_builder.annotation.NonStationParentStation;
-import org.opentripplanner.graph_builder.annotation.RepeatedStops;
-import org.opentripplanner.graph_builder.annotation.TripDegenerate;
-import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
+import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.StopTransfer;
@@ -453,7 +442,7 @@ public class GTFSPatternHopFactory {
         }
 
         /* Identify interlined trips and create the necessary edges. */
-        interline(tripPatterns.values());
+        interline(tripPatterns.values(), graph);
 
         /* Interpret the transfers explicitly defined in transfers.txt. */
         loadTransfers(graph);
@@ -474,7 +463,7 @@ public class GTFSPatternHopFactory {
      * and update the TripPatterns accordingly. This must be called after all the pattern edges and vertices
      * are already created, because it creates interline dwell edges between existing pattern arrive/depart vertices.
      */
-    private void interline (Collection<TripPattern> tripPatterns) {
+    private void interline (Collection<TripPattern> tripPatterns, Graph graph) {
 
         /* Record which Pattern each interlined TripTimes belongs to. */
         Map<TripTimes, TripPattern> patternForTripTimes = Maps.newHashMap();
@@ -517,7 +506,19 @@ public class GTFSPatternHopFactory {
                     }
                     TripPattern prevPattern = patternForTripTimes.get(prev);
                     TripPattern currPattern = patternForTripTimes.get(curr);
-                    interlines.put(new P2<TripPattern>(prevPattern, currPattern), new P2<Trip>(prev.trip, curr.trip));
+                    Stop fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
+                    Stop toStop   = currPattern.getStop(0);
+                    double teleportationDistance = distanceLibrary.fastDistance(
+                                        fromStop.getLat(), fromStop.getLon(), toStop.getLat(), toStop.getLon());
+                    if (teleportationDistance > 200) {
+                        // FIXME Trimet data contains a lot of these -- in their data, two trips sharing a block ID just
+                        // means that they are served by the same vehicle, not that interlining is automatically allowed.
+                        // see #1654
+                        // LOG.error(graph.addBuilderAnnotation(new InterliningTeleport(prev.trip, block.blockId, (int)teleportationDistance)));
+                        // Only skip this particular interline edge; there may be other valid ones in the block.
+                    } else {
+                        interlines.put(new P2<TripPattern>(prevPattern, currPattern), new P2<Trip>(prev.trip, curr.trip));
+                    }
                 }
                 prev = curr;
             }

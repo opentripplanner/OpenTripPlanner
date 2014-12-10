@@ -56,7 +56,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -79,10 +78,10 @@ public class PlanGenerator {
     private static final double MAX_ZAG_DISTANCE = 30;
 
     public PathService pathService;
-    public GraphService graphService;
+    public Graph graph;
 
-    public PlanGenerator(GraphService graphService, PathService pathService) {
-        this.graphService = graphService;
+    public PlanGenerator(Graph graph, PathService pathService) {
+        this.graph = graph;
         this.pathService = pathService;
     }
 
@@ -116,7 +115,8 @@ public class PlanGenerator {
         options.rctx.debugOutput.finishedCalculating();
 
         if (paths == null || paths.size() == 0) {
-            LOG.info("Path not found: " + options.from + " : " + options.to);
+            LOG.debug("Path not found: " + options.from + " : " + options.to);
+            options.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
             throw new PathNotFoundException();
         }
 
@@ -1077,8 +1077,6 @@ public class PlanGenerator {
     /** Returns the first trip of the service day. Currently unused.
      * TODO This should probably be done with a special time value. */
     public TripPlan generateFirstTrip(RoutingRequest request) {
-        Graph graph = graphService.getGraph(request.routerId);
-
         request.setArriveBy(false);
 
         TimeZone tz = graph.getTimeZone();
@@ -1097,8 +1095,6 @@ public class PlanGenerator {
     /** Return the last trip of the service day. Currently unused.
      * TODO This should probably be done with a special time value. */
     public TripPlan generateLastTrip(RoutingRequest request) {
-        Graph graph = graphService.getGraph(request.routerId);
-
         request.setArriveBy(true);
 
         TimeZone tz = graph.getTimeZone();

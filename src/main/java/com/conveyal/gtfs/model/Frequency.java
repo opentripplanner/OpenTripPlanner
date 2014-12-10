@@ -16,6 +16,7 @@ package com.conveyal.gtfs.model;
 import com.conveyal.gtfs.GTFSFeed;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 public class Frequency extends Entity {
 
@@ -42,6 +43,33 @@ public class Frequency extends Entity {
             f.feed = feed;
             feed.frequencies.put(f.trip.trip_id, f); // TODO this should be a multimap
         }
+
+    }
+
+    public static class Writer extends Entity.Writer<Frequency> {
+        public Writer (GTFSFeed feed) {
+            super(feed, "frequencies");
+        }
+
+        @Override
+        public void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"trip_id", "start_time", "end_time", "headway_secs", "exact_times"});
+        }
+
+        @Override
+        public void writeOneRow(Frequency f) throws IOException {
+            writeStringField(f.trip.trip_id);
+            writeTimeField(f.start_time);
+            writeTimeField(f.end_time);
+            writeIntField(f.headway_secs);
+            writeIntField(f.exact_times);
+        }
+
+        @Override
+        public Iterator<Frequency> iterator() {
+            return feed.frequencies.values().iterator();
+        }
+
 
     }
 

@@ -15,10 +15,14 @@ package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.error.DuplicateKeyError;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterators;
 import com.sun.org.apache.xerces.internal.impl.dv.xs.DateTimeDV;
+
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 public class CalendarDate extends Entity {
 
@@ -51,4 +55,33 @@ public class CalendarDate extends Entity {
         }
     }
 
+    public static class Writer extends Entity.Writer<CalendarDate> {
+        public Writer (GTFSFeed feed) {
+            super(feed, "calendar_dates");
+        }
+
+        @Override
+        protected void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"service_id", "date", "exception_type"});
+        }
+
+        @Override
+        protected void writeOneRow(CalendarDate d) throws IOException {
+            writeStringField(d.service.service_id);
+            writeDateField(d.date);
+            writeIntField(d.exception_type);
+            endRecord();
+        }
+
+        @Override
+        protected Iterator<CalendarDate> iterator() {
+            Iterator<Service> serviceIterator = feed.services.values().iterator();
+            return Iterators.concat(Iterators.transform(serviceIterator, new Function<Service, Iterator<CalendarDate>> () {
+                @Override
+                public Iterator<CalendarDate> apply(Service service) {
+                    return service.calendar_dates.values().iterator();
+                }
+            }));
+        }
+    }
 }

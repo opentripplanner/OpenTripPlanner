@@ -416,6 +416,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (AreaGroup group : areaGroups) {
                 walkableAreaBuilder.build(group);
             }
+            
+            // running a request caches the timezone; we need to clear it now so that when agencies are loaded
+            // the graph time zone is set to the agency time zone.
+            graph.clearTimeZone();
+            
             LOG.info("Done building visibility graphs for walkable areas.");
         }
 

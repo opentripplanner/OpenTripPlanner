@@ -15,10 +15,12 @@ package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.error.GeneralError;
+
 import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
 
 public class FeedInfo extends Entity {
 
@@ -53,6 +55,36 @@ public class FeedInfo extends Entity {
             } else {
                 feed.errors.add(new GeneralError(tableName, row, null, "FeedInfo contains more than one record."));
             }
+        }
+    }
+
+    public static class Writer extends Entity.Writer<FeedInfo> {
+
+        public Writer(GTFSFeed feed) {
+            super(feed, "feed_info");
+        }
+
+        @Override
+        public void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"feed_id", "feed_publisher_name", "feed_publisher_url", "feed_lang",
+                    "feed_start_date", "feed_end_date", "feed_version"});
+        }
+
+        @Override
+        public void writeOneRow(FeedInfo i) throws IOException {
+            writeStringField(i.feed_id.equals("NONE") ? "" : i.feed_id);
+            writeStringField(i.feed_publisher_name);
+            writeUrlField(i.feed_publisher_url);
+            writeStringField(i.feed_lang);
+            writeDateField(i.feed_start_date);
+            writeDateField(i.feed_end_date);
+            writeStringField(i.feed_version);
+            endRecord();
+        }
+
+        @Override
+        public Iterator<FeedInfo> iterator() {
+            return feed.feedInfo.values().iterator();
         }
 
     }

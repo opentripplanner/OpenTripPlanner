@@ -94,8 +94,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
         // to the _departure_ of the first stop of the second pattern.
         // The last stop of the first pattern does not even have a _depart_ vertex, and
         // The first stop of the second pattern does not even have an _arrive_ vertex.
-        super(p0.arriveVertices[p0.stopPattern.size - 1],
-              p1.departVertices[0]);
+        super(p0.arriveVertices[p0.stopPattern.size - 1], p1.departVertices[0]);
     }
 
     @VisibleForTesting

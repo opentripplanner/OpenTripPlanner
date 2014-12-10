@@ -62,7 +62,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
@@ -74,12 +73,10 @@ import javax.swing.event.ListSelectionListener;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
-import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -88,7 +85,6 @@ import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.ParetoPathService;
 import org.opentripplanner.routing.impl.SPTVisitor;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
@@ -459,15 +455,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	private JCheckBox longDistanceModeCheckbox;
 
-	private GraphService graphService;
-
-    public GraphVisualizer(GraphService graphService) {
+    public GraphVisualizer(Graph graph) {
         super();
         LOG.info("Starting up graph visualizer...");
         
-        this.graphService = graphService;
-        this.graph = graphService.getGraph();
-        this.pathservice = new ParetoPathService(graphService, sptServiceFactory);
+        this.graph = graph;
+        this.pathservice = new ParetoPathService(graph, sptServiceFactory);
         setTitle("GraphVisualizer");
         
         init();
@@ -780,11 +773,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	protected void setLongDistanceMode(boolean selected) {
 		if( selected ){
-			this.pathservice = new LongDistancePathService(graphService, sptServiceFactory);
+			this.pathservice = new LongDistancePathService(graph, sptServiceFactory);
 		} else {
-			this.pathservice = new ParetoPathService(graphService, sptServiceFactory);
+			this.pathservice = new ParetoPathService(graph, sptServiceFactory);
 		}
-		
 	}
 
 	OptimizeType getSelectedOptimizeType(){

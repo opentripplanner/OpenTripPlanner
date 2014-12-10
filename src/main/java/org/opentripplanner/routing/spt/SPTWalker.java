@@ -20,6 +20,8 @@ import java.util.Set;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -40,18 +42,25 @@ public class SPTWalker {
     private static final Logger LOG = LoggerFactory.getLogger(SPTWalker.class);
 
     public static interface SPTVisitor {
+
+        /**
+         * @param e The edge to filter.
+         * @return True to visit this edge, false to skip it.
+         */
         public boolean accept(Edge e);
 
         /**
          * Note: The same state can be visited several times (from different edges).
          * 
-         * @param c
-         * @param s0
-         * @param s1
+         * @param e The edge being visited (filtered from a previous call to accept)
+         * @param c The coordinate of the point alongside the edge geometry.
+         * @param s0 The state at the begin vertex of this edge
+         * @param s1 The state at the end vertex of this edge
          * @param d0 Curvilinear coordinate of c on [s0-s1], in meters
          * @param d1 Curvilinear coordinate of c on [s1-s0], in meters
+         * @param speed The assumed speed on the edge
          */
-        public void visit(Coordinate c, State s0, State s1, double d0, double d1);
+        public void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speed);
     }
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
@@ -95,10 +104,33 @@ public class SPTWalker {
                         continue;
                     }
 
+                    // Compute speed
+                    double speed = spt.getOptions().walkSpeed;
+                    if (e instanceof StreetEdge) {
+                        StreetEdge se = (StreetEdge) e;
+                        /*
+                         * Compute effective speed, taking into account end state mode (car, bike,
+                         * walk...) and edge properties (car max speed, slope, etc...)
+                         */
+                        TraverseMode mode = s0.getNonTransitMode();
+                        speed = se.calculateSpeed(spt.getOptions(), mode);
+                        if (mode != TraverseMode.CAR)
+                            speed = speed * se.getDistance() / se.getSlopeSpeedEffectiveLength();
+                        double avgSpeed = se.getDistance()
+                                / Math.abs(s0.getTimeInMillis() - s1.getTimeInMillis()) * 1000;
+                        /*
+                         * We can't go faster than the average speed on the edge. We can go slower
+                         * however, that simply means that both end vertices are closer to the
+                         * departure than any mid-point.
+                         */
+                        if (speed > avgSpeed)
+                            speed = avgSpeed;
+                    }
+
                     // Length of linestring
                     double lineStringLen = distanceLibrary.fastLength(lineString);
-                    visitor.visit(vx0.getCoordinate(), s0, s1, 0.0, lineStringLen);
-                    visitor.visit(vx1.getCoordinate(), s0, s1, lineStringLen, 0.0);
+                    visitor.visit(e, vx0.getCoordinate(), s0, s1, 0.0, lineStringLen, speed);
+                    visitor.visit(e, vx1.getCoordinate(), s0, s1, lineStringLen, 0.0, speed);
                     nTotal += 2;
                     Coordinate[] pList = lineString.getCoordinates();
                     boolean reverse = vx1.getCoordinate().equals(pList[0]);
@@ -117,8 +149,8 @@ public class SPTWalker {
                                 double k = (curLen - startLen) / segLen;
                                 Coordinate p = new Coordinate(p0.x * (1 - k) + p1.x * k, p0.y
                                         * (1 - k) + p1.y * k);
-                                visitor.visit(p, reverse ? s1 : s0, reverse ? s0 : s1, curLen,
-                                        lineStringLen - curLen);
+                                visitor.visit(e, p, reverse ? s1 : s0, reverse ? s0 : s1, curLen,
+                                        lineStringLen - curLen, speed);
                                 nTotal++;
                                 curLen += stepLen;
                                 ns++;

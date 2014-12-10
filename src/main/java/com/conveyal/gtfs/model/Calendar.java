@@ -15,8 +15,13 @@ package com.conveyal.gtfs.model;
 
 import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.error.DuplicateKeyError;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterators;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class Calendar extends Entity {
 
@@ -61,8 +66,53 @@ public class Calendar extends Entity {
                 service.calendar = c;
             }
 
-        }
-
+        }    
     }
 
+    public static class Writer extends Entity.Writer<Calendar> {
+        public Writer(GTFSFeed feed) {
+            super(feed, "calendar");
+        }
+
+        @Override
+        protected void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"service_id", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "start_date", "end_date"});
+        }
+
+        @Override
+        protected void writeOneRow(Calendar c) throws IOException {
+            writeStringField(c.service.service_id);
+            writeIntField(c.monday);
+            writeIntField(c.tuesday);
+            writeIntField(c.wednesday);
+            writeIntField(c.thursday);
+            writeIntField(c.friday);
+            writeIntField(c.saturday);
+            writeIntField(c.sunday);
+            writeIntField(c.start_date);
+            writeIntField(c.end_date);
+            endRecord();
+        }
+
+        @Override
+        protected Iterator<Calendar> iterator() {
+            // wrap an iterator over services
+            Iterator<Calendar> calIt = Iterators.transform(feed.services.values().iterator(), new Function<Service, Calendar> () {
+                @Override
+                public Calendar apply (Service s) {
+                    return s.calendar;
+                }
+            });
+            
+            // not every service has a calendar (e.g. TriMet has no calendars, just calendar dates).
+            // This is legal GTFS, so skip services with no calendar
+            return Iterators.filter(calIt, new Predicate<Calendar> () {
+                @Override
+                public boolean apply(Calendar c) {
+                    return c != null;
+                }
+            });
+            
+        }
+    }
 }
