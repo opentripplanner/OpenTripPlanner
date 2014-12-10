@@ -85,9 +85,9 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
             currentRides.add(ride);
         }
 
-        LOG.info("============ Rides for fare class {} ====================", fareType);
+        LOG.debug("=== Rides for fare class {} ===", fareType);
         for (List<Ride> ridesForAgency : ridesPerAgency) {
-            LOG.info("Ride for agency {} : {}", ridesForAgency.get(0).agency,
+            LOG.debug("Ride for agency {} : {}", ridesForAgency.get(0).agency,
                     Arrays.toString(ridesForAgency.toArray()));
         }
 
@@ -109,7 +109,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
                 }
                 costForAgency = def;
             }
-            LOG.info("Agency {} cost is {}", agencyId, costForAgency);
+            LOG.debug("Agency {} cost is {}", agencyId, costForAgency);
 
             // Check for transfer
             if (lastStartSec == -1L || startSec < lastStartSec + TRANSFER_DURATION_SEC) {
@@ -120,16 +120,16 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
                     totalCost += deltaCost;
                     // Record max ticket price for current transfer
                     currentCost = costForAgency;
-                    LOG.info("Transfer, additional cost is {}, total is {}", deltaCost, totalCost);
+                    LOG.debug("Transfer, additional cost is {}, total is {}", deltaCost, totalCost);
                 } else {
-                    LOG.info("New ticket cost lower than current {}", currentCost);
+                    LOG.debug("New ticket cost lower than current {}", currentCost);
                 }
                 // TODO Record discount
             } else {
                 // New one needed
                 currentCost = costForAgency;
                 totalCost += costForAgency;
-                LOG.info("New ticket, cost is {}, total is {}", costForAgency, totalCost);
+                LOG.debug("New ticket, cost is {}, total is {}", costForAgency, totalCost);
             }
 
             lastStartSec = startSec;
