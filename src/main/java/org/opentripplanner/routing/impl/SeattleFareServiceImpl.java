@@ -93,7 +93,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
 
         float currentCost = 0f;
         float totalCost = 0f;
-        long lastStartSec = -1L;
+        long lastStartSec = 0L;
         for (List<Ride> ridesForAgency : ridesPerAgency) {
 
             String agencyId = ridesForAgency.get(0).agency;
@@ -112,7 +112,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
             LOG.debug("Agency {} cost is {}", agencyId, costForAgency);
 
             // Check for transfer
-            if (lastStartSec == -1L || startSec < lastStartSec + TRANSFER_DURATION_SEC) {
+            if (startSec < lastStartSec + TRANSFER_DURATION_SEC) {
                 // Transfer OK
                 if (costForAgency > currentCost) {
                     // Add top-up
