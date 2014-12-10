@@ -79,7 +79,13 @@ public class ProfileRouter {
 
         // Lazy-initialize profile transfers (before setting timeouts, since this is slow)
         if (graph.index.transfersFromStopCluster == null) {
-            graph.index.initializeProfileTransfers();
+            synchronized (graph.index) {
+                // why another if statement? so that if another thread initialized this in the meantime
+                // we don't initialize it again.
+                if (graph.index.transfersFromStopCluster == null) {
+                    graph.index.initializeProfileTransfers();
+                }
+            }
         }
         // Analyst
         if (request.analyst) {

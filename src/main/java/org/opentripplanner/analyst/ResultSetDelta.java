@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ResultFeatureDelta extends ResultFeatureWithTimes {
+public class ResultSetDelta extends ResultSetWithTimes {
 
 	private static final long serialVersionUID = -6723127825189535112L;
    
@@ -14,7 +14,7 @@ public class ResultFeatureDelta extends ResultFeatureWithTimes {
 	public Map<String,Integer> times2IdMap = new ConcurrentHashMap<String,Integer>();
 	public Map<String,Integer> deltaIdMap = new ConcurrentHashMap<String,Integer>();
 	
-	public ResultFeatureDelta(SampleSet samples1, SampleSet samples2, TimeSurface surface1, TimeSurface surface2) {
+	public ResultSetDelta(SampleSet samples1, SampleSet samples2, TimeSurface surface1, TimeSurface surface2) {
 		id = samples1.pset.id + "_" + surface1.id + "_" + surface2.id + "_delta";
 		
 		// Evaluate the surface at all points in the pointset
