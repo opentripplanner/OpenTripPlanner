@@ -165,12 +165,10 @@ public class GraphService {
     }
 
     /**
-     * Blocking method to associate the specified router ID with the corresponding graph file on
-     * disk, load that serialized graph, and enable its use in routing. The relationship between
-     * router IDs and paths in the filesystem is determined by the graphService implementation.
-     * 
-     * @param routerId
-     * @param preEvict
+     * Blocking method to associate the specified router ID with the corresponding graph source,
+     * load it from appropriate source (serialized file, memory...), and enable its use in routing.
+     * The relationship between router IDs and paths in the filesystem is determined by the
+     * GraphSource implementation.
      * 
      * @return whether the operation completed successfully
      */
@@ -182,6 +180,10 @@ public class GraphService {
                     routerId);
             return false;
         }
+        if (routerLifecycleManager != null) {
+            graphSource.setRouterLifecycleManager(routerLifecycleManager);
+        }
+        graphSource.reload(true, false);
         if (graphSource.getRouter() == null) {
             LOG.warn("Can't register router ID '{}', no graph.", routerId);
             return false;

@@ -80,9 +80,8 @@ public class InputStreamGraphSource implements GraphSource {
      * @return A GraphSource loading graph from the file system under a base path.
      */
     public static InputStreamGraphSource newFileGraphSource(String routerId, File path,
-            LoadLevel loadLevel, Router.LifecycleManager routerLifecycleManager) {
-        return new InputStreamGraphSource(routerId, loadLevel, new FileGraphInputStream(path),
-                routerLifecycleManager);
+            LoadLevel loadLevel) {
+        return new InputStreamGraphSource(routerId, loadLevel, new FileGraphInputStream(path));
     }
 
     /**
@@ -93,18 +92,20 @@ public class InputStreamGraphSource implements GraphSource {
      *         inside a pre-packaged WAR for example).
      */
     public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path,
-            LoadLevel loadLevel, Router.LifecycleManager routerLifecycleManager) {
-        return new InputStreamGraphSource(routerId, loadLevel, new ClasspathGraphInputStream(path),
-                routerLifecycleManager);
+            LoadLevel loadLevel) {
+        return new InputStreamGraphSource(routerId, loadLevel, new ClasspathGraphInputStream(path));
     }
 
     private InputStreamGraphSource(String routerId, LoadLevel loadLevel,
-            GraphInputStream graphInputStream, Router.LifecycleManager routerLifecycleManager) {
+            GraphInputStream graphInputStream) {
         this.routerId = routerId;
         this.loadLevel = loadLevel;
         this.graphInputStream = graphInputStream;
+    }
+
+    @Override
+    public void setRouterLifecycleManager(LifecycleManager routerLifecycleManager) {
         this.routerLifecycleManager = routerLifecycleManager;
-        this.reload(true, false);
     }
 
     @Override
@@ -241,7 +242,7 @@ public class InputStreamGraphSource implements GraphSource {
             Preferences config = is == null ? null : new PropertiesPreferences(is);
             Router newRouter = new Router(routerId, newGraph);
             if (routerLifecycleManager != null) {
-                routerLifecycleManager.startupRouter(router, config);
+                routerLifecycleManager.startupRouter(newRouter, config);
             }
             return newRouter;
         } catch (IOException e) {
@@ -342,12 +343,10 @@ public class InputStreamGraphSource implements GraphSource {
 
         public LoadLevel loadLevel = LoadLevel.FULL;
 
-        public Router.LifecycleManager routerLifecycleManager;
-
         @Override
         public GraphSource createGraphSource(String routerId) {
             return InputStreamGraphSource.newFileGraphSource(routerId, getBasePath(routerId),
-                    loadLevel, routerLifecycleManager);
+                    loadLevel);
         }
 
         @Override

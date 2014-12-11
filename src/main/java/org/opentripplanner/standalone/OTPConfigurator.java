@@ -104,16 +104,16 @@ public class OTPConfigurator {
             try {
                 FileInputStream graphConfiguration = new FileInputStream(params.graphConfigFile);
                 Preferences config = new PropertiesPreferences(graphConfiguration);
-                this.graphService.registerGraph("", new MemoryGraphSource("", graph, routerLifecycleManager, config));
+                this.graphService.registerGraph("", new MemoryGraphSource("", graph, config));
             } catch (Exception e) {
                 if (params.graphConfigFile != null)
                     LOG.error("Can't read config file", e);
-                this.graphService.registerGraph("", new MemoryGraphSource("", graph, routerLifecycleManager));
+                this.graphService.registerGraph("", new MemoryGraphSource("", graph));
             }
         }
         if ((params.routerIds != null && params.routerIds.size() > 0) || params.autoScan) {
             /* Auto-register pre-existing graph on disk, with optional auto-scan. */
-            GraphScanner graphScanner = new GraphScanner(graphService, params.autoScan, routerLifecycleManager);
+            GraphScanner graphScanner = new GraphScanner(graphService, params.autoScan);
             graphScanner.basePath = graphSourceFactory.basePath;
             if (params.routerIds.size() > 0) {
                 graphScanner.defaultRouterId = params.routerIds.get(0);

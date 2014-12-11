@@ -205,7 +205,7 @@ public class GraphServiceImplTest extends TestCase {
 
         // Check for no graphs
         GraphService graphService = new GraphService(false);
-        GraphScanner graphScanner = new GraphScanner(graphService, true, null);
+        GraphScanner graphScanner = new GraphScanner(graphService, true);
         graphScanner.basePath = basePath;
         graphScanner.startup();
         assertEquals(0, graphService.getRouterIds().size());
@@ -218,7 +218,7 @@ public class GraphServiceImplTest extends TestCase {
 
         // Check that the single graph is there
         graphService = new GraphService(false);
-        graphScanner = new GraphScanner(graphService, true, null);
+        graphScanner = new GraphScanner(graphService, true);
         graphScanner.basePath = basePath;
         graphScanner.startup();
         assertEquals(1, graphService.getRouterIds().size());
@@ -229,7 +229,7 @@ public class GraphServiceImplTest extends TestCase {
         // Add another graph in a sub-directory
         graphSourceFactory.save("A", new ByteArrayInputStream(smallGraphData));
         graphService = new GraphService(false);
-        graphScanner = new GraphScanner(graphService, true, null);
+        graphScanner = new GraphScanner(graphService, true);
         graphScanner.basePath = basePath;
         graphScanner.startup();
         assertEquals(2, graphService.getRouterIds().size());
@@ -242,7 +242,7 @@ public class GraphServiceImplTest extends TestCase {
 
         // Check that default is A this time
         graphService = new GraphService(false);
-        graphScanner = new GraphScanner(graphService, true, null);
+        graphScanner = new GraphScanner(graphService, true);
         graphScanner.basePath = basePath;
         graphScanner.startup();
         assertEquals(1, graphService.getRouterIds().size());

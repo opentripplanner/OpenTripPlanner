@@ -222,8 +222,7 @@ public class Routers {
         try {
             graph = Graph.load(is, level);
             GraphService graphService = otpServer.getGraphService();
-            graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph,
-                    graphService.routerLifecycleManager));
+            graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
             return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
@@ -300,8 +299,7 @@ public class Routers {
         graph.index(new DefaultStreetVertexIndexFactory());
         
         GraphService graphService = otpServer.getGraphService();
-        graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph,
-                graphService.routerLifecycleManager));
+        graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
         return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
     }
     

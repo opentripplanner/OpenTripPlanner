@@ -19,6 +19,7 @@ import java.util.prefs.Preferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.Router.LifecycleManager;
 import org.opentripplanner.updater.PropertiesPreferences;
 
 /**
@@ -29,20 +30,25 @@ public class MemoryGraphSource implements GraphSource {
 
     private Router router;
 
+    private Preferences config;
+
     private Router.LifecycleManager routerLifecycleManager;
 
-    public MemoryGraphSource(String routerId, Graph graph, Router.LifecycleManager routerLifecycleManager) {
-        this(routerId, graph, routerLifecycleManager, new PropertiesPreferences(new Properties()));
+    public MemoryGraphSource(String routerId, Graph graph) {
+        this(routerId, graph, new PropertiesPreferences(new Properties()));
     }
 
-    public MemoryGraphSource(String routerId, Graph graph, Router.LifecycleManager routerLifecycleManager, Preferences config) {
+    public MemoryGraphSource(String routerId, Graph graph, Preferences config) {
         router = new Router(routerId, graph);
         router.graph.routerId = routerId;
+        this.config = config;
+        // We will startup the router later on
+    }
+
+    @Override
+    public void setRouterLifecycleManager(LifecycleManager routerLifecycleManager) {
         this.routerLifecycleManager = routerLifecycleManager;
-        if (this.routerLifecycleManager != null) {
-            // Can be null in unit-testing for example
-            this.routerLifecycleManager.startupRouter(router, config);
-        }
+        this.routerLifecycleManager.startupRouter(router, config);
     }
 
     @Override

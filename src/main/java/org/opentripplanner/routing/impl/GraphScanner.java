@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,14 +56,10 @@ public class GraphScanner {
     /** The GraphService where register graphs to */
     private GraphService graphService;
 
-    private Router.LifecycleManager routerLifecycleManager;
-
     private ScheduledExecutorService scanExecutor;
 
-    public GraphScanner(GraphService graphService, boolean autoScan,
-            Router.LifecycleManager routerLifecycleManager) {
+    public GraphScanner(GraphService graphService, boolean autoScan) {
         this.graphService = graphService;
-        this.routerLifecycleManager = routerLifecycleManager;
         if (autoScan) {
             scanExecutor = Executors.newSingleThreadScheduledExecutor();
         }
@@ -88,9 +83,8 @@ public class GraphScanner {
             LOG.info("Graph files will be sought in paths relative to {}", basePath);
             for (String routerId : routerIds) {
                 InputStreamGraphSource graphSource = InputStreamGraphSource.newFileGraphSource(
-                        routerId, getBasePath(routerId), loadLevel, routerLifecycleManager);
-                if (graphSource.getRouter() != null)
-                    graphService.registerGraph(routerId, graphSource);
+                        routerId, getBasePath(routerId), loadLevel);
+                graphService.registerGraph(routerId, graphSource);
             }
         } else {
             LOG.info("No list of routerIds was provided for automatic registration.");
@@ -139,11 +133,9 @@ public class GraphScanner {
                     Arrays.toString(graphToRegister.toArray()));
             for (String routerId : graphToRegister) {
                 InputStreamGraphSource graphSource = InputStreamGraphSource.newFileGraphSource(
-                        routerId, getBasePath(routerId), loadLevel, routerLifecycleManager);
-                if (graphSource.getRouter() != null) {
-                    // Can be null here if the file has been removed in the meantime.
-                    graphService.registerGraph(routerId, graphSource);
-                }
+                        routerId, getBasePath(routerId), loadLevel);
+                // Can be null here if the file has been removed in the meantime.
+                graphService.registerGraph(routerId, graphSource);
             }
         }
         /*
