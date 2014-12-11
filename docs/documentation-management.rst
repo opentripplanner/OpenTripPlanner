@@ -2,6 +2,19 @@
 Documentation Management
 ========================
 
+Updated Solution, as of 11 December 2014
+----------------------------------------
+
+* ReadTheDocs http://docs.readthedocs.org/en/latest/index.html, now supports
+
+* MkDocs http://www.mkdocs.org/, which uses
+
+* Markdown http://daringfireball.net/projects/markdown/syntax, which is the format our documents are already in.
+
+"MkDocs is a fast, simple and downright gorgeous static site generator that's geared towards building project documentation."
+
+It is written in Python (+1) and configured with a single YAML configuration file (+1).
+
 
 A summary of the current situation, as of 0.9.x
 -----------------------------------------------
