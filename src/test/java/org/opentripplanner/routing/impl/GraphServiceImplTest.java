@@ -27,6 +27,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
@@ -86,7 +87,7 @@ public class GraphServiceImplTest extends TestCase {
     @Test
     public final void testGraphServiceMemory() {
 
-        GraphServiceImpl graphService = new GraphServiceImpl();
+        GraphService graphService = new GraphService();
         graphService.registerGraph("A", new MemoryGraphSource("A", emptyGraph));
         assertEquals(1, graphService.getRouterIds().size());
 
@@ -137,7 +138,7 @@ public class GraphServiceImplTest extends TestCase {
     public final void testGraphServiceFile() throws IOException {
 
         // Create a GraphService and a GraphSourceFactory
-        GraphServiceImpl graphService = new GraphServiceImpl();
+        GraphService graphService = new GraphService();
         InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory();
         graphSourceFactory.basePath = basePath;
 
@@ -203,7 +204,7 @@ public class GraphServiceImplTest extends TestCase {
     public final void testGraphServiceAutoscan() throws IOException {
 
         // Check for no graphs
-        GraphServiceImpl graphService = new GraphServiceImpl(false);
+        GraphService graphService = new GraphService(false);
         GraphScanner graphScanner = new GraphScanner(graphService, true);
         graphScanner.basePath = basePath;
         graphScanner.startup();
@@ -216,7 +217,7 @@ public class GraphServiceImplTest extends TestCase {
         graphSourceFactory.save("", new ByteArrayInputStream(smallGraphData));
 
         // Check that the single graph is there
-        graphService = new GraphServiceImpl(false);
+        graphService = new GraphService(false);
         graphScanner = new GraphScanner(graphService, true);
         graphScanner.basePath = basePath;
         graphScanner.startup();
@@ -227,7 +228,7 @@ public class GraphServiceImplTest extends TestCase {
         System.out.println("------------------------------------------");
         // Add another graph in a sub-directory
         graphSourceFactory.save("A", new ByteArrayInputStream(smallGraphData));
-        graphService = new GraphServiceImpl(false);
+        graphService = new GraphService(false);
         graphScanner = new GraphScanner(graphService, true);
         graphScanner.basePath = basePath;
         graphScanner.startup();
@@ -240,7 +241,7 @@ public class GraphServiceImplTest extends TestCase {
         new File(basePath, InputStreamGraphSource.GRAPH_FILENAME).delete();
 
         // Check that default is A this time
-        graphService = new GraphServiceImpl(false);
+        graphService = new GraphService(false);
         graphScanner = new GraphScanner(graphService, true);
         graphScanner.basePath = basePath;
         graphScanner.startup();

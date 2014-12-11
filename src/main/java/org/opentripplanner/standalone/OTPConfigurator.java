@@ -42,7 +42,6 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.impl.GraphScanner;
-import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
@@ -81,7 +80,7 @@ public class OTPConfigurator {
 
     /** Create a cached GraphService that will be shared between all OTP components. */
     public void makeGraphService(Graph graph) {
-        GraphServiceImpl graphService = new GraphServiceImpl(params.autoReload);
+        GraphService graphService = new GraphService(params.autoReload);
         this.graphService = graphService;
         InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory();
         graphService.graphSourceFactory = graphSourceFactory;

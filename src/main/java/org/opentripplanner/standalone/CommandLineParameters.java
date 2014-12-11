@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
-import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.services.GraphService;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
@@ -300,7 +300,7 @@ public class CommandLineParameters implements Cloneable {
     public static class RouterId implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
-            Pattern routerIdPattern = GraphServiceImpl.routerIdPattern;
+            Pattern routerIdPattern = GraphService.routerIdPattern;
             Matcher m = routerIdPattern.matcher(value);
             if ( ! m.matches()) {
                 String msg = String.format("%s: '%s' is not a valid router ID.", name, value);
