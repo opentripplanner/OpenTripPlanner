@@ -35,7 +35,6 @@ public interface GraphSource {
 
         /**
          * @param routerId Id of the router.
-         * @param routerLifecycleManager Router startup/shutdown callback.
          * @return a new GraphSource for the given routerId.
          */
         public GraphSource createGraphSource(String routerId);
