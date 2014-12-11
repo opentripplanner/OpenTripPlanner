@@ -88,7 +88,7 @@ public class GraphServiceImplTest extends TestCase {
     public final void testGraphServiceMemory() {
 
         GraphService graphService = new GraphService();
-        graphService.registerGraph("A", new MemoryGraphSource("A", emptyGraph, null));
+        graphService.registerGraph("A", new MemoryGraphSource("A", emptyGraph));
         assertEquals(1, graphService.getRouterIds().size());
 
         Graph graph = graphService.getRouter("A").graph;
@@ -107,7 +107,7 @@ public class GraphServiceImplTest extends TestCase {
 
         assertEquals(emptyGraph, graph);
 
-        graphService.registerGraph("B", new MemoryGraphSource("B", smallGraph, null));
+        graphService.registerGraph("B", new MemoryGraphSource("B", smallGraph));
         assertEquals(2, graphService.getRouterIds().size());
 
         graph = graphService.getRouter("B").graph;
