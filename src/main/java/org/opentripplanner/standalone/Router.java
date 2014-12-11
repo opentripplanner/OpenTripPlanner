@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone;
 
+import java.util.prefs.Preferences;
+
 import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
@@ -16,6 +18,13 @@ import org.opentripplanner.routing.services.PathService;
  * in an OTP server.
  */
 public class Router {
+
+    public interface LifecycleManager {
+
+        public void startupRouter(Router router, Preferences config);
+
+        public void shutdownRouter(Router router);
+    }
 
     public String id;
     public Graph graph;

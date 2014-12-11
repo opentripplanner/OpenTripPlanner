@@ -83,6 +83,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -103,11 +104,11 @@ class Context {
 
     public Graph graph = spy(new Graph());
 
-    public GraphService graphService = new GraphService();
-
     public CommandLineParameters commandLineParameters = new CommandLineParameters();
 
-    public OTPServer otpServer = new OTPServer(commandLineParameters, graphService);
+    public OTPConfigurator otpConfigurator = new OTPConfigurator(commandLineParameters);
+
+    public OTPServer otpServer = otpConfigurator.getServer();
 
     private static Context instance = null;
 
@@ -119,8 +120,11 @@ class Context {
     }
 
     public Context() {
-        graphService.registerGraph("", new MemoryGraphSource("", makeSimpleGraph())); // default graph is tiny test graph
-        graphService.registerGraph("portland", new MemoryGraphSource("portland", graph));
+        GraphService graphService = otpServer.getGraphService();
+        graphService.registerGraph("", new MemoryGraphSource("", makeSimpleGraph(),
+                graphService.routerLifecycleManager)); // default graph is tiny test graph
+        graphService.registerGraph("portland", new MemoryGraphSource("portland", graph,
+                graphService.routerLifecycleManager));
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File(
                 "src/test/resources/portland/Streets_pdx.shp"));

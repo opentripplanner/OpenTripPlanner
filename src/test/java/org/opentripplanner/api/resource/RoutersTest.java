@@ -17,11 +17,11 @@ public class RoutersTest {
     @Test
     public void testRouters() {
         OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
-        otpServer.getGraphService().registerGraph("", new MemoryGraphSource(null, new Graph()));
-        otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("", new Graph()));
-        otpServer.getGraphService().getGraph("A").addVertex(new ExitVertex(null, "A", 0, 0));
-        otpServer.getGraphService().getGraph("A").addVertex(new ExitVertex(null, "B", 0, 1));
-        otpServer.getGraphService().getGraph("A").addVertex(new ExitVertex(null, "C", 1, 1));
+        otpServer.getGraphService().registerGraph("", new MemoryGraphSource(null, new Graph(), null));
+        otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("", new Graph(), null));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "A", 0, 0));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "B", 0, 1));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "C", 1, 1));
 
         Routers routerApi = new Routers();
         routerApi.otpServer = otpServer;

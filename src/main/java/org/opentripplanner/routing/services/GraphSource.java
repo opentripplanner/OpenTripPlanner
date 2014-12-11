@@ -15,7 +15,7 @@ package org.opentripplanner.routing.services;
 
 import java.io.InputStream;
 
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.Router;
 
 /**
  * A class responsible of graph creation / ownership.
@@ -34,7 +34,8 @@ public interface GraphSource {
     public interface Factory {
 
         /**
-         * @param routerId
+         * @param routerId Id of the router.
+         * @param routerLifecycleManager Router startup/shutdown callback.
          * @return a new GraphSource for the given routerId.
          */
         public GraphSource createGraphSource(String routerId);
@@ -52,8 +53,11 @@ public interface GraphSource {
         public boolean save(String routerId, InputStream is);
     }
 
-    /** @return The graph object */
-    public Graph getGraph();
+    /**
+     * @return The router containing a graph object. Delegates to the Router lifecycle manager the
+     *         startup and shutdown of the graph.
+     */
+    public Router getRouter();
 
     /**
      * Reload the graph from it's source.

@@ -28,7 +28,7 @@ import javax.annotation.PreDestroy;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,16 +59,13 @@ public class GraphService {
 
     private Map<String, GraphSource> graphSources = new HashMap<>();
 
-    /**
-     * Router IDs may contain alphanumeric characters, underscores, and dashes only. This prevents
-     * any confusion caused by the presence of special characters that might have a meaning for the
-     * filesystem.
-     */
-    public static final Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
+    private static final Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
 
     private String defaultRouterId = "";
 
     public GraphSource.Factory graphSourceFactory;
+
+    public Router.LifecycleManager routerLifecycleManager;
 
     private ScheduledExecutorService scanExecutor;
 
@@ -105,13 +102,17 @@ public class GraphService {
         cleanupWebapp();
     }
 
-    /** @return the current default graph object */
-    public Graph getGraph() throws GraphNotFoundException {
-        return getGraph(null);
+    /**
+     * @return the current default router object
+     */
+    public Router getRouter() throws GraphNotFoundException {
+        return getRouter(null);
     }
 
-    /** @return the graph object for the given router ID */
-    public Graph getGraph(String routerId) throws GraphNotFoundException {
+    /**
+     * @return the graph object for the given router ID
+     */
+    public Router getRouter(String routerId) throws GraphNotFoundException {
         if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
             routerId = defaultRouterId;
             LOG.debug("routerId not specified, set to default of '{}'", routerId);
@@ -126,12 +127,12 @@ public class GraphService {
             LOG.error("no graph registered with the routerId '{}'", routerId);
             throw new GraphNotFoundException();
         }
-        Graph graph = graphSource.getGraph();
-        if (graph == null) {
-            evictGraph(routerId);
+        Router router = graphSource.getRouter();
+        if (router == null) {
+            evictRouter(routerId);
             throw new GraphNotFoundException();
         }
-        return graph;
+        return router;
     }
 
     /**
@@ -150,7 +151,7 @@ public class GraphService {
                 GraphSource graphSource = graphSources.get(routerId);
                 boolean success = graphSource.reload(true, preEvict);
                 if (!success) {
-                    evictGraph(routerId);
+                    evictRouter(routerId);
                 }
                 allSucceeded &= success;
             }
@@ -174,15 +175,15 @@ public class GraphService {
      * @return whether the operation completed successfully
      */
     public boolean registerGraph(String routerId, GraphSource graphSource) {
-        LOG.info("Registering new graph '{}'", routerId);
+        LOG.info("Registering new router '{}'", routerId);
         if (!routerIdLegal(routerId)) {
             LOG.error(
                     "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
                     routerId);
             return false;
         }
-        if (graphSource.getGraph() == null) {
-            LOG.warn("Can't register router ID '{}', null graph.", routerId);
+        if (graphSource.getRouter() == null) {
+            LOG.warn("Can't register router ID '{}', no graph.", routerId);
             return false;
         }
         synchronized (graphSources) {
@@ -197,13 +198,13 @@ public class GraphService {
     }
 
     /**
-     * Dissociate a router ID from the corresponding graph object, and disable that router ID for
+     * Dissociate a router ID from the corresponding graph/services object, and disable that router ID for
      * use in routing.
      * 
-     * @return whether a graph was associated with this router ID and was evicted.
+     * @return whether a router was associated with this router ID and was evicted.
      */
-    public boolean evictGraph(String routerId) {
-        LOG.info("Evicting graph '{}'", routerId);
+    public boolean evictRouter(String routerId) {
+        LOG.info("Evicting router '{}'", routerId);
         synchronized (graphSources) {
             GraphSource graphSource = graphSources.get(routerId);
             graphSources.remove(routerId);
@@ -228,7 +229,7 @@ public class GraphService {
             int n = 0;
             Collection<String> routerIds = new ArrayList<String>(getRouterIds());
             for (String routerId : routerIds) {
-                if (evictGraph(routerId)) {
+                if (evictRouter(routerId)) {
                     n++;
                 }
             }
@@ -237,8 +238,8 @@ public class GraphService {
     }
 
     /**
-     * @return The default GraphSource factory. Needed in case someone want to register or save a new
-     *         router with a router ID only (namely, via the web-service API).
+     * @return The default GraphSource factory. Needed in case someone want to register or save a
+     *         new router with a router ID only (namely, via the web-service API).
      */
     public GraphSource.Factory getGraphSourceFactory() {
         return graphSourceFactory;
@@ -256,8 +257,12 @@ public class GraphService {
 
     /**
      * Check whether a router ID is legal or not.
+     * 
+     * Router IDs may contain alphanumeric characters, underscores, and dashes only. This prevents
+     * any confusion caused by the presence of special characters that might have a meaning for the
+     * filesystem.
      */
-    private boolean routerIdLegal(String routerId) {
+    public static boolean routerIdLegal(String routerId) {
         Matcher m = routerIdPattern.matcher(routerId);
         return m.matches();
     }
@@ -269,7 +274,7 @@ public class GraphService {
                 GraphSource graphSource = graphSources.get(routerId);
                 boolean success = graphSource.reload(false, AUTORELOAD_PREEVICT);
                 if (!success) {
-                    evictGraph(routerId);
+                    evictRouter(routerId);
                 }
             }
         }

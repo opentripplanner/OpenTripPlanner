@@ -39,6 +39,7 @@ import org.opentripplanner.analyst.batch.Individual;
 import org.opentripplanner.analyst.pointset.PropertyMetadata;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -395,7 +396,7 @@ public class PointSet implements Serializable{
 		
 		if (this.samples.containsKey(routerId))
 			return this.samples.get(routerId);
-		Graph g = this.graphService.getGraph(routerId);
+		Graph g = this.graphService.getRouter(routerId).graph;
 		
 		return getSampleSet(g);
 	}

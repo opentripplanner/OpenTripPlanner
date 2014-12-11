@@ -18,7 +18,7 @@ import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.PropertiesPreferences;
 
 /**
@@ -27,23 +27,27 @@ import org.opentripplanner.updater.PropertiesPreferences;
  */
 public class MemoryGraphSource implements GraphSource {
 
-    private Graph graph;
+    private Router router;
 
-    private GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
+    private Router.LifecycleManager routerLifecycleManager;
 
-    public MemoryGraphSource(String routerId, Graph graph) {
-        this(routerId, graph, new PropertiesPreferences(new Properties()));
+    public MemoryGraphSource(String routerId, Graph graph, Router.LifecycleManager routerLifecycleManager) {
+        this(routerId, graph, routerLifecycleManager, new PropertiesPreferences(new Properties()));
     }
 
-    public MemoryGraphSource(String routerId, Graph graph, Preferences config) {
-        this.graph = graph;
-        this.graph.routerId = routerId;
-        decorator.setupGraph(graph, config);
+    public MemoryGraphSource(String routerId, Graph graph, Router.LifecycleManager routerLifecycleManager, Preferences config) {
+        router = new Router(routerId, graph);
+        router.graph.routerId = routerId;
+        this.routerLifecycleManager = routerLifecycleManager;
+        if (this.routerLifecycleManager != null) {
+            // Can be null in unit-testing for example
+            this.routerLifecycleManager.startupRouter(router, config);
+        }
     }
 
     @Override
-    public Graph getGraph() {
-        return graph;
+    public Router getRouter() {
+        return router;
     }
 
     @Override
@@ -57,9 +61,11 @@ public class MemoryGraphSource implements GraphSource {
 
     @Override
     public void evict() {
-        if (graph != null) {
-            decorator.shutdownGraph(graph);
+        if (router != null) {
+            if (routerLifecycleManager != null) {
+                routerLifecycleManager.shutdownRouter(router);
+            }
         }
-        graph = null;
+        router = null;
     }
 }

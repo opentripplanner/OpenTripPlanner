@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
@@ -300,9 +298,7 @@ public class CommandLineParameters implements Cloneable {
     public static class RouterId implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
-            Pattern routerIdPattern = GraphService.routerIdPattern;
-            Matcher m = routerIdPattern.matcher(value);
-            if ( ! m.matches()) {
+            if (!GraphService.routerIdLegal(value)) {
                 String msg = String.format("%s: '%s' is not a valid router ID.", name, value);
                 throw new ParameterException(msg);
             }
