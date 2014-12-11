@@ -268,12 +268,22 @@ public class OTPConfigurator {
         } else return null;
     }
     
+    /**
+     * The default router lifecycle manager. Bind the services and delegates to
+     * GraphUpdaterConfigurator the real-time updater startup/shutdown.
+     */
     private Router.LifecycleManager routerLifecycleManager = new Router.LifecycleManager() {
 
         private GraphUpdaterConfigurator graphConfigurator = new GraphUpdaterConfigurator();
 
         /**
          * Create a new Router, owning a Graph and all it's associated services.
+         * 
+         * TODO: We could parametrize some services based on the given graph "preferences" (ie
+         * Graph.properties) instead of the command-line parameters. That would help simplify the
+         * growing list of OTP command-line parameters and allow for different configuration based
+         * on the routers (for example picking different path services for each routers, or enabling
+         * analyst for some routers only).
          */
         @Override
         public void startupRouter(Router router, Preferences config) {
