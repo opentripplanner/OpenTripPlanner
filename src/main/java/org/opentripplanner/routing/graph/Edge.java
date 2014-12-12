@@ -30,7 +30,8 @@ import org.opentripplanner.routing.util.UniqueIdGenerator;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
- * This is the standard implementation of an edge with fixed from and to Vertex instances; all standard OTP edges are subclasses of this.
+ * This is the standard implementation of an edge with fixed from and to Vertex instances;
+ * all standard OTP edges are subclasses of this.
  */
 public abstract class Edge implements Serializable {
 

@@ -25,6 +25,17 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.Map.Entry;
 
+/**
+ * Rather than finding a single optimal route, ProfileRouter aims to find all reasonable ways to go from an origin
+ * to a destination over a given time window, and expresses those results in terms of route combinations and time ranges.
+ * For example:
+ * riding Train A followed by Bus B between 9AM and 11AM takes between 1.2 and 1.6 hours;
+ * riding Train A followed by Bus C takes between 1.4 and 1.8 hours.
+ *
+ * Create one instance of ProfileRouter per profile search. It is not intended to be threadsafe or reusable.
+ * You MUST call the cleanup method on all ProfileRouter instances that have been used for routing before
+ * they are released for garbage collection.
+ */
 public class ProfileRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
@@ -552,7 +563,11 @@ public class ProfileRouter {
         }
     }
 
-    /** Destroy all routing contexts created during this search. */
+    /**
+     * Destroy all routing contexts created during this search. This method must be called manually on any
+     * ProfileRouter instance before it is released for garbage collection, because RoutingContexts remain linked into
+     * the graph by temporary edges if they are not cleaned up.
+     */
     public int cleanup() {
         int n = 0;
         for (RoutingContext rctx : routingContexts) {
@@ -560,8 +575,20 @@ public class ProfileRouter {
             n += 1;
         }
         routingContexts.clear();
-        LOG.info("destroyed {} routing contexts.", n);
+        LOG.debug("destroyed {} routing contexts.", n);
         return n;
+    }
+
+    /**
+     * This finalizer is intended as a failsafe to prevent memory leakage in case someone does
+     * not clean up routing contexts. It should be considered an error if this method does any work.
+     */
+    @Override
+    public void finalize() {
+        if (routingContexts.size() > 0) {
+            LOG.error("RoutingContexts were observed in the ProfileRouter finalizer: this is a memory leak.");
+            cleanup();
+        }
     }
 
 }
