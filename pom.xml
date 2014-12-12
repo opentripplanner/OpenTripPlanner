@@ -216,6 +216,17 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <filters>
+                                <filter>
+                                    <!-- exclude signatures from merged JAR to avoid invalid signature messages -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <!-- The shaded JAR will be the main artifact for the project -->
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
