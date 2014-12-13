@@ -1,6 +1,7 @@
 package org.opentripplanner.profile;
 
 import com.google.common.collect.*;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.resource.SimpleIsochrone;
@@ -8,6 +9,7 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -523,15 +525,24 @@ public class ProfileRouter {
         int worstElapsedTime = request.maxWalkTime * 60; // convert from minutes to seconds, assume walking at egress
         rr.worstTime = (rr.dateTime + worstElapsedTime);
         rr.batch = (true);
-        GenericAStar astar = new GenericAStar();
         rr.setNumItineraries(1);
+        rr.setRoutingContext(graph);
+        
+        GenericDijkstra dijk = new GenericDijkstra(rr);
+        
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             int index = tstop.getIndex();
             // Generate a tree outward from all stops that have been touched in the basic profile search
             if (mins[index] == TimeSurface.UNREACHABLE || maxs[index] == TimeSurface.UNREACHABLE) continue;
-            rr.setRoutingContext(graph, tstop, null); // Set origin vertex directly instead of generating link edges
-            astar.setTraverseVisitor(new ExtremaPropagationTraverseVisitor(mins[index], maxs[index]));
-            ShortestPathTree spt = astar.getShortestPathTree(rr, 5);
+
+            dijk.traverseVisitor = new ExtremaPropagationTraverseVisitor(mins[index], maxs[index]);
+            
+            State initialState = new State(tstop, rr);
+          
+            // the algorithm uses the traversevisitor named above to update this class; there is no need to save
+            // the SPT.
+            dijk.getShortestPathTree(initialState);
+            
             rr.rctx.destroy();
         }
         minSurface = new TimeSurface(this, false);
