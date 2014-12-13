@@ -526,7 +526,7 @@ public class ProfileRouter {
         rr.worstTime = (rr.dateTime + worstElapsedTime);
         rr.batch = (true);
         rr.setNumItineraries(1);
-        rr.setRoutingContext(graph);
+        rr.setDummyRoutingContext(graph);
         
         GenericDijkstra dijk = new GenericDijkstra(rr);
         
