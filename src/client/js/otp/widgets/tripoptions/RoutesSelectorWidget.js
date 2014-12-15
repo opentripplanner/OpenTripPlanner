@@ -69,8 +69,8 @@ otp.widgets.RoutesSelectorWidget =
             var paramStr = '', displayStr = '';
             for(var i = 0; i < this_.selectedRouteIds.length; i++) {
                 var route = this_.indexApi.routes[this_.selectedRouteIds[i]].routeData;
-
-                paramStr += route.id.agencyId+"__"+route.id.id + (i < this_.selectedRouteIds.length-1 ? ',' : '');
+                //format expected: agency_routename or agency__routeid, so, in our case, two underscores 
+                paramStr += route.id.replace(":", "__") + (i < this_.selectedRouteIds.length-1 ? ',' : '');
                 displayStr += (route.shortName || route.longName) + (i < this_.selectedRouteIds.length-1 ? ', ' : '');
             }
             this_.hide();
