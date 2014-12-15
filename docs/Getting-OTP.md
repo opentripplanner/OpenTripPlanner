@@ -11,11 +11,69 @@ of the main OTP repository on Github, the resulting JAR is published to the
 ## Building from Source
 
 You may also choose to build OTP from its source code. If you will be modifying OTP you will need to know how to rebuild
- it (though your IDE may take care of this build cycle for you). If you have the right software installed, building OTP from source is not particularly difficult. You should only need Git (our version control system), a Java Development Kit (JDK), Maven (our build system), and an internet connection so Maven can fetch all of OTP's dependencies (the libraries it needs to function).
-On Ubuntu or Debian Linux you would install these packages with the following command:
+ it (though your IDE may take care of this build cycle for you). If you have the right software installed, 
+ building OTP locally from its source code is not particularly difficult. You should only need the following software:
 
-(Move rest of text from Building-OTP wiki page.)
+- Git, a version control system
 
+- Java Development Kit, preferably version 7 (AKA version 1.7)
+
+- Maven, a build and dependency management system
+
+ 
+You will also need a reliable internet connection so Maven can fetch all of OTP's dependencies (the libraries it uses). 
+To install these software packages on a Debian or Ubuntu system, run `sudo apt-get install openjdk-7-jdk maven git`.
+
+Once you have these packages installed, create and/or switch to the directory where you will keep your Git repositories and make a local copy of the OTP source code:
+
+```shell
+mkdir git
+cd git
+git clone git@github.com:opentripplanner/OpenTripPlanner.git
+```
+
+Then change to the newly cloned OpenTripPlanner repository directory and start a build:
+
+```shell
+cd OpenTripPlanner
+mvn clean package
+```
+Maven should then be able to download all the libraries and other dependencies necessary to compile OTP. 
+If all goes well you should see a success message like the following:
+
+```
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 42.164s
+[INFO] Finished at: Tue Feb 18 19:35:48 CET 2014
+[INFO] Final Memory: 88M/695M
+[INFO] ------------------------------------------------------------------------
+```
+
+This build process should produce a JAR file called `otp.jar` in the `target/` directory which contains all the 
+compiled OTP classes and their dependencies. The shell script called 'otp' in the root of the cloned repository will 
+start the main class of that JAR file under a Java virtual machine, so after the Maven build completes you should be 
+able to run `./otp --help` and see an OTP help message including command line options.
+
+The words "clean package" are the build steps you want to run. You're telling maven to clean up any extraneous junk in
+ the directory, then perform all the build steps including compilation up to "package", which bundles the compiled program
+ into a single JAR file for distribution. 
+ 
+If you have just cloned OTP you will be working with the default "master" branch, where most active development occurs.
+ This is not the most stable or deployment-ready code available. To avoid newly minted bugs or undocumented behavior,
+ you can use Git to check out a specific release (tag or branch) of OTP to work with. The Maven build also includes 
+ many time-consuming integration tests. When working with a stable release of OTP, 
+ you may want to turn them off by adding the switch: `-DskipTests`.
+
+For example, you could do the following:
+
+```bash
+cd OpenTripPlanner
+git checkout opentripplanner-0.13.0
+git clean -df
+mvn clean package -DskipTests
+```
 
 ## Maven Repository
 
@@ -66,7 +124,7 @@ We may eventually migrate to the Gradle build system, but Gradle uses the same d
 repository system as Maven.
 
 
-## Continuous integration
+## Continuous Integration
 
 This section does not belong here, but can be moved later.
 The OpenTripPlanner project has a continuous integration (CI) server at http://ci.opentripplanner.org. Any time a change
