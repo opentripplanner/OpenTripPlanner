@@ -151,7 +151,7 @@ otp.core.IndexApi = otp.Class({
         var variantData = {};
         // since the new index api does not provide variant/pattern for trip (yet)
         // we have to iterate on route's patterns searching for the current trip.
-        _.each(route.variants,function(pattern) {
+        _.each(route.variants, function(pattern) {
             var tripIds = _.pluck(pattern.trips, 'id');
             if (_.contains(tripIds, agency_Tripid)) {
                 variantData = pattern;
@@ -179,7 +179,7 @@ otp.core.IndexApi = otp.Class({
             params.routerId = otp.config.routerId;
         }
         */
-        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' +stopId +'/stoptimes';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' + stopId + '/stoptimes';
         $.ajax(url, {
             //data:       params,
 
@@ -201,6 +201,16 @@ otp.core.IndexApi = otp.Class({
         $.ajax(url, {
             data:       params,
 
+            success: function(data) {
+                callback.call(callbackTarget, data);
+            }
+        });
+    },
+
+    loadRoutesForStop : function(agencyId, callbackTarget, callback) {
+
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' + agencyId + '/routes';
+        $.ajax(url, {
             success: function(data) {
                 callback.call(callbackTarget, data);
             }

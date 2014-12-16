@@ -32,6 +32,7 @@ otp.layers.StopsLayer =
     minimumZoomForStops : 15,
 
     initialize : function(module) {
+        var this_ = this;
         L.LayerGroup.prototype.initialize.apply(this);
         this.module = module;
 
@@ -39,6 +40,13 @@ otp.layers.StopsLayer =
 
         this.module.addLayer("stops", this);
         this.module.webapp.map.lmap.on('dragend zoomend', $.proxy(this.refresh, this));
+        this.module.webapp.map.lmap.on('popupopen', function (e) {
+            this_.module.webapp.indexApi.loadRoutesForStop(e.popup._source._stopId, this_, function(data) {
+                _.each(data, function(route) {
+                    ich['otp-stopsLayer-popupRoute'](route).appendTo($('.routeList'));
+                });
+            });
+        });
     },
 
     refresh : function() {
@@ -110,22 +118,24 @@ otp.layers.StopsLayer =
                 this_.module.setEndPoint(new L.LatLng(thisStop.lat, thisStop.lon), false, thisStop.stopName);
                 this_.module.webapp.map.lmap.closePopup();
             });
-
+            /*
             if(stop.routes) {
                 var routeList = popupContent.find('.routeList');
                 for(var r = 0; r < stop.routes.length; r++) {
                     var agencyAndId = stop.routes[r].agencyId + '_' + stop.routes[r].id;
-                    var routeData = this.module.webapp.transitIndex.routes[agencyAndId].routeData;
+                    //var routeData = this.module.webapp.indexApi.routes[agencyAndId].routeData;
                     ich['otp-stopsLayer-popupRoute'](routeData).appendTo(routeList);
                     // TODO: click opens RouteViewer
                     //routeList.append('<div>'+agencyAndId+'</div>');
                 }
             }
-
-            L.marker([stop.lat, stop.lon], {
+            */
+            m = L.marker([stop.lat, stop.lon], {
                 icon : icon,
-            }).addTo(this)
-            .bindPopup(popupContent.get(0));
+            });
+            m._stopId = stop.id;
+            m.addTo(this)
+             .bindPopup(popupContent.get(0));
 
         }
     },

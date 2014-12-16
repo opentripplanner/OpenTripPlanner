@@ -18,20 +18,18 @@
             ]
         </div>
 		<div style="margin-top: 6px;"><b>{{plan_trip}}</b>: [ <a href="#" class="planFromLink">{{from_stop}}</a> | <a href="#" class="planToLink">{{to_stop}}</a> ]</div>
-        <!--  TODO: new index api will expose routeList
         <div style="margin-top: 6px;" >
 			<b>{{routes_on_stop}}</b>:
             <ul class="routeList"/>
         </div>
-        -->
     </div>
 </script>
 
 <script id="otp-stopsLayer-popupRoute" type="text/html">
     <li style="margin: 0px;">
-        {{#routeShortName}}
-            ({{routeShortName}})
-        {{/routeShortName}}
-        {{routeLongName}}
+        {{#shortName}}
+            ({{shortName}})
+        {{/shortName}}
+        {{longName}}
     </li>
 </script>
