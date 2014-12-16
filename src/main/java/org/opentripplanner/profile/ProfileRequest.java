@@ -10,7 +10,7 @@ import javax.ws.rs.QueryParam;
 /**
  * All the modifiable paramters for profile routing.
  */
-public class ProfileRequest {
+public class ProfileRequest implements Serializable {
 
     public LatLon from;
     public LatLon to;

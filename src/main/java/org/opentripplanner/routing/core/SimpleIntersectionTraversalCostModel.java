@@ -13,10 +13,12 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
+
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
-public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel {
+public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel implements Serializable {
 
     // Model parameters are here. //
     // Constants for when there is a traffic light.
