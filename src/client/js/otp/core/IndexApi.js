@@ -34,12 +34,6 @@ otp.core.IndexApi = otp.Class({
 
         var url = otp.config.hostname + '/' + otp.config.restService + '/index/agencies';
         $.ajax(url, {
-            //dataType:   'jsonp', //defaults to "Intelligent Guess" jQuery will try to infer it based on the MIME type of the response
-            /* no parameter to send...
-            data: {
-                extended: 'true',
-            },
-            */
             success: function(data) {
                 this_.agencies = {};
 
@@ -65,12 +59,6 @@ otp.core.IndexApi = otp.Class({
 
         var url = otp.config.hostname + '/' + otp.config.restService + '/index/routes';
         $.ajax(url, {
-            /*dataType:   'jsonp',
-
-            data: {
-                extended: 'true',
-            },
-*/
             success: function(data) {
                 if(_.isEmpty(data)) {
                     console.log("Error: routes call returned no route data. OTP Message: "+data.message);
@@ -93,7 +81,7 @@ otp.core.IndexApi = otp.Class({
                 var routes = { };
                 for(var i=0; i<sortedRoutes.length; i++) {
                     var routeData = sortedRoutes[i];
-                    var agencyAndId = routeData.id;//.agencyId+"_"+routeData.id.id;
+                    var agencyAndId = routeData.id;
                     routes[agencyAndId] = {
                         index : i,
                         routeData : routeData,
@@ -186,15 +174,14 @@ otp.core.IndexApi = otp.Class({
             startTime : startTime,
             endTime : endTime,
             extended : true,
-        }; */
+        };
         if(otp.config.routerId !== undefined) {
             params.routerId = otp.config.routerId;
         }
-
+        */
         var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' +stopId +'/stoptimes';
         $.ajax(url, {
             //data:       params,
-            //dataType:   'jsonp',
 
             success: function(data) {
                 callback.call(callbackTarget, data);
