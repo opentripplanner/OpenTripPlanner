@@ -95,12 +95,12 @@ public class GTFSFeed {
         new CalendarDate.Loader(this).loadTable(zip);
         new FareAttribute.Loader(this).loadTable(zip);
         new FareRule.Loader(this).loadTable(zip);
-        new Frequency.Loader(this).loadTable(zip);
         new Route.Loader(this).loadTable(zip);
         new Shape.Loader(this).loadTable(zip);
         new Stop.Loader(this).loadTable(zip);
         new Transfer.Loader(this).loadTable(zip);
         new Trip.Loader(this).loadTable(zip);
+        new Frequency.Loader(this).loadTable(zip);
         new StopTime.Loader(this).loadTable(zip); // comment out this line for quick testing using NL feed
         LOG.info("{} errors", errors.size());
         for (GTFSError error : errors) {
