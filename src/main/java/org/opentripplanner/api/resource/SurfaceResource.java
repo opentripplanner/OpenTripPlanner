@@ -262,7 +262,7 @@ public class SurfaceResource extends RoutingResource {
      * Use Laurent's accumulative grid sampler. Cutoffs in minutes.
      * The grid and Delaunay triangulation are cached, so subsequent requests are very fast.
      */
-    public List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing) {
+    private List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing) {
 
         long t0 = System.currentTimeMillis();
         DelaunayIsolineBuilder<WTWD> isolineBuilder = new DelaunayIsolineBuilder<WTWD>(
