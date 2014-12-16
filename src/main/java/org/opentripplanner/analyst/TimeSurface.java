@@ -115,20 +115,17 @@ public class TimeSurface implements Serializable {
 
     // TODO Lazy-initialize sample grid on demand so initial SPT finishes faster, and only isolines lag behind.
     // however, the existing sampler needs an SPT, not general vertex-time mappings.
-    public void makeSampleGrid (ShortestPathTree spt) {
+    private void makeSampleGrid (ShortestPathTree spt) {
         long t0 = System.currentTimeMillis();
         final double gridSizeMeters = 300; // Todo: set dynamically and make sure this matches isoline builder params
-        // Off-road max distance MUST be APPROX EQUALS to the grid precision
-        // TODO: Loosen this restriction (by adding more closing sample).
-        // Change the 0.8 magic factor here with caution.
-        final double D0 = 0.8 * gridSizeMeters; // offroad walk distance roughly grid size
         final double V0 = 1.00; // off-road walk speed in m/sec
         Coordinate coordinateOrigin = new Coordinate();
         final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
         sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16, spt.getVertexCount(), dX, dY, coordinateOrigin);
-        SampleGridRenderer.sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0, spt.getOptions().getMaxWalkDistance(), Integer.MAX_VALUE, cosLat);
+        SampleGridRenderer.sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0, spt
+                .getOptions().getMaxWalkDistance(), Integer.MAX_VALUE, cosLat);
         long t1 = System.currentTimeMillis();
         LOG.info("Made SampleGrid from SPT in {} msec.", (int) (t1 - t0));
     }
