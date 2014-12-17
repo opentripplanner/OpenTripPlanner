@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.13.0 (2014-12-5)
+## 0.13.0 (2014-12-05)
 - Detect apparent errors in GTFS interlining
 - Long distance mode: use a pure weight-based state comparison, and use trip-banning retrying logic to get multiple paths. This compromises correctness somewhat but brings search times back within reason for large regional graphs. Also, we create significantly less SimpleTransfers.
 - Progress on GTFS reading and writing library (not yet used by OTP).
@@ -59,7 +59,7 @@ This release was made to consolidate all the development that had occurred with 
 - more lenient parsing of times
 - new directions icon set with SVG sources (thanks Laurent G)
 
-### 0.5.4 (2012-04-06) 
+## 0.5.4 (2012-04-06) 
 - catch 0 divisors in NED builder, preventing NaN propagation to edge lengths
 - avoid repeated insertion of edges into edge lists, which are now threadsafe edge sets
 - identity equality for edges
@@ -77,7 +77,7 @@ This release was made to consolidate all the development that had occurred with 
 - transfers.txt can define station paths, entry costs for stations
 - allow loading a base graph into graphbuilder instead of starting from scratch
 
-### 0.5.3 (2012-03-23)
+## 0.5.3 (2012-03-23)
 - GTFS loader now loads feeds one-at-a-time, allowing per-feed configuration
 - half-written graph files are now deleted on graph build error
 - DST issue OTP-side fixes, tests adjusted to use timezones
@@ -90,10 +90,10 @@ This release was made to consolidate all the development that had occurred with 
 - mapbox streets tile layer is now the default
 - complete Dutch translation
 
-### Version 0.5.2 (2012-03-20)
+## 0.5.2 (2012-03-20)
 - hop speed/distance checks, duplicate shape point filtering, etc.
 
-### Version 0.5.1 (2012-03-16)
+## 0.5.1 (2012-03-16)
 - more transit index features
 - default agencyIDs now determined on a per-feed basis
 - fixed fare overflow problem
@@ -101,7 +101,7 @@ This release was made to consolidate all the development that had occurred with 
 - additional graphbuilder warnings and annotations
 - fixed a batch of bugs found by fixbugs  
 
-## Version 0.5.0 (2012-03-09)
+## 0.5.0 (2012-03-09)
 - stop codes, zones, and agency names in planner responses
 - encapsulation of edge list modifications
 - expanded edge and vertex type hierarchy
@@ -118,5 +118,5 @@ This release was made to consolidate all the development that had occurred with 
 - optional island removal graphbuilder step
 - and of course, lots of bugfixes
 
-### Version 0.4.4 (2012-02-06)
+## 0.4.4 (2012-02-06)
 Release in anticipation of upcoming merges.
