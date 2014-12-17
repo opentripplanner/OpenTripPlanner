@@ -1,5 +1,7 @@
 package org.opentripplanner.profile;
 
+import java.io.Serializable;
+
 import org.joda.time.LocalDate;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.routing.core.TraverseModeSet;
