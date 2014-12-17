@@ -366,21 +366,22 @@ public class ProfileRouter {
                 }
             }
         }
-        // Truncate long lists to include a mix of nearby bus and train patterns
-        if (closest.size() > 500) {
-            LOG.warn("Truncating long list of patterns.");
+        final int MAX_PATTERNS = 1000;
+        // Truncate long lists to include a mix of nearby bus and train patterns, keeping those closest to the origin
+        if (closest.size() > MAX_PATTERNS) {
+            LOG.warn("Truncating excessively long list of patterns. {} patterns, max allowed is {}.", closest.size(), MAX_PATTERNS);
+            // The natural ordering on StopAtDistance is based on distance from the origin
             Multimap<StopAtDistance, TripPattern> busPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
             Multimap<StopAtDistance, TripPattern> otherPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-            Multimap<StopAtDistance, TripPattern> patterns;
             for (TripPattern pattern : closest.keySet()) {
-                patterns = (pattern.mode == TraverseMode.BUS) ? busPatterns : otherPatterns;
+                Multimap<StopAtDistance, TripPattern> patterns = (pattern.mode == TraverseMode.BUS) ? busPatterns : otherPatterns;
                 patterns.put(closest.get(pattern), pattern);
             }
             closest.clear();
             Iterator<StopAtDistance> iterBus = busPatterns.keySet().iterator();
             Iterator<StopAtDistance> iterOther = otherPatterns.keySet().iterator();
-            // Alternately add one of each kind of pattern until we reach the max
-            while (closest.size() < 50) {
+            // Alternately add one bus and one non-bus pattern in order of increasing distance until we reach the max
+            while (closest.size() < MAX_PATTERNS) {
                 StopAtDistance sd;
                 if (iterBus.hasNext()) {
                     sd = iterBus.next();
