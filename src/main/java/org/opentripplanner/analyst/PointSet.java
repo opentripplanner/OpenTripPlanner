@@ -411,22 +411,15 @@ public class PointSet implements Serializable{
     /**
      * Adds a graph service to allow for auto creation of SampleSets for a given
      * graph
-     * 
-     * @param reference
-     *            to the application graph service
      */
-
     public void setGraphService(GraphService graphService) {
         this.graphService = graphService;
     }
 
     /**
      * gets a sample set for a given graph id -- requires graphservice to be set
-     * 
-     * @param a valid graph id
      * @return sampleset for graph
      */
-
     public SampleSet getSampleSet(String routerId) {
         if(this.graphService == null) 
             return null;
@@ -452,6 +445,9 @@ public class PointSet implements Serializable{
         return sampleSet;
     }
 
+    public int featureCount() {
+        return ids.length;
+    }
 
     /**
      * Add a single feature with a variable number of free-form properties.
@@ -460,14 +456,8 @@ public class PointSet implements Serializable{
      * TODO: read explicit schema or infer it and validate property presence as
      * they're read
      * 
-     * @param geom
-     *            must be a Point, a Polygon, or a single-element MultiPolygon
+     * @param feat must be a Point, a Polygon, or a single-element MultiPolygon
      */
-
-    public int featureCount() {
-        return ids.length;
-    }
-
     public void addFeature(PointFeature feat, int index) {
         if (index >= capacity) {
             throw new AssertionError("Number of features seems to have grown since validation.");
