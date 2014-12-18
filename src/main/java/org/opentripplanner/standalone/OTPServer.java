@@ -33,13 +33,16 @@ public class OTPServer {
     // Core OTP modules
     private GraphService graphService;
 
-    /*
+    /**
      * The prototype routing request which establishes default parameter values. Note: this need to
      * be server-wide as we build the request before knowing which router it will be resolved to.
      * This prevent from having default request values per router instance. Fix this if this is
      * needed.
      */
     public RoutingRequest routingRequest;
+
+    /** The directory under which graphs, caches, etc. will be stored. */
+    public File basePath = null;
 
     // Optional Analyst global modules (caches)
     public SurfaceCache surfaceCache;
@@ -59,7 +62,7 @@ public class OTPServer {
         // Optional Analyst Modules.
         if (params.analyst) {
             surfaceCache = new SurfaceCache(30);
-            pointSetCache = new DiskBackedPointSetCache(100, new File(params.pointSetDirectory));
+            pointSetCache = new DiskBackedPointSetCache(100, params.pointSetDirectory);
         }
     }
 
@@ -143,6 +146,10 @@ public class OTPServer {
     /**
      * Return an HK2 Binder that injects this specific OTPServer instance into Jersey web resources.
      * This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as a singleton.
+     * Jersey forces us to use injection to get application context into HTTP method handlers, but in OTP we always
+     * just inject this OTPServer instance and grab anything else we need (routers, graphs, application components)
+     * from this single object.
+     *
      * More on custom injection in Jersey 2:
      * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
      */

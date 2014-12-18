@@ -30,7 +30,7 @@ public class GeocoderResource {
         synchronized (graphIndex) {
             if (graphIndex.luceneIndex == null) {
                 // Synchronously lazy-initialize the Lucene index
-                graphIndex.luceneIndex = new LuceneIndex(graphIndex, false);
+                graphIndex.luceneIndex = new LuceneIndex(graphIndex, otpServer.basePath, false);
             }
             index = graphIndex.luceneIndex;
         }

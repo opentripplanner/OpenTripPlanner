@@ -323,9 +323,13 @@ public class InputStreamGraphSource implements GraphSource {
 
         private static final Logger LOG = LoggerFactory.getLogger(FileFactory.class);
 
-        public File basePath = new File("/var/otp/graphs");
+        public File basePath;
 
         public LoadLevel loadLevel = LoadLevel.FULL;
+
+        public FileFactory(File basePath) {
+            this.basePath = basePath;
+        }
 
         @Override
         public GraphSource createGraphSource(String routerId) {

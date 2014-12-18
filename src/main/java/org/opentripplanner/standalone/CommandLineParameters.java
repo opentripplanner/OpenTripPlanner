@@ -35,150 +35,155 @@ import com.beust.jcommander.ParameterException;
  */
 public class CommandLineParameters implements Cloneable {
 
-    private static final int DEFAULT_PORT = 8080;
-    private static final int DEFAULT_SECURE_PORT = 8081;
-    private static final String DEFAULT_GRAPH_DIRECTORY  = "/var/otp/graphs";
-    private static final String DEFAULT_CACHE_DIRECTORY  = "/var/otp/cache";
-    private static final String DEFAULT_POINTSET_DIRECTORY  = "/var/otp/pointsets";
-    private static final String DEFAULT_ROUTER_ID = "";
+    private static final int    DEFAULT_PORT        = 8080;
+    private static final int    DEFAULT_SECURE_PORT = 8081;
+    private static final String DEFAULT_BASE_PATH   = "/var/otp";
+    private static final String DEFAULT_ROUTER_ID   = "";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
 
-    @Parameter(names = { "-h", "--help"}, help = true,
-    description = "Print this help message and exit")
+    @Parameter(names = {"--help"}, help = true,
+            description = "Print this help message and exit.")
     boolean help;
-    
-    @Parameter(names = { "-v", "--verbose" }, 
-    description = "Verbose output")
+
+    @Parameter(names = {"--verbose"},
+            description = "Verbose output.")
     boolean verbose;
-   
+
+    @Parameter(names = {"--basePath"}, validateWith = ReadWriteDirectory.class,
+            description = "Set the path under which graphs, caches, etc. are stored by default.")
+    String basePath = DEFAULT_BASE_PATH;
+
     /* Options for the graph builder sub-task. */
 
-    @Parameter(names = {"-b", "--build"}, validateWith = ReadableDirectory.class, 
-    description = "build graphs at specified paths", variableArity = true)
+    @Parameter(names = {"--build"}, validateWith = ReadableDirectory.class,
+            description = "Build graphs at specified paths.", variableArity = true)
     public List<File> build;
-    
-    @Parameter(names = { "-c", "--cache"}, validateWith = ReadWriteDirectory.class,
-            description = "the directory under which to cache OSM and NED tiles")
-    String cacheDirectory;
 
-    @Parameter(names = { "-e", "--elevation"},
+    @Parameter(names = {"--cache"}, validateWith = ReadWriteDirectory.class,
+            description = "The directory under which to cache OSM and NED tiles. Default is BASE_PATH/cache.")
+    File cacheDirectory;
+
+    @Parameter(names = {"--elevation"},
             description = "download and use elevation data for the graph")
     boolean elevation;
-    
-    @Parameter(names = { "-m", "--inMemory"},
-    description = "pass the graph to the server in-memory after building it, without saving to disk")
+
+    @Parameter(names = {"--inMemory"},
+            description = "Pass the graph to the server in-memory after building it, without saving to disk.")
     public boolean inMemory;
- 
-    @Parameter(names = { "--preFlight"},
-    description = "pass the graph to the server in-memory after building it, and saving to disk")
+
+    @Parameter(names = {"--preFlight"},
+            description = "Pass the graph to the server in-memory after building it, and saving to disk.")
     boolean preFlight;
 
     @Parameter(names = {"--noTransit"},
-    description = "skip all transit input files (GTFS)")
+            description = "Skip all transit input files (GTFS).")
     boolean noTransit;
 
     @Parameter(names = {"--useTransfersTxt"},
-    description = "use transfers.txt file for the gtfsBundle (GTFS)")
+            description = "Use transfers.txt file for the gtfsBundle (GTFS).")
     boolean useTransfersTxt;
-    
+
     @Parameter(names = {"--noParentStopLinking"},
-    description = "skip linking of stops to parent stops (GTFS)")
+            description = "Skip linking of stops to parent stops (GTFS).")
     boolean noParentStopLinking;
 
     @Parameter(names = {"--useStreetsForLinking"},
-    description = "use street network to link stops to each other")
+            description = "Use street network to link stops to each other rather than straight line distance.")
     boolean useStreetsForLinking;
 
     @Parameter(names = {"--parentStationTransfers"},
-    description = "create direct transfers between the constituent stops of each parent station")
+            description = "Create direct transfers between the constituent stops of each parent station.")
     boolean parentStationTransfers = false;
 
     @Parameter(names = {"--noStreets"},
-    description = "skip all street input files (OSM)")
+            description = "Skip all street input files (OSM/PBF).")
     boolean noStreets;
 
     @Parameter(names = {"--noEmbedConfig"},
-    description = "Skip embedding config in graph (Embed.properties)")
+            description = "Skip embedding config in graph (Embed.properties).")
     boolean noEmbedConfig = false;
 
-    @Parameter(names = { "--skipVisibility"},
-            description = "skip area visibility calculations, which are often time consuming.")
+    @Parameter(names = {"--skipVisibility"},
+            description = "Skip area visibility calculations, which are often time consuming.")
     boolean skipVisibility;
 
     /* Options for the server sub-task. */
 
-    @Parameter( names = { "-a", "--analyst"}, 
-            description = "enable OTP Analyst extensions")
+    @Parameter(names = {"--analyst"},
+            description = "Enable OTP Analyst extensions.")
     boolean analyst;
 
-    @Parameter( names = {"--bindAddress"},
-            description = "the address of the network interface to bind to. defaults to all interfaces.")
+    @Parameter(names = {"--bindAddress"},
+            description = "Specify which network interface to bind to by address. 0.0.0.0 means all interfaces.")
     String bindAddress = "0.0.0.0";
 
-    @Parameter( names = { "--securePort"}, validateWith = AvailablePort.class,
-            description = "server port")
+    @Parameter(names = {"--securePort"}, validateWith = AvailablePort.class,
+            description = "Server port for HTTPS.")
     Integer securePort;
 
-    @Parameter( names = { "-f", "--graphConfigFile"}, validateWith = ReadableFile.class,
-            description = "path to graph configuration file")
+    // TODO remove this
+    @Parameter(names = {"--graphConfigFile"}, validateWith = ReadableFile.class,
+            description = "Path to graph configuration file.")
     String graphConfigFile;
 
-    // --basePath (rather than --graphs). Maybe just eliminate most short options.
-    @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class,
-            description = "path to graph directory")
-    String graphDirectory;
-
-    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs to register in graph directory.")
+    @Parameter(names = {"--autoScan"}, description = "Auto-scan for graphs to register in graph directory.")
     boolean autoScan = false;
 
-    @Parameter(names = { "--autoReload" }, description = "auto-reload registered graphs when source data is modified.")
+    @Parameter(names = {"--autoReload"}, description = "Auto-reload registered graphs when source data is modified.")
     boolean autoReload = false;
 
-    @Parameter( names = { "-l", "--longDistance"}, 
-            description = "use an algorithm tailored for long-distance routing")
+    @Parameter(names = {"--longDistance"},
+            description = "Use an algorithm tailored for big graphs (the size of New York or the Netherlands).")
     boolean longDistance = false;
 
-    @Parameter( names = { "-p", "--port"}, validateWith = AvailablePort.class, 
-    description = "server port")
+    @Parameter(names = {"--port"}, validateWith = AvailablePort.class,
+            description = "Server port for plain HTTP.")
     Integer port;
 
-    @Parameter( names = { "-P", "--pointSet"}, validateWith =  ReadableDirectory.class, 
-    		description = "path to pointSet directory")
-    String pointSetDirectory;
-    
-    @Parameter( names = { "-r", "--router"}, validateWith = RouterId.class,
-    		description = "Router ID, first one being the default")
+    @Parameter(names = {"--graphs"}, validateWith = ReadableDirectory.class,
+            description = "Path to directory containing graphs. Defaults to BASE_PATH/graphs.")
+    File graphDirectory;
+
+    @Parameter(names = {"--pointSets"}, validateWith = ReadableDirectory.class,
+            description = "Path to directory containing PointSets. Defaults to BASE_PATH/pointsets.")
+    File pointSetDirectory;
+
+    @Parameter(names = {"--routers"}, validateWith = RouterId.class,
+            description = "One or more router IDs to build and/or serve, first one being the default.")
     List<String> routerIds;
 
-    @Parameter( names = { "-s", "--server"}, 
-            description = "run a server")
+    @Parameter(names = {"--server"},
+            description = "Run an OTP API server.")
     boolean server = false;
-    
-    @Parameter( names = { "-z", "--visualize"}, 
-    description = "open a debugging graph visualizer")
+
+    @Parameter(names = {"--visualize"},
+            description = "Open a graph visualizer window for debugging.")
     boolean visualize;
 
-    @Parameter( validateWith = ReadableFile.class, // the remaining parameters in one array
-    description = "files") 
+    // TODO should these replace the files auto-discovered in the router directory?
+    @Parameter(validateWith = ReadableFile.class, // the remaining parameters in one array
+            description = "Files for graph build.")
     List<File> files = new ArrayList<File>();
-    
-    @Parameter( names = {"--insecure"},
-            description = "allow unauthenticated access to sensitive resources, e.g. /routers")
+
+    @Parameter(names = {"--insecure"},
+            description = "Allow unauthenticated access to sensitive API resources, e.g. /routers")
     boolean insecure = false;
 
     /** Set some convenience parameters based on other parameters' values. */
-    public void infer () {
-        server |= ( inMemory || preFlight || port != null );
-        if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
+    public void infer() {
+        server |= (inMemory || preFlight || port != null);
+        if (basePath == null) basePath = DEFAULT_BASE_PATH;
         if (routerIds == null) {
             if (autoScan || inMemory || preFlight)
                 routerIds = Collections.emptyList();
             else
                 routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
         }
-        if (cacheDirectory == null) cacheDirectory = DEFAULT_CACHE_DIRECTORY;
-        if (pointSetDirectory == null) pointSetDirectory = DEFAULT_POINTSET_DIRECTORY;
+        /* If user has not overridden these paths, use default locations under the base path. */
+        if (cacheDirectory == null) cacheDirectory = new File(basePath, "cache");
+        if (graphDirectory == null) graphDirectory = new File(basePath, "graphs");
+        if (pointSetDirectory == null) pointSetDirectory = new File(basePath, "pointsets");
         if (server && port == null) {
             port = DEFAULT_PORT;
             new AvailablePort().validate(port);
@@ -189,19 +194,19 @@ public class CommandLineParameters implements Cloneable {
         }
     }
 
-    public CommandLineParameters clone () {
+    public CommandLineParameters clone() {
         CommandLineParameters ret;
         try {
             ret = (CommandLineParameters) super.clone();
         } catch (CloneNotSupportedException e) {
             return null;
         }
-        
+
         if (this.build != null) {
             ret.build = Lists.newArrayList();
             ret.build.addAll(this.build);
         }
-        
+
         if (this.routerIds != null) {
             ret.routerIds = Lists.newArrayList();
             ret.routerIds.addAll(this.routerIds);

@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 
@@ -47,12 +48,12 @@ public class GrizzlyServer {
         
         LOG.info("Starting OTP Grizzly server on ports {} (HTTP) and {} (HTTPS) of interface {}",
             params.port, params.securePort, params.bindAddress);
-        LOG.info("Base path is X, graphs are at {}", params.graphDirectory);
+        LOG.info("OTP server base path is {}", params.basePath);
         HttpServer httpServer = new HttpServer();
 
         /* Configure SSL */
         SSLContextConfigurator sslConfig = new SSLContextConfigurator();
-        sslConfig.setKeyStoreFile("/var/otp/keystore");
+        sslConfig.setKeyStoreFile(new File(params.basePath, "keystore").getAbsolutePath());
         sslConfig.setKeyStorePass("opentrip");
 
         /* OTP is CPU-bound, so we want only as many worker threads as we have cores. */

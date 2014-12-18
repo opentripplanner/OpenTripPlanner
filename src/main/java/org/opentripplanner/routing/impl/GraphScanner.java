@@ -41,8 +41,8 @@ public class GraphScanner {
     /** Auto-scan for new graphs every n secs. */
     private static final int AUTOSCAN_PERIOD_SEC = 10;
 
-    /** Where to look for graphs */
-    public File basePath = new File("/var/otp/graphs");
+    /** Where to look for graphs. Defaults to 'graphs' under the OTP server base path. */
+    public File basePath = null;
 
     /** A list of routerIds to automatically register and load at startup */
     public List<String> autoRegister;
@@ -58,8 +58,9 @@ public class GraphScanner {
 
     private ScheduledExecutorService scanExecutor;
 
-    public GraphScanner(GraphService graphService, boolean autoScan) {
+    public GraphScanner(GraphService graphService, File basePath, boolean autoScan) {
         this.graphService = graphService;
+        this.basePath = basePath;
         if (autoScan) {
             scanExecutor = Executors.newSingleThreadScheduledExecutor();
         }
