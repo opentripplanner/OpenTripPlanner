@@ -38,8 +38,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.prefs.Preferences;
 
 import com.google.common.collect.*;
+import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -87,7 +89,7 @@ public class Graph implements Serializable {
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
-    
+
     public String routerId;
 
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
@@ -109,7 +111,7 @@ public class Graph implements Serializable {
 
     /* vertex index by name is reconstructed from edges */
     private transient Map<String, Vertex> vertices;
-    
+
     private transient CalendarService calendarService;
 
     private boolean debugData = true;
@@ -122,19 +124,19 @@ public class Graph implements Serializable {
     public transient StreetVertexIndexService streetIndex;
 
     public transient GraphIndex index;
-    
+
     private transient GeometryIndex geomIndex;
-    
+
     private transient SampleFactory sampleFactory;
-    
+
     public final Deduplicator deduplicator = new Deduplicator();
 
-    /** 
+    /**
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
-    public final Map<AgencyAndId,Integer> serviceCodes = Maps.newHashMap();
-    
+    public final Map<AgencyAndId, Integer> serviceCodes = Maps.newHashMap();
+
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
@@ -161,10 +163,16 @@ public class Graph implements Serializable {
      */
     public Properties embeddedPreferences = null;
 
+    /* The preferences that were used for graph building. */
+    public Preferences preferences = null;
+
+    /* The time at which the graph was built, for detecting changed inputs and triggering a rebuild. */
+    public DateTime buildTimeJoda = null; // FIXME
+
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
      * graph updaters defined in the configuration.
-     * 
+     *
      * @see GraphUpdaterConfigurator
      */
     public transient GraphUpdaterManager updaterManager = null;
@@ -182,7 +190,7 @@ public class Graph implements Serializable {
         this.edgeById = new ConcurrentHashMap<Integer, Edge>();
         this.vertexById = new ConcurrentHashMap<Integer, Vertex>();
     }
-    
+
     /**
      * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph, when they are constructed or deserialized.
      */
@@ -198,9 +206,9 @@ public class Graph implements Serializable {
 
     /**
      * Removes a vertex from the graph.
-     * 
+     *
      * Called from streetutils, must be public for now
-     * 
+     *
      * @param v
      */
     public void removeVertex(Vertex v) {
@@ -208,7 +216,7 @@ public class Graph implements Serializable {
             LOG.error(
                     "attempting to remove vertex that is not in graph (or mapping value was null): {}",
                     v);
-        }        
+        }
     }
 
     /* Fetching vertices by label is convenient in tests and such, but avoid using in general. */
@@ -216,13 +224,13 @@ public class Graph implements Serializable {
     public Vertex getVertex(String label) {
         return vertices.get(label);
     }
-    
+
     /**
      * Returns the vertex with the given ID or null if none is present.
-     * 
+     *
      * NOTE: you may need to run rebuildVertexAndEdgeIndices() for the indices
      * to be accurate.
-     * 
+     *
      * @param id
      * @return
      */
@@ -237,20 +245,20 @@ public class Graph implements Serializable {
     public Collection<Vertex> getVertices() {
         return this.vertices.values();
     }
-    
+
     /**
      * Returns the edge with the given ID or null if none is present.
-     * 
+     *
      * NOTE: you may need to run rebuildVertexAndEdgeIndices() for the indices
      * to be accurate.
-     * 
+     *
      * @param id
      * @return
      */
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
     }
-    
+
     /**
      * Return all the edges in the graph.
      * @return

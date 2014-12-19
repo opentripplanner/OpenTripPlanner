@@ -47,11 +47,17 @@ public class LuceneIndex {
     private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_47);
     private QueryParser parser = new QueryParser(Version.LUCENE_47, "name", analyzer);
     private GraphIndex graphIndex;
-    private Directory directory;
+    private File basePath;
+    private Directory directory; // the Lucene Directory, not to be confused with a filesystem directory
     private IndexSearcher searcher; // Will be null until index is built.
 
-    public LuceneIndex(final GraphIndex graphIndex, boolean background) {
+    /**
+     * @param basePath the filesystem location under which to save indexes
+     * @param background if true, perform the initial indexing in a background thread, if false block to index
+     */
+    public LuceneIndex(final GraphIndex graphIndex, File basePath, boolean background) {
         this.graphIndex = graphIndex;
+        this.basePath = basePath;
         if (background) {
             new BackgroundIndexer().start();
         } else {
@@ -65,7 +71,8 @@ public class LuceneIndex {
     private void index() {
         try {
             long startTime = System.currentTimeMillis();
-            directory = FSDirectory.open(new File("/var/otp/lucene"));
+            /* Create or re-open a disk-backed Lucene Directory under the OTP server base filesystem directory. */
+            directory = FSDirectory.open(new File(basePath, "lucene"));
             // TODO reuse the index if it exists?
             //directory = new RAMDirectory(); // only a little faster
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, analyzer).setOpenMode(OpenMode.CREATE);

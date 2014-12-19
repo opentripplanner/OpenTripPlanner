@@ -83,10 +83,10 @@ public class OTPConfigurator {
     public void makeGraphService(Graph graph) {
         GraphServiceImpl graphService = new GraphServiceImpl(params.autoReload);
         this.graphService = graphService;
-        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory();
+        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory(params.graphDirectory);
         graphService.graphSourceFactory = graphSourceFactory;
         if (params.graphDirectory != null) {
-            graphSourceFactory.basePath = new File(params.graphDirectory);
+            graphSourceFactory.basePath = params.graphDirectory;
         }
         if (graph != null && (params.inMemory || params.preFlight)) {
             /* Hand off graph in memory to server in a in-memory GraphSource. */
@@ -102,7 +102,7 @@ public class OTPConfigurator {
         }
         if (params.routerIds.size() > 0 || params.autoScan) {
             /* Auto-register pre-existing graph on disk, with optional auto-scan. */
-            GraphScanner graphScanner = new GraphScanner(graphService, params.autoScan);
+            GraphScanner graphScanner = new GraphScanner(graphService, params.graphDirectory, params.autoScan);
             graphScanner.basePath = graphSourceFactory.basePath;
             if (params.routerIds.size() > 0) {
                 graphScanner.defaultRouterId = params.routerIds.get(0);
