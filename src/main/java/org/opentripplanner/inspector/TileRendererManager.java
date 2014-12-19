@@ -21,6 +21,7 @@ import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.inspector.TileRenderer.TileRenderContext;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +46,10 @@ public class TileRendererManager {
 
     private Map<String, TileRenderer> renderers = new HashMap<String, TileRenderer>();
 
-    private GraphService graphService;
+    private Graph graph;
 
-    public TileRendererManager(GraphService graphService) {
-        this.graphService = graphService;
+    public TileRendererManager(Graph graph) {
+        this.graph = graph;
 
         // Register layers.
         renderers.put("bike-safety", new EdgeVertexTileRenderer(new BikeSafetyEdgeRenderer()));
@@ -74,9 +75,7 @@ public class TileRendererManager {
             }
         };
 
-        context.graph = graphService.getGraph(tileRequest.routerId);
-        if (context.graph == null)
-            throw new IllegalArgumentException("Unknown routerId: " + tileRequest.routerId);
+        context.graph = graph;
 
         TileRenderer renderer = renderers.get(layer);
         if (renderer == null)

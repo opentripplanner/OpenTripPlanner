@@ -25,6 +25,17 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.Map.Entry;
 
+/**
+ * Rather than finding a single optimal route, ProfileRouter aims to find all reasonable ways to go from an origin
+ * to a destination over a given time window, and expresses those results in terms of route combinations and time ranges.
+ * For example:
+ * riding Train A followed by Bus B between 9AM and 11AM takes between 1.2 and 1.6 hours;
+ * riding Train A followed by Bus C takes between 1.4 and 1.8 hours.
+ *
+ * Create one instance of ProfileRouter per profile search. It is not intended to be threadsafe or reusable.
+ * You MUST call the cleanup method on all ProfileRouter instances that have been used for routing before
+ * they are released for garbage collection.
+ */
 public class ProfileRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
@@ -79,7 +90,13 @@ public class ProfileRouter {
 
         // Lazy-initialize profile transfers (before setting timeouts, since this is slow)
         if (graph.index.transfersFromStopCluster == null) {
-            graph.index.initializeProfileTransfers();
+            synchronized (graph.index) {
+                // why another if statement? so that if another thread initialized this in the meantime
+                // we don't initialize it again.
+                if (graph.index.transfersFromStopCluster == null) {
+                    graph.index.initializeProfileTransfers();
+                }
+            }
         }
         // Analyst
         if (request.analyst) {
@@ -349,21 +366,22 @@ public class ProfileRouter {
                 }
             }
         }
-        // Truncate long lists to include a mix of nearby bus and train patterns
-        if (closest.size() > 500) {
-            LOG.warn("Truncating long list of patterns.");
+        final int MAX_PATTERNS = 1000;
+        // Truncate long lists to include a mix of nearby bus and train patterns, keeping those closest to the origin
+        if (closest.size() > MAX_PATTERNS) {
+            LOG.warn("Truncating excessively long list of patterns. {} patterns, max allowed is {}.", closest.size(), MAX_PATTERNS);
+            // The natural ordering on StopAtDistance is based on distance from the origin
             Multimap<StopAtDistance, TripPattern> busPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
             Multimap<StopAtDistance, TripPattern> otherPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-            Multimap<StopAtDistance, TripPattern> patterns;
             for (TripPattern pattern : closest.keySet()) {
-                patterns = (pattern.mode == TraverseMode.BUS) ? busPatterns : otherPatterns;
+                Multimap<StopAtDistance, TripPattern> patterns = (pattern.mode == TraverseMode.BUS) ? busPatterns : otherPatterns;
                 patterns.put(closest.get(pattern), pattern);
             }
             closest.clear();
             Iterator<StopAtDistance> iterBus = busPatterns.keySet().iterator();
             Iterator<StopAtDistance> iterOther = otherPatterns.keySet().iterator();
-            // Alternately add one of each kind of pattern until we reach the max
-            while (closest.size() < 50) {
+            // Alternately add one bus and one non-bus pattern in order of increasing distance until we reach the max
+            while (closest.size() < MAX_PATTERNS) {
                 StopAtDistance sd;
                 if (iterBus.hasNext()) {
                     sd = iterBus.next();
@@ -546,7 +564,11 @@ public class ProfileRouter {
         }
     }
 
-    /** Destroy all routing contexts created during this search. */
+    /**
+     * Destroy all routing contexts created during this search. This method must be called manually on any
+     * ProfileRouter instance before it is released for garbage collection, because RoutingContexts remain linked into
+     * the graph by temporary edges if they are not cleaned up.
+     */
     public int cleanup() {
         int n = 0;
         for (RoutingContext rctx : routingContexts) {
@@ -554,8 +576,20 @@ public class ProfileRouter {
             n += 1;
         }
         routingContexts.clear();
-        LOG.info("destroyed {} routing contexts.", n);
+        LOG.debug("destroyed {} routing contexts.", n);
         return n;
+    }
+
+    /**
+     * This finalizer is intended as a failsafe to prevent memory leakage in case someone does
+     * not clean up routing contexts. It should be considered an error if this method does any work.
+     */
+    @Override
+    public void finalize() {
+        if (routingContexts.size() > 0) {
+            LOG.error("RoutingContexts were observed in the ProfileRouter finalizer: this is a memory leak.");
+            cleanup();
+        }
     }
 
 }

@@ -28,8 +28,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -45,16 +43,14 @@ import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,9 +80,9 @@ public class IndexAPI {
     private final StreetVertexIndexService streetIndex;
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        Graph graph = otpServer.graphService.getGraph(routerId);
-        index = graph.index;
-        streetIndex = graph.streetIndex;
+        Router router = otpServer.getRouter(routerId);
+        index = router.graph.index;
+        streetIndex = router.graph.streetIndex;
     }
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */

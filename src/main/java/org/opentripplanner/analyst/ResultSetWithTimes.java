@@ -3,7 +3,7 @@ package org.opentripplanner.analyst;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ResultFeatureWithTimes extends ResultFeature {
+public class ResultSetWithTimes extends ResultSet {
 
 	private static final long serialVersionUID = -6723127825189535112L;
     
@@ -11,11 +11,11 @@ public class ResultFeatureWithTimes extends ResultFeature {
 	
 	public Map<String,Integer> timeIdMap = new ConcurrentHashMap<String,Integer>();
 	
-	public ResultFeatureWithTimes() {
+	public ResultSetWithTimes() {
 		
 	}
 	
-	public ResultFeatureWithTimes(SampleSet samples, TimeSurface surface) {
+	public ResultSetWithTimes(SampleSet samples, TimeSurface surface) {
 		id = samples.pset.id + "_" + surface.id + "_times";
 		
 		// Evaluate the surface at all points in the pointset

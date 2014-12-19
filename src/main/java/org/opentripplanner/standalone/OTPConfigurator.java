@@ -29,6 +29,7 @@ import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.TransitToTaggedStopsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.ElevationGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
@@ -128,6 +129,7 @@ public class OTPConfigurator {
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         File configFile = null;
+        File demFile = null;
         /* For now this is adding files from all directories listed, rather than building multiple graphs. */
         for (File dir : params.build) {
             LOG.info("Searching for graph builder input files in {}", dir);
@@ -145,6 +147,14 @@ public class OTPConfigurator {
                 case OSM:
                     LOG.info("Found OSM file {}", file);
                     osmFiles.add(file);
+                    break;
+                case DEM:
+                    if (!params.elevation && demFile == null) {
+                        LOG.info("Found DEM file {}", file);
+                        demFile = file;
+                    } else {
+                        LOG.info("Skipping DEM file {}", file);
+                    }
                     break;
                 case CONFIG:
                     if (!params.noEmbedConfig) {
@@ -171,7 +181,7 @@ public class OTPConfigurator {
             }
             OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
-            streetEdgeFactory.useElevationData = params.elevation;
+            streetEdgeFactory.useElevationData = params.elevation || (demFile != null);
             osmBuilder.edgeFactory = streetEdgeFactory;
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
             osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
@@ -222,6 +232,10 @@ public class OTPConfigurator {
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
+        } else  if (demFile != null) {
+            ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
+            GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
+            graphBuilder.addGraphBuilder(elevationBuilder);
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
@@ -238,7 +252,7 @@ public class OTPConfigurator {
         if (params.visualize) {
             // FIXME get OTPServer into visualizer.
             getServer();
-            GraphVisualizer visualizer = new GraphVisualizer(getGraphService());
+            GraphVisualizer visualizer = new GraphVisualizer(getGraphService().getGraph());
             return visualizer;
         } else return null;
     }
@@ -247,7 +261,7 @@ public class OTPConfigurator {
      * Represents the different types of input files for a graph build.
      */
     private static enum InputFileType {
-        GTFS, OSM, CONFIG, OTHER;
+        GTFS, OSM, DEM, CONFIG, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -261,6 +275,7 @@ public class OTPConfigurator {
             if (name.endsWith(".pbf")) return OSM;
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;
+            if (name.endsWith(".tif")) return DEM;
             if (name.equals("Embed.properties")) return CONFIG;
             return OTHER;
         }

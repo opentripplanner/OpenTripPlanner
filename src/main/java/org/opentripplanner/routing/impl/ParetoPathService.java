@@ -17,12 +17,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -34,26 +33,26 @@ public class ParetoPathService implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParetoPathService.class);
 
-    private GraphService graphService;
+    private Graph graph;
     private SPTServiceFactory sptServiceFactory;
     
     private SPTVisitor sptVisitor = null;
 
     private double timeout = 0; // seconds
     
-    public ParetoPathService(GraphService gs, SPTServiceFactory spts) {
-		this.graphService = gs;
-		this.sptServiceFactory = spts;
-	}
+    public ParetoPathService(Graph graph, SPTServiceFactory spts) {
+        this.graph = graph;
+        this.sptServiceFactory = spts;
+    }
 
 	/** Give up on searching for itineraries after this many seconds have elapsed. */
     public void setTimeout (double seconds) {
         timeout = seconds;
     }
 
-	public void setSPTVisitor(SPTVisitor sptVisitor){
-		this.sptVisitor = sptVisitor;
-	}
+    public void setSPTVisitor(SPTVisitor sptVisitor) {
+        this.sptVisitor = sptVisitor;
+    }
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
@@ -65,7 +64,7 @@ public class ParetoPathService implements PathService {
         // make sure the options has a routing context *before* cloning it (otherwise you get
         // orphan RoutingContexts leaving temporary edges in the graph until GC)
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.routerId));
+            options.setRoutingContext(graph);
             options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
                     new NoThruTrafficPathParser() };
         }
@@ -106,14 +105,6 @@ public class ParetoPathService implements PathService {
         // We order the list of returned paths by the time of arrival or departure (not path duration)
         Collections.sort(paths, new PathComparator(options.arriveBy));
         return paths;
-    }
-
-    public GraphService getGraphService() {
-        return graphService;
-    }
-
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
     }
 
     public SPTServiceFactory getSptServiceFactory() {
