@@ -167,6 +167,9 @@ public class CommandLineParameters implements Cloneable {
             description = "allow unauthenticated access to sensitive resources, e.g. /routers")
     boolean insecure = false;
 
+    @Parameter(names = { "--script" }, description = "run the specified OTP script (groovy, javascript, python, ruby)")
+    File scriptFile = null;
+
     /** Set some convenience parameters based on other parameters' values. */
     public void infer () {
         server |= ( inMemory || preFlight || port != null );

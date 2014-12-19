@@ -15,6 +15,7 @@ package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.scripting.impl.OTPScript;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,17 @@ public class OTPMain {
         if (graphVisualizer != null) {
             graphVisualizer.run();
         }
-        
+
+        // start script, if asked for
+        OTPScript otpScript = configurator.scriptFromParameters();
+        if (otpScript != null) {
+            try {
+                otpScript.run();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // start web server, if asked for
         GrizzlyServer grizzlyServer = configurator.serverFromParameters();
         if (grizzlyServer != null) {
@@ -88,8 +99,9 @@ public class OTPMain {
             }
         }
         
-        if( graphBuilder==null && graphVisualizer==null && grizzlyServer==null ){
-        	LOG.info( "Nothing to do. Use --help to see available tasks.");;
+        if (graphBuilder == null && graphVisualizer == null && grizzlyServer == null
+                && otpScript == null) {
+            LOG.info("Nothing to do. Use --help to see available tasks.");
         }
         
     }

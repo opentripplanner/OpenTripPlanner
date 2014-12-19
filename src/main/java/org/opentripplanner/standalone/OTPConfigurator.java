@@ -46,6 +46,8 @@ import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.scripting.impl.BSFOTPScript;
+import org.opentripplanner.scripting.impl.OTPScript;
 import org.opentripplanner.updater.PropertiesPreferences;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -256,7 +258,13 @@ public class OTPConfigurator {
             return visualizer;
         } else return null;
     }
-    
+
+    public OTPScript scriptFromParameters() {
+        if (params.scriptFile != null) {
+            return new BSFOTPScript(getServer(), params.scriptFile);
+        } else return null;
+    }
+
     /**
      * Represents the different types of input files for a graph build.
      */
