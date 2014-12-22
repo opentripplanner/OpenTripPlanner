@@ -60,6 +60,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**
  * Represents a group of trips that all call at the same sequence of stops. For each stop, there
@@ -140,7 +142,7 @@ public class TripPattern implements Serializable {
      */
     final ArrayList<Trip> trips = new ArrayList<Trip>();
 
-    /** Would be used by the MapBuilder, not currently implemented. */
+    /** Used by the MapBuilder */
     public LineString geometry = null;
 
     /**
@@ -621,6 +623,39 @@ public class TripPattern implements Serializable {
     public String toString () {
         return String.format("<TripPattern %s>", this.code);
     }
+
+    /**
+     * Generates geometry from hops if it doesn't yet exists and returns it
+     * @return Pattern geometry
+     */
+    public LineString getGeometry() {
+        if (geometry != null) {
+            return geometry;
+        }
+        CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
+
+        //Based on StreetfulStopLinker
+        if (patternHops != null && patternHops.length > 0) {
+            for (int i = 0; i < patternHops.length; i++) {
+
+                LineString geometry = patternHops[i].getGeometry();
+
+                if (geometry != null) {
+                    if (coordinates.size() == 0) {
+                        coordinates.extend(geometry.getCoordinates());
+                    } else {
+                        coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplications
+                    }
+                }
+            }
+
+            this.geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
+            return this.geometry;
+        } else {
+            return null;
+        }
+    }
+
 
 	public Trip getExemplar() {
 		if(this.trips.isEmpty()){
