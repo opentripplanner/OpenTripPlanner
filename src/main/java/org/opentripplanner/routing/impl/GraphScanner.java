@@ -85,8 +85,7 @@ public class GraphScanner {
             for (String routerId : routerIds) {
                 InputStreamGraphSource graphSource = InputStreamGraphSource.newFileGraphSource(
                         routerId, getBasePath(routerId), loadLevel);
-                if (graphSource.getGraph() != null)
-                    graphService.registerGraph(routerId, graphSource);
+                graphService.registerGraph(routerId, graphSource);
             }
         } else {
             LOG.info("No list of routerIds was provided for automatic registration.");
@@ -136,10 +135,8 @@ public class GraphScanner {
             for (String routerId : graphToRegister) {
                 InputStreamGraphSource graphSource = InputStreamGraphSource.newFileGraphSource(
                         routerId, getBasePath(routerId), loadLevel);
-                if (graphSource.getGraph() != null) {
-                    // Can be null here if the file has been removed in the meantime.
-                    graphService.registerGraph(routerId, graphSource);
-                }
+                // Can be null here if the file has been removed in the meantime.
+                graphService.registerGraph(routerId, graphSource);
             }
         }
         /*
@@ -153,7 +150,7 @@ public class GraphScanner {
         } else {
             try {
                 // Check if we still have a default graph.
-                graphService.getGraph();
+                graphService.getRouter();
             } catch (GraphNotFoundException e) {
                 // Let's see which one we want to take by default
                 if (routerIds.contains("")) {

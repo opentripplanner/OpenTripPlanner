@@ -48,6 +48,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
@@ -181,12 +182,12 @@ public class Routers {
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
         LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
         try {
-            otpServer.getGraphService().getGraph(routerId);
+            otpServer.getGraphService().getRouter(routerId);
             return Response.status(404).entity("graph already registered.\n").build();
         } catch (GraphNotFoundException e) {
             if (preEvict) {
                 LOG.debug("Pre-evicting graph '{}'", routerId);
-                otpServer.getGraphService().evictGraph(routerId);
+                otpServer.getGraphService().evictRouter(routerId);
             }
             boolean success = otpServer.getGraphService()
                     .registerGraph(
@@ -214,13 +215,14 @@ public class Routers {
             InputStream is) {
         if (preEvict) {
             LOG.debug("pre-evicting graph");
-            otpServer.getGraphService().evictGraph(routerId);
+            otpServer.getGraphService().evictRouter(routerId);
         }
         LOG.debug("deserializing graph from POST data stream...");
         Graph graph;
         try {
             graph = Graph.load(is, level);
-            otpServer.getGraphService().registerGraph(routerId, new MemoryGraphSource(routerId, graph));
+            GraphService graphService = otpServer.getGraphService();
+            graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
             return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
@@ -242,7 +244,7 @@ public class Routers {
         
         if (preEvict) {
             LOG.debug("Pre-evicting graph with routerId {} before building new graph", routerId);
-            otpServer.getGraphService().evictGraph(routerId);
+            otpServer.getGraphService().evictRouter(routerId);
         }
         
         // get a temporary directory, using Google Guava
@@ -296,7 +298,8 @@ public class Routers {
         Graph graph = graphBuilder.getGraph();
         graph.index(new DefaultStreetVertexIndexFactory());
         
-        otpServer.getGraphService().registerGraph(routerId, new MemoryGraphSource(routerId, graph));
+        GraphService graphService = otpServer.getGraphService();
+        graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
         return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
     }
     
@@ -340,7 +343,7 @@ public class Routers {
     @RolesAllowed({ "ROUTERS" })
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
-        boolean existed = otpServer.getGraphService().evictGraph(routerId);
+        boolean existed = otpServer.getGraphService().evictRouter(routerId);
         if (existed)
             return Response.status(200).entity("graph evicted.\n").build();
         else
