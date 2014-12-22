@@ -31,7 +31,7 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-public class GraphServiceImplTest extends TestCase {
+public class GraphServiceTest extends TestCase {
 
     File basePath;
 
