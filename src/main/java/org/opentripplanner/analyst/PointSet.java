@@ -426,7 +426,7 @@ public class PointSet implements Serializable{
 
         if (this.samples.containsKey(routerId))
             return this.samples.get(routerId);
-        Graph g = this.graphService.getGraph(routerId);
+        Graph g = this.graphService.getRouter(routerId).graph;
 
         return getSampleSet(g);
     }
