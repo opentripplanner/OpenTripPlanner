@@ -147,7 +147,7 @@ public class CommandLineParameters implements Cloneable {
             description = "Path to directory containing PointSets. Defaults to BASE_PATH/pointsets.")
     File pointSetDirectory;
 
-    @Parameter(names = {"--routers"}, validateWith = RouterId.class,
+    @Parameter(names = {"--router"}, validateWith = RouterId.class,
             description = "One or more router IDs to build and/or serve, first one being the default.")
     List<String> routerIds;
 
