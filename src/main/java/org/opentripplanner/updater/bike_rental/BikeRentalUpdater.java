@@ -83,12 +83,13 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     protected void configurePolling(Graph graph, Preferences preferences) throws Exception {
         // Set source from preferences
         String sourceType = preferences.get("sourceType", null);
+        String apiKey = preferences.get("apiKey", null);
         BikeRentalDataSource source = null;
         if (sourceType != null) {
             if (sourceType.equals("jcdecaux")) {
                 source = new JCDecauxBikeRentalDataSource();
             } else if (sourceType.equals("b-cycle")) {
-                source = new BCycleBikeRentalDataSource();
+                source = new BCycleBikeRentalDataSource(apiKey);
             } else if (sourceType.equals("bixi")) {
                 source = new BixiBikeRentalDataSource();
             } else if (sourceType.equals("keolis-rennes")) {

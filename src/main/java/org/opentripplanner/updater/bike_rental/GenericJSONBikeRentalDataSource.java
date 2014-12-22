@@ -27,6 +27,7 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
 
     private static final Logger log = LoggerFactory.getLogger(GenericJSONBikeRentalDataSource.class);
     private String url;
+    private String apiKey;
 
     private String jsonParsePath;
 
@@ -41,6 +42,20 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
      */
     public GenericJSONBikeRentalDataSource(String jsonPath) {
         jsonParsePath = jsonPath;
+        apiKey= null;
+    }
+
+    /**
+     * Construct superclass
+     *
+     * @param JSON path to get from enclosing elements to nested rental list.
+     *        Separate path levels with '/' For example "d/list"
+     * @param Api key, when used by bike rental type
+     *
+     */
+    public GenericJSONBikeRentalDataSource(String jsonPath, String apiKeyValue) {
+        jsonParsePath = jsonPath;
+        apiKey = apiKeyValue;
     }
 
 
@@ -55,7 +70,7 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
     @Override
     public boolean update() {
         try {
-            InputStream data = HttpUtils.getData(url);
+            InputStream data = HttpUtils.getData(url, "ApiKey", apiKey);
             if (data == null) {
                 log.warn("Failed to get data from url " + url);
                 return false;
@@ -112,8 +127,21 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
     }
 
     private String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        java.util.Scanner scanner = null;
+        String result="";
+        try {
+           
+            scanner = new java.util.Scanner(is).useDelimiter("\\A");
+            result = scanner.hasNext() ? scanner.next() : "";
+            scanner.close();
+        }
+        finally
+        {
+           if(scanner!=null)
+               scanner.close();
+        }
+        return result;
+        
     }
 
     @Override

@@ -24,8 +24,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @see GenericJSONBikeRentalDataSource
  */
 public class BCycleBikeRentalDataSource extends GenericJSONBikeRentalDataSource {
-   public BCycleBikeRentalDataSource() {
-       super("d/list");
+   public BCycleBikeRentalDataSource(String apiKey) {
+       super("", apiKey);
    }
 
    public BikeRentalStation makeStation(JsonNode kioskNode) {
