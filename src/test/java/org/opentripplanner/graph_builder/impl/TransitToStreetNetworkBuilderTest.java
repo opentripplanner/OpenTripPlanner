@@ -49,6 +49,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
+import org.opentripplanner.graph_builder.impl.osm.DebugNamer;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -99,6 +100,8 @@ public class TransitToStreetNetworkBuilderTest {
         Graph gg = new Graph();
 
         OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        //names streets based on osm ids (osm:way:osmid)
+        loader.customNamer = new DebugNamer();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         AnyFileBasedOpenStreetMapProviderImpl provider = new AnyFileBasedOpenStreetMapProviderImpl();
         loader.skipVisibility = true;
@@ -283,15 +286,15 @@ public class TransitToStreetNetworkBuilderTest {
                            //and check if street edge is correct one based on edge label
                            for (Edge con_edge: connected_vertex.getOutgoingStreetEdges()) {
                                StreetEdge se = (StreetEdge) con_edge;
-                               if (se.getLabel().equals(wantedEdgeLabel)) {
+                               if (se.getName().equals(wantedEdgeLabel)) {
                                    //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getLabel());
-                                   collector.checkThat(se.getLabel(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                                   collector.checkThat(se.getName(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                    transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
                                    foundConnection = true;
                                    correctlyLinkedStops++;
                                    break;
                                } else {
-                                   sb.append(se.getLabel());
+                                   sb.append(se.getName());
                                    sb.append("|");
                                }
                            }
@@ -301,15 +304,15 @@ public class TransitToStreetNetworkBuilderTest {
                                for (Edge con_edge : connected_vertex.getIncoming()) {
                                    if (con_edge instanceof StreetEdge) {
                                        StreetEdge se = (StreetEdge) con_edge;
-                                       if (se.getLabel().equals(wantedEdgeLabel)) {
+                                       if (se.getName().equals(wantedEdgeLabel)) {
                                            //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getLabel());
-                                           collector.checkThat(se.getLabel(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                                           collector.checkThat(se.getName(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                            transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
                                            foundConnection = true;
                                            correctlyLinkedStops++;
                                            break;
                                        } else {
-                                           sb.append(se.getLabel());
+                                           sb.append(se.getName());
                                            sb.append("|");
                                        }
                                    }
