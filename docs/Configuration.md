@@ -12,8 +12,8 @@ In the United States, a high resolution [National Elevation Dataset](http://ned.
 territory. The US Geological Survey (USGS) delivers this dataset in tiles via a somewhat awkward heavyweight web-based GIS
 which generates and emails you download links. OpenTripPlanner contains a module which will automatically contact this
 service and download the proper tiles to completely cover your transit and street network area. This process is rather
-slow, as OTP limits the rate it which it performs downloads to avoid flooding the USGS servers with requests, but once
-the tiles are downloaded OTP will keep them in local cache for the next graph build operation.
+slow (download is around 1.5 hours, then setting elevation for streets takes about 5 minutes for the Portland, Oregon region),
+but once the tiles are downloaded OTP will keep them in local cache for the next graph build operation.
 
 To auto-download NED tiles when building your graph, add the `--elevation` switch to the command line. You may also want
 to add the `--cache <directory>` parameter to specify a custom NED tile cache location. For example:
@@ -22,7 +22,7 @@ to add the `--cache <directory>` parameter to specify a custom NED tile cache lo
 ./otp --build --elevation --cache /home/myname/nedcache
 ```
 
-The USGS will also deliver the dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA) via FedEx.
+The USGS will also deliver the whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA).
 OpenTripPlanner contains another module that will then automatically fetch data in this format from an Amazon S3 copy of
 your bulk data.
 
@@ -41,12 +41,12 @@ the elevation data to the streets.
 
 ## Real-time data
 
-GTFS feeds contain schedule data that is is published by an agency or operator in advance. The feed does not account
+GTFS feeds contain *schedule* data that is is published by an agency or operator in advance. The feed does not account
  for unexpected service changes or traffic disruptions that occur from day to day. Thus, this kind of data is also
  referred to as 'static' data or 'theoretical' arrival and departure times.
 
-The [GTFS Realtime spec]() (GTFS-RT) complements GTFS with three additional kinds of feeds that are meant to be updated
-from minute to minute:
+The [GTFS Realtime spec]() (GTFS-RT) complements GTFS with three additional kinds of feeds. In contrast to the
+base GTFS schedule feed, they provide *real-time* updates (*"dynamic"* data) and are are updated from minute to minute.
 
 - **Alerts** are text messages attached to GTFS objects, informing riders of disruptions and changes.
 
@@ -61,9 +61,11 @@ real-time provider over HTTP. That is to say, it fetches a file from a web serve
 the consumer opens a persistent connection to the GTFS-RT provider, which then sends incremental updates immediately as
 they become available. OTP can use both approaches.
 
-### Alerts
 
+### Alerts
 
 
 ### Trip Updates
 
+
+### Vehicle Positions

@@ -322,7 +322,7 @@ public class NEDDownloader implements NEDTileSource {
 
     @Override
     public List<File> getNEDTiles() {
-        log.info("Downloading NED elevation data.");
+        log.info("Downloading NED elevation data (or fetching it from local cache).");
         List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();
         int tileCount = 0;
