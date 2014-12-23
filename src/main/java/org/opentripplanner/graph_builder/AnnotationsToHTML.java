@@ -256,6 +256,8 @@ public class AnnotationsToHTML {
 
     class HTMLWriter {
         private PrintStream out;
+        //Key is classname, value is annotation message
+        //Multimap because there are multiple annotations for each classname
         private Multimap<String, String> annotations;
 
         public HTMLWriter(OutputStream out) {
@@ -283,6 +285,9 @@ public class AnnotationsToHTML {
             
         }
         
+        /**
+         * Generates JSON with data which is used by Javascript in HTML report
+         */
         private void writeJson() {
             try {
  
