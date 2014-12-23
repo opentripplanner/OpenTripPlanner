@@ -68,7 +68,7 @@ public class OTPMain {
                 configurator.makeGraphService(graphBuilder.getGraph());
             }
             
-            if (params.report) {
+            if (params.htmlAnnotations) {
                 AnnotationsToHTML annotationsToHTML = new AnnotationsToHTML(graphBuilder.getGraph(), new File(params.build.get(0), "report.html"));
                 annotationsToHTML.run();
             }

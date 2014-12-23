@@ -48,9 +48,9 @@ public class CommandLineParameters implements Cloneable {
             description = "Verbose output.")
     boolean verbose;
     
-    @Parameter(names = {"--report" },
-    description = "Nice HTML report of Graph errors/warnings (annotations)")
-    boolean report = false;
+    @Parameter(names = {"--htmlAnnotations" },
+    description = "Generates nice HTML report of Graph errors/warnings (annotations). They are stored next to graph")
+    boolean htmlAnnotations = false;
    
 
     @Parameter(names = {"--basePath"}, validateWith = ReadWriteDirectory.class,
