@@ -139,6 +139,8 @@ public class Timetable implements Serializable {
         /* Search at the state's time, but relative to midnight on the given service day. */
         int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
         // NOTE the time is sometimes negative here. That is fine, we search for the first trip of the day.
+        // Adjust for possible boarding time TODO: This should be included in the trip and based on GTFS
+        time += s0.getOptions().getBoardTime(this.pattern.mode);
         TripTimes bestTrip = null;
         Stop currentStop = pattern.getStop(stopIndex);
         // Linear search through the timetable looking for the best departure.
