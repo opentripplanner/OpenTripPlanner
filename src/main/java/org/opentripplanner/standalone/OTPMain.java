@@ -70,7 +70,7 @@ public class OTPMain {
             
             if (params.htmlAnnotations) {
                 AnnotationsToHTML annotationsToHTML = new AnnotationsToHTML(graphBuilder.getGraph(), new File(params.build.get(0), "report.html"));
-                annotationsToHTML.run();
+                annotationsToHTML.generateAnnotationsLog();
             }
         }
         
