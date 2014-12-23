@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Calendar;
 
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -317,6 +318,16 @@ public class GraphIndex {
             if ( ! times.times.isEmpty()) ret.add(times);
         }
         return ret;
+    }
+
+    public Timetable timeTableForTrip(TripPattern tripPattern) {
+        RoutingRequest req = new RoutingRequest();
+        req.setRoutingContext(graph, (Vertex)null, (Vertex)null);
+
+        Calendar calendar = Calendar.getInstance();
+        ServiceDate serviceDate = new ServiceDate(calendar.getTime());
+        Timetable table = req.rctx.timetableSnapshot.resolve(tripPattern, serviceDate);
+        return table;
     }
 
     /**

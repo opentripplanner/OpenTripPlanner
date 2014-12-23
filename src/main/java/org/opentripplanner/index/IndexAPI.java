@@ -341,9 +341,9 @@ public class IndexAPI {
        Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
            TripPattern pattern = index.patternForTrip.get(trip);
-           Timetable table = pattern.scheduledTimetable;
+           Timetable table = index.timeTableForTrip(pattern);
            return Response.status(Status.OK).entity(TripTimeShort.fromTripTimes(table, trip)).build();
-       } else { 
+       } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
