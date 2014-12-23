@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <name>OpenTripPlanner</name>
@@ -21,14 +20,41 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <distributionManagement>
+        <site>
+            <id>opentripplanner-docs</id>
+            <name>OpenTripPlanner Documentation</name>
+            <url>s3://docs.opentripplanner.org/</url>
+        </site>
+        <repository>
+            <!-- Also used as snapshotRepository by default -->
+            <id>conveyal-maven-repo</id>
+            <name>Conveyal Maven Repository</name>
+            <url>s3://maven.conveyal.com/</url>
+        </repository>
+    </distributionManagement>
+
     <build>
 
-        <!-- Necessary for uploading/deploying artifacts to Maven repos via WebDAV. -->
+        <!-- "Wagon" necessary for uploading/deploying artifacts to the Conveyal Maven repo on Amazon S3. -->
         <extensions>
+            <!--
             <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-webdav</artifactId>
-                <version>1.0-beta-2</version>
+                <groupId>org.springframework.build</groupId>
+                <artifactId>aws-maven</artifactId>
+                <version>5.0.0.RELEASE</version>
+            </extension>
+            -->
+            <!--
+              The Spring S3 Wagon throws ResourceDoesNotExistException when it is asked to put a directory.
+              The site contains a lot of subdirectories, so use the kuali s3 wagon which handles directories.
+              This is only important if you're deploying the OTP site to an S3 bucket as a static web site,
+              which is not a bad idea.
+            -->
+            <extension>
+                <groupId>org.kuali.maven.wagons</groupId>
+                <artifactId>maven-s3-wagon</artifactId>
+                <version>1.2.1</version>
             </extension>
         </extensions>
 
@@ -69,7 +95,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore/>
+                                        <ignore />
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -82,7 +108,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <execute/>
+                                        <execute />
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
@@ -107,16 +133,20 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
-                    <!-- by default, release:prepare runs goals 'clean' and 'verify'. Javadoc generation
-                    in release:perform requires the new release versions of our artifacts to already be
-                    installed in the local repository. -->
-                    <preparationGoals>clean install</preparationGoals>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
                     <!-- The site generation step can fail. Run it in release:prepare to make sure it
-                    works before tagging the release. Enunciate model validation is currently failing,
-                    apparently due to a problem in enunciate.
-                    <preparationGoals>clean install site</preparationGoals> -->
+                    works before tagging the release. -->
+                    <preparationGoals>clean verify site</preparationGoals>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals><goal>jar</goal></goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -196,7 +226,19 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>otp</finalName>
+                            <filters>
+                                <filter>
+                                    <!-- exclude signatures from merged JAR to avoid invalid signature messages -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <!-- The shaded JAR will be the main artifact for the project -->
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                             <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
                               We have eliminated most Jersey auto-scanning, but there is still some need for include
                               filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
@@ -205,19 +247,9 @@
                               <filters> <filter> <artifact>com.sun.jersey:*</artifact> <includes> <include>**</include>
                               </includes> </filter> <filter> <artifact>org.opentripplanner:*</artifact>
                               <includes> <include>**</include> </includes> </filter> </filters> -->
-                            <artifactSet>
-                                <excludes>
-			            <!-- Do not explode the client WAR. -->
-                                    <!-- Actually, shade seems to skip the WAR even without this exclusion (verify) -->
-                                    <exclude>org.opentripplanner:otp-leaflet-client</exclude>
-                                    --&gt;
-                                </excludes>
-                            </artifactSet>
                             <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Main-Class>org.opentripplanner.standalone.OTPMain</Main-Class>
                                         <!-- The ImageIO lines allow some image reader plugins to work (TODO elaborate) -->
@@ -262,11 +294,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
-                <configuration>
-                    <links>
-                        <link>http://developer.onebusaway.org/modules/onebusaway-gtfs-modules/1.3.3/apidocs/</link>
-                    </links>
-                </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -293,16 +320,6 @@
             <id>download.java.net</id>
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/2/</url>
-        </repository>
-        <repository>
-            <id>releases.onebusaway.org</id>
-            <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </repository>
         <repository>
             <id>osgeo</id>
@@ -400,6 +417,11 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geotiff</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-wfs</artifactId>
             <version>${geotools.version}</version>
         </dependency>
         <!-- provides EPSG database for projections (shapefile loading) -->

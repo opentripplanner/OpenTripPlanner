@@ -38,8 +38,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.prefs.Preferences;
 
 import com.google.common.collect.*;
+import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -50,6 +52,7 @@ import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.api.resource.GraphMetadata;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
@@ -86,10 +89,13 @@ public class Graph implements Serializable {
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
-    
+
+    // TODO Remove this field, use Router.routerId ?
     public String routerId;
 
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
+
+    private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
@@ -106,7 +112,7 @@ public class Graph implements Serializable {
 
     /* vertex index by name is reconstructed from edges */
     private transient Map<String, Vertex> vertices;
-    
+
     private transient CalendarService calendarService;
 
     private boolean debugData = true;
@@ -119,19 +125,19 @@ public class Graph implements Serializable {
     public transient StreetVertexIndexService streetIndex;
 
     public transient GraphIndex index;
-    
+
     private transient GeometryIndex geomIndex;
-    
+
     private transient SampleFactory sampleFactory;
-    
+
     public final Deduplicator deduplicator = new Deduplicator();
 
-    /** 
+    /**
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
-    public final Map<AgencyAndId,Integer> serviceCodes = Maps.newHashMap();
-    
+    public final Map<AgencyAndId, Integer> serviceCodes = Maps.newHashMap();
+
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
@@ -158,10 +164,16 @@ public class Graph implements Serializable {
      */
     public Properties embeddedPreferences = null;
 
+    /* The preferences that were used for graph building. */
+    public Preferences preferences = null;
+
+    /* The time at which the graph was built, for detecting changed inputs and triggering a rebuild. */
+    public DateTime buildTimeJoda = null; // FIXME
+
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
      * graph updaters defined in the configuration.
-     * 
+     *
      * @see GraphUpdaterConfigurator
      */
     public transient GraphUpdaterManager updaterManager = null;
@@ -179,7 +191,7 @@ public class Graph implements Serializable {
         this.edgeById = new ConcurrentHashMap<Integer, Edge>();
         this.vertexById = new ConcurrentHashMap<Integer, Vertex>();
     }
-    
+
     /**
      * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph, when they are constructed or deserialized.
      */
@@ -195,9 +207,9 @@ public class Graph implements Serializable {
 
     /**
      * Removes a vertex from the graph.
-     * 
+     *
      * Called from streetutils, must be public for now
-     * 
+     *
      * @param v
      */
     public void removeVertex(Vertex v) {
@@ -205,7 +217,7 @@ public class Graph implements Serializable {
             LOG.error(
                     "attempting to remove vertex that is not in graph (or mapping value was null): {}",
                     v);
-        }        
+        }
     }
 
     /* Fetching vertices by label is convenient in tests and such, but avoid using in general. */
@@ -213,13 +225,13 @@ public class Graph implements Serializable {
     public Vertex getVertex(String label) {
         return vertices.get(label);
     }
-    
+
     /**
      * Returns the vertex with the given ID or null if none is present.
-     * 
+     *
      * NOTE: you may need to run rebuildVertexAndEdgeIndices() for the indices
      * to be accurate.
-     * 
+     *
      * @param id
      * @return
      */
@@ -234,20 +246,20 @@ public class Graph implements Serializable {
     public Collection<Vertex> getVertices() {
         return this.vertices.values();
     }
-    
+
     /**
      * Returns the edge with the given ID or null if none is present.
-     * 
+     *
      * NOTE: you may need to run rebuildVertexAndEdgeIndices() for the indices
      * to be accurate.
-     * 
+     *
      * @param id
      * @return
      */
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
     }
-    
+
     /**
      * Return all the edges in the graph.
      * @return
@@ -320,6 +332,57 @@ public class Graph implements Serializable {
     }
 
     /**
+     * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
+     * {@link Edge}. This method is not thread-safe.
+     * @param edge
+     * @param turnRestriction
+     */
+    public void addTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
+        if (edge == null || turnRestriction == null) return;
+        List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
+        if (turnRestrictions == null) {
+            turnRestrictions = Lists.newArrayList();
+            this.turnRestrictions.put(edge, turnRestrictions);
+        }
+        turnRestrictions.add(turnRestriction);
+    }
+
+    /**
+     * Remove a {@link TurnRestriction} from the {@link TurnRestriction} {@link List} belonging to
+     * an {@link Edge}. This method is not thread-safe.
+     * @param edge
+     * @param turnRestriction
+     */
+    public void removeTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
+        if (edge == null || turnRestriction == null) return;
+        List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
+        if (turnRestrictions != null && turnRestrictions.contains(turnRestriction)) {
+            if (turnRestrictions.size() < 2) {
+                this.turnRestrictions.remove(edge);
+            } else {
+                turnRestrictions.remove(turnRestriction);
+            }
+        }
+    }
+
+    /**
+     * Get the {@link TurnRestriction} {@link List} that belongs to an {@link Edge} and return an
+     * immutable copy. This method is thread-safe when used by itself, but not if addTurnRestriction
+     * or removeTurnRestriction is called concurrently.
+     * @param edge
+     * @return The {@link TurnRestriction} {@link List} that belongs to the {@link Edge}
+     */
+    public List<TurnRestriction> getTurnRestrictions(Edge edge) {
+        if (edge != null) {
+            List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
+            if (turnRestrictions != null) {
+                return ImmutableList.copyOf(turnRestrictions);
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    /**
      * Return only the StreetEdges in the graph.
      * @return
      */
@@ -349,7 +412,7 @@ public class Graph implements Serializable {
     public <T> T getService(Class<T> serviceType, boolean autoCreate) {
         @SuppressWarnings("unchecked")
         T t = (T) _services.get(serviceType);
-        if (t == null) {
+        if (t == null && autoCreate) {
             try {
                 t = (T)serviceType.newInstance();
             } catch (InstantiationException e) {
@@ -801,7 +864,7 @@ public class Graph implements Serializable {
             Collection<String> agencyIds = this.getAgencyIds();
             if (agencyIds.size() == 0) {
                 timeZone = TimeZone.getTimeZone("GMT");
-                LOG.warn("graph contains no agencies; API request times will be interpreted as GMT.");
+                LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
             } else {
                 CalendarService cs = this.getCalendarService();
                 for (String agencyId : agencyIds) {
@@ -816,6 +879,14 @@ public class Graph implements Serializable {
             }
         }
         return timeZone;
+    }
+    
+    /**
+     * The timezone is cached by the graph. If you've done something to the graph that has the
+     * potential to change the time zone, you should call this to ensure it is reset. 
+     */
+    public void clearTimeZone () {
+        this.timeZone = null;
     }
 
     public void summarizeBuilderAnnotations() {

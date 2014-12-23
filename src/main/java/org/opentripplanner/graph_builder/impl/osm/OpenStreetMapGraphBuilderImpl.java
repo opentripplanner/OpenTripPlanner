@@ -45,6 +45,7 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -52,6 +53,7 @@ import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.BikeParkEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -68,6 +70,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -80,6 +83,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -130,11 +134,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
      */
     public boolean staticBikeRental = false;
-    
+
     /**
-     * Whether we should create P+R stations from OSM data. 
+     * Whether we should create car P+R stations from OSM data.
      */
     public boolean staticParkAndRide = true;
+
+    /**
+     * Whether we should create bike P+R stations from OSM data.
+     */
+    public boolean staticBikeParkAndRide = false;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -244,8 +253,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 processBikeRentalNodes();
             }
 
-            for (Area area : Iterables
-                    .concat(osmdb.getWalkableAreas(), osmdb.getParkAndRideAreas()))
+            if (staticBikeParkAndRide) {
+                processBikeParkAndRideNodes();
+            }
+
+            for (Area area : Iterables.concat(osmdb.getWalkableAreas(),
+                    osmdb.getParkAndRideAreas(), osmdb.getBikeParkingAreas()))
                 setWayName(area.parent);
 
             // figure out which nodes that are actually intersections
@@ -260,6 +273,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if (staticParkAndRide) {
                 buildParkAndRideAreas();
+            }
+            if (staticBikeParkAndRide) {
+                buildBikeParkAndRideAreas();
             }
 
             buildElevatorEdges(graph);
@@ -279,7 +295,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private void processBikeRentalNodes() {
             LOG.info("Processing bike rental nodes...");
             int n = 0;
-            BikeRentalStationService bikeRentalService = new BikeRentalStationService();
+            BikeRentalStationService bikeRentalService = graph.getService(
+                    BikeRentalStationService.class, true);
             graph.putService(BikeRentalStationService.class, bikeRentalService);
             for (OSMNode node : osmdb.getBikeRentalNodes()) {
                 n++;
@@ -303,7 +320,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (networkSet.isEmpty()) {
                     LOG.warn("Bike rental station at osm node " + node.getId() + " ("
                             + creativeName + ") with no network; including as compatible-with-all.");
-                    networkSet.add("*"); // Special "catch-all" value
+                    networkSet = null; // Special "catch-all" value
                 }
                 BikeRentalStation station = new BikeRentalStation();
                 station.id = "" + node.getId();
@@ -316,12 +333,79 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 station.spacesAvailable = capacity / 2;
                 station.bikesAvailable = capacity - station.spacesAvailable;
                 station.realTimeData = false;
-                bikeRentalService.addStation(station);
+                bikeRentalService.addBikeRentalStation(station);
                 BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
                 new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
                 new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
             }
             LOG.info("Created " + n + " bike rental stations.");
+        }
+
+        private void processBikeParkAndRideNodes() {
+            LOG.info("Processing bike P+R nodes...");
+            int n = 0;
+            BikeRentalStationService bikeRentalService = graph.getService(
+                    BikeRentalStationService.class, true);
+            for (OSMNode node : osmdb.getBikeParkingNodes()) {
+                n++;
+                String creativeName = wayPropertySet.getCreativeNameForWay(node);
+                if (creativeName == null)
+                    creativeName = "P+R";
+                BikePark bikePark = new BikePark();
+                bikePark.id = "" + node.getId();
+                bikePark.name = creativeName;
+                bikePark.x = node.lon;
+                bikePark.y = node.lat;
+                bikeRentalService.addBikePark(bikePark);
+                BikeParkVertex parkVertex = new BikeParkVertex(graph, bikePark);
+                new BikeParkEdge(parkVertex);
+            }
+            LOG.info("Created " + n + " bike P+R.");
+        }
+
+        private void buildBikeParkAndRideAreas() {
+            LOG.info("Building bike P+R areas");
+            List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
+            int n = 0;
+            for (AreaGroup group : areaGroups) {
+                for (Area area : group.areas) {
+                    buildBikeParkAndRideForArea(area);
+                    n++;
+                }
+            }
+            LOG.info("Created {} bike P+R areas.", n);
+        }
+
+        /**
+         * Build a bike P+R for the given area. Please note that, unlike car P+R, we do not use OSM
+         * connectivity between the area and ways for linking the bike P+R to the road street
+         * network. There aren't much bike park area in OSM data, but none of them are (properly)
+         * linked to the street network (they are most of the time buildings). We just create a bike
+         * P+R in the middle of the area envelope and rely on the same linking mechanism as for
+         * nodes to connect them to the nearest streets.
+         * 
+         * @param area
+         */
+        private void buildBikeParkAndRideForArea(Area area) {
+            BikeRentalStationService bikeRentalService = graph.getService(
+                    BikeRentalStationService.class, true);
+            Envelope envelope = new Envelope();
+            long osmId = area.parent.getId();
+            String creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
+            for (Ring ring : area.outermostRings) {
+                for (OSMNode node : ring.nodes) {
+                    envelope.expandToInclude(new Coordinate(node.lon, node.lat));
+                }
+            }
+            BikePark bikePark = new BikePark();
+            bikePark.id = "" + osmId;
+            bikePark.name = creativeName;
+            bikePark.x = (envelope.getMinX() + envelope.getMaxX()) / 2;
+            bikePark.y = (envelope.getMinY() + envelope.getMaxY()) / 2;
+            bikeRentalService.addBikePark(bikePark);
+            BikeParkVertex bikeParkVertex = new BikeParkVertex(graph, bikePark);
+            new BikeParkEdge(bikeParkVertex);
+            LOG.debug("Created area bike P+R '{}' ({})", creativeName, osmId);
         }
 
         private void buildWalkableAreas() {
@@ -332,6 +416,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (AreaGroup group : areaGroups) {
                 walkableAreaBuilder.build(group);
             }
+            
+            // running a request caches the timezone; we need to clear it now so that when agencies are loaded
+            // the graph time zone is set to the agency time zone.
+            graph.clearTimeZone();
+            
             LOG.info("Done building visibility graphs for walkable areas.");
         }
 
@@ -347,7 +436,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private boolean buildParkAndRideAreasForGroup(AreaGroup group) {
-            Envelope2D envelope = null;
+            Envelope envelope = new Envelope();
             // Process all nodes from outer rings
             List<IntersectionVertex> accessVertexes = new ArrayList<IntersectionVertex>();
             String creativeName = null;
@@ -358,12 +447,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
                 for (Ring ring : area.outermostRings) {
                     for (OSMNode node : ring.nodes) {
-                        // We need to lazy create the envelope as the default
-                        // constructor include (0,0) in the bounds...
-                        if (envelope == null)
-                            envelope = new Envelope2D(null, node.lon, node.lat, 0, 0);
-                        else
-                            envelope.add(node.lon, node.lat);
+                        envelope.expandToInclude(new Coordinate(node.lon, node.lat));
                         IntersectionVertex accessVertex = getVertexForOsmNode(node, area.parent);
                         if (accessVertex.getIncoming().isEmpty()
                                 || accessVertex.getOutgoing().isEmpty())
@@ -413,8 +497,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 // but this is an issue with OSM data.
             }
             // Place the P+R at the center of the envelope
-            ParkAndRideVertex parkAndRideVertex = new ParkAndRideVertex(graph, "P+R" + osmId, "P+R_"
-                    + osmId, envelope.getCenterX(), envelope.getCenterY(), creativeName);
+            ParkAndRideVertex parkAndRideVertex = new ParkAndRideVertex(graph, "P+R" + osmId,
+                    "P+R_" + osmId, (envelope.getMinX() + envelope.getMaxX()) / 2,
+                    (envelope.getMinY() + envelope.getMaxY()) / 2, creativeName);
             new ParkAndRideEdge(parkAndRideVertex);
             for (IntersectionVertex accessVertex : accessVertexes) {
                 new ParkAndRideLinkEdge(parkAndRideVertex, accessVertex);
@@ -750,7 +835,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             restriction.type = restrictionTag.type;
                             restriction.modes = restrictionTag.modes;
                             restriction.time = restrictionTag.time;
-                            from.addTurnRestriction(restriction);
+                            graph.addTurnRestriction(from, restriction);
                         }
                     }
                 }

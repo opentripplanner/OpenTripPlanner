@@ -13,37 +13,61 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
+import java.util.Iterator;
 
 public class Transfer extends Entity {
 
-    public String from_stop_id;
-    public String to_stop_id;
-    public int    transfer_type;
-    public int    min_transfer_time;
+    public Stop from_stop;
+    public Stop to_stop;
+    public int  transfer_type;
+    public int  min_transfer_time;
 
-    @Override
-    public String getKey() {
-        return null;
-    }
+    public static class Loader extends Entity.Loader<Transfer> {
 
-    public static class Factory extends Entity.Factory<Transfer> {
-
-        public Factory() {
-            tableName = "transfers";
-            requiredColumns = new String[] {"from_stop_id", "to_stop_id", "transfer_type"};
+        public Loader(GTFSFeed feed) {
+            super(feed, "transfers");
         }
 
         @Override
-        public Transfer fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Transfer tr = new Transfer();
-            tr.from_stop_id      = getStringField("from_stop_id", true);
-            tr.to_stop_id        = getStringField("to_stop_id", true);
-            tr.transfer_type     = getIntField("transfer_type", true);
-            tr.min_transfer_time = getIntField("min_transfer_time", false);
-            return tr;
+            tr.from_stop         = getRefField("from_stop_id", true, feed.stops);
+            tr.to_stop           = getRefField("to_stop_id", true, feed.stops);
+            tr.transfer_type     = getIntField("transfer_type", true, 0, 3);
+            tr.min_transfer_time = getIntField("min_transfer_time", false, 0, Integer.MAX_VALUE);
+            tr.feed = feed;
+            feed.transfers.put(Long.toString(row), tr);
         }
 
     }
 
+    public static class Writer extends Entity.Writer<Transfer> {
+        public Writer (GTFSFeed feed) {
+            super(feed, "transfers");
+        }
+
+        @Override
+        protected void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"from_stop_id", "to_stop_id", "transfer_type", "min_transfer_time"});
+        }
+
+        @Override
+        protected void writeOneRow(Transfer t) throws IOException {
+            writeStringField(t.from_stop.stop_id);
+            writeStringField(t.to_stop.stop_id);
+            writeIntField(t.transfer_type);
+            writeIntField(t.min_transfer_time);
+            endRecord();
+        }
+
+        @Override
+        protected Iterator<Transfer> iterator() {
+            return feed.transfers.values().iterator();
+        }
+
+
+    }
 }

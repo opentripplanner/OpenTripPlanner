@@ -227,8 +227,8 @@ public class StreetLocation extends StreetVertex {
         newRight.setNoThruTraffic(street.isNoThruTraffic());
         
         // Copy turn restrictions onto the outgoing half-edge.
-        for (TurnRestriction turnRestriction : street.getTurnRestrictions()) {
-            newRight.addTurnRestriction(turnRestriction);
+        for (TurnRestriction turnRestriction : graph.getTurnRestrictions(street)) {
+            graph.addTurnRestriction(newRight, turnRestriction);
         }
         base.extra.add(newLeft);
         base.extra.add(newRight);
@@ -281,12 +281,12 @@ public class StreetLocation extends StreetVertex {
     }
 
     @Override
-    public int removeTemporaryEdges() {
+    public int removeTemporaryEdges(Graph graph) {
         int nRemoved = 0;
         for (Edge e : getExtra()) {            
             graph.removeTemporaryEdge(e);
             // edges might already be detached
-            if (e.detach() != 0) nRemoved += 1;
+            if (e.detach(graph) != 0) nRemoved += 1;
         }
         return nRemoved;
     }
@@ -300,7 +300,7 @@ public class StreetLocation extends StreetVertex {
      */
     @Override
     public void finalize() {
-        if (removeTemporaryEdges() > 0)
+        if (removeTemporaryEdges(graph) > 0)
             LOG.error("Temporary edges were removed by finalizer: this is a memory leak.");
     }
 

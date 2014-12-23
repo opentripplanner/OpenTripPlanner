@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -33,9 +34,9 @@ public class AreaEdge extends StreetWithElevationEdge {
         return area;
     }
     
-    public int detach() {
+    public int detach(Graph graph) {
         area.removeEdge(this);
-        return super.detach();
+        return super.detach(graph);
     }
 
     public void setArea(AreaEdgeList area) {

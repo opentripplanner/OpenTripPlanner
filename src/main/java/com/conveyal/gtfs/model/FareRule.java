@@ -13,37 +13,40 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+import com.conveyal.gtfs.error.DuplicateKeyError;
+
 import java.io.IOException;
 
 public class FareRule extends Entity {
 
-    public String fare_id;
+    public Fare fare;
     public String route_id;
     public String origin_id;
     public String destination_id;
     public String contains_id;
 
-    @Override
-    public String getKey() {
-        return fare_id;
-    }
+    public static class Loader extends Entity.Loader<FareRule> {
 
-    public static class Factory extends Entity.Factory<FareRule> {
-
-        public Factory() {
-            tableName = "fare_rules";
-            requiredColumns = new String[] {"fare_id"};
+        public Loader(GTFSFeed feed) {
+            super(feed, "fare_rules");
         }
 
         @Override
-        public FareRule fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
+
+            /* Calendars and Fares are special: they are stored as joined tables rather than simple maps. */
+            String fareId = getStringField("fare_id", true);
+            Fare fare = feed.getOrCreateFare(fareId);
             FareRule fr = new FareRule();
-            fr.fare_id = getStringField("fare_id", true);
+            fr.fare = fare;
             fr.route_id = getStringField("route_id", false);
             fr.origin_id = getStringField("origin_id", false);
             fr.destination_id = getStringField("destination_id", false);
             fr.contains_id = getStringField("contains_id", false);
-            return fr;
+            fr.feed = feed;
+            fare.fare_rules.add(fr);
+
         }
 
     }

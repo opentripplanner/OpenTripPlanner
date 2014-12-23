@@ -16,4 +16,6 @@ public abstract class GTFSValidator {
      */
     public abstract boolean validate (GTFSFeed feed, boolean repair);
 
+    // TODO return errors themselves?
+
 }

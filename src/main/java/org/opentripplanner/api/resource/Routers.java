@@ -15,7 +15,12 @@ package org.opentripplanner.api.resource;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -37,13 +42,23 @@ import javax.ws.rs.core.Response.Status;
 
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
+import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 
 /**
  * This REST API endpoint allows remotely loading, reloading, and evicting graphs on a running server.
@@ -90,7 +105,7 @@ public class Routers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Routers.class);
 
-    @Context OTPServer server;
+    @Context OTPServer otpServer;
 
     /** 
      * Returns a list of routers and their bounds. 
@@ -101,8 +116,12 @@ public class Routers {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public RouterList getRouterIds() {
         RouterList routerList = new RouterList();
-        for (String id : server.graphService.getRouterIds()) {
-            routerList.routerInfo.add(getRouterInfo(id));
+        for (String id : otpServer.getRouterIds()) {
+            RouterInfo routerInfo = getRouterInfo(id);
+            if (routerInfo != null) {
+                // Router could have been evicted in the meantime
+                routerList.routerInfo.add(routerInfo);
+            }
         }
         return routerList;
     }
@@ -124,13 +143,17 @@ public class Routers {
     }
     
     private RouterInfo getRouterInfo(String routerId) {
-        Graph graph = server.graphService.getGraph(routerId);
-        if (graph == null) return null;
-        RouterInfo routerInfo = new RouterInfo();
-        routerInfo.routerId = routerId;
-        routerInfo.polygon = graph.getHull();
-        routerInfo.buildTime = graph.buildTime;
-        return routerInfo;
+        try {
+            Router router = otpServer.getRouter(routerId);
+            Graph graph = router.graph;
+            RouterInfo routerInfo = new RouterInfo();
+            routerInfo.routerId = routerId;
+            routerInfo.polygon = graph.getHull();
+            routerInfo.buildTime = graph.buildTime;
+            return routerInfo;
+        } catch (GraphNotFoundException e) {
+            return null;
+        }
     }
 
     /** 
@@ -140,7 +163,7 @@ public class Routers {
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        server.graphService.reloadGraphs(preEvict);
+        otpServer.getGraphService().reloadGraphs(preEvict);
         return Response.status(Status.OK).build();
     }
 
@@ -159,15 +182,18 @@ public class Routers {
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
         LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
         try {
-            server.graphService.getGraph(routerId);
+            otpServer.getGraphService().getRouter(routerId);
             return Response.status(404).entity("graph already registered.\n").build();
         } catch (GraphNotFoundException e) {
             if (preEvict) {
                 LOG.debug("Pre-evicting graph '{}'", routerId);
-                server.graphService.evictGraph(routerId);
+                otpServer.getGraphService().evictRouter(routerId);
             }
-            boolean success = server.graphService.registerGraph(routerId, server.graphService
-                    .getGraphSourceFactory().createGraphSource(routerId));
+            boolean success = otpServer.getGraphService()
+                    .registerGraph(
+                            routerId,
+                            otpServer.getGraphService().getGraphSourceFactory()
+                                    .createGraphSource(routerId));
             if (success)
                 return Response.status(201).entity("graph registered.\n").build();
             else
@@ -189,17 +215,92 @@ public class Routers {
             InputStream is) {
         if (preEvict) {
             LOG.debug("pre-evicting graph");
-            server.graphService.evictGraph(routerId);
+            otpServer.getGraphService().evictRouter(routerId);
         }
         LOG.debug("deserializing graph from POST data stream...");
         Graph graph;
         try {
             graph = Graph.load(is, level);
-            server.graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
+            GraphService graphService = otpServer.getGraphService();
+            graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
             return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
         }
+    }
+    
+    /**
+     * Build a graph from data in the ZIP file posted over the wire, associating it with the given router ID.
+     * This method will be selected when the Content-Type is application/zip.
+     */
+    @RolesAllowed({ "ROUTERS" })
+    @POST @Path("{routerId}") @Consumes({"application/zip"})
+    @Produces({ MediaType.TEXT_PLAIN })
+    public Response buildGraphOverWire (
+            @PathParam("routerId") String routerId,
+            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict,
+            InputStream input) {
+        // TODO: async processing
+        
+        if (preEvict) {
+            LOG.debug("Pre-evicting graph with routerId {} before building new graph", routerId);
+            otpServer.getGraphService().evictRouter(routerId);
+        }
+        
+        // get a temporary directory, using Google Guava
+        File tempDir = Files.createTempDir();
+        
+        // extract the zip file to the temp dir
+        ZipInputStream zis = new ZipInputStream(input);
+        
+        try {
+            for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+                if (entry.isDirectory())
+                    // we only support flat ZIP files
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("ZIP files containing directories are not supported").build();
+                    
+                File file = new File(tempDir, entry.getName());
+                
+                if (!file.getParentFile().equals(tempDir))
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity("ZIP files containing directories are not supported").build();
+                    
+                OutputStream os = new FileOutputStream(file);
+                ByteStreams.copy(zis, os);
+                os.close();
+            }
+        } catch (Exception ex) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Could not extract zip file: " + ex.getMessage()).build();
+        }
+
+           
+        // set up the build, using default parameters
+        // this is basically simulating calling otp -b on the command line
+        CommandLineParameters params = otpServer.params.clone();
+        params.build = Lists.newArrayList();
+        params.build.add(tempDir);
+        params.inMemory = true;
+        
+        GraphBuilderTask graphBuilder = new OTPConfigurator(params).builderFromParameters();
+        
+        graphBuilder.run();
+        
+        // remove the temporary directory
+        // this doesn't work for nested directories, but the extract doesn't either,
+        // so we'll crash long before we get here . . .
+        for (File file : tempDir.listFiles()) {
+            file.delete();
+        }
+        
+        tempDir.delete();
+        
+        Graph graph = graphBuilder.getGraph();
+        graph.index(new DefaultStreetVertexIndexFactory());
+        
+        GraphService graphService = otpServer.getGraphService();
+        graphService.registerGraph(routerId, new MemoryGraphSource(routerId, graph));
+        return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
     }
     
     /** 
@@ -214,7 +315,7 @@ public class Routers {
             InputStream is) {
         LOG.debug("save graph from POST data stream...");
         try {
-            boolean success = server.graphService.getGraphSourceFactory().save(routerId, is);
+            boolean success = otpServer.getGraphService().getGraphSourceFactory().save(routerId, is);
             if (success) {
                 return Response.status(201).entity("graph saved.\n").build();
             } else {
@@ -229,7 +330,7 @@ public class Routers {
     @RolesAllowed({ "ROUTERS" })
     @DELETE @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteAll() {
-        int nEvicted = server.graphService.evictAll();
+        int nEvicted = otpServer.getGraphService().evictAll();
         String message = String.format("%d graphs evicted.\n", nEvicted);
         return Response.status(200).entity(message).build();
     }
@@ -242,7 +343,7 @@ public class Routers {
     @RolesAllowed({ "ROUTERS" })
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
-        boolean existed = server.graphService.evictGraph(routerId);
+        boolean existed = otpServer.getGraphService().evictRouter(routerId);
         if (existed)
             return Response.status(200).entity("graph evicted.\n").build();
         else

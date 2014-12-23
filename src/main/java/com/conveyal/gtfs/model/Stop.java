@@ -13,7 +13,11 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
+import java.net.URL;
+import java.util.Iterator;
 
 public class Stop extends Entity {
 
@@ -24,44 +28,73 @@ public class Stop extends Entity {
     public double stop_lat;
     public double stop_lon;
     public String zone_id;
-    public String stop_url;
+    public URL    stop_url;
     public int    location_type;
     public String parent_station;
     public String stop_timezone;
+    // TODO should be int
     public String wheelchair_boarding;
 
-    @Override
-    public String getKey() {
-        return stop_id;
-    }
+    public static class Loader extends Entity.Loader<Stop> {
 
-    public static class Factory extends Entity.Factory<Stop> {
-
-        public Factory() {
-            tableName = "stops";
-            requiredColumns = new String[] {"stop_id"};
+        public Loader(GTFSFeed feed) {
+            super(feed, "stops");
         }
 
         @Override
-        public Stop fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Stop s = new Stop();
             s.stop_id   = getStringField("stop_id", true);
             s.stop_code = getStringField("stop_code", false);
             s.stop_name = getStringField("stop_name", true);
             s.stop_desc = getStringField("stop_desc", false);
-            s.stop_lat  = getDoubleField("stop_lat", true);
-            s.stop_lon  = getDoubleField("stop_lon", true);
+            s.stop_lat  = getDoubleField("stop_lat", true, -90D, 90D);
+            s.stop_lon  = getDoubleField("stop_lon", true, -180D, 180D);
             s.zone_id   = getStringField("zone_id", false);
-            s.stop_url  = getStringField("stop_url", false);
-            s.location_type  = getIntField("location_type", false);
+            s.stop_url  = getUrlField("stop_url", false);
+            s.location_type  = getIntField("location_type", false, 0, 1);
             s.parent_station = getStringField("parent_station", false);
             s.stop_timezone  = getStringField("stop_timezone", false);
             s.wheelchair_boarding = getStringField("wheelchair_boarding", false);
-            checkRangeInclusive(-90, 90, s.stop_lat);
-            checkRangeInclusive(-180, 180, s.stop_lon); // TODO check more ranges
-            return s;
+            s.feed = feed;
+            /* TODO check ref integrity later, this table self-references via parent_station */
+
+            feed.stops.put(s.stop_id, s);
         }
 
     }
 
+    public static class Writer extends Entity.Writer<Stop> {
+        public Writer (GTFSFeed feed) {
+            super(feed, "stops");
+        }
+
+        @Override
+        public void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"stop_id", "stop_code", "stop_name", "stop_desc", "stop_lat", "stop_lon", "zone_id",					
+                    "stop_url", "location_type", "parent_station", "stop_timezone", "wheelchair_boarding"});
+        }
+
+        @Override
+        public void writeOneRow(Stop s) throws IOException {
+            writeStringField(s.stop_id);
+            writeStringField(s.stop_code);
+            writeStringField(s.stop_name);
+            writeStringField(s.stop_desc);
+            writeDoubleField(s.stop_lat);
+            writeDoubleField(s.stop_lon);
+            writeStringField(s.zone_id);
+            writeUrlField(s.stop_url);
+            writeIntField(s.location_type);
+            writeStringField(s.parent_station);
+            writeStringField(s.stop_timezone);
+            writeStringField(s.wheelchair_boarding);
+            endRecord();
+        }
+
+        @Override
+        public Iterator<Stop> iterator() {
+            return feed.stops.values().iterator();
+        }   	
+    }
 }

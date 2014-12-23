@@ -34,7 +34,11 @@ import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 
-/** This is used by MapBuilder and it has no comments. TODO Figure out what it is for. */
+/**
+ * This Performs most of the work for the MapBuilder graph builder module.
+ * It determines which sequence of graph edges a GTFS shape probably corresponds to.
+ * Note that GTFS shapes are not in any way constrained to OSM edges or even roads.
+ */
 public class StreetMatcher {
     private static final Logger log = LoggerFactory.getLogger(StreetMatcher.class);
     private static final double DISTANCE_THRESHOLD = 0.0002;

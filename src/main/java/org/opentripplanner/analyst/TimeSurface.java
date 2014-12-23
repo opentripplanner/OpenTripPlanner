@@ -16,6 +16,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
@@ -68,6 +69,7 @@ public class TimeSurface implements Serializable {
         Arrays.fill(times, UNREACHABLE);
         for (State state : spt.getAllStates()) {
             Vertex vertex = state.getVertex();
+
             if (vertex instanceof StreetVertex || vertex instanceof TransitStop) {
                 int i = vertex.getIndex();
                 int t = (int) state.getActiveTime();
@@ -126,7 +128,7 @@ public class TimeSurface implements Serializable {
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
         sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16, spt.getVertexCount(), dX, dY, coordinateOrigin);
-        SampleGridRenderer.sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0, spt.getOptions().getMaxWalkDistance(), cosLat);
+        SampleGridRenderer.sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0, spt.getOptions().getMaxWalkDistance(), Integer.MAX_VALUE, cosLat);
         long t1 = System.currentTimeMillis();
         LOG.info("Made SampleGrid from SPT in {} msec.", (int) (t1 - t0));
     }

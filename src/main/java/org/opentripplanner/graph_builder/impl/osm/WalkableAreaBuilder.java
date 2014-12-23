@@ -275,6 +275,7 @@ public class WalkableAreaBuilder {
             mode = TraverseMode.CAR;
         }
         RoutingRequest options = new RoutingRequest(mode);
+        options.setDummyRoutingContext(graph);
         GenericDijkstra search = new GenericDijkstra(options);
         search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
         Set<Edge> usedEdges = new HashSet<Edge>();
@@ -293,7 +294,7 @@ public class WalkableAreaBuilder {
         for (Edge edge : edges) {
             if (!usedEdges.contains(edge)) {
                 graph.streetNotesService.removeStaticNotes(edge);
-                edge.detach();
+                edge.detach(graph);
             }
         }
     }
@@ -387,6 +388,14 @@ public class WalkableAreaBuilder {
                     length, areaPermissions, false, edgeList);
             street.setCarSpeed(carSpeed);
 
+            if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
+                street.setHasBogusName(true);
+            }
+
+            if (areaEntity.isTagFalse("wheelchair")) {
+                street.setWheelchairAccessible(false);
+            }
+
             street.setStreetClass(cls);
             edges.add(street);
 
@@ -397,6 +406,14 @@ public class WalkableAreaBuilder {
             AreaEdge backStreet = edgeFactory.createAreaEdge(endEndpoint, startEndpoint,
                     (LineString) line.reverse(), name, length, areaPermissions, true, edgeList);
             backStreet.setCarSpeed(carSpeed);
+
+            if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
+                backStreet.setHasBogusName(true);
+            }
+
+            if (areaEntity.isTagFalse("wheelchair")) {
+                street.setWheelchairAccessible(false);
+            }
 
             backStreet.setStreetClass(cls);
             edges.add(backStreet);

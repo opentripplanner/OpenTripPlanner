@@ -18,7 +18,8 @@ import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.Router.LifecycleManager;
 import org.opentripplanner.updater.PropertiesPreferences;
 
 /**
@@ -27,23 +28,32 @@ import org.opentripplanner.updater.PropertiesPreferences;
  */
 public class MemoryGraphSource implements GraphSource {
 
-    private Graph graph;
+    private Router router;
 
-    private GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
+    private Preferences config;
+
+    private Router.LifecycleManager routerLifecycleManager;
 
     public MemoryGraphSource(String routerId, Graph graph) {
         this(routerId, graph, new PropertiesPreferences(new Properties()));
     }
 
     public MemoryGraphSource(String routerId, Graph graph, Preferences config) {
-        this.graph = graph;
-        this.graph.routerId = routerId;
-        decorator.setupGraph(graph, config);
+        router = new Router(routerId, graph);
+        router.graph.routerId = routerId;
+        this.config = config;
+        // We will startup the router later on
     }
 
     @Override
-    public Graph getGraph() {
-        return graph;
+    public void setRouterLifecycleManager(LifecycleManager routerLifecycleManager) {
+        this.routerLifecycleManager = routerLifecycleManager;
+        this.routerLifecycleManager.startupRouter(router, config);
+    }
+
+    @Override
+    public Router getRouter() {
+        return router;
     }
 
     @Override
@@ -57,9 +67,11 @@ public class MemoryGraphSource implements GraphSource {
 
     @Override
     public void evict() {
-        if (graph != null) {
-            decorator.shutdownGraph(graph);
+        if (router != null) {
+            if (routerLifecycleManager != null) {
+                routerLifecycleManager.shutdownRouter(router);
+            }
         }
-        graph = null;
+        router = null;
     }
 }

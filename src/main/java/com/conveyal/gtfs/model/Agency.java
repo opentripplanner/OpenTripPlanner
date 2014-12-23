@@ -13,43 +13,71 @@
 
 package com.conveyal.gtfs.model;
 
+import com.conveyal.gtfs.GTFSFeed;
+
 import java.io.IOException;
+import java.net.URL;
+import java.util.Iterator;
 
 public class Agency extends Entity {
 
     public String agency_id;
     public String agency_name;
-    public String agency_url;
+    public URL    agency_url;
     public String agency_timezone;
     public String agency_lang;
     public String agency_phone;
-    public String agency_fare_url;
+    public URL    agency_fare_url;
 
-    @Override
-    public String getKey() {
-        return agency_id;
-    }
+    public static class Loader extends Entity.Loader<Agency> {
 
-    public static class Factory extends Entity.Factory<Agency> {
-
-        public Factory() {
-            tableName = "agency";
-            requiredColumns = new String[] {"agency_name", "agency_timezone"};
+        public Loader(GTFSFeed feed) {
+            super(feed, "agency");
         }
 
         @Override
-        public Agency fromCsv() throws IOException {
+        public void loadOneRow() throws IOException {
             Agency a = new Agency();
             a.agency_id    = getStringField("agency_id", false); // can only be absent if there is a single agency -- requires a special validator.
             a.agency_name  = getStringField("agency_name", true);
-            a.agency_url   = getStringField("agency_url", true);
+            a.agency_url   = getUrlField("agency_url", true);
             a.agency_lang  = getStringField("agency_lang", false);
             a.agency_phone = getStringField("agency_phone", false);
             a.agency_timezone = getStringField("agency_timezone", true);
-            a.agency_fare_url = getStringField("agency_fare_url", false);
-            return a;
+            a.agency_fare_url = getUrlField("agency_fare_url", false);
+            a.feed = feed;
+            feed.agency.put(a.agency_id, a);
         }
 
+    }
+
+    public static class Writer extends Entity.Writer<Agency> {
+        public Writer(GTFSFeed feed) {
+            super(feed, "agency");
+        }
+
+        @Override
+        public void writeHeaders() throws IOException {
+            writer.writeRecord(new String[] {"agency_id", "agency_name", "agency_url", "agency_lang",
+                    "agency_phone", "agency_timezone", "agency_fare_url"});
+        }
+
+        @Override
+        public void writeOneRow(Agency a) throws IOException {
+            writeStringField(a.agency_id);
+            writeStringField(a.agency_name);
+            writeUrlField(a.agency_url);
+            writeStringField(a.agency_lang);
+            writeStringField(a.agency_phone);
+            writeStringField(a.agency_timezone);
+            writeUrlField(a.agency_fare_url);
+            endRecord();
+        }
+
+        @Override
+        public Iterator<Agency> iterator() {
+            return this.feed.agency.values().iterator();
+        }
     }
 
 }

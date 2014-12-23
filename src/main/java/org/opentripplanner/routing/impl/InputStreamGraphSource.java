@@ -25,7 +25,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.Router.LifecycleManager;
 import org.opentripplanner.updater.PropertiesPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class InputStreamGraphSource implements GraphSource {
      * */
     private static final long LOAD_DELAY_SEC = 10;
 
-    private Graph graph;
+    private Router router;
 
     private String routerId;
 
@@ -70,7 +71,7 @@ public class InputStreamGraphSource implements GraphSource {
     // TODO Why do we need a factory? There is a single one implementation.
     private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
 
-    private GraphUpdaterConfigurator configurator = new GraphUpdaterConfigurator();
+    private Router.LifecycleManager routerLifecycleManager;
 
     /**
      * @param routerId
@@ -100,11 +101,15 @@ public class InputStreamGraphSource implements GraphSource {
         this.routerId = routerId;
         this.loadLevel = loadLevel;
         this.graphInputStream = graphInputStream;
-        this.reload(true, false);
     }
 
     @Override
-    public Graph getGraph() {
+    public void setRouterLifecycleManager(LifecycleManager routerLifecycleManager) {
+        this.routerLifecycleManager = routerLifecycleManager;
+    }
+
+    @Override
+    public Router getRouter() {
         /*
          * We synchronize on pre-evict mutex in case we are in the middle of reloading in pre-evict
          * mode. In that case we must make the client wait until the new graph is loaded, because
@@ -112,7 +117,7 @@ public class InputStreamGraphSource implements GraphSource {
          * often.
          */
         synchronized (preEvictMutex) {
-            return graph;
+            return router;
         }
     }
 
@@ -126,37 +131,40 @@ public class InputStreamGraphSource implements GraphSource {
                 return true;
             if (preEvict) {
                 synchronized (preEvictMutex) {
-                    if (graph != null)
-                        configurator.shutdownGraph(graph);
+                    if (router != null && routerLifecycleManager != null) {
+                        routerLifecycleManager.shutdownRouter(router);
+                    }
                     /*
-                     * Forcing graph to null here should remove any references to the graph once all
-                     * current requests are done. So the next reload is supposed to have more
+                     * Forcing router to null here should remove any references to the graph once
+                     * all current requests are done. So the next reload is supposed to have more
                      * memory.
                      */
-                    graph = null;
-                    graph = loadGraph();
+                    router = null;
+                    router = loadGraph();
                 }
             } else {
-                Graph newGraph = loadGraph();
-                if (newGraph != null) {
+                Router newRouter = loadGraph();
+                if (newRouter != null) {
                     // Load OK
-                    if (graph != null)
-                        configurator.shutdownGraph(graph);
-                    graph = newGraph; // Assignment in java is atomic
+                    if (router != null && routerLifecycleManager != null) {
+                        routerLifecycleManager.shutdownRouter(router);
+                    }
+                    router = newRouter; // Assignment in java is atomic
                 } else {
                     // Load failed
-                    if (force || graph == null) {
+                    if (force || router == null) {
                         LOG.warn("Unable to load data for router '{}'.", routerId);
-                        if (graph != null)
-                            configurator.shutdownGraph(graph);
-                        graph = null;
+                        if (router != null && routerLifecycleManager != null) {
+                            routerLifecycleManager.shutdownRouter(router);
+                        }
+                        router = null;
                     } else {
                         // No shutdown, since we keep current one.
                         LOG.warn("Unable to load data for router '{}', keeping old data.", routerId);
                     }
                 }
             }
-            if (graph == null) {
+            if (router == null) {
                 graphLastModified = 0L;
             } else {
                 /*
@@ -165,8 +173,8 @@ public class InputStreamGraphSource implements GraphSource {
                  */
                 graphLastModified = lastModified;
             }
-            // If a graph is null, it will be evicted.
-            return (graph != null);
+            // If a router is null, it will be evicted.
+            return (router != null);
         }
     }
 
@@ -194,31 +202,35 @@ public class InputStreamGraphSource implements GraphSource {
     @Override
     public void evict() {
         synchronized (this) {
-            if (graph != null) {
-                configurator.shutdownGraph(graph);
+            if (router != null) {
+                if (routerLifecycleManager != null) {
+                    routerLifecycleManager.shutdownRouter(router);
+                }
+                router = null;
             }
         }
     }
 
     /**
-     * Do the actual operation of graph loading. Load configuration if present, and configure the
-     * graph with dynamic updaters.
+     * Do the actual operation of graph loading. Load configuration if present, and startup the
+     * router with the help of the router lifecycle manager.
      * 
      * @return
      */
-    private Graph loadGraph() {
-        final Graph graph;
+    private Router loadGraph() {
+        final Graph newGraph;
         try (InputStream is = graphInputStream.getGraphInputStream()) {
             LOG.info("Loading graph...");
             try {
-                graph = Graph.load(new ObjectInputStream(is), loadLevel, streetVertexIndexFactory);
+                newGraph = Graph.load(new ObjectInputStream(is), loadLevel,
+                        streetVertexIndexFactory);
             } catch (Exception ex) {
                 LOG.error("Exception while loading graph '{}'.", routerId);
                 ex.printStackTrace();
                 return null;
             }
 
-            graph.routerId = (routerId);
+            newGraph.routerId = (routerId);
         } catch (IOException e) {
             LOG.warn("Graph file not found or not openable for routerId '{}': {}", routerId, e);
             return null;
@@ -228,11 +240,15 @@ public class InputStreamGraphSource implements GraphSource {
         // one could be bundled inside.
         try (InputStream is = graphInputStream.getConfigInputStream()) {
             Preferences config = is == null ? null : new PropertiesPreferences(is);
-            configurator.setupGraph(graph, config);
+            Router newRouter = new Router(routerId, newGraph);
+            if (routerLifecycleManager != null) {
+                routerLifecycleManager.startupRouter(newRouter, config);
+            }
+            return newRouter;
         } catch (IOException e) {
             LOG.error("Can't read config file", e);
+            return null;
         }
-        return graph;
     }
 
     /**
@@ -323,9 +339,13 @@ public class InputStreamGraphSource implements GraphSource {
 
         private static final Logger LOG = LoggerFactory.getLogger(FileFactory.class);
 
-        public File basePath = new File("/var/otp/graphs");
+        public File basePath;
 
         public LoadLevel loadLevel = LoadLevel.FULL;
+
+        public FileFactory(File basePath) {
+            this.basePath = basePath;
+        }
 
         @Override
         public GraphSource createGraphSource(String routerId) {

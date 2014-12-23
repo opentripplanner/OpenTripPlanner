@@ -13,14 +13,14 @@
 
 package org.opentripplanner.routing.impl;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import static org.opentripplanner.routing.automata.Nonterminal.choice;
 import static org.opentripplanner.routing.automata.Nonterminal.optional;
 import static org.opentripplanner.routing.automata.Nonterminal.plus;
 import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
-
-import java.util.Collections;
-import java.util.List;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
@@ -30,17 +30,10 @@ import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.OnboardEdge;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.StationEdge;
-import org.opentripplanner.routing.edgetype.StationStopEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TimedTransferEdge;
-import org.opentripplanner.routing.edgetype.TransferEdge;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -48,6 +41,12 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static org.opentripplanner.routing.automata.Nonterminal.*;
 
 /**
  * This PathService is intended to provide faster response times when routing over longer
@@ -65,15 +64,17 @@ public class LongDistancePathService implements PathService {
     private static final double DEFAULT_MAX_WALK = 2000;
     private static final double CLAMP_MAX_WALK = 15000;
 
-    private GraphService graphService;
-    private SPTService sptService;
+    private Graph graph;
+    private SPTServiceFactory sptServiceFactory;
 
-    public LongDistancePathService(GraphService graphService, SPTService sptService) {
-        this.graphService = graphService;
-        this.sptService = sptService;
+    public LongDistancePathService(Graph graph, SPTServiceFactory sptServiceFactory) {
+        this.graph = graph;
+        this.sptServiceFactory = sptServiceFactory;
     }
 
-    public double timeout = 0; // seconds
+    // Timeout in seconds relative to initial search begin time, for each new path found (generally decreasing)
+    private static double[] timeouts = new double[] {5, 2, 1, 0.5, 0.25};
+	private SPTVisitor sptVisitor;
     
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
@@ -82,19 +83,22 @@ public class LongDistancePathService implements PathService {
             LOG.error("PathService was passed a null routing request.");
             return null;
         }
+        
+        SPTService sptService = this.sptServiceFactory.instantiate();
 
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.routerId));
+            options.setRoutingContext(graph);
+            /* Use a pathparser that constrains the search to use SimpleTransfers. */
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 
         LOG.debug("rreq={}", options);
-        
+
         RemainingWeightHeuristic heuristic;
         if (options.disableRemainingWeightHeuristic) {
             heuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
-            // Only use the BiDi heuristic for transit.
+           // Only use the BiDi heuristic for transit.
             heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
         } else {
             heuristic = new DefaultRemainingWeightHeuristic();
@@ -105,7 +109,8 @@ public class LongDistancePathService implements PathService {
          * search times on the LongDistancePathService, so we set it to the maximum we ever expect
          * to see. Because people may use either the traditional path services or the 
          * LongDistancePathService, we do not change the global default but override it here. */
-        options.setMaxTransfers(10);
+        options.setMaxTransfers(4);
+        options.longDistance = true;
 
         /* In long distance mode, maxWalk has a different meaning. It's the radius around the origin or destination
          * within which you can walk on the streets. If no value is provided, max walk defaults to the largest
@@ -113,18 +118,36 @@ public class LongDistancePathService implements PathService {
          * the whole graph walkable. */
         if (options.maxWalkDistance == Double.MAX_VALUE) options.maxWalkDistance = DEFAULT_MAX_WALK;
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
-
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
-        ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
-        LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        
-        if (spt == null) { // timeout or other fail
-            LOG.warn("SPT was null.");
-            return null;
+        List<GraphPath> paths = Lists.newArrayList();
+        Set<AgencyAndId> bannedTrips = Sets.newHashSet();
+        while (paths.size() < options.numItineraries && paths.size() < timeouts.length) {
+            double timeout = searchBeginTime + (timeouts[paths.size()] * 1000) - System.currentTimeMillis();
+            // if (timeout <= 0) break; ADD THIS LINE TO MAKE TIMEOUTS ACTUALLY WORK WHEN NEGATIVE
+            ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+            if (spt == null) { // timeout or other fail
+                LOG.warn("SPT was null.");
+                return null;
+            }
+            if (options.rctx.aborted) break;
+//            if( this.sptVisitor!=null ){
+//                this.sptVisitor.spt = spt;
+//            }
+            List<GraphPath> newPaths = spt.getPaths();
+            if (newPaths.isEmpty()) break;
+            // Find all trips used in this path and ban them
+            for (GraphPath path : newPaths) {
+                for (State state : path.states) {
+                    AgencyAndId tripId = state.getTripId();
+                    if (tripId != null) options.banTrip(tripId);
+                }
+            }
+            //spt.getPaths().get(0).dump();
+            paths.addAll(newPaths);
+            LOG.debug("we have {} paths", paths.size());
         }
-        //spt.getPaths().get(0).dump();
-        List<GraphPath> paths = spt.getPaths();
+        LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         Collections.sort(paths, new PathWeightComparator());
         return paths;
     }
@@ -226,5 +249,10 @@ public class LongDistancePathService implements PathService {
         }
 
     }
+
+	@Override
+	public void setSPTVisitor(SPTVisitor vis) {
+		this.sptVisitor = vis;
+	}
     
 }

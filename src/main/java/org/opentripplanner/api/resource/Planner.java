@@ -26,6 +26,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,8 @@ public class Planner extends RoutingResource {
         try {
             // fill in request from query parameters via shared superclass method
             request = super.buildRequest();
-            TripPlan plan = otpServer.planGenerator.generate(request);
+            Router router = otpServer.getRouter(request.routerId);
+            TripPlan plan = router.planGenerator.generate(request);
             response.setPlan(plan);
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);

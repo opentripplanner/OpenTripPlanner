@@ -24,8 +24,8 @@ import org.opentripplanner.common.geometry.RecursiveGridIsolineBuilder.ZFunc;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -44,14 +44,14 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
     private static final Logger LOG = LoggerFactory
             .getLogger(IsoChroneSPTRendererRecursiveGrid.class);
 
-    private GraphService graphService;
+    private Graph graph;
     private SPTService sptService;
     private SampleSource sampleSource;
 
-    public IsoChroneSPTRendererRecursiveGrid(GraphService graphService, SPTService sptService, SampleSource sampleSource) {
-        this.graphService = graphService;
+    public IsoChroneSPTRendererRecursiveGrid(Graph graph, SPTService sptService) {
+        this.graph = graph;
         this.sptService = sptService;
-        this.sampleSource = sampleSource;
+        this.sampleSource = graph.getSampleFactory();
     }
 
     /**
@@ -72,7 +72,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
         sptRequest.worstTime = (sptRequest.dateTime
                 + (sptRequest.arriveBy ? -isoChroneRequest.maxCutoffSec : isoChroneRequest.maxCutoffSec));
         sptRequest.batch = true;
-        sptRequest.setRoutingContext(graphService.getGraph(sptRequest.routerId));
+        sptRequest.setRoutingContext(graph);
         final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
         sptRequest.cleanup();
 
@@ -84,7 +84,6 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
         ZFunc timeFunc = new ZFunc() {
             @Override
             public long z(Coordinate c) {
-                // TODO Make the sample source multi-router compatible
                 Sample sample = sampleSource.getSample(c.x, c.y);
                 if (sample == null) {
                     return Long.MAX_VALUE;

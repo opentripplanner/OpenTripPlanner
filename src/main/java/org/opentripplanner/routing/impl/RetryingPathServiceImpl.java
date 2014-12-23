@@ -21,18 +21,16 @@ import java.util.Queue;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.Context;
 
 public class RetryingPathServiceImpl implements PathService {
 
@@ -43,14 +41,14 @@ public class RetryingPathServiceImpl implements PathService {
 
     private static final double MAX_WALK_MULTIPLE = 16;
 
-    private GraphService graphService;
+    private Graph graph;
+    
+    private SPTServiceFactory sptServiceFactory;
 
-    public RetryingPathServiceImpl(GraphService graphService, SPTService sptService) {
-        this.graphService = graphService;
-        this.sptService = sptService;
+    public RetryingPathServiceImpl(Graph graph, SPTServiceFactory sptServiceFactory) {
+        this.graph = graph;
+        this.sptServiceFactory = sptServiceFactory;
     }
-
-    private SPTService sptService;
 
     private double firstPathTimeout = 0; // seconds
     private double multiPathTimeout = 0; // seconds
@@ -89,7 +87,7 @@ public class RetryingPathServiceImpl implements PathService {
         // make sure the options has a routing context *before* cloning it (otherwise you get
         // orphan RoutingContexts leaving temporary edges in the graph until GC)
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.routerId));
+            options.setRoutingContext(graph);
             options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
                     new NoThruTrafficPathParser() };
         }
@@ -106,6 +104,9 @@ public class RetryingPathServiceImpl implements PathService {
         double initialMaxWalk = maxWalk;
         long maxTime = options.arriveBy ? 0 : Long.MAX_VALUE;
         RoutingRequest currOptions;
+        
+        SPTService sptService = this.sptServiceFactory.instantiate();
+        
         while (paths.size() < options.numItineraries) {
             currOptions = optionQueue.poll();
             if (currOptions == null) {
@@ -204,20 +205,9 @@ public class RetryingPathServiceImpl implements PathService {
         return paths;
     }
 
-    public GraphService getGraphService() {
-        return graphService;
-    }
-
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
-
-    public SPTService getSptService() {
-        return sptService;
-    }
-
-    public void setSptService(SPTService sptService) {
-        this.sptService = sptService;
+    @Override
+    public void setSPTVisitor(SPTVisitor vis) {
+        throw new UnsupportedOperationException();
     }
 
 }

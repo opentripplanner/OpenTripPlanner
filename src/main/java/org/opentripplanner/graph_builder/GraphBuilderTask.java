@@ -89,20 +89,20 @@ public class GraphBuilderTask implements Runnable {
     }
 
     public void run() {
-
         /* Record how long it takes to build the graph, purely for informational purposes. */
         long startTime = System.currentTimeMillis();
 
-        if (graphFile == null) {
-            throw new RuntimeException("graphBuilderTask has no attribute graphFile.");
-        }
-
-        if( graphFile.exists() && ! _alwaysRebuild) {
-            LOG.info("graph already exists and alwaysRebuild=false => skipping graph build");
-            return;
-        }
-
         if (serializeGraph) {
+        	
+            if (graphFile == null) {
+                throw new RuntimeException("graphBuilderTask has no attribute graphFile.");
+            }
+
+            if( graphFile.exists() && ! _alwaysRebuild) {
+                LOG.info("graph already exists and alwaysRebuild=false => skipping graph build");
+                return;
+            }
+        	
             try {
                 if (!graphFile.getParentFile().exists())
                     if (!graphFile.getParentFile().mkdirs())
