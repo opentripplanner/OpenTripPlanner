@@ -84,7 +84,7 @@ public class NearbyStopFinder {
             earliestArrivalSPTService = new EarliestArrivalSPTService();
             earliestArrivalSPTService.maxDuration = (int) radius; // FIXME assuming 1 m/sec, use hard distance limiting to match straight-line mode
         } else {
-            streetIndex = new StreetVertexIndexServiceImpl(graph);
+            streetIndex = new StreetVertexIndexServiceImpl(graph); // FIXME use the one already in the graph if it exists
             distanceLibrary = SphericalDistanceLibrary.getInstance();
         }
     }

@@ -26,6 +26,7 @@ public class TimeRange {
     }
 
     /** Return true if the time range was updated, false if it remained the same. */
+    // TODO does comparing averages lead to an endless-improvement loop situation?
     public boolean mergeIn (TimeRange other) {
         if (other.min < this.min || other.max < this.max || other.avg < this.avg) {
             // the other range is better in at least one way, combine it into this one
@@ -85,6 +86,7 @@ public class TimeRange {
             return ranges.get(stop);
         }
 
+        /** Return true if the time range at the given stop was updated. */
         public boolean add (Stop stop, TimeRange newRange) {
             TimeRange existingRange = ranges.get(stop);
             if (existingRange == null) {
