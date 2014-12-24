@@ -180,6 +180,15 @@ public class Graph implements Serializable {
 
     public final Date buildTime = new Date();
 
+    /** True if OSM data was loaded into this Graph. */
+    public boolean hasStreets = false;
+
+    /** True if GTFS data was loaded into this Graph. */
+    public boolean hasTransit = false;
+
+    /** True if direct single-edge transfers were generated between transit stops in this Graph. */
+    public boolean hasDirectTransfers = false;
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();

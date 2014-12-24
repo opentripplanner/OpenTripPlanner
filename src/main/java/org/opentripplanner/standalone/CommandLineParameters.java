@@ -79,16 +79,12 @@ public class CommandLineParameters implements Cloneable {
     boolean noTransit;
 
     @Parameter(names = {"--useTransfersTxt"},
-            description = "Use transfers.txt file for the gtfsBundle (GTFS).")
+            description = "Create direct transfer edges from transfers.txt in GTFS, instead of based on distance.")
     boolean useTransfersTxt;
 
     @Parameter(names = {"--noParentStopLinking"},
             description = "Skip linking of stops to parent stops (GTFS).")
     boolean noParentStopLinking;
-
-    @Parameter(names = {"--useStreetsForLinking"},
-            description = "Use street network to link stops to each other rather than straight line distance.")
-    boolean useStreetsForLinking;
 
     @Parameter(names = {"--parentStationTransfers"},
             description = "Create direct transfers between the constituent stops of each parent station.")

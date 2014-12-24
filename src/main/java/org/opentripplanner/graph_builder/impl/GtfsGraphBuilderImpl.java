@@ -173,6 +173,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         graph.putService(CalendarServiceData.class, data);
         graph.updateTransitFeedValidity(data);
 
+        graph.hasTransit = true;
+
     }
 
     /****

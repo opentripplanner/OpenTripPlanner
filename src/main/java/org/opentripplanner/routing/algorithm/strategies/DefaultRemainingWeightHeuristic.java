@@ -125,7 +125,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         @Override public void visitVertex(State state) {
             if (state.getVertex() instanceof TransitStop) {
                 distanceToClosestStop = state.getWalkDistance();
-                LOG.info("Found closest stop to search target: {} at {}m", state.getVertex(), (int) distanceToClosestStop);
+                LOG.debug("Found closest stop to search target: {} at {}m", state.getVertex(), (int) distanceToClosestStop);
             }
         }
     }

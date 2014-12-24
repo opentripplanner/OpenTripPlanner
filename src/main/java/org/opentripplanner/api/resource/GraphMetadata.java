@@ -43,6 +43,7 @@ public class GraphMetadata {
     	// 0-arg constructor avoids com.sun.xml.bind.v2.runtime.IllegalAnnotationsException
     }
 
+    /* FIXME this is ultra slow, causing the server to stall for a long time the first time it's used. */
     public GraphMetadata(Graph graph) {
         /* generate extents */
         Envelope leftEnv = new Envelope();

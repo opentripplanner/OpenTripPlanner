@@ -24,6 +24,8 @@ import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Represents a transfer between stops that does not take the street network into account.
+ *
+ * TODO these should really have a set of valid modes in case bike vs. walk transfers are different
  */
 public class SimpleTransfer extends Edge {
     private static final long serialVersionUID = 20140408L;

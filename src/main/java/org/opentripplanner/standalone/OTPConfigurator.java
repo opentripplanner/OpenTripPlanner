@@ -30,8 +30,7 @@ import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
-import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
-import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
+import org.opentripplanner.graph_builder.impl.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.TransitToTaggedStopsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.ElevationGraphBuilderImpl;
@@ -213,23 +212,14 @@ public class OTPConfigurator {
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
-            // When using the long distance path service, or when there is no street data,
-            // link stops to each other based on distance only, unless user has requested linking
-            // based on transfers.txt or the street network (if available).
-            if ((!hasOSM ) || params.longDistance) {
-                if (!params.useTransfersTxt) {
-                    if (!hasOSM || !params.useStreetsForLinking) {
-                        graphBuilder.addGraphBuilder(new StreetlessStopLinker());
-                    }
-                }
-            } 
             if ( hasOSM ) {
                 graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
-                // The stops can be linked to each other once they have links to the street network.
-                if (params.longDistance && params.useStreetsForLinking && !params.useTransfersTxt) {
-                    graphBuilder.addGraphBuilder(new StreetfulStopLinker());
-                }
+            }
+            // The stops can be linked to each other once they are already linked to the street network.
+            if (params.longDistance && !params.useTransfersTxt) {
+                // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
+                graphBuilder.addGraphBuilder(new DirectTransferGenerator());
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
         }

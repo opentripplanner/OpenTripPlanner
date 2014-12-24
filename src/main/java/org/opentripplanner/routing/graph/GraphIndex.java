@@ -81,7 +81,7 @@ public class GraphIndex {
 
     /* Separate transfers for profile routing */
     public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
-    private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex;
+    private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex = null;
 
     /* Extra index for applying realtime updates (lazy-initialized). */
     public Map<String, Trip> tripForIdWithoutAgency = null;
@@ -139,19 +139,28 @@ public class GraphIndex {
             routeForId.put(route.getId(), route);
         }
 
-        clusterStops();
-        LOG.info("Creating a spatial index for stop clusters.");
-        stopClusterSpatialIndex = new HashGridSpatialIndex<StopCluster>();
-        for (StopCluster cluster : stopClusterForId.values()) {
-            Envelope envelope = new Envelope(new Coordinate(cluster.lon, cluster.lat));
-            stopClusterSpatialIndex.insert(envelope, cluster);
-        }
-
         // Copy these two service indexes from the graph until we have better ones.
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
         LOG.info("Done indexing graph.");
+    }
+
+    /**
+     * Stop clustering is slow to perform and only used in profile routing for the moment.
+     * Therefore it is not done automatically, and any method requiring stop clusters should call this method
+     * to ensure that the necessary indexes are lazy-initialized.
+     */
+    public void clusterStopsAsNeeded() {
+        if (stopClusterSpatialIndex == null) {
+            clusterStops();
+            LOG.info("Creating a spatial index for stop clusters.");
+            stopClusterSpatialIndex = new HashGridSpatialIndex<StopCluster>();
+            for (StopCluster cluster : stopClusterForId.values()) {
+                Envelope envelope = new Envelope(new Coordinate(cluster.lon, cluster.lat));
+                stopClusterSpatialIndex.insert(envelope, cluster);
+            }
+        }
     }
 
     private void analyzeServices() {
