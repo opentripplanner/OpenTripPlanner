@@ -75,7 +75,7 @@ public class TripPattern implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
-    
+
     public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
     public static final int MASK_PICKUP = 2|4;
     public static final int SHIFT_PICKUP = 1;
@@ -102,8 +102,8 @@ public class TripPattern implements Serializable {
      * pick-up and drop-off types.
      */
     public final StopPattern stopPattern;
-    
-    /** 
+
+    /**
      * This is the "original" timetable holding the scheduled stop times from GTFS, with no
      * realtime updates applied. If realtime stoptime updates are applied, next/previous departure
      * searches will be conducted using a different, updated timetable in a snapshot.
@@ -112,15 +112,15 @@ public class TripPattern implements Serializable {
 
     /** The human-readable, unique name for this trip pattern. */
     public String name;
-    
+
     /** The short unique identifier for this trip pattern. */
     public String code;
-    
+
     /* The vertices in the Graph that correspond to each Stop in this pattern. */
     public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. are they even used?
     public final PatternDepartVertex[] departVertices;
     public final PatternArriveVertex[] arriveVertices;
-    
+
     /* The Edges in the graph that correspond to each Stop in this pattern. */
     public final TransitBoardAlight[]  boardEdges;
     public final TransitBoardAlight[]  alightEdges;
@@ -129,7 +129,7 @@ public class TripPattern implements Serializable {
 
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
-    // in this order, e.g. for interlining. 
+    // in this order, e.g. for interlining.
     // potential optimization: trip fields can be removed from TripTimes?
     // TODO: this field can be removed, and interlining can be done differently?
     /**
@@ -148,7 +148,7 @@ public class TripPattern implements Serializable {
      * the same stops and a PatternHop apply to all those trips, so this array apply to every trip
      * in every timetable in this pattern. Please note that the array size is the number of stops
      * minus 1. This also allow to access the ordered list of stops.
-     * 
+     *
      * This appears to only be used for on-board departure. TODO: stops can now be grabbed from
      * stopPattern.
      */
@@ -157,7 +157,7 @@ public class TripPattern implements Serializable {
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
     @XmlElement int[] perStopFlags;
-    
+
     /**
      * A set of serviceIds with at least one trip in this pattern.
      * Trips in a pattern are no longer necessarily running on the same service ID.
@@ -186,11 +186,11 @@ public class TripPattern implements Serializable {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         // The serialized graph contains cyclic references TripPattern <--> Timetable.
-        // The Timetable must be indexed from here (rather than in its own readObject method) 
+        // The Timetable must be indexed from here (rather than in its own readObject method)
         // to ensure that the stops field it uses in TripPattern is already deserialized.
         scheduledTimetable.finish();
     }
-            
+
     // TODO verify correctness after substitution of StopPattern for ScheduledStopPattern
     // also, maybe get rid of the per stop flags and just use the values in StopPattern, or an Enum
     private void setStopsFromStopPattern(StopPattern stopPattern) {
@@ -207,7 +207,7 @@ public class TripPattern implements Serializable {
             ++i;
         }
     }
-    
+
     public Stop getStop(int stopIndex) {
         if (stopIndex == patternHops.length) {
             return patternHops[stopIndex - 1].getEndStop();
@@ -219,7 +219,7 @@ public class TripPattern implements Serializable {
     public List<Stop> getStops() {
         return Arrays.asList(stopPattern.stops);
     }
-    
+
     public List<PatternHop> getPatternHops() {
         return Arrays.asList(patternHops);
     }
@@ -232,7 +232,7 @@ public class TripPattern implements Serializable {
     public Trip getTrip(int tripIndex) {
         return trips.get(tripIndex);
     }
-    
+
     @XmlTransient
     public List<Trip> getTrips() {
         return trips;
@@ -256,7 +256,7 @@ public class TripPattern implements Serializable {
     public boolean wheelchairAccessible(int stopIndex) {
         return (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) != 0;
     }
-    
+
     /** Returns the zone of a given stop */
     public String getZone(int stopIndex) {
         return getStop(stopIndex).getZoneId();
@@ -270,10 +270,10 @@ public class TripPattern implements Serializable {
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
     }
 
-    /** 
+    /**
      * Gets the number of scheduled trips on this pattern. Note that when stop time updates are
      * being applied, there may be other Timetables for this pattern which contain a larger number
-     * of trips. However, all trips with indexes from 0 through getNumTrips()-1 will always 
+     * of trips. However, all trips with indexes from 0 through getNumTrips()-1 will always
      * correspond to the scheduled trips.
      */
     public int getNumScheduledTrips () {
@@ -338,7 +338,7 @@ public class TripPattern implements Serializable {
         }
         return scheduledTimetable;
     }
-    
+
     private static String stopNameAndId (Stop stop) {
         return stop.getName() + " (" + GtfsLibrary.convertIdToString(stop.getId()) + ")";
     }
@@ -348,9 +348,9 @@ public class TripPattern implements Serializable {
      * Perhaps this should be in TripPattern, and apply to Frequency patterns as well. TODO: resolve
      * this question: can a frequency and table pattern have the same stoppattern? If so should they
      * have the same "unique" name?
-     * 
+     *
      * The names should be dataset unique, not just route-unique?
-     * 
+     *
      * A TripPattern groups all trips visiting a particular pattern of stops on a particular route.
      * GFTS Route names are intended for very general customer information, but sometimes there is a
      * need to know where a particular trip actually goes. For example, the New York City N train
@@ -358,7 +358,7 @@ public class TripPattern implements Serializable {
      * lower Manhattan and the tunnel), in two directions (to Astoria or to Coney Island). During
      * construction, a fifth variant sometimes appears: trains use the D line to Coney Island after
      * 59th St (or from Coney Island to 59th in the opposite direction).
-     * 
+     *
      * TripPattern names are machine-generated on a best-effort basis. They are guaranteed to be
      * unique (among TripPatterns for a single Route) but not stable across graph builds, especially
      * when different versions of GTFS inputs are used. For instance, if a variant is the only
@@ -404,7 +404,7 @@ public class TripPattern implements Serializable {
             usedRouteNames.add(routeName);
             uniqueRouteNames.put(route, routeName);
         }
-        
+
         /* Iterate over all routes, giving the patterns within each route unique names. */
         ROUTE : for (Route route : patternsByRoute.keySet()) {
             Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
@@ -470,11 +470,11 @@ public class TripPattern implements Serializable {
                         continue PATTERN;
                     }
                 }
-                
+
                 /* Still not unique; check for express. */
                 if (remainingPatterns.size() == 2) {
                     // There are exactly two patterns sharing this start/end.
-                    // The current one must be a subset of the other, because it has no unique via. 
+                    // The current one must be a subset of the other, because it has no unique via.
                     // Therefore we call it the express.
                     sb.append(" express");
                 } else {
@@ -495,9 +495,9 @@ public class TripPattern implements Serializable {
                 }
             }
         }
-        
+
     }
-    
+
     /**
      * Repetitive logic pulled out of makePatternVerticesAndEdges().
      * No longer works because we don't have access to the DAO here.
@@ -517,17 +517,17 @@ public class TripPattern implements Serializable {
         }
         return vertex;
     }
-    
+
     /**
      * Create the PatternStop vertices and PatternBoard/Hop/Dwell/Alight edges corresponding to a
      * StopPattern/TripPattern. StopTimes are passed in instead of Stops only because they are
      * needed for shape distances (actually, stop sequence numbers?).
-     * 
+     *
      * TODO move GtfsStopContext into Graph.
      */
     public void makePatternVerticesAndEdges(Graph graph, GtfsStopContext context) {
 
-        /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */ 
+        /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */
         PatternArriveVertex pav0, pav1 = null;
         PatternDepartVertex pdv0;
         int nStops = stopPattern.size;
@@ -549,12 +549,12 @@ public class TripPattern implements Serializable {
             TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
 
             /* Add this pattern's route's mode to the modes for this Stop. */
-            // This is updating a TraverseModeSet (which is a bitmask). 
+            // This is updating a TraverseModeSet (which is a bitmask).
             // Maybe we should just store that mask in the pattern when it is created.
             // Isn't this skipping the first stop in the pattern?
-            // Do we actually need a set of modes for each stop? 
+            // Do we actually need a set of modes for each stop?
             TraverseMode mode = GtfsLibrary.getTraverseMode(this.route);
-            stopArrive.getStopVertex().addMode(mode); 
+            stopArrive.getStopVertex().addMode(mode);
 
             /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
             if (this.canBoard(stop)) {
@@ -563,7 +563,7 @@ public class TripPattern implements Serializable {
             if (this.canAlight(stop + 1)) {
                 alightEdges[stop + 1] = new TransitBoardAlight(pav1, stopArrive, stop + 1, mode);
             }
-        }        
+        }
     }
 
     public void dumpServices() {
@@ -578,7 +578,7 @@ public class TripPattern implements Serializable {
         for (int i = 0; i < this.stopPattern.size; ++i) {
             Vertex arrive = arriveVertices[i];
             Vertex depart = departVertices[i];
-            System.out.format("%s %02d %s %s\n", this.code, i, 
+            System.out.format("%s %02d %s %s\n", this.code, i,
                     arrive == null ? "NULL" : arrive.getLabel(),
                     depart == null ? "NULL" : depart.getLabel());
         }
@@ -586,7 +586,7 @@ public class TripPattern implements Serializable {
 
     /**
      * A bit of a strange place to set service codes all at once when TripTimes are already added,
-     * but we need a reference to the Graph or at least the codes map. This could also be 
+     * but we need a reference to the Graph or at least the codes map. This could also be
      * placed in the hop factory itself.
      */
     public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
@@ -655,6 +655,24 @@ public class TripPattern implements Serializable {
             sb.append(encoder.encode(tripTimes.semanticHash(murmur).asBytes()));
         }
         return sb.toString();
+    }
+
+    /** This method can be used in very specific circumstances, where each TripPattern has only one FrequencyEntry. */
+    public FrequencyEntry getSingleFrequencyEntry() {
+        Timetable table = this.scheduledTimetable;
+        List<FrequencyEntry> freqs = this.scheduledTimetable.frequencyEntries;
+        if ( ! table.tripTimes.isEmpty()) {
+            LOG.debug("Timetable has {} non-frequency entries and {} frequency entries.", table.tripTimes.size(),
+                    table.frequencyEntries.size());
+            return null;
+        }
+        if (freqs.isEmpty()) {
+            LOG.debug("Timetable has no frequency entries.");
+            return null;
+        }
+        // Many of these have multiple frequency entries. Return the first one for now.
+        // TODO return all of them and filter on time window
+        return freqs.get(0);
     }
 
 }

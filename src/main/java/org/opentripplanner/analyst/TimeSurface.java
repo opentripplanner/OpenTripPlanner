@@ -1,34 +1,31 @@
 package org.opentripplanner.analyst;
 
-import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
-
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.commons.math3.util.FastMath;
-import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
+import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.profile.AnalystProfileRouterPrototype;
 import org.opentripplanner.profile.ProfileRequest;
 import org.opentripplanner.profile.ProfileRouter;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.profile.TimeRange;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.math3.util.FastMath.max;
+import static org.apache.commons.math3.util.FastMath.min;
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
@@ -43,42 +40,36 @@ public class TimeSurface implements Serializable {
     private static int nextId = 0;
 
     public final String routerId;
-    
     public final int id;
-    public final int[] times; // one time in seconds per vertex
+    public final TObjectIntMap<Vertex> times = new TObjectIntHashMap<Vertex>(500000, 0.5f, UNREACHABLE);
     public final double lat, lon;
     public int cutoffMinutes;
     public long dateTime;
     public Map<String, String> params; // The query params sent by the user, for reference only
-
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
 
     public TimeSurface(ShortestPathTree spt) {
-    	
-    	params = spt.getOptions().parameters;
-    	
+
+        params = spt.getOptions().parameters;
+
         String routerId = spt.getOptions().routerId;
         if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
             routerId = "default";
         }
         // Here we use the key "default" unlike the graphservice which substitutes in the default ID.
         // We don't want to keep that default in sync across two modules.
-    	this.routerId = routerId;
+        this.routerId = routerId;
         long t0 = System.currentTimeMillis();
-        times = new int[Vertex.getMaxIndex()]; // memory leak due to temp vertices?
-        Arrays.fill(times, UNREACHABLE);
         for (State state : spt.getAllStates()) {
             Vertex vertex = state.getVertex();
-
             if (vertex instanceof StreetVertex || vertex instanceof TransitStop) {
-                int i = vertex.getIndex();
+                int existing = times.get(vertex);
                 int t = (int) state.getActiveTime();
-                if (times[i] == UNREACHABLE || times[i] > t) {
-                    times[i] = t;
+                if (existing == UNREACHABLE || existing > t) {
+                    times.put(vertex, t);
                 }
             }
         }
-        
         // TODO make this work as either to or from query
         GenericLocation from = spt.getOptions().from;
         this.lon = from.lng;
@@ -91,7 +82,7 @@ public class TimeSurface implements Serializable {
     }
 
     /** Make a max or min timesurface from propagated times in a ProfileRouter. */
-    public TimeSurface (ProfileRouter profileRouter, boolean maxNotMin) {
+    public TimeSurface (AnalystProfileRouterPrototype profileRouter) {
         ProfileRequest req = profileRouter.request;
         lon = req.from.lon;
         lat = req.from.lat;
@@ -99,11 +90,26 @@ public class TimeSurface implements Serializable {
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
-        times = maxNotMin ? profileRouter.maxs : profileRouter.mins;
+    }
+
+    public static void makeSurfaces (AnalystProfileRouterPrototype profileRouter) {
+        TimeSurface minSurface = new TimeSurface(profileRouter);
+        TimeSurface avgSurface = new TimeSurface(profileRouter);
+        TimeSurface maxSurface = new TimeSurface(profileRouter);
+        for (Map.Entry<Vertex, TimeRange> vtr : profileRouter.propagatedTimes.entrySet()) {
+            Vertex v = vtr.getKey();
+            TimeRange tr = vtr.getValue();
+            minSurface.times.put(v, tr.min);
+            avgSurface.times.put(v, tr.avg);
+            maxSurface.times.put(v, tr.max);
+        }
+        profileRouter.minSurface = minSurface;
+        profileRouter.avgSurface = avgSurface;
+        profileRouter.maxSurface = maxSurface;
     }
 
     public int getTime(Vertex v) {
-        return times[v.getIndex()];
+        return times.get(v);
     }
 
     private synchronized int makeUniqueId() {

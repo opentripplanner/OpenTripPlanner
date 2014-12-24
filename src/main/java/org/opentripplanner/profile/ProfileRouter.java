@@ -535,8 +535,9 @@ public class ProfileRouter {
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5);
             rr.rctx.destroy();
         }
-        minSurface = new TimeSurface(this, false);
-        maxSurface = new TimeSurface(this, true);
+        /* DISABLED while working on analyst-frequency-based-profile prototype */
+        // minSurface = new TimeSurface(this, false);
+        // maxSurface = new TimeSurface(this, true);
         LOG.info("done making timesurfaces.");
         return new P2<TimeSurface>(minSurface, maxSurface);
     }
