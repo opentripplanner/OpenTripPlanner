@@ -1,9 +1,6 @@
 package org.opentripplanner.profile;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
@@ -15,6 +12,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -25,12 +23,12 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * More optimized ProfileRouter targeting one-to-many searches on entirely frequency-based transit networks.
+ *
+ * This requires simpleTransfers to exist in the graph, so it needs to be built in longDistance mode.
  */
 public class AnalystProfileRouterPrototype {
 
@@ -155,6 +153,22 @@ public class AnalystProfileRouterPrototype {
                     }
                 }
             }
+            /* Transfer from updated stops to adjacent stops before beginning the next round.
+               Iterate over a protective copy because we add more stops to the updated list during iteration. */
+            if ( ! graph.hasDirectTransfers) {
+                throw new RuntimeException("Requires the SimpleTransfers generated in long distance mode.");
+            }
+            for (Stop stop : Lists.newArrayList(stopsUpdated)) {
+                Collection<Edge> outgoingEdges = graph.index.stopVertexForStop.get(stop).getOutgoing();
+                for (SimpleTransfer transfer : Iterables.filter(outgoingEdges, SimpleTransfer.class)) {
+                    Stop targetStop = ((TransitStop) transfer.getToVertex()).getStop();
+                    double walkTime = transfer.getDistance() / request.walkSpeed;
+                    TimeRange rangeAfterTransfer = times.get(stop).shift((int)walkTime);
+                    if (times.add(targetStop, rangeAfterTransfer)) {
+                        stopsUpdated.add(targetStop);
+                    }
+                }
+            }
         }
         LOG.info("Done with transit.");
         for (Stop stop : times) {
@@ -182,6 +196,7 @@ public class AnalystProfileRouterPrototype {
 
     /**
      * Perform an on-street search around a point with a specific mode to find nearby stops.
+     * TODO merge with NearbyStopFinder
      */
     private TObjectIntMap<Stop> findClosestStops(final TraverseMode mode) {
         RoutingRequest rr = new RoutingRequest(mode);
@@ -208,6 +223,7 @@ public class AnalystProfileRouterPrototype {
         return visitor.stopsFound;
     }
 
+    // TODO merge with NearbyStopFinder
     static class StopFinderTraverseVisitor implements TraverseVisitor {
         TraverseMode mode;
         int minTravelTimeSeconds = 0;
