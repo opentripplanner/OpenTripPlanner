@@ -19,10 +19,7 @@ import org.opentripplanner.api.param.HourMinuteSecond;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.QueryParameter;
 import org.opentripplanner.api.param.YearMonthDay;
-import org.opentripplanner.profile.Option;
-import org.opentripplanner.profile.ProfileRequest;
-import org.opentripplanner.profile.ProfileResponse;
-import org.opentripplanner.profile.ProfileRouter;
+import org.opentripplanner.profile.*;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
@@ -109,6 +106,8 @@ public class ProfileResource {
         req.minCarTime   = minCarTime;
         req.suboptimalMinutes = suboptimalMinutes;
 
+        // Uncomment to use the new prototype
+        // AnalystProfileRouterPrototype router = new AnalystProfileRouterPrototype(graph, req);
         ProfileRouter router = new ProfileRouter(graph, req);
         try {
             ProfileResponse response = router.route();
