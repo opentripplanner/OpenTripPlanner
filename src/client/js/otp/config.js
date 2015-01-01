@@ -67,6 +67,21 @@ otp.config = {
      */
      
     baseLayers: [
+/*
+        {
+            name: 'OSM Standard',
+            tileUrl: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+//            subdomains : ['otile1','otile2','otile3','otile4'],
+            attribution : 'Map provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+        },           
+        {
+            name: 'OSM Transport',
+            tileUrl: 'http://{s}.tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png',
+//            subdomains : ['a','b','c'],
+            attribution : 'Map provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+        },   
+*/        
+
         {
             name: 'MapQuest OSM',
             tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
@@ -79,6 +94,7 @@ otp.config = {
             subdomains : ['otile1','otile2','otile3','otile4'],
             attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
         },           
+
     ],
     
 
@@ -101,8 +117,9 @@ otp.config = {
      */
 
     siteName            : "My OTP Instance",
+    siteUrl            : "",
     siteDescription     : "An OpenTripPlanner deployment.",
-    logoGraphic         : 'images/otp_logo_darkbg_40px.png',
+    logoGraphic : 'images/otp_logo_darkbg_40px.png',
     // bikeshareName    : "",
     //Enable this if you want to show frontend language chooser
     showLanguageChooser : true,
@@ -162,7 +179,7 @@ otp.config = {
 
     //This is shown if showLanguageChooser is true
     infoWidgetLangChooser : {
-        title: '<img src="/images/language_icon.svg" onerror="this.onerror=\'\';this.src=\'/images/language_icon.png\'" width="30px" height="30px"/>', 
+        title: '<img src="images/language_icon.svg" onerror="this.onerror=\'\';this.src=\'images/language_icon.png\'" width="30px" height="30px"/>', 
         languages: true
     },
     
@@ -311,3 +328,63 @@ otp.config.modes = {
     //Options widgets)
     //    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle')
     };
+
+// default activity is to include all these
+otp.config.widgetFlags={
+	TripOptionsWidget_Exclude : {
+		WheelChairSelector : false,
+		MaxDistanceSelector : false,
+		PreferredRoutes : false,
+		BannedRoutes : false
+	}
+};
+
+otp.config.defaultModeColours={
+	WALK:'#808080',
+        BICYCLE:'#0073e5',
+        SUBWAY:'#f00',
+        RAIL: '#b00',
+        BUS:'#080',
+        TRAM:'#800',
+        CAR:'#444',
+	DEFAULT:'#aaa'
+};
+otp.config.defaultTripWeight=8;
+otp.config.defaultTripOpacity=1;
+
+otp.config.GeoJson={};
+/*
+otp.config.GeoJson.active='laos';
+otp.config.GeoJson.regions=[
+     		{
+    			label:'thailand',	
+    			name:'Thailand',	
+    			geojson:'geojson/thailand.geojson',
+			url:"http://www.chalo.org.uk/thailand"
+    		},
+    		{
+    			label:'srilanka',	
+    			name:'Sri Lanka',	
+    			geojson:'geojson/srilanka.geojson',
+			url:"http://www.chalo.org.uk/srilanka"	
+    		},
+    		{
+    			label:'myanmar',	
+    			name:'Myanmar',	
+    			geojson:'geojson/myanmar.geojson',
+			url:"http://www.chalo.org.uk/myanmar"	
+    		},
+    		{
+    			label:'bangladesh',	
+    			name:'Bangladesh',	
+    			geojson:'geojson/bangladesh.geojson',
+			url:"http://www.chalo.org.uk/bangladesh"	
+    		},
+    		{
+    			label:'laos',	
+    			name:'Laos',	
+    			geojson:'geojson/laos.geojson',
+			url:"http://www.chalo.org.uk/laos"	
+    		}
+];
+*/

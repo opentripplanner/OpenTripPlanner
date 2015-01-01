@@ -33,6 +33,13 @@ otp.util.Itin = {
             locationStr.split("::")[1] : locationStr;
     },
 
+    getLocationLatLng : function(locationStr) {
+        var location = locationStr.indexOf("::") != -1 ? 
+            locationStr.split("::")[1] : locationStr;
+        var [lat,lng]=location.split(",");
+	return {lat:lat,lng:lng};
+    },
+
 
     /** 
      * Extracts the "name" from an OTP "name::place" string, if present

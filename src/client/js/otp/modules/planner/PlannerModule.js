@@ -220,6 +220,7 @@ otp.modules.planner.PlannerModule =
             this.startMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.startLatLng = this.startMarker.getLatLng();
+		this.startName=null;
                 this.invokeHandlers("startChanged", [this.startLatLng]);
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
                 this.planTripFunction.apply(this);//planTrip();
@@ -229,8 +230,7 @@ otp.modules.planner.PlannerModule =
         else { // marker already exists
             this.startMarker.setLatLng(latlng);
         }
-        
-        this.invokeHandlers("startChanged", [latlng, name]);
+        this.invokeHandlers("startChanged", [this.startLatLng, this.startName]);
         
         if(update) {
             this.updateTipStep(2);
@@ -251,6 +251,7 @@ otp.modules.planner.PlannerModule =
             this.endMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
                 this.endLatLng = this.endMarker.getLatLng();
+		this.endName=null; 
                 this.invokeHandlers("endChanged", [this.endLatLng]);
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
                 this.planTripFunction.apply(this);//this_.planTrip();
@@ -261,7 +262,7 @@ otp.modules.planner.PlannerModule =
             this.endMarker.setLatLng(latlng);
         }
                  
-        this.invokeHandlers("endChanged", [latlng, name]);
+        this.invokeHandlers("endChanged", [this.endLatLng, this.endName]);
 
         if(update) {
             if(this.startLatLng) {
@@ -288,10 +289,10 @@ otp.modules.planner.PlannerModule =
     
     restoreMarkers : function(queryParams) {
       	this.startLatLng = otp.util.Geo.stringToLatLng(otp.util.Itin.getLocationPlace(queryParams.fromPlace));
-    	this.setStartPoint(this.startLatLng, false);
+    	this.setStartPoint(this.startLatLng, false,this.startName);
     	
       	this.endLatLng = otp.util.Geo.stringToLatLng(otp.util.Itin.getLocationPlace(queryParams.toPlace));
-    	this.setEndPoint(this.endLatLng, false);
+    	this.setEndPoint(this.endLatLng, false,this.endName);
     },
     
     planTrip : function(existingQueryParams, apiMethod) {
@@ -302,7 +303,7 @@ otp.modules.planner.PlannerModule =
     	
     	if(this.currentRequest !== null)
         {
-    		//console.log("Canceling current request.");
+    		console.log("Canceling current request.");
         	this.currentRequest.abort();
         	this.currentRequest = null;
         }
@@ -335,6 +336,7 @@ otp.modules.planner.PlannerModule =
                 mode: this.mode,
                 maxWalkDistance: this.maxWalkDistance
             };
+	console.log("OTP from string = "+this.getStartOTPString());
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.wheelchair !== null) _.extend(queryParams, { wheelchair : this.wheelchair });
             if(this.preferredRoutes !== null) {
@@ -471,8 +473,8 @@ otp.modules.planner.PlannerModule =
 
             // draw the polyline
             var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
-            var weight = 8;
-            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: weight});
+            var weight = otp.config.defaultTripWeight || 8;
+            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: weight , opacity: otp.config.defaultTripOpacity || 0.3 });
             this.pathLayer.addLayer(polyline);
             polyline.leg = leg;
             polyline.bindPopup("("+leg.routeShortName+") "+leg.routeLongName);
@@ -507,7 +509,7 @@ otp.modules.planner.PlannerModule =
             if(otp.util.Itin.isTransit(leg.mode)) {
                 this.drawStartBubble(leg, false);
             }
-            else if(leg.mode === 'BICYCLE') {
+            else if(leg.mode === 'BICYCLE_RENT') {
                 if(queryParams.mode === 'WALK,BICYCLE_RENT') { // bikeshare trip
                         //TRANSLATORS: shown when clicked on route on map
                 	polyline.bindPopup(_tr('Your %(bike_share_name)s route', {'bike_share_name': otp.config.bikeshareName}));
@@ -546,7 +548,7 @@ otp.modules.planner.PlannerModule =
     highlightLeg : function(leg) {
         if(!leg.legGeometry) return;
         var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
-        polyline.setStyle({ color : "yellow", weight: 16, opacity: 0.3 });
+        polyline.setStyle({ color : "yellow", weight: 16, opacity: otp.config.defaultTripOpacity || 0.3 });
         this.highlightLayer.addLayer(polyline);
     },
     
@@ -579,14 +581,18 @@ otp.modules.planner.PlannerModule =
     },
     
     getModeColor : function(mode) {
-        if(mode === "WALK") return '#444';
-        if(mode === "BICYCLE") return '#0073e5';
-        if(mode === "SUBWAY") return '#f00';
-        if(mode === "RAIL") return '#b00';
-        if(mode === "BUS") return '#080';
-        if(mode === "TRAM") return '#800';
-        if(mode === "CAR") return '#444';
-        return '#aaa';
+     if (!otp.config.defaultModeColours){
+		otp.config.defaultModeColours=[];
+	}
+
+        if(mode === "WALK") return otp.config.defaultModeColours.WALK || '#444';
+        if(mode === "BICYCLE_RENT") return otp.config.defaultModeColours.BICYCLE_RENT || '#0073e5';
+        if(mode === "SUBWAY") return otp.config.defaultModeColours.SUBWAY || '#f00';
+        if(mode === "RAIL") return otp.config.defaultModeColours.RAIL || '#b00';
+        if(mode === "BUS") return otp.config.defaultModeColours.BUS || '#080';
+        if(mode === "TRAM") return otp.config.defaultModeColours.TRAM || '#800';
+        if(mode === "CAR") return otp.config.defaultModeColours.CAR || '#444';
+        return otp.config.defaultModeColours.DEFAULT || '#aaa';
     },
     
     clearTrip : function() {
@@ -611,10 +617,10 @@ otp.modules.planner.PlannerModule =
     restorePlan : function(data){
     	
     	this.startLatLng = new L.LatLng(data.startLat, data.startLon);
-    	this.setStartPoint(this.startLatLng, false);
+    	this.setStartPoint(this.startLatLng, false,this.startName);
     	
     	this.endLatLng = new L.LatLng(data.endLat, data.endLon);
-    	this.setEndPoint(this.endLatLng, false);
+    	this.setEndPoint(this.endLatLng, false,this.endName);
     	
     	this.webapp.setBounds(new L.LatLngBounds([this.startLatLng, this.endLatLng]));
     	
