@@ -16,11 +16,13 @@ package org.opentripplanner.updater.stoptime;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.TimeZone;
-
+ 
 import com.google.common.collect.Maps;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
@@ -69,10 +71,10 @@ public class TimetableSnapshotSource {
     private final TimeZone timeZone;
 
     private GraphIndex graphIndex;
-
     public TimetableSnapshotSource(Graph graph) {
         timeZone = graph.getTimeZone();
         graphIndex = graph.index;
+ 
     }
 
     /**
@@ -110,6 +112,30 @@ public class TimetableSnapshotSource {
         if (updates == null) {
             LOG.warn("updates is null");
             return;
+        }
+
+        // After every real-time update, the trip times are deleted and reset.
+        // TODO: Handle ScheduleRelationship = NO_DATA values so that GTFS-rt producers
+        //        can communicate that there is a bus running, but they don't have any realtime info about it
+        //       see https://github.com/opentripplanner/OpenTripPlanner/issues/1347#issuecomment-45012120.
+        for (TripPattern pattern : graphIndex.patternForTrip.values()) {
+
+            // check if the pattern belongs to frequencyBased trips
+        	if (pattern.scheduledTimetable.frequencyEntries.size() != 0) {
+                SortedSet<Timetable> sortedTimetables = buffer.timetables.get(pattern);
+                if (sortedTimetables != null) {
+
+                    for (Timetable timetable : sortedTimetables) {
+                        int currentSize = timetable.tripTimes.size();
+                        for (int i = 0; i < pattern.noTrips; i++) {
+                            timetable.getTripTimes(i).vehicleID = null;
+                        }
+                        for (int i = currentSize - 1; pattern.noTrips <= i; i--) {
+                        	timetable.tripTimes.remove(i);
+                        }
+                    }
+                }
+            }
         }
 
         LOG.debug("message contains {} trip updates", updates.size());
@@ -182,6 +208,7 @@ public class TimetableSnapshotSource {
         } else {
             getTimetableSnapshot();
         }
+         
     }
 
     protected boolean handleScheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
@@ -199,7 +226,7 @@ public class TimetableSnapshotSource {
             LOG.warn("TripUpdate contains no updates, skipping.");
             return false;
         }
-
+      
         // we have a message we actually want to apply
         return buffer.update(pattern, tripUpdate, feedId, timeZone, serviceDate);
     }
@@ -211,9 +238,24 @@ public class TimetableSnapshotSource {
     }
 
     protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
-        // TODO: Handle unscheduled trip
-        LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
-        return false;
+    	
+    	TripDescriptor tripDescriptor = tripUpdate.getTrip();
+        // This does not include Agency ID or feed ID, trips are feed-unique and we currently assume a single static feed.
+        String tripId = tripDescriptor.getTripId();
+        TripPattern pattern = getPatternForTripId(tripId);
+
+        if (pattern == null) {
+            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
+            return false;
+        }
+
+        if (tripUpdate.getStopTimeUpdateCount() < 1) {
+            LOG.warn("TripUpdate contains no updates, skipping.");
+            return false;
+        }
+
+        // we have a message we actually want to apply
+        return buffer.update(pattern, tripUpdate, feedId, timeZone, serviceDate);
     }
 
     protected boolean handleReplacementTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {

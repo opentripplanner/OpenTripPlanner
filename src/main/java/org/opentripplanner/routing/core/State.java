@@ -132,6 +132,7 @@ public class State implements Cloneable {
             Arrays.fill(this.pathParserStates, AutomatonState.START);
         }
         stateData.routeSequence = new AgencyAndId[0];
+        stateData.isNonExactFrequency = null;
     }
 
     /**
@@ -260,7 +261,11 @@ public class State implements Cloneable {
     public boolean isEverBoarded() {
         return stateData.everBoarded;
     }
-
+    
+    public Boolean isNonExactFrequency() {
+        return stateData.isNonExactFrequency;
+    }
+    
     public boolean isBikeRenting() {
         return stateData.usingRentedBike;
     }

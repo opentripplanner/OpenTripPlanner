@@ -129,12 +129,12 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     public State traverse(State s0, long arrivalTimeAtStop) {
         RoutingContext rctx    = s0.getContext();
         RoutingRequest options = s0.getOptions();
-
         /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
         if (options.wheelchairAccessible && ! getPattern().wheelchairAccessible(stopIndex)) {
             return null;
         };
 
+        Boolean isNonExactFrequency = null;
         /*
          * Determine whether we are going onto or off of transit. Entering and leaving transit is
          * not the same thing as boarding and alighting. When arriveBy == true, we are entering
@@ -155,6 +155,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             StateEditor s1 = s0.edit(this);
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(s0.getTimeSeconds());
+            s1.setIsNonExactTime(isNonExactFrequency);
             // Store the stop we are alighting at, for computing stop-to-stop transfer times,
             // preferences, and permissions.
             // The vertices in the transfer table are stop arrives/departs, not pattern
@@ -239,6 +240,11 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             for (ServiceDay sd : rctx.serviceDays) {
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
                 Timetable timetable = tripPattern.getUpdatedTimetable(options, sd);
+                if (!timetable.frequencyEntries.isEmpty()){
+                	if(!timetable.frequencyEntries.get(0).exactTimes){
+                		isNonExactFrequency = true;
+                	}
+                }
                 /* Skip this day/timetable if no trip in it could possibly be useful. */
                 // TODO disabled until frequency representation is stable, and min/max timetable times are set from frequencies
                 // However, experiments seem to show very little measurable improvement here (due to cache locality?)
@@ -261,7 +267,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 }
             }
             if (bestWait < 0) return null; // no appropriate trip was found
-            Trip trip = bestTripTimes.trip;
+            
+            Trip trip = bestTripTimes.trip;    
             
             /* check if route and/or Agency are banned for this plan */
             // FIXME this should be done WHILE searching for a trip.
@@ -294,7 +301,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             s1.setPreviousTrip(trip);
             s1.setZone(getPattern().getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
-
+            s1.setIsNonExactTime(isNonExactFrequency);
+            
             double wait_cost = bestWait;
 
             if (!s0.isEverBoarded() && !options.reverseOptimizing) {

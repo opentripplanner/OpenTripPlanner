@@ -31,6 +31,7 @@ public class ConstantsForTests {
     public static final String PORTLAND_GTFS = "src/test/resources/google_transit.zip";
 
     public static final String FAKE_GTFS = "src/test/resources/testagency.zip";
+    public static final String FAKE_FREQ_GTFS = "src/test/resources/testFrequencyGTFS.zip";
 
     public static final String GENERATED_GTFS = "src/test/resources/generated.gtfs.zip";
 

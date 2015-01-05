@@ -17,8 +17,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+
 import java.io.File;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,17 +46,26 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.VehicleDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 
 public class TimetableSnapshotSourceTest {
 
     private static byte cancellation[];
+
+    private static byte freqBasedUpdate1[];
+
+    private static byte freqBasedUpdate2[];
+
     private static Graph graph = new Graph();
+
     private static GtfsContext context;
+
     private static ServiceDate serviceDate = new ServiceDate();
 
     private TimetableSnapshotSource updater;
+
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -70,6 +85,29 @@ public class TimetableSnapshotSourceTest {
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
 
         cancellation = tripUpdateBuilder.build().toByteArray();
+
+        // create update for frequencyBased trip
+        tripDescriptorBuilder.setTripId("15.1");
+        tripDescriptorBuilder
+                .setScheduleRelationship(TripDescriptor.ScheduleRelationship.UNSCHEDULED);
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder
+                .addStopTimeUpdateBuilder(0);
+        stopTimeUpdateBuilder.setStopSequence(2);
+        StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+
+        stopTimeEventBuilder.setTime((new java.util.Date().getTime()) / 1000);
+        VehicleDescriptor.Builder vehicleDescriptor = VehicleDescriptor.newBuilder();
+        vehicleDescriptor.setId("a");
+        tripUpdateBuilder.setVehicle(vehicleDescriptor);
+        freqBasedUpdate1 = tripUpdateBuilder.build().toByteArray();
+     
+        vehicleDescriptor.setId("b");
+        stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+        stopTimeUpdateBuilder.setStopSequence(1);
+        tripUpdateBuilder.setVehicle(vehicleDescriptor);
+        freqBasedUpdate2 = tripUpdateBuilder.build().toByteArray();
     }
 
     @Before
@@ -77,6 +115,7 @@ public class TimetableSnapshotSourceTest {
         graph.putService(CalendarServiceData.class,
                 GtfsLibrary.createCalendarServiceData(context.getDao()));
         updater = new TimetableSnapshotSource(graph);
+
     }
 
     @Test
@@ -94,6 +133,35 @@ public class TimetableSnapshotSourceTest {
         TimetableResolver newResolver = updater.getTimetableSnapshot();
         assertNotNull(newResolver);
         assertNotSame(resolver, newResolver);
+
+        updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(freqBasedUpdate1)),
+                "agency");
+        resolver = updater.getTimetableSnapshot();
+        assertSame(resolver, updater.getTimetableSnapshot());
+
+        AgencyAndId tripId = new AgencyAndId("agency", "15.1");
+        Trip trip = graph.index.tripForId.get(tripId);
+        TripPattern pattern = graph.index.patternForTrip.get(trip);
+ 
+        Timetable timeTable = resolver.resolve(pattern, serviceDate);
+        assertEquals(timeTable.getTripTimes(0).getVehicleID(), "a");
+
+        // wait one second and send new trip update
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // make sure the reset procedure has removed the previous tripUpdate
+        updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(freqBasedUpdate2)),
+                "agency");
+        resolver = updater.getTimetableSnapshot();
+        assertSame(resolver, updater.getTimetableSnapshot());
+ 
+        timeTable = resolver.resolve(pattern, serviceDate);
+        assertEquals(timeTable.getTripTimes(0).getVehicleID(), "b");
     }
 
     @Test
@@ -133,8 +201,8 @@ public class TimetableSnapshotSourceTest {
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
         tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(
-               TripDescriptor.ScheduleRelationship.SCHEDULED);
+        tripDescriptorBuilder
+                .setScheduleRelationship(TripDescriptor.ScheduleRelationship.SCHEDULED);
 
         TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
@@ -142,8 +210,8 @@ public class TimetableSnapshotSourceTest {
 
         StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
 
-        stopTimeUpdateBuilder.setScheduleRelationship(
-                StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+        stopTimeUpdateBuilder
+                .setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
         stopTimeUpdateBuilder.setStopSequence(2);
 
         StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
@@ -198,12 +266,43 @@ public class TimetableSnapshotSourceTest {
 
         assertNotSame(resolverA, resolverB);
 
-        assertSame   (resolverA.resolve(pattern, null ), resolverB.resolve(pattern, null ));
-        assertSame   (resolverA.resolve(pattern, serviceDate),
-                resolverB.resolve(pattern, serviceDate));
-        assertNotSame(resolverA.resolve(pattern, null ), resolverA.resolve(pattern, serviceDate));
-        assertSame   (resolverB.resolve(pattern, null ), resolverB.resolve(pattern, previously));
+        assertSame(resolverA.resolve(pattern, null), resolverB.resolve(pattern, null));
+        assertSame(resolverA.resolve(pattern, serviceDate), resolverB.resolve(pattern, serviceDate));
+        assertNotSame(resolverA.resolve(pattern, null), resolverA.resolve(pattern, serviceDate));
+        assertSame(resolverB.resolve(pattern, null), resolverB.resolve(pattern, previously));
 
         // TODO: write test for added trips
     }
+
+    /**
+     * This class extends the {@link CalendarServiceData} class to allow for easier testing. It
+     * includes methods to return both the set of service ids and the time zone used for testing.
+     */
+    private static final SimpleTimeZone timeZone = new SimpleTimeZone(2, "CEST");
+
+    private static final class CalendarServiceDataStub extends CalendarServiceData {
+        private static final long serialVersionUID = 1L;
+
+        final Set<AgencyAndId> serviceIds;
+
+        CalendarServiceDataStub(Set<AgencyAndId> serviceIds) {
+            this.serviceIds = serviceIds;
+        }
+
+        @Override
+        public Set<AgencyAndId> getServiceIds() {
+            return serviceIds;
+        }
+
+        @Override
+        public Set<AgencyAndId> getServiceIdsForDate(ServiceDate date) {
+            return serviceIds;
+        }
+
+        @Override
+        public TimeZone getTimeZoneForAgencyId(String agencyId) {
+            return timeZone;
+        }
+    }
+
 }

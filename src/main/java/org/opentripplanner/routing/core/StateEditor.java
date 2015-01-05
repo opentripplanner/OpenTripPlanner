@@ -341,7 +341,12 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings = numBoardings;
     }
-
+    
+    public void setIsNonExactTime(Boolean isNonExactFrequency){
+    	cloneStateDataAsNeeded();
+    	child.stateData.isNonExactFrequency = isNonExactFrequency;
+    }
+    
     public void setEverBoarded(boolean everBoarded) {
         cloneStateDataAsNeeded();
         child.stateData.everBoarded = true;
@@ -460,7 +465,11 @@ public class StateEditor {
     public int getNumBoardings() {
         return child.getNumBoardings();
     }
-
+    
+    public boolean isNonExactFrequency() {
+        return child.isNonExactFrequency();
+    }
+    
     public boolean isEverBoarded() {
         return child.isEverBoarded();
     }
