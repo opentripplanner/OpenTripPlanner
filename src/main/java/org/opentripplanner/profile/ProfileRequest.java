@@ -1,5 +1,7 @@
 package org.opentripplanner.profile;
 
+import java.io.Serializable;
+
 import org.joda.time.LocalDate;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -10,7 +12,7 @@ import javax.ws.rs.QueryParam;
 /**
  * All the modifiable paramters for profile routing.
  */
-public class ProfileRequest {
+public class ProfileRequest implements Serializable {
 
     public LatLon from;
     public LatLon to;
