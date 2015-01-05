@@ -52,6 +52,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class SampleGridRenderer {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleGridRenderer.class);
+    private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private Graph graph;
     private SPTServiceFactory sptServiceFactory;
@@ -105,93 +106,13 @@ public class SampleGridRenderer {
 
     /**
      * Sample a SPT using a SPTWalker and an AccumulativeGridSampler.
-     * 
-     * @param spt
-     * @return
      */
     public static void sampleSPT(final ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid,
             final double d0, final double gridSizeMeters, final double v0,
             final double maxWalkDistance, final int maxTimeSec, final double cosLat) {
 
-        final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-
-        // Below is a closure that makes use of the parameters to the enclosing function.
-
-        /**
-         * Any given sample is weighted according to the inverse of the squared normalized distance
-         * + 1 to the grid sample. We add to the sampling time a default off-road walk distance to
-         * account for off-road sampling.
-         */
-        AccumulativeMetric<WTWD> accMetric = new AccumulativeMetric<WTWD>() {
-            @Override
-            public WTWD cumulateSample(Coordinate C0, Coordinate Cs, WTWD z, WTWD zS,
-                    double offRoadSpeed) {
-                double t = z.wTime / z.w;
-                double b = z.wBoardings / z.w;
-                double wd = z.wWalkDist / z.w;
-                double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
-                // additionnal time
-                double dt = d / offRoadSpeed;
-                // t weight
-                double w = 1 / ((d + d0) * (d + d0));
-                if (zS == null) {
-                    zS = new WTWD();
-                    zS.d = Double.MAX_VALUE;
-                }
-                zS.w = zS.w + w;
-                zS.wTime = zS.wTime + w * (t + dt);
-                zS.wBoardings = zS.wBoardings + w * b;
-                zS.wWalkDist = zS.wWalkDist + w * (wd + d);
-                if (d < zS.d)
-                    zS.d = d;
-                return zS;
-            }
-
-            /**
-             * A Generated closing sample take 1) as off-road distance, the minimum of the off-road
-             * distance of all enclosing samples, plus the grid size, and 2) as time the minimum
-             * time of all enclosing samples plus the grid size * off-road walk speed as additional
-             * time. All this are approximations.
-             *
-             * TODO Is there a better way of computing this? Here the computation will be different
-             * based on the order where we close the samples.
-             */
-            @Override
-            public WTWD closeSample(WTWD zUp, WTWD zDown, WTWD zRight, WTWD zLeft) {
-                double dMin = Double.MAX_VALUE;
-                double tMin = Double.MAX_VALUE;
-                double bMin = Double.MAX_VALUE;
-                double wdMin = Double.MAX_VALUE;
-                for (WTWD z : new WTWD[] { zUp, zDown, zRight, zLeft }) {
-                    if (z == null)
-                        continue;
-                    if (z.d < dMin)
-                        dMin = z.d;
-                    double t = z.wTime / z.w;
-                    if (t < tMin)
-                        tMin = t;
-                    double b = z.wBoardings / z.w;
-                    if (b < bMin)
-                        bMin = b;
-                    double wd = z.wWalkDist / z.w;
-                    if (wd < wdMin)
-                        wdMin = wd;
-                }
-                WTWD z = new WTWD();
-                z.w = 1.0;
-                /*
-                 * The computations below are approximation, but we are on the edge anyway and the
-                 * current sample does not correspond to any computed value.
-                 */
-                z.wTime = tMin + gridSizeMeters / v0;
-                z.wBoardings = bMin;
-                z.wWalkDist = wdMin + gridSizeMeters;
-                z.d = dMin + gridSizeMeters;
-                return z;
-            }
-        };
-        final AccumulativeGridSampler<WTWD> gridSampler = new AccumulativeGridSampler<WTWD>(
-                sampleGrid, accMetric);
+        AccumulativeMetric<WTWD> accMetric = new WTWDAccumulativeMetric(cosLat, d0, v0, gridSizeMeters);
+        final AccumulativeGridSampler<WTWD> gridSampler = new AccumulativeGridSampler<WTWD>(sampleGrid, accMetric);
 
         SPTWalker johnny = new SPTWalker(spt);
         johnny.walk(new SPTVisitor() {
@@ -201,8 +122,7 @@ public class SampleGridRenderer {
             }
 
             @Override
-            public final void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1,
-                    double speed) {
+            public final void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speed) {
                 double wd0 = s0.getWalkDistance() + d0;
                 double wd1 = s0.getWalkDistance() + d1;
                 double t0 = wd0 > maxWalkDistance ? Double.POSITIVE_INFINITY : s0.getActiveTime()
@@ -301,6 +221,94 @@ public class SampleGridRenderer {
                     return k;
                 }
             }
+        }
+    }
+
+    /**
+     * Any given sample is weighted according to the inverse of the squared normalized distance
+     * + 1 to the grid sample. We add to the sampling time a default off-road walk distance to
+     * account for off-road sampling. TODO how does this "account" for off-road sampling ?
+     */
+    public static class WTWDAccumulativeMetric implements AccumulativeGridSampler.AccumulativeMetric<WTWD> {
+
+        private double cosLat, d0, v0, gridSizeMeters;
+
+        /**
+         * @param cosLat
+         * @param d0 distance off road?
+         * @param v0 walking speed off road
+         */
+        public WTWDAccumulativeMetric (double cosLat, double d0, double v0, double gridSizeMeters) {
+            this.cosLat = cosLat;
+            this.d0 = d0;
+            this.v0 = v0;
+            this.gridSizeMeters = gridSizeMeters;
+        }
+
+        @Override
+        public WTWD cumulateSample(Coordinate C0, Coordinate Cs, WTWD z, WTWD zS, double offRoadSpeed) {
+            double t = z.wTime / z.w;
+            double b = z.wBoardings / z.w;
+            double wd = z.wWalkDist / z.w;
+            double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
+            // additionnal time
+            double dt = d / offRoadSpeed;
+            // t weight
+            double w = 1 / ((d + d0) * (d + d0));
+            if (zS == null) {
+                zS = new WTWD();
+                zS.d = Double.MAX_VALUE;
+            }
+            zS.w = zS.w + w;
+            zS.wTime = zS.wTime + w * (t + dt);
+            zS.wBoardings = zS.wBoardings + w * b;
+            zS.wWalkDist = zS.wWalkDist + w * (wd + d);
+            if (d < zS.d)
+                zS.d = d;
+            return zS;
+        }
+
+        /**
+         * A Generated closing sample take 1) as off-road distance, the minimum of the off-road
+         * distance of all enclosing samples, plus the grid size, and 2) as time the minimum
+         * time of all enclosing samples plus the grid size * off-road walk speed as additional
+         * time. All this are approximations.
+         *
+         * TODO Is there a better way of computing this? Here the computation will be different
+         * based on the order where we close the samples.
+         */
+        @Override
+        public WTWD closeSample(WTWD zUp, WTWD zDown, WTWD zRight, WTWD zLeft){
+            double dMin = Double.MAX_VALUE;
+            double tMin = Double.MAX_VALUE;
+            double bMin = Double.MAX_VALUE;
+            double wdMin = Double.MAX_VALUE;
+            for (WTWD z : new WTWD[]{zUp, zDown, zRight, zLeft}) {
+                if (z == null)
+                    continue;
+                if (z.d < dMin)
+                    dMin = z.d;
+                double t = z.wTime / z.w;
+                if (t < tMin)
+                    tMin = t;
+                double b = z.wBoardings / z.w;
+                if (b < bMin)
+                    bMin = b;
+                double wd = z.wWalkDist / z.w;
+                if (wd < wdMin)
+                    wdMin = wd;
+            }
+            WTWD z = new WTWD();
+            z.w = 1.0;
+                /*
+                 * The computations below are approximation, but we are on the edge anyway and the
+                 * current sample does not correspond to any computed value.
+                 */
+            z.wTime = tMin + gridSizeMeters / v0;
+            z.wBoardings = bMin;
+            z.wWalkDist = wdMin + gridSizeMeters;
+            z.d = dMin + gridSizeMeters;
+            return z;
         }
     }
 
