@@ -48,6 +48,10 @@ public class CommandLineParameters implements Cloneable {
             description = "Verbose output.")
     public boolean verbose;
 
+    @Parameter(names = {"--htmlAnnotations" },
+    description = "Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.")
+    boolean htmlAnnotations = false;
+   
     @Parameter(names = {"--basePath"}, validateWith = ReadWriteDirectory.class,
             description = "Set the path under which graphs, caches, etc. are stored by default.")
     public String basePath = DEFAULT_BASE_PATH;
