@@ -265,7 +265,7 @@ public class SurfaceResource extends RoutingResource {
      * @param spacing the number of minutes between isochrones
      * @return a list of evenly-spaced isochrones up to the timesurface's cutoff point
      */
-    public List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing) {
+    private List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing) {
 
         long t0 = System.currentTimeMillis();
         if (surf.sampleGrid == null) {
