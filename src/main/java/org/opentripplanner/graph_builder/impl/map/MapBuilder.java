@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 /**
  * Uses the shapes from GTFS to determine which streets buses drive on. This is used for stop linking purposes.
@@ -48,7 +49,7 @@ public class MapBuilder implements GraphBuilder {
     }
 
     public List<String> getPrerequisites() {
-        return Arrays.asList("streets", "transit", "transitIndex");
+        return Arrays.asList("streets", "transit");
     }
 
     /*
@@ -58,6 +59,10 @@ public class MapBuilder implements GraphBuilder {
        NetworkLinkerLibrary later (actually in LinkRequests).
      */
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+
+        //Mapbuilder needs transit index
+        graph.index(new DefaultStreetVertexIndexFactory());
+
         StreetMatcher matcher = new StreetMatcher(graph);
         EdgesForRoute edgesForRoute = new EdgesForRoute();
         extra.put(EdgesForRoute.class, edgesForRoute);
@@ -67,10 +72,9 @@ public class MapBuilder implements GraphBuilder {
             for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
                 if (pattern.mode == TraverseMode.BUS) {
                     /* we can only match geometry to streets on bus routes */
-                    // FIXME patterns do not have geometries generated, so this can't work
-                    log.debug("Matching {} ncoords={}", pattern, pattern.geometry.getNumPoints());
+                    log.debug("Matching {} ncoords={}", pattern, pattern.getGeometry().getNumPoints());
                     List<Edge> edges = matcher.match(pattern.geometry);
-                    if (edges == null) {
+                    if (edges == null || edges.isEmpty()) {
                         log.warn("Could not match to street network: {}", pattern);
                         continue;
                     }
