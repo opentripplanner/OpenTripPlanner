@@ -311,3 +311,14 @@ otp.config.modes = {
     //Options widgets)
     //    'TRANSIT,WALK,BICYCLE_RENT': _tr('Transit & Rented Bicycle')
     };
+
+// controls to remove widgets from the planner dialog. set to true if you want to remove them
+// TODO - might be better to include rather than exclude. 
+otp.config.widgetFlags={
+	TripOptionsWidget_Exclude : {
+		WheelChairSelector : false,
+		MaxDistanceSelector : false,
+		PreferredRoutes : false,
+		BannedRoutes : false
+	}
+};
