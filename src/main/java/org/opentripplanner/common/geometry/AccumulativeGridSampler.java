@@ -82,7 +82,6 @@ public class AccumulativeGridSampler<TZ> {
 
     /**
      * @param metric TZ data "behavior" and "metric".
-     * @param size Estimated grid size
      */
     public AccumulativeGridSampler(ZSampleGrid<TZ> sampleGrid, AccumulativeMetric<TZ> metric) {
         this.metric = metric;

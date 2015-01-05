@@ -58,11 +58,8 @@ public class AnalystProfileRouterPrototype {
     Multimap<StopCluster, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop cluster
     List<RoutingContext> routingContexts = Lists.newArrayList();
 
-    public TimeSurface minSurface, avgSurface, maxSurface;
-
     TObjectIntMap<Stop> fromStops;
     TimeWindow window; // filters trips used by time of day and service schedule
-
 
     /** Return a set of all patterns that pass through the stops that are present in the given Tracker. */
     public Set<TripPattern> uniquePatternsVisiting(Set<Stop> stops) {
@@ -84,7 +81,7 @@ public class AnalystProfileRouterPrototype {
         }
     }
 
-    public ProfileResponse route () {
+    public TimeSurface.RangeSet route () {
 
         graph.index.clusterStopsAsNeeded();
 
@@ -171,6 +168,7 @@ public class AnalystProfileRouterPrototype {
             }
         }
         LOG.info("Done with transit.");
+        LOG.info("Propagating from transit stops to the street network...");
         for (Stop stop : times) {
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
@@ -189,9 +187,9 @@ public class AnalystProfileRouterPrototype {
             rr.cleanup();
         }
         LOG.info("Done with propagation.");
-        TimeSurface.makeSurfaces(this);
+        TimeSurface.RangeSet result = TimeSurface.makeSurfaces(this);
         LOG.info("Done making time surfaces.");
-        return null;
+        return result;
     }
 
     /**
