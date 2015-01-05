@@ -2,30 +2,30 @@
    modify it under the terms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
    the License, or (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 otp.namespace("otp.widgets.transit");
 
-otp.widgets.transit.StopFinderWidget = 
+otp.widgets.transit.StopFinderWidget =
     otp.Class(otp.widgets.Widget, {
 
     module : null,
 
     agency_id : null,
-    
+
     timeIndex : null,
-    
-        
+
+
     initialize : function(id, module, stopViewer) {
-    
+
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             //TRANSLATORS: Widget title
             title : _tr('Stop Finder'),
@@ -35,10 +35,10 @@ otp.widgets.transit.StopFinderWidget =
             openInitially : false,
             persistOnClose : true,
         });
-        
+
         this.module = module;
         this.stopViewer = stopViewer;
-        
+
         var this_ = this;
 
         this.activeTime = moment();
@@ -53,12 +53,12 @@ otp.widgets.transit.StopFinderWidget =
             //TRANSLATORS: Search for Stops by ID/by Name
             search: _tr('Search')
         }
-          
+
         ich['otp-stopFinder'](translated_template).appendTo(this.mainDiv);
 
         this.agencySelect = this.mainDiv.find('.otp-stopFinder-agencySelect');
-        this.module.webapp.transitIndex.loadAgencies(this, function() {
-            for(var agencyId in this.module.webapp.transitIndex.agencies) {
+        this.module.webapp.indexApi.loadAgencies(this, function() {
+            for(var agencyId in this.module.webapp.indexApi.agencies) {
                 $("<option />").html(agencyId).appendTo(this_.agencySelect);
             }
         });
@@ -69,7 +69,7 @@ otp.widgets.transit.StopFinderWidget =
             var agencyId = this_.agencySelect.val();
             var id = this_.mainDiv.find('.otp-stopFinder-idField').val();
             if(!id || id.length === 0) return;
-            this_.module.webapp.transitIndex.loadStopsById(agencyId, id, this, function(data) {
+            this_.module.webapp.indexApi.loadStopsById(agencyId, id, this, function(data) {
                 this_.updateStops(data.stops);
             });
         });
@@ -78,13 +78,13 @@ otp.widgets.transit.StopFinderWidget =
             var agencyId = this_.agencySelect.val();
             var name = this_.mainDiv.find('.otp-stopFinder-nameField').val();
             if(!name || name.length === 0) return;
-            this_.module.webapp.transitIndex.loadStopsByName(agencyId, name, this, function(data) {
+            this_.module.webapp.indexApi.loadStopsByName(agencyId, name, this, function(data) {
                 this_.updateStops(data.stops);
             });
         });
 
         this.center();
-    },    
+    },
 
     updateStops : function(stops) {
         this.stopList.empty();
@@ -106,7 +106,7 @@ otp.widgets.transit.StopFinderWidget =
                 .click(function() {
                     var s = $(this).data('stop');
                     this_.stopViewer.show();
-                    this_.stopViewer.setStop(s.id.agencyId, s.id.id, s.stopName);
+                    this_.stopViewer.setStop(s.id, s.stopName);
                     this_.stopViewer.bringToFront();
                 });
         }

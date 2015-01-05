@@ -159,7 +159,8 @@ public abstract class RoutingResource {
      */
     @DefaultValue("") @QueryParam("preferredRoutes") protected List<String> preferredRoutes;
 
-    /** The maximum number of possible itineraries to return. */
+    /** Penalty added for using every route that is not preferred if user set any route as preferred, i.e. number of seconds that we are willing
+     * to wait for preferred route. */
     @DefaultValue("-1") @QueryParam("otherThanPreferredRoutesPenalty") protected List<Integer> otherThanPreferredRoutesPenalty;
     
     /** The comma-separated list of preferred agencies. */
