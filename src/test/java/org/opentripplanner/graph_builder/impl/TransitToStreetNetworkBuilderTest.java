@@ -321,7 +321,7 @@ public class TransitToStreetNetworkBuilderTest {
                            if (!foundConnection) {
                                //assertTrue(String.format("Transit stop %s connected wrongly", ts.getLabel()), foundConnection);
                                //collector.checkThat(sb.toString(), CoreMatchers.equalTo(wantedEdgeLabel));
-                               collector.checkThat(sb.toString(), CoreMatchers.describedAs("TransitStop %0 was wrongly connected to %1 insted of %2", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), sb.toString(), wantedEdgeLabel));
+                               collector.checkThat(sb.toString(), CoreMatchers.describedAs("TransitStop %0 should be connected to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, false));
                            }
                         }
