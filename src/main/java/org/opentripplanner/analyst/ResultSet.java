@@ -47,16 +47,21 @@ public class ResultSet implements Serializable{
     }
 
     /**
-     * Sum the values of all categories at all time limits within the bounds of the search.
+     * Sum the values of specified categories at all time limits within the
+     * bounds of the search. If no categories are specified, sum all categories. 
      */
-    public long sum () {
-        return sum(null);
+    public long sum (String... categories) {
+        return sum((Integer) null, categories);
     }
     
     /**
-     * Sum the values of all categories up to the time limit specified (in seconds).
+     * Sum the values of the specified categories up to the time limit specified
+     * (in seconds). If no categories are specified, sum all categories.
      */
-    public long sum(Integer timeLimit) {
+    public long sum(Integer timeLimit, String... categories) {
+        
+        if (categories.length == 0)
+            categories = (String[]) histograms.keySet().toArray();
 
         long value = 0l;
 
@@ -67,7 +72,7 @@ public class ResultSet implements Serializable{
         else
             maxMinutes = Integer.MAX_VALUE;
 
-        for(String k : histograms.keySet()) {
+        for(String k : categories) {
             int minute = 0;
             for(int v : histograms.get(k).sums) {
                 if(minute < maxMinutes)
