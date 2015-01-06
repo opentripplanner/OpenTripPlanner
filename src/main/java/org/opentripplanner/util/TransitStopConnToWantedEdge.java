@@ -31,6 +31,8 @@ public class TransitStopConnToWantedEdge implements Serializable {
     protected final StreetEdge wantedPath;
     //Type of street connection used in vizualization
     protected StreetType streetType;
+    //Previus Street name (current street name is actually label)
+    public String street_name;
     //Used in VizGui when checking correctness of connection
     //Roads that are checked are appeared as green
     protected transient boolean checked = false;
@@ -46,9 +48,9 @@ public class TransitStopConnToWantedEdge implements Serializable {
     @Override
     public String toString() {
         String transitString = "V: " + transitStop.getStop().getName() + " (" + transitStop.getStopId().getId() + ")";
-        String edgeString = "E: " + wantedPath.getName()
+        String edgeString = "E: " + street_name
                 + " [" + wantedPath.getPermission() + "|" + streetType + "]"
-                + " (" + wantedPath.getLabel() + ")";
+                + " (" + wantedPath.getName() + ")";
         
         return transitString + " => " + edgeString;
 

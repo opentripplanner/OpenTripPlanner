@@ -279,7 +279,7 @@ public class TransitToStreetNetworkBuilderTest {
                             unknownStops++;
                         } else {
                            Vertex connected_vertex = e.getToVertex();
-                           String wantedEdgeLabel = wanted_con.getStreetEdge().getLabel();
+                           String wantedEdgeLabel = wanted_con.getStreetEdge().getName();
                            StringBuilder sb = new StringBuilder();
                            boolean foundConnection = false;
                            //Look through all outgoing street edges 
@@ -287,7 +287,7 @@ public class TransitToStreetNetworkBuilderTest {
                            for (Edge con_edge: connected_vertex.getOutgoingStreetEdges()) {
                                StreetEdge se = (StreetEdge) con_edge;
                                if (se.getName().equals(wantedEdgeLabel)) {
-                                   //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getLabel());
+                                   //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getName());
                                    collector.checkThat(se.getName(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                    transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
                                    foundConnection = true;
@@ -305,7 +305,7 @@ public class TransitToStreetNetworkBuilderTest {
                                    if (con_edge instanceof StreetEdge) {
                                        StreetEdge se = (StreetEdge) con_edge;
                                        if (se.getName().equals(wantedEdgeLabel)) {
-                                           //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getLabel());
+                                           //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getName());
                                            collector.checkThat(se.getName(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
                                            transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
                                            foundConnection = true;
@@ -341,14 +341,14 @@ public class TransitToStreetNetworkBuilderTest {
     
     @Test
     public void testMariborBus() throws Exception {
-        testTransitStreetConnections("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor_transit.ser", "maribor");
+        testTransitStreetConnections("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor.ser", "maribor");
     }
     
     /*
     // Commented for now, because I need to lower size of OSM and GTFS before adding it to Git
     @Test
     public void testPortland() throws Exception {
-        testTransitStreetConnections("washington_station.osm", "portland_gtfs.zip", "portland1.ser", "portland");
+        testTransitStreetConnections("washington_station.osm", "portland_gtfs.zip", "portland.ser", "portland");
     }
     
     @Test

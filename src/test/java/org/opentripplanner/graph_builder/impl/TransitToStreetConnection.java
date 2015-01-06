@@ -171,7 +171,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             bus_stop_feat.addPropertie("title", transitStop.getName() + "(" + transitStop.getStopId().getId() + ")");
             bus_stop_feat.addPropertie("label", transitStop.getLabel());
             //bus_stop_feat.addPropertie("stop_index", transitStop.getIndex());
-            bus_stop_feat.addPropertie("edge_label", wantedPath.getLabel());
+            bus_stop_feat.addPropertie("edge_label", wantedPath.getName());
             bus_stop_feat.addPropertie("marker-size", "small");
             bus_stop_feat.addPropertie("marker-symbol", "bus");
             addColorStreetType(bus_stop_feat, "marker-color");
@@ -179,8 +179,8 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             
             //and wanted/connected street edge which should be connected to this bus stop
             StreetFeature wanted_edge_feat = new StreetFeature(wantedPath.getGeometry());
-            wanted_edge_feat.addPropertie("title", wantedPath.getName());
-            wanted_edge_feat.addPropertie("label", wantedPath.getLabel());
+            wanted_edge_feat.addPropertie("title", street_name);
+            wanted_edge_feat.addPropertie("label", wantedPath.getName());
             //wanted_edge_feat.addPropertie("id", wantedPath.getId());
             //wanted_edge_feat.addPropertie("stop_index", transitStop.getIndex());
             wanted_edge_feat.addPropertie("stop_label", transitStop.getLabel());
@@ -195,7 +195,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             bus_stop_feat.addPropertie("title", transitStop.getName() + "(" + transitStop.getStopId().getId() + ")");
             bus_stop_feat.addPropertie("label", transitStop.getLabel());
             //bus_stop_feat.addPropertie("stop_index", transitStop.getIndex());
-            bus_stop_feat.addPropertie("edge_label", wantedPath.getLabel());
+            bus_stop_feat.addPropertie("edge_label", wantedPath.getName());
             bus_stop_feat.addPropertie("marker-size", "small");
             bus_stop_feat.addPropertie("marker-symbol", "bus");
             addColorCoretness(bus_stop_feat, "marker-color");
@@ -203,8 +203,8 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             
             //and wanted/connected street edge which should be connected to this bus stop
             StreetFeature wanted_edge_feat = new StreetFeature(wantedPath.getGeometry());
-            wanted_edge_feat.addPropertie("title", wantedPath.getName());
-            wanted_edge_feat.addPropertie("label", wantedPath.getLabel());
+            wanted_edge_feat.addPropertie("title", street_name);
+            wanted_edge_feat.addPropertie("label", wantedPath.getName());
             //wanted_edge_feat.addPropertie("id", wantedPath.getId());
             wanted_edge_feat.addPropertie("stop_label", transitStop.getLabel());
             addColorCoretness(wanted_edge_feat, "stroke");

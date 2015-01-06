@@ -30,8 +30,8 @@ public class TranstiStopOrStreetEdge {
             return "V: " + transitStop.getStop().getName() + " (" + transitStop.getStopId().getId() + ")";
         } else {
             return "E: " + wantedPath.getName() + 
-                    " [" + wantedPath.getPermission() + "]" +
-                    " (" + wantedPath.getLabel() +")";
+                    " [" + wantedPath.getPermission() + "]";// +
+                    //" (" + wantedPath.getLabel() +")";
         }
     }
     
