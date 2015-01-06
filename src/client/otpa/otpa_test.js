@@ -106,19 +106,6 @@ $(function() {
     $("#refresh").click(gui.refresh);
     gui.widget1.refresh();
 
-    // Create a slider and connect it to the color map cutoff.
-    // $("#cutoffSec").slider({
-    // min : 0,
-    // max : 5400,
-    // range : true,
-    // step : 300,
-    // values : [ 0, 5400 ]
-    // }).on("slidechange", function(ev, ui) {
-    // gui.colorMap.setMinCutoff(ui.values[0]);
-    // gui.colorMap.setMaxCutoff(ui.values[1]);
-    // gui.layer.refresh();
-    // });
-
     /* Download image button */
     $('#downloadIsoimage').click(function() {
         var image = otp.analyst.TimeGrid.getImage(gui.timeGrid, gui.colorMap, {
@@ -128,5 +115,14 @@ $(function() {
             northeast : gui.map.getBounds().getNorthEast()
         });
         window.open(image.src);
+    });
+
+    /* Download vector isochrone button */
+    $('#downloadIsochrone').click(function() {
+        var params = gui.widget1.getParameters();
+        var isochrone = new otp.analyst.Isochrone(params, 3600, {
+            load : false
+        });
+        window.open(isochrone.getUrl());
     });
 });
