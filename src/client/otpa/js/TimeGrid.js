@@ -26,7 +26,10 @@ otp.analyst.TimeGrid = otp.Class({
     initialize : function(requestParams) {
         // We do the base64 encoding on the server as
         // doing it on the client is painful and not portable.
-        var url = '/otp-rest-servlet/ws/timegrid?' + $.param(requestParams) + "&base64=true";
+        var routerId = requestParams.routerId;
+        if (!routerId || 0 === str.length)
+            routerId = 'default';
+        var url = '/otp/routers/' + routerId + '/timegrid?' + $.param(requestParams) + "&base64=true";
         var thisTg = this;
         this.precisionMeters = requestParams.precisionMeters;
         this.zDataType = requestParams.zDataType || "TIME";

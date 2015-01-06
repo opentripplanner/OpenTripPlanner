@@ -38,7 +38,10 @@ otp.analyst.Isochrone = otp.Class({
         }, options);
         this.isochrones = null;
         this.onLoadCallbacks = $.Callbacks();
-        this.url = '/otp-rest-servlet/ws/isochrone?' + $.param(parameters, false);
+        var routerId = parameters.routerId;
+        if (!routerId || 0 === str.length)
+            routerId = 'default';
+        this.url = '/otp/routers/' + routerId + '/isochrone?' + $.param(parameters, false);
         for (var i = 0; i < cutoffSec.length; i++)
             this.url += "&cutoffSec=" + cutoffSec[i];
         this.isoMap = [];
