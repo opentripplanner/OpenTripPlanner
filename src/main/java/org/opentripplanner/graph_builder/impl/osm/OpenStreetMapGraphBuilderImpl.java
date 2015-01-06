@@ -307,19 +307,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
 
-        private static final String wayLabelFormat = "osm:way:%d";
-
-        private static final String areaLabelFormat = "osm:area:%d";
-
-        private String getLabelForWay(OSMWithTags way) {
-            return String.format(wayLabelFormat, way.getId());
-        }
-
-        private String getLabelForArea(OSMWithTags way) {
-            return String.format(areaLabelFormat, way.getId());
-        }
-
-
         class Ring {
             public List<OSMNode> nodes;
 
@@ -1274,7 +1261,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 AreaEdge street = edgeFactory.createAreaEdge(startEndpoint, endEndpoint, line,
                         name, length, areaPermissions, false, edgeList);
                 street.setCarSpeed(carSpeed);
-                street.setLabel(getLabelForArea(areaEntity));
 
                 street.setStreetClass(cls);
                 edges.add(street);
@@ -1287,7 +1273,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 AreaEdge backStreet = edgeFactory.createAreaEdge(endEndpoint, startEndpoint,
                         (LineString) line.reverse(), name, length, areaPermissions, true, edgeList);
                 backStreet.setCarSpeed(carSpeed);
-                backStreet.setLabel(getLabelForArea(areaEntity));
 
                 backStreet.setStreetClass(cls);
                 edges.add(backStreet);
@@ -2576,7 +2561,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             StreetEdge street = edgeFactory.createEdge(start, end, geometry, name, length,
                     permissions, back);
             street.setCarSpeed(carSpeed);
-            street.setLabel(getLabelForWay(way));
 
             String highway = way.getTag("highway");
             int cls;

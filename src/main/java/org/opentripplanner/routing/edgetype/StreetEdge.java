@@ -99,8 +99,6 @@ public class StreetEdge extends Edge implements Cloneable {
     
     private String name;
 
-    private String label;
-    
     private StreetTraversalPermission permission;
 
     private int streetClass = CLASS_OTHERPATH;
@@ -620,14 +618,6 @@ public class StreetEdge extends Edge implements Cloneable {
 	    } else {
 	        LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
 	    }
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
 	}
 
 	public boolean isWheelchairAccessible() {
