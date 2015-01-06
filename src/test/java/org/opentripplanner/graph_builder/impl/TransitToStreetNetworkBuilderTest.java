@@ -217,7 +217,7 @@ public class TransitToStreetNetworkBuilderTest {
      * Reads saved transitStop -> streetEdge connections and compares them with 
      * connections in generated Graph.
      * 
-     * Graph is generated with loadGraph function
+     * Graph is generated with {@link #loadGraph(java.lang.String, java.lang.String, boolean, boolean) } function
      * 
      * 
      * @param osm_filename filename for OSM (in resource folder of class)
