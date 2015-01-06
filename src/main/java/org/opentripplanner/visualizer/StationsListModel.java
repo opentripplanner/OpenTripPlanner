@@ -20,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Shows list of stop to street connections in GraphVisualizer used in Linker tests 
+ * 
+ * Each connection can be edited. If it is edited connection is moved to {@link CurStationConModel}
  *
  * @author mabu
  */

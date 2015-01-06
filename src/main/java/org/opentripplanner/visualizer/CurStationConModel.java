@@ -24,6 +24,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
+ * Used in GraphVisualizer for creating tests for linker
+ * 
+ * It shows current TransitStop and StreetEdge to which this stop should be connected
+ * 
+ * Vertex should be TransitStop and is added with right clicking on vertex
+ * StreetEdge is added with right clicking on Outgoing edges
+ * 
+ * This connection can then be added to list of connections shown in {@link StationsListModel}
+ * 
  * @author mabu
  */
 public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge>{
@@ -38,6 +47,11 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
         super.clear(); 
     }
   
+    /**
+     * Adds {@link TransitStop} element if it doesn't yet exists
+     * @param element Wanted Stop
+     * @throws Exception if TransitStop already exists
+     */
     public void addTransitStop(TransitStop element) throws Exception {
         if (getSize() == 2) {
             throw new Exception("Current station can see only 2 elements at the same time!");
@@ -51,6 +65,11 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
         }
     }
     
+    /**
+     * Adds {@link StreetEdge} element if it doesn't yet exists
+     * @param element Wanted SreetEdge
+     * @throws Exception if StreetEdge already exists
+     */
     public void addStreetEdge(StreetEdge element) throws Exception {
         if (edge_index == null) {
             edge_index = getSize();
@@ -67,6 +86,10 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
         return retval;
     }
     
+    /**
+     * Converts to {@link TransitStopConnToWantedEdge}
+     * @return 
+     */
     public TransitStopConnToWantedEdge getTransitStopConWantedEdge() {
         StreetEdge se = get(edge_index).wantedPath;
         StreetType st = StreetType.NORMAL;
@@ -85,6 +108,12 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
         //Do nothing. All inserts need to be with addTransitElement
     }
 
+    /**
+     * Adds {@link TransitStop} and {@link StreetEdge} from {@link TransitStopConnToWantedEdge}
+     * 
+     * This is used to edit current street to stop connection
+     * @param selectedValue 
+     */
     void addEdit(TransitStopConnToWantedEdge selectedValue) {
         try {
             addTransitStop(selectedValue.getTransitStop());
