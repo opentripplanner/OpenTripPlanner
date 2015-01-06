@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author mabu
  */
-public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge>{
+public class CurStationConModel extends DefaultListModel<TransitStopOrStreetEdge>{
     Integer vertex_index = null;
     Integer edge_index = null;
     private static final Logger LOG = LoggerFactory.getLogger(CurStationConModel.class);
@@ -58,7 +58,7 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
         }
         if (vertex_index == null) {    
             vertex_index = getSize();
-            super.addElement(new TranstiStopOrStreetEdge(element)); 
+            super.addElement(new TransitStopOrStreetEdge(element)); 
             LOG.info("Added vertex with index: {}", vertex_index);
         } else {
             throw new Exception("Current station can have only one TransitStop!");
@@ -73,10 +73,10 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
     public void addStreetEdge(StreetEdge element) throws Exception {
         if (edge_index == null) {
             edge_index = getSize();
-            super.addElement(new TranstiStopOrStreetEdge(element));
+            super.addElement(new TransitStopOrStreetEdge(element));
             LOG.info("Added edge with index: {}", edge_index);
         } else {
-            super.set(edge_index, new TranstiStopOrStreetEdge(element));
+            super.set(edge_index, new TransitStopOrStreetEdge(element));
         }
     }
     
@@ -104,7 +104,7 @@ public class CurStationConModel extends DefaultListModel<TranstiStopOrStreetEdge
     }
 
     @Override
-    public void addElement(TranstiStopOrStreetEdge element) {
+    public void addElement(TransitStopOrStreetEdge element) {
         //Do nothing. All inserts need to be with addTransitElement
     }
 

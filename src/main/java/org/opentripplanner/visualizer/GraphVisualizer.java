@@ -428,7 +428,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JList<String> metadataList;
     
-    private JList<TranstiStopOrStreetEdge> stationStreetLinkList;
+    private JList<TransitStopOrStreetEdge> stationStreetLinkList;
     
     private CurStationConModel stationStreetLinkModel;
     

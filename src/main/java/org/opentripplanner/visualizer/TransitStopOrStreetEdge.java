@@ -23,15 +23,15 @@ import org.opentripplanner.routing.vertextype.TransitStop;
  *
  * @author mabu
  */
-public class TranstiStopOrStreetEdge {
+public class TransitStopOrStreetEdge {
     TransitStop transitStop = null;
     StreetEdge wantedPath = null;
 
-    public TranstiStopOrStreetEdge(TransitStop transitStop) {
+    public TransitStopOrStreetEdge(TransitStop transitStop) {
         this.transitStop = transitStop;
     }
 
-    public TranstiStopOrStreetEdge(StreetEdge wantedPath) {
+    public TransitStopOrStreetEdge(StreetEdge wantedPath) {
         this.wantedPath = wantedPath;
     }
 
