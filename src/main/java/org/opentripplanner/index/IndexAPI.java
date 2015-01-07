@@ -51,6 +51,8 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.util.PolylineEncoder;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -348,6 +350,20 @@ public class IndexAPI {
        }
    }
 
+    /** Return geometry for the trip as a packed coordinate sequence */
+    @GET
+    @Path("/trips/{tripId}/geometry")
+    public Response getGeometryForTrip (@PathParam("tripId") String tripIdString) {
+        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+        Trip trip = index.tripForId.get(tripId);
+        if (trip != null) {
+            TripPattern tripPattern = index.patternForTrip.get(trip);
+            return getGeometryForPattern(tripPattern.code);
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+
    @GET
    @Path("/patterns")
    public Response getPatterns () {
@@ -399,6 +415,19 @@ public class IndexAPI {
         if (pattern != null) {
             String semanticHash = pattern.semanticHashString(null);
             return Response.status(Status.OK).entity(semanticHash).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+
+    /** Return geometry for the pattern as a packed coordinate sequence */
+    @GET
+    @Path("/patterns/{patternId}/geometry")
+    public Response getGeometryForPattern (@PathParam("patternId") String patternIdString) {
+        TripPattern pattern = index.patternForId.get(patternIdString);
+        if (pattern != null) {
+            EncodedPolylineBean geometry = PolylineEncoder.createEncodings(pattern.geometry);
+            return Response.status(Status.OK).entity(geometry).build();
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
