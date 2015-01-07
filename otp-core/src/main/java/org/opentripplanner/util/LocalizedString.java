@@ -86,6 +86,9 @@ public class LocalizedString implements I18NString, Serializable {
      * @return tagName
      */
     private String getTagNames() {
+        //TODO: after finding all keys for replacements replace strings to normal java strings
+        //with https://stackoverflow.com/questions/2286648/named-placeholders-in-string-formatting if it is faster
+        //otherwise it's converted only when toString is called
         if( key_params.containsKey(key)) {
             return key_params.get(key);
         }
@@ -118,8 +121,10 @@ public class LocalizedString implements I18NString, Serializable {
         String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
         if (this.params != null) {
             translation = pattern.matcher(translation).replaceFirst("%s");
+            return String.format(translation, (Object[]) params);
+        } else {
+            return translation;
         }
-        return String.format(translation, (Object[]) params);
     }
 
 }
