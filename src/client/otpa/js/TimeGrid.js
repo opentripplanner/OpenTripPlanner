@@ -34,6 +34,7 @@ otp.analyst.TimeGrid = otp.Class({
         this.precisionMeters = requestParams.precisionMeters;
         this.zDataType = requestParams.zDataType || "TIME";
         this.zUnit = this.zDataType == "BOARDINGS" ? 1000 : this.zDataType == "WALK_DISTANCE" ? 10.0 : 1.0;
+        this.loaded = false;
         var ajaxParams = {
             url : url,
             async : true,
@@ -53,6 +54,7 @@ otp.analyst.TimeGrid = otp.Class({
                     ctx.drawImage(png, 0, 0);
                     thisTg.bitmap = ctx.getImageData(0, 0, canvas.width, canvas.height);
                     thisTg.channels = 4; // RGBA
+                    thisTg.loaded = true;
                     thisTg.onLoadCallbacks.fire(thisTg);
                 };
                 png.src = "data:image/png;base64," + data;
@@ -76,6 +78,13 @@ otp.analyst.TimeGrid = otp.Class({
     onLoad : function(callback) {
         this.onLoadCallbacks.add(callback);
         return this;
+    },
+
+    /**
+     * Return true if the TimeGrid is loaded.
+     */
+    isLoaded : function() {
+        return this.loaded;
     },
 
     /**

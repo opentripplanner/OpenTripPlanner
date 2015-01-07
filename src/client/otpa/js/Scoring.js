@@ -41,6 +41,27 @@ otp.analyst.Scoring = otp.Class({
             }
         }
         return Math.pow(w, 1 / beta);
+    },
+
+    /**
+     * Compute histogram
+     */
+    histogram : function(timeGrid, population, min, max, step) {
+        var histo = [];
+        for (var i = 0; i < Math.floor((max - min) / step); i++) {
+            histo[i] = 0.0;
+        }
+        for (var i = 0; i < population.size(); i++) {
+            var poi = population.get(i);
+            // Default POI weight is 1
+            var poiW = poi.w || 1.0;
+            var v = timeGrid.get(poi.location);
+            if (v != null && v.z >= min && v.z <= max) {
+                var index = Math.floor((v.z - min) / step);
+                histo[index] = histo[index] + poiW * 1.0;
+            }
+        }
+        return histo;
     }
 });
 
