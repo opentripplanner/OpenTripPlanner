@@ -61,7 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import org.opentripplanner.graph_builder.impl.map.MapBuilder;
+import org.opentripplanner.graph_builder.impl.map.BusRouteStreetMatcher;
 
 public class OTPConfigurator {
 
@@ -214,7 +214,7 @@ public class OTPConfigurator {
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
             if ( hasOSM ) {
-                graphBuilder.addGraphBuilder(new MapBuilder());
+                graphBuilder.addGraphBuilder(new BusRouteStreetMatcher());
                 graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
             }
