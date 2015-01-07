@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Abstract base class for edges in the (open)streetmap layer (might be paths,
@@ -78,5 +79,7 @@ public abstract class StreetEdge extends EdgeWithElevation {
 	public abstract Set<Alert> getWheelchairNotes();
 
 	public abstract List<TurnRestriction> getTurnRestrictions();
+
+        public abstract I18NString getRawName();
 
 }
