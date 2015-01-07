@@ -214,7 +214,9 @@ public class OTPConfigurator {
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
             if ( hasOSM ) {
-                graphBuilder.addGraphBuilder(new BusRouteStreetMatcher());
+                if (params.matchBusRoutesToStreets) {
+                    graphBuilder.addGraphBuilder(new BusRouteStreetMatcher());
+                }
                 graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
             }

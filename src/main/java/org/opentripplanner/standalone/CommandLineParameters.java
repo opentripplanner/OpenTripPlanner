@@ -106,6 +106,11 @@ public class CommandLineParameters implements Cloneable {
             description = "Skip area visibility calculations, which are often time consuming.")
     public boolean skipVisibility;
 
+    @Parameter(names = {"--matchBusRoutesToStreets"},
+            description = "Based on GTFS data, guess which OSM streets each bus runs on to improve stop linking.")
+    public boolean matchBusRoutesToStreets = false;
+
+    
     /* Options for the server sub-task. */
 
     @Parameter(names = {"--analyst"},
