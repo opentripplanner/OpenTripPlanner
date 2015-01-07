@@ -350,6 +350,7 @@ public class GTFSPatternHopFactory {
          * information to build a geometry). So we keep them here.
          * 
          *  A trip pattern actually does not have a single geometry, but one per hop, so we store an array.
+         *  FIXME _why_ doesn't it have a single geometry?
          */
         Map<TripPattern, LineString[]> geometriesByTripPattern = Maps.newHashMap();
         
@@ -430,14 +431,15 @@ public class GTFSPatternHopFactory {
         for (TripPattern tripPattern : tripPatterns.values()) {
             tripPattern.makePatternVerticesAndEdges(graph, context);
             
-            // add the geometries
+            // Add the geometries to the hop edges.
             LineString[] geom = geometriesByTripPattern.get(tripPattern);
             if (geom != null) {
                 for (int i = 0; i < tripPattern.hopEdges.length; i++) {
                     tripPattern.hopEdges[i].setGeometry(geom[i]);
                 }
             }
-            
+            // Make a geometry for the whole TripPattern from all its constituent hops.
+            tripPattern.makeGeometry();
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
         }
 
@@ -540,13 +542,22 @@ public class GTFSPatternHopFactory {
         LOG.info("Done finding interlining trips and creating the corresponding edges.");
     }
 
+    /**
+     * Creates a set of geometries for a single trip, considering the GTFS shapes.txt,
+     * The geometry is broken down into one geometry per inter-stop segment ("hop"). We also need a shape for the entire
+     * trip and tripPattern, but given the complexity of the existing code for generating hop geometries, we will create
+     * the full-trip geometry by simply concatenating the hop geometries.
+     *
+     * This geometry will in fact be used for an entire set of trips in a trip pattern. Technically one of the trips
+     * with exactly the same sequence of stops could follow a different route on the streets, but that's very uncommon.
+     */
     private LineString[] createGeometry(Graph graph, Trip trip, List<StopTime> stopTimes) {
         AgencyAndId shapeId = trip.getShapeId();
         
-        // one less geometry than stoptime as these are hops not stops (fencepost problem)
+        // One less geometry than stoptime as array indexes represetn hops not stops (fencepost problem).
         LineString[] geoms = new LineString[stopTimes.size() - 1];
         
-        /* Detect presence or absence of shape_dist_traveled on a per-trip basis */
+        // Detect presence or absence of shape_dist_traveled on a per-trip basis
         StopTime st0 = stopTimes.get(0);
         boolean hasShapeDist = st0.isShapeDistTraveledSet();
         if (hasShapeDist) {

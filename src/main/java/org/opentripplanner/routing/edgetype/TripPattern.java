@@ -35,6 +35,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -142,7 +143,7 @@ public class TripPattern implements Serializable {
      */
     final ArrayList<Trip> trips = new ArrayList<Trip>();
 
-    /** Used by the MapBuilder */
+    /** Used by the MapBuilder (and should be exposed by the Index API). */
     public LineString geometry = null;
 
     /**
@@ -625,34 +626,30 @@ public class TripPattern implements Serializable {
     }
 
     /**
-     * Generates geometry from hops if it doesn't yet exists and returns it
-     * @return Pattern geometry
+     * Generates a geometry for the full pattern.
+     * This is done by concatenating the shapes of all the constituent hops.
+     * It could probably just come from the full shapes.txt entry for the trips in the route, but given all the details
+     * in how the individual hop geometries are constructed we just recombine them here.
      */
-    public LineString getGeometry() {
-        if (geometry != null) {
-            return geometry;
-        }
+    public void makeGeometry() {
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-
-        //Based on StreetfulStopLinker
         if (patternHops != null && patternHops.length > 0) {
             for (int i = 0; i < patternHops.length; i++) {
-
                 LineString geometry = patternHops[i].getGeometry();
-
                 if (geometry != null) {
                     if (coordinates.size() == 0) {
                         coordinates.extend(geometry.getCoordinates());
                     } else {
-                        coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplications
+                        coordinates.extend(geometry.getCoordinates(), 1); // Avoid duplicate coords at stops
                     }
                 }
             }
-
-            this.geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
-            return this.geometry;
-        } else {
-            return null;
+            // The CoordinateArrayListSequence is easy to append to, but is not serializable.
+            // It might be possible to just mark it serializable, but it is not particularly compact either.
+            // So we convert it to a packed coordinate sequence, since that is serializable and smaller.
+            // FIXME It seems like we could simply accumulate the coordinates into an array instead of using the CoordinateArrayListSequence.
+            PackedCoordinateSequence packedCoords = new PackedCoordinateSequence.Double(coordinates.toCoordinateArray(), 2);
+            this.geometry = GeometryUtils.getGeometryFactory().createLineString(packedCoords);
         }
     }
 

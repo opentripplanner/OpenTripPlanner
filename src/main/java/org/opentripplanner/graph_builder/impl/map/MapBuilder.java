@@ -66,13 +66,13 @@ public class MapBuilder implements GraphBuilder {
         StreetMatcher matcher = new StreetMatcher(graph);
         EdgesForRoute edgesForRoute = new EdgesForRoute();
         extra.put(EdgesForRoute.class, edgesForRoute);
-        log.info("matching route variants to street edges...");
+        log.info("Finding corresponding street edges for trip patterns...");
         // Why do we need to iterate over the routes? Why not just patterns?
         for (Route route : graph.index.routeForId.values()) {
             for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
                 if (pattern.mode == TraverseMode.BUS) {
                     /* we can only match geometry to streets on bus routes */
-                    log.debug("Matching {} ncoords={}", pattern, pattern.getGeometry().getNumPoints());
+                    log.info("Matching {}", pattern);
                     List<Edge> edges = matcher.match(pattern.geometry);
                     if (edges == null || edges.isEmpty()) {
                         log.warn("Could not match to street network: {}", pattern);
@@ -85,6 +85,7 @@ public class MapBuilder implements GraphBuilder {
                     }
                     Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
                     LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
+                    // Replace the pattern's geometry from GTFS with that of the equivalent OSM edges.
                     pattern.geometry = ls;
                 }
             }
