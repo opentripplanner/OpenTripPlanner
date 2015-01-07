@@ -28,7 +28,7 @@ public class StopTreeCache {
     final int timeCutoffMinutes;
     private final Map<TransitStop, TObjectIntMap<Vertex>> distancesForStop = Maps.newHashMap();
 
-    public StopTreeCache (Graph graph, int q) {
+    public StopTreeCache (Graph graph, int timeCutoffMinutes) {
         this.timeCutoffMinutes = timeCutoffMinutes;
         LOG.info("Caching distances to nearby street intersections from each transit stop...");
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
