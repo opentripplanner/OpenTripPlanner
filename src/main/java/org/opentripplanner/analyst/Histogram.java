@@ -15,7 +15,16 @@ import java.util.List;
  */
 public class Histogram implements Serializable {
 
+    /**
+     * Counts of accessible features in a given bin.
+     * For example, value 0 is 0-1 minutes, value 50 is 50-51 minutes, etc.
+     */
     public final int[] counts;
+    
+    /**
+     * Sums of accessible features in a given bin.
+     * For example, value 0 is 0-1 minutes, value 50 is 50-51 minutes, etc.
+     */
     public final int[] sums;
 
     // TODO allow specifying breaks
@@ -37,7 +46,7 @@ public class Histogram implements Serializable {
     		if(times[i] < 0 || times[i] == Integer.MAX_VALUE)
     			continue;
     	
-    		int minuteBin = (int)Math.ceil(times[i] / 60.0);
+    		int minuteBin = (int) Math.floor(times[i] / 60.0);
     		
     		tmpCounts[minuteBin] += 1; 
     		tmpSums[minuteBin] += weights[i];
