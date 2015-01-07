@@ -38,7 +38,7 @@ public class AnalystProfileRouterPrototype {
     public static final int SLACK = 60; // in seconds, time required to catch a transit vehicle
     private static final int TIMEOUT = 10; // in seconds, maximum computation time
     public static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
-    private static final int MAX_RIDES = 5; // maximum number of boardings in a trip
+    private static final int MAX_RIDES = 4; // maximum number of boardings in a trip
     private static final List<TraverseMode> ACCESS_MODES =
             Lists.newArrayList(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR);
     private static final List<TraverseMode> EGRESS_MODES =
