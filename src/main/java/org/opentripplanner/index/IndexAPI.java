@@ -13,7 +13,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.index;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +44,6 @@ import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
-import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -352,9 +350,9 @@ public class IndexAPI {
        }
    }
 
-    /** Return geometries for each leg of the trip as packed coordinate sequences */
+    /** Return geometry for the trip as a packed coordinate sequence */
     @GET
-    @Path("/trips/{tripId}/geometries")
+    @Path("/trips/{tripId}/geometry")
     public Response getGeometryForTrip (@PathParam("tripId") String tripIdString) {
         AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
         Trip trip = index.tripForId.get(tripId);
@@ -422,17 +420,14 @@ public class IndexAPI {
         }
     }
 
-    /** Return geometries for each leg of the pattern as packed coordinate sequences */
+    /** Return geometry for the pattern as a packed coordinate sequence */
     @GET
-    @Path("/patterns/{patternId}/geometries")
+    @Path("/patterns/{patternId}/geometry")
     public Response getGeometryForPattern (@PathParam("patternId") String patternIdString) {
         TripPattern pattern = index.patternForId.get(patternIdString);
         if (pattern != null) {
-            Collection<EncodedPolylineBean> geometries = new ArrayList<>();
-            for (PatternHop edge: pattern.hopEdges) {
-                geometries.add(PolylineEncoder.createEncodings(edge.getGeometry()));
-            }
-            return Response.status(Status.OK).entity(geometries).build();
+            EncodedPolylineBean geometry = PolylineEncoder.createEncodings(pattern.geometry);
+            return Response.status(Status.OK).entity(geometry).build();
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
