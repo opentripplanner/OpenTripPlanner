@@ -22,7 +22,7 @@ public class Histogram implements Serializable {
 	 * employment that can be reached rather than the total number of jobs in all those places of employment.
      */
     public final int[] counts;
-    
+
     /**
      * The weighted sum of all accessible features in each one-minute bin.
 	 * Index 0 is 0-1 minutes, index 50 is 50-51 minutes, etc.
@@ -36,46 +36,38 @@ public class Histogram implements Serializable {
      * @param times the time at which each destination is reached. The array will be sorted in place.
      * @param weights the weight or magnitude of each destination reached. parallel to times.
      */
-    public Histogram (int[] times, int[] weights) {
+    public Histogram (int[] times, int[] weights, int nBins) {
 
-		// FIXME Hard coded array sizes.
-		int tmpCounts[] = new int[1000];
-    	int tmpSums[] = new int[1000];
-    	
-    	int uppperBound = 0;
-    	
+		counts = new int[nBins];
+		sums = new int[nBins];
+
     	for(int i = 0; i < times.length; i++) {
-    		
-    		if(times[i] < 0 || times[i] == Integer.MAX_VALUE)
-    			continue;
-    	
-    		int minuteBin = (int) Math.floor(times[i] / 60.0);
-    		
-    		tmpCounts[minuteBin] += 1; 
-    		tmpSums[minuteBin] += weights[i];
-    				
-    		if(minuteBin > uppperBound)
-    			uppperBound = minuteBin;
-    	}
-    	
-    	counts = new int[uppperBound];
-    	sums = new int[uppperBound];
 
-    	for(int i = 0; i < uppperBound; i++) {
-    		counts[i] = tmpCounts[i];
-    		sums[i] = tmpSums[i];
-    	}   	
+    		if(times[i] < 0 || times[i] == Integer.MAX_VALUE) {
+				continue;
+			}
+
+    		int minuteBin = (int) Math.floor(times[i] / 60.0);
+			if (minuteBin >= nBins) {
+				continue;
+			}
+
+    		counts[minuteBin] += 1;
+    		sums[minuteBin] += weights[i];
+
+    	}
+
     }
-    
+
     public void writeJson(JsonGenerator jgen) throws JsonGenerationException, IOException {
-    	
+
     	jgen.writeArrayFieldStart("sums"); {
     		for(int sum : sums) {
     			jgen.writeNumber(sum);
     		}
     	}
     	jgen.writeEndArray();
-    	
+
     	jgen.writeArrayFieldStart("counts"); {
     		for(int count : counts) {
     			jgen.writeNumber(count);
