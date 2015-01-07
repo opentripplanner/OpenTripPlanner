@@ -114,7 +114,7 @@ public class ProfileResource {
             AnalystProfileRouterPrototype router = new AnalystProfileRouterPrototype(graph, req);
             TimeSurface.RangeSet result = router.route();
             Map<String, Integer> idForSurface = Maps.newHashMap();
-            idForSurface.put("min", surfaceCache.add(result.min));
+            idForSurface.put("min", surfaceCache.add(result.min)); // requires analyst mode turned on
             idForSurface.put("avg", surfaceCache.add(result.avg));
             idForSurface.put("max", surfaceCache.add(result.max));
             return Response.status(Status.OK).entity(idForSurface).build();

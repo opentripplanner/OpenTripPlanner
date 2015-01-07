@@ -24,6 +24,7 @@ import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
+import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -91,6 +92,9 @@ public class GraphIndex {
 
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
+
+    /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
+    private transient StopTreeCache stopTreeCache = null;
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
@@ -326,6 +330,16 @@ public class GraphIndex {
             if ( ! times.times.isEmpty()) ret.add(times);
         }
         return ret;
+    }
+
+    /** Fetch a cache of nearby intersection distances for every transit stop in this graph, lazy-building as needed. */
+    public StopTreeCache getStopTreeCache() {
+        synchronized (this) {
+            if (stopTreeCache == null) {
+                stopTreeCache = new StopTreeCache(graph, 20); // TODO make this max-distance variable
+            }
+        }
+        return stopTreeCache;
     }
 
     /**

@@ -1,6 +1,7 @@
 package org.opentripplanner.profile;
 
 import com.google.common.collect.*;
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
@@ -83,7 +84,7 @@ public class AnalystProfileRouterPrototype {
 
     public TimeSurface.RangeSet route () {
 
-        graph.index.clusterStopsAsNeeded();
+        // NOT USED here, however FIXME this is not threadsafe, needs lock graph.index.clusterStopsAsNeeded();
 
         LOG.info("access modes: {}", request.accessModes);
         LOG.info("egress modes: {}", request.egressModes);
@@ -169,22 +170,30 @@ public class AnalystProfileRouterPrototype {
         }
         LOG.info("Done with transit.");
         LOG.info("Propagating from transit stops to the street network...");
+        // Grab a cached map of distances to street intersections from each transit stop
+        StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
+        // Iterate over all stops that were reached in the transit part of the search
         for (Stop stop : times) {
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
-            RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-            rr.batch = (true);
-            rr.setRoutingContext(graph, tstop, tstop);
-            rr.walkSpeed = request.walkSpeed;
-            // RoutingReqeust dateTime defaults to currentTime.
-            // If elapsed time is not capped, searches are very slow.
-            rr.worstTime = (rr.dateTime + request.maxWalkTime * 60);
-            GenericAStar astar = new GenericAStar();
-            rr.longDistance = true; // this will cause an earliest arrival tree to be used
-            rr.setNumItineraries(1);
-            ExtremaPropagationTraverseVisitor visitor = new ExtremaPropagationTraverseVisitor(times.get(stop));
-            astar.setTraverseVisitor(visitor);
-            astar.getShortestPathTree(rr, 5); // timeout in seconds
-            rr.cleanup();
+            // Iterate over street intersections in the vicinity of this particular transit stop.
+            // Shift the time range at this transit stop, merging it into that for all reachable street intersections.
+            TimeRange rangeAtTransitStop = times.get(stop);
+            TObjectIntMap<Vertex> distanceToVertex = stopTreeCache.getDistancesForStop(tstop);
+            for (TObjectIntIterator<Vertex> iter = distanceToVertex.iterator(); iter.hasNext(); ) {
+                iter.advance();
+                Vertex vertex = iter.key();
+                int egressWalkTime = (int) (iter.value() / request.walkSpeed);
+                if (egressWalkTime > request.maxWalkTime) {
+                    continue;
+                }
+                TimeRange propagatedRange = rangeAtTransitStop.shift(egressWalkTime);
+                TimeRange existingTimeRange = propagatedTimes.get(vertex);
+                if (existingTimeRange == null) {
+                    propagatedTimes.put(vertex, propagatedRange);
+                } else {
+                    existingTimeRange.mergeIn(propagatedRange);
+                }
+            }
         }
         LOG.info("Done with propagation.");
         TimeSurface.RangeSet result = TimeSurface.makeSurfaces(this);
