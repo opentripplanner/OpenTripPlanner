@@ -182,11 +182,12 @@ public class AnalystProfileRouterPrototype {
             for (TObjectIntIterator<Vertex> iter = distanceToVertex.iterator(); iter.hasNext(); ) {
                 iter.advance();
                 Vertex vertex = iter.key();
-                int egressWalkTime = (int) (iter.value() / request.walkSpeed);
-                if (egressWalkTime > request.maxWalkTime) {
+                // distance in meters over walkspeed in meters per second --> seconds
+                int egressWalkTimeSeconds = (int) (iter.value() / request.walkSpeed);
+                if (egressWalkTimeSeconds > request.maxWalkTime * 60) {
                     continue;
                 }
-                TimeRange propagatedRange = rangeAtTransitStop.shift(egressWalkTime);
+                TimeRange propagatedRange = rangeAtTransitStop.shift(egressWalkTimeSeconds);
                 TimeRange existingTimeRange = propagatedTimes.get(vertex);
                 if (existingTimeRange == null) {
                     propagatedTimes.put(vertex, propagatedRange);
