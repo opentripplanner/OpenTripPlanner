@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * A histogram summing/counting all time values into 1-minute bins (0-60 seconds = min 1, 61-120 = min 2, etc.)
+ * A histogram counting the number of reachable features in 1-minute bins, based on how long it takes to reach them.
+ * (0-60 seconds = min 1, 61-120 = min 2, etc.)
  */
 public class Histogram implements Serializable {
 
