@@ -191,6 +191,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
         StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
+        Locale locale;
+        if (options == null) {
+            locale = new Locale("en");
+        } else {
+            locale = options.getLocale();
+        }
         String calculatedName = location.getName();
         if (intersection != null) {
             // We have an intersection vertex. Check that this vertex has edges we can traverse.
@@ -214,12 +220,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     LOG.debug("found intersection {}. not splitting.", intersection);
                     // generate names for corners when no name was given
                     Set<String> uniqueNameSet = new HashSet<String>();
-                    Locale locale;
-                    if (options == null) {
-                        locale = new Locale("en");
-                    } else {
-                        locale = options.getLocale(); 
-                    }
                     for (Edge e : intersection.getOutgoing()) {
                         if (e instanceof StreetEdge) {
                             uniqueNameSet.add(e.getName(locale));
@@ -275,10 +275,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             closestStreetDistance = distanceLibrary.distance(coord, nearestPoint);
             LOG.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
             if (calculatedName == null || "".equals(calculatedName)) {
-                calculatedName = bestStreet.getName();
+                calculatedName = bestStreet.getName(locale);
             }
-            //TODO: where is this used. localize this.
-            String closestName = String.format("%s_%s", bestStreet.getName(), location.toString());
+            String closestName = String.format("%s_%s", bestStreet.getName(locale), location.toString());
             closestStreet = StreetLocation.createStreetLocation(graph, closestName, new NonLocalizedString(calculatedName),
                     bundle.toEdgeList(), nearestPoint, coord);
         }
