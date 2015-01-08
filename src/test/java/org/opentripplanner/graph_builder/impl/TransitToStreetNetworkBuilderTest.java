@@ -43,6 +43,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -60,9 +62,11 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TransitStopConnToWantedEdge;
@@ -336,6 +340,56 @@ public class TransitToStreetNetworkBuilderTest {
         writeGeoJson("correct_" + name +".geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
     }
     
+    private void findNeededGTFSData(String osm_filename, String gtfs_filename, String wanted_con_filename, String name) throws Exception {
+        Graph gg = loadGraph(osm_filename, gtfs_filename, true, true);
+        assertNotNull(gg);
+        gg.index(new DefaultStreetVertexIndexFactory());
+        //Reads saved correct transit stop -> Street edge connections
+        FileInputStream fis = new FileInputStream(getClass().getResource(wanted_con_filename).getFile());
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        List<TransitStopConnToWantedEdge> outList = (List<TransitStopConnToWantedEdge>) ois.readObject();
+        Set<String> stops = new HashSet<>(outList.size());
+        Set<String> routes = new HashSet<>(outList.size());
+        Set<String> trips = new HashSet<>(outList.size());
+        Set<String> shapes = new HashSet<>(outList.size());
+        Set<String> services = new HashSet<>(outList.size());
+
+        for (TransitStopConnToWantedEdge stop_edge_con: outList) {
+            Stop stop = stop_edge_con.getTransitStop().getStop();
+            if (stops.contains(stop.getId().getId())) {
+                continue;
+            }
+            Collection<TripPattern> patterns = gg.index.patternsForStop.get(stop);
+            for (TripPattern pattern: patterns) {
+                for (Trip trip: pattern.getTrips()) {
+                    trips.add(trip.getId().getId());
+                    //Shape ID is optional
+                    try {
+                        shapes.add(trip.getShapeId().getId());
+                    } catch (NullPointerException nul) {}
+                    services.add(trip.getServiceId().getId());
+                    routes.add(trip.getRoute().getId().getId());
+                }
+            }
+            stops.add(stop.getId().getId());
+        }
+        LOG.info("Stops: {}, routes: {}, trips: {}, shapes: {}, services: {}", stops.size(), routes.size(), trips.size(), shapes.size(), services.size());
+        writeUsedGTFS(stops, name, "stop");
+        writeUsedGTFS(routes, name, "route");
+        writeUsedGTFS(trips, name, "trip");
+        writeUsedGTFS(shapes, name, "shape");
+        writeUsedGTFS(services, name, "service");
+    }
+    
+    private void writeUsedGTFS(Set<String> ids, String name, String type) throws IOException {
+        CsvWriter writer = new CsvWriter(type + "s_" + name + ".csv", ':', Charset.forName("UTF8"));
+        writer.writeRecord(new String[]{type + "_ids"});
+        for (String stop_id: ids) {
+            writer.writeRecord(new String[]{stop_id});
+        }
+        writer.close();
+    }
+
     @Rule
     public ErrorCollector collector = new ErrorCollector();
     
