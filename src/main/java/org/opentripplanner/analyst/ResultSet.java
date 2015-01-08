@@ -61,7 +61,7 @@ public class ResultSet implements Serializable{
     public long sum(Integer timeLimit, String... categories) {
         
         if (categories.length == 0)
-            categories = (String[]) histograms.keySet().toArray();
+            categories = histograms.keySet().toArray(new String[histograms.keySet().size()]);
 
         long value = 0l;
 
