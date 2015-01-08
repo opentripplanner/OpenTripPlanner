@@ -318,11 +318,12 @@ public class GraphIndex {
             // A Stop may occur more than once in a pattern, so iterate over all Stops.
             int sidx = 0;
             for (Stop currStop : table.pattern.stopPattern.stops) {
-                if (currStop != stop) continue;
-                for (ServiceDay sd : req.rctx.serviceDays) {
-                    TripTimes tt = table.getNextTrip(state, sd, sidx, true);
-                    if (tt != null) {
-                        times.times.add(new TripTimeShort(tt, sidx, stop));
+                if (currStop == stop) {
+                    for (ServiceDay sd : req.rctx.serviceDays) {
+                        TripTimes tt = table.getNextTrip(state, sd, sidx, true);
+                        if (tt != null) {
+                            times.times.add(new TripTimeShort(tt, sidx, stop));
+                        }
                     }
                 }
                 sidx++;
