@@ -60,7 +60,7 @@ otp.analyst.Population = otp.Class({
                     },
                     w : 1.0
                 };
-                for (var propName in item.properties.structured) {
+                for ( var propName in item.properties.structured) {
                     // Hack: take first numeric property as w value
                     var propValue = item.properties.structured[propName];
                     if ($.isNumeric(propValue)) {
@@ -105,9 +105,9 @@ otp.analyst.Population = otp.Class({
                         lat : payload[row][latCol],
                         lng : payload[row][lonCol]
                     },
-                    w : weightCol ? payload[row][weightCol] : 1.0
+                    w : (typeof weightCol != 'undefined') ? payload[row][weightCol] : 1.0
                 };
-                if (nameCol)
+                if (typeof nameCol != 'undefined')
                     item.name = payload[row][nameCol];
                 thisPl.add(item);
             }
