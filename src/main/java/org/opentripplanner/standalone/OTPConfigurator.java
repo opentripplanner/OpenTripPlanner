@@ -15,11 +15,13 @@ package org.opentripplanner.standalone;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.bsf.BSFException;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
@@ -259,10 +261,11 @@ public class OTPConfigurator {
         } else return null;
     }
 
-    public OTPScript scriptFromParameters() {
+    public OTPScript scriptFromParameters() throws BSFException, IOException {
         if (params.scriptFile != null) {
             return new BSFOTPScript(getServer(), params.scriptFile);
-        } else return null;
+        } else
+            return null;
     }
 
     /**

@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.common.OTPExceptionMapper;
@@ -19,6 +20,7 @@ import org.opentripplanner.api.resource.Planner;
 import org.opentripplanner.api.resource.PointSetResource;
 import org.opentripplanner.api.resource.ProfileResource;
 import org.opentripplanner.api.resource.Routers;
+import org.opentripplanner.api.resource.ScriptResource;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.LIsochrone;
 import org.opentripplanner.api.resource.LegendResource;
@@ -108,8 +110,10 @@ public class OTPApplication extends Application {
             SurfaceResource.class,
             PointSetResource.class,
             GraphInspectorTileResource.class,
+            ScriptResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
-            CorsFilter.class
+            CorsFilter.class,
+            MultiPartFeature.class
         ));
         
         if (this.secure) {

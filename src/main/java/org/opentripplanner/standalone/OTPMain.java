@@ -75,13 +75,17 @@ public class OTPMain {
         }
 
         // start script, if asked for
-        OTPScript otpScript = configurator.scriptFromParameters();
-        if (otpScript != null) {
-            try {
-                otpScript.run();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        OTPScript otpScript = null;
+        try {
+            otpScript = configurator.scriptFromParameters();
+            if (otpScript != null) {
+                Object retval = otpScript.run();
+                if (retval != null) {
+                    LOG.warn("Your script returned something, no idea what to do with it: {}", retval);
+                }
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         // start web server, if asked for
