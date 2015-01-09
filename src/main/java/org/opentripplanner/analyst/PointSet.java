@@ -42,6 +42,9 @@ import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -87,7 +90,11 @@ public class PointSet implements Serializable{
      * duplication of pointset when used across multiple graphs
      */
     private Map<String, SampleSet> samples = new ConcurrentHashMap<String, SampleSet>();
-
+    
+    /**
+     * Map from string IDs to indices. This is a view into PointSet.ids.
+     */
+    private transient TObjectIntMap<String> idIndexMap;
 
     /*
      * Used to generate SampleSets on an as needed basis. 
@@ -764,4 +771,39 @@ public class PointSet implements Serializable{
         return ret;
     }
 
+    /**
+     * Get the index of a particular feature ID in this pointset.
+     * @return the index, or -1 if there is no such index.
+     */
+    public int getIndexForFeature(String featureId) {
+        
+        // this is called inside a conditional because the build method is synchronized,
+        // and there is no need to synchronize if the map has already been built.
+        if (idIndexMap == null)
+            buildIdIndexMapIfNeeded();
+        
+        return idIndexMap.get(featureId);
+    }
+    
+    /**
+     * Build the ID - Index map if needed.
+     */
+    private synchronized void buildIdIndexMapIfNeeded () {
+        // we check again if the map has been built. It's possible that it would have been built
+        // by this method in another thread while this instantiation was blocked.
+        if (idIndexMap == null) {
+            idIndexMap = new TObjectIntHashMap<String>(this.capacity, 1f, -1);
+            
+            for (int i = 0; i < this.capacity; i++) {
+                if (ids[i] != null) {
+                    if (idIndexMap.containsKey(ids[i])) {
+                        LOG.error("Duplicate ID {} in pointset.", ids[i]);
+                    }
+                    else {   
+                        idIndexMap.put(ids[i], i);
+                    }
+                }
+            }
+        }
+    }
 }
