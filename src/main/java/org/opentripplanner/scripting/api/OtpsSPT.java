@@ -16,7 +16,6 @@ package org.opentripplanner.scripting.api;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -34,24 +33,20 @@ public class OtpsSPT {
         this.sampleFactory = sampleFactory;
     }
 
-    public Long evalTime(double lat, double lon) {
-        Sample sample = sampleFactory.getSample(lon, lat);
-        if (sample == null)
-            return null;
-        long time = sample.eval(this.spt);
-        if (time == Long.MAX_VALUE)
-            return null;
-        return time;
+    public OtpsEvaluatedIndividual eval(double lat, double lon) {
+        return eval(new OtpsIndividual(lat, lon, null, null));
     }
 
-    public Long evalTime(OtpsIndividual individual) {
-        return individual.evalTime(spt, sampleFactory);
+    public OtpsEvaluatedIndividual eval(OtpsIndividual individual) {
+        return individual.eval(spt, sampleFactory);
     }
 
-    public List<Long> evalTime(Iterable<OtpsIndividual> population) {
-        List<Long> retval = new ArrayList<>(); // Size?
+    public List<OtpsEvaluatedIndividual> eval(Iterable<OtpsIndividual> population) {
+        List<OtpsEvaluatedIndividual> retval = new ArrayList<>(); // Size?
         for (OtpsIndividual individual : population) {
-            retval.add(evalTime(individual));
+            OtpsEvaluatedIndividual evaluated = eval(individual);
+            if (evaluated != null)
+                retval.add(evaluated);
         }
         return retval;
     }

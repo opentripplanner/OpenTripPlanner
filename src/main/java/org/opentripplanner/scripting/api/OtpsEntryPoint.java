@@ -13,7 +13,9 @@
 
 package org.opentripplanner.scripting.api;
 
-import org.opentripplanner.analyst.batch.CSVPopulation;
+import java.io.IOException;
+
+import org.opentripplanner.analyst.batch.RasterPopulation;
 import org.opentripplanner.analyst.batch.SyntheticRasterPopulation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.standalone.OTPServer;
@@ -24,6 +26,8 @@ import org.opentripplanner.standalone.OTPServer;
 public class OtpsEntryPoint {
 
     private OTPServer otpServer;
+
+    private Object retval = null;
 
     public OtpsEntryPoint(OTPServer otpServer) {
         this.otpServer = otpServer;
@@ -42,7 +46,11 @@ public class OtpsEntryPoint {
         return new OtpsRoutingRequest(rreq);
     }
 
-    public OtpsPopulation createSyntheticRasterPopulation(double top, double bottom, double left,
+    public OtpsPopulation createEmptyPopulation() {
+        return new OtpsPopulation();
+    }
+
+    public OtpsPopulation createGridPopulation(double top, double bottom, double left,
             double right, int rows, int cols) {
         SyntheticRasterPopulation rasterPop = new SyntheticRasterPopulation();
         rasterPop.left = left;
@@ -55,15 +63,27 @@ public class OtpsEntryPoint {
         return new OtpsPopulation(rasterPop);
     }
 
-    public OtpsPopulation loadCSVPopulation(String filename) {
-        CSVPopulation csvPop = new CSVPopulation();
-        csvPop.sourceFilename = filename;
-        // TODO
-        csvPop.setLatCol(0);
-        csvPop.setLonCol(1);
-        csvPop.labelCol = 2;
-        csvPop.inputCol = 3;
-        csvPop.setup();
-        return new OtpsPopulation(csvPop);
+    public OtpsPopulation loadCSVPopulation(String filename, String latColName, String lonColName)
+            throws IOException {
+        return OtpsPopulation.loadFromCSV(filename, latColName, lonColName);
+    }
+
+    public OtpsPopulation loadRasterPopulation(String filename) {
+        RasterPopulation rasterPop = new RasterPopulation();
+        rasterPop.sourceFilename = filename;
+        rasterPop.setup();
+        return new OtpsPopulation(rasterPop);
+    }
+
+    public OtpsCsvOutput createCSVOutput() {
+        return new OtpsCsvOutput();
+    }
+
+    public void setRetval(Object retval) {
+        this.retval = retval;
+    }
+
+    public Object getRetval() {
+        return retval;
     }
 }

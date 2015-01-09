@@ -13,7 +13,6 @@
 
 package org.opentripplanner.scripting.api;
 
-import org.opentripplanner.analyst.batch.Individual;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -23,15 +22,11 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
  */
 public class OtpsIndividual {
 
-    protected int index;
-
-    protected String label;
-
     protected double lon;
 
     protected double lat;
 
-    protected double input;
+    protected String[] data;
 
     protected boolean isSampleSet = false;
 
@@ -39,19 +34,46 @@ public class OtpsIndividual {
 
     protected Graph graph;
 
-    protected OtpsIndividual(int index, Individual i) {
-        this(index, i.lat, i.lon, i.label, i.input);
-    }
+    protected OtpsPopulation population;
 
-    protected OtpsIndividual(int index, double lat, double lon, String label, double input) {
-        this.index = index;
-        this.label = label;
+    protected OtpsIndividual(double lat, double lon, String[] data, OtpsPopulation population) {
         this.lon = lon;
         this.lat = lat;
-        this.input = input;
+        this.data = data;
+        this.population = population;
     }
 
-    protected synchronized Long evalTime(ShortestPathTree spt, SampleFactory sampleFactory) {
+    public double getLatitude() {
+        return lat;
+    }
+
+    public double getLongitude() {
+        return lon;
+    }
+
+    public String getStringData(String dataName) {
+        if (data == null)
+            return null;
+        int index = population.getDataIndex(dataName);
+        if (index >= 0 && index < data.length)
+            return data[index];
+        return null;
+    }
+
+    public Double getFloatData(String dataName) {
+        String str = getStringData(dataName);
+        if (str == null)
+            return null;
+        return Double.parseDouble(str);
+    }
+
+    public Double getFloatData(String dataName, double def) {
+        Double val = getFloatData(dataName);
+        return val == null ? def : val;
+    }
+
+    protected synchronized OtpsEvaluatedIndividual eval(ShortestPathTree spt,
+            SampleFactory sampleFactory) {
         Graph sptGraph = spt.getOptions().getRoutingContext().graph;
         if (!isSampleSet || graph != sptGraph) {
             cachedSample = sampleFactory.getSample(lon, lat);
@@ -59,9 +81,11 @@ public class OtpsIndividual {
             graph = sptGraph;
             isSampleSet = true;
         }
+        if (cachedSample == null)
+            return null;
         long time = cachedSample.eval(spt);
         if (time == Long.MAX_VALUE)
             return null;
-        return time;
+        return new OtpsEvaluatedIndividual(this, time);
     }
 }

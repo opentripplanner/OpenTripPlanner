@@ -16,20 +16,24 @@ package org.opentripplanner.scripting.api;
 /**
  * 
  */
-public class OtpsResultSet {
+public class OtpsEvaluatedIndividual {
 
-    @SuppressWarnings("unused")
-    private OtpsPopulation population;
+    private OtpsIndividual individual;
+    // TODO Add boardings, walk distance, etc...
+    private long time;
 
-    protected OtpsResultSet(OtpsPopulation population) {
-        this.population = population;
+    protected OtpsEvaluatedIndividual(OtpsIndividual individual, long time) {
+        this.individual = individual;
+        this.time = time;
     }
 
-    public void set(OtpsIndividual individual, double value) {
-        throw new UnsupportedOperationException();
+    public Long getTime() {
+        if (time == Long.MAX_VALUE)
+            return null;
+        return time;
     }
 
-    public void save(String file) {
-        throw new UnsupportedOperationException();
+    public OtpsIndividual getIndividual() {
+        return individual;
     }
 }

@@ -17,5 +17,5 @@ package org.opentripplanner.scripting.impl;
  */
 public interface OTPScript {
 
-    public void run() throws Exception;
+    public Object run() throws Exception;
 }

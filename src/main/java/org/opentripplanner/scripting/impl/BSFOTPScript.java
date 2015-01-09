@@ -14,10 +14,12 @@
 package org.opentripplanner.scripting.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
 import org.opentripplanner.scripting.api.OtpsEntryPoint;
 import org.opentripplanner.standalone.OTPServer;
@@ -32,29 +34,38 @@ public class BSFOTPScript implements OTPScript {
 
     private OTPServer otpServer;
 
-    private File scriptFile;
+    private String scriptContent, scriptPath, scriptLang;
 
-    public BSFOTPScript(OTPServer otpServer, File scriptFile) {
+    public BSFOTPScript(OTPServer otpServer, File scriptFile) throws BSFException, IOException {
         this.otpServer = otpServer;
-        this.scriptFile = scriptFile;
+        this.scriptPath = scriptFile.getAbsolutePath();
+        // Method below will throw a BSFException if the langage is not found
+        this.scriptLang = BSFManager.getLangFromFilename(scriptFile.getAbsolutePath());
+        // Read the script content
+        byte[] encoded = Files.readAllBytes(Paths.get(scriptFile.getAbsolutePath()));
+        scriptContent = new String(encoded, StandardCharsets.UTF_8);
+    }
+
+    public BSFOTPScript(OTPServer otpServer, String filename, String content) throws BSFException,
+            IOException {
+        this.otpServer = otpServer;
+        this.scriptPath = filename;
+        // Method below will throw a BSFException if the langage is not found
+        this.scriptLang = BSFManager.getLangFromFilename(filename);
+        this.scriptContent = content;
     }
 
     @Override
-    public void run() throws Exception {
-        LOG.info("Running script {}", scriptFile);
+    public Object run() throws BSFException {
+        LOG.info("Running script {}", scriptPath);
 
         BSFManager manager = new BSFManager();
-        // Method below will throw a BSFException if the langage is not found
-        String lang = BSFManager.getLangFromFilename(scriptFile.getAbsolutePath());
+        OtpsEntryPoint otpsEntryPoint = new OtpsEntryPoint(otpServer);
 
-        // TODO Create entry point
-        manager.declareBean("otp", new OtpsEntryPoint(otpServer), OtpsEntryPoint.class);
+        manager.declareBean("otp", otpsEntryPoint, OtpsEntryPoint.class);
+        manager.exec(scriptLang, scriptPath, 0, 0, scriptContent);
 
-        byte[] encoded = Files.readAllBytes(Paths.get(scriptFile.getAbsolutePath()));
-        String scriptContent = new String(encoded, StandardCharsets.UTF_8);
-
-        manager.exec(lang, scriptFile.getAbsolutePath(), 0, 0, scriptContent);
-
-        LOG.info("Script {} done", scriptFile);
+        LOG.info("Script {} done", scriptPath);
+        return otpsEntryPoint.getRetval();
     }
 }
