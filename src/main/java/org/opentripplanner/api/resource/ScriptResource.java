@@ -63,7 +63,8 @@ public class ScriptResource extends RoutingResource {
             return Response.ok().entity(retval).build();
 
         } catch (Exception e) {
-            return Response.serverError().entity(e.toString()).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.toString())
+                    .type(MediaType.TEXT_PLAIN).build();
         }
     }
 
