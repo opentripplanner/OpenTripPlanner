@@ -13,7 +13,7 @@ public class ResultSetDelta extends ResultSetWithTimes {
 
 	public Map<String,Integer> times2IdMap = new ConcurrentHashMap<String,Integer>();
 	public Map<String,Integer> deltaIdMap = new ConcurrentHashMap<String,Integer>();
-	
+
 	public ResultSetDelta(SampleSet samples1, SampleSet samples2, TimeSurface surface1, TimeSurface surface2) {
 		id = samples1.pset.id + "_" + surface1.id + "_" + surface2.id + "_delta";
 		
@@ -27,9 +27,10 @@ public class ResultSetDelta extends ResultSetWithTimes {
         	if(this.times[i] > 0 && this.times2[i] > 0)
         		this.delta[i] = this.times[i] - times2[i];
 		}
-        
+
+		cutoffMinutes = Math.max(surface1.cutoffMinutes, surface2.cutoffMinutes);
         buildDeltaHistograms(samples1.pset);
-        
+
 		int i = 0;
 		for(String id : samples1.pset.ids) {
 			timeIdMap.put(id, times[i]);
@@ -54,7 +55,7 @@ public class ResultSetDelta extends ResultSetWithTimes {
         	}	
         }
 		
-		this.histograms.put("scenario1", new Histogram(times, magSum));
-		this.histograms.put("scenario2", new Histogram(times2, magSum));
+		this.histograms.put("scenario1", new Histogram(times, magSum, cutoffMinutes));
+		this.histograms.put("scenario2", new Histogram(times2, magSum, cutoffMinutes));
 	}
 }

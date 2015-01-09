@@ -24,25 +24,26 @@ public class ResultSet implements Serializable{
     public String id;
     public Map<String,Histogram> histograms = new HashMap<String,Histogram>();
 
+    public int cutoffMinutes;
+
     public ResultSet() {
 
     }
 
     public ResultSet(SampleSet samples, TimeSurface surface){
         id = samples.pset.id + "_" + surface.id;
-
         PointSet targets = samples.pset;
         // Evaluate the surface at all points in the pointset
         int[] times = samples.eval(surface);
+        cutoffMinutes = surface.cutoffMinutes;
         buildHistograms(times, targets);
-
     }
 
     protected void buildHistograms(int[] times, PointSet targets) {
         for (Entry<String, int[]> cat : targets.properties.entrySet()) {
             String catId = cat.getKey();
             int[] mags = cat.getValue();
-            this.histograms.put(catId, new Histogram(times, mags));
+            this.histograms.put(catId, new Histogram(times, mags, cutoffMinutes));
         }
     }
 
