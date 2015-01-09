@@ -40,10 +40,14 @@ public class TimeRange {
             }
             if (other.min < this.min) this.min = other.min;
             if (other.max < this.max) this.max = other.max; // Yes, we want the minimum upper bound.
-            double newAverage = this.avg * this.n + other.avg * other.n;
-            this.n += other.n;
-            newAverage /= this.n;
-            this.avg = (int) newAverage;
+            // Watch out for overflow here.
+//            double newAverage = this.avg * (double) this.n + other.avg * (double) other.n;
+//            this.n += other.n;
+//            newAverage /= this.n;
+//            this.avg = (int) newAverage;
+            // This assumes all the mixed distributions are symmetric, which they are not. But just to get some coherent value...
+            this.avg = (int) (((double) this.min + (double) this.max) / 2.0d);
+            checkCoherent();
             return true; // We know at least one field was updated.
         } else {
             // the other range is worse in every way, ignore it
@@ -99,6 +103,15 @@ public class TimeRange {
         @Override
         public Iterator<Stop> iterator() {
             return ranges.keySet().iterator();
+        }
+    }
+
+    public void checkCoherent() {
+        if (avg < 0) {
+            System.out.printf ("avg is negative: %d \n", avg);
+        }
+        if (! (min <= avg && avg <= max)) {
+            System.out.printf("incoherent: min %d avg %d max %d \n", min, avg, max);
         }
     }
 
