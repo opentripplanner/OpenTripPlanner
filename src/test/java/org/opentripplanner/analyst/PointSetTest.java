@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.batch;
+package org.opentripplanner.analyst;
 
 import junit.framework.TestCase;
 
@@ -21,6 +21,8 @@ public class PointSetTest extends TestCase {
         PointSet austin = PointSet.fromCsv(new File("src/test/resources/pointset/austin.csv"));
         assertNotNull(austin);
         assertEquals(austin.capacity, 15922);
+        
+        assertEquals(-1, austin.getIndexForFeature("1"));
     }
 
     /** Factory method should return null but not throw an exception on malformed CSV. */
@@ -33,6 +35,10 @@ public class PointSetTest extends TestCase {
         PointSet points = PointSet.fromGeoJson(new File("src/test/resources/pointset/population.geo.json"));
         assertNotNull(points);
         assertEquals(points.capacity, 2);
+        
+        assertEquals(1, points.getIndexForFeature(points.ids[1]));
+        assertEquals(0, points.getIndexForFeature(points.ids[0]));
+        assertEquals(-1, points.getIndexForFeature("THIS FEATURE DOES NOT EXIST."));
     }
     
     public void testLoadShapefile() throws NoSuchAuthorityCodeException, IOException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
