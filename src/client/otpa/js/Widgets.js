@@ -142,12 +142,12 @@ otp.analyst.ParamsWidget = otp.Class({
         }
         // Data type (time, boardings, max walk)
         if (this.options.selectDataType && !this.options.extend) {
-            var dataTypeDiv = $("<div/>");
-            node.append(dataTypeDiv);
-            dataTypeDiv.text(this.locale.dataTypeLabel);
+            this.dataTypeDiv = $("<div/>");
+            node.append(this.dataTypeDiv);
+            this.dataTypeDiv.text(this.locale.dataTypeLabel);
             this.dataTypeInput = this._createSelect(this.locale.dataType, this.options.extend,
                     this.options.defaultDataType);
-            dataTypeDiv.append(this.dataTypeInput);
+            this.dataTypeDiv.append(this.dataTypeInput);
         }
         // Refresh button
         if (this.options.refreshButton) {
@@ -309,12 +309,19 @@ otp.analyst.ParamsWidget = otp.Class({
     _modeChanged : function(widget) {
         var hasWalk = widget.getParameters().mode.indexOf("WALK") > -1;
         var hasBike = widget.getParameters().mode.indexOf("BICYCLE") > -1;
-        widget.maxWalkDiv.hide();
-        widget.maxBikeDiv.hide();
-        if (hasWalk)
+        if (hasWalk) {
             widget.maxWalkDiv.show();
-        if (hasBike)
+            widget.dataTypeDiv.show();
+        } else {
+            widget.maxWalkDiv.hide();
+            widget.dataTypeDiv.hide();
+            widget.dataTypeInput.val("TIME");
+        }
+        if (hasBike) {
             widget.maxBikeDiv.show();
+        } else {
+            widget.maxBikeDiv.hide();
+        }
     },
 
     /**
