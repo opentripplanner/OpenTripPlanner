@@ -20,15 +20,16 @@ otp.namespace("otp.locale");
 otp.locale.French = {
 
     analyst : {
-        
+
         differentOrigin : "Origine différente",
         refresh : "Rafraîchir",
         modesLabel : "Modes",
         inheritValue : "(identique)",
         walkLabel : "Marche max. / vitesse",
+        bikeLabel : "Vitesse vélo",
         maxTimeLabel : "Durée max.",
         dataTypeLabel : "Donnée à afficher",
-        
+
         arriveDepart : [ [ 'false', 'Partir à' ], [ 'true', 'Arriver à' ] ],
 
         maxWalkDistance : [ [ '200', '200 m' ], [ '500', '500 m' ], [ '750', '750 m' ], [ '1000', '1 km' ],
@@ -38,10 +39,14 @@ otp.locale.French = {
                 [ '1.389', '5 km/h' ], [ '1.667', '6 km/h' ], [ '1.944', '7 km/h' ], [ '2.222', '8 km/h' ],
                 [ '2.500', '9 km/h' ], [ '2.778', '10 km/h' ] ],
 
+        bikeSpeed : [ [ '2.778', '10 km/h' ], [ '3.333', '12 km/h' ], [ '4.167', '15 km/h' ], [ '5.556', '20 km/h' ] ],
+
         modes : [ [ "TRANSIT,WALK", "Transport en commun" ], [ "TRAM,WALK", "Tram uniquement" ],
                 [ "SUBWAY,WALK", "Métro uniquement" ], [ "TRAM,SUBWAY,WALK", "Tram+Métro uniquement" ],
-                [ "BICYCLE", "Vélo" ], [ "WALK", "Marche à pied" ], [ "SUBWAY,BICYCLE", "Métro+Vélo" ],
-                [ "CAR", "Voiture" ] ],
+                [ "RAIL,WALK", "Train uniquement" ], [ "BUS,WALK", "Bus/Autocar uniquement" ],
+                [ "RAIL,SUBWAY,WALK", "Train+Métro uniquement" ],
+                [ "RAIL,TRAM,METRO,WALK", "Train+Tram+Metro uniquement" ], [ "BICYCLE", "Vélo" ],
+                [ "WALK", "Marche à pied" ], [ "CAR", "Voiture" ] ],
 
         maxTime : [ [ "1800", "0:30" ], [ "2700", "0:45" ], [ "3600", "1:00" ], [ "5400", "1:30" ], [ "7200", "2:00" ],
                 [ "9000", "2:30" ], [ "10800", "3:00" ] ],

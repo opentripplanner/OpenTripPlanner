@@ -26,6 +26,7 @@ otp.locale.English = {
         modes : "Modes",
         inheritValue : "(same)",
         walkLabel : "Walk max / speed",
+        bikeLabel : "Bike speed",
         maxTimeLabel : "Max time",
         dataTypeLabel : "Data to display",
 
@@ -37,6 +38,8 @@ otp.locale.English = {
         walkSpeed : [ [ '0.278', '1 km/h' ], [ '0.556', '2 km/h' ], [ '0.833', '3 km/h' ], [ '1.111', '4 km/h' ],
                 [ '1.389', '5 km/h' ], [ '1.667', '6 km/h' ], [ '1.944', '7 km/h' ], [ '2.222', '8 km/h' ],
                 [ '2.500', '9 km/h' ], [ '2.778', '10 km/h' ] ],
+
+        bikeSpeed : [ [ '2.778', '10 km/h' ], [ '3.333', '12 km/h' ], [ '4.167', '15 km/h' ], [ '5.556', '20 km/h' ] ],
 
         modes : [ [ "TRANSIT,WALK", "Transit" ], [ "TRAM,WALK", "Tram only" ], [ "SUBWAY,WALK", "Subway only" ],
                 [ "TRAM,SUBWAY,WALK", "Tram+Subway only" ], [ "BICYCLE", "Bicycle" ], [ "WALK", "Walk" ],

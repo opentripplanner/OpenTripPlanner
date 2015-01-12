@@ -42,6 +42,7 @@ otp.analyst.ParamsWidget = otp.Class({
             selectWalkParams : true,
             defaultMaxWalk : 1000,
             defaultWalkSpeed : 1.389,
+            defaultBikeSpeed : 4.167,
             coordinateOrigin : null,
             selectMaxTime : false,
             defaultMaxTime : 3600,
@@ -110,17 +111,25 @@ otp.analyst.ParamsWidget = otp.Class({
                     this._modeChanged);
             modesDiv.append(this.modesInput);
         }
-        // Max walk distance / speed
+        // Max walk/bike distance / speed
         if (this.options.selectWalkParams) {
+            // Walk
             this.maxWalkDiv = $("<div/>");
-            node.append(this.maxWalkDiv);
             this.maxWalkDiv.text(this.locale.walkLabel);
+            node.append(this.maxWalkDiv);
             this.maxWalkInput = this._createSelect(this.locale.maxWalkDistance, this.options.extend,
                     this.options.defaultMaxWalk);
             this.maxWalkDiv.append(this.maxWalkInput);
             this.walkSpeedInput = this._createSelect(this.locale.walkSpeed, this.options.extend,
                     this.options.defaultWalkSpeed);
             this.maxWalkDiv.append(this.walkSpeedInput);
+            // Bike
+            this.maxBikeDiv = $("<div/>");
+            this.maxBikeDiv.text(this.locale.bikeLabel);
+            node.append(this.maxBikeDiv);
+            this.bikeSpeedInput = this._createSelect(this.locale.bikeSpeed, this.options.extend,
+                    this.options.defaultBikeSpeed);
+            this.maxBikeDiv.append(this.bikeSpeedInput);
         }
         // Max time
         if (this.options.selectMaxTime) {
@@ -269,6 +278,12 @@ otp.analyst.ParamsWidget = otp.Class({
             retval.walkSpeed = base.walkSpeed;
         }
         retval.walkSpeed = parseFloat(retval.walkSpeed);
+        // Bike speed
+        retval.bikeSpeed = this.options.selectWalkParams ? this.bikeSpeedInput.val() : this.options.defaultBikeSpeed;
+        if (base && retval.bikeSpeed == "inherit") {
+            retval.bikeSpeed = base.bikeSpeed;
+        }
+        retval.bikeSpeed = parseFloat(retval.bikeSpeed);
         // Max time
         retval.maxTimeSec = this.options.selectMaxTime ? this.maxTimeInput.val() : this.options.defaultMaxTime;
         if (base && retval.maxTimeSec == "inherit") {
@@ -293,10 +308,13 @@ otp.analyst.ParamsWidget = otp.Class({
      */
     _modeChanged : function(widget) {
         var hasWalk = widget.getParameters().mode.indexOf("WALK") > -1;
+        var hasBike = widget.getParameters().mode.indexOf("BICYCLE") > -1;
+        widget.maxWalkDiv.hide();
+        widget.maxBikeDiv.hide();
         if (hasWalk)
             widget.maxWalkDiv.show();
-        else
-            widget.maxWalkDiv.hide();
+        if (hasBike)
+            widget.maxBikeDiv.show();
     },
 
     /**
