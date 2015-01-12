@@ -49,7 +49,10 @@ otp.analyst.Scoring = otp.Class({
     histogram : function(timeGrid, population, min, max, step) {
         var histo = [];
         for (var i = 0; i < Math.floor((max - min) / step); i++) {
-            histo[i] = 0.0;
+            histo[i] = {
+                    w: 0.0,
+                    t: i * step + min
+            }
         }
         for (var i = 0; i < population.size(); i++) {
             var poi = population.get(i);
@@ -58,7 +61,7 @@ otp.analyst.Scoring = otp.Class({
             var v = timeGrid.get(poi.location);
             if (v != null && v.z >= min && v.z <= max) {
                 var index = Math.floor((v.z - min) / step);
-                histo[index] = histo[index] + poiW * 1.0;
+                histo[index].w = histo[index].w + poiW * 1.0;
             }
         }
         return histo;
