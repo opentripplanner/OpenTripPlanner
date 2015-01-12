@@ -48,8 +48,10 @@ otp.analyst.Isochrone = otp.Class({
         var thisIso = this;
         if (this.options.load) {
             var ajaxParams = {
-                url : this.url,
-                accept : 'application/json',
+                dataType : 'json',
+                accepts : {
+                    json : 'application/json'
+                },
                 success : function(result) {
                     // Index features on cutoff time
                     for (var i = 0; i < result.features.length; i++) {
@@ -60,7 +62,7 @@ otp.analyst.Isochrone = otp.Class({
                 },
                 async : this.options.async
             };
-            jQuery.ajax(ajaxParams);
+            jQuery.ajax(this.url, ajaxParams);
         }
     },
 
