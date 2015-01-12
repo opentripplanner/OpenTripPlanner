@@ -52,7 +52,7 @@ otp.analyst.ColorMap = otp.Class({
             } else {
                 // Various colors
                 if (this.options.saturated)
-                    this.palette = [ 0x0095FF, 0x0030FF, 0x5000FF, 0xCF00FF, 0xFF0062, 0xFF3B00, 0xFF7D00, 0xFFB000,
+                    this.palette = [ 0x0095FF, 0x0050FF, 0x5000FF, 0xCF00FF, 0xFF0062, 0xFF3B00, 0xFF7D00, 0xFFB000,
                             0xFFE300, 0xADF500 ];
                 else
                     this.palette = [ 0x7FCAFF, 0x7F97FF, 0xA77FFF, 0xE77FFF, 0xFF7FB0, 0xFF9C7E, 0xFFBD7E, 0xFFD77E,
