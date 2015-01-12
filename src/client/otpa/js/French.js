@@ -29,7 +29,7 @@ otp.locale.French = {
         maxTimeLabel : "Durée max.",
         dataTypeLabel : "Donnée à afficher",
         
-        arriveDepart : [ [ 'false', 'Départ à' ], [ 'true', 'Arriver à' ] ],
+        arriveDepart : [ [ 'false', 'Partir à' ], [ 'true', 'Arriver à' ] ],
 
         maxWalkDistance : [ [ '200', '200 m' ], [ '500', '500 m' ], [ '750', '750 m' ], [ '1000', '1 km' ],
                 [ '1500', '1,5 km' ], [ '2000', '2 km' ], [ '3000', '3 km' ], [ '4000', '4 km' ], [ '5000', '5 km' ] ],
