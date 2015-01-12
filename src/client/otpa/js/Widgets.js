@@ -102,7 +102,7 @@ otp.analyst.ParamsWidget = otp.Class({
             });
             dateTimeDiv.append(this.timeInput);
         }
-        // Mode selector
+        // Mode selector + combo box
         if (this.options.selectModes) {
             var modesDiv = $("<div/>");
             node.append(modesDiv);
@@ -110,6 +110,22 @@ otp.analyst.ParamsWidget = otp.Class({
             this.modesInput = this._createSelect(this.locale.modes, this.options.extend, this.options.defaultModes,
                     this._modeChanged);
             modesDiv.append(this.modesInput);
+            this.transitModesDiv = $("<div/>");
+            this.transitModes = [];
+            $.each(this.locale.transitModes, function(i, mode) {
+                thisRw.transitModes[mode[0]] = true;
+                var label = $('<label />', {
+                    text : mode[1]
+                }).appendTo(thisRw.transitModesDiv);
+                $('<input />', {
+                    type : 'checkbox',
+                    value : mode[0],
+                    checked : true
+                }).change(function() {
+                    thisRw.transitModes[mode[0]] = this.checked;
+                }).appendTo(label);
+            });
+            node.append(this.transitModesDiv);
         }
         // Max walk/bike distance / speed
         if (this.options.selectWalkParams) {
@@ -263,7 +279,18 @@ otp.analyst.ParamsWidget = otp.Class({
                 + this.dateTime.getDate();
         retval.time = hour + ":" + (min < 10 ? "0" : "") + min + ":00";
         // Modes
-        retval.mode = this.options.selectModes ? this.modesInput.val() : this.options.defaultModes;
+        retval.mode = this.options.defaultModes;
+        if (this.options.selectModes) {
+            retval.mode = this.modesInput.val();
+            if (retval.mode.indexOf("TRANSIT") > -1) {
+                var strModes = "";
+                for ( var mode in this.transitModes) {
+                    if (this.transitModes[mode])
+                        strModes = strModes + mode + ","
+                }
+                retval.mode = retval.mode.replace("TRANSIT,", strModes);
+            }
+        }
         if (base && retval.mode == "inherit") {
             retval.mode = base.mode;
         }
@@ -307,8 +334,10 @@ otp.analyst.ParamsWidget = otp.Class({
      * Callback when the mode selector changes.
      */
     _modeChanged : function(widget) {
-        var hasWalk = widget.getParameters().mode.indexOf("WALK") > -1;
-        var hasBike = widget.getParameters().mode.indexOf("BICYCLE") > -1;
+        var modes = widget.modesInput.val();
+        var hasWalk = modes.indexOf("WALK") > -1;
+        var hasBike = modes.indexOf("BICYCLE") > -1;
+        var hasTransit = modes.indexOf("TRANSIT") > -1;
         if (hasWalk) {
             widget.maxWalkDiv.show();
             widget.dataTypeDiv.show();
@@ -321,6 +350,11 @@ otp.analyst.ParamsWidget = otp.Class({
             widget.maxBikeDiv.show();
         } else {
             widget.maxBikeDiv.hide();
+        }
+        if (hasTransit) {
+            widget.transitModesDiv.show();
+        } else {
+            widget.transitModesDiv.hide();
         }
     },
 

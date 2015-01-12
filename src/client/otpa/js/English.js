@@ -41,9 +41,9 @@ otp.locale.English = {
 
         bikeSpeed : [ [ '2.778', '10 km/h' ], [ '3.333', '12 km/h' ], [ '4.167', '15 km/h' ], [ '5.556', '20 km/h' ] ],
 
-        modes : [ [ "TRANSIT,WALK", "Transit" ], [ "TRAM,WALK", "Tram only" ], [ "SUBWAY,WALK", "Subway only" ],
-                [ "TRAM,SUBWAY,WALK", "Tram+Subway only" ], [ "BICYCLE", "Bicycle" ], [ "WALK", "Walk" ],
-                [ "SUBWAY,BICYCLE", "Subway+Bicycle" ], [ "CAR", "Car" ] ],
+        modes : [ [ "TRANSIT,WALK", "Transit" ], [ "BICYCLE", "Bicycle" ], [ "WALK", "Walk" ], [ "CAR", "Car" ] ],
+
+        transitModes : [ [ "BUS", "Bus" ], [ "TRAM", "Tram" ], [ "SUBWAY", "Subway" ], [ "RAIL", "Rail" ] ],
 
         maxTime : [ [ "1800", "0:30" ], [ "2700", "0:45" ], [ "3600", "1:00" ], [ "5400", "1:30" ], [ "7200", "2:00" ],
                 [ "9000", "2:30" ], [ "10800", "3:00" ] ],

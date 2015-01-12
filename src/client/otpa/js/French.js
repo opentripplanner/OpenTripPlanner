@@ -41,12 +41,10 @@ otp.locale.French = {
 
         bikeSpeed : [ [ '2.778', '10 km/h' ], [ '3.333', '12 km/h' ], [ '4.167', '15 km/h' ], [ '5.556', '20 km/h' ] ],
 
-        modes : [ [ "TRANSIT,WALK", "Transport en commun" ], [ "TRAM,WALK", "Tram uniquement" ],
-                [ "SUBWAY,WALK", "Métro uniquement" ], [ "TRAM,SUBWAY,WALK", "Tram+Métro uniquement" ],
-                [ "RAIL,WALK", "Train uniquement" ], [ "BUS,WALK", "Bus/Autocar uniquement" ],
-                [ "RAIL,SUBWAY,WALK", "Train+Métro uniquement" ],
-                [ "RAIL,TRAM,METRO,WALK", "Train+Tram+Metro uniquement" ], [ "BICYCLE", "Vélo" ],
-                [ "WALK", "Marche à pied" ], [ "CAR", "Voiture" ] ],
+        modes : [ [ "TRANSIT,WALK", "Transport en commun" ], [ "BICYCLE", "Vélo" ], [ "WALK", "Marche à pied" ],
+                [ "CAR", "Voiture" ] ],
+
+        transitModes : [ [ "BUS", "Bus/Car" ], [ "TRAM", "Tramway" ], [ "SUBWAY", "Métro" ], [ "RAIL", "Train" ] ],
 
         maxTime : [ [ "1800", "0:30" ], [ "2700", "0:45" ], [ "3600", "1:00" ], [ "5400", "1:30" ], [ "7200", "2:00" ],
                 [ "9000", "2:30" ], [ "10800", "3:00" ] ],
