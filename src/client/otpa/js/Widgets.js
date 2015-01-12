@@ -106,20 +106,21 @@ otp.analyst.ParamsWidget = otp.Class({
             var modesDiv = $("<div/>");
             node.append(modesDiv);
             modesDiv.text(this.locale.modesLabel);
-            this.modesInput = this._createSelect(this.locale.modes, this.options.extend, this.options.defaultModes);
+            this.modesInput = this._createSelect(this.locale.modes, this.options.extend, this.options.defaultModes,
+                    this._modeChanged);
             modesDiv.append(this.modesInput);
         }
         // Max walk distance / speed
         if (this.options.selectWalkParams) {
-            var maxWalkDiv = $("<div/>");
-            node.append(maxWalkDiv);
-            maxWalkDiv.text(this.locale.walkLabel);
+            this.maxWalkDiv = $("<div/>");
+            node.append(this.maxWalkDiv);
+            this.maxWalkDiv.text(this.locale.walkLabel);
             this.maxWalkInput = this._createSelect(this.locale.maxWalkDistance, this.options.extend,
                     this.options.defaultMaxWalk);
-            maxWalkDiv.append(this.maxWalkInput);
+            this.maxWalkDiv.append(this.maxWalkInput);
             this.walkSpeedInput = this._createSelect(this.locale.walkSpeed, this.options.extend,
                     this.options.defaultWalkSpeed);
-            maxWalkDiv.append(this.walkSpeedInput);
+            this.maxWalkDiv.append(this.walkSpeedInput);
         }
         // Max time
         if (this.options.selectMaxTime) {
@@ -146,6 +147,7 @@ otp.analyst.ParamsWidget = otp.Class({
             });
             node.append(this.refreshButton);
         }
+        this._modeChanged(this);
     },
 
     /**
@@ -287,9 +289,21 @@ otp.analyst.ParamsWidget = otp.Class({
     },
 
     /**
+     * Callback when the mode selector changes.
+     */
+    _modeChanged : function(widget) {
+        var hasWalk = widget.getParameters().mode.indexOf("WALK") > -1;
+        if (hasWalk)
+            widget.maxWalkDiv.show();
+        else
+            widget.maxWalkDiv.hide();
+    },
+
+    /**
      * Create a new <select>, filling it with provided values.
      */
-    _createSelect : function(optionsList, inherit, defaultValue) {
+    _createSelect : function(optionsList, inherit, defaultValue, onChangeCallback) {
+        var thisWg = this;
         var retval = $("<select/>");
         if (inherit)
             retval.append($("<option />").text(this.locale.inheritValue).val("inherit"));
@@ -298,6 +312,10 @@ otp.analyst.ParamsWidget = otp.Class({
         }
         if (!inherit)
             retval.val(defaultValue);
+        if (onChangeCallback)
+            retval.change(function() {
+                onChangeCallback(thisWg);
+            });
         return retval;
     }
 });
