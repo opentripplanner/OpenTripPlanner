@@ -30,7 +30,8 @@ otp.analyst.ColorMap = otp.Class({
         this.options = $.extend({
             delta : false,
             min : 0,
-            zDataType : "TIME"
+            zDataType : "TIME",
+            saturated : true
         }, options);
         this.options.discrete = this.options.discrete || this.options.zDataType == "BOARDINGS";
         this.options.max = this.options.max
@@ -50,8 +51,12 @@ otp.analyst.ColorMap = otp.Class({
                 this.palettePlus = [ 0x7F7F7F, 0x5F9F5F, 0x3FBF3F, 0x1FDF1F, 0x00FF00 ];
             } else {
                 // Various colors
-                this.palette = [ 0x7FCAFF, 0x7F97FF, 0xA77FFF, 0xE77FFF, 0xFF7FB0, 0xFF9C7E, 0xFFBD7E, 0xFFD77E,
-                        0xFFF17E, 0xCAF562 ];
+                if (this.options.saturated)
+                    this.palette = [ 0x0095FF, 0x0030FF, 0x5000FF, 0xCF00FF, 0xFF0062, 0xFF3B00, 0xFF7D00, 0xFFB000,
+                            0xFFE300, 0xADF500 ];
+                else
+                    this.palette = [ 0x7FCAFF, 0x7F97FF, 0xA77FFF, 0xE77FFF, 0xFF7FB0, 0xFF9C7E, 0xFFBD7E, 0xFFD77E,
+                            0xFFF17E, 0xCAF562 ];
             }
         } else if (this.options.delta) {
             this.minusInf = 0x7F0000;
@@ -64,10 +69,16 @@ otp.analyst.ColorMap = otp.Class({
                     0x00FF00 ];
         } else {
             // Blue - Green - Yellow - Red - Black gradient
-            this.palette = [ 0x7F7FFF, 0x7F99FF, 0x7FB4FF, 0x7FCFFF, 0x7FEAFF, 0x7FFFF8, 0x7FFFDD, 0x7FFFC2, 0x7FFFA7,
-                    0x7FFF8C, 0x8CFF7F, 0xA7FF7F, 0xC2FF7F, 0xDDFF7F, 0xF8FF7F, 0xFFEA7F, 0xFFCF7F, 0xFFB47F, 0xFF997F,
-                    0xFF7F7F, 0xE57D7D, 0xCC7A7A, 0xB27373, 0x996A6A, 0x7F5F5F, 0x665151, 0x4C4040, 0x332D2D, 0x191818,
-                    0x000000 ];
+            if (this.options.saturated) {
+                this.palette = [ 0x0000FF, 0x0033FF, 0x0065FF, 0x0099FF, 0x00CBFF, 0x00FFFF, 0x00FF99, 0x00FF33,
+                        0x33FF00, 0x99FF00, 0xFFFF00, 0xFFE200, 0xFFC600, 0xFFAA00, 0xFF8D00, 0xFF7100, 0xFF5400,
+                        0xFF3800, 0xFF1C00, 0xFF0000, 0xE50000, 0xCC0000, 0xB20000, 0x990000, 0x7F0000, 0x660000,
+                        0x4C0000, 0x330000, 0x190000, 0x000000 ];
+            } else
+                this.palette = [ 0x7F7FFF, 0x7F99FF, 0x7FB4FF, 0x7FCFFF, 0x7FEAFF, 0x7FFFF8, 0x7FFFDD, 0x7FFFC2,
+                        0x7FFFA7, 0x7FFF8C, 0x8CFF7F, 0xA7FF7F, 0xC2FF7F, 0xDDFF7F, 0xF8FF7F, 0xFFEA7F, 0xFFCF7F,
+                        0xFFB47F, 0xFF997F, 0xFF7F7F, 0xE57D7D, 0xCC7A7A, 0xB27373, 0x996A6A, 0x7F5F5F, 0x665151,
+                        0x4C4040, 0x332D2D, 0x191818, 0x000000 ];
         }
     },
 
