@@ -29,6 +29,9 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.SPTServiceFactory;
+import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
+import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.SPTWalker;
 import org.opentripplanner.routing.spt.SPTWalker.SPTVisitor;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -78,6 +81,8 @@ public class SampleGridRenderer {
                 - tOvershot : spgRequest.maxTimeSec + tOvershot));
         sptRequest.batch = (true);
         sptRequest.setRoutingContext(graph);
+        sptRequest.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+                new NoThruTrafficPathParser() };
         final ShortestPathTree spt = sptServiceFactory.instantiate().getShortestPathTree(sptRequest);
 
         // 3. Create a sample grid based on the SPT.
