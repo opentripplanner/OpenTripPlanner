@@ -28,22 +28,19 @@ public class OtpsRoutingRequest {
 
     protected OtpsRoutingRequest(RoutingRequest req) {
         this.req = req;
-        // TODO Make the batch, origin, destination, arriveBy semantics simpler.
-        // batch = (origin or destination is null)
-        // if origin is null, then arriveBy is true
-        // if destination is null, then arriveBy is false
-        req.batch = true; // unless origin/destination are set
+        req.batch = true;
     }
 
     public void setDateTime(int year, int month, int day, int hour, int min, int sec) {
         Calendar cal = Calendar.getInstance(); // Use default timezone
         cal.set(Calendar.YEAR, year);
-        cal.set(Calendar.MONTH, month + 1);
+        cal.set(Calendar.MONTH, month - 1);
         cal.set(Calendar.DAY_OF_MONTH, day);
-        cal.set(Calendar.HOUR, hour);
+        cal.set(Calendar.HOUR_OF_DAY, hour);
         cal.set(Calendar.MINUTE, min);
         cal.set(Calendar.SECOND, sec);
         cal.set(Calendar.MILLISECOND, 0);
+        System.out.println("CAL: " + cal.getTime());
         req.setDateTime(cal.getTime());
     }
 
@@ -74,5 +71,4 @@ public class OtpsRoutingRequest {
     public void setDestination(OtpsIndividual dest) {
         this.setDestination(dest.lat, dest.lon);
     }
-
 }
