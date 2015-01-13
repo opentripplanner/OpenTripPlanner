@@ -20,7 +20,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ public class TemplateTile extends Tile {
     private static final Logger LOG = LoggerFactory.getLogger(TemplateTile.class);
     Sample[] samples;
     
-    public TemplateTile(TileRequest req, GraphService graphService) {
+    public TemplateTile(TileRequest req, Graph graph) {
         super(req);
         this.samples = new Sample[width * height];
         CoordinateReferenceSystem crs = gg.getCoordinateReferenceSystem2D(); 
@@ -54,7 +54,7 @@ public class TemplateTile extends Tile {
                     double lon = sourcePos.getOrdinate(0);
                     double lat = sourcePos.getOrdinate(1);
                     // TODO: axes are reversed in the default mathtransform
-                    Sample s = graphService.getGraph(req.routerId).getSampleFactory().getSample(lon, lat);
+                    Sample s = graph.getSampleFactory().getSample(lon, lat);
                     samples[i++] = s;
                 }
             }

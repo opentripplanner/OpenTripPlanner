@@ -18,13 +18,11 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -35,7 +33,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -169,15 +166,12 @@ public class TestStreetMatcher {
         }
     }
 
+    /* TODO explain why this exists and is "simple" */
     private static class SimpleEdge extends StreetEdge {
         private static final long serialVersionUID = 1L;
 
         public SimpleEdge(StreetVertex v1, StreetVertex v2) {
-            super(v1, v2);
-        }
-        
-        public Set<Alert> getNotes () {
-            return null;
+            super(v1, v2, null, null, 0, null, false);
         }
         
         @Override
@@ -214,16 +208,6 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public PackedCoordinateSequence getElevationProfile(double from, double to) {
-            return null;
-        }
-
-        @Override
-        public boolean setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed) {
-            return false;
-        }
-
-        @Override
         public boolean canTraverse(RoutingRequest options) {
             return true;
         }
@@ -233,11 +217,6 @@ public class TestStreetMatcher {
             return true;
         }
         
-        @Override
-        public double getLength() {
-            return getDistance();
-        }
-
         @Override
         public StreetTraversalPermission getPermission() {
             return StreetTraversalPermission.ALL;
@@ -252,10 +231,6 @@ public class TestStreetMatcher {
             return "SimpleEdge(" + fromv + ", " + tov + ")";
         }
         
-        public Set<Alert> getWheelchairNotes () {
-            return null;
-        }
-
         @Override
         public int getStreetClass() {
             return StreetEdge.CLASS_STREET;
@@ -268,16 +243,6 @@ public class TestStreetMatcher {
 
         public boolean isElevationFlattened() {
             return false;
-        }
-
-        @Override
-        public ElevationProfileSegment getElevationProfileSegment() {
-            return null;
-        }
-
-        @Override
-        public List<TurnRestriction> getTurnRestrictions() {
-            return Collections.emptyList();
         }
 
         @Override
@@ -297,11 +262,6 @@ public class TestStreetMatcher {
 
         @Override
         public void setCarSpeed(float carSpeed) {}
-
-        @Override
-        public String getLabel() {
-            return "label";
-        }
 
     }
 }

@@ -24,14 +24,14 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
 
 import com.vividsolutions.jts.geom.LineString;
 
 /**
- * This is the standard implementation of an edge with fixed from and to Vertex instances; all standard OTP edges are subclasses of this.
+ * This is the standard implementation of an edge with fixed from and to Vertex instances;
+ * all standard OTP edges are subclasses of this.
  */
 public abstract class Edge implements Serializable {
 
@@ -101,28 +101,6 @@ public abstract class Edge implements Serializable {
                 this.getToVertex() == e.getFromVertex());
     }
     
-    public void attachFrom(Vertex fromv) {
-        detachFrom();
-        if (fromv == null)
-            throw new IllegalStateException("attaching to fromv null");
-        this.fromv = fromv;
-        fromv.addOutgoing(this);
-    }
-
-    public void attachTo(Vertex tov) {
-        detachTo();
-        if (tov == null)
-            throw new IllegalStateException("attaching to tov null");
-        this.tov = tov;
-        tov.addIncoming(this);
-    }
-
-    /** Attach this edge to new endpoint vertices, keeping edgelists coherent */
-    public void attach(Vertex fromv, Vertex tov) {
-        attachFrom(fromv);
-        attachTo(tov);
-    }
-
     /**
      * Get a direction on paths where it matters, or null
      * 
@@ -132,7 +110,7 @@ public abstract class Edge implements Serializable {
         return null;
     }
 
-    protected boolean detachFrom() {
+    protected boolean detachFrom(Graph graph) {
         boolean detached = false;
         if (fromv != null) {
             detached = fromv.removeOutgoing(this);
@@ -141,7 +119,7 @@ public abstract class Edge implements Serializable {
         return detached;
     }
 
-    protected boolean detachTo() {
+    protected boolean detachTo(Graph graph) {
         boolean detached = false;
         if (tov != null) {
             detached = tov.removeIncoming(this);
@@ -155,19 +133,20 @@ public abstract class Edge implements Serializable {
      * 
      * @return
      */
-    public int detach() {
+    public int detach(Graph graph) {
         int nDetached = 0;
-        if (detachFrom()) {
+        if (detachFrom(graph)) {
             ++nDetached;
         }
-        if (detachTo()) {
+        if (detachTo(graph)) {
             ++nDetached;
         }
         return nDetached;
     }
 
     /**
-     * This should only be called inside State; other methods should call {@link org.opentripplanner.routing.core.State.getBackTrip()}.
+     * This should only be called inside State; other methods should call
+     * org.opentripplanner.routing.core.State.getBackTrip()
      * 
      * @author mattwigway
      */
@@ -270,13 +249,9 @@ public abstract class Edge implements Serializable {
 
     private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         if (fromv == null) {
-            if (this instanceof PlainStreetEdge)
-                System.out.println(((PlainStreetEdge) this).getGeometry());
             System.out.printf("fromv null %s \n", this);
         }
         if (tov == null) {
-            if (this instanceof PlainStreetEdge)
-                System.out.println(((PlainStreetEdge) this).getGeometry());
             System.out.printf("tov null %s \n", this);
         }
         out.defaultWriteObject();

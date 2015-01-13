@@ -17,10 +17,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.xml.bind.annotation.XmlTransient;
@@ -46,8 +43,6 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     private int index;
     
-    private int groupIndex = -1;
-
     /* short debugging name */
     private final String label;
     
@@ -58,11 +53,9 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     private final double y;
     
-    private double distanceToNearestTransitStop = 0;
+    private transient Edge[] incoming = new Edge[0];
 
-    private transient Set<Edge> incoming = new CopyOnWriteArraySet<Edge>();
-
-    private transient Set<Edge> outgoing = new CopyOnWriteArraySet<Edge>();
+    private transient Edge[] outgoing = new Edge[0];
 
     
     /* PUBLIC CONSTRUCTORS */
@@ -100,77 +93,106 @@ public abstract class Vertex implements Serializable, Cloneable {
         return index;
     }
 
+    /* EDGE UTILITY METHODS (use arrays to eliminate copy-on-write set objects) */
+
+    /**
+     * A static helper method to avoid repeated code for outgoing and incoming lists.
+     * Synchronization must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
+     */
+    private static Edge[] addEdge(Edge[] existing, Edge e) {
+        Edge[] copy = new Edge[existing.length + 1];
+        int i;
+        for (i = 0; i < existing.length; i++) {
+            if (existing[i] == e) {
+                LOG.error("repeatedly added edge {}", e);
+                return existing;
+            }
+            copy[i] = existing[i];
+        }
+        copy[i] = e; // append the new edge to the copy of the existing array
+        return copy;
+    }
+
+    /**
+     * A static helper method to avoid repeated code for outgoing and incoming lists.
+     * Synchronization must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
+     */
+    public static Edge[] removeEdge(Edge[] existing, Edge e) {
+        int nfound = 0;
+        for (int i = 0, j = 0; i < existing.length; i++) {
+            if (existing[i] == e) nfound++;
+        }
+        if (nfound == 0) {
+            LOG.error("Requested removal of an edge which isn't connected to this vertex.");
+            return existing;
+        }
+        if (nfound > 1) {
+            LOG.error("There are multiple copies of the edge to be removed.)");
+        }
+        Edge[] copy = new Edge[existing.length - nfound];
+        for (int i = 0, j = 0; i < existing.length; i++) {
+            if (existing[i] != e) copy[j++] = existing[i];
+        }
+        return copy;
+    }
 
     /* FIELD ACCESSOR METHODS : READ/WRITE */
 
-    public void addOutgoing(Edge ee) {
-        if (outgoing.contains(ee)) {
-            LOG.error("repeatedly added edge {} to vertex {}", ee, this);
-        } else {
-            outgoing.add(ee);
+    public void addOutgoing(Edge edge) {
+        synchronized (this) {
+            outgoing = addEdge(outgoing, edge);
         }
     }
 
-    public boolean removeOutgoing(Edge ee) {
-        if (!outgoing.contains(ee)) {
-            LOG.error("Removing edge which isn't connected to this vertex");
+    /** @return whether the edge was found and removed. */
+    public boolean removeOutgoing(Edge edge) {
+        synchronized (this) {
+            int n = outgoing.length;
+            outgoing = removeEdge(outgoing, edge);
+            return (outgoing.length < n);
         }
-        boolean removed = outgoing.remove(ee);
-        if (outgoing.contains(ee)) {
-            LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
-        }
-        return removed;
     }
 
-    /** Get a collection containing all the edges leading from this vertex to other vertices. */
+
+    public void addIncoming(Edge edge) {
+        synchronized (this) {
+            incoming = addEdge(incoming, edge);
+        }
+    }
+
+    /** @return whether the edge was found and removed. */
+    public boolean removeIncoming(Edge edge) {
+        synchronized (this) {
+            int n = incoming.length;
+            incoming = removeEdge(incoming, edge);
+            return (incoming.length < n);
+        }
+    }
+
+    /**
+     * Get a collection containing all the edges leading from this vertex to other vertices.
+     * There is probably some overhead to creating the wrapper ArrayList objects, but this
+     * allows filtering and combining edge lists using stock Collection-based methods.
+     */
     public Collection<Edge> getOutgoing() {
-        return outgoing;
-    }
-
-    public void addIncoming(Edge ee) {
-        if (incoming.contains(ee)) {
-            LOG.error("repeatedly added edge {} to vertex {}", ee, this);
-        } else {
-            incoming.add(ee);
-        }
-    }
-
-    public boolean removeIncoming(Edge ee) {
-        if (!incoming.contains(ee)) {
-            LOG.error("Removing edge which isn't connected to this vertex");
-        }
-        boolean removed = incoming.remove(ee);
-        if (incoming.contains(ee)) {
-            LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
-        }
-        return removed;
+        return Arrays.asList(outgoing);
     }
 
     /** Get a collection containing all the edges leading from other vertices to this vertex. */
     public Collection<Edge> getIncoming() {
-        return incoming;
+        return Arrays.asList(incoming);
     }
 
     @XmlTransient
     public int getDegreeOut() {
-        return outgoing.size();
+        return outgoing.length;
     }
 
     @XmlTransient
     public int getDegreeIn() {
-        return incoming.size();
+        return incoming.length;
     }
     
-    // TODO: this is a candidate for no-arg message-passing style
-    public void setDistanceToNearestTransitStop(double distance) {
-        distanceToNearestTransitStop = distance;
-    }
-
-    /** Get the distance from this vertex to the closest transit stop in meters. */
-    public double getDistanceToNearestTransitStop() {
-        return distanceToNearestTransitStop;
-    }
-
     /** Get the longitude of the vertex */
     public double getX() {
         return x;
@@ -189,15 +211,6 @@ public abstract class Vertex implements Serializable, Cloneable {
     /** Get the latitude of the vertex */
     public double getLat() {
         return y;
-    }
-
-    public void setGroupIndex(int groupIndex) {
-        this.groupIndex = groupIndex;
-    }
-
-    @XmlTransient
-    public int getGroupIndex() {
-        return groupIndex;
     }
 
     /** If this vertex is located on only one street, get that street's name. */
@@ -256,8 +269,8 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.incoming = new CopyOnWriteArraySet<Edge>();
-        this.outgoing = new CopyOnWriteArraySet<Edge>();
+        this.incoming = new Edge[0];
+        this.outgoing = new Edge[0];
         index = maxIndex++;
     }
 
@@ -292,8 +305,8 @@ public abstract class Vertex implements Serializable, Cloneable {
                 source.removeOutgoing(e);
             }
         }
-        incoming = new CopyOnWriteArraySet<Edge>();
-        outgoing = new CopyOnWriteArraySet<Edge>();
+        incoming = new Edge[0];
+        outgoing = new Edge[0];
     }
 
 
@@ -352,7 +365,7 @@ public abstract class Vertex implements Serializable, Cloneable {
      * edge lists, usually by simply calling detach() on them.
      * @return the number of edges affected by the cleanup.
      */
-    public int removeTemporaryEdges() {
+    public int removeTemporaryEdges(Graph graph) {
         // do nothing, signal 0 other objects affected
         return 0;
     }

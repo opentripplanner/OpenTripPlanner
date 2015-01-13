@@ -13,10 +13,12 @@
 
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import java.io.Serializable;
+
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
-public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel {
+public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel implements Serializable {
 
     // Model parameters are here. //
     // Constants for when there is a traffic light.
@@ -42,7 +44,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     private Double expectedLeftNoLightTimeSec = 8.0;
 
     @Override
-    public double computeTraversalCost(IntersectionVertex v, PlainStreetEdge from, PlainStreetEdge to, TraverseMode mode,
+    public double computeTraversalCost(IntersectionVertex v, StreetEdge from, StreetEdge to, TraverseMode mode,
                                        RoutingRequest options, float fromSpeed, float toSpeed) {
 
         // If the vertex is free-flowing then (by definition) there is no cost to traverse it.

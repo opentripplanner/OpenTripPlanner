@@ -20,12 +20,10 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -121,6 +119,10 @@ public class State implements Cloneable {
         if (options.parkAndRide || options.kissAndRide) {
             this.stateData.carParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
+        } else if (options.bikeParkAndRide) {
+            this.stateData.bikeParked = options.arriveBy;
+            this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
+                    : TraverseMode.BICYCLE;
         }
         this.walkDistance = 0;
         this.preTransitTime = 0;
@@ -267,16 +269,30 @@ public class State implements Cloneable {
         return stateData.carParked;
     }
 
+    public boolean isBikeParked() {
+        return stateData.bikeParked;
+    }
+
     /**
      * @return True if the state at vertex can be the end of path.
      */
     public boolean isFinal() {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-        boolean checkPark = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
-        if (stateData.opt.arriveBy)
-            return !isBikeRenting() && !(checkPark && isCarParked());
-        else
-            return !isBikeRenting() && !(checkPark && !isCarParked());
+        boolean parkAndRide = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
+        boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
+        boolean bikeRentingOk = false;
+        boolean bikeParkAndRideOk = false;
+        boolean carParkAndRideOk = false;
+        if (stateData.opt.arriveBy) {
+            bikeRentingOk = !isBikeRenting();
+            bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
+            carParkAndRideOk = !parkAndRide || !isCarParked();
+        } else {
+            bikeRentingOk = !isBikeRenting();
+            bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
+            carParkAndRideOk = !parkAndRide || isCarParked();
+        }
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
     }
 
     public Stop getPreviousStop() {
@@ -364,10 +380,6 @@ public class State implements Cloneable {
         return stateData.backWalkingBike;
     }
 
-    public Set<Alert> getBackAlerts () {
-        return stateData.notes;
-    }
-    
     /**
      * Get the name of the direction used to get to this state. For transit, it is the headsign,
      * while for other things it is what you would expect.
@@ -479,6 +491,7 @@ public class State implements Cloneable {
         // TODO Check if those two lines are needed:
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
+        newState.stateData.bikeParked = stateData.bikeParked;
         return newState;
     }
 
@@ -691,9 +704,9 @@ public class State implements Cloneable {
 
                     ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTimeSeconds());
                     newInitialWaitTime = ret.stateData.initialWaitTime;
-                }
-                else                   
+                } else {
                     ret = edge.traverse(ret);
+                }
 
                 if (ret != null && ret.getBackMode() != null && orig.getBackMode() != null &&
                         ret.getBackMode() != orig.getBackMode()) {
@@ -726,14 +739,15 @@ public class State implements Cloneable {
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
                 editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
                 
-                // propagate the modes and alerts through to the reversed edge
+                // propagate the modes through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
-                editor.addAlerts(orig.getBackAlerts());
 
                 if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());
                 if (orig.isCarParked() != orig.getBackState().isCarParked())
                     editor.setCarParked(!orig.isCarParked());
+                if (orig.isBikeParked() != orig.getBackState().isBikeParked())
+                    editor.setBikeParked(!orig.isBikeParked());
 
                 editor.setNumBoardings(getNumBoardings() - orig.getNumBoardings());
 

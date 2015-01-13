@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.annotation;
 
 import java.io.Serializable;
+import org.opentripplanner.graph_builder.AnnotationsToHTML;
 
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -32,6 +33,9 @@ import org.slf4j.LoggerFactory;
  * facade. We cannot invert the process and log an annotation object which would attach itself to a graph upon creation because the logger methods
  * only accept strings. Thus, a static register method on this class that creates an annotation, adds it to a graph, and returns a message string for
  * that annotation.
+ * 
+ * {@link #getHTMLMessage() } is used in {@link AnnotationsToHTML} to create HTML annotations.
+ * It is useful to put links to OSM in annotations.
  * 
  * @author andrewbyrd
  */

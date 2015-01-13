@@ -40,7 +40,7 @@ otp.modules.bikeshare.StationCollection =
     model: otp.modules.bikeshare.StationModel,
     
     sync: function(method, model, options) {
-        options.dataType = 'jsonp';
+        options.dataType = 'json';
         options.data = options.data || {};
         if(otp.config.routerId !== undefined) {
             options.data.routerId = otp.config.routerId;
@@ -79,7 +79,7 @@ otp.modules.bikeshare.BikeShareModule =
     activate : function() {
         if(this.activated) return;
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
-        this.mode = "WALK,BICYCLE";
+        this.mode = "WALK,BICYCLE_RENT";
         
         this.stationsLayer = new L.LayerGroup();
         this.addLayer("Bike Stations", this.stationsLayer);
@@ -96,7 +96,7 @@ otp.modules.bikeshare.BikeShareModule =
         
         this.initOptionsWidget();
         
-        this.defaultQueryParams.mode = "WALK,BICYCLE";
+        this.defaultQueryParams.mode = "WALK,BICYCLE_RENT";
         this.optionsWidget.applyQueryParams(this.defaultQueryParams);
                 
        
@@ -160,7 +160,7 @@ otp.modules.bikeshare.BikeShareModule =
                         
         this.drawItinerary(itin);
         
-        if(tripPlan.queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
+        if(tripPlan.queryParams.mode === 'WALK,BICYCLE_RENT') { // bikeshare trip
             var polyline = new L.Polyline(otp.util.Geo.decodePolyline(itin.itinData.legs[1].legGeometry.points));
             var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
         }
@@ -171,7 +171,7 @@ otp.modules.bikeshare.BikeShareModule =
         //this.resultsWidget.show();
         //this.resultsWidget.newItinerary(itin);
                     
-        if(start_and_end_stations !== undefined && tripPlan.queryParams.mode === 'WALK,BICYCLE') {
+        if(start_and_end_stations !== undefined && tripPlan.queryParams.mode === 'WALK,BICYCLE_RENT') {
             if(start_and_end_stations['start'] && start_and_end_stations['end']) {
            	    this.bikestationsWidget.setContentAndShow(
            	        start_and_end_stations['start'], 

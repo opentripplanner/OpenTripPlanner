@@ -34,7 +34,7 @@ public class ElevationUtils {
 
     private static final double ENERGY_SLOPE_FACTOR = 4000;
 
-    public static double getLengthMultiplierFromElevation(CoordinateSequence elev) {
+    private static double[] getLengthsFromElevation(CoordinateSequence elev) {
 
         double trueLength = 0;
         double flatLength = 0;
@@ -49,26 +49,31 @@ public class ElevationUtils {
             lastX = c.x;
             lastY = c.y;
         }
-        if (flatLength == 0) {
-            return 0;
-        }
-        return trueLength / flatLength;
+        return new double[] { trueLength, flatLength };
     }
 
     /**
      * 
-     * @param elev The elevatioon profile, where each (x, y) is (distance along edge, elevation)
+     * @param elev The elevation profile, where each (x, y) is (distance along edge, elevation)
      * @param slopeLimit Whether the slope should be limited to 0.35, which is the max slope for
      * streets that take cars.
      * @return
      */
-    public static SlopeCosts getSlopeCosts(PackedCoordinateSequence elev, boolean slopeLimit) {
+    public static SlopeCosts getSlopeCosts(CoordinateSequence elev, boolean slopeLimit) {
         Coordinate[] coordinates = elev.toCoordinateArray();
         boolean flattened = false;
         double maxSlope = 0;
         double slopeSpeedEffectiveLength = 0;
         double slopeWorkCost = 0;
         double slopeSafetyCost = 0;
+        double[] lengths = getLengthsFromElevation(elev);
+        double trueLength = lengths[0];
+        double flatLength = lengths[1];
+        if (flatLength < 1e-3) {
+            log.error("Too small edge, returning neutral slope costs.");
+            return new SlopeCosts(1.0, 1.0, 0.0, 0.0, 1.0, false);
+        }
+        double lengthMultiplier = trueLength / flatLength;
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
@@ -97,15 +102,20 @@ public class ElevationUtils {
                     * (ENERGY_PER_METER_ON_FLAT + ENERGY_SLOPE_FACTOR * slope_or_zero
                             * slope_or_zero * slope_or_zero);
             slopeWorkCost += energy;
-            slopeSpeedEffectiveLength += hypotenuse
-                    / slopeSpeedCoefficient(slope, coordinates[i].y);
+            double slopeSpeedCoef = slopeSpeedCoefficient(slope, coordinates[i].y);
+            slopeSpeedEffectiveLength += hypotenuse / slopeSpeedCoef;
             // assume that speed and safety are inverses
-            double safetyCost = hypotenuse * (slopeSpeedCoefficient(slope, coordinates[i].y) - 1) * 0.25;
+            double safetyCost = hypotenuse * (slopeSpeedCoef - 1) * 0.25;
             if (safetyCost > 0) {
                 slopeSafetyCost += safetyCost;
             }
         }
-        return new SlopeCosts(slopeSpeedEffectiveLength, slopeWorkCost, slopeSafetyCost, maxSlope, flattened);
+        /*
+         * Here we divide by the *flat length* as the slope/work cost factors are multipliers of the
+         * length of the street edge which is the flat one.
+         */
+        return new SlopeCosts(slopeSpeedEffectiveLength / flatLength, slopeWorkCost / flatLength,
+                slopeSafetyCost, maxSlope, lengthMultiplier, flattened);
     }
 
     /** constants for slope computation */

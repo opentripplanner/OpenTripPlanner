@@ -24,6 +24,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 
 @Path("/routers/{routerId}/metadata")
 @XmlRootElement
@@ -35,7 +36,8 @@ public class Metadata {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public GraphMetadata getMetadata(@PathParam("routerId") String routerId) {
-        return otpServer.graphService.getGraph(routerId).getMetadata();
+        Router router = otpServer.getRouter(routerId);
+        return router.graph.getMetadata();
     }
 
 }

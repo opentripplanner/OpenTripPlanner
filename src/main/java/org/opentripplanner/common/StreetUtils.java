@@ -31,7 +31,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -158,13 +157,15 @@ public class StreetUtils {
             Vertex v = vIter.next();
             Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
             for (Edge e : outgoing) {
-                if (e instanceof PlainStreetEdge) {
-                    PlainStreetEdge pse = (PlainStreetEdge) e;
+                if (e instanceof StreetEdge) {
+                    StreetEdge pse = (StreetEdge) e;
                     StreetTraversalPermission permission = pse.getPermission();
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                     permission = permission.remove(StreetTraversalPermission.BICYCLE);
                     if (permission == StreetTraversalPermission.NONE) {
-                        pse.detach();
+                        // TODO Shouldn't we have a graph.removeEdge()?
+                        graph.streetNotesService.removeStaticNotes(pse);
+                        pse.detach(graph);
                     } else {
                         pse.setPermission(permission);
                     }
@@ -185,7 +186,7 @@ public class StreetUtils {
             edges.addAll(v.getIncoming());
             for (Edge e : edges) {
                 if (e instanceof StreetTransitLink) {
-                    e.detach();
+                    e.detach(graph);
                 }
             }
         }

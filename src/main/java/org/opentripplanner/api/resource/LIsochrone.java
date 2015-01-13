@@ -28,7 +28,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -47,7 +46,7 @@ import org.opentripplanner.analyst.request.IsoChroneRequest;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +69,6 @@ public class LIsochrone extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(LIsochrone.class);
 
-    @Context
-    private OTPServer otpServer;
-
     @QueryParam("cutoffSec")
     private List<Integer> cutoffSecList;
 
@@ -81,9 +77,6 @@ public class LIsochrone extends RoutingResource {
 
     @QueryParam("debug")
     private Boolean debug;
-
-    @QueryParam("algorithm")
-    private String algorithm;
 
     @QueryParam("precisionMeters")
     @DefaultValue("200")
@@ -180,13 +173,8 @@ public class LIsochrone extends RoutingResource {
             isoChroneRequest.maxTimeSec = isoChroneRequest.maxCutoffSec;
         }
 
-        List<IsochroneData> isochrones;
-        if (algorithm == null || "accSampling".equals(algorithm)) {
-            isochrones = otpServer.isoChroneSPTRenderer.getIsochrones(isoChroneRequest, sptRequest);
-        } else {
-            throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
-        }
-        return isochrones;
+        Router router = otpServer.getRouter(routerId);
+        return router.isoChroneSPTRenderer.getIsochrones(isoChroneRequest, sptRequest);
     }
 
     static SimpleFeatureType makeContourSchema() {

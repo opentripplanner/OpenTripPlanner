@@ -23,7 +23,7 @@ public class OSM {
     public Map<Long, Relation> relations;
 
     /** The nodes which are referenced more than once by ways in this OSM. */
-    NodeTracker intersections;
+    public NodeTracker intersections;
     
     /** The MapDB backing this OSM, if any. */
     DB db = null; // db.close(); ?

@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2014-08-26 14:23+0200\n"
 "PO-Revision-Date: 2014-06-24 10:27+0100\n"
-"Last-Translator: \n"
+"Last-Translator: Rafael Aguilar\n"
 "Language-Team: it <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -23,21 +23,21 @@ msgstr ""
 #: src/client/js/otp/config.js:268
 #, fuzzy
 msgid "Transit"
-msgstr "Trasporto pubblico"
+msgstr "Mezzi pubblici"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: src/client/js/otp/config.js:271
 #, fuzzy
 msgid "Bus Only"
-msgstr "Utilizza solo Bus"
+msgstr "Solo Bus"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: src/client/js/otp/config.js:274
 #, fuzzy
 msgid "Rail Only"
-msgstr "Utilizza solo Treno"
+msgstr "Solo Treno"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
@@ -51,7 +51,7 @@ msgstr "In bici"
 #: src/client/js/otp/config.js:280
 #, fuzzy
 msgid "Bicycle &amp; Transit"
-msgstr "Bici &amp; trasporto pubblico"
+msgstr "Bici &amp; mezzi pubblici"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
@@ -71,38 +71,38 @@ msgstr "In auto"
 #. Options widgets)
 #: src/client/js/otp/config.js:289
 msgid "Park and Ride"
-msgstr ""
+msgstr "Park &amp; Ride"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets) http://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride
 #: src/client/js/otp/config.js:292
 msgid "Kiss and Ride"
-msgstr ""
+msgstr "Kiss &amp; Ride"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets) (Park bicycle at Public transit station and take a
 #. transit
 #: src/client/js/otp/config.js:296
 msgid "Bike and Ride"
-msgstr ""
+msgstr "Bike &amp; Ride"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: src/client/js/otp/config.js:303
 msgid "Rented Bicycle"
-msgstr ""
+msgstr "Bike sharing"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
 #: src/client/js/otp/config.js:306
 msgid "Transit & Rented Bicycle"
-msgstr ""
+msgstr "Bike sharing & Ride"
 
 #. Context menu
 #: src/client/js/otp/core/MapContextMenu.js:36
 #, fuzzy
 msgid "Recenter Map Here"
-msgstr "Centra la mappa qui"
+msgstr "Centra"
 
 #. Context menu
 #: src/client/js/otp/core/MapContextMenu.js:39
@@ -131,26 +131,26 @@ msgstr "Ripristina tutto"
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:557
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:31
 msgid "Stop Viewer"
-msgstr ""
+msgstr "Orari"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
 #: src/client/js/otp/layers/StopsLayer.js:64
 msgid "Plan Trip"
-msgstr ""
+msgstr "Calcola percorso"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
 #: src/client/js/otp/layers/StopsLayer.js:66
 msgid "From Stop"
-msgstr ""
+msgstr "Da questa fermata"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
 #: src/client/js/otp/layers/StopsLayer.js:68
 msgid "To Stop"
-msgstr ""
+msgstr "A questa fermata"
 
 #: src/client/js/otp/layers/StopsLayer.js:69
 msgid "Routes Serving Stop"
-msgstr ""
+msgstr "Linee"
 
 #. Legend title in Analyst
 #: src/client/js/otp/modules/analyst/AnalystLegendWidget.js:26
@@ -162,7 +162,7 @@ msgstr "Legenda: tempo di viaggio in minuti"
 #: src/client/js/otp/modules/analyst/AnalystModule.js:22
 #, fuzzy
 msgid "Analyst"
-msgstr "Analisi isocrone TPL"
+msgstr "Mappe temporali"
 
 #. Button to update analyst information
 #: src/client/js/otp/modules/analyst/AnalystModule.js:64
@@ -178,7 +178,7 @@ msgstr "Origine dell'analisi"
 
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:67
 msgid "Bike Share Planner"
-msgstr ""
+msgstr "Bike Sharing"
 
 #. widget name
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:108
@@ -191,34 +191,34 @@ msgstr "Opzioni di viaggio"
 #. up
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:207
 msgid "PICK UP BIKE"
-msgstr ""
+msgstr "Prendi la bici qui"
 
 #. Popup title alternative station to pickup bike on bike
 #. sharing
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:216
 msgid "ALTERNATE PICKUP"
-msgstr ""
+msgstr "Puoi prendere la bici anche qui"
 
 #. Popup title
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:221
 msgid "DROP OFF BIKE"
-msgstr ""
+msgstr "Lascia la bici qui"
 
 #. Popup title
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:229
 msgid "ALTERNATE DROP OFF"
-msgstr ""
+msgstr "Puoi lasciare la bici anche qui"
 
 #. Popup title Bike sharing station
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:234
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:313
 msgid "BIKE STATION"
-msgstr ""
+msgstr "Stazione di Bike Sharing"
 
 #. Bike sharing station: station name
 #: src/client/js/otp/modules/bikeshare/BikeShareModule.js:318
 msgid "Station:"
-msgstr ""
+msgstr "Stazione:"
 
 #. number of bikes
 #. availible in a bike sharing
@@ -229,8 +229,8 @@ msgstr ""
 #, python-format
 msgid "<strong>%d</strong> bike available"
 msgid_plural "<strong>%d</strong> bikes available"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<strong>%d</strong> bici disponibile"
+msgstr[1] "<strong>%d</strong> bici disponibili"
 
 #. number of free
 #. places to put bikes
@@ -242,22 +242,22 @@ msgstr[1] ""
 #, python-format
 msgid "<strong>%d</strong> dock available"
 msgid_plural "<strong>%d</strong> docks available"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "<strong>%d</strong> posto disponibile"
+msgstr[1] "<strong>%d</strong> posti disponibili"
 
 #. Recommended Pick Up: bike sharing
 #. station name
 #: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:53
 #: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:68
 msgid "Recommended Pick Up:"
-msgstr ""
+msgstr "Prendi la bici:"
 
 #. Recommended Drop Off: bike sharing
 #. station name
 #: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:60
 #: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:70
 msgid "Recommended Drop Off:"
-msgstr ""
+msgstr "Lascia la bici:"
 
 #. module name
 #: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:22
@@ -277,13 +277,13 @@ msgstr "Percorsi"
 #, python-format
 msgid "%d Itinerary Returned"
 msgid_plural "%d Itineraries Returned"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d percorso trovato"
+msgstr[1] "%d percorsi trovati"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:112
 #, fuzzy
 msgid "Link to search"
-msgstr "Link alla ricerca"
+msgstr "Link a questa ricerca"
 
 #. button to first itinerary
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:171
@@ -314,23 +314,23 @@ msgstr "Ultimo"
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:346
 #, fuzzy
 msgid "CONTINUES AS"
-msgstr "Continua come"
+msgstr "Rimani a bordo"
 
 #. Something in Public transport is x minutes late
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:354
 #, python-format
 msgid "%d min late"
 msgid_plural "%d mins late"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minuto di ritardo"
+msgstr[1] "%d minuti di ritardo"
 
 #. Something in Public transport is x minutes early
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:357
 #, python-format
 msgid "%d min early"
 msgid_plural "%d mins early"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minuto in anticipo"
+msgstr[1] "%d minuti in anticipo"
 
 #. Something in Public transport is on time
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:360
@@ -344,7 +344,7 @@ msgstr "in orario"
 #: src/client/js/otp/modules/planner/Itinerary.js:336
 msgctxt "direction"
 msgid " to "
-msgstr ""
+msgstr " fino a "
 
 #. used in sentence like: <Long name of public transport route> "to" <Public
 #. transport
@@ -355,12 +355,12 @@ msgstr ""
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:115
 msgctxt "bus_direction"
 msgid " to "
-msgstr ""
+msgstr " in direzione "
 
 #. Shown as alert text before showing itinerary.
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:433
 msgid "Total walk distance for this trip exceeds specified maximum"
-msgstr ""
+msgstr "La distanza da percorrere a piedi supera il limite impostato"
 
 #. Start: Time and date (Shown before path itinerary)
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:442
@@ -368,19 +368,19 @@ msgstr ""
 #, fuzzy
 msgctxt "template"
 msgid "Start"
-msgstr "Da"
+msgstr "Partenza"
 
 #. End: Time and date (Shown after path itinerary)
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:445
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:185
 #, fuzzy
 msgid "End"
-msgstr "A"
+msgstr "Arrivo"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:450
 #: src/client/js/otp/modules/planner/Itinerary.js:299
 msgid "Trip Summary"
-msgstr ""
+msgstr "Riepilogo"
 
 #. Travel: hour date on which this trip is made
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:452
@@ -400,12 +400,12 @@ msgstr "Durata"
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:462
 #: src/client/js/otp/modules/planner/Itinerary.js:305
 msgid "Total Walk"
-msgstr ""
+msgstr "A piedi"
 
 #. Total distance on a bike for this trip
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:469
 msgid "Total Bike"
-msgstr ""
+msgstr "In bici"
 
 #. how many public transit transfers in a trip
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:475
@@ -425,12 +425,12 @@ msgstr "Costo"
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:489
 #, fuzzy
 msgid "Valid"
-msgstr "Valido"
+msgstr "Calcolato il "
 
 #. Links to this itinerary
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:494
 msgid "Link to Itinerary"
-msgstr ""
+msgstr "Link a questo percorso"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:499
 #, fuzzy
@@ -440,52 +440,52 @@ msgstr "Stampa"
 #. Default subject when sending trip to email
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:509
 msgid "Your Trip"
-msgstr ""
+msgstr "Il tuo percorso"
 
 #. Link to send trip by email
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:512
 msgid "Email"
-msgstr ""
+msgstr "Invia mail"
 
 #. public transport drives every N minutes
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:532
 #, python-format
 msgid "every %d min"
 msgid_plural "every %d mins"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ogni minuto"
+msgstr[1] "ogni %d minuti"
 
 #. Depart station / Board at station in itinerary
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:538
 #, fuzzy
 msgctxt "itinerary"
 msgid "Depart"
-msgstr "Da"
+msgstr "Parti da"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:538
 msgid "<b>Board</b> at "
-msgstr ""
+msgstr "<b>Parti</b> da "
 
 #. Public transport <Stop> (stop name)
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:557
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:93
 msgid "Stop"
-msgstr ""
+msgstr "Fermata"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:577
 #: src/client/js/otp/modules/planner/Itinerary.js:262
 #: src/client/js/otp/modules/planner/Itinerary.js:345
 msgid "Time in transit"
-msgstr ""
+msgstr "Tempo a bordo"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:579
 #: src/client/js/otp/widgets/transit/TripViewerWidget.js:35
 msgid "Trip Viewer"
-msgstr ""
+msgstr "Percorso"
 
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:637
 msgid "late as"
-msgstr ""
+msgstr "al più"
 
 #. Stay on board/Alight [at stop name]
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:643
@@ -499,7 +499,7 @@ msgstr "Rimani a bordo"
 #: src/client/js/otp/modules/planner/Itinerary.js:265
 #: src/client/js/otp/modules/planner/Itinerary.js:348
 msgid "Alight"
-msgstr ""
+msgstr "Scendi"
 
 #. [Stay on board/Alight] at [stop name]
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:645
@@ -511,7 +511,7 @@ msgstr "a"
 #: src/client/js/otp/modules/planner/Itinerary.js:102
 #, python-format
 msgid "%(currency)s %(price)s"
-msgstr ""
+msgstr "%(currency)s %(price)s"
 
 #. Start: location at [time date] (Used in print itinerary
 #. when do you start your trip)
@@ -519,14 +519,14 @@ msgstr ""
 #: src/client/js/otp/modules/planner/Itinerary.js:322
 #, python-format
 msgid "Start: %(location)s at %(time_date)s"
-msgstr ""
+msgstr "Partenza: %(location)s alle %(time_date)s"
 
 #. Board Public transit route name (agency name
 #. Stop ID ) start time
 #: src/client/js/otp/modules/planner/Itinerary.js:261
 #: src/client/js/otp/modules/planner/Itinerary.js:344
 msgid "Board"
-msgstr ""
+msgstr "Sali a bordo"
 
 #: src/client/js/otp/modules/planner/Itinerary.js:261
 #: src/client/js/otp/modules/planner/Itinerary.js:265
@@ -534,7 +534,7 @@ msgstr ""
 #: src/client/js/otp/modules/planner/Itinerary.js:348
 #, python-format
 msgid "(%(agency_id)s Stop ID #%(stop_id)s),"
-msgstr ""
+msgstr "(%(agency_id)s fermata n.%(stop_id)s),"
 
 #. End: location at [time date] (Used in print itinerary
 #. when do you come at a destination)
@@ -542,7 +542,7 @@ msgstr ""
 #: src/client/js/otp/modules/planner/Itinerary.js:366
 #, python-format
 msgid "End: %(location)s at %(time_date)s"
-msgstr ""
+msgstr "Arrivo: %(location)s alle %(time_date)s"
 
 #. text at end of email %s is link to this itinerary
 #: src/client/js/otp/modules/planner/Itinerary.js:370
@@ -551,170 +551,185 @@ msgid ""
 "\n"
 "View itinerary online:\n"
 "%(itinerary_link)s\n"
-msgstr ""
+msgstr "\nConsulta il percorso online:\n"
+"%(itinerary_link)s\n"
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:98
 #: src/client/js/otp/modules/planner/PlannerModule.js:99
 msgid ""
 "We're sorry. The trip planner is temporarily unavailable. Please try "
 "again later."
-msgstr ""
+msgstr "Siamo spiacenti. Il servizio è momentaneamente indisponibile."
+"Riprova più tardi."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:100
 msgid ""
 "Trip is not possible.  You might be trying to plan a trip outside the map"
 " data boundary."
-msgstr ""
+msgstr "Il percorso richiesto cade al di fuori dell'area di riferimento."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:101
 msgid ""
 "Trip is not possible.  Your start or end point might not be safely "
 "accessible (for instance), you might be starting on a residential street "
 "connected only to a highway)."
-msgstr ""
+msgstr "Percorso non trovato. Il punto di partenza (o di arrivo) non è raggiungibile "
+"o non è correttamente connesso alla rete stradale."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:102
 msgid ""
 "No transit times available. The date may be past or too far in the future"
 " or there may not be transit service for your trip at the time you chose."
-msgstr ""
+msgstr "Nessun servizio di Trasporto Pubblico trovato. La data indicata potrebbe "
+"essere al di fuori del periodo preso in considerazione dal Calcolo Percorso."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:103
 msgid ""
 "The trip planner is taking way too long to process your request. Please "
 "try again later."
-msgstr ""
+msgstr "Il servizio di Calcolo percorsi sta impiegando troppo tempo per "
+"processare la tua richiesta. Riprova più tardi."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:104
 msgid "The request has errors that the server is not willing or able to process."
-msgstr ""
+msgstr "La richiesta contiene errori che il server non è in grado di trattare."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:105
 msgid "Origin is unknown. Can you be a bit more descriptive?"
-msgstr ""
+msgstr "Origine non riconosciuta. Puoi essere più esplicito?"
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:106
 msgid "Destination is unknown.  Can you be a bit more descriptive?"
-msgstr ""
+msgstr "Destinazione non riconosciuta. Puoi essere più esplicito?"
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:107
 msgid ""
 "Both origin and destination are unknown. Can you be a bit more "
 "descriptive?"
-msgstr ""
+msgstr "Origine e destinazione non riconosciute. Puoi essere più esplicito?"
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:108
 msgid "Both origin and destination are not wheelchair accessible"
-msgstr ""
+msgstr "Origine e destinazione non accessibili in carrozzina"
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:109
 msgid "Origin is within a trivial distance of the destination."
-msgstr ""
+msgstr "Origine troppo vicina alla destinazione."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:111
 msgid ""
 "The trip planner is unsure of the location you want to start from. Please"
 " select from the following options, or be more specific."
-msgstr ""
+msgstr "Origine non riconosciuta. Seleziona fra le seguenti opzioni "
+"o specifica meglio l'origine."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:112
 msgid ""
 "The trip planner is unsure of the destination you want to go to. Please "
 "select from the following options, or be more specific."
-msgstr ""
+msgstr "Destinazione non riconosciuta. Seleziona fra le seguenti opzioni "
+"o specifica meglio la destinazione."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:113
 msgid ""
 "Both origin and destination are ambiguous. Please select from the "
 "following options, or be more specific."
-msgstr ""
+msgstr "Origine e destinazione non riconosciute. Seleziona fra le seguenti opzioni "
+"o specifica meglio l'origine e la destinazione."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:115
 msgid ""
 "All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor "
 "must be set if any are"
-msgstr ""
+msgstr "Specificare tutti e 3 i fattori: "
+" triangleSafetyFactor, triangleSlopeFactor e triangleTimeFactor"
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:116
 msgid ""
 "The values of triangleSafetyFactor, triangleSlopeFactor, and "
 "triangleTimeFactor must sum to 1"
-msgstr ""
+msgstr "La somma dai fattori "
+" triangleSafetyFactor, triangleSlopeFactor e triangleTimeFactor "
+"dev'essere pari a 1"
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:117
 msgid ""
 "If triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor are "
 "provided, OptimizeType must be TRIANGLE"
-msgstr ""
+msgstr "Se si forniscono i fattori "
+" triangleSafetyFactor, triangleSlopeFactor e triangleTimeFactor "
+"il parametro OptimizeType dev'essere settato a TRIANGLE"
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:118
 msgid ""
 "If OptimizeType is TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, "
 "and triangleTimeFactor must be set"
-msgstr ""
+msgstr "Se il parametro OptimizeType è settato a TRIANGLE, "
+" si devono fornire i fattori "
+" triangleSafetyFactor, triangleSlopeFactor e triangleTimeFactor "
 
 #. Context menu
 #: src/client/js/otp/modules/planner/PlannerModule.js:194
 msgid "Set as Start Location"
-msgstr ""
+msgstr "Imposta Partenza"
 
 #. Context menu
 #: src/client/js/otp/modules/planner/PlannerModule.js:198
 msgid "Set as End Location"
-msgstr ""
+msgstr "Imposta Arrivo"
 
 #. Shown in a popup on first point of a path in a map
 #: src/client/js/otp/modules/planner/PlannerModule.js:219
 #, fuzzy
 msgctxt "popup"
 msgid "Start"
-msgstr "Da"
+msgstr "Partenza"
 
 #. shown in a popup on last point of a path in a map
 #: src/client/js/otp/modules/planner/PlannerModule.js:250
 msgid "Destination"
-msgstr ""
+msgstr "Destinazione"
 
 #. Used in showing why trip wasn't found
 #: src/client/js/otp/modules/planner/PlannerModule.js:455
 #, python-format
 msgid "Error %(error_id)d"
-msgstr ""
+msgstr "Errore %(error_id)d"
 
 #. Title of no trip dialog
 #: src/client/js/otp/modules/planner/PlannerModule.js:457
 msgid "No Trip Found"
-msgstr ""
+msgstr "nessun percoro trovato"
 
 #. shown when clicked on route on map
 #: src/client/js/otp/modules/planner/PlannerModule.js:513
 #, python-format
 msgid "Your %(bike_share_name)s route"
-msgstr ""
+msgstr "Percorso con %(bike_share_name)s "
 
 #. Text which is shown when clicking bike route
 #. in a map
 #: src/client/js/otp/modules/planner/PlannerModule.js:519
 msgid "Your bike route"
-msgstr ""
+msgstr "Percorso in bici"
 
 #. Shown in map when clicking on a route
 #: src/client/js/otp/modules/planner/PlannerModule.js:527
 #, python-format
 msgid "Walk to the %(bike_share_name)s dock."
-msgstr ""
+msgstr "A piedi verso la stazione %(bike_share_name)s"
 
 #. Shown in map when clicking on a route
 #: src/client/js/otp/modules/planner/PlannerModule.js:531
 #, python-format
 msgid "Walk from the %(bike_share_name)s dock to your destination."
-msgstr ""
+msgstr "A piedi dalla stazione %(bike_share_name)s a destinazione"
 
 #. Text which is shown when clicking walking
 #. route in a map
 #: src/client/js/otp/modules/planner/PlannerModule.js:537
 msgid "Your walk route"
-msgstr ""
+msgstr "Percorso a piedi"
 
 #. Start on [street name] heading [Absolute direction] used in travel plan
 #. generation
@@ -764,154 +779,158 @@ msgstr "nod-ovest"
 #, fuzzy
 msgctxt "itinerary"
 msgid "depart"
-msgstr "Da"
+msgstr "Partenza"
 
 #. [Relative direction (Hard/Slightly Left/Right...)] to continue
 #. on /on to [streetname]
 #: src/client/js/otp/util/Itin.js:142
 #, fuzzy
 msgid "hard left"
-msgstr "decisamente a sinistra"
+msgstr "a sinistra"
 
 #: src/client/js/otp/util/Itin.js:143
 #, fuzzy
 msgid "left"
-msgstr "sinistra"
+msgstr "a sinistra"
 
 #: src/client/js/otp/util/Itin.js:144
 #, fuzzy
 msgid "slight left"
-msgstr "leggermente a sinistra"
+msgstr "tenere la sinistra"
 
 #: src/client/js/otp/util/Itin.js:145
 msgid "continue"
-msgstr ""
+msgstr "continuare"
 
 #: src/client/js/otp/util/Itin.js:146
 #, fuzzy
 msgid "slight right"
-msgstr "leggermente a destra"
+msgstr "tenere la destra"
 
 #: src/client/js/otp/util/Itin.js:147
 #, fuzzy
 msgid "right"
-msgstr "destra"
+msgstr "a destra"
 
 #: src/client/js/otp/util/Itin.js:148
 #, fuzzy
 msgid "hard right"
-msgstr "decisamente a destra"
+msgstr "a destra"
 
 #: src/client/js/otp/util/Itin.js:151
 msgid "elevator"
-msgstr ""
+msgstr "ascensore"
 
 #: src/client/js/otp/util/Itin.js:152
 msgid "U-turn left"
-msgstr ""
+msgstr "inversione di marcia"
 
 #: src/client/js/otp/util/Itin.js:153
 msgid "U-turn right"
-msgstr ""
+msgstr "inversione di marcia"
 
 #. Walk distance to place (itinerary header)
 #: src/client/js/otp/util/Itin.js:177
 msgid "Walk"
-msgstr ""
+msgstr "A piedi"
 
 #. Cycle distance to place (itinerary header)
 #: src/client/js/otp/util/Itin.js:179
 msgid "Cycle"
-msgstr ""
+msgstr "bici"
 
 #. Car distance to place (itinerary header)
 #: src/client/js/otp/util/Itin.js:181
 #, fuzzy
 msgid "Car"
-msgstr "In auto"
+msgstr "auto"
 
 #. Bus: (route number) Start station to end station (itinerary header)
 #: src/client/js/otp/util/Itin.js:183
 #, fuzzy
 msgid "Bus"
-msgstr "In bus"
+msgstr "bus"
 
 #: src/client/js/otp/util/Itin.js:184
 #, fuzzy
 msgid "Subway"
-msgstr "In metro"
+msgstr "metro"
 
 #. Used for intercity or long-distance travel.
 #: src/client/js/otp/util/Itin.js:186
 msgid "Train"
-msgstr ""
+msgstr "treno"
 
 #: src/client/js/otp/util/Itin.js:187
 #, fuzzy
 msgid "Ferry"
-msgstr "In Ferry"
+msgstr "Ferry"
 
 #. Tram, Streetcar, Light rail. Any light rail or street
 #. level system within a metropolitan area.
 #: src/client/js/otp/util/Itin.js:190
 msgid "Light Rail"
-msgstr ""
+msgstr "tram"
 
 #. Used for street-level cable cars where the cable runs
 #. beneath the car.
 #: src/client/js/otp/util/Itin.js:193
 #, fuzzy
 msgid "Cable Car"
-msgstr "In tram"
+msgstr "tram"
 
 #. Any rail system designed for steep inclines.
 #: src/client/js/otp/util/Itin.js:195
 #, fuzzy
 msgid "Funicular"
-msgstr "In funivia"
+msgstr "funivia"
 
 #. Gondola, Suspended cable car. Typically used for aerial
 #. cable cars where the car is suspended from the cable.
 #: src/client/js/otp/util/Itin.js:198
 msgid "Aerial Tram"
-msgstr ""
+msgstr "tram"
 
 #: src/client/js/otp/util/Itin.js:216
 #, python-format
 msgid ""
 "Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b>"
 " exit on <b>%(street_name)s</b>"
-msgstr ""
+msgstr "Prendere la rotonda in senso <b>antiorario</b>, <b>%(ordinal_exit_number)s</b>"
+" uscita,  <b>%(street_name)s</b>"
 
 #: src/client/js/otp/util/Itin.js:218
 #, python-format
 msgid ""
 "Take roundabout counterclockwise to %(ordinal_exit_number)s exit on "
 "%(street_name)s"
-msgstr ""
+msgstr "Prendere la rotonda in senso antiorario, %(ordinal_exit_number)s"
+" uscita,  %(street_name)s"
 
 #: src/client/js/otp/util/Itin.js:222
 #, python-format
 msgid ""
 "Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit "
 "on <b>%(street_name)s</b>"
-msgstr ""
+msgstr "Prendere la rotonda in senso <b>orario</b>, <b>%(ordinal_exit_number)s</b>"
+" uscita,  <b>%(street_name)s</b>"
 
 #: src/client/js/otp/util/Itin.js:224
 #, python-format
 msgid ""
 "Take roundabout clockwise to %(ordinal_exit_number)s exit on "
 "%(street_name)s"
-msgstr ""
+msgstr "Prendere la rotonda in senso orario, %(ordinal_exit_number)s"
+" uscita,  %(street_name)s"
 
 #. Start on [stret name] heading [compas direction]
 #: src/client/js/otp/util/Itin.js:232
 msgid "Start on"
-msgstr ""
+msgstr "Partenza su"
 
 #: src/client/js/otp/util/Itin.js:232
 msgid " heading "
-msgstr ""
+msgstr " in direzione "
 
 #. [Relative direction (Left/Right...)] to continue
 #. on /on to [streetname]
@@ -922,92 +941,92 @@ msgstr "continua su"
 
 #: src/client/js/otp/util/Itin.js:238
 msgid "on to"
-msgstr ""
+msgstr "su"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:31
 #, fuzzy
 msgid "first"
-msgstr "Primo"
+msgstr "prima"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:34
 msgid "second"
-msgstr ""
+msgstr "seconda"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:37
 msgid "third"
-msgstr ""
+msgstr "terza"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:40
 msgid "fourth"
-msgstr ""
+msgstr "quarta"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:43
 msgid "fifth"
-msgstr ""
+msgstr "quinta"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:46
 msgid "sixth"
-msgstr ""
+msgstr "sesta"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:49
 msgid "seventh"
-msgstr ""
+msgstr "settima"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:52
 msgid "eight"
-msgstr ""
+msgstr "ottava"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:55
 msgid "ninth"
-msgstr ""
+msgstr "nona"
 
 #. Take roundabout to [nth] exit on [streetname] used
 #. as ordinal_exit number parameter for roundabouts
 #: src/client/js/otp/util/Text.js:58
 msgid "tenth"
-msgstr ""
+msgstr "decima"
 
 #. n hour/hours use short form
 #: src/client/js/otp/util/Time.js:29 src/client/js/otp/util/Time.js:45
 #, python-format
 msgid "%d hr"
 msgid_plural "%d hrs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d h"
+msgstr[1] "%d h"
 
 #. n minute/minutes use short form
 #: src/client/js/otp/util/Time.js:33 src/client/js/otp/util/Time.js:45
 #, python-format
 msgid "%d min"
 msgid_plural "%d mins"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d m"
+msgstr[1] "%d m"
 
 #. n second/seconds use short form
 #: src/client/js/otp/util/Time.js:47
 #, python-format
 msgid "%d sec"
 msgid_plural "%d secs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d s"
+msgstr[1] "%d s"
 
 #: src/client/js/otp/widgets/Dialogs.js:22
 #, fuzzy
@@ -1035,42 +1054,42 @@ msgstr "Porta in secondo piano"
 #. Public transit Route: routename (Used in Trip viewer)
 #: src/client/js/otp/widgets/transit/RouteBasedWidget.js:42
 msgid "Route:"
-msgstr ""
+msgstr "Linea:"
 
 #. Public Transit Route variant: Start - end stop (Used in
 #. trip viewer)
 #: src/client/js/otp/widgets/transit/RouteBasedWidget.js:62
 msgid "Variant:"
-msgstr ""
+msgstr "Percorso:"
 
 #. Widget title
 #: src/client/js/otp/widgets/transit/StopFinderWidget.js:31
 msgid "Stop Finder"
-msgstr ""
+msgstr "Ricerca Fermata"
 
 #. [Public transport] Agency: Selector for Public transport agencies
 #: src/client/js/otp/widgets/transit/StopFinderWidget.js:48
 msgid "Agency"
-msgstr ""
+msgstr "Azienda TPL"
 
 #. Search for Stops by ID
 #: src/client/js/otp/widgets/transit/StopFinderWidget.js:50
 msgid "By ID"
-msgstr ""
+msgstr "Numero"
 
 #. Search for Stops by Name
 #: src/client/js/otp/widgets/transit/StopFinderWidget.js:52
 msgid "By Name"
-msgstr ""
+msgstr "Nome"
 
 #. Search for Stops by ID/by Name
 #: src/client/js/otp/widgets/transit/StopFinderWidget.js:54
 msgid "Search"
-msgstr ""
+msgstr "Cerca"
 
 #: src/client/js/otp/widgets/transit/StopFinderWidget.js:95
 msgid "No Stops Found"
-msgstr ""
+msgstr "Nessuna fermata trovata"
 
 #. Date: date chooser (In stop viewer)
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:49
@@ -1081,12 +1100,12 @@ msgstr "Data"
 #. Button
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:51
 msgid "Find Stops"
-msgstr ""
+msgstr "Cerca fermata"
 
 #. When no public transit stops were selected in stop viewer
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:53
 msgid "(No Stop Selected)"
-msgstr ""
+msgstr "(nessuna fermata selezionata)"
 
 #. Trip block (A block consists of two or more
 #. sequential trips made using the same vehicle, where a passenger
@@ -1094,19 +1113,19 @@ msgstr ""
 #. vehicle.)
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:120
 msgid "Block"
-msgstr ""
+msgstr "Turno"
 
 #. Recenter map on this stop (Shown at each stop in
 #. Trip viewer
 #: src/client/js/otp/widgets/transit/TripViewerWidget.js:115
 msgid "Recenter"
-msgstr ""
+msgstr "Centra"
 
 #. Link to Stop viewer (Shown at each stop in Trip
 #. viewer)
 #: src/client/js/otp/widgets/transit/TripViewerWidget.js:123
 msgid "Viewer"
-msgstr ""
+msgstr "Passaggi"
 
 #. Optimization for bicycle shown in bike triangle. Optimized
 #. for speed
@@ -1152,7 +1171,7 @@ msgstr "V"
 #: src/client/js/otp/widgets/tripoptions/RoutesSelectorWidget.js:47
 #, fuzzy
 msgid "All Routes"
-msgstr "Tutte"
+msgstr "Linee"
 
 #. save preffered/banned public transport routes
 #: src/client/js/otp/widgets/tripoptions/RoutesSelectorWidget.js:49
@@ -1184,14 +1203,14 @@ msgstr "Geocoder"
 #, fuzzy
 msgctxt "tripoptions"
 msgid "Depart"
-msgstr "Da"
+msgstr "Partenza"
 
 #. Arrive [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of arrival.
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:316
 #, fuzzy
 msgid "Arrive"
-msgstr "A"
+msgstr "Arrivo"
 
 #. on button that sets time and date of arrival/departure to now
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:318
@@ -1209,26 +1228,26 @@ msgstr "Percorso accessibile:"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474
 #, fuzzy
 msgid "Travel by"
-msgstr "Viaggia in"
+msgstr "Modalità"
 
 #. default value for preset values of maximum walk
 #. distances in Trip Options
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:580
 #, fuzzy
 msgid "Presets"
-msgstr "Presets"
+msgstr "Preset"
 
 #. label for choosing how much should person's trip on foot be
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:643
 #, fuzzy
 msgid "Maximum walk"
-msgstr "Massima distanza a piedi"
+msgstr "Max dist a piedi"
 
 #. label for choosing how much should person's trip on bicycle be
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:666
 #, fuzzy
 msgid "Maximum bike"
-msgstr "Massima distanza in bici"
+msgstr "Max dist in bici"
 
 #. label Preferred Routes: (routes/None)
 #. widget title
@@ -1236,7 +1255,7 @@ msgstr "Massima distanza in bici"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:709
 #, fuzzy
 msgid "Preferred Routes"
-msgstr "Linee preferita"
+msgstr "Linee preferite"
 
 #. button to edit Preffered public transport Routes
 #. buton edit Banned public transport routes
@@ -1274,21 +1293,20 @@ msgstr "Linee da evitare"
 #. In Bike share planner radio button: <Use>: My Own Bike A shared bike
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:947
 msgid "Use"
-msgstr ""
+msgstr "Usa"
 
 #. In Bike share planner radio button: Use: <My Own Bike> A shared bike
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:949
 msgid "My Own Bike"
-msgstr ""
+msgstr "bici propria"
 
 #. In Bike share planner radio button: Use: My Own Bike <A Shared bike>
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:951
 msgid "A Shared Bike"
-msgstr ""
+msgstr "bike sharing"
 
 #. button to send query for trip planning
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1092
 #, fuzzy
 msgid "Plan Your Trip"
 msgstr "Calcola"
-

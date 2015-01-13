@@ -10,7 +10,6 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -20,16 +19,13 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
@@ -51,11 +47,17 @@ public class LuceneIndex {
     private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_47);
     private QueryParser parser = new QueryParser(Version.LUCENE_47, "name", analyzer);
     private GraphIndex graphIndex;
-    private Directory directory;
+    private File basePath;
+    private Directory directory; // the Lucene Directory, not to be confused with a filesystem directory
     private IndexSearcher searcher; // Will be null until index is built.
 
-    public LuceneIndex(final GraphIndex graphIndex, boolean background) {
+    /**
+     * @param basePath the filesystem location under which to save indexes
+     * @param background if true, perform the initial indexing in a background thread, if false block to index
+     */
+    public LuceneIndex(final GraphIndex graphIndex, File basePath, boolean background) {
         this.graphIndex = graphIndex;
+        this.basePath = basePath;
         if (background) {
             new BackgroundIndexer().start();
         } else {
@@ -69,7 +71,8 @@ public class LuceneIndex {
     private void index() {
         try {
             long startTime = System.currentTimeMillis();
-            directory = FSDirectory.open(new File("/var/otp/lucene"));
+            /* Create or re-open a disk-backed Lucene Directory under the OTP server base filesystem directory. */
+            directory = FSDirectory.open(new File(basePath, "lucene"));
             // TODO reuse the index if it exists?
             //directory = new RAMDirectory(); // only a little faster
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, analyzer).setOpenMode(OpenMode.CREATE);
@@ -107,7 +110,7 @@ public class LuceneIndex {
         String mainStreet = null;
         String crossStreet = null;
         // TODO score based on OSM street type, using intersection nodes instead of vertices.
-        for (PlainStreetEdge pse : Iterables.filter(sv.getOutgoing(), PlainStreetEdge.class)) {
+        for (StreetEdge pse : Iterables.filter(sv.getOutgoing(), StreetEdge.class)) {
             if (mainStreet == null) mainStreet = pse.getName();
             else crossStreet = pse.getName();
         }

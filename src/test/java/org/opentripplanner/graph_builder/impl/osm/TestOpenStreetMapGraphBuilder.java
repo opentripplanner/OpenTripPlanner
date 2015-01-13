@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.net.URLDecoder;
 
 import junit.framework.TestCase;
 
@@ -53,7 +54,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 
-        File file = new File(getClass().getResource("map.osm.gz").getFile());
+        File file = new File(URLDecoder.decode(getClass().getResource("map.osm.gz").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);
@@ -111,7 +112,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 
-        File file = new File(getClass().getResource("NYC_small.osm.gz").getFile());
+        File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.gz").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);
@@ -158,7 +159,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
             // Check turn restriction consistency.
             // NOTE(flamholz): currently there don't appear to be any turn restrictions
             // in the OSM file we are loading.
-            for (TurnRestriction tr : se.getTurnRestrictions()) {                
+            for (TurnRestriction tr : gg.getTurnRestrictions(se)) {
                 // All turn restrictions should apply equally to
                 // CAR and CUSTOM_MOTOR_VEHICLE.
                 TraverseModeSet modes = tr.modes;
@@ -222,7 +223,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
 
         dataForWay = wayPropertySet.getDataForWay(way);
-        assertEquals(dataForWay.getSafetyFeatures().getFirst(), 1.5);
+        assertEquals(dataForWay.getSafetyFeatures().first, 1.5);
 
         // test a left-right distinction
         way = new OSMWay();
@@ -236,9 +237,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         wayPropertySet.addProperties(track_only, track_is_safest);
         dataForWay = wayPropertySet.getDataForWay(way);
-        assertEquals(0.25, dataForWay.getSafetyFeatures().getFirst()); // right (with traffic) comes
+        assertEquals(0.25, dataForWay.getSafetyFeatures().first); // right (with traffic) comes
                                                                        // from track
-        assertEquals(0.75, dataForWay.getSafetyFeatures().getSecond()); // left comes from lane
+        assertEquals(0.75, dataForWay.getSafetyFeatures().second); // left comes from lane
 
         way = new OSMWay();
         way.addTag("highway", "footway");

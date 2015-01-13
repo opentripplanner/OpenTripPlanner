@@ -10,11 +10,13 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
@@ -161,6 +163,8 @@ public class Ride {
     /**
      * Create a compound Stats for all the constituent PatternRides of this Ride.
      * This should not be called until all PatternRides have been added to this Ride.
+     * There are two separate Stats objects: The rideStats includes the time spent on the patterns themselves.
+     * The waitStats capture the time spent waiting to board those patterns (transfer or initial boarding).
      */
     public void calcStats(TimeWindow window, double walkSpeed) {
         /* Stats for the ride on transit. */
@@ -168,9 +172,20 @@ public class Ride {
         for (PatternRide patternRide : patternRides) {
             stats.add(patternRide.stats);
         }
-        this.rideStats = new Stats(stats);
+        rideStats = new Stats(stats);
         /* Stats for the wait between the last ride and this one, NOT including walk time. */
-        this.waitStats = this.calcStatsForTransfer(window, walkSpeed);
+        waitStats = calcStatsForFreqs(window);
+        // Only try schedule-based boarding if there were no non-exact frequency entries.
+        // FIXME there is an assumption here that there are only frequency or non-frequency entries in a PatternRide
+        if (waitStats == null) {
+            if (previous == null) {
+                // If there is no previous ride, assume uniformly distributed arrival times.
+                waitStats = calcStatsForBoarding(window);
+            } else {
+                // There is a previous ride, so account for arrival and departure times before and after the transfer.
+                waitStats = calcStatsForTransfer(window, walkSpeed);
+            }
+        }
     }
 
     /* Maybe store transfer distances by stop pair, and look them up. */
@@ -182,6 +197,8 @@ public class Ride {
     public List<Integer> getSortedStoptimes (TimeWindow window, boolean arrivals) {
         // Using Lists because we don't know the length in advance
         List<Integer> times = Lists.newArrayList();
+        // TODO include exact-times frequency trips along with non-frequency trips
+        // non-exact (headway-based) frequency trips will be handled elsewhere since they don't have specific boarding times.
         for (PatternRide patternRide : patternRides) {
             for (TripTimes tt : patternRide.pattern.scheduledTimetable.tripTimes) {
                 if (window.servicesRunning.get(tt.serviceCode)) {
@@ -195,12 +212,37 @@ public class Ride {
         return times;
     }
 
+    /** Calculate the wait time stats for boarding all (non-exact) frequency entries in this Ride. */
+    private Stats calcStatsForFreqs(TimeWindow window) {
+        Stats stats = new Stats(); // all stats fields are initialized to zero
+        stats.num = 0; // the total number of seconds that headway boarding is possible
+        for (PatternRide patternRide : patternRides) {
+            for (FrequencyEntry freq : patternRide.pattern.scheduledTimetable.frequencyEntries) {
+                if (freq.exactTimes) {
+                    LOG.error("Exact times not yet supported in profile routing.");
+                    return null;
+                }
+                int overlap = window.overlap(freq.startTime, freq.endTime, freq.tripTimes.serviceCode);
+                if (overlap > 0) {
+                    if (freq.headway > stats.max) stats.max = freq.headway;
+                    // weight the average of each headway by the number of seconds it is valid
+                    stats.avg += (freq.headway / 2) * overlap;
+                    stats.num += overlap;
+                }
+            }
+        }
+        if (stats.num == 0) return null;
+        /* Some frequency entries were added to the stats. */
+        stats.avg /= stats.num;
+        return stats;
+    }
+
     /**
      * Produce stats about boarding an initial Ride, which has no previous ride.
      * This assumes arrival times are uniformly distributed during the window.
      * The Ride must contain some trips, and the window must have a positive duration.
      */
-    public Stats statsForBoarding(TimeWindow window) {
+    public Stats calcStatsForBoarding(TimeWindow window) {
         Stats stats = new Stats ();
         stats.min = 0; // You can always arrive just before a train departs.
         List<Integer> departures = getSortedStoptimes(window, false);
@@ -228,8 +270,6 @@ public class Ride {
      * calculated from full sets of patterns, which are not known until a round is over.
      */
     public Stats calcStatsForTransfer (TimeWindow window, double walkSpeed) {
-        /* If there is no previous ride, assume uniformly distributed arrival times. */
-        if (previous == null) return this.statsForBoarding (window); 
         List<Integer> arrivals = previous.getSortedStoptimes(window, true);
         List<Integer> departures = this.getSortedStoptimes(window, false);
         List<Integer> waits = Lists.newArrayList();

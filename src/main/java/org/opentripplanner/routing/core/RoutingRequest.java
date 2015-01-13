@@ -199,6 +199,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Cost of dropping-off a rented bike */
     public int bikeRentalDropoffCost = 30;
 
+    /** Time to park a bike */
+    public int bikeParkTime = 60;
+
+    /** Cost of parking a bike. */
+    public int bikeParkCost = 120;
+
     /**
      * Time to park a car in a park and ride, w/o taking into account driving and walking cost
      * (time to park, switch off, pick your stuff, lock the car, etc...)
@@ -219,7 +225,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double waitReluctance = 1.0;
 
     /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
-    public double waitAtBeginningFactor = 0.2;
+    public double waitAtBeginningFactor = 0.9;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
     public int walkBoardCost = 60 * 10;
@@ -392,6 +398,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
+
+    /* Whether we are in "long-distance mode". This is currently a server-wide setting, but it could be made per-request. */
+    public boolean longDistance = false;
 
     /* CONSTRUCTORS */
 
@@ -1171,6 +1180,21 @@ public class RoutingRequest implements Cloneable, Serializable {
             preferences_penalty += useUnpreferredRoutesPenalty;
         }
         return preferences_penalty;
+    }
+
+    /**
+     * Get the maximum expected speed over all transit modes.
+     * TODO derive actual speeds from GTFS feeds. On the other hand, that's what the bidirectional heuristic does on the fly.
+     */
+    public double getTransitSpeedUpperBound() {
+        if (modes.contains(TraverseMode.RAIL)) {
+            return 84; // 300kph typical peak speed of a TGV
+        }
+        if (modes.contains(TraverseMode.CAR)) {
+            return 40; // 130kph max speed of a car on a highway
+        }
+        // Considering that buses can travel on highways, return the same max speed for all other transit.
+        return 40; // TODO find accurate max speeds
     }
 
 }

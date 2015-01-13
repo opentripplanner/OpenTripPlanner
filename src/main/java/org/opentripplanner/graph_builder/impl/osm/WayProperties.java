@@ -59,8 +59,7 @@ public class WayProperties implements Cloneable {
         WayProperties result;
         try {
             result = (WayProperties) super.clone();
-            result.setSafetyFeatures(new P2<Double>(safetyFeatures.getFirst(), safetyFeatures
-                    .getSecond()));
+            result.setSafetyFeatures(new P2<Double>(safetyFeatures.first, safetyFeatures.second));
             return result;
         } catch (CloneNotSupportedException e) {
             // unreached

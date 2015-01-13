@@ -42,14 +42,12 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -58,11 +56,9 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
@@ -82,10 +78,10 @@ public class PlanGenerator {
     private static final double MAX_ZAG_DISTANCE = 30;
 
     public PathService pathService;
-    public GraphService graphService;
+    public Graph graph;
 
-    public PlanGenerator(GraphService graphService, PathService pathService) {
-        this.graphService = graphService;
+    public PlanGenerator(Graph graph, PathService pathService) {
+        this.graph = graph;
         this.pathService = pathService;
     }
 
@@ -113,13 +109,14 @@ public class PlanGenerator {
                 tooSloped = true;
             }
         } catch (VertexNotFoundException e) {
-            LOG.info("Vertex not found: " + options.from + " : " + options.to, e);
+            LOG.info("Vertex not found: " + options.from + " : " + options.to);
             throw e;
         }
         options.rctx.debugOutput.finishedCalculating();
 
         if (paths == null || paths.size() == 0) {
-            LOG.info("Path not found: " + options.from + " : " + options.to);
+            LOG.debug("Path not found: " + options.from + " : " + options.to);
+            options.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
             throw new PathNotFoundException();
         }
 
@@ -240,7 +237,7 @@ public class PlanGenerator {
             itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops));
         }
 
-        addWalkSteps(itinerary.legs, legsStates);
+        addWalkSteps(graph, itinerary.legs, legsStates);
 
         fixupLegs(itinerary.legs, legsStates);
 
@@ -428,11 +425,11 @@ public class PlanGenerator {
      * @param legs The legs of the itinerary
      * @param legsStates The states that go with the legs
      */
-    private void addWalkSteps(List<Leg> legs, State[][] legsStates) {
+    private void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates) {
         WalkStep previousStep = null;
 
         for (int i = 0; i < legsStates.length; i++) {
-            List<WalkStep> walkSteps = generateWalkSteps(legsStates[i], previousStep);
+            List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep);
 
             legs.get(i).walkSteps = walkSteps;
 
@@ -555,16 +552,13 @@ public class PlanGenerator {
      */
     private void calculateElevations(Itinerary itinerary, Edge[] edges) {
         for (Edge edge : edges) {
-            if (!(edge instanceof EdgeWithElevation)) continue;
+            if (!(edge instanceof StreetEdge)) continue;
 
-            EdgeWithElevation edgeWithElevation = (EdgeWithElevation) edge;
-            ElevationProfileSegment profileSegment = edgeWithElevation.getElevationProfileSegment();
-
-            if (profileSegment == null) continue;
-
-            PackedCoordinateSequence coordinates = profileSegment.getElevationProfile();
+            StreetEdge edgeWithElevation = (StreetEdge) edge;
+            PackedCoordinateSequence coordinates = edgeWithElevation.getElevationProfile();
 
             if (coordinates == null) continue;
+            // TODO Check the test below, AFAIU current elevation profile has 3 dimensions.
             if (coordinates.getDimension() != 2) continue;
 
             for (int i = 0; i < coordinates.size() - 1; i++) {
@@ -588,7 +582,7 @@ public class PlanGenerator {
     private void addModeAndAlerts(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
-            Set<Alert> alerts = state.getBackAlerts();
+            Set<Alert> alerts = graph.streetNotesService.getNotes(state);
             Edge edge = state.getBackEdge();
 
             if (mode != null) {
@@ -758,7 +752,7 @@ public class PlanGenerator {
      * 
      * @return
      */
-    public static List<WalkStep> generateWalkSteps(State[] states, WalkStep previous) {
+    public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous) {
         List<WalkStep> steps = new ArrayList<WalkStep>();
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
@@ -786,7 +780,7 @@ public class PlanGenerator {
             // before or will come after
             if (edge instanceof ElevatorAlightEdge) {
                 // don't care what came before or comes after
-                step = createWalkStep(forwardState);
+                step = createWalkStep(graph, forwardState);
                 createdNewStep = true;
                 disableZagRemovalForThisStep = true;
 
@@ -814,7 +808,7 @@ public class PlanGenerator {
 
             if (step == null) {
                 // first step
-                step = createWalkStep(forwardState);
+                step = createWalkStep(graph, forwardState);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -845,7 +839,7 @@ public class PlanGenerator {
                     roundaboutExit = 0;
                 }
                 /* start a new step */
-                step = createWalkStep(forwardState);
+                step = createWalkStep(graph, forwardState);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -886,7 +880,7 @@ public class PlanGenerator {
                     // intersection
                     // to see if we should generate a "left to continue" instruction.
                     boolean shouldGenerateContinue = false;
-                    if (edge instanceof PlainStreetEdge) {
+                    if (edge instanceof StreetEdge) {
                         // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
@@ -932,7 +926,7 @@ public class PlanGenerator {
 
                     if (shouldGenerateContinue) {
                         // turn to stay on same-named street
-                        step = createWalkStep(forwardState);
+                        step = createWalkStep(graph, forwardState);
                         createdNewStep = true;
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle, false);
@@ -1003,7 +997,7 @@ public class PlanGenerator {
                                     step.elevation = twoBack.elevation;
                                 } else {
                                     for (P2<Double> d : twoBack.elevation) {
-                                        step.elevation.add(new P2<Double>(d.getFirst() + step.distance, d.getSecond()));
+                                        step.elevation.add(new P2<Double>(d.first + step.distance, d.second));
                                     }
                                 }
                             }
@@ -1025,7 +1019,7 @@ public class PlanGenerator {
 
             // increment the total length for this step
             step.distance += edge.getDistance();
-            step.addAlerts(forwardState.getBackAlerts());
+            step.addAlerts(graph.streetNotesService.getNotes(forwardState));
             lastAngle = DirectionUtils.getLastAngle(geom);
         }
         return steps;
@@ -1047,7 +1041,7 @@ public class PlanGenerator {
         return angleDiff;
     }
 
-    private static WalkStep createWalkStep(State s) {
+    private static WalkStep createWalkStep(Graph graph, State s) {
         Edge en = s.getBackEdge();
         WalkStep step;
         step = new WalkStep();
@@ -1056,7 +1050,7 @@ public class PlanGenerator {
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
         step.bogusName = en.hasBogusName();
-        step.addAlerts(s.getBackAlerts());
+        step.addAlerts(graph.streetNotesService.getNotes(s));
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
         if (s.getBackEdge() instanceof AreaEdge) {
             step.area = true;
@@ -1065,10 +1059,10 @@ public class PlanGenerator {
     }
 
     private static List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
-        if (!(edge instanceof EdgeWithElevation)) {
+        if (!(edge instanceof StreetEdge)) {
             return new ArrayList<P2<Double>>();
         }
-        EdgeWithElevation elevEdge = (EdgeWithElevation) edge;
+        StreetEdge elevEdge = (StreetEdge) edge;
         if (elevEdge.getElevationProfile() == null) {
             return new ArrayList<P2<Double>>();
         }
@@ -1083,8 +1077,6 @@ public class PlanGenerator {
     /** Returns the first trip of the service day. Currently unused.
      * TODO This should probably be done with a special time value. */
     public TripPlan generateFirstTrip(RoutingRequest request) {
-        Graph graph = graphService.getGraph(request.routerId);
-
         request.setArriveBy(false);
 
         TimeZone tz = graph.getTimeZone();
@@ -1103,8 +1095,6 @@ public class PlanGenerator {
     /** Return the last trip of the service day. Currently unused.
      * TODO This should probably be done with a special time value. */
     public TripPlan generateLastTrip(RoutingRequest request) {
-        Graph graph = graphService.getGraph(request.routerId);
-
         request.setArriveBy(true);
 
         TimeZone tz = graph.getTimeZone();

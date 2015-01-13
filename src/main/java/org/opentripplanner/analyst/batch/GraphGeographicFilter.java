@@ -55,7 +55,7 @@ public class GraphGeographicFilter implements IndividualFilter {
         LOG.debug("using only stops? {}", useOnlyStops);
         if (bufferMeters < prototypeRoutingRequest.maxWalkDistance)
             LOG.warn("geographic filter buffer is smaller than max walk distance, this will probably yield incorrect results.");
-        Graph graph= graphService.getGraph(prototypeRoutingRequest.routerId);
+        Graph graph= graphService.getRouter(prototypeRoutingRequest.routerId).graph;
         List<Geometry> geometries = new ArrayList<Geometry>();
         for (Vertex v : graph.getVertices()) {
             if (useOnlyStops && ! (v instanceof TransitStop))

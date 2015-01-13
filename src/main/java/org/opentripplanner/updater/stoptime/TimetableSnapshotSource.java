@@ -15,9 +15,10 @@ package org.opentripplanner.updater.stoptime;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import com.google.common.collect.Maps;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -102,8 +103,10 @@ public class TimetableSnapshotSource {
 
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot.
+     * A GTFS-RT feed is always applied against a single static feed (indicated by feedId).
+     * However, multi-feed support is not completed and we currently assume there is only one static feed when matching IDs.
      */
-    public void applyTripUpdates(List<TripUpdate> updates, String agencyId) {
+    public void applyTripUpdates(List<TripUpdate> updates, String feedId) {
         if (updates == null) {
             LOG.warn("updates is null");
             return;
@@ -138,30 +141,31 @@ public class TimetableSnapshotSource {
             if (tripDescriptor.hasScheduleRelationship()) {
                 switch(tripDescriptor.getScheduleRelationship()) {
                     case SCHEDULED:
-                        applied = handleScheduledTrip(tripUpdate, agencyId, serviceDate);
+                        applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
                         break;
                     case ADDED:
-                        applied = handleAddedTrip(tripUpdate, agencyId, serviceDate);
+                        applied = handleAddedTrip(tripUpdate, feedId, serviceDate);
                         break;
                     case UNSCHEDULED:
-                        applied = handleUnscheduledTrip(tripUpdate, agencyId, serviceDate);
+                        applied = handleUnscheduledTrip(tripUpdate, feedId, serviceDate);
                         break;
                     case CANCELED:
-                        applied = handleCanceledTrip(tripUpdate, agencyId, serviceDate);
+                        applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                         break;
                     case REPLACEMENT:
-                        applied = handleReplacementTrip(tripUpdate, agencyId, serviceDate);
+                        applied = handleReplacementTrip(tripUpdate, feedId, serviceDate);
                         break;
                 }
             } else {
                 // Default
-                applied = handleScheduledTrip(tripUpdate, agencyId, serviceDate);
+                applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
             }
 
             if(applied) {
                 appliedBlockCount++;
              } else {
-                 LOG.warn("Failed to apply TripUpdate:\n{}", tripUpdate);
+                 LOG.warn("Failed to apply TripUpdate.");
+                 LOG.trace(" Contents: {}", tripUpdate);
              }
 
              if (appliedBlockCount % logFrequency == 0) {
@@ -180,10 +184,10 @@ public class TimetableSnapshotSource {
         }
     }
 
-    protected boolean handleScheduledTrip(TripUpdate tripUpdate, String agencyId,
-            ServiceDate serviceDate) {
+    protected boolean handleScheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
-        AgencyAndId tripId = new AgencyAndId(agencyId, tripDescriptor.getTripId());
+        // This does not include Agency ID or feed ID, trips are feed-unique and we currently assume a single static feed.
+        String tripId = tripDescriptor.getTripId();
         TripPattern pattern = getPatternForTripId(tripId);
 
         if (pattern == null) {
@@ -197,27 +201,31 @@ public class TimetableSnapshotSource {
         }
 
         // we have a message we actually want to apply
-        return buffer.update(pattern, tripUpdate, agencyId, timeZone, serviceDate);
+        return buffer.update(pattern, tripUpdate, feedId, timeZone, serviceDate);
     }
 
-    protected boolean handleAddedTrip(TripUpdate tripUpdate, String agencyId,
-            ServiceDate serviceDate) {
+    protected boolean handleAddedTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         // TODO: Handle added trip
         LOG.warn("Added trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
-    protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String agencyId,
-            ServiceDate serviceDate) {
+    protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         // TODO: Handle unscheduled trip
         LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
+    protected boolean handleReplacementTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
+        // TODO: Handle replacement trip
+        LOG.warn("Replacement trips are currently unsupported. Skipping TripUpdate.");
+        return false;
+    }
+
     protected boolean handleCanceledTrip(TripUpdate tripUpdate, String agencyId,
-            ServiceDate serviceDate) {
+                                         ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
-        AgencyAndId tripId = new AgencyAndId(agencyId, tripDescriptor.getTripId());
+        String tripId = tripDescriptor.getTripId(); // This does not include Agency ID, trips are feed-unique.
         TripPattern pattern = getPatternForTripId(tripId);
 
         if (pattern == null) {
@@ -226,13 +234,6 @@ public class TimetableSnapshotSource {
         }
 
         return buffer.update(pattern, tripUpdate, agencyId, timeZone, serviceDate);
-    }
-
-    protected boolean handleReplacementTrip(TripUpdate tripUpdate, String agencyId,
-            ServiceDate serviceDate) {
-        // TODO: Handle replacement trip
-        LOG.warn("Replacement trips are currently unsupported. Skipping TripUpdate.");
-        return false;
     }
 
     protected boolean purgeExpiredData() {
@@ -251,9 +252,19 @@ public class TimetableSnapshotSource {
         return buffer.purgeExpiredData(previously);
     }
 
-    protected TripPattern getPatternForTripId(AgencyAndId tripId) {
-        Trip trip = graphIndex.tripForId.get(tripId);
+    protected TripPattern getPatternForTripId(String tripIdWithoutAgency) {
+        /* Lazy-initialize a separate index that ignores agency IDs.
+         * Stopgap measure assuming no cross-feed ID conflicts, until we get GTFS loader replaced. */
+        if (graphIndex.tripForIdWithoutAgency == null) {
+            Map<String, Trip> map = Maps.newHashMap();
+            for (Trip trip : graphIndex.tripForId.values()) {
+                map.put(trip.getId().getId(), trip);
+            }
+            graphIndex.tripForIdWithoutAgency = map;
+        }
+        Trip trip = graphIndex.tripForIdWithoutAgency.get(tripIdWithoutAgency);
         TripPattern pattern = graphIndex.patternForTrip.get(trip);
         return pattern;
     }
+
 }

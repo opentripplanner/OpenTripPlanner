@@ -26,7 +26,7 @@ public class SafetyFeaturesEditor extends PropertyEditorSupport {
     }
 
     public String getAsText() {
-        return value.getFirst() + ", " + value.getSecond();
+        return value.first + ", " + value.second;
     }
 
     public Object getValue() {

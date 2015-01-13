@@ -30,6 +30,7 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +159,8 @@ public abstract class RoutingResource {
      */
     @DefaultValue("") @QueryParam("preferredRoutes") protected List<String> preferredRoutes;
 
-    /** The maximum number of possible itineraries to return. */
+    /** Penalty added for using every route that is not preferred if user set any route as preferred, i.e. number of seconds that we are willing
+     * to wait for preferred route. */
     @DefaultValue("-1") @QueryParam("otherThanPreferredRoutesPenalty") protected List<Integer> otherThanPreferredRoutesPenalty;
     
     /** The comma-separated list of preferred agencies. */
@@ -336,13 +338,8 @@ public abstract class RoutingResource {
             String d = get(date, n, null);
             String t = get(time, n, null);
             TimeZone tz;
-            if (otpServer.graphService != null) { // in tests graphService can be null
-                tz = otpServer.graphService.getGraph(request.routerId).getTimeZone();
-            } else {
-                LOG.warn("No graph service available, using default time zone.");
-                tz = TimeZone.getDefault();
-                LOG.info("Time zone set to {}", tz);
-            }
+            Router router = otpServer.getRouter(request.routerId);
+            tz = router.graph.getTimeZone();
             if (d == null && t != null) { // Time was provided but not date
                 LOG.debug("parsing ISO datetime {}", t);
                 try {

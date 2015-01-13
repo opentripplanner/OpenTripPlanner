@@ -19,7 +19,7 @@ import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVertexRenderer;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.EdgeVisualAttributes;
 import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -43,10 +43,10 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
 
     @Override
     public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
-        if (e instanceof PlainStreetEdge) {
-            PlainStreetEdge pse = (PlainStreetEdge) e;
+        if (e instanceof StreetEdge) {
+            StreetEdge pse = (StreetEdge) e;
             if (pse.getPermission().allows(TraverseMode.BICYCLE)) {
-                double bikeSafety = pse.getBicycleSafetyEffectiveLength() / pse.getLength();
+                double bikeSafety = pse.getBicycleSafetyFactor();
                 attrs.color = palette.getColor(bikeSafety);
                 attrs.label = String.format("%.02f", bikeSafety);
             } else {
@@ -75,4 +75,8 @@ public class BikeSafetyEdgeRenderer implements EdgeVertexRenderer {
         return true;
     }
 
+    @Override
+    public String getName() {
+        return "Bike safety";
+    }
 }

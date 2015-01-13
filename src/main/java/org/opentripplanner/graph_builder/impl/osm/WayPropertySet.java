@@ -17,15 +17,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,8 +105,8 @@ public class WayPropertySet {
             OSMSpecifier specifier = picker.getSpecifier();
             WayProperties wayProperties = picker.getProperties();
             P2<Integer> score = specifier.matchScores(way);
-            int leftScore = score.getFirst();
-            int rightScore = score.getSecond();
+            int leftScore = score.first;
+            int rightScore = score.second;
             if (picker.isSafetyMixin()) {
                 if (leftScore > 0) {
                     leftMixins.add(wayProperties);
@@ -126,8 +128,8 @@ public class WayPropertySet {
         }
 
         WayProperties result = rightResult.clone();
-        result.setSafetyFeatures(new P2<Double>(rightResult.getSafetyFeatures().getFirst(),
-                leftResult.getSafetyFeatures().getSecond()));
+        result.setSafetyFeatures(new P2<Double>(rightResult.getSafetyFeatures().first,
+                leftResult.getSafetyFeatures().second));
 
         /* apply mixins */
         if (leftMixins.size() > 0) {
@@ -163,13 +165,13 @@ public class WayPropertySet {
 
     private void applyMixins(WayProperties result, List<WayProperties> mixins, boolean right) {
         P2<Double> safetyFeatures = result.getSafetyFeatures();
-        double first = safetyFeatures.getFirst();
-        double second = safetyFeatures.getSecond();
+        double first = safetyFeatures.first;
+        double second = safetyFeatures.second;
         for (WayProperties properties : mixins) {
             if (right) {
-                second *= properties.getSafetyFeatures().getSecond();
+                second *= properties.getSafetyFeatures().second;
             } else {
-                first *= properties.getSafetyFeatures().getFirst();
+                first *= properties.getSafetyFeatures().first;
             }
         }
         result.setSafetyFeatures(new P2<Double>(first, second));
@@ -256,13 +258,13 @@ public class WayPropertySet {
             return this.defaultSpeed;
     }
 
-    public Set<Alert> getNoteForWay(OSMWithTags way) {
-        HashSet<Alert> out = new HashSet<Alert>();
+    public Set<T2<Alert, NoteMatcher>> getNoteForWay(OSMWithTags way) {
+        HashSet<T2<Alert, NoteMatcher>> out = new HashSet<>();
         for (NotePicker picker : notes) {
             OSMSpecifier specifier = picker.specifier;
             NoteProperties noteProperties = picker.noteProperties;
             if (specifier.matchScore(way) > 0) {
-                out.add(Alert.createSimpleAlerts(noteProperties.generateNote(way).intern()));
+                out.add(noteProperties.generateNote(way));
             }
         }
         if (out.size() == 0) {

@@ -1,7 +1,7 @@
 <script id="otp-stopViewer" type="text/html">
 
     <div class="otp-stopViewer-container notDraggable">
-        <div class="otp-stopViewer-stopInfo"> 
+        <div class="otp-stopViewer-stopInfo">
 			{{no_stops_selected}}
         </div>
 
@@ -23,10 +23,10 @@
             {{formattedTime}}
         </div>
         <div class="otp-stopViewer-routeRow">
-            {{#trip.route.shortName}}
-                ({{trip.route.shortName}}) 
-            {{/trip.route.shortName}}
-            {{trip.route.longName}}
+            {{#routeShortName}}
+                ({{routeShortName}})
+            {{/routeShortName}}
+            {{routeLongName}}
         </div>
 
         {{#direction}}
@@ -34,12 +34,12 @@
 				{{to}}{{direction}}
             </div>
         {{/direction}}
-        
+
         {{#trip.blockId}}
             <div class="otp-stopViewer-blockRow">
 				{{block}} {{trip.blockId}}
             </div>
-        {{/trip.blockId}}            
+        {{/trip.blockId}}
     </div>
 </script>
 

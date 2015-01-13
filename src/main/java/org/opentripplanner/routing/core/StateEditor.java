@@ -15,13 +15,11 @@ package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -52,9 +50,6 @@ public class StateEditor {
     private boolean defectiveTraversal = false;
 
     private boolean traversingBackward;
-    
-    // we use our own set of notes and only replace the child notes if they're different
-    private Set<Alert> notes = null;
 
     /* CONSTRUCTORS */
 
@@ -145,12 +140,6 @@ public class StateEditor {
             return null;
         }
 
-        // copy the notes if need be, keeping in mind they may both be null
-        if (this.notes != child.stateData.notes) {
-            cloneStateDataAsNeeded();
-            child.stateData.notes = this.notes;
-        }
-        
         spawned = true;
         return child;
     }
@@ -199,30 +188,6 @@ public class StateEditor {
      */
     public void blockTraversal() {
         this.defectiveTraversal = true;
-    }
-
-    /**
-     * Add an alert to this state. This used to use an EdgeNarrative
-     */
-    public void addAlert(Alert notes) {
-        if (notes == null)
-            return;
-        
-        if (this.notes == null)
-            this.notes = new HashSet<Alert>();
-        
-        this.notes.add(notes);
-    }
-    
-    /**
-     * Convenience function to add multiple alerts
-     */
-    public void addAlerts(Iterable<Alert> alerts) {
-        if (alerts == null)
-            return;
-        for (Alert alert : alerts) {
-            this.addAlert(alert);
-        }
     }
 
     /* Incrementors */
@@ -407,6 +372,16 @@ public class StateEditor {
         }
     }
 
+    public void setBikeParked(boolean bikeParked) {
+        cloneStateDataAsNeeded();
+        child.stateData.bikeParked = bikeParked;
+        if (bikeParked) {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
+        }
+    }
+
     public void setPreviousStop(Stop previousStop) {
         cloneStateDataAsNeeded();
         child.stateData.previousStop = previousStop;
@@ -444,6 +419,7 @@ public class StateEditor {
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
         child.stateData.carParked = state.stateData.carParked;
+        child.stateData.bikeParked = state.stateData.bikeParked;
     }
 
     /* PUBLIC GETTER METHODS */

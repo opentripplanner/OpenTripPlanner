@@ -31,11 +31,11 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
      */
     private List<TripUpdate> updates;
 
-    private String agencyId;
+    private String feedId;
 
-    public TripUpdateGraphWriterRunnable(List<TripUpdate> updates, String agencyId) {
+    public TripUpdateGraphWriterRunnable(List<TripUpdate> updates, String feedId) {
 		this.updates = updates;
-		this.agencyId = agencyId;
+		this.feedId = feedId;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
         // Apply updates to graph using realtime snapshot source
         TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
         if (snapshotSource != null) {
-            snapshotSource.applyTripUpdates(updates, agencyId);
+            snapshotSource.applyTripUpdates(updates, feedId);
         } else {
             LOG.error("Could not find realtime data snapshot source in graph."
                     + " The following updates are not applied: {}", updates);

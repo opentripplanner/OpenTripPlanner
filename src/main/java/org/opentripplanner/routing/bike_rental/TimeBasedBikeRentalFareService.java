@@ -65,15 +65,15 @@ public class TimeBasedBikeRentalFareService implements ChainedFareService, Seria
         Collections.sort(pricing_by_second, new Comparator<P2<Integer>>() {
             @Override
             public int compare(P2<Integer> arg0, P2<Integer> arg1) {
-                return arg0.getFirst() - arg1.getFirst();
+                return arg0.first - arg1.first;
             }
 
         });
         int seconds = -1;
         int lastCost = 0;
         for (P2<Integer> bracket : pricing_by_second) {
-            int maxTime = bracket.getFirst();
-            int cost = bracket.getSecond();
+            int maxTime = bracket.first;
+            int cost = bracket.second;
             if (maxTime == seconds) {
                 throw new RuntimeException("Bike share pricing has two entries for " + maxTime);
             }
@@ -100,9 +100,9 @@ public class TimeBasedBikeRentalFareService implements ChainedFareService, Seria
                     int time_on_bike = (int) (state.getTimeSeconds() - start);
                     int ride_cost = -1;
                     for (P2<Integer> bracket : pricing_by_second) {
-                        int time = bracket.getFirst();
+                        int time = bracket.first;
                         if (time_on_bike < time) {
-                            ride_cost = bracket.getSecond();
+                            ride_cost = bracket.second;
                             break;
                         }
                     }

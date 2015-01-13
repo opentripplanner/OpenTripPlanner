@@ -1,13 +1,6 @@
 package org.opentripplanner.profile;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.google.common.collect.TreeMultimap;
-import org.onebusaway.gtfs.model.AgencyAndId;
+import com.google.common.collect.*;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.resource.SimpleIsochrone;
@@ -16,7 +9,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -30,14 +22,20 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
+/**
+ * Rather than finding a single optimal route, ProfileRouter aims to find all reasonable ways to go from an origin
+ * to a destination over a given time window, and expresses those results in terms of route combinations and time ranges.
+ * For example:
+ * riding Train A followed by Bus B between 9AM and 11AM takes between 1.2 and 1.6 hours;
+ * riding Train A followed by Bus C takes between 1.4 and 1.8 hours.
+ *
+ * Create one instance of ProfileRouter per profile search. It is not intended to be threadsafe or reusable.
+ * You MUST call the cleanup method on all ProfileRouter instances that have been used for routing before
+ * they are released for garbage collection.
+ */
 public class ProfileRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
@@ -47,7 +45,6 @@ public class ProfileRouter {
     private static final int TIMEOUT = 10; // in seconds, maximum computation time
     public static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
     private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
-    private static final int MIN_DRIVE_TIME = 10 * 60; // in seconds
     private static final List<TraverseMode> ACCESS_MODES =
             Lists.newArrayList(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR);
     private static final List<TraverseMode> EGRESS_MODES =
@@ -93,7 +90,13 @@ public class ProfileRouter {
 
         // Lazy-initialize profile transfers (before setting timeouts, since this is slow)
         if (graph.index.transfersFromStopCluster == null) {
-            graph.index.initializeProfileTransfers();
+            synchronized (graph.index) {
+                // why another if statement? so that if another thread initialized this in the meantime
+                // we don't initialize it again.
+                if (graph.index.transfersFromStopCluster == null) {
+                    graph.index.initializeProfileTransfers();
+                }
+            }
         }
         // Analyst
         if (request.analyst) {
@@ -102,7 +105,9 @@ public class ProfileRouter {
             Arrays.fill(mins, TimeSurface.UNREACHABLE);
             Arrays.fill(maxs, TimeSurface.UNREACHABLE);
         }
-        LOG.info("modes: {}", request.modes);
+        LOG.info("access modes: {}", request.accessModes);
+        LOG.info("egress modes: {}", request.egressModes);
+        LOG.info("direct modes: {}", request.directModes);
 
         // Establish search timeouts
         long searchBeginTime = System.currentTimeMillis();
@@ -123,7 +128,8 @@ public class ProfileRouter {
             toStops = findClosestPatterns(toStopPaths);
             // Also look for options connecting origin to destination with no transit.
             for (TraverseMode mode : ACCESS_MODES) {
-                if (request.modes.contains(mode)) findStreetOption(mode);
+                LOG.info("Finding non-transit path for mode {}", mode);
+                if (request.directModes.contains(mode)) findStreetOption(mode); // TODO rename function
             }
         }
         LOG.info("Done finding access/egress paths.");
@@ -135,7 +141,9 @@ public class ProfileRouter {
         for (Entry<TripPattern, StopAtDistance> entry : fromStops.entrySet()) {
             TripPattern pattern = entry.getKey();
             StopAtDistance sd = entry.getValue();
-            if ( ! request.modes.contains(pattern.mode)) continue; // FIXME why are we even storing these patterns?
+            if ( ! request.transitModes.contains(pattern.mode)) {
+                continue; // FIXME why are we even storing these patterns?
+            }
             /* Loop over stop clusters in case stop cluster appears more than once in the same pattern. */
             for (int i = 0; i < pattern.getStops().size(); ++i) {
                 // FIXME using String identity equality for stop clusters on purpose
@@ -203,15 +211,17 @@ public class ProfileRouter {
                 if ( ! addIfNondominated(r1)) continue; // abandon this ride if it is dominated by some existing ride at the same location
                 // We have a new, nondominated, completed ride. Record its lower and upper bounds at the arrival stop.
                 if (request.analyst) {
-                    // This could be done at the end now that we are retaining all rides.
-                    TransitStop tstop = graph.index.stopVertexForStop.get(r1.to);
-                    int tsidx = tstop.getIndex();
-                    int lb = r1.durationLowerBound();
-                    int ub = r1.durationUpperBound();
-                    if (mins[tsidx] == TimeSurface.UNREACHABLE || mins[tsidx] > lb)
-                        mins[tsidx] = lb;
-                    if (maxs[tsidx] == TimeSurface.UNREACHABLE || maxs[tsidx] > ub) // Yes, we want the _minimum_ upper bound.
-                        maxs[tsidx] = ub;
+                    for (Stop s : r1.to.children) {
+                        // TODO This could be done at the end now that we are retaining all rides.
+                        TransitStop tstop = graph.index.stopVertexForStop.get(s);
+                        int tsidx = tstop.getIndex();
+                        int lb = r1.durationLowerBound();
+                        int ub = r1.durationUpperBound();
+                        if (mins[tsidx] == TimeSurface.UNREACHABLE || mins[tsidx] > lb)
+                            mins[tsidx] = lb;
+                        if (maxs[tsidx] == TimeSurface.UNREACHABLE || maxs[tsidx] > ub) // Yes, we want the _minimum_ upper bound.
+                            maxs[tsidx] = ub;
+                    }
                 }
                 /* Find transfers out of this new ride. */
                 // Do not transfer too many times. Check after calculating stats since stats are needed in any case.
@@ -221,7 +231,7 @@ public class ProfileRouter {
                 // Invariant: r1.to should be the same as r1's key in rides
                 // TODO benchmark, this is so not efficient
                 for (ProfileTransfer tr : graph.index.transfersFromStopCluster.get(r1.to)) {
-                    if ( ! request.modes.contains(tr.tp2.mode)) continue;
+                    if ( ! request.transitModes.contains(tr.tp2.mode)) continue;
                     if (r1.containsPattern(tr.tp1)) {
                         // Prune loopy or repetitive paths.
                         if (r1.pathContainsRoute(tr.tp2.route)) continue;
@@ -265,8 +275,9 @@ public class ProfileRouter {
             makeSurfaces();
             return null;
         }
-        /* Determine which rides are good ways to reach the destination. */
-        Set<Ride> targetRides = Sets.newHashSet(); // FIXME determine why there are multiple copies of the same ride then maybe use a list
+        /* Non-analyst: Determine which rides are good ways to reach the destination. */
+        // FIXME determine why there are multiple copies of the same ride then maybe use a list
+        Set<Ride> targetRides = Sets.newHashSet();
         for (StopCluster cluster : toStopPaths.keySet()) {
             for (Ride ride : retainedRides.get(cluster)) {
                 PATTERN: for (PatternRide pr : ride.patternRides) {
@@ -279,7 +290,7 @@ public class ProfileRouter {
             }
         }
         LOG.info("{} nondominated rides stop near the destination.", targetRides.size());
-        /* Non-analyst. Build the list of Options by following the back-pointers in Rides. */
+        /* Non-analyst: Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
@@ -287,8 +298,6 @@ public class ProfileRouter {
             Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStopCluster());
             Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStopCluster());
             Option option = new Option(ride, accessPaths, egressPaths);
-            StopCluster s0 = ride.getAccessStopCluster();
-            StopCluster s1 = ride.getEgressStopCluster();
             if ( ! option.hasEmptyRides()) options.add(option);
         }
         /* Include the direct (no-transit) biking, driving, and walking options. */
@@ -310,24 +319,24 @@ public class ProfileRouter {
     /** Check whether a new ride has too long a duration relative to existing rides at the same location or global time limit. */
     public boolean addIfNondominated(Ride newRide) {
         StopCluster cluster = newRide.to;
-        if (cluster == null) { // if ride is unfinished, calculate time to its from cluster based on previous ride
+        if (cluster == null) { // if ride is unfinished, calculate time to its from-cluster based on previous ride
             cluster = newRide.from;
             newRide = newRide.previous;
         }
         if (newRide.durationLowerBound() > MAX_DURATION) return false;
-        // Check whether any existing rides at the same location (stop cluster) dominate the new one
+        // Check whether any existing rides at the same location (stop cluster) dominate the new one.
         for (Ride oldRide : retainedRides.get(cluster)) {
             if (oldRide.to == null) oldRide = oldRide.previous; // rides may be unfinished
-            // new ride must be strictly better (min and max) than any existing one with less transfers.
-            // this avoids inserting extra rides "just for fun".
+            // New rides must be strictly better (min and max) than any existing one with less transfers.
+            // This avoids alternatives formed by simply inserting extra unnecessary rides.
             if (oldRide.pathLength() < newRide.pathLength() &&
                 oldRide.durationLowerBound() < newRide.durationLowerBound() &&
                 oldRide.durationUpperBound() < newRide.durationUpperBound()) {
                 return false;
             }
             // State is not strictly dominated. Perhaps it has the same number of transfers.
-            // In this case we want to keep it as long as it's sometimes better than all the others (time ranged overlap).
-            if (newRide.durationLowerBound() > oldRide.durationUpperBound()) {
+            // In this case we want to keep it as long as it's sometimes better than all the others (time ranges overlap).
+            if (newRide.durationLowerBound() > oldRide.durationUpperBound() + request.suboptimalMinutes) {
                 return false;
             }
         }
@@ -353,24 +362,26 @@ public class ProfileRouter {
             for (Stop stop : stopDist.stop.children) {
                 for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
                     closest.putMin(pattern, stopDist);
+                    //LOG.info("trip pattern {}", pattern);
                 }
             }
         }
-        // Truncate long lists to include a mix of nearby bus and train patterns
-        if (closest.size() > 500) {
-            LOG.warn("Truncating long list of patterns.");
+        final int MAX_PATTERNS = 1000;
+        // Truncate long lists to include a mix of nearby bus and train patterns, keeping those closest to the origin
+        if (closest.size() > MAX_PATTERNS) {
+            LOG.warn("Truncating excessively long list of patterns. {} patterns, max allowed is {}.", closest.size(), MAX_PATTERNS);
+            // The natural ordering on StopAtDistance is based on distance from the origin
             Multimap<StopAtDistance, TripPattern> busPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
             Multimap<StopAtDistance, TripPattern> otherPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-            Multimap<StopAtDistance, TripPattern> patterns;
             for (TripPattern pattern : closest.keySet()) {
-                patterns = (pattern.mode == TraverseMode.BUS) ? busPatterns : otherPatterns;
+                Multimap<StopAtDistance, TripPattern> patterns = (pattern.mode == TraverseMode.BUS) ? busPatterns : otherPatterns;
                 patterns.put(closest.get(pattern), pattern);
             }
             closest.clear();
             Iterator<StopAtDistance> iterBus = busPatterns.keySet().iterator();
             Iterator<StopAtDistance> iterOther = otherPatterns.keySet().iterator();
-            // Alternately add one of each kind of pattern until we reach the max
-            while (closest.size() < 50) {
+            // Alternately add one bus and one non-bus pattern in order of increasing distance until we reach the max
+            while (closest.size() < MAX_PATTERNS) {
                 StopAtDistance sd;
                 if (iterBus.hasNext()) {
                     sd = iterBus.next();
@@ -392,7 +403,7 @@ public class ProfileRouter {
     private Multimap<StopCluster, StopAtDistance> findClosestStops(boolean dest) {
         Multimap<StopCluster, StopAtDistance> pathsByStop = ArrayListMultimap.create();
         for (TraverseMode mode: (dest ? EGRESS_MODES : ACCESS_MODES)) {
-            if (request.modes.contains(mode)) {
+            if ((dest ? request.egressModes : request.accessModes).contains(mode)) {
                 LOG.info("{} mode {}", dest ? "egress" : "access", mode);
                 for (StopAtDistance sd : findClosestStops(mode, dest)) {
                     pathsByStop.put(sd.stop, sd);
@@ -408,29 +419,45 @@ public class ProfileRouter {
      */
     private Collection<StopAtDistance> findClosestStops(final TraverseMode mode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        RoutingRequest rr = new RoutingRequest(mode);
+        if (mode == TraverseMode.CAR) {
+            //rr.kissAndRide = true; // allow car->walk transition. we are assuming that someone will drop you off.
+            rr.parkAndRide = true; // allow car->walk transition only at tagged park and ride facilities.
+            rr.modes.setWalk(true); // need to walk after dropping the car off
+        }
         rr.from = (new GenericLocation(request.from.lat, request.from.lon));
         // FIXME requires destination to be set, not necesary for analyst
         rr.to = new GenericLocation(request.to.lat, request.to.lon);
         rr.setArriveBy(dest);
-        rr.setMode(mode);
-        // TODO CAR does not seem to work. rr.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
         rr.batch = (true);
         rr.walkSpeed = request.walkSpeed;
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
-        long worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
-        if (dest) worstElapsedTime *= -1;
-        rr.worstTime = (rr.dateTime + worstElapsedTime);
+        int minAccessTime = 0;
+        int maxAccessTime = request.maxWalkTime;
+        if (mode == TraverseMode.BICYCLE) {
+            rr.bikeSpeed = request.bikeSpeed;
+            minAccessTime = request.minBikeTime;
+            maxAccessTime = request.maxBikeTime;
+        } else if (mode == TraverseMode.CAR) {
+            rr.carSpeed = request.carSpeed;
+            minAccessTime = request.minCarTime;
+            maxAccessTime = request.maxCarTime;
+        } else {
+            LOG.warn("No modes matched when setting min/max travel times.");
+        }
+        long worstElapsedTimeSeconds = maxAccessTime * 60; // convert from minutes to seconds
+        if (dest) worstElapsedTimeSeconds *= -1;
+        rr.worstTime = (rr.dateTime + worstElapsedTimeSeconds);
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         GenericAStar astar = new GenericAStar();
         rr.setNumItineraries(1);
-        StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode);
+        StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode, minAccessTime * 60);
         astar.setTraverseVisitor(visitor);
-        ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // seconds timeout
+        astar.getShortestPathTree(rr, 5); // timeout in seconds
         // Save the routing context for later cleanup. We need its temporary edges to render street segments at the end.
         routingContexts.add(rr.rctx);
         return visitor.stopClustersFound.values();
@@ -438,8 +465,12 @@ public class ProfileRouter {
 
     static class StopFinderTraverseVisitor implements TraverseVisitor {
         TraverseMode mode;
+        int minTravelTimeSeconds = 0;
         Map<StopCluster, StopAtDistance> stopClustersFound = Maps.newHashMap();
-        public StopFinderTraverseVisitor(TraverseMode mode) { this.mode = mode; }
+        public StopFinderTraverseVisitor(TraverseMode mode, int minTravelTimeSeconds) {
+            this.mode = mode;
+            this.minTravelTimeSeconds = minTravelTimeSeconds;
+        }
         @Override public void visitEdge(Edge edge, State state) { }
         @Override public void visitEnqueue(State state) { }
         // Accumulate stops into ret as the search runs.
@@ -447,8 +478,8 @@ public class ProfileRouter {
             Vertex vertex = state.getVertex();
             if (vertex instanceof TransitStop) {
                 StopAtDistance sd = new StopAtDistance(state);
-                sd.mode = mode;
-                if (sd.mode == TraverseMode.CAR && sd.etime < MIN_DRIVE_TIME) return;
+                sd.mode = mode; // Override final mode from State, since driving to transit ends in walking.
+                if (sd.mode == TraverseMode.CAR && sd.etime < minTravelTimeSeconds) return;
                 if (stopClustersFound.containsKey(sd.stop)) return; // record only the closest stop in each cluster
                 LOG.debug("found stop cluster: {}", sd);
                 stopClustersFound.put(sd.stop, sd);
@@ -456,7 +487,7 @@ public class ProfileRouter {
         }
     }
 
-    /** Look for an option connecting origin to destination with no transit. */
+    /** Look for an option connecting origin to destination without using transit. */
     private void findStreetOption(TraverseMode mode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(mode);
@@ -472,7 +503,7 @@ public class ProfileRouter {
         rr.bikeSpeed = request.bikeSpeed;
         GenericAStar astar = new GenericAStar();
         rr.setNumItineraries(1);
-        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000);
+        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000); // FIXME timeout is absolute and in seconds ?
         State state = spt.getState(rr.rctx.target);
         if (state != null) {
             LOG.info("Found non-transit option for mode {}", mode);
@@ -490,7 +521,7 @@ public class ProfileRouter {
         rr.setMode(TraverseMode.WALK);
         rr.walkSpeed = request.walkSpeed;
         // If max trip duration is not limited, searches are of course much slower.
-        int worstElapsedTime = request.accessTime * 60; // convert from minutes to seconds
+        int worstElapsedTime = request.maxWalkTime * 60; // convert from minutes to seconds, assume walking at egress
         rr.worstTime = (rr.dateTime + worstElapsedTime);
         rr.batch = (true);
         GenericAStar astar = new GenericAStar();
@@ -504,8 +535,9 @@ public class ProfileRouter {
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5);
             rr.rctx.destroy();
         }
-        minSurface = new TimeSurface(this, false);
-        maxSurface = new TimeSurface(this, true);
+        /* DISABLED while working on analyst-frequency-based-profile prototype */
+        // minSurface = new TimeSurface(this, false);
+        // maxSurface = new TimeSurface(this, true);
         LOG.info("done making timesurfaces.");
         return new P2<TimeSurface>(minSurface, maxSurface);
     }
@@ -533,7 +565,11 @@ public class ProfileRouter {
         }
     }
 
-    /** Destroy all routing contexts created during this search. */
+    /**
+     * Destroy all routing contexts created during this search. This method must be called manually on any
+     * ProfileRouter instance before it is released for garbage collection, because RoutingContexts remain linked into
+     * the graph by temporary edges if they are not cleaned up.
+     */
     public int cleanup() {
         int n = 0;
         for (RoutingContext rctx : routingContexts) {
@@ -541,8 +577,20 @@ public class ProfileRouter {
             n += 1;
         }
         routingContexts.clear();
-        LOG.info("destroyed {} routing contexts.", n);
+        LOG.debug("destroyed {} routing contexts.", n);
         return n;
+    }
+
+    /**
+     * This finalizer is intended as a failsafe to prevent memory leakage in case someone does
+     * not clean up routing contexts. It should be considered an error if this method does any work.
+     */
+    @Override
+    public void finalize() {
+        if (routingContexts.size() > 0) {
+            LOG.error("RoutingContexts were observed in the ProfileRouter finalizer: this is a memory leak.");
+            cleanup();
+        }
     }
 
 }

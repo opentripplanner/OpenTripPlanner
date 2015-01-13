@@ -19,7 +19,6 @@ import java.util.List;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
@@ -51,7 +50,6 @@ public interface StreetVertexIndexService {
      * Get the closest edges to this location are traversable given these preferences.
      * 
      * @param location
-     * @param prefs Must be able to traverse these edges given these preferences.
      * @param extraEdges Additional edges to consider, may be null
      * @param preferredEdges Edges which are preferred, may be null
      * @param possibleTransitLinksOnly Only include possible transit links.
@@ -67,16 +65,23 @@ public interface StreetVertexIndexService {
      * Convenience wrapper for above.
      * 
      * @param location
-     * @param prefs
      * @return
      */
     public CandidateEdgeBundle getClosestEdges(GenericLocation location,
             TraversalRequirements reqs);
 
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
+    /**
+     * @param coordinate
+     * @param radiusMeters
+     * @return The transit stops within a certain radius of the given location.
+     */
+    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radiusMeters);
 
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne,
-            Coordinate coordinateTwo);
+    /**
+     * @param envelope
+     * @return The transit stops within an envelope.
+     */
+    public List<TransitStop> getTransitStopForEnvelope(Envelope envelope);
 
     /**
      * Finds the appropriate vertex for this location.
@@ -85,7 +90,7 @@ public interface StreetVertexIndexService {
      * @param options
      * @return
      */
-    Vertex getVertexForLocation(GenericLocation location, RoutingRequest options);
+    public Vertex getVertexForLocation(GenericLocation location, RoutingRequest options);
 
     /**
      * Finds the appropriate vertex for this location.
@@ -96,5 +101,5 @@ public interface StreetVertexIndexService {
      *        be used to locate this one as well.
      * @return
      */
-    Vertex getVertexForLocation(GenericLocation place, RoutingRequest options, Vertex other);
+    public Vertex getVertexForLocation(GenericLocation place, RoutingRequest options, Vertex other);
 }

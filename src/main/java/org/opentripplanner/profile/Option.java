@@ -32,13 +32,16 @@ public class Option {
     public Option (Ride tail, Collection<StopAtDistance> accessPaths, Collection<StopAtDistance> egressPaths) {
         access = StreetSegment.list(accessPaths);
         egress = StreetSegment.list(egressPaths);
+        // Include access and egress times across all modes in the overall travel time statistics for this option.
         // FIXME In the event that there is only access, N will still be 1 which is strange.
-        stats.add(access); // FIXME double-adding access time here, it's already in the path.
+        stats.add(access);
         stats.add(egress);
         List<Ride> rides = Lists.newArrayList();
         for (Ride ride = tail; ride != null; ride = ride.previous) rides.add(ride);
         if ( ! rides.isEmpty()) {
             Collections.reverse(rides);
+            rides.get(0).accessTime = 0; // Avoid double-inclusion of the access time for the first leg.
+            rides.get(0).accessDist = 0; // Just to make dist coherent with the accessTime in the result object.
             transit = Lists.newArrayList();
             for (Ride ride : rides) {
                 Segment segment = new Segment(ride);

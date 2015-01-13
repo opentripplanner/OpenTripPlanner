@@ -32,7 +32,6 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -48,19 +47,25 @@ import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.util.PolylineEncoder;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 @Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
+    @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
     private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
@@ -74,9 +79,12 @@ public class IndexAPI {
     @QueryParam("refs") private boolean refs = false;
 
     private final GraphIndex index;
+    private final StreetVertexIndexService streetIndex;
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        index = otpServer.graphService.getGraph(routerId).index;
+        Router router = otpServer.getRouter(routerId);
+        index = router.graph.index;
+        streetIndex = router.graph.streetIndex;
     }
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
@@ -142,8 +150,8 @@ public class IndexAPI {
            }
            List<StopShort> stops = Lists.newArrayList(); 
            Coordinate coord = new Coordinate(lon, lat);
-           /* TODO Ack this should use the spatial index! */
-           for (TransitStop stopVertex : index.stopSpatialIndex.query(lon, lat, radius)) {
+           for (TransitStop stopVertex : streetIndex.getNearbyTransitStops(
+                    new Coordinate(lon, lat), radius)) {
                double distance = distanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
                    stops.add(new StopShort(stopVertex.getStop(), (int) distance));
@@ -158,15 +166,14 @@ public class IndexAPI {
            if (maxLat <= minLat || maxLon <= minLon) {
                return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
            }
-           List<StopShort> stops = Lists.newArrayList(); 
-           for (TransitStop stopVertex : index.stopSpatialIndex.query(lon, lat, radius)) {
-               /* TODO The spatial index needs a rectangle query function. */
-               index.stopSpatialIndex.query(lon, lat, radius);
+           List<StopShort> stops = Lists.newArrayList();
+           Envelope envelope = new Envelope(new Coordinate(minLon, minLat), new Coordinate(maxLon, maxLat));
+           for (TransitStop stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
                stops.add(new StopShort(stopVertex.getStop()));
            }
            return Response.status(Status.OK).entity(stops).build();           
        }
-}
+   }
 
    @GET
    @Path("/stops/{stopId}/routes")
@@ -315,7 +322,21 @@ public class IndexAPI {
        }
    }
 
-   @GET
+    @GET
+    @Path("/trips/{tripId}/semanticHash")
+    public Response getSemanticHashForTrip (@PathParam("tripId") String tripIdString) {
+        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+        Trip trip = index.tripForId.get(tripId);
+        if (trip != null) {
+            TripPattern pattern = index.patternForTrip.get(trip);
+            String hashString = pattern.semanticHashString(trip);
+            return Response.status(Status.OK).entity(hashString).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+
+    @GET
    @Path("/trips/{tripId}/stoptimes")
    public Response getStoptimesForTrip (@PathParam("tripId") String tripIdString) {
        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
@@ -328,6 +349,20 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
+
+    /** Return geometry for the trip as a packed coordinate sequence */
+    @GET
+    @Path("/trips/{tripId}/geometry")
+    public Response getGeometryForTrip (@PathParam("tripId") String tripIdString) {
+        AgencyAndId tripId = GtfsLibrary.convertIdFromString(tripIdString);
+        Trip trip = index.tripForId.get(tripId);
+        if (trip != null) {
+            TripPattern tripPattern = index.patternForTrip.get(trip);
+            return getGeometryForPattern(tripPattern.code);
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
 
    @GET
    @Path("/patterns")
@@ -362,7 +397,7 @@ public class IndexAPI {
    @GET
    @Path("/patterns/{patternId}/stops")
    public Response getStopsForPattern (@PathParam("patternId") String patternIdString) {
-       // Pattern names are graph-unique because we made them up.
+       // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
        TripPattern pattern = index.patternForId.get(patternIdString);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
@@ -371,6 +406,34 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
+
+    @GET
+    @Path("/patterns/{patternId}/semanticHash")
+    public Response getSemanticHashForPattern (@PathParam("patternId") String patternIdString) {
+        // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
+        TripPattern pattern = index.patternForId.get(patternIdString);
+        if (pattern != null) {
+            String semanticHash = pattern.semanticHashString(null);
+            return Response.status(Status.OK).entity(semanticHash).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+
+    /** Return geometry for the pattern as a packed coordinate sequence */
+    @GET
+    @Path("/patterns/{patternId}/geometry")
+    public Response getGeometryForPattern (@PathParam("patternId") String patternIdString) {
+        TripPattern pattern = index.patternForId.get(patternIdString);
+        if (pattern != null) {
+            EncodedPolylineBean geometry = PolylineEncoder.createEncodings(pattern.geometry);
+            return Response.status(Status.OK).entity(geometry).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+
+    // TODO include pattern ID for each trip in responses
 
     /** List basic information about all service IDs. */
     @GET

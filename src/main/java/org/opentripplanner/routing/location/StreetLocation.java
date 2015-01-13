@@ -20,22 +20,25 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Iterables;
+
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.PartialStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdge;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,11 +143,6 @@ public class StreetLocation extends StreetVertex {
             // creates links from street head -> location -> street tail.
             createHalfLocation(graph, location, label + " to " + tov.getLabel(), name,
                     nearestPoint, street);
-            
-            double distanceToNearestTransitStop = Math.min(
-                    tov.getDistanceToNearestTransitStop(),
-                    fromv.getDistanceToNearestTransitStop());
-            edgeLocation.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
         }
         location.setWheelchairAccessible(wheelchairAccessible);
         return location;
@@ -180,11 +178,6 @@ public class StreetLocation extends StreetVertex {
                 // creates links from street head -> location -> street tail.
                 createHalfLocation(graph, location, label + " to " + tov.getLabel(), name,
                         nearestPoint, street);
-                
-                double distanceToNearestTransitStop = Math.min(
-                        tov.getDistanceToNearestTransitStop(),
-                        fromv.getDistanceToNearestTransitStop());
-                edgeLocation.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
             }
         }
         location.setWheelchairAccessible(wheelchairAccessible);
@@ -213,32 +206,29 @@ public class StreetLocation extends StreetVertex {
         P2<LineString> geometries = getGeometry(street, nearestPoint);
 
         double totalGeomLength = geometry.getLength();
-        double lengthRatioIn = geometries.getFirst().getLength() / totalGeomLength;
+        double lengthRatioIn = geometries.first.getLength() / totalGeomLength;
 
-        double lengthIn = street.getLength() * lengthRatioIn;
-        double lengthOut = street.getLength() * (1 - lengthRatioIn);
+        double lengthIn = street.getDistance() * lengthRatioIn;
+        double lengthOut = street.getDistance() * (1 - lengthRatioIn);
 
-        PlainStreetEdge newLeft = new PartialPlainStreetEdge(street, fromv, base,
-                geometries.getFirst(), name, lengthIn);
-        PlainStreetEdge newRight = new PartialPlainStreetEdge(street, base, tov,
-                geometries.getSecond(), name, lengthOut);
+        StreetWithElevationEdge newLeft = new PartialStreetEdge(street, fromv, base,
+                geometries.first, name, lengthIn);
+        StreetWithElevationEdge newRight = new PartialStreetEdge(street, base, tov,
+                geometries.second, name, lengthOut);
 
-        newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
+        newLeft.setElevationProfile(ElevationUtils.getPartialElevationProfile(
+                street.getElevationProfile(), 0, lengthIn), false);
         newLeft.setNoThruTraffic(street.isNoThruTraffic());
         newLeft.setStreetClass(street.getStreetClass());
-        newLeft.setWheelchairNote(street.getWheelchairNotes());
-        newLeft.setNote(street.getNotes());
 
-        newRight.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut),
-                false);
+        newRight.setElevationProfile(ElevationUtils.getPartialElevationProfile(
+                street.getElevationProfile(), lengthIn, lengthIn + lengthOut), false);
         newRight.setStreetClass(street.getStreetClass());
         newRight.setNoThruTraffic(street.isNoThruTraffic());
-        newRight.setWheelchairNote(street.getWheelchairNotes());
-        newRight.setNote(street.getNotes());
         
         // Copy turn restrictions onto the outgoing half-edge.
-        for (TurnRestriction turnRestriction : street.getTurnRestrictions()) {
-            newRight.addTurnRestriction(turnRestriction);
+        for (TurnRestriction turnRestriction : graph.getTurnRestrictions(street)) {
+            graph.addTurnRestriction(newRight, turnRestriction);
         }
         base.extra.add(newLeft);
         base.extra.add(newRight);
@@ -291,12 +281,12 @@ public class StreetLocation extends StreetVertex {
     }
 
     @Override
-    public int removeTemporaryEdges() {
+    public int removeTemporaryEdges(Graph graph) {
         int nRemoved = 0;
         for (Edge e : getExtra()) {            
             graph.removeTemporaryEdge(e);
             // edges might already be detached
-            if (e.detach() != 0) nRemoved += 1;
+            if (e.detach(graph) != 0) nRemoved += 1;
         }
         return nRemoved;
     }
@@ -310,7 +300,7 @@ public class StreetLocation extends StreetVertex {
      */
     @Override
     public void finalize() {
-        if (removeTemporaryEdges() > 0)
+        if (removeTemporaryEdges(graph) > 0)
             LOG.error("Temporary edges were removed by finalizer: this is a memory leak.");
     }
 
@@ -320,7 +310,7 @@ public class StreetLocation extends StreetVertex {
      * all temporary edges after they are created.
      */
     public void setTemporaryEdgeVisibility(RoutingContext rctx) {
-        for (PartialPlainStreetEdge ppse : Iterables.filter(this.extra, PartialPlainStreetEdge.class)) {
+        for (PartialStreetEdge ppse : Iterables.filter(this.extra, PartialStreetEdge.class)) {
             ppse.visibleTo = rctx;
         }
         // There are other temporary edges (FreeEdges) but it's a rabbit hole...

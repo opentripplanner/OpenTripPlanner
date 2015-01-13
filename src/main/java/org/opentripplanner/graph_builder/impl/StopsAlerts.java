@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.common.IterableLibrary;
+import com.google.common.collect.Iterables;
 import org.opentripplanner.graph_builder.impl.stopsAlerts.IStopTester;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -47,7 +47,7 @@ public class StopsAlerts implements GraphBuilder {
         try {
             PrintWriter pw = new PrintWriter(new File(logFile));
             pw.printf("%s,%s,%s,%s\n","stopId","lon","lat","types");
-            for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
+            for (TransitStop ts : Iterables.filter(graph.getVertices(), TransitStop.class)) {
                 StringBuilder types = new StringBuilder();
                 for(IStopTester stopTester:stopTesters){
                     if(stopTester.fulfillDemands(ts,graph)){

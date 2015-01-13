@@ -54,9 +54,10 @@ public class AccumulativeGridSampler<TZ> {
          * @param z The z value of the initial sample, as given in the addSample() call.
          * @param zS The previous z value of the sample. Can be null if this is the first time, it's
          *        up to the caller to initialize the z value.
+         * @param offRoadSpeed The offroad speed to assume.
          * @return The modified z value for the sample.
          */
-        public TZ cumulateSample(Coordinate C0, Coordinate Cs, TZ z, TZ zS);
+        public TZ cumulateSample(Coordinate C0, Coordinate Cs, TZ z, TZ zS, double offRoadSpeed);
 
         /**
          * Callback function to handle a "closing" sample (that is a sample post-created to surround
@@ -81,14 +82,13 @@ public class AccumulativeGridSampler<TZ> {
 
     /**
      * @param metric TZ data "behavior" and "metric".
-     * @param size Estimated grid size
      */
     public AccumulativeGridSampler(ZSampleGrid<TZ> sampleGrid, AccumulativeMetric<TZ> metric) {
         this.metric = metric;
         this.sampleGrid = sampleGrid;
     }
 
-    public final void addSamplingPoint(Coordinate C0, TZ z) {
+    public final void addSamplingPoint(Coordinate C0, TZ z, double offRoadSpeed) {
         if (closed)
             throw new IllegalStateException("Can't add a sample after closing.");
         int[] xy = sampleGrid.getLowerLeftIndex(C0);
@@ -102,7 +102,7 @@ public class AccumulativeGridSampler<TZ> {
         ABCD[3] = sampleGrid.getOrCreate(x + 1, y + 1);
         for (ZSamplePoint<TZ> P : ABCD) {
             Coordinate C = sampleGrid.getCoordinates(P);
-            P.setZ(metric.cumulateSample(C0, C, z, P.getZ()));
+            P.setZ(metric.cumulateSample(C0, C, z, P.getZ(), offRoadSpeed));
         }
     }
 

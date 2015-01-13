@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class ExtraElevationData {
-    public Map<EdgeWithElevation, List<ElevationPoint>> data = new HashMap<EdgeWithElevation, List<ElevationPoint>>();
+    public Map<StreetEdge, List<ElevationPoint>> data = new HashMap<StreetEdge, List<ElevationPoint>>();
 }

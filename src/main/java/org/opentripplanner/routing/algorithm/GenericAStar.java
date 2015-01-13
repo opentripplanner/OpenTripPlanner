@@ -26,8 +26,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.SPTService;
-import org.opentripplanner.routing.spt.MultiShortestPathTree;
-import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.spt.*;
 import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
@@ -42,6 +41,7 @@ import com.beust.jcommander.internal.Lists;
 public class GenericAStar implements SPTService { // maybe this should be wrapped in a component SPT service 
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
+    // FIXME this is not really a factory, it's a way to fake a global variable. This should be stored at the OTPServer level.
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
     private static final double OVERSEARCH_MULTIPLIER = 4.0;
 
@@ -52,6 +52,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     enum RunStatus {
         RUNNING, STOPPED
     }
+
+    /* TODO instead of having a separate class for search state, we should just make one GenericAStar per request. */
     class RunState {
 
         public State u;
@@ -88,33 +90,30 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
      * Compute SPT using default termination strategy.
      */
     @Override
-    public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
-        return this.getShortestPathTree(req, timeoutSeconds, null);
+    public ShortestPathTree getShortestPathTree(RoutingRequest req, double relTimeoutSeconds) {
+        return this.getShortestPathTree(req, relTimeoutSeconds, null);
     }
     
     public void startSearch(RoutingRequest options,
             SearchTerminationStrategy terminationStrategy, long abortTime) {
+
         runState = new RunState( options, terminationStrategy );
-
         runState.rctx = options.getRoutingContext();
+        // TODO this is a hackish way of communicating which mode we are in (since search mode is currently server-wide)
+        runState.spt = options.longDistance ?
+                new WeightOnlyShortestPathTree(runState.options) : new MultiShortestPathTree(runState.options);
+        runState.heuristic = options.batch ?
+                new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic;
 
-        // null checks on origin and destination vertices are already performed in setRoutingContext
-        // options.rctx.check();
-        
-        runState.spt = new MultiShortestPathTree(runState.options);
-
-        runState.heuristic = options.batch ? 
-                new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
-
-        // heuristic calc could actually be done when states are constructed, inside state
-        State initialState = new State(options);
-        runState.heuristic.initialize(initialState, runState.rctx.target, abortTime);
+        // Since initial states can be multiple, heuristic cannot depend on the initial state.
+        runState.heuristic.initialize(runState.options, runState.rctx.origin, runState.rctx.target, abortTime);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-            LOG.warn("Timeout during initialization of interleaved bidirectional heuristic.");
+            LOG.warn("Timeout during initialization of goal direction heuristic.");
             options.rctx.debugOutput.timedOut = true;
             runState = null; // Search timed out
             return;
         }
+        State initialState = new State(options);
         runState.spt.add(initialState);
 
         // Priority Queue.
@@ -190,11 +189,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 // }
 
                 double remaining_w = computeRemainingWeight(runState.heuristic, v, runState.rctx.target, runState.options);
-
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
-                double estimate = v.getWeight() + remaining_w*runState.options.heuristicWeight;
+                double estimate = v.getWeight() + remaining_w * runState.options.heuristicWeight;
 
                 if (verbose) {
                     System.out.println("      edge " + edge);
@@ -267,22 +265,24 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             // Don't search too far past the most recently found accepted path/state
             if (runState.foundPathWeight != null &&
                 runState.u.getWeight() > runState.foundPathWeight * OVERSEARCH_MULTIPLIER ) {
-
                 break;
             }
             if (runState.terminationStrategy != null) {
-                if (!runState.terminationStrategy.shouldSearchContinue(
-                    runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options))
-
+                if (runState.terminationStrategy.shouldSearchTerminate(
+                    runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options)) {
                     break;
+                }
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
             }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
+                //new GraphPath(runState.u, false).dump();
+                /* Only find one path at a time in long distance mode. */
+                if (runState.options.longDistance) break;
+                /* Break out of the search if we've found the requested number of paths. */
                 if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
-
                     break;
                 }
             }
@@ -291,10 +291,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
 
     /** @return the shortest path, or null if none is found */
-    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeoutSeconds,
             SearchTerminationStrategy terminationStrategy) {
         ShortestPathTree spt = null;
-        long abortTime = DateUtils.absoluteTimeout(relTimeout);
+        long abortTime = DateUtils.absoluteTimeout(relTimeoutSeconds);
 
         startSearch (options, terminationStrategy, abortTime);
 

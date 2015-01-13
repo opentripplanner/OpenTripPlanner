@@ -36,13 +36,16 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +65,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
     private FeatureSourceFactory _featureSourceFactory;
 
     private ShapefileStreetSchema _schema;
+
+    public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
     public List<String> provides() {
         return Arrays.asList("streets");
@@ -199,18 +204,20 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 }
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
 
-                PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection,
-                        geom, name, length, permissions.getFirst(), false);
+                // TODO Set appropriate car speed from shapefile source.
+                StreetEdge street = edgeFactory.createEdge(startIntersection, endIntersection,
+                        geom, name, length, permissions.first, false);
                 LineString reversed = (LineString) geom.reverse();
-                PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection,
-                        startIntersection, reversed, name, length, permissions.getSecond(), true);
+                StreetEdge backStreet = edgeFactory.createEdge(endIntersection, startIntersection,
+                        reversed, name, length, permissions.second, true);
+                backStreet.shareData(street);
 
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
                 	if (note != null && note.length() > 0) {
-                		HashSet<Alert> notes = Alert.newSimpleAlertSet(note);
-                		street.setNote(notes);
-                		backStreet.setNote(notes);
+				Alert noteAlert = Alert.createSimpleAlerts(note);
+				graph.streetNotesService.addStaticNote(street, noteAlert, StreetNotesService.ALWAYS_MATCHER);
+				graph.streetNotesService.addStaticNote(backStreet, noteAlert, StreetNotesService.ALWAYS_MATCHER);
                 	}
                 }
 
@@ -218,12 +225,11 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 street.setSlopeOverride(slopeOverride);
                 backStreet.setSlopeOverride(slopeOverride);
 
-                P2<Double> effectiveLength;
                 if (safetyConverter != null) {
-                    effectiveLength = safetyConverter.convert(feature);
-                    if (effectiveLength != null) {
-                        street.setBicycleSafetyEffectiveLength(effectiveLength.getFirst() * length);
-                        backStreet.setBicycleSafetyEffectiveLength(effectiveLength.getSecond() * length);
+                    P2<Double> safetyFactors = safetyConverter.convert(feature);
+                    if (safetyFactors != null) {
+                        street.setBicycleSafetyFactor(safetyFactors.first.floatValue());
+                        backStreet.setBicycleSafetyFactor(safetyFactors.second.floatValue());
                     }
                 }
             }

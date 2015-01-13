@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -22,8 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
@@ -45,13 +43,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TransferEdge;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -59,7 +52,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -89,8 +81,8 @@ public class TestPatternHopFactory extends TestCase {
             IntersectionVertex front = new IntersectionVertex(graph, "near_1_" + stop.getStopId(), stop.getX() + 0.0001, stop.getY() + 0.0001);
             IntersectionVertex back =  new IntersectionVertex(graph, "near_2_" + stop.getStopId(), stop.getX() - 0.0001, stop.getY() - 0.0001);
             
-            PlainStreetEdge street1 = new PlainStreetEdge(front, back, GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "street", 100, StreetTraversalPermission.ALL, false);
-            PlainStreetEdge street2 = new PlainStreetEdge(back, front, GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "street", 100, StreetTraversalPermission.ALL, true);
+            StreetEdge street1 = new StreetEdge(front, back, GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "street", 100, StreetTraversalPermission.ALL, false);
+            StreetEdge street2 = new StreetEdge(back, front, GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "street", 100, StreetTraversalPermission.ALL, true);
         }
 
         NetworkLinker nl = new NetworkLinker(graph);
@@ -446,10 +438,11 @@ public class TestPatternHopFactory extends TestCase {
         Vertex near_a = graph.getVertex("near_1_agency_A");
         Vertex near_b = graph.getVertex("near_1_agency_B");
         Vertex near_c = graph.getVertex("near_1_agency_C");
+        Vertex near_e = graph.getVertex("near_1_agency_E");
 
         Vertex stop_d = graph.getVertex("agency:D");
         Vertex split_d = null;
-        for (StreetTransitLink e : filter(stop_d.getOutgoing(), StreetTransitLink.class)) {
+        for (StreetTransitLink e : Iterables.filter(stop_d.getOutgoing(), StreetTransitLink.class)) {
             split_d = e.getToVertex();
         }
         
@@ -473,6 +466,13 @@ public class TestPatternHopFactory extends TestCase {
 
         path = spt.getPath(near_c, false);
         assertNull(path);
+        
+        // stop E has no accessibility information, but we should still be able to route to it.
+        options.setRoutingContext(graph, near_a, near_e);
+        spt = aStar.getShortestPathTree(options);
+
+        path = spt.getPath(near_e, false);
+        assertNotNull(path);
 
         // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
         // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00

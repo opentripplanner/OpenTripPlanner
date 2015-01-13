@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import jj2000.j2k.NotImplementedError;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
@@ -39,10 +41,10 @@ public class TravelingSalesmanPathService implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TravelingSalesmanPathService.class);
 
-    public GraphService graphService;
+    public Graph graph;
 
-    public TravelingSalesmanPathService(GraphService graphService, PathService chainedPathService) {
-        this.graphService = graphService;
+    public TravelingSalesmanPathService(Graph graph, PathService chainedPathService) {
+        this.graph = graph;
         this.chainedPathService = chainedPathService;
     }
 
@@ -58,7 +60,6 @@ public class TravelingSalesmanPathService implements PathService {
         }
 
         /* intermediate places present, intercept request */
-        Graph graph = graphService.getGraph(options.routerId);
         long time = options.dateTime;
         options.setRoutingContext(graph);
         options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
@@ -160,5 +161,10 @@ public class TravelingSalesmanPathService implements PathService {
         }
         return newPath;
     }
+
+	@Override
+	public void setSPTVisitor(SPTVisitor vis) {
+		throw new NotImplementedError();
+	}
 
 }

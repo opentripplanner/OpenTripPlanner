@@ -58,30 +58,12 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
-import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
-import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PreAlightEdge;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -114,6 +96,7 @@ public class PlanGeneratorTest {
     private static final double NORTHEAST = OCTANT * 1;
     private static final double EAST = OCTANT * 2;
     private static final double NORTHWEST = OCTANT * -1;
+    private static final double SOUTH = OCTANT * 4;
     private static final double EPSILON = 1e-1;
 
     private static final SimpleTimeZone timeZone = new SimpleTimeZone(2, "CEST");
@@ -500,8 +483,8 @@ public class PlanGeneratorTest {
         // Edges for leg 0
         FreeEdge e1 = new FreeEdge(
                 v0, v2);
-        PlainStreetEdge e3 = new PlainStreetEdge(
-                v2, v4, l3, "Edge 3", 3.0, StreetTraversalPermission.ALL, false, 0);
+        StreetWithElevationEdge e3 = new StreetWithElevationEdge(
+                v2, v4, l3, "Edge 3", 3.0, StreetTraversalPermission.ALL, false);
 
         // Edges for legs 1 and 2
         StreetTransitLink e5 = new StreetTransitLink(
@@ -543,25 +526,26 @@ public class PlanGeneratorTest {
 
         // Edges for legs 5 and 6, where edges 39 and 41 have the same name to trigger stayOn = true
         AreaEdge e39 = new AreaEdge(
-                v38, v40, l39, "Edge 39 / 41", 2.1, StreetTraversalPermission.ALL, false, 0,
+                v38, v40, l39, "Edge 39 / 41", 2.1, StreetTraversalPermission.ALL, false,
                 new AreaEdgeList());
-        PlainStreetEdge e41 = new PlainStreetEdge(
-                v40, v42, l41, "Edge 39 / 41", 1.9, StreetTraversalPermission.ALL, false, 0);
+        StreetWithElevationEdge e41 = new StreetWithElevationEdge(
+                v40, v42, l41, "Edge 39 / 41", 1.9, StreetTraversalPermission.ALL, false);
         StreetBikeRentalLink e43 = new StreetBikeRentalLink(
                 v42, v44);
         RentABikeOnEdge e45 = new RentABikeOnEdge(
                 v44, v46, Collections.singleton(""));
         StreetBikeRentalLink e47 = new StreetBikeRentalLink(
                 v46, v48);
-        PlainStreetEdge e49 = new PlainStreetEdge(
-                v48, v50, l49, "Edge 49", 2.0, StreetTraversalPermission.ALL, false, 0);
+        StreetWithElevationEdge e49 = new StreetWithElevationEdge(
+                v48, v50, l49, "Edge 49", 2.0, StreetTraversalPermission.ALL, false);
 
         // Edges for legs 6, 7 and 8
         LegSwitchingEdge e51 = new LegSwitchingEdge(
                 v50, v52);
-        PartialPlainStreetEdge e53 = new PartialPlainStreetEdge(new PlainStreetEdge(
-                v52, v54, l53, "Edge 53", 1.0, StreetTraversalPermission.ALL, false, 0),
-                v52, v54, l53, "Edge 53", 1.0, StreetTraversalPermission.ALL, false);
+        StreetEdge e53p = new StreetEdge(v52, v54, l53, "Edge 53", 1.0,
+                StreetTraversalPermission.ALL, false);
+        PartialStreetEdge e53 = new PartialStreetEdge(e53p, v52, v54, l53, "Edge 53",
+                1.0, StreetTraversalPermission.ALL, false);
         StreetBikeRentalLink e55 = new StreetBikeRentalLink(
                 v54, v56);
         RentABikeOffEdge e57 = new RentABikeOffEdge(
@@ -583,14 +567,15 @@ public class PlanGeneratorTest {
         e41.setHasBogusName(true);
         e49.setElevationProfile(elevation49, false);
         e53.setElevationProfile(elevation53, false);
-        e53.setNote(Alert.newSimpleAlertSet(alertsExample));
+        graph.streetNotesService.addStaticNote(e53p, Alert.createSimpleAlerts(alertsExample),
+                StreetNotesService.ALWAYS_MATCHER);
 
         // Add an extra edge to the graph in order to generate stayOn = true for one walk step.
-        new PlainStreetEdge(v40,
+        new StreetEdge(v40,
                 new IntersectionVertex(graph, "Extra vertex", 180, 88),
                 new LineString(new PackedCoordinateSequence.Double(
                         new double[]{180, 89, 180, 88}, 2), geometryFactory),
-                "Extra edge", 1.9, StreetTraversalPermission.NONE, true, 0);
+                "Extra edge", 1.9, StreetTraversalPermission.NONE, true);
 
         // Various bookkeeping operations
         graph.serviceCodes.put(firstTrip.getId(), 0);
@@ -890,8 +875,8 @@ public class PlanGeneratorTest {
                 if (steps[i].length <= j) break;
                 for (int k = 0; k < elevations[i][j].length; k++) {
                     if (steps[i][j].elevation.size() <= k) break;
-                    elevations[i][j][k][0] = steps[i][j].elevation.get(k).getFirst();
-                    elevations[i][j][k][1] = steps[i][j].elevation.get(k).getSecond();
+                    elevations[i][j][k][0] = steps[i][j].elevation.get(k).first;
+                    elevations[i][j][k][1] = steps[i][j].elevation.get(k).second;
                 }
             }
         }
@@ -1364,9 +1349,9 @@ public class PlanGeneratorTest {
         assertFalse(steps[5][1].area);
         assertNull(steps[5][1].exit);
 
-        assertEquals(AbsoluteDirection.NORTHWEST, steps[6][0].absoluteDirection);
-        assertEquals(RelativeDirection.LEFT, steps[6][0].relativeDirection);
-        assertEquals(NORTHWEST, steps[6][0].angle, EPSILON);
+        assertEquals(AbsoluteDirection.SOUTH, steps[6][0].absoluteDirection);
+        assertEquals(RelativeDirection.HARD_LEFT, steps[6][0].relativeDirection);
+        assertEquals(SOUTH, steps[6][0].angle, EPSILON);
         assertEquals("Edge 49", steps[6][0].streetName);
         assertEquals(2.0, steps[6][0].distance, 0.0);
         assertFalse(steps[6][0].bogusName);
@@ -1378,15 +1363,15 @@ public class PlanGeneratorTest {
         assertNull(steps[6][0].exit);
 
         /*
-         * The behavior of the relative direction computation code is actually incorrect here.
-         * However, it seems unlikely that anyone would care about correct relative directions in
+         * The behavior of the relative direction computation code should now be correct here.
+         * Anyway, it seems unlikely that anyone would care about correct relative directions in
          * the arctic regions. Of course, longitude becomes meaningless at the poles themselves, but
-         * walking towards the pole, past it, and then back again will also yield incorrect results.
+         * walking towards the pole, past it, and then back again will now yield correct results.
          */
         assertEquals(alertsExample, steps[7][0].alerts.get(0).alertHeaderText.getSomeTranslation());
-        assertEquals(AbsoluteDirection.NORTHWEST, steps[7][0].absoluteDirection);
+        assertEquals(AbsoluteDirection.SOUTH, steps[7][0].absoluteDirection);
         assertEquals(RelativeDirection.CONTINUE, steps[7][0].relativeDirection);
-        assertEquals(NORTHWEST, steps[7][0].angle, EPSILON);
+        assertEquals(SOUTH, steps[7][0].angle, EPSILON);
         assertEquals("Edge 53", steps[7][0].streetName);
         assertEquals(1.0, steps[7][0].distance, 0.0);
         assertEquals(1, steps[7][0].alerts.size());
