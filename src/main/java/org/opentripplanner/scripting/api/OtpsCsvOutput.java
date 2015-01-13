@@ -43,7 +43,7 @@ public class OtpsCsvOutput {
     public void addRow(Object[] row) {
         List<String> strs = new ArrayList<>(row.length);
         for (int i = 0; i < row.length; i++) {
-            strs.add(row[i].toString());
+            strs.add(row[i] == null ? "" : row[i].toString());
         }
         data.add(strs);
     }
