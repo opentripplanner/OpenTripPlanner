@@ -15,6 +15,9 @@ package org.opentripplanner.scripting.api;
 
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
+import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.standalone.Router;
 
@@ -30,10 +33,12 @@ public class OtpsRouter {
     }
 
     public OtpsSPT plan(OtpsRoutingRequest req) {
-        // TODO Is this correct?
         try {
+            // TODO Is this correct?
             RoutingRequest req2 = req.req.clone();
             req2.setRoutingContext(router.graph);
+            req2.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+                    new NoThruTrafficPathParser() };
             ShortestPathTree spt = router.sptServiceFactory.instantiate().getShortestPathTree(req2);
             return new OtpsSPT(spt, router.graph.getSampleFactory());
         } catch (VertexNotFoundException e) {
