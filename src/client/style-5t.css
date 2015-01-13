@@ -63,7 +63,20 @@ a:focus{outline:none}
 
 #map{top:64px}
 
-
+.powered-by {
+    cursor: pointer;
+    z-index: 1000;
+    width: 134px;
+    height: 33px;
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 15px;
+    background: url(../images/5t/powered-by-5t.png) 0 0 no-repeat;
+    text-indent: -9999px;
+    line-height: 0;
+    font-size: 0;
+}
 
 }/* END MEDIA SCREEN*/	
 
