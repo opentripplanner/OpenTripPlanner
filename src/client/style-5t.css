@@ -1,6 +1,98 @@
-header#branding{
+
+/* ------- MEDIA SCREEN ------- */	
+
+@media screen{
+    
+/* ----------- RESET DEFAULT STYLES ----------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+html{_font-size:62.5%;width:100%;height:100%}body{font-family:arial,helvetica,sans-serif;position:relative;width:100%;height:100%;_font-size:1.2em;margin:0;padding:0}
+div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outline:0;font-size:1em;vertical-align:baseline;background:transparent}body{line-height:1}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}nav ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}a{margin:0;padding:0;vertical-align:baseline;background:transparent}ins{background-color:#ff9;color:#000;text-decoration:none}mark{background-color:#ff9;color:#000;font-style:italic;font-weight:bold}del{text-decoration:line-through}abbr[title],dfn[title]{border-bottom:1px dotted;cursor:help}table{border-collapse:collapse;border-spacing:0}hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0}input,select{vertical-align:middle}
+html { overflow-y: hidden; }
+
+/* ----------- COMMON CLASSES ----------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+.alt,.navigation {position:absolute;top:-9999px;left:-9999px}
+.hidden, hr{display:none}
+img,fieldset{border:0}
+p,ul,ol,li,form,fieldset,table,td,th,h1,h2,h3,h4,h5,sup{margin:0;padding:0}
+ul{list-style-type:none}
+a {color:#ccc;text-decoration:none}
+a:hover {text-decoration:none;color:#ccc}
+a:focus{outline:none}
+.clear{clear:both}
+.ext{text-indent:-9999px;font-size:0;display:block;line-height:0}
+.aux{position:relative;width:1000px}
+
+
+/* ----------- STRUCTURE --------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+
+#branding{
     box-shadow: 0 0 10px -6px #000;
     height: 64px;
     background: #29547c;
+    
+}
+#logo{position:relative;margin:0px;width:177px;height:54px}
+#logo h1{width:290px;height:64px;text-indent:-9999px;font-size:0;line-height:0;background:url(../images/5t/logo-pronto-tpl.gif) 0 0 no-repeat}
+
+.partner{display:none;}
+.main-menu-container{display:none;font-size:0.9em;}
+
+
+.language-switcher{float:left;margin-left:8px;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;text-transform:uppercase;background:#3e6a94;overflow:hidden;}
+.language-switcher span, .language-switcher a{text-align:right;width:25px;padding-right:22px;cursor:pointer;height:28px;display:block;font-weight:bold;font-size:1.08em;line-height:28px;color:#fff}
+.language-switcher a{display:none}
+.language-switcher:hover a{display:block}
+.language-switcher a:hover{background:#5580a9}
+/*.language-switcher span .fonticon:before{display:inline-block;content:"\e800";font-size:16px;color:#fff;padding:0;position:absolute;top:1px;right:8px;} */
+
+
+@font-face {
+    font-family: 'icons-5t';
+    src: url('../fonts/icons-5t.eot?71856095');
+    src: url('../fonts/icons-5t.eot?71856095#iefix') format('embedded-opentype'),
+    url('../fonts/icons-5t.woff?71856095') format('woff'),
+    url('../fonts/icons-5t.ttf?71856095') format('truetype'),
+    url('../fonts/icons-5t.svg?71856095#icons-5t') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+.fonticon{font-family:'icons-5t';vertical-align:middle;speak:none;text-align:center;line-height:1;font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+
+#map{top:64px}
+
+
+
+}/* END MEDIA SCREEN*/	
+
+
+
+@media only screen and (min-width:30em){ 
+    
+    .partner{width:150px;height:64px;position:absolute;top:0;right:0;background:url(../images/5t/bg-loghi.png) 0 0 no-repeat;padding-left:50px;display:block;}
+    .partner a{background-position:0 0;background-repeat:no-repeat;display:block;text-indent:-9999px;line-height:0;font-size:0;margin-top:10px;}
+    .partner a.first{margin-left:15px;}
+    .partner .logo-1{top:20px;right:128px;width:119px;height:44px;background-image:url(../images/5t/logo-regione-piemonte.gif)}
+    .partner a:hover{opacity:0.9}
+    .partner-aux{background:#fff;width:100%;height:100%;float:left;}
+    
+    
+}
+
+
+
+@media only screen and (min-width:55em){ 
+    
+    .main-menu-container{position:absolute;top:18px;right:228px;float:right;display:block;}
+    
+    .main-menu-5t{float:left}
+    .main-menu-5t li{float:left;margin-left:8px}
+    .main-menu-5t li.first{margin-left:0}
+    .main-menu-5t a{font-weight:bold;font-family:'Roboto',sans-serif;font-size:1.08em;line-height:28px;height:28px;padding:0 13px;display:block;background:#3e6a94;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;color:#fff;text-transform:uppercase}
+    .main-menu-5t a:hover{background:#fe9b25}
+    .main-menu-5t .active a{background:#fe9b25}
+    
     
 }
