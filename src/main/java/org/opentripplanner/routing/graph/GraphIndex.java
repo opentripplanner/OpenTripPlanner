@@ -329,7 +329,10 @@ public class GraphIndex {
 
         long now = System.currentTimeMillis()/1000;
         List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableResolver timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+        TimetableResolver timetableResolver = null;
+        if (graph.timetableSnapshotSource != null) {
+            timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+        }
         ServiceDate[] serviceDates = {new ServiceDate().previous(), new ServiceDate(), new ServiceDate().next()};
 
         for (TripPattern pattern : patternsForStop.get(stop)) {
@@ -347,7 +350,12 @@ public class GraphIndex {
             // Loop through all possible days
             for (ServiceDate serviceDate : serviceDates) {
                 ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
-                Timetable tt = timetableResolver.resolve(pattern, serviceDate);
+                Timetable tt;
+                if (timetableResolver != null){
+                    tt = timetableResolver.resolve(pattern, serviceDate);
+                } else {
+                    tt = pattern.scheduledTimetable;
+                }
 
                 if (!tt.temporallyViable(sd, now, timeRange, true)) continue;
 
