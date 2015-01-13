@@ -40,7 +40,6 @@ public class OtpsRoutingRequest {
         cal.set(Calendar.MINUTE, min);
         cal.set(Calendar.SECOND, sec);
         cal.set(Calendar.MILLISECOND, 0);
-        System.out.println("CAL: " + cal.getTime());
         req.setDateTime(cal.getTime());
     }
 
