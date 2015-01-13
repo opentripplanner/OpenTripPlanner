@@ -41,6 +41,14 @@ public class OtpsSPT {
         return individual.eval(spt, sampleFactory);
     }
 
+    public double getOriginLatitude() {
+        return spt.getOptions().rctx.origin.getLat();
+    }
+
+    public double getOriginLongitude() {
+        return spt.getOptions().rctx.origin.getLon();
+    }
+
     public List<OtpsEvaluatedIndividual> eval(Iterable<OtpsIndividual> population) {
         List<OtpsEvaluatedIndividual> retval = new ArrayList<>(); // Size?
         for (OtpsIndividual individual : population) {
