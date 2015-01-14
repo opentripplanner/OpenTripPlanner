@@ -5,7 +5,7 @@ router = otp.getRouter()
 
 # Create a default request for a given time
 req = otp.createRequest()
-req.setDateTime(2015, 1, 9, 10, 00, 00)
+req.setDateTime(2015, 1, 15, 10, 00, 00)
 req.setMaxTimeSec(1800)
 
 # Create a regular and rectangular n x n grid of points
@@ -22,7 +22,7 @@ grid30Csv.setHeader([ 'lat', 'lon', 'min_college_time', 'n_colleges_30', 'n_pop_
 # For each point of the synthetic grid
 for origin in grid:
 
-	print "Processing: ", origin.getLatitude(), origin.getLongitude()
+	print "Processing: ", origin
 	# Set the origin of the request to this point and run a search
 	req.setOrigin(origin)
 	spt = router.plan(req)
@@ -42,7 +42,8 @@ for origin in grid:
 	nPop30 = sum([ r.getIndividual().getFloatData('ind') for r in res if r.getTime() < 1800 ])
 
 	# Add a new row of result in the CSV output
-	grid30Csv.addRow([ origin.getLatitude(), origin.getLongitude(), minTime, nCollege30, nPop30 ])
+	grid30Csv.addRow([ spt.getSnappedOrigin().getLat(), spt.getSnappedOrigin().getLon(),
+		minTime, nCollege30, nPop30 ])
 
 # Save the result
 grid30Csv.save('grid30.csv')

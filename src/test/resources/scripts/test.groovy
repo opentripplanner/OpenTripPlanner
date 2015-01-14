@@ -3,7 +3,7 @@ def router = otp.getRouter()
 
 // Create a default request for a given time
 def req = otp.createRequest()
-req.setDateTime(2015, 1, 9, 10, 00, 00)
+req.setDateTime(2015, 1, 15, 10, 00, 00)
 req.setMaxTimeSec(1800)
 
 // Create a regular and rectangular n x n grid of points
@@ -27,12 +27,19 @@ for (origin in grid) {
 	if (spt == null) continue
 
 	// Evaluate times for all colleges
-	def res = spt.evalTime(colleges)
+	def res = spt.eval(colleges)
 	// Find the time to nearest college
 	// TODO def minTime = res.min()
+	def minTime = -1
 
 	// Find the number of colleges nearer than 30mn
-	def n = res.findAll { it.getTime() < 1800 }.size()
+	def nCollege30 = res.findAll { it.getTime() < 1800 }.size()
+	// TODO pop
+	def nPop30 = res.findAll { it.getTime() < 1800 }.size();
 
-	// TODO: Save the results in an extended result set
+	// Add a new row of result in the CSV output
+	grid30Csv.addRow([ spt.getSnappedOrigin().getLat(), spt.getSnappedOrigin().getLon(),
+		minTime, nCollege30, nPop30 ])
 }
+
+grid30Csv.save("grid30b.csv")
