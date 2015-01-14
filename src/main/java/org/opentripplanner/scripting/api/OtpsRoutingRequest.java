@@ -55,6 +55,26 @@ public class OtpsRoutingRequest {
         req.worstTime = req.dateTime + (req.arriveBy ? -maxTimeSec : maxTimeSec);
     }
 
+    public void setWalkSpeedMs(double walkSpeed) {
+        req.walkSpeed = walkSpeed;
+    }
+
+    public void setBikeSpeedMs(double bikeSpeed) {
+        req.bikeSpeed = bikeSpeed;
+    }
+
+    public void setMaxWalkDistance(double maxWalkDistance) {
+        req.maxWalkDistance = maxWalkDistance;
+    }
+
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
+        req.wheelchairAccessible = wheelchairAccessible;
+    }
+
+    public void setClampInitialWait(long clampInitialWait) {
+        req.clampInitialWait = clampInitialWait;
+    }
+
     public void setOrigin(double lat, double lon) {
         req.from = new GenericLocation(lat, lon);
     }
