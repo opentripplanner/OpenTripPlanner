@@ -16,30 +16,26 @@ package org.opentripplanner.scripting.api;
 /**
  * 
  */
-public class OtpsEvaluatedIndividual {
+public class OtpsLatLon {
 
-    private OtpsIndividual individual;
+    private double lat, lon;
 
-    // TODO Add boardings, walk distance, etc...
-    private long time;
-
-    protected OtpsEvaluatedIndividual(OtpsIndividual individual, long time) {
-        this.individual = individual;
-        this.time = time;
+    protected OtpsLatLon(double lat, double lon) {
+        this.lat = lat;
+        this.lon = lon;
     }
 
-    public Long getTime() {
-        if (time == Long.MAX_VALUE)
-            return null;
-        return time;
+    public double getLat() {
+        return lat;
     }
 
-    public OtpsIndividual getIndividual() {
-        return individual;
+    public double getLon() {
+        return lon;
     }
 
     @Override
     public String toString() {
-        return individual.toString() + " -> t=" + (getTime() == null ? "null" : (getTime() + "s"));
+        return "(" + lat + "," + lon + ")";
     }
+
 }

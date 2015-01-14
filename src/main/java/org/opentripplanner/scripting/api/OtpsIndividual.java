@@ -15,8 +15,13 @@ package org.opentripplanner.scripting.api;
 
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
 /**
  */
@@ -43,12 +48,27 @@ public class OtpsIndividual {
         this.population = population;
     }
 
-    public double getLatitude() {
-        return lat;
+    public OtpsLatLon getLocation() {
+        return new OtpsLatLon(lat, lon);
     }
 
-    public double getLongitude() {
-        return lon;
+    public OtpsLatLon getSnappedLocation() {
+        if (cachedSample == null)
+            return null;
+        // Maybe the Sample should store the snapped location itself
+        for (Edge e : cachedSample.v0.getOutgoingStreetEdges()) {
+            if (e.getToVertex().equals(cachedSample.v1) && e.getGeometry() != null) {
+                LineString geom = e.getGeometry();
+                LengthIndexedLine liline = new LengthIndexedLine(geom);
+                int t = cachedSample.t0 + cachedSample.t1;
+                double k = t == 0 ? 0.0 : 1.0 * cachedSample.t0 / t;
+                double x = liline.getStartIndex() + (liline.getEndIndex() - liline.getStartIndex())
+                        * k;
+                Coordinate p = liline.extractPoint(x);
+                return new OtpsLatLon(p.y, p.x);
+            }
+        }
+        return getLocation();
     }
 
     public String getStringData(String dataName) {
@@ -87,5 +107,10 @@ public class OtpsIndividual {
         if (time == Long.MAX_VALUE)
             return null;
         return new OtpsEvaluatedIndividual(this, time);
+    }
+
+    @Override
+    public String toString() {
+        return "Individual" + getLocation().toString();
     }
 }
