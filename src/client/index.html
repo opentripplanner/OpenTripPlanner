@@ -48,8 +48,6 @@
 <script src="//cdn.jsdelivr.net/mustache.js/0.7.2/mustache.js"></script>
 <script src="js/lib/ICanHaz.js"></script>
 
-<!-- jsPDF -->
-<script src="js/lib/jspdf.min.js"></script>
 
 
 <!-- otp-specific imports -->
@@ -103,38 +101,76 @@
 <script src="js/otp/modules/planner/Itinerary.js?v=1"></script>
 <script src="js/otp/modules/planner/ItinerariesWidget.js?v=1"></script>
 
-<script src="js/otp/modules/bikeshare/BikeShareModule.js?v=1"></script>
-<script src="js/otp/modules/bikeshare/BikeStationsWidget.js?v=1"></script>
-
 <script src="js/otp/modules/multimodal/MultimodalPlannerModule.js?v=1"></script>
 
-<script src="js/otp/modules/calltaker/CallTakerModule.js?v=1"></script>
-<script src="js/otp/modules/calltaker/CallHistoryWidget.js?v=1"></script>
-<script src="js/otp/modules/calltaker/MailablesWidget.js?v=1"></script>
-<script src="js/otp/modules/calltaker/calltaker-models.js?v=1"></script>
+<!--Loads some javascript modules only if they are enabled in config.js-->
+<script type="text/javascript">
+	//Which modules needs which files
+	var modules = {
+		'otp.modules.bikeshare.BikeShareModule': 
+			[
+			'js/otp/modules/bikeshare/BikeShareModule.js?v=1',
+			'js/otp/modules/bikeshare/BikeStationsWidget.js?v=1'
+		],
+		'otp.modules.analyst.AnalystModule':
+			[
+			'js/otp/modules/analyst/AnalystModule.js?v=1',
+			'js/otp/modules/analyst/AnalystLegendWidget.js?v=1',
+		],
+		'otp.modules.calltaker.CallTakerModule':
+			[
+			'js/lib/jspdf.min.js',
+			'js/otp/modules/calltaker/CallTakerModule.js?v=1',
+			'js/otp/modules/calltaker/CallHistoryWidget.js?v=1',
+			'js/otp/modules/calltaker/MailablesWidget.js?v=1',
+			'js/otp/modules/calltaker/calltaker-models.js?v=1',
+			],
+		'otp.modules.annotations.AnnotationsModule':
+			[
+			'js/otp/modules/annotations/AnnotationsModule.js?v=1'
+		],
+		'otp.modules.alerts.AlertsModule':
+			[
+			'js/otp/modules/alerts/AlertsModule.js?v=1',
+			'js/otp/modules/alerts/AlertsWidget.js?v=1',
+			'js/otp/modules/alerts/EntitiesWidget.js?v=1',
+			'js/otp/modules/alerts/alerts-models.js?v=1',
+		],
+		'otp.modules.fieldtrip.FieldTripModule':
+			[
+			'js/otp/modules/fieldtrip/FieldTripModule.js?v=1',
+			'js/otp/modules/fieldtrip/FieldTripManagerWidget.js?v=1',
+			'js/otp/modules/fieldtrip/FieldTripRequestWidget.js?v=1',
+			'js/otp/modules/fieldtrip/FieldTripGeocoderWidget.js?v=1',
+			'js/otp/modules/fieldtrip/SaveFieldTripWidget.js?v=1',
+			'js/otp/modules/fieldtrip/SearchWidget.js?v=1'
+			]
+			
+	}
+	for (var moduleIndex = 0; moduleIndex < otp.config.modules.length; moduleIndex++) {
+		var curModuleClass = otp.config.modules[moduleIndex]["className"]
+		//console.log(curModuleClass);
+		if (curModuleClass in modules) {
+			var modulesScripts = modules[curModuleClass];
+			for (var scriptIndex = 0; scriptIndex < modulesScripts.length; scriptIndex++) {
+				$.ajax({
+					url: modulesScripts[scriptIndex],
+					dataType: "script",
+					cache: true,
+					async: false
+				})
+				.fail(function(jqxhr, settings, exception) {
+					console.error(settings);
+					console.error(jqxhr.error());
+					console.error(exception);
+				});
+			}
+		}
+	}
 
-<script src="js/otp/modules/annotations/AnnotationsModule.js?v=1"></script>
-
-<script src="js/otp/modules/analyst/AnalystModule.js?v=1"></script>
-<script src="js/otp/modules/analyst/AnalystLegendWidget.js?v=1"></script>
-
-<script src="js/otp/modules/alerts/AlertsModule.js?v=1"></script>
-<script src="js/otp/modules/alerts/EntitiesWidget.js?v=1"></script>
-<script src="js/otp/modules/alerts/EditAlertWidget.js?v=1"></script>
-
-<script src="js/otp/modules/alerts/AlertsModule.js?v=1"></script>
-<script src="js/otp/modules/alerts/AlertsWidget.js?v=1"></script>
-<script src="js/otp/modules/alerts/EntitiesWidget.js?v=1"></script>
-<script src="js/otp/modules/alerts/EditAlertWidget.js?v=1"></script>
-<script src="js/otp/modules/alerts/alerts-models.js?v=1"></script>
+</script>
 
 
-<script src="js/otp/modules/fieldtrip/FieldTripModule.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/FieldTripManagerWidget.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/FieldTripRequestWidget.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/FieldTripGeocoderWidget.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/SaveFieldTripWidget.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/SearchWidget.js?v=1"></script>
 
 <script src="js/otp/widgets/InfoWidget.js?v=1"></script>
 <script src="js/otp/widgets/tripoptions/RoutesSelectorWidget.js?v=1"></script>
@@ -147,9 +183,6 @@
 <script src="js/otp/widgets/transit/TripViewerWidget.js?v=1"></script>
 
 <script src="js/otp/layers/StopsLayer.js?v=1"></script>
-
-
-
 
 <!-- make legacy Internet Explorer play nice(r) -->
 <!--[if lt IE 9]>
