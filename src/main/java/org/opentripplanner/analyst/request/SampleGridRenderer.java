@@ -115,7 +115,7 @@ public class SampleGridRenderer {
      * @return
      */
     public static void sampleSPT(final ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid,
-            final double d0, final double gridSizeMeters, final double v0,
+            final double d0, final double gridSizeMeters, final double offRoadSpeed,
             final double maxWalkDistance, final int maxTimeSec, final double cosLat) {
 
         final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
@@ -188,7 +188,7 @@ public class SampleGridRenderer {
                  * The computations below are approximation, but we are on the edge anyway and the
                  * current sample does not correspond to any computed value.
                  */
-                z.wTime = tMin + gridSizeMeters / v0;
+                z.wTime = tMin + gridSizeMeters / offRoadSpeed;
                 z.wBoardings = bMin;
                 z.wWalkDist = wdMin + gridSizeMeters;
                 z.d = dMin + gridSizeMeters;
@@ -207,13 +207,13 @@ public class SampleGridRenderer {
 
             @Override
             public final void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1,
-                    double speed) {
+                    double speedAlongEdge) {
                 double wd0 = s0.getWalkDistance() + d0;
                 double wd1 = s0.getWalkDistance() + d1;
                 double t0 = wd0 > maxWalkDistance ? Double.POSITIVE_INFINITY : s0.getActiveTime()
-                        + d0 / speed;
+                        + d0 / speedAlongEdge;
                 double t1 = wd1 > maxWalkDistance ? Double.POSITIVE_INFINITY : s1.getActiveTime()
-                        + d1 / speed;
+                        + d1 / speedAlongEdge;
                 if (t0 < maxTimeSec || t1 < maxTimeSec) {
                     if (!Double.isInfinite(t0) || !Double.isInfinite(t1)) {
                         WTWD z = new WTWD();
@@ -228,7 +228,7 @@ public class SampleGridRenderer {
                             z.wBoardings = s1.getNumBoardings();
                             z.wWalkDist = s1.getWalkDistance() + d1;
                         }
-                        gridSampler.addSamplingPoint(c, z, speed);
+                        gridSampler.addSamplingPoint(c, z, offRoadSpeed);
                     }
                 }
             }
