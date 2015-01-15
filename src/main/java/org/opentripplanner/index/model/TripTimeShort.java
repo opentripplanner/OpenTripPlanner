@@ -24,6 +24,7 @@ public class TripTimeShort {
     public boolean timepoint = false;
     public boolean realtime = false;
     public long serviceDay;
+    public AgencyAndId tripId;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
@@ -42,6 +43,7 @@ public class TripTimeShort {
 
     public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {
         this(tt, i, stop);
+        tripId = tt.trip.getId();
         serviceDay = sd.time(0);
     }
 
