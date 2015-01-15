@@ -34,6 +34,7 @@ import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -308,7 +309,7 @@ public class GraphIndex {
      * @return
      */
     public Collection<StopTimesInPattern> stopTimesForStop(Stop stop) {
-        return getStopTimesForStop(stop, 24*60*60, 2);
+        return getStopTimesForStop(stop, 24 * 60 * 60, 2);
     }
 
     /**
@@ -368,6 +369,21 @@ public class GraphIndex {
                             if (t.getDepartureTime(sidx) != -1 &&
                                     t.getDepartureTime(sidx) >= secondsSinceMidnight) {
                                 pq.insertWithOverflow(new TripTimeShort(t, sidx, stop, sd));
+                            }
+                        }
+
+                        // TODO: This needs to be adapted after #1647 is merged
+                        for (FrequencyEntry freq : tt.frequencyEntries) {
+                            if (!sd.serviceRunning(freq.tripTimes.serviceCode)) continue;
+                            int departureTime = freq.nextDepartureTime(sidx, secondsSinceMidnight);
+                            if (departureTime == -1) continue;
+                            int lastDeparture = freq.endTime + freq.tripTimes.getArrivalTime(sidx) -
+                                    freq.tripTimes.getDepartureTime(0);
+                            int i = 0;
+                            while (departureTime <= lastDeparture && i < numberOfDepartures) {
+                                pq.insertWithOverflow(new TripTimeShort(freq.materialize(sidx, departureTime, true), sidx, stop, sd));
+                                departureTime += freq.headway;
+                                i++;
                             }
                         }
                     }
