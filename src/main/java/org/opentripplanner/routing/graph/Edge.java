@@ -110,40 +110,6 @@ public abstract class Edge implements Serializable {
         return null;
     }
 
-    protected boolean detachFrom(Graph graph) {
-        boolean detached = false;
-        if (fromv != null) {
-            detached = fromv.removeOutgoing(this);
-            fromv = null;
-        }
-        return detached;
-    }
-
-    protected boolean detachTo(Graph graph) {
-        boolean detached = false;
-        if (tov != null) {
-            detached = tov.removeIncoming(this);
-            tov = null;
-        }
-        return detached;
-    }
-
-    /**
-     * Disconnect this edge from its endpoint vertices, keeping edgelists coherent
-     * 
-     * @return
-     */
-    public int detach(Graph graph) {
-        int nDetached = 0;
-        if (detachFrom(graph)) {
-            ++nDetached;
-        }
-        if (detachTo(graph)) {
-            ++nDetached;
-        }
-        return nDetached;
-    }
-
     /**
      * This should only be called inside State; other methods should call
      * org.opentripplanner.routing.core.State.getBackTrip()

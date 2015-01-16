@@ -26,11 +26,8 @@ import com.vividsolutions.jts.geom.LineString;
 public class LegSwitchingEdge extends Edge {
 	private static final long serialVersionUID = 1L;
 
-    private static final Vertex dummy = new Vertex(null, null, 0.0, 0.0) {};
-
 	public LegSwitchingEdge(Vertex v1, Vertex v2) {
-		super(dummy, dummy);
-        dummy.removeAllEdges();
+        super(new Vertex(null, null, 0.0, 0.0) {}, new Vertex(null, null, 0.0, 0.0) {});
         fromv = v1;
         tov = v2;
         // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.

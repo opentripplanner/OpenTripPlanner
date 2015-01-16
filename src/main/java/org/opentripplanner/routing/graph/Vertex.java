@@ -285,25 +285,4 @@ public abstract class Vertex implements Serializable, Cloneable {
         }
         return result;
     }
-
-    /**
-     * Clear this vertex's outgoing and incoming edge lists, and remove all the edges
-     * they contained from this vertex's neighbors.
-     */
-    public void removeAllEdges() {
-        for (Edge e : outgoing) {
-            Vertex target = e.getToVertex();
-            if (target != null && target != this) {
-                target.removeIncoming(e);
-            }
-        }
-        for (Edge e : incoming) {
-            Vertex source = e.getFromVertex();
-            if (source != null && source != this) {
-                source.removeOutgoing(e);
-            }
-        }
-        incoming = new Edge[0];
-        outgoing = new Edge[0];
-    }
 }
