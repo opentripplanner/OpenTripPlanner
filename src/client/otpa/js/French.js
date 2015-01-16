@@ -42,7 +42,7 @@ otp.locale.French = {
         bikeSpeed : [ [ '2.778', '10 km/h' ], [ '3.333', '12 km/h' ], [ '4.167', '15 km/h' ], [ '5.556', '20 km/h' ] ],
 
         modes : [ [ "TRANSIT,WALK", "Transport en commun" ], [ "BICYCLE", "Vélo" ], [ "WALK", "Marche à pied" ],
-                [ "CAR", "Voiture" ] ],
+                [ "CAR", "Voiture" ], [ "CAR_PARK,WALK,TRANSIT", "P+R (Voiture puis TC)" ] ],
 
         transitModes : [ [ "BUS", "Bus/Car" ], [ "TRAM", "Tramway" ], [ "SUBWAY", "Métro" ], [ "RAIL", "Train" ] ],
 
