@@ -36,7 +36,14 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// removed component, mixing spring and jersey annotations is bad?
+/**
+ * NOTE This way of fetching travel time tiles does not currently work.
+ * It relied on an SPT cache which would find existing SPTs based on search request parameters.
+ * Server side stored search results are now done explicitly with TimeSurfaces.
+ * See org.opentripplanner.api.resource.SurfaceResource, functions createSurface and tileGet
+ * The basic idea is to create a surface for a "batch" or one-to-many OTP search, then using the returned ID
+ * fetch the tiles from a URL under that surface ID.
+ */
 @Path("/routers/{routerId}/analyst/tile/{z}/{x}/{y}.png")
 public class TileService extends RoutingResource {
     
@@ -63,8 +70,9 @@ public class TileService extends RoutingResource {
         RenderRequest renderRequest = new RenderRequest(format, layer, style, true, false);
         Router router = otpServer.getRouter(routerId);
 
-        // TODO Is this a deprecated method?
-        return null; //router.renderer.getResponse(tileRequest, sptRequestA, sptRequestB, renderRequest);
+        // The method below that takes sptRequests directly is deprecated, see javadoc above on this class and
+        // org.opentripplanner.api.resource.SurfaceResource, functions createSurface and tileGet
+        return null; // router.renderer.getResponse(tileRequest, sptRequestA, sptRequestB, renderRequest);
     }
 
 }
