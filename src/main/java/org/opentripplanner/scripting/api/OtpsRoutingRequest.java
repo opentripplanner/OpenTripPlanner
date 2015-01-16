@@ -20,7 +20,9 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 
 /**
+ * Routing request options: date/time, modes, max walk distance...
  * 
+ * @author laurent
  */
 public class OtpsRoutingRequest {
 

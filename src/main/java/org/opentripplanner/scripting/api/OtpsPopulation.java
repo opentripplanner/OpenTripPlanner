@@ -27,7 +27,9 @@ import org.opentripplanner.analyst.batch.Population;
 import com.csvreader.CsvReader;
 
 /**
+ * A population is a collection of individuals.
  * 
+ * @author laurent
  */
 public class OtpsPopulation implements Iterable<OtpsIndividual> {
 
@@ -47,6 +49,13 @@ public class OtpsPopulation implements Iterable<OtpsIndividual> {
         }
     }
 
+    /**
+     * Set data header keys. Only useful for population you create yourself programmatically. For
+     * CSV population this will be set automatically according to the CSV headers.
+     * 
+     * @param headers The data header, in order. Later used as a key to retrieve individual data
+     *        value.
+     */
     public void setHeaders(String[] headers) {
         dataIndex = new HashMap<>();
         for (int i = 0; i < headers.length; i++) {
@@ -63,10 +72,23 @@ public class OtpsPopulation implements Iterable<OtpsIndividual> {
         return ret;
     }
 
+    /**
+     * Add a new data-less individual to the collection.
+     * 
+     * @param lat Latitude of the individual location
+     * @param lon Longitude of the individual location
+     */
     public void addIndividual(double lat, double lon) {
         this.addIndividual(lat, lon, null);
     }
 
+    /**
+     * Add a new individual with some data attached to it.
+     * 
+     * @param lat Latitude of the individual location
+     * @param lon Longitude of the individual location
+     * @param data An array of data to store in the individual
+     */
     public void addIndividual(double lat, double lon, String[] data) {
         OtpsIndividual individual = new OtpsIndividual(lat, lon, data, this);
         individuals.add(individual);

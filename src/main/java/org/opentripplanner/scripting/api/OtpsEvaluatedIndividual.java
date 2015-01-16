@@ -14,7 +14,13 @@
 package org.opentripplanner.scripting.api;
 
 /**
+ * This class encapsulate both an individual and evaluated values (time...).
  * 
+ * Objects are returned by the eval method of the SPT.
+ * 
+ * @see OtpsSPT.eval()
+ * 
+ * @author laurent
  */
 public class OtpsEvaluatedIndividual {
 
@@ -28,12 +34,19 @@ public class OtpsEvaluatedIndividual {
         this.time = time;
     }
 
+    /**
+     * @return The time, in seconds, for this evualuated individual. Return null/None if no time is
+     *         available (position not snapped or out of time range).
+     */
     public Long getTime() {
         if (time == Long.MAX_VALUE)
             return null;
         return time;
     }
 
+    /**
+     * @return The individual evaluated (the same individual from the evuluated population).
+     */
     public OtpsIndividual getIndividual() {
         return individual;
     }

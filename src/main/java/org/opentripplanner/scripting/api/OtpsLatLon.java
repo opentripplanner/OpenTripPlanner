@@ -14,7 +14,9 @@
 package org.opentripplanner.scripting.api;
 
 /**
+ * Simple geographical coordinates.
  * 
+ * @author laurent
  */
 public class OtpsLatLon {
 
@@ -25,10 +27,16 @@ public class OtpsLatLon {
         this.lon = lon;
     }
 
+    /**
+     * @return The latitude.
+     */
     public double getLat() {
         return lat;
     }
 
+    /**
+     * @return The longitude.
+     */
     public double getLon() {
         return lon;
     }

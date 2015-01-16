@@ -22,7 +22,9 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.standalone.Router;
 
 /**
+ * A router.
  * 
+ * @author laurent
  */
 public class OtpsRouter {
 
@@ -32,6 +34,13 @@ public class OtpsRouter {
         this.router = router;
     }
 
+    /**
+     * Plan a route on the router given the various options.
+     * 
+     * @param req The routing request options (date/time, modes, etc...)
+     * @return A Shortest-path-tree (a time+various states for each vertices around the
+     *         origin/destination).
+     */
     public OtpsSPT plan(OtpsRoutingRequest req) {
         try {
             // TODO Is this correct?
