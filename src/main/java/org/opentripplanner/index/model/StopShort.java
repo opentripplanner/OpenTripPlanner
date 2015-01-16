@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class StopShort {
 
     public AgencyAndId id;
+    public String code;
     public String name;
     public double lat;
     public double lon;
@@ -23,6 +24,7 @@ public class StopShort {
     
     public StopShort (Stop stop) {
         id = stop.getId();
+        code = stop.getCode();
         name = stop.getName();
         lat = stop.getLat();
         lon = stop.getLon();
