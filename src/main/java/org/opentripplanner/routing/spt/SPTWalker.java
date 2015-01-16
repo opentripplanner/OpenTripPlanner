@@ -80,13 +80,20 @@ public class SPTWalker {
     public void walk(SPTVisitor visitor, double d0) {
         int nTotal = 0, nSkippedDupEdge = 0, nSkippedNoGeometry = 0;
         Collection<? extends State> allStates = spt.getAllStates();
-        Set<Edge> processedEdges = new HashSet<Edge>(allStates.size());
-        for (State s0 : allStates) {
+        Set<Vertex> allVertices = new HashSet<Vertex>(spt.getVertexCount());
+        for (State s : allStates) {
+            allVertices.add(s.getVertex());
+        }
+        Set<Edge> processedEdges = new HashSet<Edge>(allVertices.size());
+        for (Vertex v : allVertices) {
+            State s0 = spt.getState(v);
+            if (s0 == null || !s0.isFinal())
+                continue;
             for (Edge e : s0.getVertex().getIncoming()) {
                 // Take only street
                 if (e != null && visitor.accept(e)) {
                     State s1 = spt.getState(e.getFromVertex());
-                    if (s1 == null)
+                    if (s1 == null || !s1.isFinal())
                         continue;
                     if (e.getFromVertex() != null && e.getToVertex() != null) {
                         // Hack alert: e.hashCode() throw NPE
@@ -166,7 +173,7 @@ public class SPTWalker {
                 }
             }
         }
-        LOG.info("SPTWalker: Generated {} points ({} dup edges, {} no geometry) from {} states.",
-                nTotal, nSkippedDupEdge, nSkippedNoGeometry, allStates.size());
+        LOG.info("SPTWalker: Generated {} points ({} dup edges, {} no geometry) from {} vertices / {} states.",
+                nTotal, nSkippedDupEdge, nSkippedNoGeometry, allVertices.size(), allStates.size());
     }
 }
