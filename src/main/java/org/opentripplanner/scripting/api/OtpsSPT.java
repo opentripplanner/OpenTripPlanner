@@ -22,6 +22,15 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 /**
  * A shortest-path-tree, the result of a plan request on a router.
  * 
+ * Example of use (python script):
+ * <pre>
+ *   router = otp.getRouter()
+ *   req = otp.createRequest()
+ *   req.setDateTime(...)
+ *   spt = router.plan(req)
+ * </pre>
+ * 
+ * @author laurent
  */
 public class OtpsSPT {
 

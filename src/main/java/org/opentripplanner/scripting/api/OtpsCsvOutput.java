@@ -25,7 +25,6 @@ import com.google.common.base.Charsets;
  * This class allow one to generate easily tabular data and save it as a CSV file.
  * 
  * For example, in python:
- * 
  * <pre>
  *   csv = otp.createCSVOutput()
  *   csv.setHeader( [ 'lat', 'lon', 'total' ] )

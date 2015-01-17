@@ -29,6 +29,15 @@ import com.csvreader.CsvReader;
 /**
  * A population is a collection of individuals.
  * 
+ * Example of use (python script loading a CSV file):
+ * <pre>
+ *   spt = ...
+ *   pop = otp.loadCSVPopulation('pop.csv', 'lat', 'lon')
+ *   result = spt.eval(pop)
+ *   for r in result:
+ *       print r.getTime()
+ * </pre>
+ * 
  * @author laurent
  */
 public class OtpsPopulation implements Iterable<OtpsIndividual> {

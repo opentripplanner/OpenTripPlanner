@@ -29,9 +29,12 @@ public class OtpsEvaluatedIndividual {
     // TODO Add boardings, walk distance, etc...
     private long time;
 
-    protected OtpsEvaluatedIndividual(OtpsIndividual individual, long time) {
+    private int boardings;
+
+    protected OtpsEvaluatedIndividual(OtpsIndividual individual, long time, int boardings) {
         this.individual = individual;
         this.time = time;
+        this.boardings = boardings;
     }
 
     /**
@@ -42,6 +45,17 @@ public class OtpsEvaluatedIndividual {
         if (time == Long.MAX_VALUE)
             return null;
         return time;
+    }
+
+    /**
+     * @return The number of boardings to get to this point (this is the number of transfers +1).
+     *         Return 0 for walk only path. Return null/None if no information is available at this
+     *         point (position not snapped or out of evaluated time range).
+     */
+    public Integer getBoardings() {
+        if (boardings == 255) // TODO Use a constant
+            return null;
+        return boardings;
     }
 
     /**

@@ -26,8 +26,10 @@ import org.opentripplanner.standalone.OTPServer;
  * 
  * This facade allow a script to access / create OTP objects (routers, populations, ...)
  * 
- * @author laurent
+ * @see OtpsRouter
+ * @see OtpsPopulation
  * 
+ * @author laurent
  */
 public class OtpsEntryPoint {
 

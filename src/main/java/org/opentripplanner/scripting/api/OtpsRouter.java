@@ -22,7 +22,15 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.standalone.Router;
 
 /**
- * A router.
+ * A router, as returned by the getRouter function of the OTP script entry point.
+ * 
+ * Example of code (python script):
+ * <pre>
+ *   # Get the default router
+ *   defRouter = otp.getRouter()
+ *   # Get the router of ID 'paris'
+ *   parisRouter = otp.getRouter('paris')
+ * </pre>
  * 
  * @author laurent
  */

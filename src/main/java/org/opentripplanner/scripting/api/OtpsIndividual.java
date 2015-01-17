@@ -146,7 +146,8 @@ public class OtpsIndividual {
         long time = cachedSample.eval(spt);
         if (time == Long.MAX_VALUE)
             return null;
-        return new OtpsEvaluatedIndividual(this, time);
+        int boardings = cachedSample.evalBoardings(spt);
+        return new OtpsEvaluatedIndividual(this, time, boardings);
     }
 
     @Override

@@ -22,6 +22,17 @@ import org.opentripplanner.routing.core.RoutingRequest;
 /**
  * Routing request options: date/time, modes, max walk distance...
  * 
+ * Example of code (python script):
+ * <pre>
+ *   router = otp.getRouter()
+ *   req = otp.createRequest()
+ *   req.setDateTime(2015, 1, 15, 14, 00, 00)
+ *   req.setModes('WALK,BUS,RAIL')
+ *   req.setOrigin(45.123, 1.456)
+ *   spt = router.plan(req)
+ *   ...
+ * </pre>
+ * 
  * @author laurent
  */
 public class OtpsRoutingRequest {
