@@ -27,8 +27,9 @@ otp.modules.analyst.AnalystModule =
     initialize : function(webapp, id, options) {
         //otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
-                
-        this.analystUrl = otp.config.hostname + "/" + otp.config.restService + "/analyst/tile/{z}/{x}/{y}.png";
+
+        this.analystSurfaceUrl = otp.config.hostname + "/otp/surfaces";
+        this.surfaceId = null;
     },
 
     activate : function() {
@@ -95,61 +96,87 @@ otp.modules.analyst.AnalystModule =
             this_.startLatLng = this_.locMarker.getLatLng();
             this_.runAnalystQuery();
         });
-    },    
+    },
     
+    /**
+     * Retrieves this.surfaceId from backend and updates analyst map layer after that
+     * This retrieval can take a few seconds so a loader is shown in the UI
+     */
     runAnalystQuery : function() {
-
-	    var params = { 
-		    batch : true,
-		    layers : 'traveltime',
-		    styles : 'color30',
-		    
+        var this_ = this;
+        var params = {
+            batch : true,
+            layers : 'traveltime',
+            styles : 'color30',
             time : (this.time) ? this.time : moment().format("h:mma"),
             date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
             mode : this.mode,
-	        maxWalkDistance : this.maxWalkDistance,
-	        arriveBy : this.arriveBy,
-	        fromPlace : this.startLatLng.lat+','+this.startLatLng.lng,
-	        toPlace : this.startLatLng.lat+','+this.startLatLng.lng
+            maxWalkDistance : this.maxWalkDistance,
+            arriveBy : this.arriveBy,
+            fromPlace : this.startLatLng.lat+','+this.startLatLng.lng,
+            toPlace : this.startLatLng.lat+','+this.startLatLng.lng
+        };
+
+        $('#otp-spinner').show();
+        this.surfaceId = null;
+
+        $.post(this.analystSurfaceUrl+this.buildQuery(params))
+            .done( function (data) {
+                // success
+                if (data.id) {
+                    this_.surfaceId = data.id;
+                }
+                this_.updateAnalystLayer(params);
+            })
+            .fail( function (err) {
+                alert("Coudn't start analysis, is the marker inside the map bounds?");
+            })
+            .always( function () {
+                $('#otp-spinner').hide();
+            });
+    },
+
+    updateAnalystLayer: function (params) {
+        if (!this.surfaceId) {
+            console.warn("No surfaceId set, first call runAnalystQuery with a correct lat lon");
+            return;
         }
-
-        var URL = this.analystUrl + this.buildQuery(params);
-
-        if(this.analystLayer != null) {
+        var URL = this.analystSurfaceUrl + "/" + this.surfaceId + "/isotiles/{z}/{x}/{y}.png" + this.buildQuery(params);
+        if(this.analystLayer !== null) {
             this.analystLayer.setUrl(URL); // trigger a refresh without removing the layer
         } else {
             this.analystLayer = new L.TileLayer(URL, {zIndex : 100});
             this.addLayer("Analyst Accessibility", this.analystLayer);
         }
         
-	    this.analystLayer._url = URL;
+        this.analystLayer._url = URL;
         this.webapp.map.lmap.addLayer(this.analystLayer);
 
         this.legendWidget.refresh(params);
-    },     
+    },
 
     // convert a map of query parameters into a query string, 
     // expanding Array values into multiple query parameters
     buildQuery :  function(params) {
-	    ret = [];
-	    for (key in params) {
-		    vals = params[key];
-		    // wrap scalars in array
-		    if ( ! (vals instanceof Array)) {
-		        var v = vals;
-		        vals = new Array();
-		        vals[0] = v;
-		    }
-		    for (i in vals) { 
-			    val = vals[i]; // js iterates over indices not values!
-			    // skip params that are empty or stated to be the same as previous
-			    if (val == '' || val == 'same')
-				    continue;
-			    param = [encodeURIComponent(key), encodeURIComponent(val)].join('=');
-			    ret.push(param);
-		    }
-	    }
-	    return "?" + ret.join('&');
+        ret = [];
+        for (key in params) {
+            vals = params[key];
+            // wrap scalars in array
+            if ( ! (vals instanceof Array)) {
+                var v = vals;
+                vals = new Array();
+                vals[0] = v;
+            }
+            for (i in vals) { 
+                val = vals[i]; // js iterates over indices not values!
+                // skip params that are empty or stated to be the same as previous
+                if (val == '' || val == 'same')
+                    continue;
+                param = [encodeURIComponent(key), encodeURIComponent(val)].join('=');
+                ret.push(param);
+            }
+        }
+        return "?" + ret.join('&');
     },
      
 });
