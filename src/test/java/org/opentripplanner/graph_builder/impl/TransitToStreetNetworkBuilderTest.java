@@ -395,23 +395,22 @@ public class TransitToStreetNetworkBuilderTest {
     
     @Test
     public void testMariborBus() throws Exception {
-        testTransitStreetConnections("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor.ser", "maribor");
+        testTransitStreetConnections("maribor_clean.osm.gz", "marprom_fake_gtfs_small.zip", "maribor.ser", "maribor");
         //findNeededGTFSData("maribor_clean.osm.gz", "marprom_fake_gtfs.zip", "maribor.ser", "maribor");
     }
     
-    /* 
-    // Commented for now, because I need to lower size of OSM and GTFS before adding it to Git
+
     @Test
     public void testPortland() throws Exception {
-        testTransitStreetConnections("washington_station.osm", "portland_gtfs.zip", "portland.ser", "portland");
+        testTransitStreetConnections("washington_station.osm", "portland_small_gtfs.zip", "portland.ser", "portland");
         //findNeededGTFSData("washington_station.osm", "portland_gtfs.zip", "portland.ser", "portland");
     }
     
     @Test
     public void testMilano() throws Exception {
-        testTransitStreetConnections("milan_italy.osm.pbf", "Export_OpenDataTPL_Current.zip", "milano.ser", "milano");
+        testTransitStreetConnections("milan_italy.osm.pbf", "milano_small_gtfs.zip", "milano.ser", "milano");
         //findNeededGTFSData("milan_italy.osm.pbf", "Export_OpenDataTPL_Current.zip", "milano.ser", "milano");
-    }*/
+    }
     
     
     
