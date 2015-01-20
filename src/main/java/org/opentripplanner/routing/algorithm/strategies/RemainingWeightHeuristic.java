@@ -15,6 +15,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import java.io.Serializable;
 
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -28,7 +29,7 @@ public interface RemainingWeightHeuristic extends Serializable {
      * Perform any one-time setup and pre-computation that will be needed by later calls to 
      * computeForwardWeight/computeReverseWeight. 
      */
-    public void initialize(State s, Vertex target, long abortTime);
+    public void initialize(RoutingRequest options, Vertex origin, Vertex target, long abortTime);
 
     public double computeForwardWeight(State s, Vertex target);
 

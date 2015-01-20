@@ -24,6 +24,7 @@ import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
+import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -81,7 +82,7 @@ public class GraphIndex {
 
     /* Separate transfers for profile routing */
     public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
-    private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex;
+    private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex = null;
 
     /* Extra index for applying realtime updates (lazy-initialized). */
     public Map<String, Trip> tripForIdWithoutAgency = null;
@@ -91,6 +92,9 @@ public class GraphIndex {
 
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
+
+    /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
+    private transient StopTreeCache stopTreeCache = null;
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
@@ -139,19 +143,28 @@ public class GraphIndex {
             routeForId.put(route.getId(), route);
         }
 
-        clusterStops();
-        LOG.info("Creating a spatial index for stop clusters.");
-        stopClusterSpatialIndex = new HashGridSpatialIndex<StopCluster>();
-        for (StopCluster cluster : stopClusterForId.values()) {
-            Envelope envelope = new Envelope(new Coordinate(cluster.lon, cluster.lat));
-            stopClusterSpatialIndex.insert(envelope, cluster);
-        }
-
         // Copy these two service indexes from the graph until we have better ones.
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
         LOG.info("Done indexing graph.");
+    }
+
+    /**
+     * Stop clustering is slow to perform and only used in profile routing for the moment.
+     * Therefore it is not done automatically, and any method requiring stop clusters should call this method
+     * to ensure that the necessary indexes are lazy-initialized.
+     */
+    public void clusterStopsAsNeeded() {
+        if (stopClusterSpatialIndex == null) {
+            clusterStops();
+            LOG.info("Creating a spatial index for stop clusters.");
+            stopClusterSpatialIndex = new HashGridSpatialIndex<StopCluster>();
+            for (StopCluster cluster : stopClusterForId.values()) {
+                Envelope envelope = new Envelope(new Coordinate(cluster.lon, cluster.lat));
+                stopClusterSpatialIndex.insert(envelope, cluster);
+            }
+        }
     }
 
     private void analyzeServices() {
@@ -317,6 +330,16 @@ public class GraphIndex {
             if ( ! times.times.isEmpty()) ret.add(times);
         }
         return ret;
+    }
+
+    /** Fetch a cache of nearby intersection distances for every transit stop in this graph, lazy-building as needed. */
+    public StopTreeCache getStopTreeCache() {
+        synchronized (this) {
+            if (stopTreeCache == null) {
+                stopTreeCache = new StopTreeCache(graph, 20); // TODO make this max-distance variable
+            }
+        }
+        return stopTreeCache;
     }
 
     /**

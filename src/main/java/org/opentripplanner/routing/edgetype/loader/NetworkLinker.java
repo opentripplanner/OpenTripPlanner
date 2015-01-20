@@ -19,7 +19,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import com.google.common.collect.Iterables;
+
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -29,6 +31,7 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -113,11 +116,26 @@ public class NetworkLinker {
             }
         }
 
+        /*
+         * TODO Those two steps should be in a separate builder, really. We re-use this builder to
+         * prevent having to spatially re-index several times the street network. Instead we could
+         * have a "spatial indexer" builder that add a spatial index to the graph, and make all
+         * builders that rely on spatial indexing to add a dependency to this builder. And we do not
+         * link stations directly in the OSM build as they can come from other builders (static bike
+         * rental or P+R builders) and street data can be coming from shapefiles.
+         */
         LOG.debug("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : Iterables.filter(vertices,
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
+            }
+        }
+
+        LOG.debug("Linking bike P+R stations...");
+        for (BikeParkVertex bprv : Iterables.filter(vertices, BikeParkVertex.class)) {
+            if (!networkLinkerLibrary.connectVertexToStreets(bprv).getResult()) {
+                LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked(bprv)));
             }
         }
     }

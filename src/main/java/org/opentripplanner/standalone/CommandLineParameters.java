@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.opentripplanner.routing.impl.GraphServiceFileImpl;
+import jersey.repackaged.com.google.common.collect.Lists;
+
+import org.opentripplanner.routing.services.GraphService;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
@@ -30,140 +31,162 @@ import com.beust.jcommander.ParameterException;
  * 
  * @author abyrd
  */
-public class CommandLineParameters {
+public class CommandLineParameters implements Cloneable {
 
-    private static final int DEFAULT_PORT = 8080;
-    private static final int DEFAULT_SECURE_PORT = 8081;
-    private static final String DEFAULT_GRAPH_DIRECTORY  = "/var/otp/graphs";
-    private static final String DEFAULT_CACHE_DIRECTORY  = "/var/otp/cache";
-    private static final String DEFAULT_POINTSET_DIRECTORY  = "/var/otp/pointsets";
-    private static final String DEFAULT_ROUTER_ID = "";
+    private static final int    DEFAULT_PORT        = 8080;
+    private static final int    DEFAULT_SECURE_PORT = 8081;
+    private static final String DEFAULT_BASE_PATH   = "/var/otp";
+    private static final String DEFAULT_ROUTER_ID   = "";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
 
-    @Parameter(names = { "-h", "--help"}, help = true,
-    description = "Print this help message and exit")
-    boolean help;
-    
-    @Parameter(names = { "-v", "--verbose" }, 
-    description = "Verbose output")
-    boolean verbose;
+    @Parameter(names = {"--help"}, help = true,
+            description = "Print this help message and exit.")
+    public boolean help;
+
+    @Parameter(names = {"--verbose"},
+            description = "Verbose output.")
+    public boolean verbose;
+
+    @Parameter(names = {"--htmlAnnotations" },
+    description = "Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.")
+    boolean htmlAnnotations = false;
    
+    @Parameter(names = {"--basePath"}, validateWith = ReadWriteDirectory.class,
+            description = "Set the path under which graphs, caches, etc. are stored by default.")
+    public String basePath = DEFAULT_BASE_PATH;
+
     /* Options for the graph builder sub-task. */
 
-    @Parameter(names = {"-b", "--build"}, validateWith = ReadableDirectory.class, 
-    description = "build graphs at specified paths", variableArity = true)
+    @Parameter(names = {"--build"}, validateWith = ReadableDirectory.class,
+            description = "Build graphs at specified paths.", variableArity = true)
     public List<File> build;
-    
-    @Parameter(names = { "-c", "--cache"}, validateWith = ReadWriteDirectory.class,
-            description = "the directory under which to cache OSM and NED tiles")
-    String cacheDirectory;
 
-    @Parameter(names = { "-e", "--elevation"},
+    @Parameter(names = {"--cache"}, validateWith = ReadWriteDirectory.class,
+            description = "The directory under which to cache OSM and NED tiles. Default is BASE_PATH/cache.")
+    public File cacheDirectory;
+
+    @Parameter(names = {"--elevation"},
             description = "download and use elevation data for the graph")
-    boolean elevation;
-    
-    @Parameter(names = { "-m", "--inMemory"},
-    description = "pass the graph to the server in-memory after building it, without saving to disk")
-    boolean inMemory;
- 
-    @Parameter(names = { "--preFlight"},
-    description = "pass the graph to the server in-memory after building it, and saving to disk")
+    public boolean elevation;
 
-    boolean preFlight;
+    @Parameter(names = {"--inMemory"},
+            description = "Pass the graph to the server in-memory after building it, without saving to disk.")
+    public boolean inMemory;
+
+    @Parameter(names = {"--preFlight"},
+            description = "Pass the graph to the server in-memory after building it, and saving to disk.")
+    public boolean preFlight;
+
     @Parameter(names = {"--noTransit"},
-    description = "skip all transit input files (GTFS)")
-    boolean noTransit;
+            description = "Skip all transit input files (GTFS).")
+    public boolean noTransit;
 
     @Parameter(names = {"--useTransfersTxt"},
-    description = "use transfers.txt file for the gtfsBundle (GTFS)")
-    boolean useTransfersTxt;
-    
-    @Parameter(names = {"--noParentStopLinking"},
-    description = "skip linking of stops to parent stops (GTFS)")
-    boolean noParentStopLinking;
+            description = "Create direct transfer edges from transfers.txt in GTFS, instead of based on distance.")
+    public boolean useTransfersTxt;
 
-    @Parameter(names = {"--useStreetsForLinking"},
-    description = "use street network to link stops to each other")
-    boolean useStreetsForLinking;
+    @Parameter(names = {"--noParentStopLinking"},
+            description = "Skip linking of stops to parent stops (GTFS).")
+    public boolean noParentStopLinking;
 
     @Parameter(names = {"--parentStationTransfers"},
-    description = "create direct transfers between the constituent stops of each parent station")
-    boolean parentStationTransfers = false;
+            description = "Create direct transfers between the constituent stops of each parent station.")
+    public boolean parentStationTransfers = false;
 
     @Parameter(names = {"--noStreets"},
-    description = "skip all street input files (OSM)")
-    boolean noStreets;
+            description = "Skip all street input files (OSM/PBF).")
+    public boolean noStreets;
 
     @Parameter(names = {"--noEmbedConfig"},
-    description = "Skip embedding config in graph (Embed.properties)")
-    boolean noEmbedConfig = false;
+            description = "Skip embedding config in graph (Embed.properties).")
+    public boolean noEmbedConfig = false;
 
-    @Parameter(names = { "--skipVisibility"},
-            description = "skip area visibility calculations, which are often time consuming.")
-    boolean skipVisibility;
+    @Parameter(names = {"--skipVisibility"},
+            description = "Skip area visibility calculations, which are often time consuming.")
+    public boolean skipVisibility;
+
+    @Parameter(names = {"--matchBusRoutesToStreets"},
+            description = "Based on GTFS data, guess which OSM streets each bus runs on to improve stop linking.")
+    public boolean matchBusRoutesToStreets = false;
+
 
     /* Options for the server sub-task. */
 
-    @Parameter( names = { "-a", "--analyst"}, 
-            description = "enable OTP Analyst extensions")
-    boolean analyst;
+    @Parameter(names = {"--analyst"},
+            description = "Enable OTP Analyst extensions.")
+    public boolean analyst;
 
-    @Parameter( names = {"--bindAddress"},
-            description = "enable OTP Analyst extensions")
-    String bindAddress = "0.0.0.0";
+    @Parameter(names = {"--bindAddress"},
+            description = "Specify which network interface to bind to by address. 0.0.0.0 means all interfaces.")
+    public String bindAddress = "0.0.0.0";
 
-    @Parameter( names = { "--securePort"}, validateWith = AvailablePort.class,
-            description = "server port")
-    Integer securePort;
+    @Parameter(names = {"--securePort"}, validateWith = AvailablePort.class,
+            description = "Server port for HTTPS.")
+    public Integer securePort;
 
-    @Parameter( names = { "-f", "--graphConfigFile"}, validateWith = ReadableFile.class,
-            description = "path to graph configuration file")
-    String graphConfigFile;
+    // TODO remove this
+    @Parameter(names = {"--graphConfigFile"}, validateWith = ReadableFile.class,
+            description = "Path to graph configuration file.")
+    public String graphConfigFile;
 
-    // --basePath (rather than --graphs). Maybe just eliminate most short options.
-    @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class,
-            description = "path to graph directory")
-    String graphDirectory;
+    @Parameter(names = {"--autoScan"}, description = "Auto-scan for graphs to register in graph directory.")
+    public boolean autoScan = false;
 
-    @Parameter(names = { "--autoScan" }, description = "auto-scan for graphs in graph directory. Also activate auto-reload.")
-    boolean autoScan = false;
+    @Parameter(names = {"--autoReload"}, description = "Auto-reload registered graphs when source data is modified.")
+    public boolean autoReload = false;
 
-    @Parameter( names = { "-l", "--longDistance"}, 
-            description = "use an algorithm tailored for long-distance routing")
-    boolean longDistance = false;
+    @Parameter(names = {"--longDistance"},
+            description = "Use an algorithm tailored for big graphs (the size of New York or the Netherlands).")
+    public boolean longDistance = false;
 
-    @Parameter( names = { "-p", "--port"}, validateWith = AvailablePort.class, 
-    description = "server port")
-    Integer port;
+    @Parameter(names = {"--port"}, validateWith = AvailablePort.class,
+            description = "Server port for plain HTTP.")
+    public Integer port;
 
-    @Parameter( names = { "-P", "--pointSet"}, validateWith =  ReadableDirectory.class, 
-    		description = "path to pointSet directory")
-    String pointSetDirectory;
-    
-    @Parameter( names = { "-r", "--router"}, validateWith = RouterId.class,
-    		description = "Router ID, first one being the default")
-    List<String> routerIds;
+    @Parameter(names = {"--graphs"}, validateWith = ReadableDirectory.class,
+            description = "Path to directory containing graphs. Defaults to BASE_PATH/graphs.")
+    public File graphDirectory;
 
-    @Parameter( names = { "-s", "--server"}, 
-            description = "run a server")
-    boolean server = false;
-    
-    @Parameter( names = { "-z", "--visualize"}, 
-    description = "open a debugging graph visualizer")
-    boolean visualize;
+    @Parameter(names = {"--pointSets"}, validateWith = ReadableDirectory.class,
+            description = "Path to directory containing PointSets. Defaults to BASE_PATH/pointsets.")
+    public File pointSetDirectory;
 
-    @Parameter( validateWith = ReadableFile.class, // the remaining parameters in one array
-    description = "files") 
-    List<File> files = new ArrayList<File>();
+    @Parameter(names = {"--router"}, validateWith = RouterId.class,
+            description = "One or more router IDs to build and/or serve, first one being the default.")
+    public List<String> routerIds;
+
+    @Parameter(names = {"--server"},
+            description = "Run an OTP API server.")
+    public boolean server = false;
+
+    @Parameter(names = {"--visualize"},
+            description = "Open a graph visualizer window for debugging.")
+    public boolean visualize;
+
+    // TODO should these replace the files auto-discovered in the router directory?
+    @Parameter(validateWith = ReadableFile.class, // the remaining parameters in one array
+            description = "Files for graph build.")
+    public List<File> files = new ArrayList<File>();
+
+    @Parameter(names = {"--insecure"},
+            description = "Allow unauthenticated access to sensitive API resources, e.g. /routers")
+    public boolean insecure = false;
 
     /** Set some convenience parameters based on other parameters' values. */
-    public void infer () {
-        server |= ( inMemory || preFlight || port != null );
-        if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
-        if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
-        if (cacheDirectory == null) cacheDirectory = DEFAULT_CACHE_DIRECTORY;
-        if (pointSetDirectory == null) pointSetDirectory = DEFAULT_POINTSET_DIRECTORY;
+    public void infer() {
+        server |= (inMemory || preFlight || port != null);
+        if (basePath == null) basePath = DEFAULT_BASE_PATH;
+        if (routerIds == null) {
+            if (autoScan || inMemory || preFlight)
+                routerIds = Collections.emptyList();
+            else
+                routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
+        }
+        /* If user has not overridden these paths, use default locations under the base path. */
+        if (cacheDirectory == null) cacheDirectory = new File(basePath, "cache");
+        if (graphDirectory == null) graphDirectory = new File(basePath, "graphs");
+        if (pointSetDirectory == null) pointSetDirectory = new File(basePath, "pointsets");
         if (server && port == null) {
             port = DEFAULT_PORT;
             new AvailablePort().validate(port);
@@ -174,6 +197,27 @@ public class CommandLineParameters {
         }
     }
 
+    public CommandLineParameters clone() {
+        CommandLineParameters ret;
+        try {
+            ret = (CommandLineParameters) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+
+        if (this.build != null) {
+            ret.build = Lists.newArrayList();
+            ret.build.addAll(this.build);
+        }
+
+        if (this.routerIds != null) {
+            ret.routerIds = Lists.newArrayList();
+            ret.routerIds.addAll(this.routerIds);
+        }
+        
+        return ret;
+    }
+    
     public static class ReadableFile implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
@@ -264,9 +308,7 @@ public class CommandLineParameters {
     public static class RouterId implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
-            Pattern routerIdPattern = GraphServiceFileImpl.routerIdPattern;
-            Matcher m = routerIdPattern.matcher(value);
-            if ( ! m.matches()) {
+            if (!GraphService.routerIdLegal(value)) {
                 String msg = String.format("%s: '%s' is not a valid router ID.", name, value);
                 throw new ParameterException(msg);
             }

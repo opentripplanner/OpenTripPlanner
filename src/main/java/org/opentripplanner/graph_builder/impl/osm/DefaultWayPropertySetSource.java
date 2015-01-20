@@ -561,6 +561,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "amenity=bicycle_rental;name=*", "name.bicycle_rental_name");
         createNames(props, "amenity=bicycle_rental", "name.bicycle_rental_station");
 
+        createNames(props, "amenity=bicycle_parking;name=*", "name.bicycle_parking_name");
+        createNames(props, "amenity=bicycle_parking", "name.bicycle_parking");
+
         createNames(props, "amenity=parking;name=*", "name.park_and_ride_name");
         createNames(props, "amenity=parking", "name.park_and_ride_station");
 

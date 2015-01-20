@@ -13,8 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -30,22 +30,24 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     private static final long serialVersionUID = 1L;
 
-    private ElevationProfileSegment elevationProfileSegment;
+    private byte[] packedElevationProfile;
+
+    private float slopeSpeedFactor = 1.0f;
+
+    private float slopeWorkFactor = 1.0f;
+
+    private float maxSlope;
+
+    private boolean flattened;
 
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
             String name, double length, StreetTraversalPermission permission, boolean back) {
         super(v1, v2, geometry, name, length, permission, back);
-        this.elevationProfileSegment = ElevationProfileSegment.getFlatProfile();
     }
 
     @Override
     public StreetWithElevationEdge clone() {
         return (StreetWithElevationEdge) super.clone();
-    }
-
-    @Override
-    public ElevationProfileSegment getElevationProfileSegment() {
-        return elevationProfileSegment;
     }
 
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
@@ -57,10 +59,41 @@ public class StreetWithElevationEdge extends StreetEdge {
         }
         boolean slopeLimit = getPermission().allows(StreetTraversalPermission.CAR);
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, slopeLimit);
-        elevationProfileSegment = new ElevationProfileSegment(costs, elev);
+
+        packedElevationProfile = CompactElevationProfile.compactElevationProfile(elev);
+        slopeSpeedFactor = (float)costs.slopeSpeedFactor;
+        slopeWorkFactor = (float)costs.slopeWorkFactor;
+        maxSlope = (float)costs.maxSlope;
+        flattened = costs.flattened;
+
         bicycleSafetyFactor *= costs.lengthMultiplier;
         bicycleSafetyFactor += costs.slopeSafetyCost / getDistance();
         return costs.flattened;
+    }
+
+    @Override
+    public PackedCoordinateSequence getElevationProfile() {
+        return CompactElevationProfile.uncompactElevationProfile(packedElevationProfile);
+    }
+
+    @Override
+    public boolean isElevationFlattened() {
+        return flattened;
+    }
+
+    @Override
+    public float getMaxSlope() {
+        return maxSlope;
+    }
+
+    @Override
+    public double getSlopeSpeedEffectiveLength() {
+        return slopeSpeedFactor * getDistance();
+    }
+
+    @Override
+    public double getSlopeWorkCostEffectiveLength() {
+        return slopeWorkFactor * getDistance();
     }
 
     @Override

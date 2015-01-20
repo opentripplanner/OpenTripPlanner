@@ -131,4 +131,8 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
         return sb.toString();
     }
 
+    @Override
+    public String getName() {
+        return "Traversal permissions";
+    }
 }

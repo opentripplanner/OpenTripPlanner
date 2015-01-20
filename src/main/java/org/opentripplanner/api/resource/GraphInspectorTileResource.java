@@ -23,6 +23,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.geotools.geometry.Envelope2D;
@@ -30,8 +31,12 @@ import org.opentripplanner.analyst.core.SlippyTile;
 import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
+
+import static org.opentripplanner.api.resource.ServerInfo.Q;
+
 import org.opentripplanner.inspector.TileRenderer;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
@@ -56,7 +61,7 @@ import org.opentripplanner.standalone.OTPServer;
  * @author laurent
  * 
  */
-@Path("/routers/{routerId}/inspector/tile/{layer}/{z}/{x}/{y}.{ext}")
+@Path("/routers/{routerId}/inspector")
 public class GraphInspectorTileResource extends RoutingResource {
 
     @Context
@@ -80,15 +85,16 @@ public class GraphInspectorTileResource extends RoutingResource {
     @PathParam("ext")
     String ext;
 
-    @GET
+    @GET @Path("/tile/{layer}/{z}/{x}/{y}.{ext}")
     @Produces("image/*")
     public Response tileGet() throws Exception {
 
         // Re-use analyst
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
-        TileRequest tileRequest = new TileRequest(routerId, env, 256, 256);
+        TileRequest tileRequest = new TileRequest(env, 256, 256);
 
-        BufferedImage image = otpServer.tileRendererManager.renderTile(tileRequest, layer);
+        Router router = otpServer.getRouter(routerId);
+        BufferedImage image = router.tileRendererManager.renderTile(tileRequest, layer);
 
         MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(image.getWidth() * image.getHeight() / 4);
@@ -97,6 +103,21 @@ public class GraphInspectorTileResource extends RoutingResource {
         cc.setMaxAge(3600);
         cc.setNoCache(false);
         return Response.ok(baos.toByteArray()).type(format.toString()).cacheControl(cc).build();
+    }
+
+    /**
+     * Gets all layer names
+     * 
+     * Used in fronted to create layer chooser
+     * @return 
+     */
+    @GET @Path("layers")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    public InspectorLayersList getLayers() {
+
+        Router router = otpServer.getRouter(routerId);
+        InspectorLayersList layersList = new InspectorLayersList(router.tileRendererManager.getRenderers());
+        return layersList;
     }
 
 }

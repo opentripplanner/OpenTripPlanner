@@ -82,6 +82,13 @@ public class EdgeVertexTileRenderer implements TileRenderer {
          * @return True to render this vertex, false otherwise.
          */
         public abstract boolean renderVertex(Vertex v, VertexVisualAttributes attrs);
+
+        /**
+         * Name of this tile Render which would be shown in frontend
+         *
+         * @return Name of tile render
+         */
+        public abstract String getName();
     }
 
     @Override
@@ -93,6 +100,11 @@ public class EdgeVertexTileRenderer implements TileRenderer {
 
     public EdgeVertexTileRenderer(EdgeVertexRenderer evRenderer) {
         this.evRenderer = evRenderer;
+    }
+
+    @Override
+    public String getName() {
+        return evRenderer.getName();
     }
 
     @Override
@@ -172,6 +184,8 @@ public class EdgeVertexTileRenderer implements TileRenderer {
                     bufParams);
             Coordinate[] coords = offsetBuilder.getOffsetCurve(midLineGeom.getCoordinates(),
                     lineWidth * 0.4);
+            if (coords.length < 2)
+                continue; // Can happen for very small edges (<1mm)
             LineString offsetLine = geomFactory.createLineString(coords);
             Shape midLineShape = shapeWriter.toShape(midLineGeom);
             Shape offsetShape = shapeWriter.toShape(offsetLine);

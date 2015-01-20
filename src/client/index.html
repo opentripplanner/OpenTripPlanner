@@ -11,7 +11,7 @@
 <!--  Mobile Viewport Fix -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  
+
 <!-- Google WebFonts -->
 <link href='http://fonts.googleapis.com/css?family=Dancing+Script:700' rel='stylesheet' type='text/css'>
 
@@ -96,6 +96,7 @@
 <script src="js/otp/core/GeocoderBuiltin.js?v=1"></script>
 <script src="js/otp/core/SOLRGeocoder.js?v=1"></script>
 <script src="js/otp/core/TransitIndex.js?v=1"></script>
+<script src="js/otp/core/IndexApi.js?v=1"></script>
 <script src="js/otp/core/TrinetSessionManager.js?v=1"></script>
 
 <script src="js/otp/widgets/Widget.js?v=1"></script>
@@ -199,12 +200,12 @@ $(document).ready(function() {
             $('<div style="display:none;"></div>').appendTo($("body")).html(html);
             loadedTemplates++;
             if(loadedTemplates == templateUrls.length) {
-                ich.grabTemplates();                   
+                ich.grabTemplates();
                 new otp.core.Webapp();
             }
         });
     }
-        
+
 });
 
 
@@ -215,7 +216,7 @@ $(document).ready(function() {
 <body>
 
 <header id="branding" role="banner" class="clearfix">
-  
+
   <!--<hgroup id="logo">
     <div class="ribbon">
       <h1 id="site-title"><span><a href="/" title="cibi.me" rel="home">cibi.me</a></span></h1>
@@ -227,7 +228,7 @@ $(document).ready(function() {
 
  <!--
   <div class="search">
-    
+
     <input type="text" name="location_search" placeholder="Search for a location&hellip;" />
   </div>
  -->

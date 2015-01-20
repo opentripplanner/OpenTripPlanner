@@ -96,7 +96,7 @@ public class TraversalRequirements {
             if (!e.isWheelchairAccessible()) {
                 return false;
             }
-            if (e.getElevationProfileSegment().getMaxSlope() > maxWheelchairSlope) {
+            if (e.getMaxSlope() > maxWheelchairSlope) {
                 return false;
             }
         }

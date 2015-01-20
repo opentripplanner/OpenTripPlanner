@@ -30,8 +30,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class BikeRental {
 
     @Context
-    OTPServer server;
+    OTPServer otpServer;
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
@@ -49,9 +49,9 @@ public class BikeRental {
             @QueryParam("upperRight") String upperRight,
             @PathParam("routerId") String routerId) {
 
-        Graph graph = server.graphService.getGraph(routerId);
-        if (graph == null) return null;
-        BikeRentalStationService bikeRentalService = graph.getService(BikeRentalStationService.class);
+        Router router = otpServer.getRouter(routerId);
+        if (router == null) return null;
+        BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
         if (bikeRentalService == null) return new BikeRentalStationList();
         Envelope envelope;
         if (lowerLeft != null) {
@@ -59,7 +59,7 @@ public class BikeRental {
         } else {
             envelope = new Envelope(-180,180,-90,90); 
         }
-        Collection<BikeRentalStation> stations = bikeRentalService.getStations();
+        Collection<BikeRentalStation> stations = bikeRentalService.getBikeRentalStations();
         List<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
         for (BikeRentalStation station : stations) {
             if (envelope.contains(station.x, station.y)) {

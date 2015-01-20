@@ -66,4 +66,14 @@ public class OSMNode extends OSMWithTags {
                 || "halt".equals(getTag("railway"))
                 || "bus_station".equals(getTag("amenity"));
     }
+
+    /**
+     * TODO Maybe all those methods (isSomething...) in OSMXxx should be moved to a dedicated OSM
+     * filtering class.
+     * 
+     * @return True if this node is a bike rental station.
+     */
+    public boolean isBikeRental() {
+        return isTag("amenity", "bicycle_rental");
+    }
 }

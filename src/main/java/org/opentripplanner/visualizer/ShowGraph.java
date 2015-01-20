@@ -22,14 +22,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
@@ -773,9 +766,13 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		stroke(200, 200, 000, 16); // yellow transparent edge highlight
 		strokeWeight(8);
 		if (drawHighlighted  && highlightedEdges != null) {
-		    for (Edge e : highlightedEdges) {
-		        drawEdge(e);
-		    }
+            try {
+                for (Edge e : highlightedEdges) {
+                    drawEdge(e);
+                }
+            } catch (ConcurrentModificationException cme) {
+                // The edge list was cleared or added to while it was being drawn, no harm done.
+            }
 		}
 		/* Draw highlighted graph path in another color */
 		if (highlightedGraphPath != null) {

@@ -365,7 +365,7 @@ public abstract class Vertex implements Serializable, Cloneable {
      * edge lists, usually by simply calling detach() on them.
      * @return the number of edges affected by the cleanup.
      */
-    public int removeTemporaryEdges() {
+    public int removeTemporaryEdges(Graph graph) {
         // do nothing, signal 0 other objects affected
         return 0;
     }
