@@ -340,6 +340,18 @@ public class TransitToStreetNetworkBuilderTest {
         writeGeoJson("correct_" + name +".geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
     }
     
+    /**
+     * Function is used to make size of test GTFS files by including only the necessary trips/routes/stops
+     * 
+     * Function outputs 5 CSV files in OTP home folder. With help of this files GTFS file is lowered.
+     * OBA transformer was also tested, but size is lowered 2 times more this way.
+     * 
+     * @param osm_filename filename for OSM (in resource folder of class)
+     * @param gtfs_filename filename for GTFS (in resource folder of class)
+     * @param wanted_con_filename filename for saved connections (in resource folder of class)
+     * @param name text name of this GTFS files
+     * @throws Exception 
+     */
     private void findNeededGTFSData(String osm_filename, String gtfs_filename, String wanted_con_filename, String name) throws Exception {
         Graph gg = loadGraph(osm_filename, gtfs_filename, true, true);
         assertNotNull(gg);
