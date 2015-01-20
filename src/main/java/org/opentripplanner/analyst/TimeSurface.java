@@ -86,8 +86,8 @@ public class TimeSurface implements Serializable {
     /** Make a max or min timesurface from propagated times in a ProfileRouter. */
     public TimeSurface (AnalystProfileRouterPrototype profileRouter) {
         ProfileRequest req = profileRouter.request;
-        lon = req.from.lon;
-        lat = req.from.lat;
+        lon = req.fromLon;
+        lat = req.fromLat;
         id = makeUniqueId();
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;

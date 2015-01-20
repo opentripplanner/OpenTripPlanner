@@ -86,8 +86,10 @@ public class ProfileResource {
         QueryParameter.checkRangeInclusive(suboptimalMinutes, 0, 30);
 
         ProfileRequest req = new ProfileRequest();
-        req.from         = from;
-        req.to           = to;
+        req.fromLat      = from.lat;
+        req.fromLon      = from.lon;
+        req.toLat        = to.lat;
+        req.toLon        = to.lon;
         req.fromTime     = fromTime.toSeconds();
         req.toTime       = toTime.toSeconds();
         req.walkSpeed    = walkSpeed;
