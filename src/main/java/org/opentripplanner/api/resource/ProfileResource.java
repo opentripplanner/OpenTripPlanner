@@ -65,7 +65,7 @@ public class ProfileResource {
             @QueryParam("minCarTime")   @DefaultValue("1")     int minCarTime,
             @QueryParam("minBikeTime")  @DefaultValue("1")     int minBikeTime,
             @QueryParam("orderBy")      @DefaultValue("AVG")   Option.SortOrder orderBy,
-            @QueryParam("limit")        @DefaultValue("10")    int limit,
+            @QueryParam("limit")        @DefaultValue("10")    int limit,       // max options to return PER ACCESS MODE
             @QueryParam("suboptimal")   @DefaultValue("5")     int suboptimalMinutes,
             @QueryParam("accessModes")  @DefaultValue("WALK,BICYCLE") TraverseModeSet accessModes,
             @QueryParam("egressModes")  @DefaultValue("WALK")         TraverseModeSet egressModes,

@@ -37,7 +37,7 @@ public class ProfileRequest implements Serializable {
 
     public LocalDate date;
     public Option.SortOrder orderBy;
-    public int limit;
+    public int limit; // the maximum number of options presented PER ACCESS MODE
     public TraverseModeSet accessModes, egressModes, directModes, transitModes;
     public boolean analyst = false; // if true, propagate travel times out to street network
 
