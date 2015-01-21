@@ -17,11 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -35,6 +31,7 @@ import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,8 +90,10 @@ public class TimeGridWs extends RoutingResource {
 
     @GET
     @Produces({ "image/png" })
-    public Response getTimeGridPng(@QueryParam("base64") @DefaultValue("false") boolean base64)
-            throws Exception {
+    public Response getTimeGridPng(@QueryParam("base64") @DefaultValue("false") boolean base64) throws Exception {
+
+        /* Fetch the Router for this request using server and routerId fields from superclass. */
+        Router router = otpServer.getRouter(routerId);
 
         if (precisionMeters < 10)
             throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
@@ -105,12 +104,10 @@ public class TimeGridWs extends RoutingResource {
         tgRequest.maxTimeSec = maxTimeSec;
         tgRequest.precisionMeters = precisionMeters;
         if (coordinateOrigin != null)
-            tgRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin)
-                    .getCoordinate();
+            tgRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin).getCoordinate();
 
         // Get a sample grid
-        ZSampleGrid<WTWD> sampleGrid = otpServer.sampleGridRenderer.getSampleGrid(tgRequest,
-                sptRequest);
+        ZSampleGrid<WTWD> sampleGrid = router.sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
         int cols = sampleGrid.getXMax() - sampleGrid.getXMin() + 1;
         int rows = sampleGrid.getYMax() - sampleGrid.getYMin() + 1;
         int channels = 4; // Hard-coded to RGBA
@@ -137,7 +134,7 @@ public class TimeGridWs extends RoutingResource {
         String gridCellSzStr = String.format(Locale.US, "%.12f,%.12f", sampleGrid.getCellSize().y,
                 sampleGrid.getCellSize().x);
         String offRoadDistStr = String.format(Locale.US, "%f",
-                otpServer.sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));
+                router.sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));
 
         PngChunkTEXT gridCornerChunk = new PngChunkTEXT(imgInfo);
         gridCornerChunk.setKeyVal(OTPA_GRID_CORNER, gridCornerStr);
