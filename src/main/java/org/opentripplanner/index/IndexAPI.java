@@ -14,6 +14,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.index;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -111,6 +112,28 @@ public class IndexAPI {
        }
        return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
    }
+
+    /** Return all routes for the specific agency. */
+    @GET
+    @Path("/agencies/{agencyId}/routes")
+    public Response getAgencyRoutes (@PathParam("agencyId") String agencyId) {
+        Collection<Route> routes = index.routeForId.values();
+        Agency agency = index.agencyForId.get(agencyId);
+        if (agency == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        Collection<Route> agencyRoutes = new ArrayList<>();
+        for (Route route: routes) {
+            if (route.getAgency() == agency) {
+                agencyRoutes.add(route);
+            }
+        }
+        routes = agencyRoutes;
+        if (detail){
+            return Response.status(Status.OK).entity(routes).build();
+        }
+        else {
+            return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
+        }
+    }
    
    /** Return specific transit stop in the graph, by ID. */
    @GET
