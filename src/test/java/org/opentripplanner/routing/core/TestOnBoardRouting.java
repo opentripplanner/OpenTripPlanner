@@ -204,8 +204,7 @@ public class TestOnBoardRouting extends TestCase {
             assertTrue(numBoardings2 < numBoardings1);
 
             /* Cleanup edges */
-            int nRemoved = onboardOrigin.removeTemporaryEdges(graph);
-            assertEquals(1, nRemoved);
+            onboardOrigin.removeAllEdges();
 
             n++;
             if (n > NTESTS)

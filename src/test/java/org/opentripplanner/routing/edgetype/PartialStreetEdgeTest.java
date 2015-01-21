@@ -29,14 +29,15 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
-public class PartialPlainStreetEdgeTest {
+public class PartialStreetEdgeTest {
     
     private Graph _graph;
     private IntersectionVertex v1, v2, v3, v4;
@@ -60,22 +61,8 @@ public class PartialPlainStreetEdgeTest {
 
     @Test
     public void testConstruction() {
-        StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
         PartialStreetEdge pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getDistance(), perm, true);
-
-        assertTrue(pEdge.isEquivalentTo(e1));
-        assertTrue(pEdge.isPartial());
-        assertTrue(pEdge.isBack());
-        assertFalse(pEdge.isReverseOf(e1));
-        assertTrue(pEdge.isReverseOf(e1Reverse));
-        assertEquals(e1.getId(), pEdge.getId());
-        assertEquals(perm, pEdge.getPermission());
-        assertEquals(e1.getCarSpeed(), pEdge.getCarSpeed(), 0.0);
-
-        // Simpler constructor - copies permission from parent edge and sets back to true.
-        pEdge = new PartialStreetEdge(e1, v1, v2, e1.getGeometry(), "partial e1",
-                e1.getDistance());
+                "partial e1", e1.getDistance());
 
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
@@ -98,12 +85,6 @@ public class PartialPlainStreetEdgeTest {
                 "partial e1", e1.getDistance());
         PartialStreetEdge pEdge2 = new PartialStreetEdge(e2, v2, v3, e2.getGeometry(),
                 "partial e2", e2.getDistance());
-
-        // Partial edges are temporary edges. They are only traversable by one routing context.
-        // They are associated with a routing context when an edge is split for a StreetLocation,
-        // but here we're making them manually.
-        pEdge1.visibleTo = options.rctx;
-        pEdge2.visibleTo = options.rctx;
 
         // Traverse both the partial and parent edges.
         State s0 = new State(options);
@@ -132,13 +113,14 @@ public class PartialPlainStreetEdgeTest {
         Coordinate nearestPoint = new Coordinate(0.5, 2.0);
         List<StreetEdge> edges = new ArrayList<StreetEdge>();
         edges.add(e2);
-        StreetLocation intermediate = StreetLocation.createStreetLocation(_graph, "middle of e2", "foo", edges, nearestPoint);
-        
+        TemporaryStreetLocation end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(
+                _graph, "middle of e2", "foo", edges, nearestPoint, true);
+        TemporaryStreetLocation start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(
+                _graph, "middle of e2", "foo", edges, nearestPoint, false);
+
         RoutingRequest options = new RoutingRequest();
         options.setMode(TraverseMode.CAR);
         options.setRoutingContext(_graph, v1, v2);
-        // Creating a streetlocation splits a street and makes temporary edges that are only visible to one routing context.
-        intermediate.setTemporaryEdgeVisibility(options.rctx);
 
         // All intersections take 10 minutes - we'll notice if one isn't counted.
         double turnDurationSecs = 10.0 * 60.0;  
@@ -150,11 +132,9 @@ public class PartialPlainStreetEdgeTest {
         State s2 = e2.traverse(s1);
         State s3 = e3.traverse(s2);
         
-        Edge partialE2First = intermediate.getIncoming().iterator().next();
-        Edge partialE2Second = intermediate.getOutgoing().iterator().next();
-        System.out.println(intermediate.getIncoming());
-        System.out.println(intermediate.getOutgoing());
-        
+        Edge partialE2First = end.getIncoming().iterator().next();
+        Edge partialE2Second = start.getOutgoing().iterator().next();
+
         State partialS0 = new State(options);
         State partialS1 = e1.traverse(partialS0);
         State partialS2A = partialE2First.traverse(partialS1);

@@ -175,9 +175,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 if (vertex == null) {
                     vertex = new BikeRentalStationVertex(graph, station);
                     LinkRequest request = networkLinkerLibrary.connectVertexToStreets(vertex);
-                    for (Edge e : request.getEdgesAdded()) {
-                        graph.addTemporaryEdge(e);
-                    }
                     verticesByStation.put(station, vertex);
                     new RentABikeOnEdge(vertex, vertex, station.networks);
                     if (station.allowDropoff)

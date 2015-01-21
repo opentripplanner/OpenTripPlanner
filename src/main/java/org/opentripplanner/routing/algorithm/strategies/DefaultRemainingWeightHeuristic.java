@@ -103,8 +103,11 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
      */
     private double determineRequiredWalkDistance(RoutingRequest req) {
         if ( ! req.modes.isTransit()) return 0; // required walk distance will be unused.
+        req = req.clone();
+        req.setArriveBy(!req.arriveBy);
+        req.setRoutingContext(req.rctx.graph, req.rctx.fromVertex, req.rctx.toVertex);
         GenericDijkstra gd = new GenericDijkstra(req);
-        State s = new State(req.rctx.target, req);
+        State s = new State(req);
         gd.setHeuristic(new TrivialRemainingWeightHeuristic());
         final ClosestStopTraverseVisitor visitor = new ClosestStopTraverseVisitor();
         gd.traverseVisitor = visitor;
