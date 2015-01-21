@@ -12,18 +12,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<!-- Google WebFonts -->
-<link href='http://fonts.googleapis.com/css?family=Dancing+Script:700' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="js/lib/jquery-ui/css/smoothness/jquery-ui-1.9.1.custom.css" />
+<link rel="stylesheet" href="js/lib/jquery-ui/addons/jquery-ui-timepicker.css" />
+<link rel="stylesheet" href="//cdn.jsdelivr.net/leaflet/0.7.3/leaflet.css" />
+<link rel="stylesheet" href="js/otp/widgets/widget-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/modules/planner/planner-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/modules/bikeshare/bikeshare-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/modules/multimodal/multimodal-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/modules/calltaker/calltaker-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/modules/analyst/analyst-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/modules/alerts/alerts-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/modules/alerts/alerts-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/modules/fieldtrip/fieldtrip-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/widgets/tripoptions/tripoptions-style.css?v=1" />
+<link rel="stylesheet" href="js/otp/widgets/transit/widgets-transit-style.css?v=1" />
+<link rel="stylesheet" href="style.css?v=1" />
 
-
-<!-- jquery -->
-<script src="js/lib/jquery/jquery-1.9.1.js"></script>
+<!--Loads jquery, underscore, leaflet, json2, momentjs and raphael makes 7 requests less-->
+<script src="//cdn.jsdelivr.net/g/jquery@1.9.1,underscorejs@1.4.2,leaflet@0.7.3,json2@0.1,momentjs@1.7.2,raphael@2.1.2"></script>
 
 <!-- jquery-ui -->
 <script src="js/lib/jquery-ui/js/jquery-ui-1.9.1.custom.min.js"></script>
-<link rel="stylesheet" href="js/lib/jquery-ui/css/smoothness/jquery-ui-1.9.1.custom.css" />
 <script src="js/lib/jquery-ui/addons/jquery-ui-timepicker.js"></script>
-<link rel="stylesheet" href="js/lib/jquery-ui/addons/jquery-ui-timepicker.css" />
 
 <script src="./js/lib/jquery-ui/i18n/jquery.ui.datepicker-sl.js"></script>
 <script src="./js/lib/jquery-ui/i18n/jquery.ui.datepicker-de.js"></script>
@@ -32,32 +42,12 @@
 <script src="./js/lib/jquery-ui/i18n/jquery.ui.datepicker-ca.js"></script>
 
 <!-- backbone -->
-<script src="js/lib/underscore.js"></script>
 <script src="js/lib/backbone.js"></script>
 
-<!-- leaflet -->
-<script src="js/lib/leaflet/leaflet.js"></script>
-<link rel="stylesheet" href="js/lib/leaflet/leaflet.css" />
-<!--[if lte IE 8]>
-    <link rel="stylesheet" href="js/lib/leaflet/leaflet.ie.css" />
-<![endif]-->
-
-<!-- json support -->
-<script src="js/lib/json2.js"></script>
-
-
-<!-- moment.js -->
-<script src="js/lib/moment.min.js"></script>
-
-<!-- raphael -->
-<script src="js/lib/raphael/raphael-min.js"></script>
-
 <!-- Mustache/ICanHaz -->
-<script src="js/lib/mustache.js"></script>
+<script src="//cdn.jsdelivr.net/mustache.js/0.7.2/mustache.js"></script>
 <script src="js/lib/ICanHaz.js"></script>
 
-<!-- jsPDF -->
-<script src="js/lib/jspdf.min.js"></script>
 
 
 <!-- otp-specific imports -->
@@ -102,7 +92,6 @@
 <script src="js/otp/widgets/Widget.js?v=1"></script>
 <script src="js/otp/widgets/WidgetManager.js?v=1"></script>
 <script src="js/otp/widgets/Dialogs.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/widgets/widget-style.css?v=1" />
 
 <script src="js/otp/modules/Module.js?v=1"></script>
 
@@ -111,70 +100,94 @@
 <script src="js/otp/modules/planner/TripPlan.js?v=1"></script>
 <script src="js/otp/modules/planner/Itinerary.js?v=1"></script>
 <script src="js/otp/modules/planner/ItinerariesWidget.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/modules/planner/planner-style.css?v=1" />
-
-<script src="js/otp/modules/bikeshare/BikeShareModule.js?v=1"></script>
-<script src="js/otp/modules/bikeshare/BikeStationsWidget.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/modules/bikeshare/bikeshare-style.css?v=1" />
 
 <script src="js/otp/modules/multimodal/MultimodalPlannerModule.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/modules/multimodal/multimodal-style.css?v=1" />
 
-<script src="js/otp/modules/calltaker/CallTakerModule.js?v=1"></script>
-<script src="js/otp/modules/calltaker/CallHistoryWidget.js?v=1"></script>
-<script src="js/otp/modules/calltaker/MailablesWidget.js?v=1"></script>
-<script src="js/otp/modules/calltaker/calltaker-models.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/modules/calltaker/calltaker-style.css?v=1" />
+<!--Loads some javascript modules only if they are enabled in config.js-->
+<script type="text/javascript">
+	//Which modules needs which files
+	var modules = {
+		'otp.modules.bikeshare.BikeShareModule': 
+			[
+			'js/otp/modules/bikeshare/BikeShareModule.js?v=1',
+			'js/otp/modules/bikeshare/BikeStationsWidget.js?v=1'
+		],
+		'otp.modules.analyst.AnalystModule':
+			[
+			'js/otp/modules/analyst/AnalystModule.js?v=1',
+			'js/otp/modules/analyst/AnalystLegendWidget.js?v=1',
+		],
+		'otp.modules.calltaker.CallTakerModule':
+			[
+			'js/lib/jspdf.min.js',
+			'js/otp/modules/calltaker/CallTakerModule.js?v=1',
+			'js/otp/modules/calltaker/CallHistoryWidget.js?v=1',
+			'js/otp/modules/calltaker/MailablesWidget.js?v=1',
+			'js/otp/modules/calltaker/calltaker-models.js?v=1',
+			],
+		'otp.modules.annotations.AnnotationsModule':
+			[
+			'js/otp/modules/annotations/AnnotationsModule.js?v=1'
+		],
+		'otp.modules.alerts.AlertsModule':
+			[
+			'js/otp/modules/alerts/AlertsModule.js?v=1',
+			'js/otp/modules/alerts/AlertsWidget.js?v=1',
+			'js/otp/modules/alerts/EntitiesWidget.js?v=1',
+			'js/otp/modules/alerts/alerts-models.js?v=1',
+		],
+		'otp.modules.fieldtrip.FieldTripModule':
+			[
+			'js/otp/modules/fieldtrip/FieldTripModule.js?v=1',
+			'js/otp/modules/fieldtrip/FieldTripManagerWidget.js?v=1',
+			'js/otp/modules/fieldtrip/FieldTripRequestWidget.js?v=1',
+			'js/otp/modules/fieldtrip/FieldTripGeocoderWidget.js?v=1',
+			'js/otp/modules/fieldtrip/SaveFieldTripWidget.js?v=1',
+			'js/otp/modules/fieldtrip/SearchWidget.js?v=1'
+			]
+			
+	}
+	for (var moduleIndex = 0; moduleIndex < otp.config.modules.length; moduleIndex++) {
+		var curModuleClass = otp.config.modules[moduleIndex]["className"]
+		//console.log(curModuleClass);
+		if (curModuleClass in modules) {
+			var modulesScripts = modules[curModuleClass];
+			for (var scriptIndex = 0; scriptIndex < modulesScripts.length; scriptIndex++) {
+				$.ajax({
+					url: modulesScripts[scriptIndex],
+					dataType: "script",
+					cache: true,
+					async: false
+				})
+				.fail(function(jqxhr, settings, exception) {
+					console.error(settings);
+					console.error(jqxhr.error());
+					console.error(exception);
+				});
+			}
+		}
+	}
 
-<script src="js/otp/modules/annotations/AnnotationsModule.js?v=1"></script>
-
-<script src="js/otp/modules/analyst/AnalystModule.js?v=1"></script>
-<script src="js/otp/modules/analyst/AnalystLegendWidget.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/modules/analyst/analyst-style.css?v=1" />
-
-<script src="js/otp/modules/alerts/AlertsModule.js?v=1"></script>
-<script src="js/otp/modules/alerts/EntitiesWidget.js?v=1"></script>
-<script src="js/otp/modules/alerts/EditAlertWidget.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/modules/alerts/alerts-style.css?v=1" />
-
-<script src="js/otp/modules/alerts/AlertsModule.js?v=1"></script>
-<script src="js/otp/modules/alerts/AlertsWidget.js?v=1"></script>
-<script src="js/otp/modules/alerts/EntitiesWidget.js?v=1"></script>
-<script src="js/otp/modules/alerts/EditAlertWidget.js?v=1"></script>
-<script src="js/otp/modules/alerts/alerts-models.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/modules/alerts/alerts-style.css?v=1" />
+</script>
 
 
-<script src="js/otp/modules/fieldtrip/FieldTripModule.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/FieldTripManagerWidget.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/FieldTripRequestWidget.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/FieldTripGeocoderWidget.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/SaveFieldTripWidget.js?v=1"></script>
-<script src="js/otp/modules/fieldtrip/SearchWidget.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/modules/fieldtrip/fieldtrip-style.css?v=1" />
 
 <script src="js/otp/widgets/InfoWidget.js?v=1"></script>
 <script src="js/otp/widgets/tripoptions/RoutesSelectorWidget.js?v=1"></script>
 <script src="js/otp/widgets/tripoptions/TripOptionsWidget.js?v=1"></script>
 <script src="js/otp/widgets/tripoptions/BikeTrianglePanel.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/widgets/tripoptions/tripoptions-style.css?v=1" />
 
 <script src="js/otp/widgets/transit/RouteBasedWidget.js?v=1"></script>
 <script src="js/otp/widgets/transit/StopViewerWidget.js?v=1"></script>
 <script src="js/otp/widgets/transit/StopFinderWidget.js?v=1"></script>
 <script src="js/otp/widgets/transit/TripViewerWidget.js?v=1"></script>
-<link rel="stylesheet" href="js/otp/widgets/transit/widgets-transit-style.css?v=1" />
 
 <script src="js/otp/layers/StopsLayer.js?v=1"></script>
 
-
-
-<link rel="stylesheet" href="style.css?v=1" />
-
 <!-- make legacy Internet Explorer play nice(r) -->
 <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <script src="js/lib/respond.min.js"></script>
+  <script src="//cdn.jsdelivr.net/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="//cdn.jsdelivr.net/respond/0.1/respond.min.js"></script>
 <![endif]-->
 
 
