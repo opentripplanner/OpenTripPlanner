@@ -88,6 +88,9 @@ public class ProfileRouter {
 
     public ProfileResponse route () {
 
+        // Lazy-initialize stop clusters (threadsafe method)
+        graph.index.clusterStopsAsNeeded();
+
         // Lazy-initialize profile transfers (before setting timeouts, since this is slow)
         if (graph.index.transfersFromStopCluster == null) {
             synchronized (graph.index) {

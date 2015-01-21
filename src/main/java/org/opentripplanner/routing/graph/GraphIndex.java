@@ -159,7 +159,7 @@ public class GraphIndex {
      * Therefore it is not done automatically, and any method requiring stop clusters should call this method
      * to ensure that the necessary indexes are lazy-initialized.
      */
-    public void clusterStopsAsNeeded() {
+    public synchronized void clusterStopsAsNeeded() {
         if (stopClusterSpatialIndex == null) {
             clusterStops();
             LOG.info("Creating a spatial index for stop clusters.");

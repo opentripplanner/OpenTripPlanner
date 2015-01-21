@@ -112,7 +112,7 @@ public class ProfileResource {
         req.suboptimalMinutes = suboptimalMinutes;
 
         /* Use the new prototype faster profile-analyst. Really this should be constrained to freq-only cases. */
-        if (req.analyst == true) {
+        if (req.analyst) {
             AnalystProfileRouterPrototype router = new AnalystProfileRouterPrototype(graph, req);
             TimeSurface.RangeSet result = router.route();
             Map<String, Integer> idForSurface = Maps.newHashMap();
