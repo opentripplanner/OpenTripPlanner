@@ -362,6 +362,7 @@ public class GTFSPatternHopFactory {
             // TODO: move to a validator module
             if ( ! _calendarService.getServiceIds().contains(trip.getServiceId())) {
                 LOG.warn(graph.addBuilderAnnotation(new TripUndefinedService(trip)));
+                continue TRIP; // Invalid trip, skip it, it will break later
             }
 
             /* Fetch the stop times for this trip. Copy the list since it's immutable. */
