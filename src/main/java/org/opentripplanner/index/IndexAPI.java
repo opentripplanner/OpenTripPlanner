@@ -13,6 +13,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.index;
 
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -41,6 +43,7 @@ import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.index.model.StopClusterDetail;
 import org.opentripplanner.index.model.StopShort;
+import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
@@ -206,6 +209,25 @@ public class IndexAPI {
         return Response.status(Status.OK).entity(index.stopTimesForStop(stop)).build();
     }
 
+    /** Return upcoming vehicle arrival/departure times at the given stop. */
+    @GET
+    @Path("/stops/{stopId}/stoptimes/{date}")
+    public Response getStoptimesForStopAndDate (@PathParam("stopId") String stopIdString,
+                                                @PathParam("date") String date) {
+        Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
+        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        ServiceDate sd;
+        try {
+            sd = ServiceDate.parseString(date);
+        }
+        catch (ParseException e){
+            return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
+        }
+
+        List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd);
+        return Response.status(Status.OK).entity(ret).build();
+    }
+    
    /** Return a list of all routes in the graph. */
    // with repeated hasStop parameters, replaces old routesBetweenStops
    @GET
