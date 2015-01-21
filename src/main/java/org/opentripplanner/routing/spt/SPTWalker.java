@@ -80,13 +80,20 @@ public class SPTWalker {
     public void walk(SPTVisitor visitor, double d0) {
         int nTotal = 0, nSkippedDupEdge = 0, nSkippedNoGeometry = 0;
         Collection<? extends State> allStates = spt.getAllStates();
-        Set<Edge> processedEdges = new HashSet<Edge>(allStates.size());
-        for (State s0 : allStates) {
+        Set<Vertex> allVertices = new HashSet<Vertex>(spt.getVertexCount());
+        for (State s : allStates) {
+            allVertices.add(s.getVertex());
+        }
+        Set<Edge> processedEdges = new HashSet<Edge>(allVertices.size());
+        for (Vertex v : allVertices) {
+            State s0 = spt.getState(v);
+            if (s0 == null || !s0.isFinal())
+                continue;
             for (Edge e : s0.getVertex().getIncoming()) {
                 // Take only street
                 if (e != null && visitor.accept(e)) {
                     State s1 = spt.getState(e.getFromVertex());
-                    if (s1 == null)
+                    if (s1 == null || !s1.isFinal())
                         continue;
                     if (e.getFromVertex() != null && e.getToVertex() != null) {
                         // Hack alert: e.hashCode() throw NPE
@@ -104,8 +111,8 @@ public class SPTWalker {
                         continue;
                     }
 
-                    // Compute speed
-                    double speed = spt.getOptions().walkSpeed;
+                    // Compute speed along edge
+                    double speedAlongEdge = spt.getOptions().walkSpeed;
                     if (e instanceof StreetEdge) {
                         StreetEdge se = (StreetEdge) e;
                         /*
@@ -113,24 +120,27 @@ public class SPTWalker {
                          * walk...) and edge properties (car max speed, slope, etc...)
                          */
                         TraverseMode mode = s0.getNonTransitMode();
-                        speed = se.calculateSpeed(spt.getOptions(), mode);
+                        speedAlongEdge = se.calculateSpeed(spt.getOptions(), mode);
                         if (mode != TraverseMode.CAR)
-                            speed = speed * se.getDistance() / se.getSlopeSpeedEffectiveLength();
+                            speedAlongEdge = speedAlongEdge * se.getDistance() / se.getSlopeSpeedEffectiveLength();
                         double avgSpeed = se.getDistance()
                                 / Math.abs(s0.getTimeInMillis() - s1.getTimeInMillis()) * 1000;
+                        if (avgSpeed < 1e-10)
+                            avgSpeed = 1e-10;
                         /*
                          * We can't go faster than the average speed on the edge. We can go slower
-                         * however, that simply means that both end vertices are closer to the
-                         * departure than any mid-point.
+                         * however, that simply means that one end vertice has a time higher than
+                         * the other end vertice + time to traverse the edge (can happen due to
+                         * max walk clamping).
                          */
-                        if (speed > avgSpeed)
-                            speed = avgSpeed;
+                        if (speedAlongEdge > avgSpeed)
+                            speedAlongEdge = avgSpeed;
                     }
 
                     // Length of linestring
                     double lineStringLen = distanceLibrary.fastLength(lineString);
-                    visitor.visit(e, vx0.getCoordinate(), s0, s1, 0.0, lineStringLen, speed);
-                    visitor.visit(e, vx1.getCoordinate(), s0, s1, lineStringLen, 0.0, speed);
+                    visitor.visit(e, vx0.getCoordinate(), s0, s1, 0.0, lineStringLen, speedAlongEdge);
+                    visitor.visit(e, vx1.getCoordinate(), s0, s1, lineStringLen, 0.0, speedAlongEdge);
                     nTotal += 2;
                     Coordinate[] pList = lineString.getCoordinates();
                     boolean reverse = vx1.getCoordinate().equals(pList[0]);
@@ -150,7 +160,7 @@ public class SPTWalker {
                                 Coordinate p = new Coordinate(p0.x * (1 - k) + p1.x * k, p0.y
                                         * (1 - k) + p1.y * k);
                                 visitor.visit(e, p, reverse ? s1 : s0, reverse ? s0 : s1, curLen,
-                                        lineStringLen - curLen, speed);
+                                        lineStringLen - curLen, speedAlongEdge);
                                 nTotal++;
                                 curLen += stepLen;
                                 ns++;
@@ -163,7 +173,7 @@ public class SPTWalker {
                 }
             }
         }
-        LOG.info("SPTWalker: Generated {} points ({} dup edges, {} no geometry) from {} states.",
-                nTotal, nSkippedDupEdge, nSkippedNoGeometry, allStates.size());
+        LOG.info("SPTWalker: Generated {} points ({} dup edges, {} no geometry) from {} vertices / {} states.",
+                nTotal, nSkippedDupEdge, nSkippedNoGeometry, allVertices.size(), allStates.size());
     }
 }

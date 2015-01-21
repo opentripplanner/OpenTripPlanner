@@ -19,7 +19,6 @@ import java.util.Locale;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.codec.binary.Base64;
@@ -30,7 +29,6 @@ import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +41,7 @@ import ar.com.hjg.pngj.chunks.PngChunkTEXT;
 import ar.com.hjg.pngj.chunks.PngChunkTextVar;
 
 /**
- * Return a grid with time for a set of points.
+ * A Jersey web service resource class that returns a grid with time for a set of points.
  * 
  * Example of request:
  * 
@@ -64,9 +62,6 @@ public class TimeGridWs extends RoutingResource {
 
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TimeGridWs.class);
-
-    @Context
-    private OTPServer otpServer;
 
     @QueryParam("maxTimeSec")
     private Integer maxTimeSec;
@@ -107,7 +102,8 @@ public class TimeGridWs extends RoutingResource {
             tgRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin).getCoordinate();
 
         // Get a sample grid
-        ZSampleGrid<WTWD> sampleGrid = router.sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
+		ZSampleGrid<WTWD> sampleGrid = router.sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
+
         int cols = sampleGrid.getXMax() - sampleGrid.getXMin() + 1;
         int rows = sampleGrid.getYMax() - sampleGrid.getYMin() + 1;
         int channels = 4; // Hard-coded to RGBA
@@ -133,6 +129,7 @@ public class TimeGridWs extends RoutingResource {
                 + sampleGrid.getXMin() * sampleGrid.getCellSize().x);
         String gridCellSzStr = String.format(Locale.US, "%.12f,%.12f", sampleGrid.getCellSize().y,
                 sampleGrid.getCellSize().x);
+
         String offRoadDistStr = String.format(Locale.US, "%f",
                 router.sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));
 
