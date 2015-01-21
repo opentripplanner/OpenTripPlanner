@@ -27,7 +27,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.codec.binary.Base64;
-import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 import org.opentripplanner.analyst.request.SampleGridRequest;
 import org.opentripplanner.api.common.RoutingResource;
@@ -35,6 +34,7 @@ import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +51,12 @@ import ar.com.hjg.pngj.chunks.PngChunkTextVar;
  * Example of request:
  * 
  * <code>
- * http://localhost:8080/otp-rest-servlet/ws/timegrid?routerId=bordeaux&fromPlace=47.059,-0.880&date=2013/10/01&time=12:00:00&maxWalkDistance=1000&mode=WALK,TRANSIT
+ * http://localhost:8080/otp/routers/bordeaux/timegrid?fromPlace=47.059,-0.880&date=2013/10/01&time=12:00:00&maxWalkDistance=1000&maxTimeSec=3600&mode=WALK,TRANSIT
  * </code>
  * 
  * @author laurent
  */
-@Path("/timegrid")
+@Path("/routers/{routerId}/timegrid")
 public class TimeGridWs extends RoutingResource {
 
     public enum DataChannel {
@@ -68,8 +68,8 @@ public class TimeGridWs extends RoutingResource {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TimeGridWs.class);
 
-    @Context // FIXME use Application injection
-    private SampleGridRenderer sampleGridRenderer;
+    @Context
+    private OTPServer otpServer;
 
     @QueryParam("maxTimeSec")
     private Integer maxTimeSec;
@@ -109,7 +109,8 @@ public class TimeGridWs extends RoutingResource {
                     .getCoordinate();
 
         // Get a sample grid
-        ZSampleGrid<WTWD> sampleGrid = sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
+        ZSampleGrid<WTWD> sampleGrid = otpServer.sampleGridRenderer.getSampleGrid(tgRequest,
+                sptRequest);
         int cols = sampleGrid.getXMax() - sampleGrid.getXMin() + 1;
         int rows = sampleGrid.getYMax() - sampleGrid.getYMin() + 1;
         int channels = 4; // Hard-coded to RGBA
@@ -136,7 +137,7 @@ public class TimeGridWs extends RoutingResource {
         String gridCellSzStr = String.format(Locale.US, "%.12f,%.12f", sampleGrid.getCellSize().y,
                 sampleGrid.getCellSize().x);
         String offRoadDistStr = String.format(Locale.US, "%f",
-                sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));
+                otpServer.sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));
 
         PngChunkTEXT gridCornerChunk = new PngChunkTEXT(imgInfo);
         gridCornerChunk.setKeyVal(OTPA_GRID_CORNER, gridCornerStr);
