@@ -208,7 +208,7 @@ public class AnalystProfileRouterPrototype {
      */
     private TObjectIntMap<Stop> findClosestStops(final TraverseMode mode) {
         RoutingRequest rr = new RoutingRequest(mode);
-        GenericLocation gl = new GenericLocation(request.from.lat, request.from.lon);
+        GenericLocation gl = new GenericLocation(request.fromLat, request.fromLon);
         rr.from = gl;
         // FIXME destination must be set, even though this is meaningless for one-to-many
         rr.to = gl;

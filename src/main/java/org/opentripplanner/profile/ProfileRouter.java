@@ -425,9 +425,9 @@ public class ProfileRouter {
             rr.parkAndRide = true; // allow car->walk transition only at tagged park and ride facilities.
             rr.modes.setWalk(true); // need to walk after dropping the car off
         }
-        rr.from = (new GenericLocation(request.from.lat, request.from.lon));
+        rr.from = (new GenericLocation(request.fromLat, request.fromLon));
         // FIXME requires destination to be set, not necesary for analyst
-        rr.to = new GenericLocation(request.to.lat, request.to.lon);
+        rr.to = new GenericLocation(request.toLat, request.toLon);
         rr.setArriveBy(dest);
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
@@ -491,8 +491,8 @@ public class ProfileRouter {
     private void findStreetOption(TraverseMode mode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(mode);
-        rr.from = (new GenericLocation(request.from.lat, request.from.lon));
-        rr.to = new GenericLocation(request.to.lat, request.to.lon);
+        rr.from = (new GenericLocation(request.fromLat, request.fromLon));
+        rr.to = new GenericLocation(request.toLat, request.toLon);
         rr.setArriveBy(false);
         rr.setRoutingContext(graph);
         // This is not a batch search, it is a point-to-point search with goal direction.
