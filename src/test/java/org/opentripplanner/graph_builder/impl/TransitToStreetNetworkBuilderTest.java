@@ -267,69 +267,61 @@ public class TransitToStreetNetworkBuilderTest {
         int allStops = 0;
         //Stops for which there is no correct connection
         int unknownStops = 0;
-        //Stops which aren't linked to the same street as in correct connection
+        //Stops which are linked to the same street as in correct connection
         int correctlyLinkedStops = 0;
         //For each transit stop in current graph check if transitStop is correctly connected
-        for(Vertex v: gg.getVertices()) {
-            if (v instanceof TransitStop
-                    && extent.contains(v.getCoordinate())) {
-                 for (Edge e : v.getOutgoing()) {
-                    if (e instanceof StreetTransitLink) {
-                        allStops++;
-                        TransitStop ts = (TransitStop) v;
-                        TransitStopConnToWantedEdge wanted_con = stop_id_toEdge.get(ts.getLabel());
-                        if (wanted_con == null) {
-                            LOG.debug("Stop {} wasn't found in saved stops", ts.getLabel());
-                            unknownStops++;
+        for(TransitStop ts: Iterables.filter(gg.getVertices(), TransitStop.class)) {
+            //Each stop usually has 2 outgoing StreetTransit links each for a different direction
+            for (StreetTransitLink e : Iterables.filter(ts.getOutgoing(), StreetTransitLink.class)) {
+                allStops++;
+                TransitStopConnToWantedEdge wanted_con = stop_id_toEdge.get(ts.getLabel());
+                if (wanted_con == null) {
+                    LOG.debug("Stop {} wasn't found in saved stops", ts.getLabel());
+                    unknownStops++;
+                } else {
+                    Vertex connected_vertex = e.getToVertex();
+                    String wantedEdgeLabel = wanted_con.getStreetEdge().getName();
+                    StringBuilder sb = new StringBuilder();
+                    boolean foundConnection = false;
+                    //Look through all outgoing street edges on end vertex of StreetTransitLink
+                    //and check if one street edge is correct one based on edge label
+                    for (StreetEdge currentStreetEdge : Iterables.filter(connected_vertex.getOutgoingStreetEdges(), StreetEdge.class)) {
+                        if (currentStreetEdge.getName().equals(wantedEdgeLabel)) {
+                            //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getName());
+                            collector.checkThat(currentStreetEdge.getName(), CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                            transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
+                            foundConnection = true;
+                            correctlyLinkedStops++;
+                            break;
                         } else {
-                           Vertex connected_vertex = e.getToVertex();
-                           String wantedEdgeLabel = wanted_con.getStreetEdge().getName();
-                           StringBuilder sb = new StringBuilder();
-                           boolean foundConnection = false;
-                           //Look through all outgoing street edges 
-                           //and check if street edge is correct one based on edge label
-                           for (Edge con_edge: connected_vertex.getOutgoingStreetEdges()) {
-                               StreetEdge se = (StreetEdge) con_edge;
-                               if (se.getName().equals(wantedEdgeLabel)) {
-                                   //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getName());
-                                   collector.checkThat(se.getName(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
-                                   transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
-                                   foundConnection = true;
-                                   correctlyLinkedStops++;
-                                   break;
-                               } else {
-                                   sb.append(se.getName());
-                                   sb.append("|");
-                               }
-                           }
-                           //If correct connection wasn't found we need to check incoming edges
-                           //because sometimes connection is made right on OSM way split which means different labels.
-                           if (!foundConnection) {                               
-                               for (Edge con_edge : connected_vertex.getIncoming()) {
-                                   if (con_edge instanceof StreetEdge) {
-                                       StreetEdge se = (StreetEdge) con_edge;
-                                       if (se.getName().equals(wantedEdgeLabel)) {
-                                           //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getName());
-                                           collector.checkThat(se.getName(),CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
-                                           transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
-                                           foundConnection = true;
-                                           correctlyLinkedStops++;
-                                           break;
-                                       } else {
-                                           sb.append(se.getName());
-                                           sb.append("|");
-                                       }
-                                   }
-                               }
-                           }
-                           if (!foundConnection) {
-                               //assertTrue(String.format("Transit stop %s connected wrongly", ts.getLabel()), foundConnection);
-                               //collector.checkThat(sb.toString(), CoreMatchers.equalTo(wantedEdgeLabel));
-                               collector.checkThat(sb.toString(), CoreMatchers.describedAs("TransitStop %0 should be connected to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
-                               transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, false));
-                           }
+                            sb.append(currentStreetEdge.getName());
+                            sb.append("|");
                         }
                     }
+                    //If correct connection wasn't found we need to check incoming edges
+                    //because sometimes connection is made right on OSM way split which means different labels.
+                    if (!foundConnection) {
+                        for (StreetEdge se : Iterables.filter(connected_vertex.getIncoming(), StreetEdge.class)) {
+                            if (se.getName().equals(wantedEdgeLabel)) {
+                                //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getName());
+                                collector.checkThat(se.getName(), CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                                transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
+                                foundConnection = true;
+                                correctlyLinkedStops++;
+                                break;
+                            } else {
+                                sb.append(se.getName());
+                                sb.append("|");
+                            }
+
+                        }
+                    }
+                    if (!foundConnection) {
+                        //assertTrue(String.format("Transit stop %s connected wrongly", ts.getLabel()), foundConnection);
+                        //collector.checkThat(sb.toString(), CoreMatchers.equalTo(wantedEdgeLabel));
+                        collector.checkThat(sb.toString(), CoreMatchers.describedAs("TransitStop %0 should be connected to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
+                        transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, false));
+                    } 
                 }
             }
         }
