@@ -162,6 +162,13 @@ public class PointFeature implements Serializable {
         return this.properties.get(id);
     }
     
+    /**
+     * Compare to another object.
+     * 
+     * We can't use identity equality, because point features may be serialized and deserialized
+     * (for example, during message passing in otpa-cluster) and thus the same PointFeature may
+     * exist in memory more than once.
+     */
     public boolean equals (Object o) {
         if (o instanceof PointFeature) {
             PointFeature f = (PointFeature) o;
@@ -175,6 +182,9 @@ public class PointFeature implements Serializable {
         return false; 
     }
     
+    /**
+     * Hash the relevant features of this PointFeature for efficient use in HashSets, etc.
+     */
     public int hashCode () {
         return (int) (this.lat * 1000) + (int) (this.lon * 1000) +
                 (this.geom != null ? this.geom.hashCode() : 0) + 
