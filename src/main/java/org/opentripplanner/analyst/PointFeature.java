@@ -161,5 +161,24 @@ public class PointFeature implements Serializable {
     public int getProperty(String id) {
         return this.properties.get(id);
     }
-
+    
+    public boolean equals (Object o) {
+        if (o instanceof PointFeature) {
+            PointFeature f = (PointFeature) o;
+            return f.lat == this.lat &&
+                    f.lon == this.lon &&
+                    (f.geom == this.geom || f.geom != null && f.geom.equals(this.geom)) &&
+                    (f.id == this.id || f.id != null && f.id.equals(this.id)) &&
+                    this.properties.equals(f.properties);
+        }
+        
+        return false; 
+    }
+    
+    public int hashCode () {
+        return (int) (this.lat * 1000) + (int) (this.lon * 1000) +
+                (this.geom != null ? this.geom.hashCode() : 0) + 
+                (this.id != null ? this.id.hashCode() : 0) +
+                this.properties.hashCode();
+    }
 }
