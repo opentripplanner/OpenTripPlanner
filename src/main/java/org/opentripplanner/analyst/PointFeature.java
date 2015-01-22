@@ -166,8 +166,9 @@ public class PointFeature implements Serializable {
      * Compare to another object.
      * 
      * We can't use identity equality, because point features may be serialized and deserialized
-     * (for example, during message passing in otpa-cluster) and thus the same PointFeature may
-     * exist in memory more than once.
+     * and thus the same PointFeature may exist in memory more than once. For example, PointFeatures
+     * are compared inside the conveyal/otpa-cluster project to figure out which origins have
+     * returned from the compute cluster. 
      */
     public boolean equals (Object o) {
         if (o instanceof PointFeature) {
@@ -184,6 +185,7 @@ public class PointFeature implements Serializable {
     
     /**
      * Hash the relevant features of this PointFeature for efficient use in HashSets, etc.
+     * PointFeatures are put in HashSets in the conveyal/otpa-cluster project.
      */
     public int hashCode () {
         return (int) (this.lat * 1000) + (int) (this.lon * 1000) +
