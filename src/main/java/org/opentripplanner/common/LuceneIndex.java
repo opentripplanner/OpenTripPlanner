@@ -152,20 +152,20 @@ public class LuceneIndex {
     /** Fetch results for the geocoder using the OTP graph for stops, clusters and street names
      *
      * @param queryString
-     * @param autoComplete Whether we should use the query string to do a prefix match
-     * @param showStops Search for stops, either for name or stop code
-     * @param showClusters Search for clusters by their name
-     * @param showCorners Search for street corners using at least one of the street names
+     * @param autocomplete Whether we should use the query string to do a prefix match
+     * @param stops Search for stops, either by name or stop code
+     * @param clusters Search for clusters by their name
+     * @param corners Search for street corners using at least one of the street names
      * @return list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet client
      */
-    public List<LuceneResult> query (String queryString, boolean autoComplete,
-                                     boolean showStops, boolean showClusters, boolean showCorners) {
+    public List<LuceneResult> query (String queryString, boolean autocomplete,
+                                     boolean stops, boolean clusters, boolean corners) {
         /* Turn the query string into a Lucene query.*/
         BooleanQuery query = new BooleanQuery();
         BooleanQuery termQuery = new BooleanQuery();
         for (String term : queryString.split(" ")) {
             /* PrefixQuery matches all strings that start with the query string */
-            if (autoComplete) {
+            if (autocomplete) {
                 termQuery.add(new PrefixQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
             /* FuzzyQuery matches with all string stat are maximum 2 edits away from the query sring */
             } else {
@@ -177,15 +177,15 @@ public class LuceneIndex {
         }
 
         query.add(termQuery, BooleanClause.Occur.MUST);
-        if (showStops || showClusters || showCorners) {
+        if (stops || clusters || corners) {
             BooleanQuery typeQuery = new BooleanQuery();
-            if (showStops) {
+            if (stops) {
                 typeQuery.add(new TermQuery(new Term("category", Category.STOP.name())), BooleanClause.Occur.SHOULD);
             }
-            if (showClusters) {
+            if (clusters) {
                 typeQuery.add(new TermQuery(new Term("category", Category.CLUSTER.name())), BooleanClause.Occur.SHOULD);
             }
-            if (showCorners) {
+            if (corners) {
                 typeQuery.add(new TermQuery(new Term("category", Category.CORNER.name())), BooleanClause.Occur.SHOULD);
             }
             query.add(typeQuery, BooleanClause.Occur.MUST);
