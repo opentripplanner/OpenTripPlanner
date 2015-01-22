@@ -15,9 +15,15 @@
 otp.namespace("otp.core");
 
 /**
- * otp.core.GeocoderBag is an alternative to the otp.core.GeocoderBuiltin geocoder
- * It will add a geocoder that can make requests to a BAG instance or any similar API
+ * otp.core.GeocoderBag is an alternative to the otp.core.GeocoderBuiltin geocoder for usage inside the Netherlands
+ * 
+ * It will add a geocoder that can make requests to a BAG geocoder instance or any similar API
  *
+ * BAG is a Dutch acronym for Basic Address Data and is a Netherlands-specific geo database.
+ * On top of this dataset (in combination with other data-sets ) an open source geocoder has been developed
+ * 
+ * More information about the geocoder can be found http://blog.plannerstack.org/shop/bag42-vm/ or at https://github.com/calendar42/bag42/
+ * 
  * USAGE: Replace or add the geocoder config inside config.geocoders in config.js with:
  *
  * {
