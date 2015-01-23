@@ -109,6 +109,8 @@ otp.modules.planner.PlannerModule =
             this.defaultQueryParams.maxWalkDistance = this.defaultQueryParams.imperialDefaultMaxWalkDistance;
         }
 
+        _.extend(this.defaultQueryParams, this.getExtendedQueryParams());
+
         if(_.has(this.options, 'defaultQueryParams')) {
             _.extend(this.defaultQueryParams, this.options.defaultQueryParams);
         }
@@ -318,8 +320,10 @@ otp.modules.planner.PlannerModule =
                 });
             }
             if(this.maxHours) queryParams.maxHours = this.maxHours;
+            if(this.numItineraries) queryParams.numItineraries = this.numItineraries;
+            if(this.minTransferTime) queryParams.minTransferTime = this.minTransferTime;
+            if(this.showIntermediateStops) queryParams.showIntermediateStops = this.showIntermediateStops;
 
-            _.extend(queryParams, this.getExtendedQueryParams());
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;
             }

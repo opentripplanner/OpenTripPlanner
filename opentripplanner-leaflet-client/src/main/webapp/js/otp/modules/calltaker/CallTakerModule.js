@@ -31,8 +31,6 @@ otp.modules.calltaker.CallTakerModule =
 
         this.requiresAuth = true;
         this.authUserRoles = ['calltaker', 'all'];
-
-        this.showIntermediateStops = true;
     },
     
     activate : function() {    
@@ -49,7 +47,7 @@ otp.modules.calltaker.CallTakerModule =
     
     getExtendedQueryParams : function() {
         return { 
-            showIntermediateStops : this.showIntermediateStops,
+            showIntermediateStops : true,
             minTransferTime : 180
         };
     },
