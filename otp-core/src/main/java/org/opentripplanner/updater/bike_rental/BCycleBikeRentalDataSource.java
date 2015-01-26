@@ -15,6 +15,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import org.codehaus.jackson.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Build a BikeRentalStation object from a B-Cycle data source JsonNode object.
@@ -38,7 +39,7 @@ public class BCycleBikeRentalDataSource extends GenericJSONBikeRentalDataSource 
        brstation.id = kioskNode.path("Id").toString();
        brstation.x = kioskNode.path("Location").path("Longitude").asDouble();
        brstation.y = kioskNode.path("Location").path("Latitude").asDouble();
-       brstation.name =  kioskNode.path("Name").getTextValue();
+       brstation.raw_name =  new NonLocalizedString(kioskNode.path("Name").getTextValue());
        brstation.bikesAvailable = kioskNode.path("BikesAvailable").asInt();
        brstation.spacesAvailable = kioskNode.path("DocksAvailable").asInt();
 

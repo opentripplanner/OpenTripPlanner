@@ -32,6 +32,7 @@ import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -94,7 +95,7 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Pref
             brstation.id = station.getString("id");
             brstation.x = station.getLong("lng") / 1000000.0;
             brstation.y = station.getLong("lat") / 1000000.0;
-            brstation.name = station.getString("name");
+            brstation.raw_name = new NonLocalizedString(station.getString("name"));
             brstation.bikesAvailable = station.getInt("bikes");
             brstation.spacesAvailable = station.getInt("free");
             if (brstation != null)
