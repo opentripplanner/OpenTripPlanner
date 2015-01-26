@@ -250,7 +250,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
                 "railway=platform;highway=footway;footway=sidewalk"), namer);
         namer = new CreativeNamer("sidewalk");
         propset.addCreativeNamer(new OSMSpecifier("highway=footway;footway=sidewalk"), namer);
-        assertEquals("sidewalk", propset.getCreativeNameForWay(way));
+        assertEquals("sidewalk", propset.getCreativeNameForWay(way).toString());
     }
 
     @Test
@@ -263,7 +263,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         CreativeNamer namer = new CreativeNamer();
         namer.setCreativeNamePattern("Highway with cycleway {cycleway} and access {access} and morx {morx}");
         assertEquals("Highway with cycleway lane and access no and morx ",
-                namer.generateCreativeName(way));
+                namer.generateCreativeName(way).toString());
     }
 
     // disabled pending discussion with author (AMB)

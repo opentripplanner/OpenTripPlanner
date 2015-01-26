@@ -29,6 +29,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Test P+R.
@@ -72,7 +73,7 @@ public class TestParkAndRide extends TestCase {
 
         // So we Add a P+R at B.
         ParkAndRideVertex PRB = new ParkAndRideVertex(graph, "P+R", "P+R.B", 0.001, 45.00001,
-                "P+R B");
+                new NonLocalizedString("P+R B"));
         new ParkAndRideEdge(PRB);
         new ParkAndRideLinkEdge(PRB, B);
         new ParkAndRideLinkEdge(B, PRB);

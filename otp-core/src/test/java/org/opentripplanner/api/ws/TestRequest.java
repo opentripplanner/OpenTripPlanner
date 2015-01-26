@@ -112,6 +112,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.NonLocalizedString;
 
 class SimpleGraphServiceImpl implements GraphService {
 
@@ -271,7 +272,7 @@ class Context {
         station.bikesAvailable = 5;
         station.spacesAvailable = 4;
         station.id = "1";
-        station.name = "bike rental station";
+        station.raw_name = new NonLocalizedString("bike rental station");
 
         service.addStation(station);
         graph.putService(BikeRentalStationService.class, service);
@@ -432,14 +433,14 @@ public class TestRequest extends TestCase {
         BikeRental bikeRental = new BikeRental();
         bikeRental.setGraphService(Context.getInstance().graphService);
         // no stations in graph
-        BikeRentalStationList stations = bikeRental.getBikeRentalStations(null, null, null);
+        BikeRentalStationList stations = bikeRental.getBikeRentalStations(null, null, null, "en_US");
         assertEquals(0, stations.stations.size());
 
         // no stations in range
-        stations = bikeRental.getBikeRentalStations("55.5,-122.7", "65.6,-122.6", "portland");
+        stations = bikeRental.getBikeRentalStations("55.5,-122.7", "65.6,-122.6", "portland", "en_US");
         assertEquals(0, stations.stations.size());
         // finally, a station
-        stations = bikeRental.getBikeRentalStations("45.5,-122.7", "45.6,-122.6", "portland");
+        stations = bikeRental.getBikeRentalStations("45.5,-122.7", "45.6,-122.6", "portland", "en_US");
         assertEquals(1, stations.stations.size());
     }
 

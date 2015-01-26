@@ -45,6 +45,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import java.util.Locale;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * This represents a street segment.
@@ -163,6 +164,20 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         // use a default car speed of ~25 mph for splitter vertices and the like
         // TODO(flamholz): do something smarter with the car speed here.
         this(v1, v2, geometry, name, length, permission, back, 11.2f);
+    }
+
+    //For testing only
+    public PlainStreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, 
+            String name, double length,
+            StreetTraversalPermission permission, boolean back) {
+        this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back, 11.2f);
+    }
+
+    //For testing only
+    public PlainStreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, 
+            String name, double length,
+            StreetTraversalPermission permission, boolean back, float carSpeed) {
+        this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back, carSpeed);
     }
 
     public PlainStreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, 

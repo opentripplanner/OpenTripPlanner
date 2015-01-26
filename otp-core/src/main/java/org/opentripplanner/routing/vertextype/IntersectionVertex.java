@@ -50,6 +50,11 @@ public class IntersectionVertex extends StreetVertex {
         return getDegreeIn() == 1 && getDegreeOut() == 1 && !this.trafficLight;
     }
 
+    //For testing only
+    public IntersectionVertex(Graph g, String label, double x, double y, String name) {
+        this(g, label, x, y, new NonLocalizedString(name));
+    }
+
     public IntersectionVertex(Graph g, String label, double x, double y, I18NString name) {
         super(g, label, x, y, name);
         freeFlowing = false;

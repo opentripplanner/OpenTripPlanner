@@ -22,6 +22,7 @@ import com.vividsolutions.jts.geom.LineString;
 import lombok.Getter;
 import lombok.Setter;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Represents a sub-segment of a StreetEdge.
@@ -47,6 +48,19 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
         this.parentEdge = parentEdge;
     }
     
+    //For testing only
+    public PartialPlainStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+            LineString geometry, String name, double length, StreetTraversalPermission permission,
+            boolean back) {
+        this(parentEdge, v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
+    }
+
+    //For testing only
+    public PartialPlainStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+            LineString geometry, String name, double length) {
+        this(parentEdge, v1, v2, geometry, new NonLocalizedString(name), length, parentEdge.getPermission(), false);
+    }
+
     /**
      * Simplifies construction by copying some stuff from the parentEdge.
      */

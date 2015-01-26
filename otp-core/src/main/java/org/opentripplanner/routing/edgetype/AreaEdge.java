@@ -17,10 +17,20 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class AreaEdge extends PlainStreetEdge {
     private static final long serialVersionUID = 6761687673982054612L;
     private AreaEdgeList area;
+
+    //For testing only
+    public AreaEdge(IntersectionVertex startEndpoint,
+            IntersectionVertex endEndpoint, LineString geometry, String name,
+            double length, StreetTraversalPermission permissions, boolean back,
+            float carSpeed, AreaEdgeList area) {
+        this(startEndpoint, endEndpoint, geometry, new NonLocalizedString(name),
+                length, permissions, back, carSpeed, area);
+    }
 
     public AreaEdge(IntersectionVertex startEndpoint,
             IntersectionVertex endEndpoint, LineString geometry, I18NString name,

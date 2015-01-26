@@ -42,6 +42,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Represents a location on a street, somewhere between the two corners. This is used when computing the first and last segments of a trip, for trips
@@ -66,6 +67,11 @@ public class StreetLocation extends StreetVertex {
         // calling constructor with null graph means this vertex is temporary
         super(null, id, nearestPoint.x, nearestPoint.y, name);
         this.graph = graph;
+    }
+
+    //For testing only
+    public StreetLocation(Graph graph, String id, Coordinate nearestPoint, String name) {
+        this(graph, id, nearestPoint, new NonLocalizedString(name));
     }
 
     private static final long serialVersionUID = 1L;
@@ -149,7 +155,13 @@ public class StreetLocation extends StreetVertex {
         return location;
 
     }
-    
+
+    //For testing only
+    public static StreetLocation createStreetLocation(Graph graph, String label, String name,
+        Iterable<StreetEdge> edges, Coordinate nearestPoint) {
+        return createStreetLocation(graph, label, new NonLocalizedString(name), edges, nearestPoint);
+    }
+
     public static StreetLocation createStreetLocation(Graph graph, String label, I18NString name,
             Iterable<StreetEdge> edges, Coordinate nearestPoint) {
 
