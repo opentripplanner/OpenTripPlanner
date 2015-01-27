@@ -258,6 +258,38 @@ public class IndexAPI {
         return Response.status(Status.OK).entity(ret).build();
     }
     
+    /**
+     * Return the generated transfers a stop in the graph, by stop ID
+     */
+    @GET
+    @Path("/stops/{stopId}/transfers")
+    public Response getTransfers(@PathParam("stopId") String stopIdString) {
+        Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
+        
+        if (stop != null) {
+            // get the transfers for the stop
+            TransitStop v = index.stopVertexForStop.get(stop);
+            Collection<Edge> transfers = Collections2.filter(v.getOutgoing(), new Predicate<Edge>() {
+                @Override
+                public boolean apply(Edge edge) {
+                    return edge instanceof SimpleTransfer;
+                }
+            });
+            
+            Collection<Transfer> out = Collections2.transform(transfers, new Function<Edge, Transfer> () {
+                @Override
+                public Transfer apply(Edge edge) {
+                    // TODO Auto-generated method stub
+                    return new Transfer((SimpleTransfer) edge);
+                }
+            });
+            
+            return Response.status(Status.OK).entity(out).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+    
    /** Return a list of all routes in the graph. */
    // with repeated hasStop parameters, replaces old routesBetweenStops
    @GET
@@ -483,40 +515,7 @@ public class IndexAPI {
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
-    }
-    
-    /**
-     * Return the generated transfers a stop in the graph, by stop ID
-     */
-    @GET
-    @Path("/transfers/{stopId}")
-    public Response getTransfers(@PathParam("stopId") String stopIdString) {
-        Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
-        
-        if (stop != null) {
-            // get the transfers for the stop
-            TransitStop v = index.stopVertexForStop.get(stop);
-            Collection<Edge> transfers = Collections2.filter(v.getOutgoing(), new Predicate<Edge>() {
-                @Override
-                public boolean apply(Edge edge) {
-                    return edge instanceof SimpleTransfer;
-                }
-            });
-            
-            Collection<Transfer> out = Collections2.transform(transfers, new Function<Edge, Transfer> () {
-                @Override
-                public Transfer apply(Edge edge) {
-                    // TODO Auto-generated method stub
-                    return new Transfer((SimpleTransfer) edge);
-                }
-            });
-            
-            return Response.status(Status.OK).entity(out).build();
-        } else {
-            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        }
-    }
-
+    }    
 
     // TODO include pattern ID for each trip in responses
 
