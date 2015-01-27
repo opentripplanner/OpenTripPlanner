@@ -16,6 +16,7 @@ package org.opentripplanner.util;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import org.apache.commons.lang.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,21 +70,14 @@ public enum ResourceBundleSingleton {
         if (localeSpec == null || localeSpec.isEmpty()) {
             return defaultLocale;
         }
-        String[] localeSpecParts = localeSpec.split("_");
+        //TODO: This should probably use Locale.forLanguageTag
+        //but format is little (IETF language tag) different - instead of _
         Locale locale;
-        switch (localeSpecParts.length) {
-            case 1:
-                locale = new Locale(localeSpecParts[0]);
-                break;
-            case 2:
-                locale = new Locale(localeSpecParts[0]);
-                break;
-            case 3:
-                locale = new Locale(localeSpecParts[0]);
-                break;
-            default:
-                LOG.debug("Bogus locale " + localeSpec + ", defaulting to " + defaultLocale.toLanguageTag());
-                locale = defaultLocale;
+        try {
+            locale = LocaleUtils.toLocale(localeSpec);
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Bogus locale " + localeSpec + ", defaulting to " + defaultLocale.toLanguageTag());
+            locale = defaultLocale;
         }
         return locale;
     }
