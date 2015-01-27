@@ -13,12 +13,12 @@
 
 package org.opentripplanner.util;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -31,15 +31,16 @@ public class LocalizedString implements I18NString, Serializable {
     private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
     
     /**
-     * Map which key has which tagName. Used only when building graph.
+     * Map which key has which tagNames. Used only when building graph.
      */
-    private transient static Map<String, String> key_params;
+    private transient static ListMultimap<String, String> key_tag_names;
     
     static {
-        key_params = new HashMap<String, String>();
+        key_tag_names = ArrayListMultimap.create();
     }
-    
+    //Key which specifies translation
     private String key;
+    //Values with which tagNames are replaced in translations.
     private String[] params;
 
     /**
@@ -56,9 +57,10 @@ public class LocalizedString implements I18NString, Serializable {
      * Creates String which can be localized
      * <p>
      * Uses {@link #getTagNames() } to get which tag values are needed for this key.
-     * For each of this tag names tag value is get from OSM way.
+     * For each of this tag names tag value is read from OSM way.
+     * If tag value is missing it is added as empty string.
      * 
-     * For example. If key platform has key ref current value of tag ref in way is saved to be used in localizations.
+     * For example. If key platform has key {ref} current value of tag ref in way is saved to be used in localizations.
      * It currently assumes that tag exists in way. (otherwise this namer wouldn't be used)
      * </p>
      * @param key key of translation for this way set in {@link DefaultWayPropertySetSource} and translations read from from properties Files
@@ -66,17 +68,20 @@ public class LocalizedString implements I18NString, Serializable {
      */
     public LocalizedString(String key, OSMWithTags way) {
         this.key = key;
-        List<String> lparams = new ArrayList<String>(1);
+        List<String> lparams = new ArrayList<String>(4);
         //Which tags do we want from way
-        String tag_name = getTagNames();
-        if (tag_name != null) {
-            //Tag value
-            String param = way.getTag(tag_name);
-            if (param != null) {
-                lparams.add(param);
-                this.params = lparams.toArray(new String[lparams.size()]);
+        List<String> tag_names = getTagNames();
+        if (tag_names != null) {
+            for(String tag_name: tag_names) {
+                String param = way.getTag(tag_name);
+                if (param != null) {
+                    lparams.add(param);
+                } else {
+                    lparams.add("");
+                }
             }
         }
+        this.params = lparams.toArray(new String[lparams.size()]);
     }
     
     /**
@@ -87,37 +92,45 @@ public class LocalizedString implements I18NString, Serializable {
      * 
      * For example "Platform {ref}" ref is way tagname.
      * 
-     * NOTE: Only one tag name is currently supported.
      * </p>
      * @return tagName
      */
-    private String getTagNames() {
+    private List<String> getTagNames() {
         //TODO: after finding all keys for replacements replace strings to normal java strings
         //with https://stackoverflow.com/questions/2286648/named-placeholders-in-string-formatting if it is faster
         //otherwise it's converted only when toString is called
-        if( key_params.containsKey(key)) {
-            return key_params.get(key);
+        if( key_tag_names.containsKey(key)) {
+            return key_tag_names.get(key);
         }
+        List<String> tag_names = new ArrayList<String>(4);
         String english_trans = ResourceBundleSingleton.INSTANCE.localize(this.key, Locale.ENGLISH);
 
         Matcher matcher = patternMatcher.matcher(english_trans);
-        int lastEnd = 0;
         while (matcher.find()) {
-            
-            lastEnd = matcher.end();
-            // and then the value for the match
-            String m_key = matcher.group(1);
-            key_params.put(key, m_key);
-            return m_key;
+            String tag_name = matcher.group(1);
+            key_tag_names.put(key, tag_name);
+            tag_names.add(tag_name);
         }
-        return null;
+        return tag_names;
     }
 
+    /**
+     * Returns translated string in default locale
+     * with tag_names replaced with values
+     * 
+     * Default locale is defaultLocale from {@link ResourceBundleSingleton}
+     * @return 
+     */
     @Override
     public String toString() {
         return this.toString(ResourceBundleSingleton.INSTANCE.getDefaultLocale());
     }    
 
+     /**
+     * Returns translated string in wanted locale
+     * with tag_names replaced with values
+     * @return 
+     */
     @Override
     public String toString(Locale locale) {
         if (this.key == null) {
@@ -127,7 +140,7 @@ public class LocalizedString implements I18NString, Serializable {
         //in string formatting with values from way tags values
         String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
         if (this.params != null) {
-            translation = patternMatcher.matcher(translation).replaceFirst("%s");
+            translation = patternMatcher.matcher(translation).replaceAll("%s");
             return String.format(translation, (Object[]) params);
         } else {
             return translation;
