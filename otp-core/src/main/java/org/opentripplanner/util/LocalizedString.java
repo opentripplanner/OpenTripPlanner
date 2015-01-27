@@ -28,8 +28,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * @author mabu
  */
 public class LocalizedString implements I18NString, Serializable {
-    private static final Pattern pattern = Pattern.compile("\\{(.*?)\\}");
-    private static final Matcher matcher = pattern.matcher("");
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
     
     /**
      * Map which key has which tagName. Used only when building graph.
@@ -100,7 +99,8 @@ public class LocalizedString implements I18NString, Serializable {
             return key_params.get(key);
         }
         String english_trans = ResourceBundleSingleton.INSTANCE.localize(this.key, Locale.ENGLISH);
-        matcher.reset(english_trans);
+
+        Matcher matcher = patternMatcher.matcher(english_trans);
         int lastEnd = 0;
         while (matcher.find()) {
             
@@ -127,7 +127,7 @@ public class LocalizedString implements I18NString, Serializable {
         //in string formatting with values from way tags values
         String translation = ResourceBundleSingleton.INSTANCE.localize(this.key, locale);
         if (this.params != null) {
-            translation = pattern.matcher(translation).replaceFirst("%s");
+            translation = patternMatcher.matcher(translation).replaceFirst("%s");
             return String.format(translation, (Object[]) params);
         } else {
             return translation;
