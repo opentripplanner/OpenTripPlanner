@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Envelope;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 @Path("/bike_rental")
 @XmlRootElement
@@ -58,26 +59,7 @@ public class BikeRental {
         Graph graph = graphService.getGraph(routerId);
         if (graph == null) return null;
         Locale locale;
-        if (locale_param == null || locale_param.isEmpty()) {
-            locale = new Locale("en", "US");
-        } else {
-            //FIXME: currently copied from routingResource
-            String[] localeSpecParts = locale_param.split("_");
-            switch (localeSpecParts.length) {
-                case 1:
-                    locale = new Locale(localeSpecParts[0]);
-                    break;
-                case 2:
-                    locale = new Locale(localeSpecParts[0]);
-                    break;
-                case 3:
-                    locale = new Locale(localeSpecParts[0]);
-                    break;
-                default:
-                    //LOG.debug("Bogus locale " + localeSpec + ", defaulting to en");
-                    locale = new Locale("en");
-            }
-        }
+        locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
         ResourceBundle resources_names = ResourceBundle.getBundle("WayProperties", locale);
         BikeRentalStationService bikeRentalService = graph.getService(BikeRentalStationService.class);
         if (bikeRentalService == null) return new BikeRentalStationList();

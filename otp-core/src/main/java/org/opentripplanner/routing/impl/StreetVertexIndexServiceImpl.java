@@ -195,7 +195,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
         Locale locale;
         if (options == null) {
-            locale = new Locale("en");
+            locale = ResourceBundleSingleton.INSTANCE.getDefaultLocale();
         } else {
             locale = options.getLocale();
         }

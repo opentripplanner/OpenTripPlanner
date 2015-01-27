@@ -115,7 +115,7 @@ public class LocalizedString implements I18NString, Serializable {
 
     @Override
     public String toString() {
-        return this.toString(Locale.getDefault());
+        return this.toString(ResourceBundleSingleton.INSTANCE.getDefaultLocale());
     }    
 
     @Override
