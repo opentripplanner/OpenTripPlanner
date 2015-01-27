@@ -60,7 +60,6 @@ public class BikeRental {
         if (graph == null) return null;
         Locale locale;
         locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
-        ResourceBundle resources_names = ResourceBundle.getBundle("WayProperties", locale);
         BikeRentalStationService bikeRentalService = graph.getService(BikeRentalStationService.class);
         if (bikeRentalService == null) return new BikeRentalStationList();
         Envelope envelope;
@@ -83,19 +82,4 @@ public class BikeRental {
         brsl.stations = out;
         return brsl;
     }
-    
-    private String localize(String key, ResourceBundle resourceBundle) {
-        if (key == null) {
-            return null;
-        }
-        try {
-            String retval = resourceBundle.getString(key);
-            //LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
-            return retval;
-        } catch (MissingResourceException e) {
-            //LOG.debug("Missing translation for key: " + key);
-            return key;
-        }
-    }
-
 }
