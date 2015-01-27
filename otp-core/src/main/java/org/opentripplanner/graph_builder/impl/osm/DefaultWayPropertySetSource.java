@@ -549,15 +549,16 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     }
 
     private void createNames(WayPropertySet propset, String spec, String patternKey) {
-        String pattern = patternKey; // localize(patternKey);
+        String pattern = patternKey;
         CreativeNamer namer = new CreativeNamer(pattern);
         propset.addCreativeNamer(new OSMSpecifier(spec), namer);
     }
 
     private void createNotes(WayPropertySet propset, String spec, String patternKey) {
         NoteProperties properties = new NoteProperties();
-        String pattern = patternKey; // localize(patternKey);
+        String pattern = patternKey;
         properties.setNotePattern(pattern);
+        //TODO: notes aren't localized
         propset.addNote(new OSMSpecifier(spec), properties);
     }
 
@@ -587,24 +588,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         picker.setSpecifier(new OSMSpecifier(spec));
         picker.setSpeed(speed);
         propset.addSpeedPicker(picker);
-    }
-
-    private String localize(String key) {
-        try {
-            String retval = getResourceBundle().getString(key);
-            LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
-            return retval;
-        } catch (MissingResourceException e) {
-            LOG.warn("Missing translation for key: " + key);
-            return key;
-        }
-    }
-
-    private ResourceBundle getResourceBundle() {
-        if (resources == null) {
-            resources = ResourceBundle.getBundle("WayProperties", locale);
-        }
-        return resources;
     }
 
     public void setLocale(Locale locale) {
