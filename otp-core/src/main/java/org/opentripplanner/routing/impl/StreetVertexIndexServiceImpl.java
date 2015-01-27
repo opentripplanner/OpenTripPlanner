@@ -231,12 +231,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         }
                     }
                     List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
-                    
-                    //TODO: move corner making with parameter to Localized string
-                    String fmt = ResourceBundleSingleton.INSTANCE.localize("corner", locale);
+
                     if (uniqueNames.size() > 1) {
-                        calculatedName = new NonLocalizedString(String.format(fmt, uniqueNames.get(0),
-                                uniqueNames.get(1)));
+                        calculatedName = new LocalizedString("corner", new String[]{uniqueNames.get(0),
+                                uniqueNames.get(1)});
                     } else if (uniqueNames.size() == 1) {
                         calculatedName = new NonLocalizedString(uniqueNames.get(0));
                     } else {
