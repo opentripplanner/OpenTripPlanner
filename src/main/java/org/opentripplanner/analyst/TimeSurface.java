@@ -94,6 +94,19 @@ public class TimeSurface implements Serializable {
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
     }
 
+    /** Make a max or min timesurface from propagated times in a ProfileRouter. */
+    public TimeSurface (ProfileRouter profileRouter) {
+        // TODO merge with the version that takes AnalystProfileRouterPrototype, they are exactly the same.
+        // But those two classes are not in the same inheritance hierarchy.
+        ProfileRequest req = profileRouter.request;
+        lon = req.fromLon;
+        lat = req.fromLat;
+        id = makeUniqueId();
+        dateTime = req.fromTime; // FIXME
+        routerId = profileRouter.graph.routerId;
+        cutoffMinutes = profileRouter.MAX_DURATION / 60;
+    }
+
     public static TimeSurface.RangeSet makeSurfaces (AnalystProfileRouterPrototype profileRouter) {
         TimeSurface minSurface = new TimeSurface(profileRouter);
         TimeSurface avgSurface = new TimeSurface(profileRouter);
@@ -105,6 +118,32 @@ public class TimeSurface implements Serializable {
             avgSurface.times.put(v, tr.avg);
             maxSurface.times.put(v, tr.max);
         }
+        RangeSet result = new RangeSet();
+        minSurface.description = "Travel times assuming best luck (never waiting for a transfer).";
+        avgSurface.description = "Expected travel times (average wait for every transfer).";
+        maxSurface.description = "Travel times assuming worst luck (maximum wait for every transfer).";
+        result.min = minSurface;
+        result.avg = avgSurface;
+        result.max = maxSurface;
+        return result;
+    }
+
+    public static RangeSet makeSurfaces(ProfileRouter profileRouter, TObjectIntMap<Vertex> lbs, TObjectIntMap<Vertex> ubs) {
+        TimeSurface minSurface = new TimeSurface(profileRouter);
+        TimeSurface avgSurface = new TimeSurface(profileRouter);
+        TimeSurface maxSurface = new TimeSurface(profileRouter);
+        for (Vertex v : lbs.keySet()) {
+            int min = lbs.get(v);
+            int max = ubs.get(v);
+            int avg = UNREACHABLE;
+            if (min != UNREACHABLE && max != UNREACHABLE) {
+                avg = (int)((long)min + max / 2);
+            }
+            minSurface.times.put(v, min);
+            avgSurface.times.put(v, avg);
+            maxSurface.times.put(v, max);
+        }
+        // TODO merge with the version that takes AnalystProfileRouterPrototype, they are mostly the same.
         RangeSet result = new RangeSet();
         minSurface.description = "Travel times assuming best luck (never waiting for a transfer).";
         avgSurface.description = "Expected travel times (average wait for every transfer).";

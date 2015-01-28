@@ -1,6 +1,9 @@
 package org.opentripplanner.profile;
 
 import com.google.common.collect.*;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.resource.SimpleIsochrone;
@@ -62,9 +65,8 @@ public class ProfileRouter {
     Multimap<StopCluster, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop cluster
     List<RoutingContext> routingContexts = Lists.newArrayList();
 
-    /* Analyst: time bounds for each vertex */
-    public int[] mins, maxs;
-    public TimeSurface minSurface, maxSurface;
+    /* Analyst: time bounds for each vertex. This field contains the output after the search is run. */
+    public TimeSurface.RangeSet timeSurfaceRangeSet = null;
 
     // while finding direct paths:
     // if dist < M meters OR we don't yet have N stations: record station
@@ -100,13 +102,6 @@ public class ProfileRouter {
                     graph.index.initializeProfileTransfers();
                 }
             }
-        }
-        // Analyst
-        if (request.analyst) {
-            mins = new int[Vertex.getMaxIndex()];
-            maxs = new int[Vertex.getMaxIndex()];
-            Arrays.fill(mins, TimeSurface.UNREACHABLE);
-            Arrays.fill(maxs, TimeSurface.UNREACHABLE);
         }
         LOG.info("access modes: {}", request.accessModes);
         LOG.info("egress modes: {}", request.egressModes);
@@ -212,20 +207,8 @@ public class ProfileRouter {
                     continue;
                 }
                 if ( ! addIfNondominated(r1)) continue; // abandon this ride if it is dominated by some existing ride at the same location
-                // We have a new, nondominated, completed ride. Record its lower and upper bounds at the arrival stop.
-                if (request.analyst) {
-                    for (Stop s : r1.to.children) {
-                        // TODO This could be done at the end now that we are retaining all rides.
-                        TransitStop tstop = graph.index.stopVertexForStop.get(s);
-                        int tsidx = tstop.getIndex();
-                        int lb = r1.durationLowerBound();
-                        int ub = r1.durationUpperBound();
-                        if (mins[tsidx] == TimeSurface.UNREACHABLE || mins[tsidx] > lb)
-                            mins[tsidx] = lb;
-                        if (maxs[tsidx] == TimeSurface.UNREACHABLE || maxs[tsidx] > ub) // Yes, we want the _minimum_ upper bound.
-                            maxs[tsidx] = ub;
-                    }
-                }
+                // We have a new, nondominated, completed ride.
+
                 /* Find transfers out of this new ride. */
                 // Do not transfer too many times. Check after calculating stats since stats are needed in any case.
                 int nRides = r1.pathLength();
@@ -515,59 +498,6 @@ public class ProfileRouter {
         routingContexts.add(rr.rctx); // save context for later cleanup so temp edges remain available
     }
 
-    // Major change: This needs to include all stops, not just those where transfers occur or those near the destination.
-    /** Make two time surfaces, one for the minimum and one for the maximum. */
-    public P2<TimeSurface> makeSurfaces() {
-        LOG.info("Propagating profile router result to street vertices.");
-        // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.setMode(TraverseMode.WALK);
-        rr.walkSpeed = request.walkSpeed;
-        // If max trip duration is not limited, searches are of course much slower.
-        int worstElapsedTime = request.maxWalkTime * 60; // convert from minutes to seconds, assume walking at egress
-        rr.worstTime = (rr.dateTime + worstElapsedTime);
-        rr.batch = (true);
-        GenericAStar astar = new GenericAStar();
-        rr.setNumItineraries(1);
-        for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
-            int index = tstop.getIndex();
-            // Generate a tree outward from all stops that have been touched in the basic profile search
-            if (mins[index] == TimeSurface.UNREACHABLE || maxs[index] == TimeSurface.UNREACHABLE) continue;
-            rr.setRoutingContext(graph, tstop, null); // Set origin vertex directly instead of generating link edges
-            astar.setTraverseVisitor(new ExtremaPropagationTraverseVisitor(mins[index], maxs[index]));
-            ShortestPathTree spt = astar.getShortestPathTree(rr, 5);
-            rr.rctx.destroy();
-        }
-        /* DISABLED while working on analyst-frequency-based-profile prototype */
-        // minSurface = new TimeSurface(this, false);
-        // maxSurface = new TimeSurface(this, true);
-        LOG.info("done making timesurfaces.");
-        return new P2<TimeSurface>(minSurface, maxSurface);
-    }
-
-    /** Given a minimum and maximum at a starting vertex, build an on-street SPT and propagate those values outward. */
-    class ExtremaPropagationTraverseVisitor implements TraverseVisitor {
-        final int min0;
-        final int max0;
-        ExtremaPropagationTraverseVisitor(int min0, int max0) {
-            this.min0 = min0;
-            this.max0 = max0;
-        }
-        @Override public void visitEdge(Edge edge, State state) { }
-        @Override public void visitEnqueue(State state) { }
-        @Override public void visitVertex(State state) {
-            int min = min0 + (int) state.getElapsedTimeSeconds();
-            int max = max0 + (int) state.getElapsedTimeSeconds();
-            Vertex vertex = state.getVertex();
-            int index = vertex.getIndex();
-            if (index >= mins.length) return; // New temp vertices may have been created since the array was dimensioned.
-            if (mins[index] == TimeSurface.UNREACHABLE || mins[index] > min)
-                mins[index] = min;
-            if (maxs[index] == TimeSurface.UNREACHABLE || maxs[index] > max) // Yes we want the minimum upper bound (minimum maximum)
-                maxs[index] = max;
-        }
-    }
-
     /**
      * Destroy all routing contexts created during this search. This method must be called manually on any
      * ProfileRouter instance before it is released for garbage collection, because RoutingContexts remain linked into
@@ -594,6 +524,50 @@ public class ProfileRouter {
             LOG.error("RoutingContexts were observed in the ProfileRouter finalizer: this is a memory leak.");
             cleanup();
         }
+    }
+
+    private void makeSurfaces() {
+        LOG.info("Propagating from transit stops to the street network...");
+        // A map to store the travel time to each vertex
+        TObjectIntMap<Vertex> lbs = new TObjectIntHashMap<>(1000000, 0.5f, TimeSurface.UNREACHABLE);
+        TObjectIntMap<Vertex> ubs = new TObjectIntHashMap<>(1000000, 0.5f, TimeSurface.UNREACHABLE);
+        // Grab a cached map of distances to street intersections from each transit stop
+        StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
+        // Iterate over all nondominated rides at all clusters
+        for (Entry<StopCluster, Ride> entry : retainedRides.entries()) {
+            StopCluster cluster = entry.getKey();
+            Ride ride = entry.getValue();
+            int lb0 = ride.durationLowerBound();
+            int ub0 = ride.durationUpperBound();
+            for (Stop stop : cluster.children) {
+                TransitStop tstop = graph.index.stopVertexForStop.get(stop);
+                // Iterate over street intersections in the vicinity of this particular transit stop.
+                // Shift the time range at this transit stop, merging it into that for all reachable street intersections.
+                TObjectIntMap<Vertex> distanceToVertex = stopTreeCache.getDistancesForStop(tstop);
+                for (TObjectIntIterator<Vertex> iter = distanceToVertex.iterator(); iter.hasNext(); ) {
+                    iter.advance();
+                    Vertex vertex = iter.key();
+                    // distance in meters over walkspeed in meters per second --> seconds
+                    int egressWalkTimeSeconds = (int) (iter.value() / request.walkSpeed);
+                    if (egressWalkTimeSeconds > request.maxWalkTime * 60) {
+                        continue;
+                    }
+                    int propagated_lb = lb0 + egressWalkTimeSeconds;
+                    int propagated_ub = ub0 + egressWalkTimeSeconds;
+                    int existing_lb = lbs.get(vertex);
+                    int existing_ub = ubs.get(vertex);
+                    if (existing_lb == TimeSurface.UNREACHABLE || existing_lb > propagated_lb) {
+                        lbs.put(vertex, propagated_lb);
+                    }
+                    if (existing_ub == TimeSurface.UNREACHABLE || existing_ub > propagated_ub) {
+                        ubs.put(vertex, propagated_ub);
+                    }
+                }
+            }
+        }
+        LOG.info("Done with propagation.");
+        /* Store the result in a field in the router object. */
+        timeSurfaceRangeSet = TimeSurface.makeSurfaces(this, lbs, ubs);
     }
 
 }
