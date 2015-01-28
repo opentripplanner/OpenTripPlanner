@@ -238,7 +238,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     } else if (uniqueNames.size() == 1) {
                         calculatedName = new NonLocalizedString(uniqueNames.get(0));
                     } else {
-                        calculatedName = new LocalizedString("unnamedStreed", (String[]) null); //params) NonLocalizedString(ResourceBundleSingleton.INSTANCE.localize("unnamedStreet", locale));
+                        calculatedName = new LocalizedString("unnamedStreed", (String[]) null); 
                     }
                 }
                 StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(), coord,
