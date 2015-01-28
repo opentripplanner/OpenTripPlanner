@@ -28,6 +28,7 @@ import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances;
@@ -203,7 +204,19 @@ public abstract class Edge implements Serializable {
         return 0;
     }
 
+
+    /**
+     * Gets english localized name
+     * @return english localized name
+     */
     public abstract String getName();
+
+    /**
+     * Gets wanted localization
+     * @param locale wanted locale
+     * @return Localized in specified locale name
+     */
+    public abstract String getName(Locale locale);
 
     public boolean hasBogusName() {
         return false;

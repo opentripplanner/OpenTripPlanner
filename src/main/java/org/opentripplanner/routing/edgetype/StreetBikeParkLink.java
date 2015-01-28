@@ -25,6 +25,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * This represents the connection between a street vertex and a bike park vertex.
@@ -68,6 +69,10 @@ public class StreetBikeParkLink extends Edge {
 
     public String getName() {
         return bikeParkVertex.getName();
+    }
+
+    public String getName(Locale locale) {
+        return bikeParkVertex.getName(locale);
     }
 
     public State traverse(State s0) {

@@ -13,12 +13,15 @@
 
 package org.opentripplanner.routing.bike_rental;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.util.I18NString;
 
 public class BikeRentalStation implements Serializable {
     private static final long serialVersionUID = 8311460609708089384L;
@@ -26,6 +29,9 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public String id;
+    @XmlTransient
+    @JsonIgnore
+    public I18NString raw_name;
     @XmlAttribute
     @JsonSerialize
     public String name;

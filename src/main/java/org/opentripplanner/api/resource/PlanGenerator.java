@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -83,6 +85,7 @@ public class PlanGenerator {
 
     public PathService pathService;
     public Graph graph;
+    private Locale requestedLocale;
 
     public PlanGenerator(Graph graph, PathService pathService) {
         this.graph = graph;
@@ -98,6 +101,8 @@ public class PlanGenerator {
         
         // Copy options to keep originals
         RoutingRequest originalOptions = options.clone();
+
+        requestedLocale = options.locale;
 
         /* try to plan the trip */
         List<GraphPath> paths = null;
@@ -218,11 +223,13 @@ public class PlanGenerator {
      */
     TripPlan generatePlan(List<GraphPath> paths, RoutingRequest request) {
 
+        requestedLocale = request.locale;
+
         GraphPath exemplar = paths.get(0);
         Vertex tripStartVertex = exemplar.getStartVertex();
         Vertex tripEndVertex = exemplar.getEndVertex();
-        String startName = tripStartVertex.getName();
-        String endName = tripEndVertex.getName();
+        String startName = tripStartVertex.getName(requestedLocale);
+        String endName = tripEndVertex.getName(requestedLocale);
 
         // Use vertex labels if they don't have names
         if (startName == null) {
@@ -491,7 +498,7 @@ public class PlanGenerator {
         WalkStep previousStep = null;
 
         for (int i = 0; i < legsStates.length; i++) {
-            List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep);
+            List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
 
             legs.get(i).walkSteps = walkSteps;
 
@@ -683,7 +690,7 @@ public class PlanGenerator {
             leg.agencyName = agency.getName();
             leg.agencyUrl = agency.getUrl();
             leg.headsign = states[states.length - 1].getBackDirection();
-            leg.route = states[states.length - 1].getBackEdge().getName();
+            leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
             leg.routeId = route.getId().getId();
             leg.routeLongName = route.getLongName();
@@ -814,7 +821,7 @@ public class PlanGenerator {
      * 
      * @return
      */
-    public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous) {
+    public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale wantedLocale) {
         List<WalkStep> steps = new ArrayList<WalkStep>();
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
@@ -842,7 +849,7 @@ public class PlanGenerator {
             // before or will come after
             if (edge instanceof ElevatorAlightEdge) {
                 // don't care what came before or comes after
-                step = createWalkStep(graph, forwardState);
+                step = createWalkStep(graph, forwardState, wantedLocale);
                 createdNewStep = true;
                 disableZagRemovalForThisStep = true;
 
@@ -852,7 +859,7 @@ public class PlanGenerator {
                 // exit != null and uses to <exit>
                 // the floor name is the AlightEdge name
                 // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-                step.streetName = ((ElevatorAlightEdge) edge).getName();
+                step.streetName = ((ElevatorAlightEdge) edge).getName(wantedLocale); 
 
                 step.relativeDirection = RelativeDirection.ELEVATOR;
 
@@ -860,7 +867,7 @@ public class PlanGenerator {
                 continue;
             }
 
-            String streetName = edge.getName();
+            String streetName = edge.getName(wantedLocale);
             int idx = streetName.indexOf('(');
             String streetNameNoParens;
             if (idx > 0)
@@ -870,7 +877,7 @@ public class PlanGenerator {
 
             if (step == null) {
                 // first step
-                step = createWalkStep(graph, forwardState);
+                step = createWalkStep(graph, forwardState, wantedLocale);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -901,7 +908,7 @@ public class PlanGenerator {
                     roundaboutExit = 0;
                 }
                 /* start a new step */
-                step = createWalkStep(graph, forwardState);
+                step = createWalkStep(graph, forwardState, wantedLocale);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -909,7 +916,7 @@ public class PlanGenerator {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
-                    roundaboutPreviousStreet = backState.getBackEdge().getName();
+                    roundaboutPreviousStreet = backState.getBackEdge().getName(wantedLocale);
                     idx = roundaboutPreviousStreet.indexOf('(');
                     if (idx > 0)
                         roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
@@ -946,7 +953,7 @@ public class PlanGenerator {
                         // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
-                            if (alternative.getName().equals(streetName)) {
+                            if (alternative.getName(wantedLocale).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -971,7 +978,7 @@ public class PlanGenerator {
                                 continue; // this is not an alternative
                             }
                             alternative = alternatives.get(0);
-                            if (alternative.getName().equals(streetName)) {
+                            if (alternative.getName(wantedLocale).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -988,7 +995,7 @@ public class PlanGenerator {
 
                     if (shouldGenerateContinue) {
                         // turn to stay on same-named street
-                        step = createWalkStep(graph, forwardState);
+                        step = createWalkStep(graph, forwardState, wantedLocale);
                         createdNewStep = true;
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle, false);
@@ -1103,11 +1110,11 @@ public class PlanGenerator {
         return angleDiff;
     }
 
-    private static WalkStep createWalkStep(Graph graph, State s) {
+    private static WalkStep createWalkStep(Graph graph, State s, Locale wantedLocale) {
         Edge en = s.getBackEdge();
         WalkStep step;
         step = new WalkStep();
-        step.streetName = en.getName();
+        step.streetName = en.getName(wantedLocale);
         step.lon = en.getFromVertex().getX();
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0);

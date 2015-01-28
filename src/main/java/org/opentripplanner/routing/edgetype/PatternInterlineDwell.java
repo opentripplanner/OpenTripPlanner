@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * A PatternInterlineDwell refers to "interlining", where a single physical vehicle carries out several logical trips
@@ -115,6 +116,11 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
     @Override
     public String getName() {
         return "INTERLINE"; //GtfsLibrary.getRouteName(pattern.getRoute());
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
     }
 
     @Override

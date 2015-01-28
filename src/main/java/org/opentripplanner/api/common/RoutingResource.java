@@ -35,6 +35,7 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.opentripplanner.util.ResourceBundleSingleton;
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -286,7 +287,7 @@ public abstract class RoutingResource {
     private List<Integer> alightSlack;
 
     @DefaultValue("en_US") @QueryParam("locale")
-    private List<String> locale;
+    private List<String> locales;
     
     /**
      * If true, realtime updates are ignored during this search.
@@ -474,23 +475,8 @@ public abstract class RoutingResource {
         request.disableRemainingWeightHeuristic = (get(disableRemainingWeightHeuristic, n,
                 request.disableRemainingWeightHeuristic));
         
-        String localeSpec = get(locale, n, "en");
-        String[] localeSpecParts = localeSpec.split("_");
-        Locale locale;
-        switch (localeSpecParts.length) {
-            case 1:
-                locale = new Locale(localeSpecParts[0]);
-                break;
-            case 2:
-                locale = new Locale(localeSpecParts[0]);
-                break;
-            case 3:
-                locale = new Locale(localeSpecParts[0]);
-                break;
-            default:
-                LOG.debug("Bogus locale " + localeSpec + ", defaulting to en");
-                locale = new Locale("en");
-        }
+        String localeSpec = get(locales, n, "en");
+        Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(localeSpec);
 
         request.locale = locale;
         return request;

@@ -91,6 +91,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
@@ -199,7 +200,7 @@ class Context {
         station.bikesAvailable = 5;
         station.spacesAvailable = 4;
         station.id = "1";
-        station.name = "bike rental station";
+        station.raw_name = new NonLocalizedString("bike rental station");
         service.addBikeRentalStation(station);
     }
 
@@ -341,14 +342,14 @@ public class TestRequest extends TestCase {
         BikeRental bikeRental = new BikeRental();
         bikeRental.otpServer = Context.getInstance().otpServer;
         // no stations in graph
-        BikeRentalStationList stations = bikeRental.getBikeRentalStations(null, null, null);
+        BikeRentalStationList stations = bikeRental.getBikeRentalStations(null, null, null, "en_US");
         assertEquals(0, stations.stations.size());
 
         // no stations in range
-        stations = bikeRental.getBikeRentalStations("55.5,-122.7", "65.6,-122.6", "portland");
+        stations = bikeRental.getBikeRentalStations("55.5,-122.7", "65.6,-122.6", "portland", "en_US");
         assertEquals(0, stations.stations.size());
         // finally, a station
-        stations = bikeRental.getBikeRentalStations("45.5,-122.7", "45.6,-122.6", "portland");
+        stations = bikeRental.getBikeRentalStations("45.5,-122.7", "45.6,-122.6", "portland", "en_US");
         assertEquals(1, stations.stations.size());
     }
 

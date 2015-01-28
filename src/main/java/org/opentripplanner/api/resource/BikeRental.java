@@ -18,7 +18,7 @@ import static org.opentripplanner.api.resource.ServerInfo.Q;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
+import java.util.Locale;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -34,6 +34,7 @@ import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 
 import com.vividsolutions.jts.geom.Envelope;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 @Path("/routers/{routerId}/bike_rental")
 @XmlRootElement
@@ -47,11 +48,14 @@ public class BikeRental {
     public BikeRentalStationList getBikeRentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
-            @PathParam("routerId") String routerId) {
+            @PathParam("routerId") String routerId,
+            @QueryParam("locale") String locale_param) {
 
         Router router = otpServer.getRouter(routerId);
         if (router == null) return null;
         BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
+        Locale locale;
+        locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
         if (bikeRentalService == null) return new BikeRentalStationList();
         Envelope envelope;
         if (lowerLeft != null) {
@@ -63,6 +67,10 @@ public class BikeRental {
         List<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
         for (BikeRentalStation station : stations) {
             if (envelope.contains(station.x, station.y)) {
+                //TODO: This should probably be improved somehow
+                if (station.raw_name != null) {
+                    station.name = station.raw_name.toString(locale);
+                }
                 out.add(station);
             }
         }

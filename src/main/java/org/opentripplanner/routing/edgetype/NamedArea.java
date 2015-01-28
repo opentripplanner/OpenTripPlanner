@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import java.io.Serializable;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A named area is a subset of an area with a certain set of properties
@@ -29,7 +30,7 @@ public class NamedArea implements Serializable {
 
     private Geometry originalEdges;
 
-    private String name;
+    private I18NString name;
 
     private double bicycleSafetyMultiplier;
 
@@ -38,10 +39,14 @@ public class NamedArea implements Serializable {
     private StreetTraversalPermission permission;
 
     public String getName() {
+        return name.toString();
+    }
+
+    public I18NString getRawName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(I18NString name) {
         this.name = name;
     }
 

@@ -11,17 +11,30 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.vertextype;
+package org.opentripplanner.util;
 
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.util.NonLocalizedString;
+import java.io.Serializable;
+import java.util.Locale;
 
-public class ElevatorOffboardVertex extends StreetVertex {
+/**
+ *
+ * @author mabu
+ */
+public class NonLocalizedString implements I18NString, Serializable {
+    private String name;
 
-    private static final long serialVersionUID = 20120209L;
+    public NonLocalizedString(String name) {
+        this.name = name;
+    }
 
-    public ElevatorOffboardVertex(Graph g, String label, double x, double y, String name) {
-        super(g, label, x, y, new NonLocalizedString(name));
+    @Override
+    public String toString() {
+        return this.name;
+    }
+
+    @Override
+    public String toString(Locale locale) {
+        return this.name;
     }
 
 }

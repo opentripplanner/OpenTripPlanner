@@ -27,6 +27,7 @@ import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * This represents the connection between a P+R and the street access.
@@ -89,6 +90,12 @@ public class ParkAndRideLinkEdge extends Edge {
     public String getName() {
         // TODO I18n
         return parkAndRideVertex.getName() + (exit ? " (exit)" : " (entrance)");
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        //TODO: localize
+        return this.getName();
     }
 
     @Override

@@ -86,6 +86,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -301,7 +303,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             graph.putService(BikeRentalStationService.class, bikeRentalService);
             for (OSMNode node : osmdb.getBikeRentalNodes()) {
                 n++;
-                String creativeName = wayPropertySet.getCreativeNameForWay(node);
+                I18NString creativeName = wayPropertySet.getCreativeNameForWay(node);
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
@@ -325,7 +327,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
                 BikeRentalStation station = new BikeRentalStation();
                 station.id = "" + node.getId();
-                station.name = creativeName;
+                //FIXME: This is hack for translating bikeStation name
+                //Problem is what happens if this name is read from vertex.
+                //We have no idea from name that this is bikeRental
+                station.raw_name = creativeName;
                 station.x = node.lon;
                 station.y = node.lat;
                 // The following make sure that spaces+bikes=capacity, always.
@@ -349,12 +354,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     BikeRentalStationService.class, true);
             for (OSMNode node : osmdb.getBikeParkingNodes()) {
                 n++;
-                String creativeName = wayPropertySet.getCreativeNameForWay(node);
+                I18NString creativeName = wayPropertySet.getCreativeNameForWay(node);
+                //TODO: localize
                 if (creativeName == null)
-                    creativeName = "P+R";
+                    creativeName = new NonLocalizedString("P+R");
                 BikePark bikePark = new BikePark();
                 bikePark.id = "" + node.getId();
-                bikePark.name = creativeName;
+                //TODO: localize bikePark name
+                bikePark.name = creativeName.toString();
                 bikePark.x = node.lon;
                 bikePark.y = node.lat;
                 bikeRentalService.addBikePark(bikePark);
@@ -392,7 +399,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     BikeRentalStationService.class, true);
             Envelope envelope = new Envelope();
             long osmId = area.parent.getId();
-            String creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
+            I18NString creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
             for (Ring ring : area.outermostRings) {
                 for (OSMNode node : ring.nodes) {
                     envelope.expandToInclude(new Coordinate(node.lon, node.lat));
@@ -400,7 +407,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             BikePark bikePark = new BikePark();
             bikePark.id = "" + osmId;
-            bikePark.name = creativeName;
+            //TODO: localize 
+            bikePark.name = creativeName.toString();
             bikePark.x = (envelope.getMinX() + envelope.getMaxX()) / 2;
             bikePark.y = (envelope.getMinY() + envelope.getMaxY()) / 2;
             bikeRentalService.addBikePark(bikePark);
@@ -440,7 +448,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             Envelope envelope = new Envelope();
             // Process all nodes from outer rings
             List<IntersectionVertex> accessVertexes = new ArrayList<IntersectionVertex>();
-            String creativeName = null;
+            I18NString creativeName = null;
             long osmId = 0L;
             for (Area area : group.areas) {
                 osmId = area.parent.getId();
@@ -489,7 +497,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             if (!walkAccessibleOut || !carAccessibleIn) {
                 // This will prevent the P+R to be useful.
-                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked(creativeName, osmId)));
+                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked(creativeName.toString(), osmId)));
                 return false;
             }
             if (!walkAccessibleIn || !carAccessibleOut) {
@@ -698,9 +706,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private void setWayName(OSMWithTags way) {
             if (!way.hasTag("name")) {
-                String creativeName = wayPropertySet.getCreativeNameForWay(way);
+                I18NString creativeName = wayPropertySet.getCreativeNameForWay(way);
                 if (creativeName != null) {
-                    way.addTag("otp:gen_name", creativeName);
+                    //way.addTag("otp:gen_name", creativeName);
+                    way.setCreativeName(creativeName);
                 }
             }
         }
@@ -1026,7 +1035,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             String label = "way " + way.getId() + " from " + index;
             label = unique(label);
-            String name = getNameForWay(way, label);
+            I18NString name = getNameForWay(way, label);
 
             // consider the elevation gain of stairs, roughly
             boolean steps = way.isSteps();
@@ -1085,15 +1094,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         // TODO Set this to private once WalkableAreaBuilder is gone
-        protected String getNameForWay(OSMWithTags way, String id) {
-            String name = way.getAssumedName();
+        protected I18NString getNameForWay(OSMWithTags way, String id) {
+            I18NString name = way.getAssumedName();
 
             if (customNamer != null) {
-                name = customNamer.name(way, name);
+                name = new NonLocalizedString(customNamer.name(way, name.toString()));
             }
 
             if (name == null) {
-                name = id;
+                name = new NonLocalizedString(id);
             }
             return name;
         }
@@ -1119,7 +1128,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 Coordinate coordinate = getCoordinate(node);
                 String label = this.getLevelNodeLabel(node, level);
                 IntersectionVertex vertex = new IntersectionVertex(graph, label, coordinate.x,
-                        coordinate.y, label);
+                        coordinate.y, new NonLocalizedString(label));
                 vertices.put(level, vertex);
                 // multilevel nodes should also undergo turn-conversion
                 endpoints.add(vertex);
@@ -1172,7 +1181,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
 
                 if (iv == null) {
-                    iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
+                    iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, new NonLocalizedString(label));
                     if (node.hasTrafficLight()) {
                         iv.trafficLight = (true);
                     }

@@ -87,6 +87,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.Schedu
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class PlanGeneratorTest {
     private static final double F_DISTANCE[] = {3, 9996806.8, 3539050.5, 7, 2478638.8, 4, 2, 1, 0};
@@ -393,19 +394,19 @@ public class PlanGeneratorTest {
         BikeRentalStation exitDropoffStation = new BikeRentalStation();
 
         enterPickupStation.id = "Enter pickup";
-        enterPickupStation.name = "Enter pickup station";
+        enterPickupStation.raw_name = new NonLocalizedString("Enter pickup station");
         enterPickupStation.x = 180;
         enterPickupStation.y = 90;
         exitPickupStation.id = "Exit pickup";
-        exitPickupStation.name = "Exit pickup station";
+        exitPickupStation.raw_name = new NonLocalizedString("Exit pickup station");
         exitPickupStation.x = 180;
         exitPickupStation.y = 90;
         enterDropoffStation.id = "Enter dropoff";
-        enterDropoffStation.name = "Enter dropoff station";
+        enterDropoffStation.raw_name = new NonLocalizedString("Enter dropoff station");
         enterDropoffStation.x = 0;
         enterDropoffStation.y = 90;
         exitDropoffStation.id = "Exit dropoff";
-        exitDropoffStation.name = "Exit dropoff station";
+        exitDropoffStation.raw_name = new NonLocalizedString("Exit dropoff station");
         exitDropoffStation.x = 0;
         exitDropoffStation.y = 90;
 

@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 public class SimpleConcreteEdge extends Edge {
     private static final long serialVersionUID = 1L;
@@ -46,6 +47,11 @@ public class SimpleConcreteEdge extends Edge {
 
     @Override
     public String getName() {
+        return null;
+    }
+
+    @Override
+    public String getName(Locale locale) {
         return null;
     }
 

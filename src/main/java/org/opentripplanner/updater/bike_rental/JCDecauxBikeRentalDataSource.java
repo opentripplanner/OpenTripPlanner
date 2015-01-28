@@ -14,6 +14,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.updater.bike_rental;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.util.NonLocalizedString;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -60,7 +61,7 @@ public class JCDecauxBikeRentalDataSource extends GenericJSONBikeRentalDataSourc
         station.id = String.format("%d", node.path("number").asInt());
         station.x = node.path("position").path("lng").asDouble();
         station.y = node.path("position").path("lat").asDouble();
-        station.name = node.path("name").asText();
+        station.raw_name = new NonLocalizedString(node.path("name").asText());
         station.bikesAvailable = node.path("available_bikes").asInt();
         station.spacesAvailable = node.path("available_bike_stands").asInt();
         return station;

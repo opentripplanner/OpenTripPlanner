@@ -61,6 +61,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas
@@ -382,7 +383,7 @@ public class WalkableAreaBuilder {
 
             String label = "way (area) " + areaEntity.getId() + " from " + startEndpoint.getLabel()
                     + " to " + endEndpoint.getLabel();
-            String name = __handler.getNameForWay(areaEntity, label);
+            I18NString name = __handler.getNameForWay(areaEntity, label);
 
             AreaEdge street = edgeFactory.createAreaEdge(startEndpoint, endEndpoint, line, name,
                     length, areaPermissions, false, edgeList);
@@ -489,7 +490,7 @@ public class WalkableAreaBuilder {
             namedArea.setStreetClass(cls);
 
             String id = "way (area) " + areaEntity.getId() + " (splitter linking)";
-            String name = __handler.getNameForWay(areaEntity, id);
+            I18NString name = __handler.getNameForWay(areaEntity, id);
             namedArea.setName(name);
 
             WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);

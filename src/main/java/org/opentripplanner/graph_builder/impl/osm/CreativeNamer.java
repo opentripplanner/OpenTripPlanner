@@ -14,6 +14,8 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.LocalizedString;
 
 /**
  * A CreativeNamer makes up names for ways that don't have one in the OSM data set.
@@ -36,9 +38,9 @@ public class CreativeNamer {
 
     public CreativeNamer() {
     }
-
-    public String generateCreativeName(OSMWithTags way) {
-        return TemplateLibrary.generate(creativeNamePattern, way);
+   
+    public I18NString generateCreativeName(OSMWithTags way) {
+        return new LocalizedString(creativeNamePattern, way);
     }
 
     public void setCreativeNamePattern(String creativeNamePattern) {
