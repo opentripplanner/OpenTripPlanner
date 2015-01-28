@@ -421,6 +421,8 @@ public class GTFSPatternHopFactory {
 
         } // end foreach TRIP
         LOG.info("Added {} frequency-based and {} single-trip timetable entries.", freqCount, nonFreqCount);
+        graph.hasFrequencyService = graph.hasFrequencyService || freqCount > 0;
+        graph.hasScheduledService = graph.hasScheduledService || nonFreqCount > 0;
 
         /* Generate unique human-readable names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns.values());

@@ -188,6 +188,12 @@ public class Graph implements Serializable {
     /** True if direct single-edge transfers were generated between transit stops in this Graph. */
     public boolean hasDirectTransfers = false;
 
+    /** True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0). */
+    public boolean hasFrequencyService = false;
+
+    /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
+    public boolean hasScheduledService = false;
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
