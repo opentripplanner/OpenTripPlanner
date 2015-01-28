@@ -16,6 +16,7 @@ package org.opentripplanner.graph_builder.impl.osm;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -34,6 +35,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.util.LocalizedString;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -264,6 +266,16 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         namer.setCreativeNamePattern("Highway with cycleway {cycleway} and access {access} and morx {morx}");
         assertEquals("Highway with cycleway lane and access no and morx ",
                 namer.generateCreativeName(way).toString());
+    }
+
+    @Test
+    public void testLocalizedString() {
+        LocalizedString localizedString = new LocalizedString("corner",
+                new String[]{"first", "second"});
+
+        assertEquals("corner of first and second", localizedString.toString());
+        assertEquals("križišče first in second",
+                localizedString.toString(new Locale("sl")));
     }
 
     // disabled pending discussion with author (AMB)
