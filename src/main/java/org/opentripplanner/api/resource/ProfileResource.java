@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response.Status;
 import com.beust.jcommander.internal.Maps;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.analyst.TimeSurface;
-import org.opentripplanner.api.model.TimeSurfaceShort;
 import org.opentripplanner.api.param.HourMinuteSecond;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.QueryParameter;
@@ -28,10 +27,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.java2d.cmm.Profile;
 
 /**
  * A Jersey resource class which exposes OTP profile routing functionality as a web service.
