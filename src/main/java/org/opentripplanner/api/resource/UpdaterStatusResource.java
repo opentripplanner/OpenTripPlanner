@@ -1,10 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import com.oracle.deploy.update.Updater;
-import org.opentripplanner.common.geometry.DistanceLibrary;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.GraphUpdaterManager;
