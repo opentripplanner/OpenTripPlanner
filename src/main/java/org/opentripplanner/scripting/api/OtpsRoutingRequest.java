@@ -17,12 +17,14 @@ import java.util.Calendar;
 
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingRequest;
 
 /**
  * Routing request options: date/time, modes, max walk distance...
  * 
  * Example of code (python script):
+ * 
  * <pre>
  *   router = otp.getRouter()
  *   req = otp.createRequest()
@@ -102,5 +104,9 @@ public class OtpsRoutingRequest {
 
     public void setDestination(OtpsIndividual dest) {
         this.setDestination(dest.lat, dest.lon);
+    }
+
+    public void setBannedRoutes(String routeSpecList) {
+        req.bannedRoutes = RouteMatcher.parse(routeSpecList);
     }
 }
