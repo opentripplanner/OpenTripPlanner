@@ -128,6 +128,7 @@ public class TimeSurface implements Serializable {
         return result;
     }
 
+    // FIXME wait this is copying ObjectInt maps two times, just make the surfaces directly when propagating!
     public static RangeSet makeSurfaces(ProfileRouter profileRouter, TObjectIntMap<Vertex> lbs, TObjectIntMap<Vertex> ubs) {
         TimeSurface minSurface = new TimeSurface(profileRouter);
         TimeSurface avgSurface = new TimeSurface(profileRouter);
@@ -137,7 +138,7 @@ public class TimeSurface implements Serializable {
             int max = ubs.get(v);
             int avg = UNREACHABLE;
             if (min != UNREACHABLE && max != UNREACHABLE) {
-                avg = (int)((long)min + max / 2);
+                avg = (int)(((long)min + max) / 2); // FIXME HACK
             }
             minSurface.times.put(v, min);
             avgSurface.times.put(v, avg);
