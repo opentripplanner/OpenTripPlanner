@@ -128,33 +128,6 @@ public class TimeSurface implements Serializable {
         return result;
     }
 
-    // FIXME wait this is copying ObjectInt maps two times, just make the surfaces directly when propagating!
-    public static RangeSet makeSurfaces(ProfileRouter profileRouter, TObjectIntMap<Vertex> lbs, TObjectIntMap<Vertex> ubs) {
-        TimeSurface minSurface = new TimeSurface(profileRouter);
-        TimeSurface avgSurface = new TimeSurface(profileRouter);
-        TimeSurface maxSurface = new TimeSurface(profileRouter);
-        for (Vertex v : lbs.keySet()) {
-            int min = lbs.get(v);
-            int max = ubs.get(v);
-            int avg = UNREACHABLE;
-            if (min != UNREACHABLE && max != UNREACHABLE) {
-                avg = (int)(((long)min + max) / 2); // FIXME HACK
-            }
-            minSurface.times.put(v, min);
-            avgSurface.times.put(v, avg);
-            maxSurface.times.put(v, max);
-        }
-        // TODO merge with the version that takes AnalystProfileRouterPrototype, they are mostly the same.
-        RangeSet result = new RangeSet();
-        minSurface.description = "Travel times assuming best luck (never waiting for a transfer).";
-        avgSurface.description = "Expected travel times (average wait for every transfer).";
-        maxSurface.description = "Travel times assuming worst luck (maximum wait for every transfer).";
-        result.min = minSurface;
-        result.avg = avgSurface;
-        result.max = maxSurface;
-        return result;
-    }
-
     /** Groups together three TimeSurfaces as a single response for profile-analyst. */
     public static class RangeSet {
         public TimeSurface min;

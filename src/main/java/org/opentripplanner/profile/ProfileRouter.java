@@ -529,8 +529,9 @@ public class ProfileRouter {
     private void makeSurfaces() {
         LOG.info("Propagating from transit stops to the street network...");
         // A map to store the travel time to each vertex
-        TObjectIntMap<Vertex> lbs = new TObjectIntHashMap<>(1000000, 0.5f, TimeSurface.UNREACHABLE);
-        TObjectIntMap<Vertex> ubs = new TObjectIntHashMap<>(1000000, 0.5f, TimeSurface.UNREACHABLE);
+        TimeSurface minSurface = new TimeSurface(this);
+        TimeSurface avgSurface = new TimeSurface(this);
+        TimeSurface maxSurface = new TimeSurface(this);
         // Grab a cached map of distances to street intersections from each transit stop
         StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
         // Iterate over all nondominated rides at all clusters
@@ -552,22 +553,32 @@ public class ProfileRouter {
                     if (egressWalkTimeSeconds > request.maxWalkTime * 60) {
                         continue;
                     }
-                    int propagated_lb = lb0 + egressWalkTimeSeconds;
-                    int propagated_ub = ub0 + egressWalkTimeSeconds;
-                    int existing_lb = lbs.get(vertex);
-                    int existing_ub = ubs.get(vertex);
-                    if (existing_lb == TimeSurface.UNREACHABLE || existing_lb > propagated_lb) {
-                        lbs.put(vertex, propagated_lb);
+                    int propagated_min = lb0 + egressWalkTimeSeconds;
+                    int propagated_max = ub0 + egressWalkTimeSeconds;
+                    int propagated_avg = (int)(((long) propagated_min + propagated_max) / 2); // FIXME HACK
+                    int existing_min = minSurface.times.get(vertex);
+                    int existing_max = maxSurface.times.get(vertex);
+                    int existing_avg = avgSurface.times.get(vertex);
+                    // FIXME this is taking the least lower bound and the least upper bound
+                    // which is not necessarily wrong but it's a crude way to perform the combination
+                    if (existing_min == TimeSurface.UNREACHABLE || existing_min > propagated_min) {
+                        minSurface.times.put(vertex, propagated_min);
                     }
-                    if (existing_ub == TimeSurface.UNREACHABLE || existing_ub > propagated_ub) {
-                        ubs.put(vertex, propagated_ub);
+                    if (existing_max == TimeSurface.UNREACHABLE || existing_max > propagated_max) {
+                        maxSurface.times.put(vertex, propagated_max);
+                    }
+                    if (existing_avg == TimeSurface.UNREACHABLE || existing_avg > propagated_avg) {
+                        avgSurface.times.put(vertex, propagated_avg);
                     }
                 }
             }
         }
         LOG.info("Done with propagation.");
-        /* Store the result in a field in the router object. */
-        timeSurfaceRangeSet = TimeSurface.makeSurfaces(this, lbs, ubs);
+        /* Store the results in a field in the router object. */
+        timeSurfaceRangeSet = new TimeSurface.RangeSet();
+        timeSurfaceRangeSet.min = minSurface;
+        timeSurfaceRangeSet.max = maxSurface;
+        timeSurfaceRangeSet.avg = avgSurface;
     }
 
 }
