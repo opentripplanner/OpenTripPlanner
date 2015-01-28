@@ -196,7 +196,7 @@ public class GraphIndex {
         transfersFromStopCluster = HashMultimap.create();
         final double TRANSFER_RADIUS = 500.0; // meters
         Map<P2<TripPattern>, ProfileTransfer.GoodTransferList> transfers = Maps.newHashMap();
-        LOG.info("Finding transfers...");
+        LOG.info("Finding transfers between clusters...");
         for (StopCluster sc0 : stopClusterForId.values()) {
             Set<TripPattern> tripPatterns0 = patternsForStopCluster(sc0);
             // Accounts for area-like (rather than point-like) nature of clusters
