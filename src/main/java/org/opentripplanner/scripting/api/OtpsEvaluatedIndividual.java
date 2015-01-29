@@ -31,10 +31,14 @@ public class OtpsEvaluatedIndividual {
 
     private int boardings;
 
-    protected OtpsEvaluatedIndividual(OtpsIndividual individual, long time, int boardings) {
+    private double walkDistance;
+
+    protected OtpsEvaluatedIndividual(OtpsIndividual individual, long time, int boardings,
+            double walkDistance) {
         this.individual = individual;
         this.time = time;
         this.boardings = boardings;
+        this.walkDistance = walkDistance;
     }
 
     /**
@@ -56,6 +60,16 @@ public class OtpsEvaluatedIndividual {
         if (boardings == 255) // TODO Use a constant
             return null;
         return boardings;
+    }
+
+    /**
+     * @return The distance in meters walked to get to this point. Return null/None if no
+     *         information is available at this point.
+     */
+    public Double getWalkDistance() {
+        if (Double.isNaN(walkDistance))
+            return null;
+        return walkDistance;
     }
 
     /**

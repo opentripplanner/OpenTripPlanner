@@ -147,7 +147,8 @@ public class OtpsIndividual {
         if (time == Long.MAX_VALUE)
             return null;
         int boardings = cachedSample.evalBoardings(spt);
-        return new OtpsEvaluatedIndividual(this, time, boardings);
+        double walkDistance = cachedSample.evalWalkDistance(spt);
+        return new OtpsEvaluatedIndividual(this, time, boardings, walkDistance);
     }
 
     @Override
