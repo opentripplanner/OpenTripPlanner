@@ -359,6 +359,9 @@ otp.modules.planner.PlannerModule =
         }
         $('#otp-spinner').show();
 
+        //sends wanted translation to server
+        _.extend(queryParams, {locale : otp.config.locale.config.locale_short} );
+
         this.lastQueryParams = queryParams;
 
         this.planTripRequestCount = 0;
