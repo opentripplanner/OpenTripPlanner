@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.TranslatedString;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -146,7 +147,7 @@ public class OSMWithTags {
      */
     public I18NString getAssumedName() {
         if (_tags.containsKey("name"))
-            return new NonLocalizedString(_tags.get("name"));
+            return TranslatedString.getI18NString(getTagsByPrefix("name", true));
 
         if (_tags.containsKey("otp:route_name"))
             return new NonLocalizedString(_tags.get("otp:route_name"));
@@ -164,11 +165,23 @@ public class OSMWithTags {
     }
 
     public Map<String, String> getTagsByPrefix(String prefix) {
+        return getTagsByPrefix(prefix, false);
+    }
+
+    private Map<String, String> getTagsByPrefix(String prefix, boolean removePrefix) {
         Map<String, String> out = new HashMap<String, String>();
         for (Map.Entry<String, String> entry : _tags.entrySet()) {
             String k = entry.getKey();
             if (k.equals(prefix) || k.startsWith(prefix + ":")) {
-                out.put(k, entry.getValue());
+                if (removePrefix){
+                    if (k.equals(prefix)){
+                        out.put(null, entry.getValue());
+                    } else{
+                        out.put(k.replaceFirst(prefix + ":", ""), entry.getValue());
+                    }
+                } else {
+                    out.put(k, entry.getValue());
+                }
             }
         }
 
