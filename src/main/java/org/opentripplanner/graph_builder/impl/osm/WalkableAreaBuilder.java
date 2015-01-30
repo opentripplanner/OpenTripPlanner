@@ -293,8 +293,7 @@ public class WalkableAreaBuilder {
         }
         for (Edge edge : edges) {
             if (!usedEdges.contains(edge)) {
-                graph.streetNotesService.removeStaticNotes(edge);
-                edge.detach(graph);
+                graph.removeEdge(edge);
             }
         }
     }

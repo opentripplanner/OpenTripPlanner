@@ -560,21 +560,6 @@ public class StreetEdge extends Edge implements Cloneable {
         return true;
     }
 
-    protected boolean detachFrom(Graph graph) {
-        if (fromv != null) {
-            for (Edge e : fromv.getIncoming()) {
-                if (e instanceof StreetEdge) {
-                    for (TurnRestriction restriction : graph.getTurnRestrictions(e)) {
-                        if (restriction.to == this) {
-                            graph.removeTurnRestriction(e, restriction);
-                        }
-                    }
-                }
-            }
-        }
-        return super.detachFrom(graph);
-    }
-
 	@Override
 	public String getName() {
 		return this.name;

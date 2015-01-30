@@ -707,7 +707,7 @@ public class TestRequest extends TestCase {
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41820, 41820,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
         // Remove the timed transfer from the graph
-        timedTransferEdge.detach(graph);
+        graph.removeEdge(timedTransferEdge);
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
@@ -779,7 +779,7 @@ public class TestRequest extends TestCase {
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41820, 41820,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
         // Remove the timed transfer from the graph
-        timedTransferEdge.detach(graph);
+        graph.removeEdge(timedTransferEdge);
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
