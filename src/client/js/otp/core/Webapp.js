@@ -96,12 +96,12 @@ otp.core.Webapp = otp.Class({
         // set the logo & title
 
         if(otp.config.showLogo) {
-          //$('<div id="logo"><a href="'+otp.config.siteURL+'"><img src="'+otp.config.logoGraphic+'" style="height:100%"></a></div>').appendTo('#branding');
-            $(Mustache.render(otp.templates.img, {
+          //$('<div id="logo"><a href="'+otp.config.siteUrl+'"><img src="'+otp.config.logoGraphic+'" style="height:100%"></a></div>').appendTo('#branding');
+            $(Mustache.render(otp.templates.img, { 
                 src : otp.config.logoGraphic,
                 style : 'height:100%',
                 wrapLink : true,
-                linkHref : otp.config.siteURL,
+                linkHref : otp.config.siteUrl,
                 wrapDiv : true,
                 divId : 'logo'
             })).appendTo('#branding');
@@ -116,7 +116,7 @@ otp.core.Webapp = otp.Class({
         if(otp.config.siteName !== undefined) {
             document.title = otp.config.siteName;
             if(otp.config.showTitle) {
-                $("<div id='site-title'><a href='"+otp.config.siteURL+"'>"+otp.config.siteName+"</a></div>").appendTo('#branding');
+                $("<div id='site-title'><a href='"+otp.config.siteUrl+"'>"+otp.config.siteName+"</a></div>").appendTo('#branding');
             }
         }
 
@@ -147,7 +147,7 @@ otp.core.Webapp = otp.Class({
 
         if(otp.config.showAddThis) {
             var addThisHtml = '<div id="addthis" class="addthis_toolbox addthis_default_style"\n';
-            addThisHtml += 'addthis:url="'+otp.config.siteURL+'"\n';
+            addThisHtml += 'addthis:url="'+otp.config.siteUrl+'"\n';
             addThisHtml += 'addthis:title="'+otp.config.addThisTitle+'"\n';
             addThisHtml += 'addthis:description="'+otp.config.siteDescription+'">\n';
             addThisHtml += '<a class="addthis_button_twitter"></a>\n';
