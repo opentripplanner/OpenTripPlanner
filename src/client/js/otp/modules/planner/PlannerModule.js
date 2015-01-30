@@ -628,7 +628,7 @@ otp.modules.planner.PlannerModule =
     	window.location.hash = this.currentHash;
 
         /*var shareRoute = $("#share-route");
-        shareRoute.find(".addthis_toolbox").attr("addthis:url", otp.config.siteURL+"/#"+this.currentHash);
+        shareRoute.find(".addthis_toolbox").attr("addthis:url", otp.config.siteUrl+"/#"+this.currentHash);
         addthis.toolbox(".addthis_toolbox_route");*/
     },
 
