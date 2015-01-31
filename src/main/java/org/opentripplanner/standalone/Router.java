@@ -10,8 +10,8 @@ import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.SPTServiceFactory;
-import org.opentripplanner.routing.services.PathService;
 
 /**
  * Represents the configuration of a single router (a single graph for a specific geographic area)
@@ -26,7 +26,7 @@ public class Router {
      * command-line or properties file, etc...) and 2) starting / stopping real-time updaters
      * (delegated to the GraphUpdaterConfigurator class).
      * 
-     * @see GraphUpdaterConfigurator
+     * @see org.opentripplanner.updater.GraphUpdaterConfigurator
      */
     public interface LifecycleManager {
 
@@ -48,7 +48,7 @@ public class Router {
 
     // Core services
     public PlanGenerator planGenerator;
-    public PathService pathService;
+    public LongDistancePathService pathService;
     public SPTServiceFactory sptServiceFactory;
 
     // Inspector/debug services

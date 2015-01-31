@@ -34,7 +34,6 @@ import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -49,15 +48,21 @@ import java.util.Set;
 import static org.opentripplanner.routing.automata.Nonterminal.*;
 
 /**
- * This PathService is intended to provide faster response times when routing over longer
- * distances (e.g. across the entire Netherlands). It only uses the street network at the first
- * and last legs of the trip, and all other transfers between transit vehicles will occur via
- * SimpleTransfer edges which must be created by the graph builder.
+ * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
+ * the graph until the requested number of them have been found.
+ * It is used in point-to-point (i.e. not one-to-many / analyst) routing.
+ *
+ * Its exact behavior will depend on whether the routing request allows transit.
+ *
+ * When using transit it will incorporate techniques from what we called "long distance" mode, which is designed to
+ * provide reasonable response times when routing over large graphs (e.g. the entire Netherlands or New York State).
+ * In this case it only uses the street network at the first and last legs of the trip, and all other transfers
+ * between transit vehicles will occur via SimpleTransfer edges which are pre-computed by the graph builder.
  * 
  * More information is available on the OTP wiki at:
  * https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs 
  */
-public class LongDistancePathService implements PathService {
+public class LongDistancePathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LongDistancePathService.class);
 
@@ -66,6 +71,10 @@ public class LongDistancePathService implements PathService {
 
     private Graph graph;
     private SPTServiceFactory sptServiceFactory;
+
+    public RemainingWeightHeuristic heuristic;
+    public boolean x;
+
 
     public LongDistancePathService(Graph graph, SPTServiceFactory sptServiceFactory) {
         this.graph = graph;
@@ -76,7 +85,6 @@ public class LongDistancePathService implements PathService {
     private static double[] timeouts = new double[] {5, 2, 1, 0.5, 0.25};
 	private SPTVisitor sptVisitor;
     
-    @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
 
         if (options == null) {
@@ -131,19 +139,15 @@ public class LongDistancePathService implements PathService {
                 return null;
             }
             if (options.rctx.aborted) break;
-//            if( this.sptVisitor!=null ){
-//                this.sptVisitor.spt = spt;
-//            }
             List<GraphPath> newPaths = spt.getPaths();
             if (newPaths.isEmpty()) break;
-            // Find all trips used in this path and ban them
+            // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 for (State state : path.states) {
                     AgencyAndId tripId = state.getTripId();
                     if (tripId != null) options.banTrip(tripId);
                 }
             }
-            //spt.getPaths().get(0).dump();
             paths.addAll(newPaths);
             LOG.debug("we have {} paths", paths.size());
         }
@@ -250,7 +254,6 @@ public class LongDistancePathService implements PathService {
 
     }
 
-	@Override
 	public void setSPTVisitor(SPTVisitor vis) {
 		this.sptVisitor = vis;
 	}

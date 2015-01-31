@@ -40,8 +40,6 @@ import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.LongDistancePathService;
-import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -55,7 +53,7 @@ public abstract class GtfsTest extends TestCase {
     public Graph graph;
     AlertsUpdateHandler alertsUpdateHandler;
     PlanGenerator planGenerator;
-    PathService pathService;
+    LongDistancePathService pathService;
     GenericAStarFactory genericAStar;
     TimetableSnapshotSource timetableSnapshotSource;
     AlertPatchServiceImpl alertPatchServiceImpl;
@@ -106,7 +104,8 @@ public abstract class GtfsTest extends TestCase {
         if (isLongDistance()) {
             pathService = new LongDistancePathService(null, genericAStar);
         } else {
-            pathService = new RetryingPathServiceImpl(null, genericAStar);
+            // FIXME there is now only one path service but apparently all GTFSTests are isLongDistance()
+            pathService = null; // new RetryingPathServiceImpl(null, genericAStar);
         }
         planGenerator = new PlanGenerator(null, pathService);
     }

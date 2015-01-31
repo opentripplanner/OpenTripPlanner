@@ -83,9 +83,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.LongDistancePathService;
-import org.opentripplanner.routing.impl.ParetoPathService;
 import org.opentripplanner.routing.impl.SPTVisitor;
-import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -369,7 +367,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JList<GraphBuilderAnnotation> annotationMatches;
     
-    private PathService pathservice;
+    private LongDistancePathService pathservice;
         
     private GenericAStarFactory sptServiceFactory = new GenericAStarFactory();
 
@@ -460,7 +458,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         LOG.info("Starting up graph visualizer...");
         
         this.graph = graph;
-        this.pathservice = new ParetoPathService(graph, sptServiceFactory);
+        this.pathservice = new LongDistancePathService(graph, sptServiceFactory);
         setTitle("GraphVisualizer");
         
         init();
@@ -775,7 +773,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		if( selected ){
 			this.pathservice = new LongDistancePathService(graph, sptServiceFactory);
 		} else {
-			this.pathservice = new ParetoPathService(graph, sptServiceFactory);
+            // FIXME there is now only one path service
+			this.pathservice = null; // new ParetoPathService(graph, sptServiceFactory);
 		}
 	}
 
