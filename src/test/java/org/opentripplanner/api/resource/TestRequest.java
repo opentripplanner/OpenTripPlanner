@@ -75,14 +75,12 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -241,7 +239,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testPlanner() throws Exception {
-        TestPlanner planner = new TestPlanner(
+        TestPlannerResource planner = new TestPlannerResource(
                 "portland", "From::NE 43RD AVE at NE GLISAN ST", "To::NE 43RD AVE at NE ROYAL CT");
 
         Response response = planner.getItineraries();
@@ -269,7 +267,7 @@ public class TestRequest extends TestCase {
 
     public void testAlerts() throws Exception {
         // SE 47th and Ash, NE 47th and Davis (note that we cross Burnside, this goes from SE to NE)
-        TestPlanner planner = new TestPlanner(
+        TestPlannerResource planner = new TestPlannerResource(
                 "portland", "SE 47TH AVE at SE ASH ST", "NE 47TH AVE at NE COUCH ST");
         Response response = planner.getItineraries();
 
@@ -300,7 +298,7 @@ public class TestRequest extends TestCase {
         assertNotNull(v3);
         assertNotNull(v4);
 
-        TestPlanner planner = new TestPlanner("portland", v1.getLabel(), v4.getLabel(),
+        TestPlannerResource planner = new TestPlannerResource("portland", v1.getLabel(), v4.getLabel(),
                 Arrays.asList(v2.getLabel(), v3.getLabel()));
         TripPlan plan = planner.getItineraries().getPlan();
         Itinerary itinerary = plan.itinerary.get(0);
@@ -385,7 +383,7 @@ public class TestRequest extends TestCase {
 
     public void testBannedTrips() {
         // Plan short trip along NE GLISAN ST
-        TestPlanner planner = new TestPlanner(
+        TestPlannerResource planner = new TestPlannerResource(
                 "portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
         // Ban trips with ids 190W1280 and 190W1260 from agency with id TriMet
         planner.setBannedTrips(Arrays.asList("TriMet:190W1280,TriMet:190W1260"));
@@ -401,7 +399,7 @@ public class TestRequest extends TestCase {
 
     public void testBannedStops() throws ParameterException {
         // Plan short trip along NE GLISAN ST
-        TestPlanner planner = new TestPlanner(
+        TestPlannerResource planner = new TestPlannerResource(
                 "portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
         // Ban stops with ids 2106 and 2107 from agency with id TriMet
         // These are the two stops near NE 30TH AVE at NE GLISAN ST
@@ -452,7 +450,7 @@ public class TestRequest extends TestCase {
 
     public void testBannedStopsHard() throws ParameterException {
         // Plan short trip along NE GLISAN ST
-        TestPlanner planner = new TestPlanner(
+        TestPlannerResource planner = new TestPlannerResource(
                 "portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
 
         // Do the planning
@@ -527,7 +525,7 @@ public class TestRequest extends TestCase {
  * @param smaller if true, number of legs should be smaller;
  *                if false, number of legs should be exact
  */
-    private void checkLegsWithTransferPenalty(TestPlanner planner, int transferPenalty,
+    private void checkLegsWithTransferPenalty(TestPlannerResource planner, int transferPenalty,
             int expectedLegs, boolean smaller) {
         // Set transfer penalty
         planner.setTransferPenalty(Arrays.asList(transferPenalty));
@@ -678,7 +676,7 @@ public class TestRequest extends TestCase {
         ServiceDate serviceDate = new ServiceDate(2009, 10, 01);
 
         // Plan short trip
-        TestPlanner planner = new TestPlanner(
+        TestPlannerResource planner = new TestPlannerResource(
                 "portland", "45.506077,-122.621139", "45.464637,-122.706061");
 
         // Replace the transfer table with an empty table
@@ -741,7 +739,7 @@ public class TestRequest extends TestCase {
         ServiceDate serviceDate = new ServiceDate(2009, 10, 01);
 
         // Plan short trip
-        TestPlanner planner = new TestPlanner(
+        TestPlannerResource planner = new TestPlannerResource(
                 "portland", "45.506077,-122.621139", "45.464637,-122.706061");
 
         // Replace the transfer table with an empty table
@@ -898,8 +896,8 @@ public class TestRequest extends TestCase {
      * Subclass of Planner for testing. Constructor sets fields that would usually be set by Jersey
      * from HTTP Query string.
      */
-    private static class TestPlanner extends Planner {
-        public TestPlanner(String routerId, String v1, String v2) {
+    private static class TestPlannerResource extends PlannerResource {
+        public TestPlannerResource(String routerId, String v1, String v2) {
             super();
             this.fromPlace = Arrays.asList(v1);
             this.toPlace = Arrays.asList(v2);
@@ -921,7 +919,7 @@ public class TestRequest extends TestCase {
             this.otpServer = Context.getInstance().otpServer;
         }
 
-        public TestPlanner(String routerId, String v1, String v2, List<String> intermediates) {
+        public TestPlannerResource(String routerId, String v1, String v2, List<String> intermediates) {
             this(routerId, v1, v2);
             this.modes = Arrays.asList(new QualifiedModeSetSequence("WALK"));
             this.intermediatePlaces = intermediates;

@@ -10,7 +10,7 @@ import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.LongDistancePathService;
+import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.SPTServiceFactory;
 
 /**
@@ -48,7 +48,7 @@ public class Router {
 
     // Core services
     public PlanGenerator planGenerator;
-    public LongDistancePathService pathService;
+    public GraphPathFinder pathService;
     public SPTServiceFactory sptServiceFactory;
 
     // Inspector/debug services

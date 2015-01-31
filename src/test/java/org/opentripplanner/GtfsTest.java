@@ -30,16 +30,14 @@ import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GenericAStarFactory;
-import org.opentripplanner.routing.impl.LongDistancePathService;
+import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -53,7 +51,7 @@ public abstract class GtfsTest extends TestCase {
     public Graph graph;
     AlertsUpdateHandler alertsUpdateHandler;
     PlanGenerator planGenerator;
-    LongDistancePathService pathService;
+    GraphPathFinder pathService;
     GenericAStarFactory genericAStar;
     TimetableSnapshotSource timetableSnapshotSource;
     AlertPatchServiceImpl alertPatchServiceImpl;
@@ -102,7 +100,7 @@ public abstract class GtfsTest extends TestCase {
 
         genericAStar = new GenericAStarFactory();
         if (isLongDistance()) {
-            pathService = new LongDistancePathService(null, genericAStar);
+            pathService = new GraphPathFinder(null, genericAStar);
         } else {
             // FIXME there is now only one path service but apparently all GTFSTests are isLongDistance()
             pathService = null; // new RetryingPathServiceImpl(null, genericAStar);

@@ -50,7 +50,7 @@ import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
-import org.opentripplanner.routing.impl.LongDistancePathService;
+import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -283,7 +283,7 @@ public class OTPConfigurator {
 
             router.sptServiceFactory = new GenericAStarFactory();
             // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
-            router.pathService = new LongDistancePathService(router.graph, router.sptServiceFactory);
+            router.pathService = new GraphPathFinder(router.graph, router.sptServiceFactory);
             router.planGenerator = new PlanGenerator(router.graph, router.pathService);
             router.tileRendererManager = new TileRendererManager(router.graph);
 

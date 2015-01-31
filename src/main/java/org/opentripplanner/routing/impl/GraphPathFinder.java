@@ -45,8 +45,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.opentripplanner.routing.automata.Nonterminal.*;
-
 /**
  * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
  * the graph until the requested number of them have been found.
@@ -62,9 +60,9 @@ import static org.opentripplanner.routing.automata.Nonterminal.*;
  * More information is available on the OTP wiki at:
  * https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs 
  */
-public class LongDistancePathService {
+public class GraphPathFinder {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LongDistancePathService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphPathFinder.class);
 
     private static final double DEFAULT_MAX_WALK = 2000;
     private static final double CLAMP_MAX_WALK = 15000;
@@ -76,7 +74,7 @@ public class LongDistancePathService {
     public boolean x;
 
 
-    public LongDistancePathService(Graph graph, SPTServiceFactory sptServiceFactory) {
+    public GraphPathFinder(Graph graph, SPTServiceFactory sptServiceFactory) {
         this.graph = graph;
         this.sptServiceFactory = sptServiceFactory;
     }

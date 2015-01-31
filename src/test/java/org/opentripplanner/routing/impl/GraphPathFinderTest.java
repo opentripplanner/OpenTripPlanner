@@ -31,11 +31,11 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.impl.LongDistancePathService.Parser;
+import org.opentripplanner.routing.impl.GraphPathFinder.Parser;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-public class LongDistancePathServiceTest {
+public class GraphPathFinderTest {
     @Test
     public final void testTerminalFor() {
         // Create a long distance path parser

@@ -59,7 +59,7 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.LongDistancePathService;
+import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -81,10 +81,10 @@ public class PlanGenerator {
 
     private static final double MAX_ZAG_DISTANCE = 30;
 
-    public LongDistancePathService pathService;
+    public GraphPathFinder pathService;
     public Graph graph;
 
-    public PlanGenerator(Graph graph, LongDistancePathService pathService) {
+    public PlanGenerator(Graph graph, GraphPathFinder pathService) {
         this.graph = graph;
         this.pathService = pathService;
     }

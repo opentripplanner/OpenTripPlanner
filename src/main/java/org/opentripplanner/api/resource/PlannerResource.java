@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the primary entry point for the trip planning web service.
  * All parameters are passed in the query string. These parameters are defined in the abstract
- * SearchResource superclass, which also has methods for building routing requests from query
+ * RoutingResource superclass, which also has methods for building routing requests from query
  * parameters. In order for inheritance to work, the REST resources are actually request-scoped 
  * rather than singleton-scoped.
  * 
@@ -44,9 +44,9 @@ import org.slf4j.LoggerFactory;
  *         client making the request.
  */
 @Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
-public class Planner extends RoutingResource {
+public class PlannerResource extends RoutingResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PlannerResource.class);
 
     // We inject info about the incoming request so we can include the incoming query
     // parameters in the outgoing response. This is a TriMet requirement.
