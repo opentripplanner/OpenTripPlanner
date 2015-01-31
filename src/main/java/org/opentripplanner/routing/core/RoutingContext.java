@@ -32,7 +32,7 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
+import org.opentripplanner.routing.impl.EuclideanRemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -62,7 +62,7 @@ public class RoutingContext implements Cloneable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
 
-    private static RemainingWeightHeuristicFactory heuristicFactory = new DefaultRemainingWeightHeuristicFactoryImpl();
+    private static RemainingWeightHeuristicFactory heuristicFactory = new EuclideanRemainingWeightHeuristicFactory();
 
     /* FINAL FIELDS */
 

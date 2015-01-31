@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
@@ -26,16 +26,13 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andrewbyrd
  */
-public class DefaultRemainingWeightHeuristicFactoryImpl 
-    implements RemainingWeightHeuristicFactory {
+public class EuclideanRemainingWeightHeuristicFactory implements RemainingWeightHeuristicFactory {
 
-    private static final Logger LOG = 
-    	LoggerFactory.getLogger(DefaultRemainingWeightHeuristicFactoryImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EuclideanRemainingWeightHeuristicFactory.class);
 
     @Override
     public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
-        //LOG.debug("Using Euclidean heuristic independent of search type.");
-        return new DefaultRemainingWeightHeuristic();
+        return new EuclideanRemainingWeightHeuristic();
     }
 
 }

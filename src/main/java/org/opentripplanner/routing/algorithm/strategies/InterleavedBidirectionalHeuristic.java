@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import java.util.List;
-import java.util.Map;
 
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -37,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public class InterleavedBidirectionalHeuristic implements RemainingWeightHeuristic {
 
@@ -334,7 +332,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 return new InterleavedBidirectionalHeuristic (opt.rctx.graph);
             } else {
                 LOG.debug("Non-transit itinerary requested.");
-                return new DefaultRemainingWeightHeuristic();
+                return new EuclideanRemainingWeightHeuristic();
             }
         }
     }

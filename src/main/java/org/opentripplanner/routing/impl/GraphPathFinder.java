@@ -22,7 +22,7 @@ import static org.opentripplanner.routing.automata.Nonterminal.plus;
 import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
 
-import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -107,7 +107,7 @@ public class GraphPathFinder {
            // Only use the BiDi heuristic for transit.
             heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
         } else {
-            heuristic = new DefaultRemainingWeightHeuristic();
+            heuristic = new EuclideanRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
         /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see 

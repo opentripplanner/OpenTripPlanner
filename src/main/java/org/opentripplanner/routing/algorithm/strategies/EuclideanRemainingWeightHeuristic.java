@@ -33,10 +33,10 @@ import org.slf4j.LoggerFactory;
  * A Euclidean remaining weight strategy that takes into account transit boarding costs where applicable.
  * 
  */
-public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic {
+public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     private static final long serialVersionUID = -5172878150967231550L;
-    private static Logger LOG = LoggerFactory.getLogger(DefaultRemainingWeightHeuristic.class);
+    private static Logger LOG = LoggerFactory.getLogger(EuclideanRemainingWeightHeuristic.class);
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     private double lat;
