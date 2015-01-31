@@ -136,6 +136,10 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--autoReload"}, description = "Auto-reload registered graphs when source data is modified.")
     public boolean autoReload = false;
 
+    @Parameter(names = {"--longDistance"},
+            description = "Use an algorithm tailored for big graphs (the size of New York or the Netherlands).")
+    public boolean longDistance = false;
+
     @Parameter(names = {"--port"}, validateWith = AvailablePort.class,
             description = "Server port for plain HTTP.")
     public Integer port;

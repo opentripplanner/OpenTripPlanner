@@ -220,9 +220,9 @@ public class OTPConfigurator {
                 graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
             }
-            // The stops are linked to the street network. They can now be linked to one another with transfer edges.
-            if (!params.useTransfersTxt) {
-                // This module will use streets or straight line distance depending on whether OSM data is in the graph.
+            // The stops can be linked to each other once they are already linked to the street network.
+            if (params.longDistance && !params.useTransfersTxt) {
+                // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addGraphBuilder(new DirectTransferGenerator());
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
@@ -284,8 +284,19 @@ public class OTPConfigurator {
 
             router.sptServiceFactory = new GenericAStarFactory();
             // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
-            LongDistancePathService pathService = new LongDistancePathService(router.graph, router.sptServiceFactory);
-            router.pathService = pathService;
+            if (params.longDistance) {
+                LongDistancePathService pathService = new LongDistancePathService(router.graph,
+                        router.sptServiceFactory);
+                router.pathService = pathService;
+            } else {
+                RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(router.graph,
+                        router.sptServiceFactory);
+                pathService.setFirstPathTimeout(10.0);
+                pathService.setMultiPathTimeout(1.0);
+                router.pathService = pathService;
+                // cpf.bind(RemainingWeightHeuristicFactory.class,
+                //        new DefaultRemainingWeightHeuristicFactoryImpl());
+            }
             router.planGenerator = new PlanGenerator(router.graph, router.pathService);
             router.tileRendererManager = new TileRendererManager(router.graph);
 
