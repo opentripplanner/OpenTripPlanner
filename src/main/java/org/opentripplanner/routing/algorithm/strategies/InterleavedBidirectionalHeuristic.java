@@ -26,7 +26,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -320,17 +319,4 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         return stopStates;
     }
  
-    public static class Factory implements RemainingWeightHeuristicFactory {
-        @Override
-        public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
-            if (opt.modes.isTransit()) {
-                LOG.debug("Transit itinerary requested.");
-                return new InterleavedBidirectionalHeuristic (opt.rctx.graph);
-            } else {
-                LOG.debug("Non-transit itinerary requested.");
-                return new EuclideanRemainingWeightHeuristic();
-            }
-        }
-    }
-
 }
