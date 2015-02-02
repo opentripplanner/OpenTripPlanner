@@ -81,7 +81,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.SPTVisitor;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -369,8 +368,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     
     private GraphPathFinder pathservice;
         
-    private GenericAStarFactory sptServiceFactory = new GenericAStarFactory();
-
     private DefaultListModel<String> metadataModel;
 
     private HashSet<Vertex> closed;
@@ -583,7 +580,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // init center graphical panel
         showGraph = new ShowGraph(this, getGraph());
         pane.add(showGraph, BorderLayout.CENTER);
-        sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
 
         // init left panel
         leftPanel = new JPanel();
@@ -1468,12 +1464,15 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.numItineraries = ( Integer.parseInt( this.nPaths.getText() ) );
         
         // apply callback if the options call for it
+        /*
+            TODO apply this to the GenericAStar directly instaed of a wrapping "service"
         if( dontUseGraphicalCallbackCheckBox.isSelected() ){
         	sptServiceFactory.setTraverseVisitor(null);
         } else {
         	sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
         }
-        
+     */
+
         // set up a visitor to the path service so we can get the SPT as it's generated
         SPTVisitor vis = new SPTVisitor();
         // pathservice.setSPTVisitor(vis);

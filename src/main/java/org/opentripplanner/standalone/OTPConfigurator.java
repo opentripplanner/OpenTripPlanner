@@ -46,7 +46,6 @@ import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderI
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.GraphPathFinder;

@@ -36,7 +36,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
@@ -51,7 +50,6 @@ public abstract class GtfsTest extends TestCase {
 
     public Graph graph;
     AlertsUpdateHandler alertsUpdateHandler;
-    GenericAStarFactory genericAStar;
     TimetableSnapshotSource timetableSnapshotSource;
     AlertPatchServiceImpl alertPatchServiceImpl;
 
@@ -96,8 +94,6 @@ public abstract class GtfsTest extends TestCase {
             timetableSnapshotSource.applyTripUpdates(updates, agencyId);
             alertsUpdateHandler.update(feedMessage);
         } catch (Exception exception) {}
-
-        genericAStar = new GenericAStarFactory();
     }
 
     public Leg plan(long dateTime, String fromVertex, String toVertex, String onTripId,
