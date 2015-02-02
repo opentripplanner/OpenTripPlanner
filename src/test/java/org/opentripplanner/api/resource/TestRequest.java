@@ -897,6 +897,7 @@ public class TestRequest extends TestCase {
      * from HTTP Query string.
      */
     private static class TestPlannerResource extends PlannerResource {
+
         public TestPlannerResource(String routerId, String v1, String v2) {
             super();
             this.fromPlace = Arrays.asList(v1);
@@ -954,7 +955,7 @@ public class TestRequest extends TestCase {
         }
 
         public Response getItineraries() {
-            return getItineraries(otpServer, null);
+            return plan(otpServer, null);
         }
 
         public Response getFirstTrip() {

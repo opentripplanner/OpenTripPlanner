@@ -458,7 +458,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         LOG.info("Starting up graph visualizer...");
         
         this.graph = graph;
-        this.pathservice = new GraphPathFinder(graph, sptServiceFactory);
+        this.pathservice = null; // FIXME
         setTitle("GraphVisualizer");
         
         init();
@@ -771,7 +771,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	protected void setLongDistanceMode(boolean selected) {
 		if( selected ){
-			this.pathservice = new GraphPathFinder(graph, sptServiceFactory);
+            // FIXME there is no OTPServer in the visualizer! Maybe just don't use a GraphPathFinder (ex-pathservice) at all and call the GenericAStar directly.
+			this.pathservice = null; // new GraphPathFinder(otpServer);
 		} else {
             // FIXME there is now only one path service
 			this.pathservice = null; // new ParetoPathService(graph, sptServiceFactory);
@@ -1475,7 +1476,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         // set up a visitor to the path service so we can get the SPT as it's generated
         SPTVisitor vis = new SPTVisitor();
-        pathservice.setSPTVisitor(vis);
+        // pathservice.setSPTVisitor(vis);
+        // TODO set visitor -- perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
         
         long t0 = System.currentTimeMillis();
         // TODO: check options properly intialized (AMB)

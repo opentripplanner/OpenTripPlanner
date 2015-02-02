@@ -21,14 +21,25 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.collect.Lists;
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.impl.GenericAStarFactory;
+import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * This is the primary entry point for the trip planning web service.
@@ -53,7 +64,7 @@ public class PlannerResource extends RoutingResource {
     // Jersey uses @Context to inject internal types and @InjectParam or @Resource for DI objects.
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
-    public Response getItineraries(@Context OTPServer otpServer, @Context UriInfo uriInfo) {
+    public Response plan(@Context OTPServer otpServer, @Context UriInfo uriInfo) {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -67,11 +78,19 @@ public class PlannerResource extends RoutingResource {
         Response response = new Response(uriInfo);
         RoutingRequest request = null;
         try {
-            // fill in request from query parameters via shared superclass method
+
+            /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
             request = super.buildRequest();
+
+            /* Find some good GraphPaths through the OTP Graph. */
             Router router = otpServer.getRouter(request.routerId);
-            TripPlan plan = router.planGenerator.generate(request);
+            GraphPathFinder gpFinder = new GraphPathFinder(router.graph); // or maybe get a persistent router-scoped GraphPathFinder?
+            List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
+
+            /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */
+            TripPlan plan = PlanGenerator.generatePlan(paths, request);
             response.setPlan(plan);
+
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
             if(!PlannerError.isPlanningError(e.getClass()))

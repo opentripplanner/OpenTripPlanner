@@ -360,15 +360,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean disableRemainingWeightHeuristic = false;
 
     /**
-     * The routing context used to actually carry out this search. It is important to build States from TraverseOptions rather than RoutingContexts,
-     * and just keep a reference to the context in the TraverseOptions, rather than using RoutingContexts for everything because in some testing and
-     * graph building situations we need to build a bunch of initial states with different times and vertices from a single TraverseOptions, without
-     * setting all the transit context or building temporary vertices (with all the exception-throwing checks that entails).
+     * The routing context used to actually carry out this search. It is important to build States from TraverseOptions
+     * rather than RoutingContexts,and just keep a reference to the context in the TraverseOptions, rather than using
+     * RoutingContexts for everything because in some testing and graph building situations we need to build a bunch of
+     * initial states with different times and vertices from a single TraverseOptions, without setting all the transit
+     * context or building temporary vertices (with all the exception-throwing checks that entails).
      * 
-     * While they are conceptually separate, TraverseOptions does maintain a reference to its accompanying RoutingContext (and vice versa) so that
-     * both do not need to be passed/injected separately into tight inner loops within routing algorithms. These references should be set to null when
-     * the request scope is torn down -- the routing context becomes irrelevant at that point, since temporary graph elements have been removed and
-     * the graph may have been reloaded.
+     * While they are conceptually separate, TraverseOptions does maintain a reference to its accompanying
+     * RoutingContext (and vice versa) so that both do not need to be passed/injected separately into tight inner loops
+     * within routing algorithms. These references should be set to null when the request scope is torn down -- the
+     * routing context becomes irrelevant at that point, since temporary graph elements have been removed and the graph
+     * may have been reloaded.
      */
     public RoutingContext rctx;
 
@@ -391,7 +393,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
     public double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
 
-    /* Additional flags affecting mode transitions. This is a temporary solution, as it only covers parking and rental at the beginning of the trip. */
+    /*
+      Additional flags affecting mode transitions.
+      This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
+    */
     public boolean allowBikeRental = false;
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;

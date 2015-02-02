@@ -53,8 +53,7 @@ public class StreetSegment {
         }
         Geometry geom = GeometryUtils.getGeometryFactory().createLineString(coordinates);
         this.geometry = PolylineEncoder.createEncodings(geom);
-        PlanGenerator pgen = new PlanGenerator(null, null);
-        Itinerary itin = pgen.generateItinerary(path, false);
+        Itinerary itin = PlanGenerator.generateItinerary(path, false);
         for (Leg leg : itin.legs) {
             walkSteps.addAll(leg.walkSteps);
         }

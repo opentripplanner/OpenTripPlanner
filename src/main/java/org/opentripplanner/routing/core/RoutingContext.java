@@ -53,10 +53,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph. Includes things like
- * (temporary) endpoint vertices, transfer tables, service day caches, etc.
- * 
- * @author abyrd
+ * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
+ * Includes things like (temporary) endpoint vertices, transfer tables, service day caches, etc.
+ *
+ * In addition, while the RoutingRequest should only carry parameters _in_ to the routing operation, the routing context
+ * should be used to carry information back out, such as debug figures or flags that certain thresholds have been exceeded.
  */
 public class RoutingContext implements Cloneable {
 
@@ -121,7 +122,10 @@ public class RoutingContext implements Cloneable {
 
     /** Indicates that the search timed out or was otherwise aborted. */
     public boolean aborted;
-    
+
+    /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
+    public boolean slopeRestrictionRemoved = false;
+
     /* CONSTRUCTORS */
 
     /**

@@ -104,8 +104,6 @@ public class PlanGeneratorTest {
     private static final String alertsExample =
             "Mine is the last voice that you will ever hear. Do not be alarmed.";
 
-    private static final PlanGenerator planGenerator = new PlanGenerator(null, null);
-
     /**
      * Test the generateItinerary() method. This test is intended to be comprehensive but fast.
      * Any future changes to the generateItinerary() method should be accompanied by changes in this
@@ -115,9 +113,9 @@ public class PlanGeneratorTest {
     public void testGenerateItinerary() {
         GraphPath[] graphPaths = buildPaths();
 
-        compare(planGenerator.generateItinerary(graphPaths[0], true), Type.FORWARD);
-        compare(planGenerator.generateItinerary(graphPaths[1], true), Type.BACKWARD);
-        compare(planGenerator.generateItinerary(graphPaths[2], true), Type.ONBOARD);
+        compare(PlanGenerator.generateItinerary(graphPaths[0], true), Type.FORWARD);
+        compare(PlanGenerator.generateItinerary(graphPaths[1], true), Type.BACKWARD);
+        compare(PlanGenerator.generateItinerary(graphPaths[2], true), Type.ONBOARD);
     }
 
     /**
@@ -129,7 +127,7 @@ public class PlanGeneratorTest {
         // Reuse testGenerateItinerary()'s graph path, but shorten it
         GraphPath graphPath = new GraphPath(buildPaths()[0].states.get(3), false);
 
-        Itinerary itinerary = planGenerator.generateItinerary(graphPath, false);
+        Itinerary itinerary = PlanGenerator.generateItinerary(graphPath, false);
 
         assertEquals(1, itinerary.legs.size());
         assertEquals("WALK", itinerary.legs.get(0).mode);

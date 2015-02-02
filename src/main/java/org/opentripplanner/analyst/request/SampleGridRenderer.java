@@ -23,6 +23,7 @@ import org.opentripplanner.common.geometry.IsolineBuilder;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.ZSampleGrid;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.impl.SPTServiceFactory;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.spt.EarliestArrivalShortestPathTree;
 import org.opentripplanner.routing.spt.SPTWalker;
 import org.opentripplanner.routing.spt.SPTWalker.SPTVisitor;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -58,11 +60,9 @@ public class SampleGridRenderer {
     private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private Graph graph;
-    private SPTServiceFactory sptServiceFactory;
 
-    public SampleGridRenderer(Graph graph, SPTServiceFactory sptServiceFactory) {
+    public SampleGridRenderer(Graph graph) {
         this.graph = graph;
-        this.sptServiceFactory = sptServiceFactory;
     }
 
     /**
@@ -83,7 +83,8 @@ public class SampleGridRenderer {
         sptRequest.batch = (true);
         sptRequest.setRoutingContext(graph);
         sptRequest.rctx.pathParsers = new PathParser[] { new BasicPathParser(), new NoThruTrafficPathParser() };
-        final ShortestPathTree spt = sptServiceFactory.instantiate().getShortestPathTree(sptRequest);
+        // TODO swap in different state dominance logic (earliest arrival, pareto, etc.)
+        final ShortestPathTree spt = new GenericAStar().getShortestPathTree(sptRequest);
 
         // 3. Create a sample grid based on the SPT.
         long t1 = System.currentTimeMillis();

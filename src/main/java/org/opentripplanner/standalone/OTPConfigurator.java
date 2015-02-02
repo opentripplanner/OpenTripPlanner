@@ -22,7 +22,6 @@ import java.util.zip.ZipFile;
 
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.Renderer;
-import org.opentripplanner.analyst.request.SPTCache;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
@@ -281,21 +280,14 @@ public class OTPConfigurator {
         @Override
         public void startupRouter(Router router, Preferences config) {
 
-            router.sptServiceFactory = new GenericAStarFactory();
-            // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
-            router.pathService = new GraphPathFinder(router.graph, router.sptServiceFactory);
-            router.planGenerator = new PlanGenerator(router.graph, router.pathService);
             router.tileRendererManager = new TileRendererManager(router.graph);
 
             // Optional Analyst Modules.
             if (params.analyst) {
                 router.tileCache = new TileCache(router.graph);
-                router.sptCache = new SPTCache(router.sptServiceFactory, router.graph);
-                router.renderer = new Renderer(router.tileCache, router.sptCache);
-                router.sampleGridRenderer = new SampleGridRenderer(router.graph,
-                        router.sptServiceFactory);
-                router.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(
-                        router.sampleGridRenderer);
+                router.renderer = new Renderer(router.tileCache);
+                router.sampleGridRenderer = new SampleGridRenderer(router.graph);
+                router.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(router.sampleGridRenderer);
             }
 
             // Setup graph from config (Graph.properties for example)

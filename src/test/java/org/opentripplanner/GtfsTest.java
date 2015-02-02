@@ -38,6 +38,7 @@ import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -50,8 +51,6 @@ public abstract class GtfsTest extends TestCase {
 
     public Graph graph;
     AlertsUpdateHandler alertsUpdateHandler;
-    PlanGenerator planGenerator;
-    GraphPathFinder pathService;
     GenericAStarFactory genericAStar;
     TimetableSnapshotSource timetableSnapshotSource;
     AlertPatchServiceImpl alertPatchServiceImpl;
@@ -99,13 +98,6 @@ public abstract class GtfsTest extends TestCase {
         } catch (Exception exception) {}
 
         genericAStar = new GenericAStarFactory();
-        if (isLongDistance()) {
-            pathService = new GraphPathFinder(null, genericAStar);
-        } else {
-            // FIXME there is now only one path service but apparently all GTFSTests are isLongDistance()
-            pathService = null; // new RetryingPathServiceImpl(null, genericAStar);
-        }
-        planGenerator = new PlanGenerator(null, pathService);
     }
 
     public Leg plan(long dateTime, String fromVertex, String toVertex, String onTripId,
@@ -152,7 +144,8 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWaitReluctance(1);
         routingRequest.setWalkBoardCost(30);
 
-        TripPlan tripPlan = planGenerator.generate(routingRequest);
+        List<GraphPath> paths = new GraphPathFinder(graph).getPaths(routingRequest);
+        TripPlan tripPlan = PlanGenerator.generatePlan(paths, routingRequest);
         // Stored in instance field for use in individual tests
         itinerary = tripPlan.itinerary.get(0);
 
