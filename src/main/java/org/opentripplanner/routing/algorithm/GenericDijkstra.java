@@ -28,6 +28,8 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
  * Find the shortest path between graph vertices using Dijkstra's algorithm.
+ *
+ * TODO do we need this since we have GenericAStar and trivial remaining weight heuristic?
  */
 public class GenericDijkstra {
 

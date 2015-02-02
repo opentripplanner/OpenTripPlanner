@@ -40,7 +40,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -104,7 +103,7 @@ public class GraphPathFinder {
             return null;
         }
         
-        SPTService sptService = new GenericAStar();
+        GenericAStar aStar = new GenericAStar();
         if (options.rctx == null) {
             options.setRoutingContext(graph);
             /* Use a pathparser that constrains the search to use SimpleTransfers. */
@@ -144,7 +143,7 @@ public class GraphPathFinder {
         while (paths.size() < options.numItineraries && paths.size() < timeouts.length) {
             double timeout = searchBeginTime + (timeouts[paths.size()] * 1000) - System.currentTimeMillis();
             // if (timeout <= 0) break; ADD THIS LINE TO MAKE TIMEOUTS ACTUALLY WORK WHEN NEGATIVE
-            ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+            ShortestPathTree spt = aStar.getShortestPathTree(options, timeout);
             if (spt == null) { // timeout or other fail
                 LOG.warn("SPT was null.");
                 return null;

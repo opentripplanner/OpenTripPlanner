@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.*;
 import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
@@ -37,8 +36,11 @@ import com.beust.jcommander.internal.Lists;
 
 /**
  * Find the shortest path between graph vertices using A*.
+ *
+ * NOTE this is now per-request scoped, which has caused some threading problems in the past.
+ * Always make one new instance of this class per request, it contains a lot of state fields.
  */
-public class GenericAStar implements SPTService { // maybe this should be wrapped in a component SPT service 
+public class GenericAStar {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
     // FIXME this is not really a factory, it's a way to fake a global variable. This should be stored at the OTPServer level.
@@ -81,7 +83,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /**
      * Compute SPT using default timeout and termination strategy.
      */
-    @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
         return getShortestPathTree(req, -1, null); // negative timeout means no timeout
     }
@@ -89,7 +90,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /**
      * Compute SPT using default termination strategy.
      */
-    @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req, double relTimeoutSeconds) {
         return this.getShortestPathTree(req, relTimeoutSeconds, null);
     }

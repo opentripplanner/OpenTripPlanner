@@ -11,7 +11,7 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.algorithm.EarliestArrivalSPTService;
+import org.opentripplanner.routing.algorithm.EarliestArrivalSearch;
 import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -54,7 +54,7 @@ public class NearbyStopFinder {
 
     /* Fields used when finding stops via the street network. */
     private PathParser parsers[];
-    private EarliestArrivalSPTService earliestArrivalSPTService;
+    private EarliestArrivalSearch earliestArrivalSearch;
 
     /* Fields used when finding stops without a street network. */
     private StreetVertexIndexService streetIndex;
@@ -78,8 +78,8 @@ public class NearbyStopFinder {
         this.radius = radius;
         if (useStreets) {
             parsers = new PathParser[] {new TransferFinderParser()};
-            earliestArrivalSPTService = new EarliestArrivalSPTService();
-            earliestArrivalSPTService.maxDuration = (int) radius; // FIXME assuming 1 m/sec, use hard distance limiting to match straight-line mode
+            earliestArrivalSearch = new EarliestArrivalSearch();
+            earliestArrivalSearch.maxDuration = (int) radius; // FIXME assuming 1 m/sec, use hard distance limiting to match straight-line mode
         } else {
             streetIndex = new StreetVertexIndexServiceImpl(graph); // FIXME use the one already in the graph if it exists
             distanceLibrary = SphericalDistanceLibrary.getInstance();
@@ -139,7 +139,7 @@ public class NearbyStopFinder {
         routingRequest.clampInitialWait = (0L);
         routingRequest.setRoutingContext(graph, originVertex, null);
         routingRequest.rctx.pathParsers = parsers;
-        ShortestPathTree spt = earliestArrivalSPTService.getShortestPathTree(routingRequest);
+        ShortestPathTree spt = earliestArrivalSearch.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         if (spt != null) {

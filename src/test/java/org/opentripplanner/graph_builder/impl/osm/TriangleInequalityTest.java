@@ -33,10 +33,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
-import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class TriangleInequalityTest {
@@ -73,11 +70,11 @@ public class TriangleInequalityTest {
         end = _graph.getVertex("osm:node:42448554");    
     }
 
-    private GraphPath getPath(SPTService sptService, RoutingRequest proto,
+    private GraphPath getPath(GenericAStar aStar, RoutingRequest proto,
             Edge startBackEdge, Vertex u, Vertex v) {
         RoutingRequest options = proto.clone();
         options.setRoutingContext(_graph, startBackEdge, u, v);
-        ShortestPathTree tree = sptService.getShortestPathTree(options);
+        ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(v, false);
         options.cleanup();
         return path;
