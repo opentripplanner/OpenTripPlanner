@@ -101,7 +101,7 @@ public enum Message {
                     }
                 }
             }
-        } catch (Exception _) {
+        } catch (Exception ex) {
         }
 
         return retVal;
