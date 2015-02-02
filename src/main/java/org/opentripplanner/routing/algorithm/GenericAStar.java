@@ -102,11 +102,12 @@ public class GenericAStar {
         // TODO this is a hackish way of communicating which mode we are in (since search mode is currently server-wide)
         runState.spt = options.longDistance ?
                 new WeightOnlyShortestPathTree(runState.options) : new MultiShortestPathTree(runState.options);
+        // We want to reuse the heuristic instance in a series of requests for the same target to avoid repeated work.
         runState.heuristic = options.batch ?
                 new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic;
 
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
-        runState.heuristic.initialize(runState.options, runState.rctx.origin, runState.rctx.target, abortTime);
+        runState.heuristic.initialize(runState.options, abortTime);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
             options.rctx.debugOutput.timedOut = true;
@@ -188,7 +189,7 @@ public class GenericAStar {
                 // lbs.getWeightDelta(), v.getWeightDelta(), edge);
                 // }
 
-                double remaining_w = computeRemainingWeight(runState.heuristic, v, runState.rctx.target, runState.options);
+                double remaining_w = runState.heuristic.estimateRemainingWeight(v);
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
@@ -313,17 +314,6 @@ public class GenericAStar {
             long memoryUsed = Runtime.getRuntime().totalMemory() -
                     Runtime.getRuntime().freeMemory();
             store.setLongMax("memoryUsed", memoryUsed);
-        }
-    }
-
-    private double computeRemainingWeight(final RemainingWeightHeuristic heuristic, State v,
-            Vertex target, RoutingRequest options) {
-        // actually, the heuristic could figure this out from the TraverseOptions.
-        // set private member back=options.isArriveBy() on initial weight computation.
-        if (options.arriveBy) {
-            return heuristic.computeReverseWeight(v, target);
-        } else {
-            return heuristic.computeForwardWeight(v, target);
         }
     }
 

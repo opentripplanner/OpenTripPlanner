@@ -116,7 +116,7 @@ public class GenericDijkstra {
                     }
                     if (v.exceedsWeightLimit(options.maxWeight)) continue;
                     if (spt.add(v)) {
-                        double estimate = heuristic.computeForwardWeight(v, target);
+                        double estimate = heuristic.estimateRemainingWeight(v);
                         queue.insert(v, v.getWeight() + estimate);
                         if (traverseVisitor != null) traverseVisitor.visitEnqueue(v);
                     }

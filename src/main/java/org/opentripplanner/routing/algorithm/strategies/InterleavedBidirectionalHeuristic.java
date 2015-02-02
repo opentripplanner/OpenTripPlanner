@@ -42,9 +42,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     private static final long serialVersionUID = 20130813L;
 
     private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 4; // TODO determine a good value empirically
+
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance(); // TODO make non-pluggable
 
     /* 
      * http://en.wikipedia.org/wiki/Train_routes_in_the_Netherlands
@@ -93,9 +94,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      */
     
     @Override
-    public void initialize(RoutingRequest options, Vertex origin, Vertex target, long abortTime) {
+    public void initialize(RoutingRequest options, long abortTime) {
+        Vertex target = options.rctx.target;
         if (target == this.target) {
-            LOG.debug("reusing existing heuristic");
+            LOG.debug("Reusing existing heuristic, the target vertex has not changed.");
             return;
         }
         long start = System.currentTimeMillis();
@@ -176,11 +178,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         }
     }
     
-    @Override
-    public double computeForwardWeight(State s, Vertex target) {
-        return computeReverseWeight(s, target);
-    }
-
     /**
      * We must return an underestimate of the cost to reach the destination no matter how much 
      * progress has been made on the heuristic search.
@@ -189,7 +186,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * This allows us to completely skip walking outside a certain radius of the origin/destination.
      */
     @Override
-    public double computeReverseWeight(State s, Vertex target) {
+    public double estimateRemainingWeight (State s) {
         final Vertex v = s.getVertex();
         // Temporary vertices (StreetLocations) might not be found in walk search.
         if (v instanceof StreetLocation) return 0;
@@ -217,8 +214,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     }
 
     @Override
-    public void reset() {
-    }
+    public void reset() { }
         
 
     /*
