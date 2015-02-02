@@ -16,6 +16,7 @@ package org.opentripplanner.routing.algorithm;
 import java.util.Collection;
 import java.util.List;
 
+import com.sun.java.browser.plugin2.DOM;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
@@ -101,10 +102,13 @@ public class GenericAStar {
         runState.rctx = options.getRoutingContext();
         // TODO this is a hackish way of communicating which mode we are in (since search mode is currently server-wide)
         runState.spt = options.longDistance ?
-                new WeightOnlyShortestPathTree(runState.options) : new MultiShortestPathTree(runState.options);
+                new SingleStateShortestPathTree(runState.options, new DominanceFunction.MinimumWeight()) :
+                new MultiStateShortestPathTree(runState.options);
+
         // We want to reuse the heuristic instance in a series of requests for the same target to avoid repeated work.
         runState.heuristic = options.batch ?
-                new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic;
+                new TrivialRemainingWeightHeuristic() :
+                runState.rctx.remainingWeightHeuristic;
 
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
         runState.heuristic.initialize(runState.options, abortTime);

@@ -13,55 +13,29 @@
 
 package org.opentripplanner.routing.spt;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 
+import java.util.*;
+
 /**
- * A ShortestPathTree implementation that corresponds to a basic Dijkstra search for the earliest 
- * arrival problem. A single optimal state is tracked per vertex: the one that minimizes
- * arrival time. Optimizing for arrival time eliminates the usual need to maintain Pareto-optimal 
- * sets of states when working on a time-dependent graph.
- * 
- * This approach is more coherent in Analyst when we are extracting travel times from the optimal 
- * paths. It should also lead to less branching and faster response times when building large
- * shortest path trees.
- * 
- * Note that for this SPT to work properly, the work queue should be ordered by time rather than weight.
- * 
- * @author andrewbyrd
+ * A ShortestPathTree implementation that corresponds to a basic Dijkstra search that optimizes a single variable
+ * (earliest arrival, lowest-weight, etc.). A single optimal state is tracked per vertex.
  */
-public class EarliestArrivalShortestPathTree extends ShortestPathTree {
-    
-    private static final int DEFAULT_CAPACITY = 500;
+public class SingleStateShortestPathTree extends ShortestPathTree {
+
+    private static final int INITIAL_CAPACITY = 500;
 
     Map<Vertex, State> states;
 
     /**
-     * Parameterless constructor that uses a default capacity for internal vertex-keyed data
-     * structures.
-     */
-    public EarliestArrivalShortestPathTree (RoutingRequest options) {
-        this(options, DEFAULT_CAPACITY);
-    }
-
-    /**
      * Constructor with a parameter indicating the initial capacity of the data structures holding
      * vertices. This can help avoid resizing and rehashing these objects during path searches.
-     * 
-     * @param n
-     *            - the initial size of vertex-keyed maps
      */
-    public EarliestArrivalShortestPathTree (RoutingRequest options, int n) {
-        super(options);
-        states = new IdentityHashMap<Vertex, State>(n);
+    public SingleStateShortestPathTree(RoutingRequest options, DominanceFunction dominanceFunction) {
+        super (options, dominanceFunction);
+        states = new IdentityHashMap<Vertex, State>(INITIAL_CAPACITY);
     }
 
     @Override
@@ -69,23 +43,15 @@ public class EarliestArrivalShortestPathTree extends ShortestPathTree {
         return states.values();
     }
 
-    /****
-     * {@link ShortestPathTree} Interface
-     ****/
-
-    private boolean earlier (State s0, State s1) {
-        return s0.getActiveTime() < s1.getActiveTime();
-    }
-    
     @Override
     public boolean add(State state) {
         Vertex here = state.getVertex();
         State existing = states.get(here);
-        if (existing == null || earlier (state, existing)) {
+        if (existing == null || dominanceFunction.dominates (state, existing)) {
             states.put(here, state);
             return true;
         } else {
-            // !! turn restriction code removed
+            // FIXME !! turn restriction code removed
             return false;
         }
     }

@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.sun.java.browser.plugin2.DOM;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
@@ -36,12 +37,15 @@ public abstract class ShortestPathTree {
     public final RoutingRequest options;
 
     protected ShortestPathTree () {
-        this.options = null;
+        this (null, new DominanceFunction.EarliestArrival());
     }
 
-    protected ShortestPathTree (RoutingRequest options) {
+    protected ShortestPathTree (RoutingRequest options, DominanceFunction dominanceFunction) {
         this.options = options;
+        this.dominanceFunction = dominanceFunction;
     }
+
+    public DominanceFunction dominanceFunction = new DominanceFunction.EarliestArrival();
 
     /**
      * The add method checks a new State to see if it is non-dominated and thus worth visiting

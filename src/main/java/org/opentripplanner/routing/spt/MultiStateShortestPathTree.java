@@ -24,8 +24,6 @@ import java.util.Set;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,15 +31,15 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
-public class MultiShortestPathTree extends ShortestPathTree {
+/**
+ * TODO add turn restriction logic!
+ * Note that turn restrictions make all searches multi-state; however turn restrictions do not apply when walking.
+ * The turn restriction handling should be done in the SPT implementation, independent of the dominance function.
+ * It essentially splits each vertex into N vertices depending on the incoming edge being taken.
+ */
+public class MultiStateShortestPathTree extends ShortestPathTree {
 	
-	private static final double WALK_DIST_EPSILON = 0.05;
-	private static final double WEIGHT_EPSILON = 0.02;
-	private static final int WEIGHT_DIFF_MARGIN = 30;
-	private static final double TIME_EPSILON = 0.02;
-	private static final int TIME_DIFF_MARGIN = 30;
-
-    private static final Logger LOG = LoggerFactory.getLogger(MultiShortestPathTree.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MultiStateShortestPathTree.class);
 
     private Map<Vertex, List<State>> stateSets;
 
@@ -68,8 +66,10 @@ public class MultiShortestPathTree extends ShortestPathTree {
         }
     }
 
-    public MultiShortestPathTree(RoutingRequest options) {
-        super(options);
+    public MultiStateShortestPathTree (RoutingRequest options) {
+        // For now we only have one multistate dominance function, so hard-wire it.
+        // You can always change it by setting the field directly with a new instance.
+        super(options, new DominanceFunction.ParetoTimeWeight());
         stateSets = new IdentityHashMap<Vertex, List<State>>();
     }
 
@@ -101,9 +101,9 @@ public class MultiShortestPathTree extends ShortestPathTree {
             State oldState = it.next();
             // order is important, because in the case of a tie
             // we want to reject the new state
-            if (dominates( oldState, newState) )
+            if (dominanceFunction.dominates(oldState, newState))
                 return false;
-            if (dominates( newState, oldState) )
+            if (dominanceFunction.dominates(newState, oldState))
                 it.remove();
         }
         
@@ -112,57 +112,15 @@ public class MultiShortestPathTree extends ShortestPathTree {
         return true;
     }
 
-    public static boolean dominates(State thisState, State other) {
-        if (other.weight == 0) {
-            return false;
-        }
-        // Multi-state (bike rental, P+R) - no domination for different states
-        if (thisState.isBikeRenting() != other.isBikeRenting())
-            return false;
-        if (thisState.isCarParked() != other.isCarParked())
-            return false;
-        if (thisState.isBikeParked() != other.isBikeParked())
-            return false;
-
-        Graph graph = thisState.getOptions().rctx.graph;
-        if (thisState.backEdge != other.getBackEdge() && ((thisState.backEdge instanceof StreetEdge)
-                && (!graph.getTurnRestrictions(thisState.backEdge).isEmpty())))
-            return false;
-
-        if (thisState.routeSequenceSubset(other)) {
-            // TODO subset is not really the right idea
-            return thisState.weight <= other.weight &&
-            		thisState.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds();
-            // && this.getNumBoardings() <= other.getNumBoardings();
-        }
-
-        // If returning more than one result from GenericAStar, the search can be very slow
-        // unless you replace the following code with:
-        // return false;
-        
-        boolean walkDistanceIsHopeful = thisState.walkDistance / other.getWalkDistance() < 1+WALK_DIST_EPSILON;
-        
-        double weightRatio = thisState.weight / other.weight;
-        boolean weightIsHopeful = (weightRatio < 1+WEIGHT_EPSILON && thisState.weight - other.weight < WEIGHT_DIFF_MARGIN);
-        
-        double t1 = (double)thisState.getElapsedTimeSeconds();
-        double t2 = (double)other.getElapsedTimeSeconds();
-        double timeRatio = t1/t2;
-        boolean timeIsHopeful = (timeRatio < 1+TIME_EPSILON) && (t1 - t2 <= TIME_DIFF_MARGIN);
-        
-        // only dominate if everything is at least hopeful
-        return walkDistanceIsHopeful && weightIsHopeful && timeIsHopeful;
-//    	return this.weight < other.weight;
-	}
-
-	@Override
+    @Override
     public State getState(Vertex dest) {
         Collection<State> states = stateSets.get(dest);
         if (states == null)
             return null;
         State ret = null;
+        // TODO are we only checking path parser acceptance when we fetch states via this specific method?
         for (State s : states) {
-            if ((ret == null || s.betterThan(ret)) && s.isFinal() && s.allPathParsersAccept()) {
+            if ((ret == null || s.weight < ret.weight) && s.isFinal() && s.allPathParsersAccept()) {
                 ret = s;
             }
         }

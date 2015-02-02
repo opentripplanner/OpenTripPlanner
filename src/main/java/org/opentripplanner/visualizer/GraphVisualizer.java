@@ -83,8 +83,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.SPTVisitor;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.MultiShortestPathTree;
+import org.opentripplanner.routing.spt.MultiStateShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
@@ -542,11 +543,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         dominateButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				State s1 = firstComparePathStates.getSelectedValue();
+                State s1 = firstComparePathStates.getSelectedValue();
 				State s2 = secondComparePathStates.getSelectedValue();
-				
-				System.out.println("s1 dominates s2:"+MultiShortestPathTree.dominates(s1,s2));
-				System.out.println("s2 dominates s1:"+MultiShortestPathTree.dominates(s2,s1));
+                DominanceFunction pareto = new DominanceFunction.ParetoTimeWeight();
+				System.out.println("s1 dominates s2:" + pareto.dominates(s1, s2));
+				System.out.println("s2 dominates s1:" + pareto.dominates(s2, s1));
 			}
         });
         pane.add(dominateButton);

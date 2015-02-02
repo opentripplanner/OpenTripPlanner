@@ -21,8 +21,9 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.EarliestArrivalShortestPathTree;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.spt.SingleStateShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,7 @@ public class EarliestArrivalSearch {
             
         // SPT cache does not look at routing request in SPT to perform lookup, 
         // so it's OK to construct with the local cloned one
-        ShortestPathTree spt = new EarliestArrivalShortestPathTree(options); 
+        ShortestPathTree spt = new SingleStateShortestPathTree(options, new DominanceFunction.EarliestArrival());
         State initialState = new State(options);
         spt.add(initialState);
 
