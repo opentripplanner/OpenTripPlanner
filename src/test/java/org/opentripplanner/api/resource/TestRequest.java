@@ -262,7 +262,7 @@ public class TestRequest extends TestCase {
     }
 
     public void testFirstAndLastLeg() throws Exception {
-        /** Subsumed by tests in {@link PlanGeneratorTest}. */
+        /** Subsumed by tests in {@link GraphPathToTripPlanConverterTest}. */
     }
 
     public void testAlerts() throws Exception {

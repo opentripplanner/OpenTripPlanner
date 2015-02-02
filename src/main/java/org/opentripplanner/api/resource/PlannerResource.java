@@ -81,7 +81,7 @@ public class PlannerResource extends RoutingResource {
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
 
             /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */
-            TripPlan plan = PlanGenerator.generatePlan(paths, request);
+            TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
             response.setPlan(plan);
 
         } catch (Exception e) {

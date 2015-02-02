@@ -3,13 +3,11 @@ package org.opentripplanner.profile;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.api.resource.PlanGenerator;
+import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -53,7 +51,7 @@ public class StreetSegment {
         }
         Geometry geom = GeometryUtils.getGeometryFactory().createLineString(coordinates);
         this.geometry = PolylineEncoder.createEncodings(geom);
-        Itinerary itin = PlanGenerator.generateItinerary(path, false);
+        Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false);
         for (Leg leg : itin.legs) {
             walkSteps.addAll(leg.walkSteps);
         }

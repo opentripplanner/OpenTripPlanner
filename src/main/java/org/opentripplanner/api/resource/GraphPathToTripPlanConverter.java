@@ -14,9 +14,7 @@
 package org.opentripplanner.api.resource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -34,7 +32,6 @@ import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -46,20 +43,16 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
-import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -70,7 +63,6 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -80,9 +72,9 @@ import com.vividsolutions.jts.geom.LineString;
  * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
  * are also bundled together here.
  */
-public abstract class PlanGenerator {
+public abstract class GraphPathToTripPlanConverter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphPathToTripPlanConverter.class);
     private static final double MAX_ZAG_DISTANCE = 30;
 
     /**

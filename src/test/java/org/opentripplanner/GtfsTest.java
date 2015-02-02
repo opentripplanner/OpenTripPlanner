@@ -26,7 +26,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.resource.PlanGenerator;
+import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -141,7 +141,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(graph).getPaths(routingRequest);
-        TripPlan tripPlan = PlanGenerator.generatePlan(paths, routingRequest);
+        TripPlan tripPlan = GraphPathToTripPlanConverter.generatePlan(paths, routingRequest);
         // Stored in instance field for use in individual tests
         itinerary = tripPlan.itinerary.get(0);
 
