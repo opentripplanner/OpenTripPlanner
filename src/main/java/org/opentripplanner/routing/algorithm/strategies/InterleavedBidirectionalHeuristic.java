@@ -37,6 +37,20 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Euclidean heuristics are terrible for transit because the maximum transit speed is quite high, especially relative
+ * to the walk speed. Transit can require going away from the destination in Euclidean space to get closer according
+ * to the travel time metric. This heuristic is designed to be good for transit.
+ *
+ * After many experiments embedding transit travel time metrics in tables or low-dimensional Euclidean space I
+ * eventually came to the conclusion that the most efficient structure for representing the metric was already right
+ * in front of us: a graph.
+ *
+ * This heuristic searches backward from the target over the street and transit network, modifying it on the fly to
+ * remove any time-dependent component (e.g. by evaluating all boarding wait times as zero). This produces an
+ * admissible heuristic (which always underestimates path weight) making it valid independent of the clock time.
+ * This is important because you don't know precisely what time you will arrive at the destination until you get there.
+ */
 public class InterleavedBidirectionalHeuristic implements RemainingWeightHeuristic {
 
     private static final long serialVersionUID = 20130813L;
