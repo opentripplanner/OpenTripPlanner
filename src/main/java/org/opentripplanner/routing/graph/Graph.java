@@ -40,6 +40,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.*;
 import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
@@ -162,7 +163,7 @@ public class Graph implements Serializable {
     /**
      * Makes it possible to embed a default configuration inside a graph.
      */
-    public Properties embeddedPreferences = null;
+    public JsonNode embeddedPreferences = null;
 
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -86,11 +87,10 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void configure(Graph graph, Preferences preferences) throws Exception {
-        // Read configuration
-        url = preferences.get("url", null);
-        feedId = preferences.get("feedId", "");
-        reconnectPeriodSec = preferences.getInt("reconnectPeriodSec", DEFAULT_RECONNECT_PERIOD_SEC);
+    public void configure(Graph graph, JsonNode config) throws Exception {
+        url = config.path("url").asText();
+        feedId = config.path("feedId").asText("");
+        reconnectPeriodSec = config.path("reconnectPeriodSec").asInt(DEFAULT_RECONNECT_PERIOD_SEC);
     }
 
     @Override

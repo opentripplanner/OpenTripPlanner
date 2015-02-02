@@ -20,6 +20,9 @@ import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
@@ -27,7 +30,6 @@ import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
-import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.impl.DirectTransferGenerator;
@@ -55,7 +57,6 @@ import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
-import org.opentripplanner.updater.PropertiesPreferences;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,8 +103,12 @@ public class OTPConfigurator {
         if (graph != null && (params.inMemory || params.preFlight)) {
             /* Hand off graph in memory to server in a in-memory GraphSource. */
             try {
-                FileInputStream graphConfiguration = new FileInputStream(params.graphConfigFile);
-                Preferences config = new PropertiesPreferences(graphConfiguration);
+                FileInputStream graphConfigurationStream = new FileInputStream(params.graphConfigFile);
+                // FIXME this repeats code in InputStreamGraphSource
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+                mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+                JsonNode config = mapper.readTree(graphConfigurationStream);
                 this.graphService.registerGraph("", new MemoryGraphSource("", graph, config));
             } catch (Exception e) {
                 if (params.graphConfigFile != null)
@@ -227,11 +232,6 @@ public class OTPConfigurator {
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
         }
-        if (configFile != null) {
-            EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
-            embeddedConfigBuilder.propertiesFile = configFile;
-            graphBuilder.addGraphBuilder(embeddedConfigBuilder);
-        }
         if (params.elevation) {
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
@@ -280,7 +280,7 @@ public class OTPConfigurator {
          * analyst for some routers only).
          */
         @Override
-        public void startupRouter(Router router, Preferences config) {
+        public void startupRouter(Router router, JsonNode config) {
 
             router.sptServiceFactory = new GenericAStarFactory();
             // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
@@ -313,6 +313,7 @@ public class OTPConfigurator {
 
             // Setup graph from config (Graph.properties for example)
             graphConfigurator.setupGraph(router.graph, config);
+
         }
 
         @Override
@@ -340,7 +341,7 @@ public class OTPConfigurator {
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif")) return DEM;
-            if (name.equals("Embed.properties")) return CONFIG;
+            if (name.equals(InputStreamGraphSource.CONFIG_FILENAME)) return CONFIG;
             return OTHER;
         }
     }

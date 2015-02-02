@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -96,9 +97,9 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
     }
 
     @Override
-    public void configure(Graph graph, Preferences preferences) {
-        super.configure(graph, preferences);
-        setNamePrefix(preferences.get("namePrefix", null));
+    public void configure(Graph graph, JsonNode config) {
+        super.configure(graph, config);
+        setNamePrefix(config.path("namePrefix").asText());
     }
 
 }

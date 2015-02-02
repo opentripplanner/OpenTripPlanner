@@ -2,6 +2,7 @@ package org.opentripplanner.standalone;
 
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
@@ -26,7 +27,7 @@ public class Router {
      * command-line or properties file, etc...) and 2) starting / stopping real-time updaters
      * (delegated to the GraphUpdaterConfigurator class).
      * 
-     * @see GraphUpdaterConfigurator
+     * @see org.opentripplanner.updater.GraphUpdaterConfigurator
      */
     public interface LifecycleManager {
 
@@ -35,7 +36,7 @@ public class Router {
          * @param router The router to bind/setup
          * @param config The configuration (loaded from Graph.properties for example).
          */
-        public void startupRouter(Router router, Preferences config);
+        public void startupRouter(Router router, JsonNode config);
 
         /**
          * Shutdown a router when evicted / (auto-)reloaded. Stop any real-time updaters threads.

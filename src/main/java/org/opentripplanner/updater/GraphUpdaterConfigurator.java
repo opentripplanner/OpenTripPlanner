@@ -21,9 +21,8 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -58,21 +57,19 @@ public class GraphUpdaterConfigurator {
 
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
-    public void setupGraph(Graph graph, Preferences mainConfig) {
+    public void setupGraph(Graph graph, JsonNode mainConfig) {
         // Create a updater manager for this graph
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
 
         // Look for embedded config if it exists
-        Properties embeddedGraphPreferences = graph.embeddedPreferences;
-        Preferences embeddedConfig = null;
-        if (embeddedGraphPreferences != null) {
-            embeddedConfig = new PropertiesPreferences(embeddedGraphPreferences);
-        }
+        // TODO figure out how we will use embedded config in absence of main config.
+        JsonNode embeddedConfig = graph.embeddedPreferences;
         LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
                 + (embeddedConfig == null ? "" : "[embedded]"));
         
-        // Apply configuration 
-        updaterManager = applyConfigurationToGraph(graph, updaterManager, Arrays.asList(mainConfig, embeddedConfig));
+        // Apply configuration
+        // FIXME why are we returning the same updatermanager object that has been modified ? this method could just create it.
+        updaterManager = applyConfigurationToGraph(graph, updaterManager, mainConfig);
 
         // Stop the updater manager if it contains nothing
         if (updaterManager.size() == 0) {
@@ -85,85 +82,63 @@ public class GraphUpdaterConfigurator {
     }
 
     /**
-     * Apply a list of configs to a graph. Please note that the order of the config in the list *is
-     * important* as a child node already seen will not be overriden.
      * @param graph
      * @param updaterManager is the graph updater manager to which all updaters should be added
-     * @param configs is the list of configs.
-     * @return reference to the same updaterManager as was given as input   
+     * @return reference to the same updaterManager as was given as input
      */
-    private GraphUpdaterManager applyConfigurationToGraph(Graph graph, GraphUpdaterManager updaterManager, List<Preferences> configs) {
-        try {
-            Set<String> configurableNames = new HashSet<String>();
-            for (Preferences config : configs) {
-                if (config == null) {
-                    // This config is not used; skip it
-                    continue;
+    private GraphUpdaterManager applyConfigurationToGraph(Graph graph, GraphUpdaterManager updaterManager, JsonNode config) {
+        for (JsonNode configItem : config) {
+
+            // For each sub-node, determine which kind of updater is being created.
+            String type = configItem.path("type").asText();
+            GraphUpdater updater = null;
+            if (type != null) {
+                if (type.equals("bike-rental")) {
+                    updater = new BikeRentalUpdater();
                 }
-                for (String configurableName : config.childrenNames()) {
-                    if (configurableNames.contains(configurableName)) {
-                        // Already processed this configurable; skip it
-                        continue;
-                    }
-                    configurableNames.add(configurableName);
-                    
-                    // Determine the updater
-                    Preferences prefs = config.node(configurableName);
-                    String type = prefs.get("type", null);
-                    GraphUpdater updater = null;
-                    if (type != null) {
-                        if (type.equals("bike-rental")) {
-                            updater = new BikeRentalUpdater();
-                        }
-                        else if (type.equals("bike-park")) {
-                            updater = new BikeParkUpdater();
-                        }
-                        else if (type.equals("stop-time-updater")) {
-                            updater = new PollingStoptimeUpdater();
-                        }
-                        else if (type.equals("websocket-gtfs-rt-updater")) {
-                            updater = new WebsocketGtfsRealtimeUpdater();
-                        }
-                        else if (type.equals("real-time-alerts")) {
-                            updater = new GtfsRealtimeAlertsUpdater();
-                        }
-                        else if (type.equals("example-updater")) {
-                            updater = new ExampleGraphUpdater();
-                        }
-                        else if (type.equals("example-polling-updater")) {
-                            updater = new ExamplePollingGraphUpdater();
-                        }
-                        else if (type.equals("winkki-polling-updater")) {
-                            updater = new WinkkiPollingGraphUpdater();
-                        }
-                    }
-                    
-                    // Configure and activate the updaters
-                    try {
-                        // Check whether no updater type was found 
-                        if (updater == null) {
-                            LOG.error("Unknown updater type: " + type);
-                        }
-                        else {
-                            // Add manager as parent
-                            updater.setGraphUpdaterManager(updaterManager);
-                            
-                            // Configure updater if found and necessary
-                            if (updater instanceof PreferencesConfigurable) {
-                                ((PreferencesConfigurable) updater).configure(graph, prefs);
-                            }
-                            
-                            // Add graph updater to manager
-                            updaterManager.addUpdater(updater);
-                        }
-                    } catch (Exception e) {
-                        LOG.error("Can't configure: " + configurableName, e);
-                        // Continue on next configurable
-                    }
+                else if (type.equals("bike-park")) {
+                    updater = new BikeParkUpdater();
+                }
+                else if (type.equals("stop-time-updater")) {
+                    updater = new PollingStoptimeUpdater();
+                }
+                else if (type.equals("websocket-gtfs-rt-updater")) {
+                    updater = new WebsocketGtfsRealtimeUpdater();
+                }
+                else if (type.equals("real-time-alerts")) {
+                    updater = new GtfsRealtimeAlertsUpdater();
+                }
+                else if (type.equals("example-updater")) {
+                    updater = new ExampleGraphUpdater();
+                }
+                else if (type.equals("example-polling-updater")) {
+                    updater = new ExamplePollingGraphUpdater();
+                }
+                else if (type.equals("winkki-polling-updater")) {
+                    updater = new WinkkiPollingGraphUpdater();
                 }
             }
-        } catch (BackingStoreException e) {
-            LOG.error("Can't read configuration", e); // Should not happen
+
+            // Configure and activate the new updater.
+            try {
+                // Check whether no updater type was found
+                if (updater == null) {
+                    LOG.error("Unknown updater type: " + type);
+                } else {
+                    // Add manager as parent
+                    updater.setGraphUpdaterManager(updaterManager);
+                    // Configure updater if found and necessary
+                    if (updater instanceof JsonConfigurable) {
+                        ((JsonConfigurable) updater).configure(graph, configItem);
+                    }
+                    // Add graph updater to manager
+                    updaterManager.addUpdater(updater);
+                    LOG.info ("Configured GraphUpdater: {}", updater);
+                }
+            } catch (Exception e) {
+                LOG.error("Can't configure: " + configItem.asText(), e);
+                // Continue on to the next node
+            }
         }
         return updaterManager;
     }

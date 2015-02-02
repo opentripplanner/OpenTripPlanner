@@ -20,8 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.PreferencesConfigurable;
+import org.opentripplanner.updater.JsonConfigurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 /** Reads the GTFS-RT from a local file. */
-public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, PreferencesConfigurable {
+public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonConfigurable {
     private static final Logger LOG =
             LoggerFactory.getLogger(GtfsRealtimeFileTripUpdateSource.class);
 
@@ -42,9 +43,9 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, Prefe
     private String agencyId;
 
     @Override
-    public void configure(Graph graph, Preferences preferences) throws Exception {
-        this.agencyId = preferences.get("defaultAgencyId", null);
-        this.file = new File(preferences.get("file", ""));
+    public void configure(Graph graph, JsonNode config) throws Exception {
+        this.agencyId = config.path("defaultAgencyId").asText();
+        this.file = new File(config.path("file").asText(""));
     }
 
     @Override

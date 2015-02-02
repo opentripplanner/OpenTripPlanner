@@ -18,9 +18,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.PreferencesConfigurable;
+import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @author laurent
  * @author GoAbout
  */
-public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesConfigurable {
+public class KmlBikeParkDataSource implements BikeParkDataSource, JsonConfigurable {
 
     private static final Logger LOG = LoggerFactory.getLogger(KmlBikeParkDataSource.class);
 
@@ -77,14 +78,6 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
         });
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public void setNamePrefix(String namePrefix) {
-        this.namePrefix = namePrefix;
-    }
-
     /**
      * Update the data from the source;
      * 
@@ -114,11 +107,14 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
     }
 
     @Override
-    public void configure(Graph graph, Preferences preferences) {
-        String url = preferences.get("url", null);
-        if (url == null)
+    public void configure (Graph graph, JsonNode config) {
+        String url = config.path("url").asText();
+        if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
-        setUrl(url);
-        setNamePrefix(preferences.get("namePrefix", null));
+        }
+        this.url = url;
+        this.namePrefix = config.path("namePrefix").asText();
     }
+
+    public void setUrl (String url) {this.url = url;}
 }

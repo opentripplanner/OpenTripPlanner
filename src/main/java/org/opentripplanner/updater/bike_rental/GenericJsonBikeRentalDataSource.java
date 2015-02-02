@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import org.opentripplanner.updater.PreferencesConfigurable;
+import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @see BikeRentalDataSource
  */
-public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataSource, PreferencesConfigurable {
+public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
 
-    private static final Logger log = LoggerFactory.getLogger(GenericJSONBikeRentalDataSource.class);
+    private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
     private String url;
     private String apiKey;
 
@@ -40,7 +40,7 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
      *        Separate path levels with '/' For example "d/list"
      *
      */
-    public GenericJSONBikeRentalDataSource(String jsonPath) {
+    public GenericJsonBikeRentalDataSource(String jsonPath) {
         jsonParsePath = jsonPath;
         apiKey= null;
     }
@@ -53,7 +53,7 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
      * @param Api key, when used by bike rental type
      *
      */
-    public GenericJSONBikeRentalDataSource(String jsonPath, String apiKeyValue) {
+    public GenericJsonBikeRentalDataSource(String jsonPath, String apiKeyValue) {
         jsonParsePath = jsonPath;
         apiKey = apiKeyValue;
     }
@@ -63,7 +63,7 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
      * Construct superclass where rental list is on the top level of JSON code
      *
      */
-    public GenericJSONBikeRentalDataSource() {
+    public GenericJsonBikeRentalDataSource() {
         jsonParsePath = "";
     }
 
@@ -153,10 +153,6 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public abstract BikeRentalStation makeStation(JsonNode rentalStationNode);
 
     @Override
@@ -164,11 +160,16 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
         return getClass().getName() + "(" + url + ")";
     }
 
+    /**
+     * Note that the JSON being passed in here is for configuration of the OTP component, it's completely separate
+     * from the JSON coming in from the update source.
+     */
     @Override
-    public void configure(Graph graph, Preferences preferences) {
-        String url = preferences.get("url", null);
-        if (url == null)
+    public void configure (Graph graph, JsonNode jsonNode) {
+        String url = jsonNode.path("url").asText(); // path() returns MissingNode not null.
+        if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
-        setUrl(url);
+        }
+        this.url = url;
     }
 }
