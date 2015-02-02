@@ -289,7 +289,7 @@ public class TransitToStreetNetworkBuilderTest {
                         if (currentStreetEdge.getName().equals(wantedEdgeLabel)) {
                             //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getName());
                             collector.checkThat(currentStreetEdge.getName(), CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
-                            transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
+                            transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true, currentStreetEdge));
                             foundConnection = true;
                             correctlyLinkedStops++;
                             break;
@@ -305,7 +305,7 @@ public class TransitToStreetNetworkBuilderTest {
                             if (se.getName().equals(wantedEdgeLabel)) {
                                 //assertEquals(String.format("Transit stop %s connected correctly", ts.getLabel()), wantedEdgeLabel, se.getName());
                                 collector.checkThat(se.getName(), CoreMatchers.describedAs("TransitStop %0 connected correctly to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
-                                transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true));
+                                transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, true, se));
                                 foundConnection = true;
                                 correctlyLinkedStops++;
                                 break;
@@ -320,7 +320,7 @@ public class TransitToStreetNetworkBuilderTest {
                         //assertTrue(String.format("Transit stop %s connected wrongly", ts.getLabel()), foundConnection);
                         //collector.checkThat(sb.toString(), CoreMatchers.equalTo(wantedEdgeLabel));
                         collector.checkThat(sb.toString(), CoreMatchers.describedAs("TransitStop %0 should be connected to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
-                        transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, false));
+                        transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, false, (StreetEdge) e.getToVertex().getOutgoingStreetEdges().get(0)));
                     } 
                 }
             }

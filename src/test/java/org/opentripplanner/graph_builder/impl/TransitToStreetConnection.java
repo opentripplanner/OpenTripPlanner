@@ -33,6 +33,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
     private transient StreetTransitLink streetTransitLink;
     //Is transitStop linked to the same edge as in correctly linked edges
     private Boolean correctlyLinked;
+    private transient StreetEdge currentLink;
 
     /**
      * Converts to {@link TransitStopConnToWantedEdge} which is used in serialization
@@ -56,10 +57,11 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         this.correctlyLinked = null;
     }
     
-    public TransitToStreetConnection(TransitStopConnToWantedEdge transitStopConnToWantedEdge, StreetTransitLink streetTransitLink, boolean correctlyLinked) {
+    public TransitToStreetConnection(TransitStopConnToWantedEdge transitStopConnToWantedEdge, StreetTransitLink streetTransitLink, boolean correctlyLinked, StreetEdge curEdge) {
         super(transitStopConnToWantedEdge.getTransitStop(), transitStopConnToWantedEdge.getStreetEdge(), transitStopConnToWantedEdge.getStreetType());
         this.streetTransitLink = streetTransitLink;
         this.correctlyLinked = correctlyLinked;
+        this.currentLink = curEdge;
     }
     
     /**
@@ -202,7 +204,8 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             bus_stop_feat.addPropertie("title", transitStop.getName() + "(" + transitStop.getStopId().getId() + ")");
             bus_stop_feat.addPropertie("label", transitStop.getLabel());
             //bus_stop_feat.addPropertie("stop_index", transitStop.getIndex());
-            bus_stop_feat.addPropertie("edge_label", wantedPath.getName());
+            bus_stop_feat.addPropertie("wanted_edge_label", wantedPath.getName());
+            bus_stop_feat.addPropertie("current_edge_label", this.currentLink.getName());
             bus_stop_feat.addPropertie("marker-size", "small");
             bus_stop_feat.addPropertie("marker-symbol", "bus");
             addColorCoretness(bus_stop_feat, "marker-color");
@@ -211,12 +214,22 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             //and wanted/connected street edge which should be connected to this bus stop
             StreetFeature wanted_edge_feat = new StreetFeature(wantedPath.getGeometry());
             wanted_edge_feat.addPropertie("title", street_name);
-            wanted_edge_feat.addPropertie("label", wantedPath.getName());
+            //wanted_edge_feat.addPropertie("label", wantedPath.getName());
             //wanted_edge_feat.addPropertie("id", wantedPath.getId());
             wanted_edge_feat.addPropertie("stop_label", transitStop.getLabel());
+            wanted_edge_feat.addPropertie("opacity", "0.8");
             addColorCoretness(wanted_edge_feat, "stroke");
             curFeatures.add(wanted_edge_feat);
-            
+
+            StreetFeature sf = new StreetFeature(this.currentLink.getGeometry());
+            sf.addPropertie("title", "CON " + this.currentLink.getName());
+            sf.addPropertie("stop_label", transitStop.getLabel());
+            if (correctlyLinked) {
+                sf.addPropertie("stroke", "#11772D");
+            } else {
+                sf.addPropertie("stroke", "#800000");
+            }
+            curFeatures.add(sf);
         }
         return curFeatures;
     }
