@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
-public class MultiShortestPathTree extends AbstractShortestPathTree {
+public class MultiShortestPathTree extends ShortestPathTree {
 	
 	private static final double WALK_DIST_EPSILON = 0.05;
 	private static final double WEIGHT_EPSILON = 0.02;

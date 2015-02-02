@@ -122,7 +122,6 @@ public class GenericDijkstra {
                     }
                 }
             }
-            spt.postVisit(u);
         }
         return spt;
     }

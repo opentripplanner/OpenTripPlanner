@@ -33,7 +33,7 @@ import java.util.*;
  * 
  * @author andrewbyrd
  */
-public class WeightOnlyShortestPathTree extends AbstractShortestPathTree {
+public class WeightOnlyShortestPathTree extends ShortestPathTree {
 
     private static final int DEFAULT_CAPACITY = 500;
 

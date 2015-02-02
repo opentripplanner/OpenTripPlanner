@@ -34,7 +34,7 @@ import org.opentripplanner.routing.graph.Vertex;
  * 
  * @author andrewbyrd
  */
-public class BasicShortestPathTree extends AbstractShortestPathTree {
+public class BasicShortestPathTree extends ShortestPathTree {
     
     private static final int DEFAULT_CAPACITY = 500;
 

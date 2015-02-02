@@ -38,7 +38,7 @@ import org.opentripplanner.routing.graph.Vertex;
  * 
  * @author andrewbyrd
  */
-public class EarliestArrivalShortestPathTree extends AbstractShortestPathTree {
+public class EarliestArrivalShortestPathTree extends ShortestPathTree {
     
     private static final int DEFAULT_CAPACITY = 500;
 
