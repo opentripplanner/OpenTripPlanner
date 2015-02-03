@@ -430,8 +430,7 @@ public class PlanGeneratorTest {
                 graph, enterDropoffStation);
         BikeRentalStationVertex v58 = new BikeRentalStationVertex(
                 graph, exitDropoffStation);
-        StreetLocation v60 = new StreetLocation(
-                graph, "Vertex 60", new Coordinate(0, 90), "Vertex 60");
+        StreetLocation v60 = new StreetLocation("Vertex 60", new Coordinate(0, 90), "Vertex 60");
 
         // Vertex initialization that can't be done using the constructor
         v0.setExitName("Ausfahrt");
@@ -544,8 +543,7 @@ public class PlanGeneratorTest {
                 v50, v52);
         StreetEdge e53p = new StreetEdge(v52, v54, l53, "Edge 53", 1.0,
                 StreetTraversalPermission.ALL, false);
-        PartialStreetEdge e53 = new PartialStreetEdge(e53p, v52, v54, l53, "Edge 53",
-                1.0, StreetTraversalPermission.ALL, false);
+        PartialStreetEdge e53 = new PartialStreetEdge(e53p, v52, v54, l53, "Edge 53", 1.0);
         StreetBikeRentalLink e55 = new StreetBikeRentalLink(
                 v54, v56);
         RentABikeOffEdge e57 = new RentABikeOffEdge(
@@ -665,7 +663,6 @@ public class PlanGeneratorTest {
         forwardOptions.dateTime = 0L;
         forwardOptions.bikeRentalPickupTime = 4;
         forwardOptions.bikeRentalDropoffTime = 2;
-        e53.visibleTo = forwardContext;
 
         // Forward traversal of all edges
         State s0Forward = new State(forwardOptions);
@@ -712,7 +709,6 @@ public class PlanGeneratorTest {
         backwardOptions.bikeRentalPickupTime = 4;
         backwardOptions.bikeRentalDropoffTime = 2;
         backwardOptions.setArriveBy(true);
-        e53.visibleTo = backwardContext;
 
         // Backward traversal of all edges
         State s60Backward = new State(backwardOptions);
@@ -759,7 +755,6 @@ public class PlanGeneratorTest {
         onboardOptions.dateTime = 6L;
         onboardOptions.bikeRentalPickupTime = 4;
         onboardOptions.bikeRentalDropoffTime = 2;
-        e53.visibleTo = onboardContext;
 
         // Onboard traversal of all edges
         State s10Onboard = new State(onboardOptions);

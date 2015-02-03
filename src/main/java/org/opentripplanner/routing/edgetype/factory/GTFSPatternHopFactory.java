@@ -362,6 +362,7 @@ public class GTFSPatternHopFactory {
             // TODO: move to a validator module
             if ( ! _calendarService.getServiceIds().contains(trip.getServiceId())) {
                 LOG.warn(graph.addBuilderAnnotation(new TripUndefinedService(trip)));
+                continue TRIP; // Invalid trip, skip it, it will break later
             }
 
             /* Fetch the stop times for this trip. Copy the list since it's immutable. */
@@ -420,6 +421,8 @@ public class GTFSPatternHopFactory {
 
         } // end foreach TRIP
         LOG.info("Added {} frequency-based and {} single-trip timetable entries.", freqCount, nonFreqCount);
+        graph.hasFrequencyService = graph.hasFrequencyService || freqCount > 0;
+        graph.hasScheduledService = graph.hasScheduledService || nonFreqCount > 0;
 
         /* Generate unique human-readable names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns.values());

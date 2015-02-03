@@ -80,10 +80,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The end location */
     public GenericLocation to;
 
-    /** An unordered list of intermediate locations to be visited. */
+    /** An ordered list of intermediate locations to be visited. */
     public List<GenericLocation> intermediatePlaces;
-
-    public boolean intermediatePlacesOrdered;
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
     public double maxWalkDistance = Double.MAX_VALUE;
@@ -757,14 +755,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         this.intermediatePlaces.add(location);
     }
-    
-    /**
-     * Returns true if intermediate places are marked ordered, or there is only one of them.
-     */
-    public boolean intermediatesEffectivelyOrdered() {
-        boolean exactlyOneIntermediate = (this.intermediatePlaces != null && this.intermediatePlaces.size() == 1);
-        return this.intermediatePlacesOrdered || exactlyOneIntermediate;
-    }
 
     public void setTriangleSafetyFactor(double triangleSafetyFactor) {
         this.triangleSafetyFactor = triangleSafetyFactor;
@@ -999,8 +989,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (this.rctx == null)
             LOG.warn("routing context was not set, cannot destroy it.");
         else {
-            int nRemoved = this.rctx.destroy();
-            LOG.debug("routing context destroyed ({} temporary edges removed)", nRemoved);
+            rctx.destroy();
+            LOG.debug("routing context destroyed");
         }
     }
 

@@ -57,29 +57,19 @@ public class RoutingRequestTest {
     public void testIntermediatePlaces() {
         RoutingRequest req = new RoutingRequest();
         assertFalse(req.hasIntermediatePlaces());
-        assertFalse(req.intermediatesEffectivelyOrdered());
-        
+
         req.clearIntermediatePlaces();
         assertFalse(req.hasIntermediatePlaces());
-        assertFalse(req.intermediatesEffectivelyOrdered());
-        
+
         req.addIntermediatePlace(randomLocation());
         assertTrue(req.hasIntermediatePlaces());
         
-        // There is only one intermediate, so they are effectively ordered.
-        assertTrue(req.intermediatesEffectivelyOrdered());
-        
         req.clearIntermediatePlaces();
         assertFalse(req.hasIntermediatePlaces());
-        assertFalse(req.intermediatesEffectivelyOrdered());
-        
+
         req.addIntermediatePlace(randomLocation());
         req.addIntermediatePlace(randomLocation());
         assertTrue(req.hasIntermediatePlaces());
-        assertFalse(req.intermediatesEffectivelyOrdered());
-        
-        req.intermediatePlacesOrdered = true;
-        assertTrue(req.intermediatesEffectivelyOrdered());        
     }
 
     @Test

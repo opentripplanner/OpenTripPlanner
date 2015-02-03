@@ -61,6 +61,7 @@ import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -147,8 +148,6 @@ public class Graph implements Serializable {
 
     private Collection<Agency> agencies = new HashSet<Agency>();
 
-    private transient Set<Edge> temporaryEdges;
-
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
     private transient TimeZone timeZone = null;
@@ -190,6 +189,12 @@ public class Graph implements Serializable {
     /** True if direct single-edge transfers were generated between transit stops in this Graph. */
     public boolean hasDirectTransfers = false;
 
+    /** True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0). */
+    public boolean hasFrequencyService = false;
+
+    /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
+    public boolean hasScheduledService = false;
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
@@ -197,7 +202,6 @@ public class Graph implements Serializable {
 
     public Graph() {
         this.vertices = new ConcurrentHashMap<String, Vertex>();
-        this.temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
         this.edgeById = new ConcurrentHashMap<Integer, Edge>();
         this.vertexById = new ConcurrentHashMap<Integer, Vertex>();
     }
@@ -227,6 +231,43 @@ public class Graph implements Serializable {
             LOG.error(
                     "attempting to remove vertex that is not in graph (or mapping value was null): {}",
                     v);
+        }
+    }
+
+    /**
+     * Removes an edge from the graph. This method is not thread-safe.
+     * @param e The edge to be removed
+     */
+    public void removeEdge(Edge e) {
+        if (e != null) {
+            synchronized (alertPatches) {   // This synchronization is somewhat silly because this
+                alertPatches.remove(e);     // method isn't thread-safe anyway, but it is consistent
+            }
+
+            turnRestrictions.remove(e);
+            streetNotesService.removeStaticNotes(e);
+            edgeById.remove(e.getId());
+
+            if (e instanceof EdgeWithCleanup) ((EdgeWithCleanup) e).detach();
+
+            if (e.fromv != null) {
+                e.fromv.removeOutgoing(e);
+
+                for (Edge otherEdge : e.fromv.getIncoming()) {
+                    for (TurnRestriction turnRestriction : getTurnRestrictions(otherEdge)) {
+                        if (turnRestriction.to == e) {
+                            removeTurnRestriction(otherEdge, turnRestriction);
+                        }
+                    }
+                }
+
+                e.fromv = null;
+            }
+
+            if (e.tov != null) {
+                e.tov.removeIncoming(e);
+                e.tov = null;
+            }
         }
     }
 
@@ -443,13 +484,15 @@ public class Graph implements Serializable {
         if (!containsVertex(vertex)) {
             throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
-        for (Edge e : vertex.getIncoming()) {
-            temporaryEdges.remove(e);
+
+        List<Edge> edges = new ArrayList<Edge>(vertex.getDegreeIn() + vertex.getDegreeOut());
+        edges.addAll(vertex.getIncoming());
+        edges.addAll(vertex.getOutgoing());
+
+        for (Edge edge : edges) {
+            removeEdge(edge);
         }
-        for (Edge e : vertex.getOutgoing()) {
-            temporaryEdges.remove(e);
-        }
-        vertex.removeAllEdges();
+
         this.remove(vertex);
     }
 
@@ -635,7 +678,6 @@ public class Graph implements Serializable {
      * TODO: do we really need a factory for different street vertex indexes?
      */
     public void index(StreetVertexIndexFactory indexFactory) {
-        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
         streetIndex = indexFactory.newIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
@@ -838,29 +880,6 @@ public class Graph implements Serializable {
     public void addAgency(Agency agency) {
         agencies.add(agency);
         agenciesIds.add(agency.getId());
-    }
-
-    public void addTemporaryEdge(Edge edge) {
-        temporaryEdges.add(edge);
-    }
-
-    public void removeTemporaryEdge(Edge edge) {
-        if (edge.getFromVertex() == null || edge.getToVertex() == null) {
-            return;
-        }
-        temporaryEdges.remove(edge);
-    }
-
-    public Collection<Edge> getTemporaryEdges() {
-        return temporaryEdges;
-    }
-
-    public VertexComparatorFactory getVertexComparatorFactory() {
-        return vertexComparatorFactory;
-    }
-
-    public void setVertexComparatorFactory(VertexComparatorFactory vertexComparatorFactory) {
-        this.vertexComparatorFactory = vertexComparatorFactory;
     }
 
     /**

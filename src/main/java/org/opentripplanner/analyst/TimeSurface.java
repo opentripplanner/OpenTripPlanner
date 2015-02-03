@@ -86,8 +86,21 @@ public class TimeSurface implements Serializable {
     /** Make a max or min timesurface from propagated times in a ProfileRouter. */
     public TimeSurface (AnalystProfileRouterPrototype profileRouter) {
         ProfileRequest req = profileRouter.request;
-        lon = req.from.lon;
-        lat = req.from.lat;
+        lon = req.fromLon;
+        lat = req.fromLat;
+        id = makeUniqueId();
+        dateTime = req.fromTime; // FIXME
+        routerId = profileRouter.graph.routerId;
+        cutoffMinutes = profileRouter.MAX_DURATION / 60;
+    }
+
+    /** Make a max or min timesurface from propagated times in a ProfileRouter. */
+    public TimeSurface (ProfileRouter profileRouter) {
+        // TODO merge with the version that takes AnalystProfileRouterPrototype, they are exactly the same.
+        // But those two classes are not in the same inheritance hierarchy.
+        ProfileRequest req = profileRouter.request;
+        lon = req.fromLon;
+        lat = req.fromLat;
         id = makeUniqueId();
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;

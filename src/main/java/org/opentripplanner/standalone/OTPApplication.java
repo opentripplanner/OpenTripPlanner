@@ -10,24 +10,7 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.model.JSONObjectMapperProvider;
-import org.opentripplanner.api.resource.AlertPatcher;
-import org.opentripplanner.api.resource.BikeRental;
-import org.opentripplanner.api.resource.ExternalGeocoderResource;
-import org.opentripplanner.api.resource.GraphInspectorTileResource;
-import org.opentripplanner.api.resource.Metadata;
-import org.opentripplanner.api.resource.Planner;
-import org.opentripplanner.api.resource.PointSetResource;
-import org.opentripplanner.api.resource.ProfileResource;
-import org.opentripplanner.api.resource.Routers;
-import org.opentripplanner.api.resource.ServerInfo;
-import org.opentripplanner.api.resource.LIsochrone;
-import org.opentripplanner.api.resource.LegendResource;
-import org.opentripplanner.api.resource.Raster;
-import org.opentripplanner.api.resource.SIsochrone;
-import org.opentripplanner.api.resource.SimpleIsochrone;
-import org.opentripplanner.api.resource.SurfaceResource;
-import org.opentripplanner.api.resource.TileService;
-import org.opentripplanner.api.resource.TimeGridWs;
+import org.opentripplanner.api.resource.*;
 import org.opentripplanner.index.GeocoderResource;
 import org.opentripplanner.index.IndexAPI;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -108,6 +91,7 @@ public class OTPApplication extends Application {
             SurfaceResource.class,
             PointSetResource.class,
             GraphInspectorTileResource.class,
+            UpdaterStatusResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             CorsFilter.class
         ));

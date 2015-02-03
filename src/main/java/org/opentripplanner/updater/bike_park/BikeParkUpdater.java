@@ -27,9 +27,7 @@ import java.util.prefs.Preferences;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.loader.LinkRequest;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -156,11 +154,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                 BikeParkVertex bikeParkVertex = verticesByPark.get(bikePark);
                 if (bikeParkVertex == null) {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
-                    LinkRequest request = networkLinkerLibrary
-                            .connectVertexToStreets(bikeParkVertex);
-                    for (Edge e : request.getEdgesAdded()) {
-                        graph.addTemporaryEdge(e);
-                    }
+                    networkLinkerLibrary.connectVertexToStreets(bikeParkVertex);
                     verticesByPark.put(bikePark, bikeParkVertex);
                     new BikeParkEdge(bikeParkVertex);
                 } else {

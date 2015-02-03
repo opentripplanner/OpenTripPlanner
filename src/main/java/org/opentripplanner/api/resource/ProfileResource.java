@@ -17,7 +17,6 @@ import javax.ws.rs.core.Response.Status;
 import com.beust.jcommander.internal.Maps;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.analyst.TimeSurface;
-import org.opentripplanner.api.model.TimeSurfaceShort;
 import org.opentripplanner.api.param.HourMinuteSecond;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.QueryParameter;
@@ -28,7 +27,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 
-import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Jersey resource class which exposes OTP profile routing functionality as a web service.
@@ -37,6 +37,7 @@ import com.google.common.collect.Lists;
 @Path("routers/{routerId}/profile")
 public class ProfileResource {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ProfileResource.class);
     private Graph graph;
     private SurfaceCache surfaceCache;
 
@@ -65,7 +66,7 @@ public class ProfileResource {
             @QueryParam("minCarTime")   @DefaultValue("1")     int minCarTime,
             @QueryParam("minBikeTime")  @DefaultValue("1")     int minBikeTime,
             @QueryParam("orderBy")      @DefaultValue("AVG")   Option.SortOrder orderBy,
-            @QueryParam("limit")        @DefaultValue("10")    int limit,
+            @QueryParam("limit")        @DefaultValue("10")    int limit,       // max options to return PER ACCESS MODE
             @QueryParam("suboptimal")   @DefaultValue("5")     int suboptimalMinutes,
             @QueryParam("accessModes")  @DefaultValue("WALK,BICYCLE") TraverseModeSet accessModes,
             @QueryParam("egressModes")  @DefaultValue("WALK")         TraverseModeSet egressModes,
@@ -86,8 +87,13 @@ public class ProfileResource {
         QueryParameter.checkRangeInclusive(suboptimalMinutes, 0, 30);
 
         ProfileRequest req = new ProfileRequest();
-        req.from         = from;
-        req.to           = to;
+        req.fromLat      = from.lat;
+        req.fromLon      = from.lon;
+        // In analyst requests the 'to' coordinates may be null.
+        // We need to provide some value though because lower-level routing requests are intolerant of a missing 'to'.
+        if (to == null) to = from;
+        req.toLat = to.lat;
+        req.toLon = to.lon;
         req.fromTime     = fromTime.toSeconds();
         req.toTime       = toTime.toSeconds();
         req.walkSpeed    = walkSpeed;
@@ -109,10 +115,26 @@ public class ProfileResource {
         req.minCarTime   = minCarTime;
         req.suboptimalMinutes = suboptimalMinutes;
 
-        /* Use the new prototype faster profile-analyst. Really this should be constrained to freq-only cases. */
-        if (req.analyst == true) {
-            AnalystProfileRouterPrototype router = new AnalystProfileRouterPrototype(graph, req);
-            TimeSurface.RangeSet result = router.route();
+        if (req.analyst) {
+            if (surfaceCache == null) {
+                LOG.error ("You must run OTP with the --analyst option to enable spatial analysis features.");
+            }
+            TimeSurface.RangeSet result;
+
+            if (graph.hasFrequencyService && ! graph.hasScheduledService) {
+                /* Use the new prototype profile-analyst for frequency-only cases. */
+                AnalystProfileRouterPrototype router = new AnalystProfileRouterPrototype(graph, req);
+                result = router.route();
+            } else {
+                /* Use the Modeify profile router for the general case. */
+                ProfileRouter router = new ProfileRouter(graph, req);
+                try {
+                    router.route();
+                    result = router.timeSurfaceRangeSet;
+                } finally {
+                    router.cleanup();
+                }
+            }
             Map<String, Integer> idForSurface = Maps.newHashMap();
             idForSurface.put("min", surfaceCache.add(result.min)); // requires analyst mode turned on
             idForSurface.put("avg", surfaceCache.add(result.avg));
@@ -122,16 +144,7 @@ public class ProfileResource {
             ProfileRouter router = new ProfileRouter(graph, req);
             try {
                 ProfileResponse response = router.route();
-                if (req.analyst) {
-                    surfaceCache.add(router.minSurface);
-                    surfaceCache.add(router.maxSurface);
-                    List<TimeSurfaceShort> surfaceShorts = Lists.newArrayList();
-                    surfaceShorts.add(new TimeSurfaceShort(router.minSurface));
-                    surfaceShorts.add(new TimeSurfaceShort(router.maxSurface));
-                    return Response.status(Status.OK).entity(surfaceShorts).build();
-                } else {
-                    return Response.status(Status.OK).entity(response).build();
-                }
+                return Response.status(Status.OK).entity(response).build();
             } finally {
                 router.cleanup(); // destroy routing contexts even when an exception happens
             }

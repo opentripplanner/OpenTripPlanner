@@ -38,9 +38,6 @@ import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
 
 /**
- * This finds all TransitStops near a given Vertex.
- * TODO rename to nearbyStopFinder or something.
- *
  * These library functions are used by the streetless and streetful stop linkers, and in profile transfer generation.
  * Ideally they could also be used in long distance mode and profile routing for the street segments.
  * For each stop, it finds the closest stops on all other patterns. This reduces the number of transfer edges
@@ -98,18 +95,18 @@ public class NearbyStopFinder {
     public Set<StopAtDistance> findNearbyStopsConsideringPatterns (Vertex vertex) {
 
         /* Track the closest stop on each pattern passing nearby. */
-        // FIXME the stop search results should contain this stop itself to avoid problems with patterns that pass through it.
-        // TODO move this into the stoplinker library class itself, which has access to the graph index.
-        Map<TripPattern, StopAtDistance> closestStopForPattern = new SimpleIsochrone.MinMap<TripPattern,NearbyStopFinder.StopAtDistance>();
+        SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closestStopForPattern =
+                new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
             /* Filter out destination stops that are already reachable via pathways or transfers. */
+            // FIXME why is the above comment relevant here? how does the next line achieve this?
             TransitStop ts1 = stopAtDistance.tstop;
             if (!ts1.isStreetLinkable()) continue;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-            for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) { // FIXME the graph index should be stored in the graph itself so it is passed around
-                closestStopForPattern.put(pattern, stopAtDistance);
+            for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) {
+                closestStopForPattern.putMin(pattern, stopAtDistance);
             }
         }
 

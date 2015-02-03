@@ -104,7 +104,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     private Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<Edge>();
 
-    private Vertex highlightedVertex;
+    private Coordinate highlightedCoordinate;
 
     private Edge highlightedEdge;
 
@@ -610,9 +610,13 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         lastLabelY = y;
     }
 
-    private void drawVertex(Vertex v, double r) {
+    private void drawCoordinate(Coordinate c, double r) {
         noStroke();
-        ellipse(toScreenX(v.getX()), toScreenY(v.getY()), r, r);
+        ellipse(toScreenX(c.x), toScreenY(c.y), r, r);
+    }
+
+    private void drawVertex(Vertex v, double r) {
+        drawCoordinate(v.getCoordinate(), r);
     }
 
     public synchronized void draw() {
@@ -792,10 +796,10 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 		        drawVertex(v, 8);
 		    }
 		}
-		/* Draw (single) highlighed vertex in a different color */
-		if (highlightedVertex != null) {
+		/* Draw (single) highlighed coordinate in a different color */
+		if (highlightedCoordinate != null) {
 		    fill(255, 255, 30);
-		    drawVertex(highlightedVertex, 7);
+		    drawCoordinate(highlightedCoordinate, 7);
 		}
 		noFill();
 	}
@@ -1026,8 +1030,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         selectors.remove(selectors.size() - 1);
     }
 
-    public void highlightVertex(Vertex v) {
-        Coordinate c = v.getCoordinate();
+    public void highlightCoordinate(Coordinate c) {
         double xd = 0, yd = 0;
         while (!modelBounds.contains(c)) {
             xd = modelBounds.getWidth() / 100;
@@ -1035,8 +1038,12 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             modelBounds.expandBy(xd, yd);
         }
         modelBounds.expandBy(xd, yd);
-        highlightedVertex = v;
+        highlightedCoordinate = c;
         drawLevel = DRAW_ALL;
+    }
+
+    public void highlightVertex(Vertex v) {
+        highlightCoordinate(v.getCoordinate());
     }
 
     public void enqueueHighlightedEdge(Edge de) {

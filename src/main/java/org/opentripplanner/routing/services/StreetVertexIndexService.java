@@ -86,20 +86,19 @@ public interface StreetVertexIndexService {
     /**
      * Finds the appropriate vertex for this location.
      * 
-     * @param location
-     * @param options
-     * @return
-     */
-    public Vertex getVertexForLocation(GenericLocation location, RoutingRequest options);
-
-    /**
-     * Finds the appropriate vertex for this location.
-     * 
      * @param place
      * @param options
-     * @param other non-null when another vertex has already been found. Passed in so that any extra edges made when locating the previous vertex may
-     *        be used to locate this one as well.
+     * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
      * @return
      */
-    public Vertex getVertexForLocation(GenericLocation place, RoutingRequest options, Vertex other);
+    public Vertex getVertexForLocation(GenericLocation place, RoutingRequest options,
+                                       boolean endVertex);
+
+    /**
+     * Finds the on-street coordinate closest to a given coordinate
+     *
+     * @param coordinate The coordinate to be found on the street network
+     * @return The on-street {@link Coordinate} that's closest to the given input {@link Coordinate}
+     */
+    public Coordinate getClosestPointOnStreet(Coordinate coordinate);
 }

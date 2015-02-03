@@ -14,6 +14,7 @@
 package org.opentripplanner.api.resource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -42,12 +44,14 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -66,10 +70,10 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
 
 public class PlanGenerator {
 
@@ -99,13 +103,13 @@ public class PlanGenerator {
         List<GraphPath> paths = null;
         boolean tooSloped = false;
         try {
-            paths = pathService.getPaths(options);
+            paths = getPaths(options);
             if (paths == null && options.wheelchairAccessible) {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions (and warn user).
                 options.maxSlope = Double.MAX_VALUE;
                 options.maxWalkDistance = originalOptions.maxWalkDistance;
-                paths = pathService.getPaths(options);
+                paths = getPaths(options);
                 tooSloped = true;
             }
         } catch (VertexNotFoundException e) {
@@ -149,6 +153,64 @@ public class PlanGenerator {
         }
         options.rctx.debugOutput.finishedRendering();
         return plan;
+    }
+
+    /**
+     * Break up a RoutingRequest with intermediate places into separate requests, in the given order
+     */
+    private List<GraphPath> getPaths(RoutingRequest request) {
+        if (request.hasIntermediatePlaces()) {
+            long time = request.dateTime;
+            GenericLocation from = request.from;
+            List<GenericLocation> places = Lists.newLinkedList(request.intermediatePlaces);
+            places.add(request.to);
+            request.clearIntermediatePlaces();
+            List<GraphPath> paths = new ArrayList<>();
+
+            for (GenericLocation to : places) {
+                request.dateTime = time;
+                request.from = from;
+                request.to = to;
+                request.rctx = null;
+                request.setRoutingContext(graph);
+
+                List<GraphPath> partialPaths = pathService.getPaths(request);
+                if (partialPaths == null || partialPaths.size() == 0) {
+                    return null;
+                }
+
+                GraphPath path = partialPaths.get(0);
+                paths.add(path);
+                from = to;
+                time = path.getEndTime();
+            }
+
+            return Arrays.asList(joinPaths(paths));
+        } else {
+            return pathService.getPaths(request);
+        }
+    }
+
+    private GraphPath joinPaths(List<GraphPath> paths) {
+        State lastState = paths.get(0).states.getLast();
+        GraphPath newPath = new GraphPath(lastState, false);
+        Vertex lastVertex = lastState.getVertex();
+        for (GraphPath path : paths.subList(1, paths.size())) {
+            lastState = newPath.states.getLast();
+            // add a leg-switching state
+            LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
+            lastState = legSwitchingEdge.traverse(lastState);
+            newPath.edges.add(legSwitchingEdge);
+            newPath.states.add(lastState);
+            // add the next subpath
+            for (Edge e : path.edges) {
+                lastState = e.traverse(lastState);
+                newPath.edges.add(e);
+                newPath.states.add(lastState);
+            }
+            lastVertex = path.getEndVertex();
+        }
+        return newPath;
     }
 
     /**

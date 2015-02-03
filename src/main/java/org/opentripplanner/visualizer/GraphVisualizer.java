@@ -1331,10 +1331,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                 String locString = (String) JOptionPane.showInputDialog(frame, "Location string",
                         "");
                 GenericLocation loc = GenericLocation.fromOldStyleString(locString);
-                RoutingRequest rr = new RoutingRequest();
-                Vertex v = graph.streetIndex.getVertexForLocation(
-                        loc, rr);
-                showGraph.highlightVertex(v);
+                Coordinate c = graph.streetIndex.getClosestPointOnStreet(loc.getCoordinate());
+                if (c != null) showGraph.highlightCoordinate(c);
             }
         });
         buttonPanel.add(snapButton);

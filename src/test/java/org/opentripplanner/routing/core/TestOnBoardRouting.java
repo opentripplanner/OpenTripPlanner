@@ -28,6 +28,7 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -204,8 +205,9 @@ public class TestOnBoardRouting extends TestCase {
             assertTrue(numBoardings2 < numBoardings1);
 
             /* Cleanup edges */
-            int nRemoved = onboardOrigin.removeTemporaryEdges(graph);
-            assertEquals(1, nRemoved);
+            for (Edge edge : onboardOrigin.getOutgoing()) {
+                graph.removeEdge(edge);
+            }
 
             n++;
             if (n > NTESTS)

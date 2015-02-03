@@ -324,12 +324,10 @@ public class LinkRequest {
         }
         
         // disconnect the two old edges from the graph
-        linker.graph.removeTemporaryEdge(e1);
         edgesAdded.remove(e1);
         //e1.detach();
         
         if (e2 != null) {
-            linker.graph.removeTemporaryEdge(e2);
             edgesAdded.remove(e2);
             //e2.detach();
             // return the two new splitter vertices

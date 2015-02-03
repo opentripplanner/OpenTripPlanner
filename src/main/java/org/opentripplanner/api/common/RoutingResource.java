@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -65,12 +66,9 @@ public abstract class RoutingResource {
     /** The end location (see fromPlace for format). */
     @QueryParam("toPlace") protected List<String> toPlace;
 
-    /** An unordered list of intermediate locations to be visited (see the fromPlace for format). */
+    /** An ordered list of intermediate locations to be visited (see the fromPlace for format). */
     @QueryParam("intermediatePlaces") protected List<String> intermediatePlaces;
-    
-    /** Whether or not the order of intermediate locations is to be respected (TSP vs series). */
-    @DefaultValue("false") @QueryParam("intermediatePlacesOrdered") protected Boolean intermediatePlacesOrdered;
-    
+
     /** The date that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("date") protected List<String> date;
     
@@ -311,7 +309,7 @@ public abstract class RoutingResource {
      * Alternatively, we could eliminate the separate RoutingRequest objects and just resolve
      * vertices and timezones here right away, but just ignore them in semantic equality checks.
      */
-    @Inject
+    @Context
     protected OTPServer otpServer;
 
     /** 
@@ -404,9 +402,6 @@ public abstract class RoutingResource {
             && ! intermediatePlaces.get(0).equals("")) {
             request.setIntermediatePlacesFromStrings(intermediatePlaces);
         }
-        if (intermediatePlacesOrdered == null)
-            intermediatePlacesOrdered = request.intermediatePlacesOrdered;
-        request.intermediatePlacesOrdered = intermediatePlacesOrdered;
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
         request.setOtherThanPreferredRoutesPenalty(get(otherThanPreferredRoutesPenalty, n, request.otherThanPreferredRoutesPenalty));
         request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
@@ -456,11 +451,6 @@ public abstract class RoutingResource {
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;
         request.useBikeRentalAvailabilityInformation = (tripPlannedForNow);
-        if (request.intermediatePlaces != null
-                && (request.modes.isTransit() || 
-                        (request.modes.getWalk() && 
-                         request.modes.getBicycle())))
-            throw new UnsupportedOperationException("TSP is not supported for transit or bike share trips");
 
         String startTransitStopId = get(this.startTransitStopId, n,
                 AgencyAndId.convertToString(request.startingTransitStopId));

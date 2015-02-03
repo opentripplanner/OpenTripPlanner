@@ -24,7 +24,7 @@ otp.core.GeocoderBuiltin = otp.Class({
 
     geocode : function(address, callback) {
         // The built in geocoder returns results in the form expected by the client:
-        // A JSON array of objects containing lat, lon, and description fields.
+        // A JSON array of objects containing lat, lng, and description fields.
         $.getJSON(this.url, {query: address}, function(response) {
             callback.call(this, response);
         });

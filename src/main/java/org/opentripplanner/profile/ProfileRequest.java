@@ -10,12 +10,15 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 
 /**
- * All the modifiable paramters for profile routing.
+ * All the modifiable parameters for profile routing.
  */
 public class ProfileRequest implements Serializable {
 
-    public LatLon from;
-    public LatLon to;
+    public double fromLat;
+    public double fromLon;
+    public double toLat;
+    public double toLon;
+    
     public int    fromTime;
     public int    toTime;
 
@@ -34,7 +37,7 @@ public class ProfileRequest implements Serializable {
 
     public LocalDate date;
     public Option.SortOrder orderBy;
-    public int limit;
+    public int limit; // the maximum number of options presented PER ACCESS MODE
     public TraverseModeSet accessModes, egressModes, directModes, transitModes;
     public boolean analyst = false; // if true, propagate travel times out to street network
 
@@ -49,8 +52,10 @@ public class ProfileRequest implements Serializable {
     
     public ProfileRequest clone () {
         ProfileRequest ret = new ProfileRequest();
-        ret.from = from;
-        ret.to = to;
+        ret.fromLat = fromLat;
+        ret.fromLon = fromLon;
+        ret.toLat = toLat;
+        ret.toLon = toLon;
         ret.fromTime = fromTime;
         ret.toTime = toTime;
         
