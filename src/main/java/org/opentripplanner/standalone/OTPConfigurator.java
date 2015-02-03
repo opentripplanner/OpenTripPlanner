@@ -364,8 +364,8 @@ public class OTPConfigurator {
     public static String dumpFields (Object object) {
         StringBuilder sb = new StringBuilder();
         Class clazz = object.getClass();
-        sb.append("Summarizing all public fields of an instance of class ");
-        sb.append(clazz);
+        sb.append("Summarizing ");
+        sb.append(clazz.getSimpleName());
         sb.append('\n');
         for (Field field : clazz.getFields()) {
             sb.append(field.getName());
