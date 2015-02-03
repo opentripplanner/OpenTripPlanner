@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * Check the every vertex and edge in the graph to make sure the edge lists and from/to
  * members are coherent, and that there are no edgeless vertices. Primarily intended for debugging.
  */
-public class GraphCoherencyChecker implements GraphBuilder {
+public class GraphCoherencyCheckerModule implements GraphBuilderModule {
 
 
     /** An set of ids which identifies what stages this graph builder provides (i.e. streets, elevation, transit) */
@@ -42,7 +42,7 @@ public class GraphCoherencyChecker implements GraphBuilder {
         return Arrays.asList("streets");
     }
     
-    private static final Logger LOG = LoggerFactory.getLogger(GraphCoherencyChecker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphCoherencyCheckerModule.class);
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {

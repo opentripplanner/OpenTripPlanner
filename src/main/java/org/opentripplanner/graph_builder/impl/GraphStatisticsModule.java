@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.LineString;
  * Print statistics on geometry and edge/vertices data for a graph (number of geometry, average
  * number of points, size distribution, edge names size, etc...)
  */
-public class GraphStatisticsGraphBuilderImpl implements GraphBuilder {
+public class GraphStatisticsModule implements GraphBuilderModule {
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -55,7 +55,7 @@ public class GraphStatisticsGraphBuilderImpl implements GraphBuilder {
     }
 
     private static final Logger LOG = LoggerFactory
-            .getLogger(GraphStatisticsGraphBuilderImpl.class);
+            .getLogger(GraphStatisticsModule.class);
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {

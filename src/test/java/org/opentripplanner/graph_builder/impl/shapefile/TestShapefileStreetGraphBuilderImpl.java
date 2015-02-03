@@ -98,7 +98,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 
         schema.setPermissionConverter(perms);
 
-        ShapefileStreetGraphBuilderImpl loader = new ShapefileStreetGraphBuilderImpl();
+        ShapefileStreetModule loader = new ShapefileStreetModule();
         loader.setFeatureSourceFactory(factory);
         loader.setSchema(schema);
 

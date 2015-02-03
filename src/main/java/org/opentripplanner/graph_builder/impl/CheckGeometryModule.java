@@ -23,7 +23,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.annotation.BogusEdgeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusVertexGeometry;
 import org.opentripplanner.graph_builder.annotation.VertexShapeError;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * This is mainly good for debugging, but probably worth keeping on for production
  * because the cost is small compared to the pain of debugging.
  */
-public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
+public class CheckGeometryModule implements GraphBuilderModule {
 
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
@@ -55,7 +55,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
         return Arrays.asList("streets");
     }
     
-    private static final Logger LOG = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CheckGeometryModule.class);
     private static final double MAX_VERTEX_SHAPE_ERROR = 150;
 
     @Override

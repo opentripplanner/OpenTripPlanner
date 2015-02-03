@@ -32,11 +32,11 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
-public class GtfsGraphBuilderImplTest {
+public class GtfsGraphBuilderModuleTest {
 
     private static final HashMap<Class<?>, Object> _extra = new HashMap<Class<?>, Object>();
 
-    private GtfsGraphBuilderImpl _builder = new GtfsGraphBuilderImpl();
+    private GtfsModule _builder = new GtfsModule();
 
     @Test
     public void testNoBikesByDefault() throws IOException {

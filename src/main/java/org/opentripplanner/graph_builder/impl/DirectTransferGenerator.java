@@ -19,7 +19,7 @@ import com.google.common.collect.Iterables;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link GraphBuilder} module that links up the stops of a transit network among themselves. This is necessary for
+ * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit network among themselves. This is necessary for
  * routing in long-distance mode.
  *
  * It will use the street network if OSM data has already been loaded into the graph.
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * TODO make tests for this that are sensitive to the presence of trip patterns
  */
-public class DirectTransferGenerator implements GraphBuilder {
+public class DirectTransferGenerator implements GraphBuilderModule {
 
     private static Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
 

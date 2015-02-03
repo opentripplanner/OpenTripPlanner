@@ -13,7 +13,7 @@
 
 package org.opentripplanner.standalone;
 
-import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import java.io.File;
-import org.opentripplanner.graph_builder.AnnotationsToHTML;
 
 /**
  * I originally considered configuring OTP server through Java properties, with one global
@@ -59,7 +57,7 @@ public class OTPMain {
         OTPConfigurator configurator = new OTPConfigurator(params);
         
         // start graph builder, if asked for
-        GraphBuilderTask graphBuilder = configurator.builderFromParameters();
+        GraphBuilder graphBuilder = configurator.builderFromParameters();
         if (graphBuilder != null) {
             graphBuilder.run();
             // Inform configurator which graph is to be used for in-memory handoff.

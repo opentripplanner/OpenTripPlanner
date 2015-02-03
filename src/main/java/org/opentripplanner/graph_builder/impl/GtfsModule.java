@@ -45,7 +45,7 @@ import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -58,9 +58,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
-public class GtfsGraphBuilderImpl implements GraphBuilder {
+public class GtfsModule implements GraphBuilderModule {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GtfsGraphBuilderImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
 
     private GtfsBundles _gtfsBundles;
 
@@ -83,13 +83,13 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
      * TODO why is there a wrapper class around a list of GTFS files?
      * TODO why is there a wrapper around GTFS files at all?
      */
-    public GtfsGraphBuilderImpl (List<GtfsBundle> gtfsBundles) {
+    public GtfsModule(List<GtfsBundle> gtfsBundles) {
         GtfsBundles gtfsb = new GtfsBundles();
         gtfsb.setBundles(gtfsBundles);
         this.setGtfsBundles(gtfsb);
     }
     
-    public GtfsGraphBuilderImpl() { };
+    public GtfsModule() { };
 
     public List<String> provides() {
         List<String> result = new ArrayList<String>();

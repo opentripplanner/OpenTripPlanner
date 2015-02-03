@@ -42,7 +42,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
-import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
@@ -56,7 +56,6 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
@@ -280,7 +279,7 @@ public class Routers {
         params.build = tempDir;
         params.inMemory = true;
         
-        GraphBuilderTask graphBuilder = new OTPConfigurator(params).builderFromParameters();
+        GraphBuilder graphBuilder = new OTPConfigurator(params).builderFromParameters();
         
         graphBuilder.run();
         

@@ -45,12 +45,12 @@ import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.GtfsModule;
+import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkModule;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFactoryImpl;
-import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetModule;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
@@ -75,14 +75,12 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -120,7 +118,7 @@ class Context {
         GraphService graphService = otpServer.getGraphService();
         graphService.registerGraph("", new MemoryGraphSource("", makeSimpleGraph())); // default graph is tiny test graph
         graphService.registerGraph("portland", new MemoryGraphSource("portland", graph));
-        ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
+        ShapefileStreetModule builder = new ShapefileStreetModule();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File(
                 "src/test/resources/portland/Streets_pdx.shp"));
         builder.setFeatureSourceFactory(factory);
@@ -172,7 +170,7 @@ class Context {
     }
 
     private void initTransit() {
-        GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl();
+        GtfsModule gtfsBuilder = new GtfsModule();
         GtfsBundle bundle = new GtfsBundle();
         bundle.setPath(new File("src/test/resources/google_transit.zip"));
 
@@ -185,8 +183,8 @@ class Context {
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         gtfsBuilder.buildGraph(graph, extra);
 
-        TransitToStreetNetworkGraphBuilderImpl linker =
-                new TransitToStreetNetworkGraphBuilderImpl();
+        TransitToStreetNetworkModule linker =
+                new TransitToStreetNetworkModule();
         linker.buildGraph(graph, extra);
 
     }

@@ -13,12 +13,10 @@
 
 package org.opentripplanner.graph_builder.impl.bike;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
@@ -34,9 +32,9 @@ import org.slf4j.LoggerFactory;
  * the dynamic bike rental updater. This may help when the source does not contain real-time info
  * (or one is not interested in), location of stations do not change that often, or development.
  */
-public class BikeRentalGraphBuilder implements GraphBuilder {
+public class BikeRentalModule implements GraphBuilderModule {
 
-    private static Logger LOG = LoggerFactory.getLogger(BikeRentalGraphBuilder.class);
+    private static Logger LOG = LoggerFactory.getLogger(BikeRentalModule.class);
 
     private BikeRentalDataSource dataSource;
 
@@ -63,16 +61,6 @@ public class BikeRentalGraphBuilder implements GraphBuilder {
                 new RentABikeOffEdge(vertex, vertex, station.networks);
         }
         LOG.info("Created " + stations.size() + " bike rental stations.");
-    }
-
-    @Override
-    public List<String> provides() {
-        return Arrays.asList("bike_rental");
-    }
-
-    @Override
-    public List<String> getPrerequisites() {
-        return Arrays.asList("streets");
     }
 
     @Override

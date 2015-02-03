@@ -32,7 +32,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.graph_builder.annotation.ElevationFlattened;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * {@link GraphBuilder} plugin that applies elevation data to street data that has already
+ * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street data that has already
  * been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
  * in the Graph. Depending on the {@link ElevationGridCoverageFactory} specified
  * this could be auto-downloaded and cached National Elevation Dataset (NED) raster data or
@@ -55,8 +55,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * the edge measured from the start, and the y-coord representing the sampled elevation at that
  * point (both in meters).
  */
-public class ElevationGraphBuilderImpl implements GraphBuilder {
-    private static final Logger log = LoggerFactory.getLogger(ElevationGraphBuilderImpl.class);
+public class ElevationModule implements GraphBuilderModule {
+    private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
     private ElevationGridCoverageFactory gridCoverageFactory;
 
@@ -70,9 +70,9 @@ public class ElevationGraphBuilderImpl implements GraphBuilder {
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
-    public ElevationGraphBuilderImpl() { /* This makes me a "bean" */ };
+    public ElevationModule() { /* This makes me a "bean" */ };
     
-    public ElevationGraphBuilderImpl(ElevationGridCoverageFactory factory) {
+    public ElevationModule(ElevationGridCoverageFactory factory) {
         this.setGridCoverageFactory(factory);
     }
 

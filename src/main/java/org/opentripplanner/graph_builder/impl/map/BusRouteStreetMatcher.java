@@ -18,7 +18,7 @@ import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.extra_graph.EdgesForRoute;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -40,7 +40,7 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
  * Then transitively we get a mapping from stop->edges.
  * The edges that "belong" to a stop are favored when linking that stop to the street network.
  */
-public class BusRouteStreetMatcher implements GraphBuilder {
+public class BusRouteStreetMatcher implements GraphBuilderModule {
     private static final Logger log = LoggerFactory.getLogger(BusRouteStreetMatcher.class);
 
     public List<String> provides() {

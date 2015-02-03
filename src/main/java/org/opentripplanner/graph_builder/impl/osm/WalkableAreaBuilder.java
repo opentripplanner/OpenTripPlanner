@@ -25,7 +25,7 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl.Handler;
+import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;

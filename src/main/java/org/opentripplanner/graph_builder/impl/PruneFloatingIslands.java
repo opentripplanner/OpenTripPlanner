@@ -19,17 +19,17 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.StreetUtils;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.*;
 
 /**
- * this module is part of the  {@link GraphBuilder} process. it design to remove small isolated 
+ * this module is part of the  {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} process. it design to remove small isolated
  * islands form the graph. Islands are created when there is no connectivity in the map, island 
  * acts like trap since there is no connectivity there is no way in or out the island.
  * The module distinguish between two island types one with transit stops and one without stops.
  */
-public class PruneFloatingIslands implements GraphBuilder {
+public class PruneFloatingIslands implements GraphBuilderModule {
 
     private static org.slf4j.Logger LOG = LoggerFactory.getLogger(PruneFloatingIslands.class);
 
@@ -52,7 +52,7 @@ public class PruneFloatingIslands implements GraphBuilder {
      */
     private String islandLogFile;
 
-    private TransitToStreetNetworkGraphBuilderImpl transitToStreetNetwork;
+    private TransitToStreetNetworkModule transitToStreetNetwork;
 
     public List<String> provides() {
         return Collections.emptyList();

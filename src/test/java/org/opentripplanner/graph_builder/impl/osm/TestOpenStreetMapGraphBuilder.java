@@ -50,7 +50,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         Graph gg = new Graph();
 
-        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 
@@ -108,7 +108,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         Graph gg = new Graph();
 
-        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 

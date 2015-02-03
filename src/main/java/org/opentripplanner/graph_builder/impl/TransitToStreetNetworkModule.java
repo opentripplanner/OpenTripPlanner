@@ -17,19 +17,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link GraphBuilder} plugin that links up the stops of a transit network to a street network.
+ * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links up the stops of a transit network to a street network.
  * Should be called after both the transit network and street network are loaded.
  */
-public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
+public class TransitToStreetNetworkModule implements GraphBuilderModule {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkGraphBuilderImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkModule.class);
 
     public List<String> provides() {
         return Arrays.asList("street to transit", "linking");

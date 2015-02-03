@@ -28,11 +28,9 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.GtfsModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -73,7 +71,7 @@ public abstract class GtfsTest extends TestCase {
         File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
         GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
         List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
-        GtfsGraphBuilderImpl gtfsGraphBuilderImpl = new GtfsGraphBuilderImpl(gtfsBundleList);
+        GtfsModule gtfsGraphBuilderImpl = new GtfsModule(gtfsBundleList);
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();

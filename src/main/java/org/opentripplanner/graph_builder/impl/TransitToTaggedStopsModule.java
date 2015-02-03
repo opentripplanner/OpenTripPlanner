@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.impl;
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -20,9 +20,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-public class TransitToTaggedStopsGraphBuilderImpl implements GraphBuilder {
+public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsGraphBuilderImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
 
     StreetVertexIndexServiceImpl index;
     private double searchRadiusM = 250;

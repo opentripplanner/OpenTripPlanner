@@ -13,12 +13,10 @@
 
 package org.opentripplanner.graph_builder.impl.bike;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.BikeParkEdge;
@@ -38,9 +36,9 @@ import org.slf4j.LoggerFactory;
  * @author laurent
  * @author GoAbout
  */
-public class BikeParkGraphBuilder implements GraphBuilder {
+public class BikeParkModule implements GraphBuilderModule {
 
-    private static Logger LOG = LoggerFactory.getLogger(BikeParkGraphBuilder.class);
+    private static Logger LOG = LoggerFactory.getLogger(BikeParkModule.class);
 
     private BikeParkDataSource dataSource;
 
@@ -65,16 +63,6 @@ public class BikeParkGraphBuilder implements GraphBuilder {
             new BikeParkEdge(bikeParkVertex);
         }
         LOG.info("Created " + bikeParks.size() + " bike parks.");
-    }
-
-    @Override
-    public List<String> provides() {
-        return Arrays.asList("bike_parks");
-    }
-
-    @Override
-    public List<String> getPrerequisites() {
-        return Arrays.asList("streets");
     }
 
     @Override

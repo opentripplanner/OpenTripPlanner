@@ -37,7 +37,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
@@ -59,8 +59,8 @@ import com.vividsolutions.jts.geom.MultiLineString;
  * Loads a shapefile into an edge-based graph.
  *
  */
-public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
-    private static Logger log = LoggerFactory.getLogger(ShapefileStreetGraphBuilderImpl.class);
+public class ShapefileStreetModule implements GraphBuilderModule {
+    private static Logger log = LoggerFactory.getLogger(ShapefileStreetModule.class);
 
     private FeatureSourceFactory _featureSourceFactory;
 

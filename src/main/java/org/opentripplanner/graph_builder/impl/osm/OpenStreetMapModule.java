@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -36,7 +35,7 @@ import org.opentripplanner.graph_builder.annotation.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.annotation.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
@@ -90,9 +89,9 @@ import com.vividsolutions.jts.geom.LineString;
 /**
  * Builds a street graph from OpenStreetMap data.
  */
-public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
+public class OpenStreetMapModule implements GraphBuilderModule {
 
-    private static Logger LOG = LoggerFactory.getLogger(OpenStreetMapGraphBuilderImpl.class);
+    private static Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
 
     // Private members that are only read or written internally.
 
@@ -179,11 +178,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     /**
      * Construct and set providers all at once.
      */
-    public OpenStreetMapGraphBuilderImpl(List<OpenStreetMapProvider> providers) {
+    public OpenStreetMapModule(List<OpenStreetMapProvider> providers) {
         this.setProviders(providers);
     }
 
-    public OpenStreetMapGraphBuilderImpl() {
+    public OpenStreetMapModule() {
     }
 
     @Override

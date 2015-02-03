@@ -30,16 +30,16 @@ import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.graph_builder.AnnotationsToHTML;
-import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.impl.*;
-import org.opentripplanner.graph_builder.impl.ned.ElevationGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.ned.ElevationModule;
 import org.opentripplanner.graph_builder.impl.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
@@ -125,12 +125,12 @@ public class OTPConfigurator {
     }
 
     // TODO parameterize with the build directory, to make multiple builderTasks
-    public GraphBuilderTask builderFromParameters() {
+    public GraphBuilder builderFromParameters() {
         if (params.build == null) {
             return null;
         }
         LOG.info("Wiring up and configuring graph builder task.");
-        GraphBuilderTask graphBuilder = new GraphBuilderTask();
+        GraphBuilder graphBuilder = new GraphBuilder();
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         JsonNode builderConfig = null;
@@ -184,7 +184,7 @@ public class OTPConfigurator {
                 OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
                 osmProviders.add(osmProvider);
             }
-            OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders);
+            OpenStreetMapModule osmBuilder = new OpenStreetMapModule(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
             streetEdgeFactory.useElevationData = builderParams.elevation || (demFile != null);
             osmBuilder.edgeFactory = streetEdgeFactory;
@@ -205,14 +205,14 @@ public class OTPConfigurator {
                 gtfsBundle.parentStationTransfers = builderParams.parentStationTransfers;
                 gtfsBundles.add(gtfsBundle);
             }
-            GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
+            GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
             if ( hasOSM ) {
                 if (builderParams.matchBusRoutesToStreets) {
                     graphBuilder.addGraphBuilder(new BusRouteStreetMatcher());
                 }
-                graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
-                graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
+                graphBuilder.addGraphBuilder(new TransitToTaggedStopsModule());
+                graphBuilder.addGraphBuilder(new TransitToStreetNetworkModule());
             }
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
@@ -224,11 +224,11 @@ public class OTPConfigurator {
         if (builderParams.elevation) {
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
         } else  if (demFile != null) {
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
-            GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
         }
         graphBuilder.addGraphBuilder(new EmbedConfig(builderConfig, routerConfig));

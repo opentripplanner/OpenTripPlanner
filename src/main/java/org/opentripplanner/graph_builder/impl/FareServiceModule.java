@@ -13,12 +13,9 @@
 
 package org.opentripplanner.graph_builder.impl;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.services.ChainedFareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareService;
@@ -27,7 +24,7 @@ import org.opentripplanner.routing.services.FareService;
  * Builds a street graph from OpenStreetMap data.
  * 
  */
-public class FareServiceGraphBuilderImpl implements GraphBuilder {
+public class FareServiceModule implements GraphBuilderModule {
 
     private ChainedFareService service;
 
@@ -40,16 +37,6 @@ public class FareServiceGraphBuilderImpl implements GraphBuilder {
 
     public void setService(ChainedFareService service) {
         this.service = service;
-    }
-
-    @Override
-    public List<String> provides() {
-        return Arrays.asList("fares");
-    }
-
-    @Override
-    public List<String> getPrerequisites() {
-        return Collections.emptyList();
     }
 
     @Override

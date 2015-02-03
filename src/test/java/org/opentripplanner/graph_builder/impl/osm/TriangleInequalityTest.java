@@ -22,8 +22,6 @@ import java.net.URLDecoder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
@@ -34,9 +32,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.SPTService;
-import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class TriangleInequalityTest {
@@ -53,7 +49,7 @@ public class TriangleInequalityTest {
         extra = new HashMap<Class<?>, Object>();
         _graph = new Graph();
 
-        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 

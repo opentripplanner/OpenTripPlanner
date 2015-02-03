@@ -21,7 +21,7 @@ package org.opentripplanner.graph_builder.impl.osm;
  *
  * @author bdferris, novalis
  * @see WayProperty
- * @see OpenStreetMapGraphBuilderImpl#setWayPropertySetSource(WayPropertySetSource)
+ * @see OpenStreetMapModule#setWayPropertySetSource(WayPropertySetSource)
  */
 public interface WayPropertySetSource {
     public WayPropertySet getWayPropertySet();

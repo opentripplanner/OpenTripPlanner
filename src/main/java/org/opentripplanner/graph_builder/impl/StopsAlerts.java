@@ -17,14 +17,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
 import org.opentripplanner.graph_builder.impl.stopsAlerts.IStopTester;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * The output is a list of stops, some of the stops attributes (coordinates and etc.) and the criteria it satisfies.
  */
 
-public class StopsAlerts implements GraphBuilder {
+public class StopsAlerts implements GraphBuilderModule {
 
     private static org.slf4j.Logger LOG = LoggerFactory.getLogger(StopsAlerts.class);
 
@@ -65,16 +63,6 @@ public class StopsAlerts implements GraphBuilder {
             LOG.error("Failed to write StopsAlerts log file due to {}", e);
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public List<String> provides() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<String> getPrerequisites() {
-        return Arrays.asList("transit","streets");
     }
 
     @Override

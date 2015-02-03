@@ -1,23 +1,18 @@
 package org.opentripplanner.graph_builder.impl;
 
-import com.beust.jcommander.internal.Lists;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.GraphBuilderParameters;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * A graph builder that will embed the JSON graph builder and router configuration into the Graph.
  * This allows us to check whether a graph was built with a different configuration file than one found on disk,
  * and allows us to provide all configuration information to the server within a single Graph file.
  */
-public class EmbedConfig implements GraphBuilder {
+public class EmbedConfig implements GraphBuilderModule {
 
     /* We are storing the JSON as a string because JsonNodes are not serializable. */
     private final JsonNode builderConfig;
@@ -38,16 +33,6 @@ public class EmbedConfig implements GraphBuilder {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    @Override
-    public List<String> provides() {
-        return Lists.newArrayList();
-    }
-
-    @Override
-    public List<String> getPrerequisites() {
-        return Lists.newArrayList();
     }
 
     @Override

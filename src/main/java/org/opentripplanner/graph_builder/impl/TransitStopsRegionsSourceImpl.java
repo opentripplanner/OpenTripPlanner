@@ -16,7 +16,7 @@ package org.opentripplanner.graph_builder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.openstreetmap.services.RegionsSource;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -37,7 +37,7 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
     private double distance = 2000;
 
     // FIXME replace autowiring
-    GraphBuilderTask task;
+    GraphBuilder task;
     
     public void setDistance(double distance) {
         this.distance = distance;

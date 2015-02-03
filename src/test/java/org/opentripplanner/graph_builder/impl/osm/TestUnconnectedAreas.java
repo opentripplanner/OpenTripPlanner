@@ -44,7 +44,7 @@ public class TestUnconnectedAreas extends TestCase {
 
         Graph gg = new Graph();
 
-        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
         File file = new File(getClass().getResource("P+R.osm.gz").getFile());
@@ -80,7 +80,7 @@ public class TestUnconnectedAreas extends TestCase {
     	
     	Graph g = new Graph();
     	
-        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
         File file = new File(getClass().getResource("hackett_pr.osm.gz").getFile());
@@ -180,7 +180,7 @@ public class TestUnconnectedAreas extends TestCase {
     	 
      	Graph g = new Graph();
      	
-         OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+         OpenStreetMapModule loader = new OpenStreetMapModule();
          loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
          FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
          File file = new File(getClass().getResource(fn).getFile());

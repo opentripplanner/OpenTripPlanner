@@ -19,20 +19,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GraphBuilderTask implements Runnable {
+/**
+ * This makes a Graph out of various inputs like GTFS and OSM.
+ * It is modular: GraphBuilderModules are placed in a list and run in sequence.
+ */
+public class GraphBuilder implements Runnable {
     
-    private static Logger LOG = LoggerFactory.getLogger(GraphBuilderTask.class); 
+    private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
-    private List<GraphBuilder> _graphBuilders = new ArrayList<GraphBuilder>();
+    private List<GraphBuilderModule> _graphBuilderModules = new ArrayList<GraphBuilderModule>();
 
     private File graphFile;
     
@@ -47,12 +49,12 @@ public class GraphBuilderTask implements Runnable {
     /** Should the graph be serialized to disk after being created or not? */
     public boolean serializeGraph = true;
 
-    public void addGraphBuilder(GraphBuilder loader) {
-        _graphBuilders.add(loader);
+    public void addGraphBuilder(GraphBuilderModule loader) {
+        _graphBuilderModules.add(loader);
     }
 
-    public void setGraphBuilders(List<GraphBuilder> graphLoaders) {
-        _graphBuilders = graphLoaders;
+    public void setGraphBuilders(List<GraphBuilderModule> graphLoaders) {
+        _graphBuilderModules = graphLoaders;
     }
 
     public void setAlwaysRebuild(boolean alwaysRebuild) {
@@ -104,40 +106,24 @@ public class GraphBuilderTask implements Runnable {
             }
         	
             try {
-                if (!graphFile.getParentFile().exists())
-                    if (!graphFile.getParentFile().mkdirs())
+                if (!graphFile.getParentFile().exists()) {
+                    if (!graphFile.getParentFile().mkdirs()) {
                         LOG.error("Failed to create directories for graph bundle at " + graphFile);
+                    }
+                }
                 graphFile.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException("Cannot create or overwrite graph at path " + graphFile);
             }
         }
 
-        //check prerequisites
-        ArrayList<String> provided = new ArrayList<String>();
-        boolean bad = false;
-        for (GraphBuilder builder : _graphBuilders) {
-            List<String> prerequisites = builder.getPrerequisites();
-            for (String prereq : prerequisites) {
-                if (!provided.contains(prereq)) {
-                    LOG.error("Graph builder " + builder + " requires " + prereq + " but no previous stages provide it");
-                    bad = true;
-                }
-            }
-            provided.addAll(builder.provides());
-        }
-        if (_baseGraph != null)
-            LOG.warn("base graph loaded, not enforcing prerequisites");
-        else if (bad)
-            throw new RuntimeException("Prerequisites unsatisfied");
-
-        //check inputs
-        for (GraphBuilder builder : _graphBuilders) {
+        // Check all graph builder inputs, and fail fast to avoid waiting until the build process advances.
+        for (GraphBuilderModule builder : _graphBuilderModules) {
             builder.checkInputs();
         }
         
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
-        for (GraphBuilder load : _graphBuilders)
+        for (GraphBuilderModule load : _graphBuilderModules)
             load.buildGraph(graph, extra);
 
         graph.summarizeBuilderAnnotations();
@@ -154,4 +140,5 @@ public class GraphBuilderTask implements Runnable {
         long endTime = System.currentTimeMillis();
         LOG.info(String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0));
     }
+
 }

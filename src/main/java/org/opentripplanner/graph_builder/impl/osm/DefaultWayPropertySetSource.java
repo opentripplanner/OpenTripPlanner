@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author bdferris, novalis
  * @see WayPropertySetSource
- * @see OpenStreetMapGraphBuilderImpl
+ * @see OpenStreetMapModule
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
