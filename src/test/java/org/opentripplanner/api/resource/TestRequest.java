@@ -53,7 +53,6 @@ import org.opentripplanner.graph_builder.module.shapefile.ShapefileFeatureSource
 import org.opentripplanner.graph_builder.module.shapefile.ShapefileStreetModule;
 import org.opentripplanner.graph_builder.module.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -170,15 +169,12 @@ class Context {
     }
 
     private void initTransit() {
-        GtfsModule gtfsBuilder = new GtfsModule();
         GtfsBundle bundle = new GtfsBundle();
         bundle.setPath(new File("src/test/resources/google_transit.zip"));
 
         ArrayList<GtfsBundle> bundleList = new ArrayList<GtfsBundle>();
         bundleList.add(bundle);
-        GtfsBundles bundles = new GtfsBundles();
-        bundles.setBundles(bundleList);
-        gtfsBuilder.setGtfsBundles(bundles);
+        GtfsModule gtfsBuilder = new GtfsModule(bundleList);
 
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         gtfsBuilder.buildGraph(graph, extra);

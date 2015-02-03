@@ -20,13 +20,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
+import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.MockGtfs;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -36,7 +36,7 @@ public class GtfsGraphBuilderModuleTest {
 
     private static final HashMap<Class<?>, Object> _extra = new HashMap<Class<?>, Object>();
 
-    private GtfsModule _builder = new GtfsModule();
+    private GtfsModule _builder;
 
     @Test
     public void testNoBikesByDefault() throws IOException {
@@ -46,9 +46,9 @@ public class GtfsGraphBuilderModuleTest {
         gtfs.putTrips(2, "r0", "sid0", "bikes_allowed=0,1");
         gtfs.putStopTimes("t0,t1", "s0,s1");
 
-        GtfsBundles bundles = getGtfsAsBundles(gtfs);
-        bundles.getBundles().get(0).setDefaultBikesAllowed(false);
-        _builder.setGtfsBundles(bundles);
+        List<GtfsBundle> bundleList = getGtfsAsBundleList(gtfs);
+        bundleList.get(0).setDefaultBikesAllowed(false);
+        _builder = new GtfsModule(bundleList);
 
         Graph graph = new Graph();
         _builder.buildGraph(graph, _extra);
@@ -71,9 +71,9 @@ public class GtfsGraphBuilderModuleTest {
         gtfs.putTrips(2, "r0", "sid0", "bikes_allowed=0,2");
         gtfs.putStopTimes("t0,t1", "s0,s1");
 
-        GtfsBundles bundles = getGtfsAsBundles(gtfs);
-        bundles.getBundles().get(0).setDefaultBikesAllowed(true);
-        _builder.setGtfsBundles(bundles);
+        List<GtfsBundle> bundleList = getGtfsAsBundleList(gtfs);
+        bundleList.get(0).setDefaultBikesAllowed(true);
+        _builder = new GtfsModule(bundleList);
 
         Graph graph = new Graph();
         _builder.buildGraph(graph, _extra);
@@ -99,12 +99,12 @@ public class GtfsGraphBuilderModuleTest {
         return gtfs;
     }
 
-    private static GtfsBundles getGtfsAsBundles(MockGtfs gtfs) {
+    private static List<GtfsBundle> getGtfsAsBundleList (MockGtfs gtfs) {
         GtfsBundle bundle = new GtfsBundle();
         bundle.setPath(gtfs.getPath());
-        GtfsBundles bundles = new GtfsBundles();
-        bundles.getBundles().add(bundle);
-        return bundles;
+        List<GtfsBundle> list = Lists.newArrayList();
+        list.add(bundle);
+        return list;
     }
 
     private static <S extends Serializable, T extends IdentityBean<S>> T withId(Iterable<T> beans,

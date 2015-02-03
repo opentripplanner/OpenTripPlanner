@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.beust.jcommander.internal.Lists;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
@@ -44,7 +45,6 @@ import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -62,8 +62,6 @@ public class GtfsModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
 
-    private GtfsBundles _gtfsBundles;
-
     EntityHandler counter = new EntityCounter();
 
     private FareServiceFactory _fareServiceFactory;
@@ -78,18 +76,9 @@ public class GtfsModule implements GraphBuilderModule {
 
     int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
-    /**
-     * Construct and set bundles all at once. 
-     * TODO why is there a wrapper class around a list of GTFS files?
-     * TODO why is there a wrapper around GTFS files at all?
-     */
-    public GtfsModule(List<GtfsBundle> gtfsBundles) {
-        GtfsBundles gtfsb = new GtfsBundles();
-        gtfsb.setBundles(gtfsBundles);
-        this.setGtfsBundles(gtfsb);
-    }
-    
-    public GtfsModule() { };
+    public List<GtfsBundle> gtfsBundles;
+
+    public GtfsModule(List<GtfsBundle> bundles) { this.gtfsBundles = bundles; };
 
     public List<String> provides() {
         List<String> result = new ArrayList<String>();
@@ -99,19 +88,6 @@ public class GtfsModule implements GraphBuilderModule {
 
     public List<String> getPrerequisites() {
         return Collections.emptyList();
-    }
-
-    public void setGtfsBundles(GtfsBundles gtfsBundles) {
-        _gtfsBundles = gtfsBundles;
-        /* check for dups */
-        HashSet<String> bundles = new HashSet<String>();
-        for (GtfsBundle bundle : gtfsBundles.getBundles()) {
-            String key = bundle.getDataKey();
-            if (bundles.contains(key)) {
-                throw new RuntimeException("duplicate GTFS bundle " + key);
-            }
-            bundles.add(key);
-        }
     }
 
     public void setFareServiceFactory(FareServiceFactory factory) {
@@ -131,7 +107,7 @@ public class GtfsModule implements GraphBuilderModule {
         GtfsStopContext stopContext = new GtfsStopContext();
         
         try {
-            for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
+            for (GtfsBundle gtfsBundle : gtfsBundles) {
                 // apply global defaults to individual GTFSBundles (if globals have been set) 
                 if (cacheDirectory != null && gtfsBundle.cacheDirectory == null)
                     gtfsBundle.cacheDirectory = cacheDirectory;
@@ -371,7 +347,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     @Override
     public void checkInputs() {
-        for (GtfsBundle bundle : _gtfsBundles.getBundles()) {
+        for (GtfsBundle bundle : gtfsBundles) {
             bundle.checkInputs();
         }
     }
