@@ -786,16 +786,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private void unifyTurnRestrictions() {
             // Note that usually when the from or to way is not found, it's because OTP has already
-            // filtered that way.
-            // So many of these are not really problems worth issuing warnings on.
+            // filtered that way. So many missing edges are not really problems worth issuing warnings on.
             for (Long fromWay : osmdb.getTurnRestrictionWayIds()) {
                 for (TurnRestrictionTag restrictionTag : osmdb.getFromWayTurnRestrictions(fromWay)) {
                     if (restrictionTag.possibleFrom.isEmpty()) {
-                        LOG.warn("No from edge found for " + restrictionTag);
+                        LOG.debug("No from edge found for " + restrictionTag);
                         continue;
                     }
                     if (restrictionTag.possibleTo.isEmpty()) {
-                        LOG.warn("No to edge found for " + restrictionTag);
+                        LOG.debug("No to edge found for " + restrictionTag);
                         continue;
                     }
                     for (StreetEdge from : restrictionTag.possibleFrom) {
