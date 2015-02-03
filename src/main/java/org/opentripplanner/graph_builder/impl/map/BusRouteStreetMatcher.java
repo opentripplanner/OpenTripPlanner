@@ -71,7 +71,13 @@ public class BusRouteStreetMatcher implements GraphBuilder {
             for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
                 if (pattern.mode == TraverseMode.BUS) {
                     /* we can only match geometry to streets on bus routes */
-                    log.info("Matching {}", pattern);
+                    log.debug("Matching {}", pattern);
+                    //If there are no shapes in GTFS pattern geometry is generated
+                    //generated geometry is useless for street matching
+                    //that is why pattern.geometry is null in that case
+                    if (pattern.geometry == null) {
+                        continue;
+                    }
                     List<Edge> edges = matcher.match(pattern.geometry);
                     if (edges == null || edges.isEmpty()) {
                         log.warn("Could not match to street network: {}", pattern);
