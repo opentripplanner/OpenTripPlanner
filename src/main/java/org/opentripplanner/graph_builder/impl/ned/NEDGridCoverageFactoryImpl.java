@@ -13,14 +13,18 @@
 
 package org.opentripplanner.graph_builder.impl.ned;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.media.jai.InterpolationBilinear;
+import javax.ws.rs.core.Response;
 
+import com.google.common.io.ByteStreams;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.opengis.coverage.Coverage;
@@ -39,6 +43,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private Graph graph;
 
+    /** All tiles for the DEM stitched into a single coverage. */
     UnifiedGridCoverage coverage = null;
 
     private File cacheDirectory;
@@ -47,23 +52,13 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private List<VerticalDatum> datums;
 
-    public NEDGridCoverageFactoryImpl () { }
-    
     public NEDGridCoverageFactoryImpl(File cacheDirectory) {
-        this.setCacheDirectory(cacheDirectory);
-    }
-
-    /** Set the directory where NED data will be cached. */
-    public void setCacheDirectory(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
     }
 
-    // FIXME replace Autowiring
-    public void setTileSource(NEDTileSource source) {
-        this.tileSource = source;
-    }
+    private static final String[] DATUM_FILENAMES = {"g2012a00.gtx", "g2012g00.gtx", "g2012h00.gtx", "g2012p00.gtx", "g2012s00.gtx", "g2012u00.gtx"};
 
-    /* 
+    /*
      * Summarizing from http://www.nauticalcharts.noaa.gov/csdl/learn_datum.html:
      * Like GPS, OpenStreetMap uses the World Geodetic System of 1984 (WGS84) coordinate system, 
      * and altitudes in OSM are measured relative to the WGS84 datum. On the other hand, USGS 
@@ -99,20 +94,20 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
      * ellipsoid equivalence is also explained in a post at 
      * http://forums.groundspeak.com/GC/index.php?showtopic=97337.
      * 
-     * The datum rasters must be downloaded from the OTP website and placed in the NED cache directory. 
+     * The datum rasters must be downloaded from the OTP website and placed in the NED cache directory.
+     * TODO they could be fetched automatically from a static URL on the opentripplanner website.
      */
     private void loadVerticalDatum () {
         if (datums == null) {
             datums = new ArrayList<VerticalDatum>();
-            String[] datumFilenames = {"g2012a00.gtx","g2012g00.gtx","g2012h00.gtx","g2012p00.gtx","g2012s00.gtx","g2012u00.gtx"};
             try {
-                for (String filename : datumFilenames) {
+                for (String filename : DATUM_FILENAMES) {
                     File datumFile = new File(cacheDirectory, filename);
                     VerticalDatum datum = VerticalDatum.fromGTX(new FileInputStream(datumFile)); 
                     datums.add(datum);
                 }
             } catch (IOException e) {
-                LOG.error("OTP needs additional files (a vertical datum) to convert between NED elevations and OSM's WGS84 elevations. See https://github.com/openplans/OpenTripPlanner/wiki/GraphBuilder#elevation-data for further information.");
+                LOG.error("Datum file has disappeared since preflight inputs check.");
                 throw new RuntimeException(e);
             }            
         }
@@ -139,12 +134,61 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
         return coverage;
     }
 
+    /**
+     * Grab the rather voluminous vertical datum files from the OTP web server and save them in the NED cache directory.
+     */
+    private void fetchDatum() throws Exception {
+        LOG.info("Attempting to fetch datum files from OTP project web server...");
+        URL datumUrl = new URL("http://dev.opentripplanner.org/resources/datum.zip");
+        ZipInputStream zis = new ZipInputStream(datumUrl.openStream());
+        /* Silly boilerplate because Java has no simple unzip-to-directory function. */
+        for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
+            if (entry.isDirectory()) {
+                throw new RuntimeException("ZIP files containing directories are not supported");
+            }
+            File file = new File(cacheDirectory, entry.getName());
+            if (!file.getParentFile().equals(cacheDirectory)) {
+                throw new RuntimeException("ZIP files containing directories are not supported");
+            }
+            LOG.info("decompressing {}", file);
+            OutputStream os = new FileOutputStream(file);
+            ByteStreams.copy(zis, os);
+            os.close();
+        }
+        zis.close();
+        LOG.info("Done.");
+    }
+
     @Override
     public void checkInputs() {
-        /* This is actually checking before we call tileSource.setCacheDirectory, which creates the dirs */
-        if (!cacheDirectory.canWrite()) {
-            throw new RuntimeException("Can't write to NED cache: " + cacheDirectory);
+        /* Attempt to create cache directory if it doesn't exist. */
+        if (!cacheDirectory.exists()) {
+            LOG.info("Cache directory {} does not exist, creating it.", cacheDirectory);
+            if (!cacheDirectory.mkdirs()) {
+                throw new RuntimeException("Failed to create cache directory for NED at " + cacheDirectory);
+            }
         }
+        if (!cacheDirectory.canRead() || !cacheDirectory.canWrite()) {
+            throw new RuntimeException(String.format("Can't write and write NED cache at '%s'. Check permissions.", cacheDirectory));
+        }
+        boolean missingDatum = false;
+        for (String filename : DATUM_FILENAMES) {
+            File datumFile = new File(cacheDirectory, filename);
+            if (! datumFile.canRead()) {
+                missingDatum = true;
+            }
+        }
+        if (missingDatum) {
+            /* Attempt to fetch the datum files from the web. */
+            LOG.warn("OTP needs additional files (a vertical datum) to convert between NED elevations and OSM's WGS84 elevations.");
+            try {
+                fetchDatum();
+            } catch (Exception ex) {
+                LOG.error("Exception while fetching datum files from the web.");
+                throw new RuntimeException(ex);
+            }
+        }
+
     }
 
     /** Set the graph that will be used to determine the extent of the NED. */

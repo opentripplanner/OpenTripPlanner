@@ -13,13 +13,14 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import java.util.List;
 
 /**
  * Represents a sub-segment of a StreetEdge.
@@ -31,27 +32,16 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
 
     private static final long serialVersionUID = 1L;
 
-    public RoutingContext visibleTo = null;
-
     /**
      * The edge on which this lies.
      */
     private StreetEdge parentEdge;
 
     public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-                             LineString geometry, String name, double length, StreetTraversalPermission permission,
-                             boolean back) {
-        super(v1, v2, geometry, name, length, permission, back);
+                             LineString geometry, String name, double length) {
+        super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
         setCarSpeed(parentEdge.getCarSpeed());
         this.parentEdge = parentEdge;
-    }
-    
-    /**
-     * Simplifies construction by copying some stuff from the parentEdge.
-     */
-    public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-                             LineString geometry, String name, double length) {
-        this(parentEdge, v1, v2, geometry, name, length, parentEdge.getPermission(), false);
     }
     
     /**
@@ -85,7 +75,15 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
     public int getOutAngle() {
         return parentEdge.getInAngle();
     }
-    
+
+    /**
+     * Have the turn restrictions of  their parent.
+     */
+    @Override
+    protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
+        return graph.getTurnRestrictions(parentEdge);
+    }
+
     /**
      * This implementation makes it so that TurnRestrictions on the parent edge are applied to this edge as well.
      */
@@ -125,20 +123,8 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
 
     @Override
     public String toString() {
-        return "PartialPlainStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
+        return "PartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }
-
-    @Override
-    public State traverse(State s0) {
-        // Split edges should only be usable by the routing context that created them.
-        // This should alleviate the concurrency problem in issue 1025.
-        // In the window of time before the visibleTo field is set, traversal will also fail (which is what we want).
-        if ( ! (this.visibleTo == s0.getOptions().rctx)) {
-            return null;
-        }
-        return super.traverse(s0);
-    }
-
 }

@@ -2,14 +2,14 @@
    modify it under the terms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
    the License, or (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 otp.namespace("otp.util");
@@ -17,35 +17,35 @@ otp.namespace("otp.util");
 /**
  * Utility routines for OTP itinerary-based operations
  */
- 
+
 otp.util.Itin = {
 
-    /** 
+    /**
      * Extracts the "place" from an OTP "name::place" string, where "place" is
      * a latitude,longitude string or a vertex ID.
      *
      * @param {string} locationStr an OTP GenericLocation string
-     * @return {string} the "place" component of an OTP location string 
+     * @return {string} the "place" component of an OTP location string
      */
-     
+
     getLocationPlace : function(locationStr) {
-        return locationStr.indexOf("::") != -1 ? 
+        return locationStr.indexOf("::") != -1 ?
             locationStr.split("::")[1] : locationStr;
     },
 
 
-    /** 
+    /**
      * Extracts the "name" from an OTP "name::place" string, if present
      *
      * @param {string} locationStr an OTP GenericLocation string
-     * @return {string} the "name" component of an OTP location string, null if not present 
+     * @return {string} the "name" component of an OTP location string, null if not present
      */
 
     getLocationName : function(locationStr) {
-        return locationStr.indexOf("::") != -1 ? 
+        return locationStr.indexOf("::") != -1 ?
             locationStr.split("::")[0] : null;
     },
-    
+
     /**
      * Extracts the unqualified mode from an OTP "mode_qualifier" string
      *
@@ -72,7 +72,7 @@ otp.util.Itin = {
     isTransit : function(mode) {
         return mode === "TRANSIT" || mode === "SUBWAY" || mode === "RAIL" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH";
     },
-    
+
     includesTransit : function(mode) {
         var modeArr = mode.split(",");
         for(var i = 0; i < modeArr.length; i++) {
@@ -80,7 +80,7 @@ otp.util.Itin = {
         }
         return false;
     },
-    
+
     includesWalk : function(mode) {
         var modeArr = mode.split(",");
         for(var i = 0; i < modeArr.length; i++) {
@@ -107,7 +107,7 @@ otp.util.Itin = {
 
     absoluteDirectionStrings : {
         // note: keep these lower case (and uppercase via template / code if needed)
-        //TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation 
+        //TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
         'NORTH': _tr('north'),
         'NORTHEAST': _tr('northeast'),
         'EAST': _tr('east'),
@@ -117,15 +117,15 @@ otp.util.Itin = {
         'WEST': _tr('west'),
         'NORTHWEST': _tr('northwest'),
     },
-    
-    /** 
+
+    /**
      * Returns localized absolute direction string
      *
      * @param {string} dir a absolute direction string from a server
      * @return {string} localized absolute direction string
      */
 
-    getLocalizedAbsoluteDirectionString : function(dir) { 
+    getLocalizedAbsoluteDirectionString : function(dir) {
         if (dir in this.absoluteDirectionStrings) return this.absoluteDirectionStrings[dir];
         // This is used if dir isn't found in directionStrings
         // This shouldn't happen
@@ -141,7 +141,7 @@ otp.util.Itin = {
         //on /on to [streetname]
         'HARD_LEFT': _tr("hard left"),
         'LEFT': _tr("left"),
-        'SLIGHTLY_LEFT': _tr("slight left"), 
+        'SLIGHTLY_LEFT': _tr("slight left"),
         'CONTINUE': _tr("continue"),
         'SLIGHTLY_RIGHT': _tr("slight right"),
         'RIGHT': _tr("right"),
@@ -154,24 +154,24 @@ otp.util.Itin = {
     },
 
 
-    /** 
+    /**
      * Returns localized relative direction string
      *
      * @param {string} dir a relative direction string from a server
      * @return {string} localized direction string
      */
 
-    getLocalizedRelativeDirectionString : function(dir) { 
+    getLocalizedRelativeDirectionString : function(dir) {
         if (dir in this.relativeDirectionStrings) return this.relativeDirectionStrings[dir];
         // This is used if dir isn't found in directionStrings
         // This shouldn't happen
         return dir.toLowerCase().replace('_',' ').replace('ly','');
     },
-    
+
     distanceString : function(m) {
         return otp.util.Geo.distanceString(m);
     },
-    
+
     modeStrings : {
         //TRANSLATORS: Walk distance to place (itinerary header)
         'WALK': _tr('Walk'),
@@ -197,12 +197,12 @@ otp.util.Itin = {
         //cable cars where the car is suspended from the cable.
         'GONDOLA' : _tr('Aerial Tram'),
     },
-    
+
     modeString : function(mode) {
         if(mode in this.modeStrings) return this.modeStrings[mode];
         return mode;
     },
-    
+
     getLegStepText : function(step, asHtml) {
         asHtml = (typeof asHtml === "undefined") ? true : asHtml;
         var text = '';
@@ -241,14 +241,14 @@ otp.util.Itin = {
         }
         return text;
     },
-    
+
     getRouteDisplayString : function(routeData) {
-        var str = routeData.routeShortName ? '('+routeData.routeShortName+') ' : '';
-        str += routeData.routeLongName;
+        var str = routeData.shortName ? '('+routeData.shortName+') ' : '';
+        str += routeData.longName;
         return str;
     },
-    
+
     getRouteShortReference : function(routeData) {
         return routeData.routeShortName || routeData.id.id;
-    },    
+    },
 }

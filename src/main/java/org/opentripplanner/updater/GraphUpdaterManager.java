@@ -13,6 +13,7 @@
 
 package org.opentripplanner.updater;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
 import java.util.List;
@@ -200,6 +201,18 @@ public class GraphUpdaterManager {
 
     public int size() {
         return updaterList.size();
+    }
+
+    /**
+     * Just an example of fetching status information from the graph updater manager to expose it in a web service.
+     * More useful stuff should be added later.
+     */
+    public List<Class> getUpdaterClasses() {
+        List<Class> ret = Lists.newArrayList();
+        for (GraphUpdater updater : updaterList) {
+            ret.add(updater.getClass());
+        }
+        return ret;
     }
 
 }

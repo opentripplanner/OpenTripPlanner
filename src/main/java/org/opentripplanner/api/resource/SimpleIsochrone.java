@@ -343,7 +343,11 @@ public class SimpleIsochrone extends RoutingResource {
         }
     }
 
-    /** A HashMap that has been extended to track the greatest or smallest value for each key. */
+    /**
+     * A HashMap that has been extended to track the greatest or smallest value for each key.
+     * Note that this does not change the meaning of the 'put' method. It adds two new methods that add the min/max
+     * behavior.
+     */
     public static class MinMap<K, V extends Comparable<V>> extends HashMap<K, V> {
         private static final long serialVersionUID = -23L;
 

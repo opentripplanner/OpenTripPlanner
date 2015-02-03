@@ -1,11 +1,13 @@
 package org.opentripplanner.routing.graph;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -24,12 +26,15 @@ import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
+import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -81,7 +86,7 @@ public class GraphIndex {
 
     /* Separate transfers for profile routing */
     public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
-    private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex;
+    private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex = null;
 
     /* Extra index for applying realtime updates (lazy-initialized). */
     public Map<String, Trip> tripForIdWithoutAgency = null;
@@ -91,6 +96,9 @@ public class GraphIndex {
 
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
+
+    /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
+    private transient StopTreeCache stopTreeCache = null;
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
@@ -139,19 +147,28 @@ public class GraphIndex {
             routeForId.put(route.getId(), route);
         }
 
-        clusterStops();
-        LOG.info("Creating a spatial index for stop clusters.");
-        stopClusterSpatialIndex = new HashGridSpatialIndex<StopCluster>();
-        for (StopCluster cluster : stopClusterForId.values()) {
-            Envelope envelope = new Envelope(new Coordinate(cluster.lon, cluster.lat));
-            stopClusterSpatialIndex.insert(envelope, cluster);
-        }
-
         // Copy these two service indexes from the graph until we have better ones.
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
         LOG.info("Done indexing graph.");
+    }
+
+    /**
+     * Stop clustering is slow to perform and only used in profile routing for the moment.
+     * Therefore it is not done automatically, and any method requiring stop clusters should call this method
+     * to ensure that the necessary indexes are lazy-initialized.
+     */
+    public synchronized void clusterStopsAsNeeded() {
+        if (stopClusterSpatialIndex == null) {
+            clusterStops();
+            LOG.info("Creating a spatial index for stop clusters.");
+            stopClusterSpatialIndex = new HashGridSpatialIndex<StopCluster>();
+            for (StopCluster cluster : stopClusterForId.values()) {
+                Envelope envelope = new Envelope(new Coordinate(cluster.lon, cluster.lat));
+                stopClusterSpatialIndex.insert(envelope, cluster);
+            }
+        }
     }
 
     private void analyzeServices() {
@@ -179,7 +196,7 @@ public class GraphIndex {
         transfersFromStopCluster = HashMultimap.create();
         final double TRANSFER_RADIUS = 500.0; // meters
         Map<P2<TripPattern>, ProfileTransfer.GoodTransferList> transfers = Maps.newHashMap();
-        LOG.info("Finding transfers...");
+        LOG.info("Finding transfers between clusters...");
         for (StopCluster sc0 : stopClusterForId.values()) {
             Set<TripPattern> tripPatterns0 = patternsForStopCluster(sc0);
             // Accounts for area-like (rather than point-like) nature of clusters
@@ -285,38 +302,145 @@ public class GraphIndex {
     }
 
     /**
-     * Fetch upcoming vehicle arrivals at a stop.
-     * This is a rather convoluted process because all of the departure search functions currently assume the
-     * existence of a State and a routing context. It would be nice to have another function that gives
-     * all departures within a time window at a stop, being careful to get a mix of all patterns passing through
-     * that stop. In fact, such a function could replace the current boarding logic if we want to allow boarding
-     * more than one trip on the same route at once (return more than one state).
-     * The current implementation is a sketch and does not adequately
+     * Fetch upcoming vehicle departures from a stop.
+     * Fetches two departures for each pattern during the next 24 hours as default
+     *
+     * @param stop
+     * @return
      */
     public Collection<StopTimesInPattern> stopTimesForStop(Stop stop) {
-        List<StopTimesInPattern> ret = Lists.newArrayList();
-        RoutingRequest req = new RoutingRequest();
-        req.setRoutingContext(graph, (Vertex)null, (Vertex)null);
-        State state = new State(req);
+        return getStopTimesForStop(stop, 24 * 60 * 60, 2);
+    }
+
+    /**
+     * Fetch upcoming vehicle departures from a stop.
+     * It goes though all patterns passing the stop for the previous, current and next service date.
+     * It uses a priority queue to keep track of the next departures. The queue is shared between all dates, as services
+     * from the previous service date can visit the stop later than the current service date's services. This happens
+     * eg. with sleeper trains.
+     *
+     * TODO: Add frequency based trips
+     *
+     * @param stop
+     * @param timeRange
+     * @param numberOfDepartures
+     * @return
+     */
+    public List<StopTimesInPattern> getStopTimesForStop(Stop stop, int timeRange, int numberOfDepartures) {
+
+        long now = System.currentTimeMillis()/1000;
+        List<StopTimesInPattern> ret = new ArrayList<>();
+        TimetableResolver timetableResolver = null;
+        if (graph.timetableSnapshotSource != null) {
+            timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+        }
+        ServiceDate[] serviceDates = {new ServiceDate().previous(), new ServiceDate(), new ServiceDate().next()};
+
         for (TripPattern pattern : patternsForStop.get(stop)) {
-            StopTimesInPattern times = new StopTimesInPattern(pattern);
-            // Should actually be getUpdatedTimetable
-            Timetable table = pattern.scheduledTimetable;
-            // A Stop may occur more than once in a pattern, so iterate over all Stops.
+
+            // Use the Lucene PriorityQueue, which has a fixed size
+            PriorityQueue<TripTimeShort> pq = new PriorityQueue<TripTimeShort>(numberOfDepartures) {
+                @Override
+                protected boolean lessThan(TripTimeShort tripTimeShort, TripTimeShort t1) {
+                    // Calculate exact timestamp
+                    return (tripTimeShort.serviceDay + tripTimeShort.realtimeDeparture) >
+                            (t1.serviceDay + t1.realtimeDeparture);
+                }
+            };
+
+            // Loop through all possible days
+            for (ServiceDate serviceDate : serviceDates) {
+                ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
+                Timetable tt;
+                if (timetableResolver != null){
+                    tt = timetableResolver.resolve(pattern, serviceDate);
+                } else {
+                    tt = pattern.scheduledTimetable;
+                }
+
+                if (!tt.temporallyViable(sd, now, timeRange, true)) continue;
+
+                int secondsSinceMidnight = sd.secondsSinceMidnight(now);
+                int sidx = 0;
+                for (Stop currStop : pattern.stopPattern.stops) {
+                    if (currStop == stop) {
+                        for (TripTimes t : tt.tripTimes) {
+                            if (!sd.serviceRunning(t.serviceCode)) continue;
+                            if (t.getDepartureTime(sidx) != -1 &&
+                                    t.getDepartureTime(sidx) >= secondsSinceMidnight) {
+                                pq.insertWithOverflow(new TripTimeShort(t, sidx, stop, sd));
+                            }
+                        }
+
+                        // TODO: This needs to be adapted after #1647 is merged
+                        for (FrequencyEntry freq : tt.frequencyEntries) {
+                            if (!sd.serviceRunning(freq.tripTimes.serviceCode)) continue;
+                            int departureTime = freq.nextDepartureTime(sidx, secondsSinceMidnight);
+                            if (departureTime == -1) continue;
+                            int lastDeparture = freq.endTime + freq.tripTimes.getArrivalTime(sidx) -
+                                    freq.tripTimes.getDepartureTime(0);
+                            int i = 0;
+                            while (departureTime <= lastDeparture && i < numberOfDepartures) {
+                                pq.insertWithOverflow(new TripTimeShort(freq.materialize(sidx, departureTime, true), sidx, stop, sd));
+                                departureTime += freq.headway;
+                                i++;
+                            }
+                        }
+                    }
+                    sidx++;
+                }
+            }
+
+            if (pq.size() != 0) {
+                StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
+                while (pq.size() != 0) {
+                    stopTimes.times.add(0, pq.pop());
+                }
+                ret.add(stopTimes);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when creating complete stop
+     * timetables for a single day.
+     *
+     * @param stop
+     * @param serviceDate
+     * @return
+     */
+    public List<StopTimesInPattern> getStopTimesForStop(Stop stop, ServiceDate serviceDate) {
+        List<StopTimesInPattern> ret = new ArrayList<>();
+        TimetableResolver timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+        Collection<TripPattern> patterns = patternsForStop.get(stop);
+        for (TripPattern pattern : patterns) {
+            StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
+            Timetable tt = timetableResolver.resolve(pattern, serviceDate);
+            ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
             int sidx = 0;
-            for (Stop currStop : table.pattern.stopPattern.stops) {
-                if (currStop != stop) continue;
-                for (ServiceDay sd : req.rctx.serviceDays) {
-                    TripTimes tt = table.getNextTrip(state, sd, sidx, true);
-                    if (tt != null) {
-                        times.times.add(new TripTimeShort(tt, sidx, stop));
+            for (Stop currStop : pattern.stopPattern.stops) {
+                if (currStop == stop) {
+                    for (TripTimes t : tt.tripTimes) {
+                        if (!sd.serviceRunning(t.serviceCode)) continue;
+                        stopTimes.times.add(new TripTimeShort(t, sidx, stop));
                     }
                 }
                 sidx++;
             }
-            if ( ! times.times.isEmpty()) ret.add(times);
+            ret.add(stopTimes);
         }
         return ret;
+    }
+
+    /** Fetch a cache of nearby intersection distances for every transit stop in this graph, lazy-building as needed. */
+    public StopTreeCache getStopTreeCache() {
+        synchronized (this) {
+            if (stopTreeCache == null) {
+                stopTreeCache = new StopTreeCache(graph, 20); // TODO make this max-distance variable
+            }
+        }
+        return stopTreeCache;
     }
 
     /**

@@ -200,6 +200,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
         LOG.info("Building street graph from OSM");
         handler.buildGraph(extra);
+        graph.hasStreets = true;
     }
 
     /*

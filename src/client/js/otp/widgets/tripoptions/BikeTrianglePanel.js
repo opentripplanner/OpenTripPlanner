@@ -154,9 +154,10 @@ otp.widgets.BikeTrianglePanel = new otp.Class({
             // storing original coordinates
             this.ox = this.attr("cx");
             this.oy = this.attr("cy");
-            this_.quickBar.animate({opacity: .25}, animTime);
-            this_.flatBar.animateWith(this_.quickBar, {opacity: .25}, animTime);
-            this_.safeBar.animateWith(this_.quickBar, {opacity: .25}, animTime);
+            var opacityAnimation = Raphael.animation({opacity: .25}, animTime);
+            this_.quickBar.animate(opacityAnimation);
+            this_.flatBar.animateWith(this_.quickBar, opacityAnimation, opacityAnimation);
+            this_.safeBar.animateWith(this_.quickBar, opacityAnimation, opacityAnimation);
             //quickLabel.animate({opacity: 1}, animTime);
             //flatLabel.animate({opacity: 1}, animTime);
             //safeLabel.animate({opacity: 1}, animTime);
@@ -185,9 +186,10 @@ otp.widgets.BikeTrianglePanel = new otp.Class({
         },
         up = function () {
             // restoring state
-            this_.quickBar.animate({opacity: 1}, animTime);
-            this_.flatBar.animateWith(this_.quickBar, {opacity: 1}, animTime);
-            this_.safeBar.animateWith(this_.quickBar, {opacity: 1}, animTime);
+            var opacityAnimation = Raphael.animation({opacity: 1}, animTime);
+            this_.quickBar.animate(opacityAnimation);
+            this_.flatBar.animateWith(this_.quickBar, opacityAnimation, opacityAnimation);
+            this_.safeBar.animateWith(this_.quickBar, opacityAnimation, opacityAnimation);
             //quickLabel.animate({opacity: 0}, animTime);
             //flatLabel.animate({opacity: 0}, animTime);
             //safeLabel.animate({opacity: 0}, animTime);

@@ -35,7 +35,14 @@ public class HttpUtils {
     private static final int TIMEOUT_SOCKET = 5000;
 
     public static InputStream getData(String url) throws IOException {
+        return getData(url, null, null);
+    }
+
+    public static InputStream getData(String url, String requestHeaderName, String requestHeaderValue) throws ClientProtocolException, IOException {
         HttpGet httpget = new HttpGet(url);
+        if (requestHeaderValue != null) {
+            httpget.addHeader(requestHeaderName, requestHeaderValue);
+        }
         HttpClient httpclient = getClient();
         HttpResponse response = httpclient.execute(httpget);
         if(response.getStatusLine().getStatusCode() != 200)

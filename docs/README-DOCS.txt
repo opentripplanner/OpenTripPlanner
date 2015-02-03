@@ -7,3 +7,7 @@ In short:
 
 $ pip install mkdocs
 $ mkdocs serve
+
+
+Tracking progress on documentation migration (many are wiki commit messages):
+Move Building-OTP from wiki to mkdocs, replacing RST version.

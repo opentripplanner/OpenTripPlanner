@@ -261,10 +261,17 @@ public class SurfaceResource extends RoutingResource {
     /**
      * Use Laurent's accumulative grid sampler. Cutoffs in minutes.
      * The grid and Delaunay triangulation are cached, so subsequent requests are very fast.
+     *
+     * @param spacing the number of minutes between isochrones
+     * @return a list of evenly-spaced isochrones up to the timesurface's cutoff point
      */
-    public List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing) {
+    private List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing) {
 
         long t0 = System.currentTimeMillis();
+        if (surf.sampleGrid == null) {
+            // The sample grid was not built from the SPT; make a minimal one including only time from the vertices in this timesurface
+            surf.makeSampleGridWithoutSPT();
+        }
         DelaunayIsolineBuilder<WTWD> isolineBuilder = new DelaunayIsolineBuilder<WTWD>(
                 surf.sampleGrid.delaunayTriangulate(), new WTWD.IsolineMetric());
 
@@ -280,7 +287,7 @@ public class SurfaceResource extends RoutingResource {
         }
 
         long t1 = System.currentTimeMillis();
-        LOG.debug("Computed {} isochrones in {}msec", isochrones.size(), (int) (t1 - t0));
+        LOG.debug("Computed {} isochrones in {} msec", isochrones.size(), (int) (t1 - t0));
 
         return isochrones;
     }

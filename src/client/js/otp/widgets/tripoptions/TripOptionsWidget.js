@@ -2,31 +2,31 @@
    modify it under the terms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
    the License, or (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 otp.namespace("otp.widgets.tripoptions");
 
-otp.widgets.tripoptions.TripOptionsWidget = 
+otp.widgets.tripoptions.TripOptionsWidget =
     otp.Class(otp.widgets.Widget, {
-    
+
     //planTripCallback : null,
     controls : null,
     module : null,
 
     scrollPanel : null,
-    
+
     autoPlan : false,
-            
+
     initialize : function(id, module, options) {
-    
+
         options = options || {};
         //TRANSLATORS: Widget title
         if(!_.has(options, 'title')) options['title'] = _tr("Travel Options");
@@ -34,15 +34,15 @@ otp.widgets.tripoptions.TripOptionsWidget =
         otp.widgets.Widget.prototype.initialize.call(this, id, module, options);
 
         this.mainDiv.addClass('otp-tripOptionsWidget');
-        
+
         //this.planTripCallback = planTripCallback;
         this.module = module;
-        
+
         this.controls = {};
     },
 
     addControl : function(id, control, scrollable) {
-    
+
         if(scrollable) {
             if(this.scrollPanel == null) this.initScrollPanel();
             control.$().appendTo(this.scrollPanel);
@@ -54,7 +54,7 @@ otp.widgets.tripoptions.TripOptionsWidget =
         control.doAfterLayout();
         this.controls[id] = control;
     },
-    
+
     initScrollPanel : function() {
         this.scrollPanel = $('<div id="'+this.id+'-scollPanel" class="notDraggable" style="overflow: auto;"></div>').appendTo(this.$());
         this.$().resizable({
@@ -62,7 +62,7 @@ otp.widgets.tripoptions.TripOptionsWidget =
             alsoResize: this.scrollPanel
         });
     },
-    
+
     addSeparator : function(scrollable) {
         var hr = $("<hr />")
         if(scrollable) {
@@ -73,7 +73,7 @@ otp.widgets.tripoptions.TripOptionsWidget =
             hr.appendTo(this.$());
         }
     },
-    
+
     addVerticalSpace : function(pixels, scrollable) {
         var vSpace = $('<div style="height: '+pixels+'px;"></div>');
         if(scrollable) {
@@ -87,7 +87,7 @@ otp.widgets.tripoptions.TripOptionsWidget =
 
     restorePlan : function(data) {
 	    if(data == null) return;
-	    
+
 	    for(var id in this.controls) {
             this.controls[id].restorePlan(data);
         }
@@ -105,21 +105,21 @@ otp.widgets.tripoptions.TripOptionsWidget =
         }
         this.applyQueryParams(params);
     },
-    
+
     newItinerary : function(itin) {
         for(var id in this.controls) {
             this.controls[id].newItinerary(itin);
         }
     },
-    
+
     inputChanged : function(params) {
         if(params) _.extend(this.module, params);
         if(this.autoPlan) {
             this.module.planTrip();
         }
     },
-    
-    
+
+
     CLASS_NAME : "otp.widgets.TripWidget"
 });
 
@@ -127,29 +127,29 @@ otp.widgets.tripoptions.TripOptionsWidget =
 //** CONTROL CLASSES **//
 
 otp.widgets.tripoptions.TripOptionsWidgetControl = otp.Class({
-    
+
     div :   null,
     tripWidget : null,
-    
+
     initialize : function(tripWidget) {
         this.tripWidget = tripWidget;
         this.div = document.createElement('div');
         //this.div.className()
     },
-    
+
     setContent : function(content) {
         this.div.innerHTML = content;
     },
-        
+
     doAfterLayout : function() {
     },
-    
+
     restorePlan : function(data) {
     },
-    
+
     newItinerary : function(itin) {
     },
-    
+
     isApplicableForMode : function(mode) {
         return false;
     },
@@ -161,21 +161,21 @@ otp.widgets.tripoptions.TripOptionsWidgetControl = otp.Class({
 
 //** LocationsSelector **//
 
-otp.widgets.tripoptions.LocationsSelector = 
+otp.widgets.tripoptions.LocationsSelector =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-    
+
     id           :  null,
     geocoders    :  null,
-    
+
     activeIndex  :  0,
-    
+
     initialize : function(tripWidget, geocoders) {
         console.log("init loc");
         this.geocoders = geocoders;
-        
+
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-locSelector";
-        
+
         ich['otp-tripOptions-locations']({
             widgetId : this.id,
             showGeocoders : (this.geocoders && this.geocoders.length > 1),
@@ -185,7 +185,7 @@ otp.widgets.tripoptions.LocationsSelector =
             end: _tr("End"),
             geocoder: _tr("Geocoder")
         }).appendTo(this.$());
-        
+
         this.tripWidget.module.on("startChanged", $.proxy(function(latlng, name) {
             $("#"+this.id+"-start").val(name || '(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
         }, this));
@@ -198,11 +198,11 @@ otp.widgets.tripoptions.LocationsSelector =
 
     doAfterLayout : function() {
         var this_ = this;
-        
+
         this.startInput = this.initInput($("#"+this.id+"-start"), this.tripWidget.module.setStartPoint);
         this.endInput = this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
 
-        
+
         $("#"+this.id+"-startDropdown").click($.proxy(function() {
             $("#"+this.id+"-start").autocomplete("widget").show();
         }, this));
@@ -210,7 +210,7 @@ otp.widgets.tripoptions.LocationsSelector =
         $("#"+this.id+"-endDropdown").click($.proxy(function() {
             $("#"+this.id+"-end").autocomplete("widget").show();
         }, this));
-                
+
 
         $("#"+this.id+"-reverseButton").click($.proxy(function() {
             var module = this.tripWidget.module;
@@ -220,9 +220,9 @@ otp.widgets.tripoptions.LocationsSelector =
             module.setStartPoint(endLatLng, false, endName);
             module.setEndPoint(startLatLng, false, startName);
             this_.tripWidget.inputChanged();
-            
+
         }, this));
-        
+
         if(this.geocoders.length > 1) {
             var selector = $("#"+this.id+"-selector");
             selector.change(function() {
@@ -230,7 +230,7 @@ otp.widgets.tripoptions.LocationsSelector =
             });
         }
     },
-        
+
     initInput : function(input, setterFunction) {
         var this_ = this;
         input.autocomplete({
@@ -255,7 +255,7 @@ otp.widgets.tripoptions.LocationsSelector =
         });
         return input;
     },
-    
+
     getResultLookup : function(results) {
         var resultLookup = {};
         for(var i=0; i<results.length; i++) {
@@ -263,7 +263,7 @@ otp.widgets.tripoptions.LocationsSelector =
         }
         return resultLookup;
     },
-    
+
     restorePlan : function(data) {
         if(data.queryParams.fromPlace) {
             console.log("rP: "+data.queryParams.fromPlace);
@@ -277,7 +277,7 @@ otp.widgets.tripoptions.LocationsSelector =
             $("#"+this.id+"-start").val('');
             this.tripWidget.module.startName = null;
         }
-        
+
         if(data.queryParams.toPlace) {
             var toName = otp.util.Itin.getLocationName(data.queryParams.toPlace);
             if(toName) {
@@ -289,19 +289,19 @@ otp.widgets.tripoptions.LocationsSelector =
             $("#"+this.id+"-end").val('');
             this.tripWidget.module.endName = null;
         }
-    }    
-        
+    }
+
 });
 
 
 //** TimeSelector **//
 
-otp.widgets.tripoptions.TimeSelector = 
+otp.widgets.tripoptions.TimeSelector =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-    
+
     id          :  null,
-    epoch       : null,   
-    
+    epoch       : null,
+
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-timeSelector";
@@ -317,8 +317,8 @@ otp.widgets.tripoptions.TimeSelector =
             //TRANSLATORS: on button that sets time and date of arrival/departure to now
             now      : _tr("Now")
         }).appendTo(this.$());
-    
-        this.epoch = moment().unix();    
+
+        this.epoch = moment().unix();
     },
 
     doAfterLayout : function() {
@@ -337,7 +337,7 @@ otp.widgets.tripoptions.TimeSelector =
             }
         });
         $('#'+this.id+'-date').datepicker("setDate", new Date());
-        
+
         $('#'+this.id+'-time').val(moment().format(otp.config.locale.time.time_format))
         .keyup(function() {
             if(otp.config.locale.time.time_format.toLowerCase().charAt(otp.config.locale.time.time_format.length-1) === 'a') {
@@ -357,15 +357,15 @@ otp.widgets.tripoptions.TimeSelector =
                         }
                     }
                 }
-            }            
+            }
             this_.tripWidget.inputChanged({
                 time : $(this).val(),
             });
-            
+
         });
-        
+
         $("#"+this.id+'-nowButton').click(function() {
-            $('#'+this_.id+'-date').datepicker("setDate", new Date());        
+            $('#'+this_.id+'-date').datepicker("setDate", new Date());
             $('#'+this_.id+'-time').val(moment().format(otp.config.locale.time.time_format))
             this_.tripWidget.inputChanged({
                 time : $('#'+this_.id+'-time').val(),
@@ -374,7 +374,7 @@ otp.widgets.tripoptions.TimeSelector =
         });
 
     },
-    
+
     getDate : function() {
         return $('#'+this.id+'-date').val();
     },
@@ -396,14 +396,14 @@ otp.widgets.tripoptions.TimeSelector =
         }
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
             this.tripWidget.module.arriveBy = true;
-            $('#'+this.id+'-depArr option:eq(1)').prop('selected', true);  
+            $('#'+this.id+'-depArr option:eq(1)').prop('selected', true);
         }
         else {
             this.tripWidget.module.arriveBy = false;
-            $('#'+this.id+'-depArr option:eq(0)').prop('selected', true);  
+            $('#'+this.id+'-depArr option:eq(0)').prop('selected', true);
         }
     }
-        
+
 });
 
 
@@ -454,16 +454,16 @@ otp.widgets.tripoptions.WheelChairSelector =
 
 //** ModeSelector **//
 
-otp.widgets.tripoptions.ModeSelector = 
+otp.widgets.tripoptions.ModeSelector =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-    
+
     id           :  null,
 
     modes        : otp.config.modes,
-    
+
     optionLookup : null,
     modeControls : null,
-           
+
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-modeSelector";
@@ -474,12 +474,12 @@ otp.widgets.tripoptions.ModeSelector =
         var html = "<div class='notDraggable'>" + _tr("Travel by") + ": ";
         html += '<select id="'+this.id+'">';
         _.each(this.modes, function(text, key) {
-            html += '<option>'+text+'</option>';            
+            html += '<option>'+text+'</option>';
         });
         html += '</select>';
         html += '<div id="'+this.id+'-widgets" style="overflow: hidden;"></div>';
         html += "</div>";
-        
+
         $(html).appendTo(this.$());
         //this.setContent(content);
     },
@@ -498,19 +498,19 @@ otp.widgets.tripoptions.ModeSelector =
         var i = 0;
         for(mode in this.modes) {
             if(mode === data.queryParams.mode) {
-                this.tripWidget.module.mode = data.queryParams.mode; 
-                $('#'+this.id+' option:eq('+i+')').prop('selected', true);    
+                this.tripWidget.module.mode = data.queryParams.mode;
+                $('#'+this.id+' option:eq('+i+')').prop('selected', true);
             }
             i++;
         }
-        
+
         for(i = 0; i < this.modeControls.length; i++) {
             this.modeControls[i].restorePlan(data);
         }
     },
-    
+
     controlPadding : "8px",
-    
+
     refreshModeControls : function() {
         var container = $("#"+this.id+'-widgets');
         container.empty();
@@ -524,19 +524,19 @@ otp.widgets.tripoptions.ModeSelector =
             }
         }
     },
-    
+
     addModeControl : function(widget) {
         this.modeControls.push(widget);
     }
-        
+
 });
 
 
 //** MaxWalkSelector **//
 
-otp.widgets.tripoptions.MaxDistanceSelector = 
+otp.widgets.tripoptions.MaxDistanceSelector =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-    
+
     id           :  null,
     presets      : null,
     distSuffix   : null,
@@ -552,7 +552,7 @@ otp.widgets.tripoptions.MaxDistanceSelector =
         var presets;
 
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
-        
+
         // Set it up the system correctly ones, so we don't need to later on
         if (otp.config.metric) {
             this.presets = presets = this.metricPresets;
@@ -595,7 +595,7 @@ otp.widgets.tripoptions.MaxDistanceSelector =
 
             this_.setDistance(meters);
         });
-        
+
         $('#'+this.id+'-presets').change(function() {
             var presetVal = this_.presets[this.selectedIndex-1];
 
@@ -605,8 +605,8 @@ otp.widgets.tripoptions.MaxDistanceSelector =
             if (!otp.config.metric) { presetVal = otp.util.Imperial.metersToMiles(presetVal); } // Output in miles
 
             // Show the value in miles/meters
-            $('#'+this_.id+'-value').val(presetVal.toFixed(2));    
-            $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);    
+            $('#'+this_.id+'-value').val(presetVal.toFixed(2));
+            $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);
         });
     },
 
@@ -618,7 +618,7 @@ otp.widgets.tripoptions.MaxDistanceSelector =
 
         if (!otp.config.metric) { meters = otp.util.Imperial.metersToMiles(meters); }
 
-        $('#'+this.id+'-value').val(meters.toFixed(2));  
+        $('#'+this.id+'-value').val(meters.toFixed(2));
         this.tripWidget.module.maxWalkDistance = parseFloat(data.queryParams.maxWalkDistance);
     },
 
@@ -630,7 +630,7 @@ otp.widgets.tripoptions.MaxDistanceSelector =
 
 });
 
-otp.widgets.tripoptions.MaxWalkSelector = 
+otp.widgets.tripoptions.MaxWalkSelector =
     otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
 
     // miles (0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)
@@ -639,21 +639,21 @@ otp.widgets.tripoptions.MaxWalkSelector =
     // meters
     metricPresets      : [100, 200, 300, 400, 500, 750, 1000, 1500, 2000, 2500, 5000, 7500, 10000],
 
-    //TRANSLATORS: label for choosing how much should person's trip on foot be 
+    //TRANSLATORS: label for choosing how much should person's trip on foot be
     label       : _tr("Maximum walk")+":",
 
     initialize : function(tripWidget) {
         this.id = tripWidget.id+"-maxWalkSelector";
         otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
     },
-    
+
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
     },
 
 });
 
-otp.widgets.tripoptions.MaxBikeSelector = 
+otp.widgets.tripoptions.MaxBikeSelector =
     otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
 
     // miles (0.1, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 100)
@@ -662,14 +662,14 @@ otp.widgets.tripoptions.MaxBikeSelector =
     // meters
     metricPresets      : [100, 300, 750, 1000, 1500, 2500, 5000, 7500, 10000],
 
-    //TRANSLATORS: label for choosing how much should person's trip on bicycle be 
+    //TRANSLATORS: label for choosing how much should person's trip on bicycle be
     label       : _tr("Maximum bike")+":",
 
     initialize : function(tripWidget) {
         this.id = tripWidget.id+"-maxBikeSelector";
         otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
     },
-    
+
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesBicycle(mode);
     },
@@ -678,20 +678,20 @@ otp.widgets.tripoptions.MaxBikeSelector =
 
 //** PreferredRoutes **//
 
-otp.widgets.tripoptions.PreferredRoutes = 
+otp.widgets.tripoptions.PreferredRoutes =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-    
+
     id           :  null,
-    
+
     selectorWidget : null,
-    
+
     lastSliderValue : null,
-       
+
     initialize : function(tripWidget) {
         var this_ = this;
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-preferredRoutes";
-        
+
         ich['otp-tripOptions-preferredRoutes']({
             widgetId : this.id,
             //TRANSLATORS: label Preferred Routes: (routes/None)
@@ -704,7 +704,7 @@ otp.widgets.tripoptions.PreferredRoutes =
             //transport routes
             weight: _tr("Weight")
         }).appendTo(this.$());
-        
+
         //TRANSLATORS: widget title
         this.selectorWidget = new otp.widgets.RoutesSelectorWidget(this.id+"-selectorWidget", this, _tr("Preferred Routes"));
     },
@@ -718,7 +718,7 @@ otp.widgets.tripoptions.PreferredRoutes =
             if(this_.selectorWidget.isMinimized) this_.selectorWidget.unminimize();
             this_.selectorWidget.bringToFront();
         });
-        
+
         $('#'+this.id+'-weightSlider').slider({
             min : 0,
             max : 57600,
@@ -739,11 +739,11 @@ otp.widgets.tripoptions.PreferredRoutes =
         });
         $('#'+this.id+'-list').html(displayStr);
     },
-    
+
     restorePlan : function(planData) {
         if(planData.queryParams.preferredRoutes) {
             var this_ = this;
-            
+
             var restoredIds = [];
             var preferredRoutesArr = planData.queryParams.preferredRoutes.split(',');
 
@@ -758,18 +758,18 @@ otp.widgets.tripoptions.PreferredRoutes =
             if(this.selectorWidget.initializedRoutes) this.selectorWidget.restoreSelected();
 
             this.tripWidget.module.preferredRoutes = planData.queryParams.preferredRoutes;
-            
+
             // resolve the IDs to user-friendly names
-            var ti = this.tripWidget.module.webapp.transitIndex;
-            ti.loadRoutes(this, function() {
+            var indexApi = this.tripWidget.module.webapp.indexApi;
+            indexApi.loadRoutes(this, function() {
                 var routeNames = [];
                 for(var i = 0; i < restoredIds.length; i++) {
-                    var route = ti.routes[restoredIds[i]].routeData;
-                    routeNames.push(route.routeShortName || route.routeLongName);
+                    var route = indexApi.routes[restoredIds[i]].routeData;
+                    routeNames.push(route.shortName || route.longName);
                 }
                 $('#'+this_.id+'-list').html(routeNames.join(', '));
             });
-            
+
         }
         else { // none specified
             this.selectorWidget.clearSelected();
@@ -782,28 +782,28 @@ otp.widgets.tripoptions.PreferredRoutes =
             $('#'+this.id+'-weightSlider').slider('value', this.lastSliderValue);
         }
     },
-    
+
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesTransit(mode);
-    }      
-        
+    }
+
 });
 
 
 //** BannedRoutes **//
 
-otp.widgets.tripoptions.BannedRoutes = 
+otp.widgets.tripoptions.BannedRoutes =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-    
+
     id           :  null,
-    
+
     selectorWidget : null,
-       
+
     initialize : function(tripWidget) {
         var this_ = this;
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-bannedRoutes";
-        
+
         var html = '<div class="notDraggable">';
         //TRANSLATORS: buton edit Banned public transport routes
         var html = '<div style="float:right; font-size: 12px;"><button id="'+this.id+'-button">' + _tr("Edit") + '…</button></div>';
@@ -811,7 +811,7 @@ otp.widgets.tripoptions.BannedRoutes =
         //(Routes you don't want to take)
         html += _tr("Banned routes") + ': <span id="'+this.id+'-list">('+_tr("None")+')</span>';
         html += '<div style="clear:both;"></div></div>';
-        
+
         $(html).appendTo(this.$());
 
         //TRANSLATORS: Widget title
@@ -834,11 +834,11 @@ otp.widgets.tripoptions.BannedRoutes =
         });
         $('#'+this.id+'-list').html(displayStr);
     },
-    
+
     restorePlan : function(planData) {
         if(planData.queryParams.bannedRoutes) {
             var this_ = this;
-            
+
             var restoredIds = [];
             var bannedRoutesArr = planData.queryParams.bannedRoutes.split(',');
 
@@ -853,18 +853,18 @@ otp.widgets.tripoptions.BannedRoutes =
             if(this.selectorWidget.initializedRoutes) this.selectorWidget.restoreSelected();
 
             this.tripWidget.module.bannedRoutes = planData.queryParams.bannedRoutes;
-            
+
             // resolve the IDs to user-friendly names
-            var ti = this.tripWidget.module.webapp.transitIndex;
-            ti.loadRoutes(this, function() {
+            var indexApi = this.tripWidget.module.webapp.indexApi;
+            indexApi.loadRoutes(this, function() {
                 var routeNames = [];
                 for(var i = 0; i < restoredIds.length; i++) {
-                    var route = ti.routes[restoredIds[i]].routeData;
-                    routeNames.push(route.routeShortName || route.routeLongName);
+                    var route = indexApi.routes[restoredIds[i]].routeData;
+                    routeNames.push(route.shortName || route.longName);
                 }
                 $('#'+this_.id+'-list').html(routeNames.join(', '));
             });
-            
+
         }
         else { // none specified
             this.selectorWidget.clearSelected();
@@ -873,30 +873,30 @@ otp.widgets.tripoptions.BannedRoutes =
             this.tripWidget.module.bannedRoutes = null;
         }
     },
-    
+
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesTransit(mode);
-    }      
-        
+    }
+
 });
 
 
 //** BikeTriangle **//
 
-otp.widgets.tripoptions.BikeTriangle = 
+otp.widgets.tripoptions.BikeTriangle =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-    
+
     id           :  null,
     bikeTriangle :  null,
-       
+
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-bikeTriangle";
-        
+
         var content = '';
         //content += '<h6 class="drag-to-change">Drag to Change Trip:</h6>';
         content += '<div id="'+this.id+'" class="otp-bikeTriangle notDraggable"></div>';
-        
+
         this.setContent(content);
     },
 
@@ -909,9 +909,9 @@ otp.widgets.tripoptions.BikeTriangle =
                 optimize : "TRIANGLE",
                 triangleTimeFactor : formData.triangleTimeFactor,
                 triangleSlopeFactor : formData.triangleSlopeFactor,
-                triangleSafetyFactor : formData.triangleSafetyFactor,                
+                triangleSafetyFactor : formData.triangleSafetyFactor,
             });
-            
+
         };
     },
 
@@ -922,34 +922,34 @@ otp.widgets.tripoptions.BikeTriangle =
                                         planData.queryParams.triangleSafetyFactor);
         }
     },
-    
+
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesAnyBicycle(mode);
-    }      
-        
+    }
+
 });
 
 
 //** BikeType **//
 
-otp.widgets.tripoptions.BikeType = 
+otp.widgets.tripoptions.BikeType =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
 
     id           :  null,
-       
+
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-bikeType";
         this.$().addClass('notDraggable');
 
-        var content = '';        
+        var content = '';
         //TRANSLATORS: In Bike share planner radio button: <Use>: My Own Bike A shared bike
         content += _tr('Use') + ': ';
         //TRANSLATORS: In Bike share planner radio button: Use: <My Own Bike> A shared bike
         content += '<input id="'+this.id+'-myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked> ' + _tr("My Own Bike") + '&nbsp;&nbsp;';
         //TRANSLATORS: In Bike share planner radio button: Use: My Own Bike <A Shared bike>
         content += '<input id="'+this.id+'-sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"> ' + _tr("A Shared Bike");
-        
+
         this.setContent(content);
     },
 
@@ -972,7 +972,7 @@ otp.widgets.tripoptions.BikeType =
             });
         });
     },
-    
+
     restorePlan : function(planData) {
         if(planData.queryParams.mode === "BICYCLE") {
             $('#'+this.id+'-myOwnBikeRBtn').attr('checked', 'checked');
@@ -981,43 +981,43 @@ otp.widgets.tripoptions.BikeType =
             $('#'+this.id+'-sharedBikeRBtn').attr('checked', 'checked');
         }
     },
-    
+
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesBicycle(mode) && otp.util.Itin.includesWalk(mode);
-    }    
-        
+    }
+
 });
 
 
 //** TripSummary **//
 
-otp.widgets.tripoptions.TripSummary = 
+otp.widgets.tripoptions.TripSummary =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-       
+
     id  : null,
-    
+
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-tripSummary";
-        
-                
+
+
         var content = '';
         content += '<div id="'+this.id+'-distance" class="otp-tripSummary-distance"></div>';
         content += '<div id="'+this.id+'-duration" class="otp-tripSummary-duration"></div>';
-        content += '<div id="'+this.id+'-timeSummary" class="otp-tripSummary-timeSummary"></div>';    
+        content += '<div id="'+this.id+'-timeSummary" class="otp-tripSummary-timeSummary"></div>';
         this.setContent(content);
     },
 
     newItinerary : function(itin) {
     	var dist = 0;
-    	
+
     	for(var i=0; i < itin.legs.length; i++) {
     		dist += itin.legs[i].distance;
         }
-    	
+
         $("#"+this.id+"-distance").html(otp.util.Geo.distanceString(dist));
-        $("#"+this.id+"-duration").html(otp.util.Time.secsToHrMin(itin.duration));	
-        
+        $("#"+this.id+"-duration").html(otp.util.Time.secsToHrMin(itin.duration));
+
         var timeByMode = { };
         for(var i=0; i < itin.legs.length; i++) {
             if(itin.legs[i].mode in timeByMode) {
@@ -1027,14 +1027,14 @@ otp.widgets.tripoptions.TripSummary =
                 timeByMode[itin.legs[i].mode] = itin.legs[i].duration;
             }
         }
-        
+
         var summaryStr = "";
         for(mode in timeByMode) {
             summaryStr += otp.util.Time.secsToHrMin(timeByMode[mode]) + " " + this.getModeName(mode) + " / ";
         }
         summaryStr = summaryStr.slice(0, -3);
-        $("#"+this.id+"-timeSummary").html(summaryStr);	
-    },    
+        $("#"+this.id+"-timeSummary").html(summaryStr);
+    },
 
     getModeName : function(mode) {
         switch(mode) {
@@ -1050,50 +1050,50 @@ otp.widgets.tripoptions.TripSummary =
 
 //** AddThis **//
 
-otp.widgets.tripoptions.AddThis = 
+otp.widgets.tripoptions.AddThis =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-       
+
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
-        
+
         var content = '';
         content += '<h6 id="share-route-header">Share this Trip:</h6>';
         content += '<div id="share-route"></div>';
 
         this.setContent(content);
     },
-    
+
     doAfterLayout : function() {
         // Copy our existing share widget from the header and customize it for route sharing.
         // The url to share is set in PlannerModule.js in the newTrip() callback that is called
         // once a new route is loaded from the server.
         var addthisElement = $(".addthis_toolbox").clone();
         addthisElement.find(".addthis_counter").remove();
-        
+
         // give this addthis toolbox a unique class so we can activate it alone in Webapp.js
         addthisElement.addClass("addthis_toolbox_route");
         addthisElement.appendTo("#share-route");
         addthisElement.attr("addthis:title", "Check out my trip planned on "+otp.config.siteName);
-        addthisElement.attr("addthis:description", otp.config.siteDescription);    
+        addthisElement.attr("addthis:description", otp.config.siteDescription);
     }
 });
 
 
 //** Submit **//
 
-otp.widgets.tripoptions.Submit = 
+otp.widgets.tripoptions.Submit =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-       
+
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-submit";
-        
+
         //TRANSLATORS: button to send query for trip planning
         $('<div class="notDraggable" style="text-align:center;"><button id="'+this.id+'-button">' + _tr("Plan Your Trip") + '</button></div>').appendTo(this.$());
         //console.log(this.id+'-button')
-        
+
     },
-    
+
     doAfterLayout : function() {
         var this_ = this;
         $('#'+this.id+'-button').button().click(function() {
@@ -1106,18 +1106,18 @@ otp.widgets.tripoptions.Submit =
 
 //** Group Trip **//
 
-otp.widgets.tripoptions.GroupTripOptions = 
+otp.widgets.tripoptions.GroupTripOptions =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
 
-       
+
     initialize : function(tripWidget, label) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-groupTripOptions";
-        
+
         label = label || "Group size: ";
         var html = '<div class="notDraggable">'+label+'<input id="'+this.id+'-value" type="text" style="width:30px;" value="100" />';
         html += "</div>";
-              
+
         $(html).appendTo(this.$());
     },
 
@@ -1138,24 +1138,24 @@ otp.widgets.tripoptions.GroupTripOptions =
             this.tripWidget.module.groupSize = parseInt(data.queryParams['groupSize']);
         }
     },
- 
+
     isApplicableForMode : function(mode) {
         return otp.util.Itin.includesTransit(mode);
-    }       
+    }
 });
 
-/*otp.widgets.TW_GroupTripSubmit = 
+/*otp.widgets.TW_GroupTripSubmit =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-       
+
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-gtSubmit";
 
         $('<div class="notDraggable" style="text-align:center;"><button id="'+this.id+'-button">Plan Trip</button></div>').appendTo(this.$());
         //console.log(this.id+'-button')
-        
+
     },
-    
+
     doAfterLayout : function() {
         var this_ = this;
         $('#'+this.id+'-button').button().click(function() {

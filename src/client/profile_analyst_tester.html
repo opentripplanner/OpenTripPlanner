@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <style> body, html { height: 100%; } #map { height: 100%; } </style>
+        <title>Profile Analyst Tester</title>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script>
+
+(function () { // create a context for the purpose of namespacing and applying strict syntax
+    'use strict';
+
+    // Basic test of one-to-many profile routing served up at http://localhost:8080/profile_analyst_tester.html
+    // Or access using a file:// URL to allow modifying this client while using a running OTP server.
+    // When you move the marker, a request is sent to OTP profile router in one-to-many mode.
+
+    var map = L.map('map');
+
+    L.tileLayer('http://otile4.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Groups together all visible isochrone layers and allows removing them all at once
+    var isochroneLayerGroup = L.layerGroup();
+    isochroneLayerGroup.addTo(map);
+
+    var fromMarker = L.marker(center, {draggable: true});
+
+    // Find center of default region
+    var center;
+    var req = new XMLHttpRequest();
+    req.open('GET', 'http://localhost:8080/otp/routers/default/metadata', false); // async=false, define center before setting up map
+    req.setRequestHeader("Accept", "application/json");
+    req.onload = function() {
+        var resp = JSON.parse(req.responseText);
+        // console.log(resp);
+        var lat = resp['centerLatitude'];
+        var lng = resp['centerLongitude'];
+        var center = new L.LatLng(lat, lng);
+        map.setView(center, 13);
+        fromMarker.setLatLng(center);
+    };
+    req.send(null);
+
+    // Fetch an isochrone for the given surface ID and add the isochrone to the map with the given name.
+    function getIsochroneForSurfaceId (surfaceId, name) {
+        var req = new XMLHttpRequest();
+        // TODO limit the number of isochrones coming back
+        req.open('GET', 'http://localhost:8080/otp/surfaces/' + surfaceId + '/isochrone?spacing=60', true); // async=true, background call
+        req.setRequestHeader("Accept", "application/json");
+        req.onload = function() {
+            var response = JSON.parse(req.responseText);
+            console.log(response);
+            // Each response is a FeatureCollection with 1 feature (a multipolygon with holes)
+            // Actually maybe more than one feature if the above call returns multiple isochrones
+            L.geoJson(response).addTo(isochroneLayerGroup);
+        }
+        req.send(null);
+    }
+
+    function profileRoute() {
+        var req = new XMLHttpRequest();
+        var fromPos = fromMarker.getLatLng();
+        var qstring = '?from=' + fromPos.lat + ',' + fromPos.lng;
+        qstring += '&analyst=true';
+        qstring += '&modes=WALK,BICYCLE,TRANSIT'; // note that TRANSIT or specific transit modes must be included
+        req.open('GET', 'http://localhost:8080/otp/routers/default/profile' + qstring, true); // async=true, background call
+        req.setRequestHeader("Accept", "application/json");
+        req.onload = function() {
+            var resp = JSON.parse(req.responseText);
+            console.log(resp);
+            getIsochroneForSurfaceId(resp.min, "min");
+            getIsochroneForSurfaceId(resp.avg, "avg");
+            getIsochroneForSurfaceId(resp.max, "max");
+        };
+        isochroneLayerGroup.clearLayers();
+        req.send(null);
+    }
+
+    fromMarker.on("dragend",function(ev){
+        var pos = ev.target.getLatLng();
+        this.bindPopup(pos.toString()).openPopup();
+        profileRoute();
+    });
+
+    fromMarker.addTo(map);
+
+}()); // close namespace and call to execute.
+
+        </script>
+    </body>
+</html>

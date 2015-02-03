@@ -165,9 +165,10 @@ public class NEDDownloader implements NEDTileSource {
         String RTendpointURL = "http://extract.cr.usgs.gov/requestValidationService/services/RequestValidationService";
 
         try {
+            int nd = 0;
             for (String payload : payloads) {
+                // FIXME document why this sleep call exists. Rate limiting?
                 sleep(2000);
-
                 Service RTservice = new Service();
                 Call RTcall = (Call) RTservice.createCall();
 
@@ -194,13 +195,13 @@ public class NEDDownloader implements NEDTileSource {
 
                 // hopefully, this will be a list of one.
                 if (nodes.getLength() > 1) {
-                    log
-                            .debug("One of our NED tiles requires more than one tile from the server.  This is slightly inefficient, and sort of yucky.");
+                    log.debug("One of our NED tiles requires more than one tile from the server.  This is slightly inefficient, and sort of yucky.");
                 }
                 for (int i = 0; i < nodes.getLength(); ++i) {
                     Node node = nodes.item(i);
                     String urlString = node.getTextContent().trim();
-                    log.debug("Adding NED URL:" + urlString);
+                    log.info("Getting URL {}/{}", ++nd, payloads.size());
+                    log.debug("Adding NED URL: " + urlString);
                     // use one specific, less-broken server at usgs
                     urlString = urlString.replaceAll(" ", "+"); // urls returned are broken
                     // sometimes.
@@ -321,7 +322,7 @@ public class NEDDownloader implements NEDTileSource {
 
     @Override
     public List<File> getNEDTiles() {
-        log.info("Downloading NED elevation data.");
+        log.info("Downloading NED elevation data (or fetching it from local cache).");
         List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();
         int tileCount = 0;

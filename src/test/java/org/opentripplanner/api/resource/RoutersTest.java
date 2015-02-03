@@ -1,27 +1,27 @@
 package org.opentripplanner.api.resource;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPServer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class RoutersTest {
     @Test
     public void testRouters() {
-        OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphServiceImpl());
+        OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
         otpServer.getGraphService().registerGraph("", new MemoryGraphSource(null, new Graph()));
         otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("", new Graph()));
-        otpServer.getGraphService().getGraph("A").addVertex(new ExitVertex(null, "A", 0, 0));
-        otpServer.getGraphService().getGraph("A").addVertex(new ExitVertex(null, "B", 0, 1));
-        otpServer.getGraphService().getGraph("A").addVertex(new ExitVertex(null, "C", 1, 1));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "A", 0, 0));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "B", 0, 1));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "C", 1, 1));
 
         Routers routerApi = new Routers();
         routerApi.otpServer = otpServer;

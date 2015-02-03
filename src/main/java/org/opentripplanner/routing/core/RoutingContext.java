@@ -14,21 +14,17 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.edgetype.PartialStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
@@ -38,10 +34,11 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
-import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
@@ -87,8 +84,6 @@ public class RoutingContext implements Cloneable {
     // NOTE: not final so that it can be modified post-construction for testing.
     // TODO(flamholz): figure out a better way.
     public Edge originBackEdge;
-
-    public final ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
 
     // public final Calendar calendar;
     public final CalendarService calendarService;
@@ -144,9 +139,9 @@ public class RoutingContext implements Cloneable {
     }
 
     /**
-     * Returns the PlainStreetEdges that overlap between two vertices edge sets.
+     * Returns the StreetEdges that overlap between two vertices edge sets.
      */
-    private Set<StreetEdge> overlappingPlainStreetEdges(Vertex u, Vertex v) {
+    private Set<StreetEdge> overlappingStreetEdges(Vertex u, Vertex v) {
         Set<Integer> vIds = new HashSet<Integer>();
         Set<Integer> uIds = new HashSet<Integer>();
         for (Edge e : Iterables.concat(v.getIncoming(), v.getOutgoing())) {
@@ -161,7 +156,7 @@ public class RoutingContext implements Cloneable {
         Set<Integer> overlappingIds = uIds;
 
         // Fetch the edges by ID - important so we aren't stuck with temporary edges.
-        Set<StreetEdge> overlap = new HashSet<StreetEdge>();
+        Set<StreetEdge> overlap = new HashSet<>();
         for (Integer id : overlappingIds) {
             Edge e = graph.getEdgeById(id);
             if (e == null || !(e instanceof StreetEdge)) {
@@ -174,36 +169,26 @@ public class RoutingContext implements Cloneable {
     }
 
     /**
-     * Creates a PartialPlainStreetEdge along the input PlainStreetEdge.
-     * 
-     * Orders the endpoints u, v so that they are consistent with the direction of the edge e.
+     * Creates a PartialStreetEdge along the input StreetEdge iff its direction makes this possible.
      */
-    private PartialStreetEdge makePartialEdgeAlong(StreetEdge e, StreetVertex u,
-            StreetVertex v) {
-        DistanceLibrary dLib = SphericalDistanceLibrary.getInstance();
+    private void makePartialEdgeAlong(StreetEdge streetEdge, TemporaryStreetLocation from,
+                                      TemporaryStreetLocation to) {
+        LineString parent = streetEdge.getGeometry();
+        LineString head = GeometryUtils.getInteriorSegment(parent,
+                streetEdge.getFromVertex().getCoordinate(), from.getCoordinate());
+        LineString tail = GeometryUtils.getInteriorSegment(parent,
+                to.getCoordinate(), streetEdge.getToVertex().getCoordinate());
 
-        Vertex head = e.getFromVertex();
-        double uDist = dLib.fastDistance(head.getCoordinate(), u.getCoordinate());
-        double vDist = dLib.fastDistance(head.getCoordinate(), v.getCoordinate());
+        if (parent.getLength() > head.getLength() + tail.getLength()) {
+            LineString partial = GeometryUtils.getInteriorSegment(parent,
+                    from.getCoordinate(), to.getCoordinate());
 
-        // Order the vertices along the partial edge by distance from the head of the edge.
-        // TODO(flamholz): this logic is insufficient for curvy streets/roundabouts.
-        StreetVertex first = u;
-        StreetVertex second = v;
-        if (vDist < uDist) {
-            first = v;
-            second = u;
+            double lengthRatio = partial.getLength() / parent.getLength();
+            double length = streetEdge.getDistance() * lengthRatio;
+
+            String name = from.getLabel() + " to " + to.getLabel();
+            new TemporaryPartialStreetEdge(streetEdge, from, to, partial, name, length);
         }
-
-        Geometry parentGeom = e.getGeometry();
-        LineString myGeom = GeometryUtils.getInteriorSegment(parentGeom, first.getCoordinate(),
-                second.getCoordinate());
-
-        double lengthRatio = myGeom.getLength() / parentGeom.getLength();
-        double length = e.getDistance() * lengthRatio;
-
-        String name = first.getLabel() + " to " + second.getLabel();
-        return new PartialStreetEdge(e, first, second, myGeom, name, length);
     }
 
     /**
@@ -244,7 +229,7 @@ public class RoutingContext implements Cloneable {
             // normal mode, search for vertices based RoutingRequest
             if (!opt.batch || opt.arriveBy) {
                 // non-batch mode, or arriveBy batch mode: we need a to vertex
-                toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt);
+                toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt, true);
                 if (opt.to.hasEdgeId()) {
                     toBackEdge = graph.getEdgeById(opt.to.edgeId);
                 }
@@ -259,18 +244,12 @@ public class RoutingContext implements Cloneable {
                 fromVertex = onBoardDepartService.setupDepartOnBoard(this);
             } else if (!opt.batch || !opt.arriveBy) {
                 // non-batch mode, or depart-after batch mode: we need a from vertex
-                fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, toVertex);
+                fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, false);
                 if (opt.from.hasEdgeId()) {
                     fromBackEdge = graph.getEdgeById(opt.from.edgeId);
                 }
             } else {
                 fromVertex = null;
-            }
-            if (opt.intermediatePlaces != null) {
-                for (GenericLocation intermediate : opt.intermediatePlaces) {
-                    Vertex vertex = graph.streetIndex.getVertexForLocation(intermediate, opt);
-                    intermediateVertices.add(vertex);
-                }
             }
         } else {
             // debug mode, force endpoint vertices to those specified rather than searching
@@ -282,17 +261,15 @@ public class RoutingContext implements Cloneable {
         // up along those edges so that we don't get odd circuitous routes for really short trips.
         // TODO(flamholz): seems like this might be the wrong place for this code? Can't find a better one.
         //
-        if (fromVertex instanceof StreetLocation && toVertex instanceof StreetLocation) {
-            StreetVertex fromStreetVertex = (StreetVertex) fromVertex;
-            StreetVertex toStreetVertex = (StreetVertex) toVertex;
-            Set<StreetEdge> overlap = overlappingPlainStreetEdges(fromStreetVertex,
+        if (fromVertex instanceof TemporaryStreetLocation &&
+                toVertex instanceof TemporaryStreetLocation) {
+            TemporaryStreetLocation fromStreetVertex = (TemporaryStreetLocation) fromVertex;
+            TemporaryStreetLocation toStreetVertex = (TemporaryStreetLocation) toVertex;
+            Set<StreetEdge> overlap = overlappingStreetEdges(fromStreetVertex,
                     toStreetVertex);
 
             for (StreetEdge pse : overlap) {
-                PartialStreetEdge ppse = makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
-                // Register this edge-fragment as a temporary edge so it will be assigned a routing context and cleaned up.
-                // It's connecting the from and to vertices so it could be placed in either vertex's temp edge list.
-                ((StreetLocation)fromVertex).getExtra().add(ppse);
+                makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
             }
         }
         
@@ -309,14 +286,6 @@ public class RoutingContext implements Cloneable {
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         else
             remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
-
-        // If any temporary half-street-edges were created, record the fact that they should
-        // only be visible to the routing context we are currently constructing.
-        for (Vertex vertex : new Vertex[] {fromVertex, toVertex}) {
-            if (vertex instanceof StreetLocation) {
-                ((StreetLocation)vertex).setTemporaryEdgeVisibility(this);
-            }
-        }
 
         if (this.origin != null) {
             LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());
@@ -341,13 +310,9 @@ public class RoutingContext implements Cloneable {
                 notFound.add("from");
 
         // check destination present when not doing a depart-after batch search
-        if (!opt.batch || opt.arriveBy) //
-            if (toVertex == null)
+        if (!opt.batch || opt.arriveBy) {
+            if (toVertex == null) {
                 notFound.add("to");
-
-        for (int i = 0; i < intermediateVertices.size(); i++) {
-            if (intermediateVertices.get(i) == null) {
-                notFound.add("intermediate." + i);
             }
         }
         if (notFound.size() > 0) {
@@ -415,18 +380,9 @@ public class RoutingContext implements Cloneable {
 
     /**
      * Tear down this routing context, removing any temporary edges.
-     * 
-     * @returns the number of edges removed.
      */
-    public int destroy() {
-        int nRemoved = 0;
-        if (origin != null)
-            nRemoved += origin.removeTemporaryEdges(graph);
-        if (target != null)
-            nRemoved += target.removeTemporaryEdges(graph);
-        for (Vertex v : intermediateVertices)
-            nRemoved += v.removeTemporaryEdges(graph);
-        return nRemoved;
+    public void destroy() {
+        if (origin instanceof TemporaryVertex) ((TemporaryVertex) origin).dispose();
+        if (target instanceof TemporaryVertex) ((TemporaryVertex) target).dispose();
     }
-
 }

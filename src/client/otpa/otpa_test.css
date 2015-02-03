@@ -1,0 +1,41 @@
+body,table {
+	font-family: sans-serif;
+	font-size: 11pt;
+	margin: 0;
+	/* do not add scroll bars unless overridden on sub-elements */
+	overflow: hidden;
+}
+
+div#map {
+	height: 100%;
+	background: #eee;
+	margin: 0;
+	padding: 0;
+}
+
+div#toolbox {
+	height: 100%;
+	width: 320px;
+	float: left;
+	background: #ddd;
+	margin: 0;
+	padding: 0;
+	padding-left: 0.5em;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+h1 {
+	font-size: 120%;
+	font-weight: bold;
+}
+
+h2 {
+	font-size: 110%;
+	font-weight: bold;
+}
+
+.ui-widget-content {
+	font-family: sans-serif;
+	font-size: 10pt;
+}

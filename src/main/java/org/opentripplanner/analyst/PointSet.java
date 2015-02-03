@@ -42,6 +42,9 @@ import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -87,7 +90,11 @@ public class PointSet implements Serializable{
      * duplication of pointset when used across multiple graphs
      */
     private Map<String, SampleSet> samples = new ConcurrentHashMap<String, SampleSet>();
-
+    
+    /**
+     * Map from string IDs to indices. This is a view into PointSet.ids.
+     */
+    private transient TObjectIntMap<String> idIndexMap;
 
     /*
      * Used to generate SampleSets on an as needed basis. 
@@ -411,29 +418,22 @@ public class PointSet implements Serializable{
     /**
      * Adds a graph service to allow for auto creation of SampleSets for a given
      * graph
-     * 
-     * @param reference
-     *            to the application graph service
      */
-
     public void setGraphService(GraphService graphService) {
         this.graphService = graphService;
     }
 
     /**
      * gets a sample set for a given graph id -- requires graphservice to be set
-     * 
-     * @param a valid graph id
      * @return sampleset for graph
      */
-
     public SampleSet getSampleSet(String routerId) {
         if(this.graphService == null) 
             return null;
 
         if (this.samples.containsKey(routerId))
             return this.samples.get(routerId);
-        Graph g = this.graphService.getGraph(routerId);
+        Graph g = this.graphService.getRouter(routerId).graph;
 
         return getSampleSet(g);
     }
@@ -452,6 +452,9 @@ public class PointSet implements Serializable{
         return sampleSet;
     }
 
+    public int featureCount() {
+        return ids.length;
+    }
 
     /**
      * Add a single feature with a variable number of free-form properties.
@@ -460,14 +463,8 @@ public class PointSet implements Serializable{
      * TODO: read explicit schema or infer it and validate property presence as
      * they're read
      * 
-     * @param geom
-     *            must be a Point, a Polygon, or a single-element MultiPolygon
+     * @param feat must be a Point, a Polygon, or a single-element MultiPolygon
      */
-
-    public int featureCount() {
-        return ids.length;
-    }
-
     public void addFeature(PointFeature feat, int index) {
         if (index >= capacity) {
             throw new AssertionError("Number of features seems to have grown since validation.");
@@ -774,4 +771,39 @@ public class PointSet implements Serializable{
         return ret;
     }
 
+    /**
+     * Get the index of a particular feature ID in this pointset.
+     * @return the index, or -1 if there is no such index.
+     */
+    public int getIndexForFeature(String featureId) {
+        
+        // this is called inside a conditional because the build method is synchronized,
+        // and there is no need to synchronize if the map has already been built.
+        if (idIndexMap == null)
+            buildIdIndexMapIfNeeded();
+        
+        return idIndexMap.get(featureId);
+    }
+    
+    /**
+     * Build the ID - Index map if needed.
+     */
+    private synchronized void buildIdIndexMapIfNeeded () {
+        // we check again if the map has been built. It's possible that it would have been built
+        // by this method in another thread while this instantiation was blocked.
+        if (idIndexMap == null) {
+            idIndexMap = new TObjectIntHashMap<String>(this.capacity, 1f, -1);
+            
+            for (int i = 0; i < this.capacity; i++) {
+                if (ids[i] != null) {
+                    if (idIndexMap.containsKey(ids[i])) {
+                        LOG.error("Duplicate ID {} in pointset.", ids[i]);
+                    }
+                    else {   
+                        idIndexMap.put(ids[i], i);
+                    }
+                }
+            }
+        }
+    }
 }

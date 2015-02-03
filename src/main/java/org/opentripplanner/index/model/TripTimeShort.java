@@ -5,6 +5,7 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -21,6 +22,9 @@ public class TripTimeShort {
     public int arrivalDelay = UNDEFINED ;
     public int departureDelay = UNDEFINED ;
     public boolean timepoint = false;
+    public boolean realtime = false;
+    public long serviceDay;
+    public AgencyAndId tripId;
 
     /**
      * This is stop-specific, so the index i is a stop index, not a hop index.
@@ -34,6 +38,13 @@ public class TripTimeShort {
         realtimeDeparture  = tt.getDepartureTime(i);
         departureDelay     = tt.getDepartureDelay(i);
         timepoint          = tt.isTimepoint(i);
+        realtime           = !tt.isScheduled();
+    }
+
+    public TripTimeShort(TripTimes tt, int i, Stop stop, ServiceDay sd) {
+        this(tt, i, stop);
+        tripId = tt.trip.getId();
+        serviceDay = sd.time(0);
     }
 
     /**

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.common.model;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +27,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author avi
  */
-public class GenericLocation implements Cloneable {
+public class GenericLocation implements Cloneable, Serializable {
 
     /**
      * The name of the place, if provided.
