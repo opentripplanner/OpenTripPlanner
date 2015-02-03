@@ -16,7 +16,6 @@ package org.opentripplanner.standalone;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -32,11 +31,7 @@ import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.graph_builder.AnnotationsToHTML;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
-import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
-import org.opentripplanner.graph_builder.impl.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.TransitToTaggedStopsGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.*;
 import org.opentripplanner.graph_builder.impl.ned.ElevationGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
@@ -56,7 +51,6 @@ import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
-import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.visualizer.GraphVisualizer;
@@ -80,7 +74,7 @@ public class OTPConfigurator {
 
     private OTPServer server;
 
-    public static final String GRAPH_CONFIG_FILENAME = "build-config.json";
+    public static final String BUILDER_CONFIG_FILENAME = "build-config.json";
     public static final String ROUTER_CONFIG_FILENAME = "router-config.json";
 
     /**
@@ -139,7 +133,7 @@ public class OTPConfigurator {
         GraphBuilderTask graphBuilder = new GraphBuilderTask();
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
-        JsonNode graphConfig = null;
+        JsonNode builderConfig = null;
         JsonNode routerConfig = null;
         File demFile = null;
         /* TODO build multiple graphs (previous implementation was broken and lumped together files from multiple directories) */
@@ -151,8 +145,8 @@ public class OTPConfigurator {
         }
         graphBuilder.setPath(dir);
         // Find and parse config files first to reveal syntax errors early without waiting for graph build.
-        graphConfig = loadJson(new File(dir, GRAPH_CONFIG_FILENAME));
-        GraphBuilderParameters builderParams = new GraphBuilderParameters(graphConfig);
+        builderConfig = loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
+        GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
         routerConfig = loadJson(new File(dir, ROUTER_CONFIG_FILENAME));
         RouterParameters routerParams = new RouterParameters(routerConfig);
         LOG.info(dumpFields(builderParams));
@@ -237,14 +231,11 @@ public class OTPConfigurator {
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
             graphBuilder.addGraphBuilder(elevationBuilder);
         }
-        graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
-
+        graphBuilder.addGraphBuilder(new EmbedConfig(builderConfig, routerConfig));
         if (builderParams.htmlAnnotations) {
-            AnnotationsToHTML annotationsToHTML = new AnnotationsToHTML(graphBuilder.getGraph(), new File(params.build, "report.html"));
-            // FIXME make this a GraphBuilder so it can be enqueued in the GraphBuilderTask
-            // annotationsToHTML.generateAnnotationsLog();
+            graphBuilder.addGraphBuilder(new AnnotationsToHTML(new File(params.build, "report.html")));
         }
-
+        graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
 

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder;
 
+import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ArrayListMultimap;
@@ -23,8 +24,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,30 +39,23 @@ import org.slf4j.LoggerFactory;
  * They are created with the help of getHTMLMessage function in {@link GraphBuilderAnnotation} derived classes.
  * @author mabu
  */
-public class AnnotationsToHTML {
+public class AnnotationsToHTML implements GraphBuilder {
 
     private static Logger LOG = LoggerFactory.getLogger(AnnotationsToHTML.class); 
 
     //Path to output file
     private File outPath;
 
-    private Graph graph;
-
     private HTMLWriter writer;
   
-    public AnnotationsToHTML(Graph graph, File outpath) {
-        this.graph = graph;
+    public AnnotationsToHTML (File outpath) {
         this.outPath = outpath;
     }
 
 
-    public void generateAnnotationsLog() {
+    @Override
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 
-        if (graph == null) {
-            LOG.error("No graph file found");
-            return;
-        }
-        
         if (outPath == null) {
             LOG.error("Saving folder is empty!");
             return;
@@ -182,6 +179,21 @@ public class AnnotationsToHTML {
         LOG.info("Annotated log is in {}", outPath);
 
         writer.close();
+    }
+
+    @Override
+    public List<String> provides() {
+        return Lists.newArrayList();
+    }
+
+    @Override
+    public List<String> getPrerequisites() {
+        return Lists.newArrayList();
+    }
+
+    @Override
+    public void checkInputs() {
+
     }
 
     class HTMLWriter {

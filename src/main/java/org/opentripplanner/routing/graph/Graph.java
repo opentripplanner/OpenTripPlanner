@@ -160,10 +160,11 @@ public class Graph implements Serializable {
     /** The density center of the graph for determining the initial geographic extent in the client. */
     private Coordinate center = null;
 
-    /**
-     * Makes it possible to embed a default configuration inside a graph.
-     */
-    public JsonNode embeddedPreferences = null;
+    /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
+    public String builderConfig = null;
+
+    /** Embed a router configuration inside the graph, for starting up with a single file. */
+    public String routerConfig = null;
 
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;

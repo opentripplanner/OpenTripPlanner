@@ -59,8 +59,8 @@ public abstract class GraphUpdaterConfigurator {
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
 
         // Look for embedded config if it exists
-        // TODO figure out how we will use embedded config in absence of main config.
-        JsonNode embeddedConfig = graph.embeddedPreferences;
+        // TODO figure out how & when we will use embedded config in absence of main config.
+        JsonNode embeddedConfig = null; // graph.routerConfig;
         LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
                 + (embeddedConfig == null ? "" : "[embedded]"));
         
