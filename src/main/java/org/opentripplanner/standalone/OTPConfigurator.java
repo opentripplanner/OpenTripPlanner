@@ -268,8 +268,6 @@ public class OTPConfigurator {
      */
     private Router.LifecycleManager routerLifecycleManager = new Router.LifecycleManager() {
 
-        private GraphUpdaterConfigurator graphConfigurator = new GraphUpdaterConfigurator();
-
         /**
          * Create a new Router, owning a Graph and all it's associated services.
          * 
@@ -312,13 +310,13 @@ public class OTPConfigurator {
             }
 
             // Setup graph from config (Graph.properties for example)
-            graphConfigurator.setupGraph(router.graph, config);
+            GraphUpdaterConfigurator.setupGraph(router.graph, config);
 
         }
 
         @Override
         public void shutdownRouter(Router router) {
-            graphConfigurator.shutdownGraph(router.graph);
+            GraphUpdaterConfigurator.shutdownGraph(router.graph);
         }
     };
 

@@ -53,11 +53,11 @@ import org.slf4j.LoggerFactory;
  * *not* merged.
  * 
  */
-public class GraphUpdaterConfigurator {
+public abstract class GraphUpdaterConfigurator {
 
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
-    public void setupGraph(Graph graph, JsonNode mainConfig) {
+    public static void setupGraph(Graph graph, JsonNode mainConfig) {
         // Create a updater manager for this graph
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
 
@@ -86,8 +86,9 @@ public class GraphUpdaterConfigurator {
      * @param updaterManager is the graph updater manager to which all updaters should be added
      * @return reference to the same updaterManager as was given as input
      */
-    private GraphUpdaterManager applyConfigurationToGraph(Graph graph, GraphUpdaterManager updaterManager, JsonNode config) {
-        for (JsonNode configItem : config) {
+    private static GraphUpdaterManager applyConfigurationToGraph(Graph graph, GraphUpdaterManager updaterManager, JsonNode config) {
+
+        for (JsonNode configItem : config.path("updaters")) {
 
             // For each sub-node, determine which kind of updater is being created.
             String type = configItem.path("type").asText();
@@ -143,7 +144,7 @@ public class GraphUpdaterConfigurator {
         return updaterManager;
     }
 
-    public void shutdownGraph(Graph graph) {
+    public static void shutdownGraph(Graph graph) {
         GraphUpdaterManager updaterManager = graph.updaterManager;
         if (updaterManager != null) {
             LOG.info("Stopping updater manager with " + updaterManager.size() + " updaters.");
