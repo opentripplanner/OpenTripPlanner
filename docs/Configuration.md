@@ -69,3 +69,44 @@ they become available. OTP can use both approaches.
 
 
 ### Vehicle Positions
+
+
+```JSON
+{
+    updaters: [
+        // GTFS-RT service alerts (polling)
+        {
+            type: "real-time-alerts",
+            frequencySec: 30,
+            url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/7D841E367D34BA85B11326EB3",
+            defaultAgencyId: "TriMet"
+        },
+
+        // Bike rental updater for Citybikes (polling)
+        {
+            type: "bike-rental",
+            frequencySec: 300,
+            sourceType: "city-bikes",
+            url: "http://host.domain.tld"
+        },
+
+        // Bike parking availability
+        // bp.type=bike-park
+
+        // Stop Time Updates (polling GTFS-RT TripUpdates)
+        {
+            type: "stop-time-updater",
+            frequencySec: 60,
+            // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
+            sourceType: "gtfs-http",
+            url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/7D841E367D34BA85B11326EB3",
+            defaultAgencyId: "TriMet"
+        },
+
+        // Stop Time Updates (streaming differential GTFS-RT TripUpdates)
+        {
+            type: "websocket-gtfs-rt-updater"
+        }
+    ]
+}
+```

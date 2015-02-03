@@ -13,8 +13,7 @@
 
 package org.opentripplanner.standalone;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
@@ -23,12 +22,14 @@ import java.util.zip.ZipFile;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
+import org.opentripplanner.graph_builder.AnnotationsToHTML;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
@@ -77,7 +78,10 @@ public class OTPConfigurator {
     }
 
     private OTPServer server;
-    
+
+    private static final String GRAPH_CONFIG_FILENAME = "graph-config.json";
+    private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
+
     /**
      * We could even do this at Configurator construct time (rather than lazy initializing), using
      * the inMemory param to create the right kind of GraphService ahead of time. However that
@@ -91,7 +95,7 @@ public class OTPConfigurator {
     }
 
     /** Create a cached GraphService that will be shared between all OTP components. */
-    public void makeGraphService(Graph graph) {
+    public void makeGraphService (Graph graph) {
         GraphService graphService = new GraphService(params.autoReload);
         this.graphService = graphService;
         InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory(params.graphDirectory);
@@ -102,19 +106,8 @@ public class OTPConfigurator {
         }
         if (graph != null && (params.inMemory || params.preFlight)) {
             /* Hand off graph in memory to server in a in-memory GraphSource. */
-            try {
-                FileInputStream graphConfigurationStream = new FileInputStream(params.graphConfigFile);
-                // FIXME this repeats code in InputStreamGraphSource
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-                mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-                JsonNode config = mapper.readTree(graphConfigurationStream);
-                this.graphService.registerGraph("", new MemoryGraphSource("", graph, config));
-            } catch (Exception e) {
-                if (params.graphConfigFile != null)
-                    LOG.error("Can't read config file", e);
-                this.graphService.registerGraph("", new MemoryGraphSource("", graph));
-            }
+            // FIXME pass in Router config
+            this.graphService.registerGraph("", new MemoryGraphSource("", graph, MissingNode.getInstance()));
         }
         if ((params.routerIds != null && params.routerIds.size() > 0) || params.autoScan) {
             /* Auto-register pre-existing graph on disk, with optional auto-scan. */
@@ -135,57 +128,57 @@ public class OTPConfigurator {
         }
         return graphService;
     }
-    
+
+    // TODO parameterize with the build directory, to make multiple builderTasks
     public GraphBuilderTask builderFromParameters() {
-        if (params.build == null || params.build.isEmpty()) {
+        if (params.build == null) {
             return null;
         }
         LOG.info("Wiring up and configuring graph builder task.");
         GraphBuilderTask graphBuilder = new GraphBuilderTask();
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
-        File configFile = null;
+        JsonNode graphConfig = null;
+        JsonNode routerConfig = null;
         File demFile = null;
-        /* For now this is adding files from all directories listed, rather than building multiple graphs. */
-        for (File dir : params.build) {
-            LOG.info("Searching for graph builder input files in {}", dir);
-            if ( ! dir.isDirectory() && dir.canRead()) {
-                LOG.error("'{}' is not a readable directory.", dir);
-                continue;
-            }
-            graphBuilder.setPath(dir);
-            for (File file : dir.listFiles()) {
-                switch (InputFileType.forFile(file)) {
-                case GTFS:
-                    LOG.info("Found GTFS file {}", file);
-                    gtfsFiles.add(file);
-                    break;
-                case OSM:
-                    LOG.info("Found OSM file {}", file);
-                    osmFiles.add(file);
-                    break;
-                case DEM:
-                    if (!params.elevation && demFile == null) {
-                        LOG.info("Found DEM file {}", file);
-                        demFile = file;
-                    } else {
-                        LOG.info("Skipping DEM file {}", file);
-                    }
-                    break;
-                case CONFIG:
-                    if (!params.noEmbedConfig) {
-                        LOG.info("Found CONFIG file {}", file);
-                        configFile = file;
-                    }
-                    break;
-                case OTHER:
-                    LOG.debug("Skipping file '{}'", file);
+        /* TODO build multiple graphs (previous implementation was broken and lumped together files from multiple directories) */
+        File dir = params.build;
+        LOG.info("Searching for graph builder input files in {}", dir);
+        if ( ! dir.isDirectory() && dir.canRead()) {
+            LOG.error("'{}' is not a readable directory.", dir);
+            return null;
+        }
+        graphBuilder.setPath(dir);
+        // Find and parse config files first to reveal syntax errors early without waiting for graph build.
+        graphConfig = loadJson(new File(dir, GRAPH_CONFIG_FILENAME));
+        GraphBuilderParameters builderParams = new GraphBuilderParameters(graphConfig);
+        routerConfig = loadJson(new File(dir, ROUTER_CONFIG_FILENAME));
+        RouterParameters routerParams = new RouterParameters(routerConfig);
+        for (File file : dir.listFiles()) {
+            switch (InputFileType.forFile(file)) {
+            case GTFS:
+                LOG.info("Found GTFS file {}", file);
+                gtfsFiles.add(file);
+                break;
+            case OSM:
+                LOG.info("Found OSM file {}", file);
+                osmFiles.add(file);
+                break;
+            case DEM:
+                if (!builderParams.elevation && demFile == null) {
+                    LOG.info("Found DEM file {}", file);
+                    demFile = file;
+                } else {
+                    LOG.info("Skipping DEM file {}", file);
                 }
+                break;
+            case OTHER:
+                LOG.debug("Skipping file '{}'", file);
             }
         }
-        boolean hasOSM  = ! (osmFiles.isEmpty()  || params.noStreets);
-        boolean hasGTFS = ! (gtfsFiles.isEmpty() || params.noTransit);
-        if ( ! (hasOSM || hasGTFS )) {
+        boolean hasOSM  = builderParams.streets && !osmFiles.isEmpty();
+        boolean hasGTFS = builderParams.transit && !gtfsFiles.isEmpty();
+        if ( ! ( hasOSM || hasGTFS )) {
             LOG.error("Found no input files from which to build a graph in {}", params.build.toString());
             return null;
         }
@@ -197,11 +190,11 @@ public class OTPConfigurator {
             }
             OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
-            streetEdgeFactory.useElevationData = params.elevation || (demFile != null);
+            streetEdgeFactory.useElevationData = builderParams.elevation || (demFile != null);
             osmBuilder.edgeFactory = streetEdgeFactory;
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
             osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
-            osmBuilder.skipVisibility = params.skipVisibility;
+            osmBuilder.skipVisibility = !builderParams.areaVisibility;
             graphBuilder.addGraphBuilder(osmBuilder);
             graphBuilder.addGraphBuilder(new PruneFloatingIslands());
         }
@@ -209,30 +202,30 @@ public class OTPConfigurator {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (File gtfsFile : gtfsFiles) {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
-                gtfsBundle.setTransfersTxtDefinesStationPaths(params.useTransfersTxt);
-                if (!params.noParentStopLinking) {
+                gtfsBundle.setTransfersTxtDefinesStationPaths(builderParams.useTransfersTxt);
+                if (builderParams.parentStopLinking) {
                     gtfsBundle.linkStopsToParentStations = true;
                 }
-                gtfsBundle.parentStationTransfers = params.parentStationTransfers;
+                gtfsBundle.parentStationTransfers = builderParams.parentStationTransfers;
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
             if ( hasOSM ) {
-                if (params.matchBusRoutesToStreets) {
+                if (builderParams.matchBusRoutesToStreets) {
                     graphBuilder.addGraphBuilder(new BusRouteStreetMatcher());
                 }
                 graphBuilder.addGraphBuilder(new TransitToTaggedStopsGraphBuilderImpl());
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
             }
             // The stops can be linked to each other once they are already linked to the street network.
-            if (params.longDistance && !params.useTransfersTxt) {
+            if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addGraphBuilder(new DirectTransferGenerator());
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
         }
-        if (params.elevation) {
+        if (builderParams.elevation) {
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilder elevationBuilder = new ElevationGraphBuilderImpl(gcf);
@@ -243,6 +236,13 @@ public class OTPConfigurator {
             graphBuilder.addGraphBuilder(elevationBuilder);
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
+
+        if (builderParams.htmlAnnotations) {
+            AnnotationsToHTML annotationsToHTML = new AnnotationsToHTML(graphBuilder.getGraph(), new File(params.build, "report.html"));
+            // FIXME make this a GraphBuilder so it can be enqueued in the GraphBuilderTask
+            // annotationsToHTML.generateAnnotationsLog();
+        }
+
         return graphBuilder;
     }
 
@@ -281,20 +281,8 @@ public class OTPConfigurator {
         public void startupRouter(Router router, JsonNode config) {
 
             router.sptServiceFactory = new GenericAStarFactory();
-            // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
-            if (params.longDistance) {
-                LongDistancePathService pathService = new LongDistancePathService(router.graph,
-                        router.sptServiceFactory);
-                router.pathService = pathService;
-            } else {
-                RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(router.graph,
-                        router.sptServiceFactory);
-                pathService.setFirstPathTimeout(10.0);
-                pathService.setMultiPathTimeout(1.0);
-                router.pathService = pathService;
-                // cpf.bind(RemainingWeightHeuristicFactory.class,
-                //        new DefaultRemainingWeightHeuristicFactoryImpl());
-            }
+            LongDistancePathService pathService = new LongDistancePathService(router.graph, router.sptServiceFactory);
+            router.pathService = pathService;
             router.planGenerator = new PlanGenerator(router.graph, router.pathService);
             router.tileRendererManager = new TileRendererManager(router.graph);
 
@@ -339,8 +327,35 @@ public class OTPConfigurator {
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif")) return DEM;
-            if (name.equals(InputStreamGraphSource.CONFIG_FILENAME)) return CONFIG;
             return OTHER;
         }
     }
+
+    /**
+     * Open and parse the JSON file at the given path into a Jackson JSON tree. Comments and unquoted keys are allowed.
+     * Returns null if the file does not exist,
+     * Returns null if the file contains syntax errors or cannot be parsed for some other reason.
+     *
+     * We do not require any JSON config files to be present because that would get in the way of the simplest
+     * rapid deployment workflow. Therefore we return an empty JSON node when the file is missing, causing us to fall
+     * back on all the default values as if there was a JSON file present with no fields defined.
+     */
+    private static JsonNode loadJson (File file) {
+        try (FileInputStream jsonStream = new FileInputStream(file)) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+            mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+            JsonNode config = mapper.readTree(jsonStream);
+            LOG.info("Found and loaded JSON configuration file '{}'", file);
+            return config;
+        } catch (FileNotFoundException ex) {
+            LOG.info("File '{}' is not present. Using default configuration.", file);
+            return MissingNode.getInstance();
+        } catch (Exception ex) {
+            LOG.error("Error while parsing JSON config file '{}': {}", file, ex.getMessage());
+            System.exit(42); // probably "should" be done with an exception
+            return null;
+        }
+    }
+
 }

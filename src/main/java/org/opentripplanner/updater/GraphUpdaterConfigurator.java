@@ -35,23 +35,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Configure/decorate a graph upon loading through Preferences (Preference is the new Java API
- * replacing "Properties"). Usually preferences are loaded from a .properties files, but could also
- * come from the graph itself or any other sources.
+ * Upon loading a Graph, configure/decorate it using a JSON tree from Jackson. This mainly involves starting
+ * graph updater processes (GTFS-RT, bike rental, etc.), hence the class name.
  * 
- * When a graph is loaded, client should call setupGraph() with the Preferences setup.
- * 
- * When a graph is unloaded, one must ensure the shutdownGraph() method is called to cleanup all
- * resources that could have been created.
- * 
- * This class then creates "graph updaters" (usually real-time connector, etc...) depending on the
- * given configuration, and configure them using the corresponding children Preferences node.
- * 
+ * When a Graph is loaded, one should call setupGraph() with the JSON tree containing configuration for the Graph.
+ * That method creates "graph updaters" according to the given JSON, which should contain an array or object field
+ * called "updaters". Each child element represents one updater.
+ *
+ * When a graph is unloaded, one must ensure the shutdownGraph() method is called to clean up all resources that may
+ * have been used.
+ *
  * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
  * between two child nodes in both configs (two childs node with the same name) the dynamic (ie
  * provided) configuration takes complete precedence over the embedded one: childrens properties are
  * *not* merged.
- * 
  */
 public abstract class GraphUpdaterConfigurator {
 
