@@ -110,7 +110,7 @@ public class CommandLineParameters implements Cloneable {
 
     @Parameter( names = { "-a", "--analyst"}, 
             description = "enable OTP Analyst extensions")
-    boolean analyst;
+    public boolean analyst;
 
     @Parameter( names = {"--bindAddress"},
             description = "the address of the network interface to bind to. defaults to all interfaces.")
