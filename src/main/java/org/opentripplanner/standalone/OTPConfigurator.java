@@ -14,6 +14,7 @@
 package org.opentripplanner.standalone;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
@@ -79,8 +80,8 @@ public class OTPConfigurator {
 
     private OTPServer server;
 
-    private static final String GRAPH_CONFIG_FILENAME = "graph-config.json";
-    private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
+    public static final String GRAPH_CONFIG_FILENAME = "build-config.json";
+    public static final String ROUTER_CONFIG_FILENAME = "router-config.json";
 
     /**
      * We could even do this at Configurator construct time (rather than lazy initializing), using
@@ -154,6 +155,7 @@ public class OTPConfigurator {
         GraphBuilderParameters builderParams = new GraphBuilderParameters(graphConfig);
         routerConfig = loadJson(new File(dir, ROUTER_CONFIG_FILENAME));
         RouterParameters routerParams = new RouterParameters(routerConfig);
+        LOG.info(dumpFields(builderParams));
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
             case GTFS:
@@ -356,6 +358,27 @@ public class OTPConfigurator {
             System.exit(42); // probably "should" be done with an exception
             return null;
         }
+    }
+
+    /** Concatenate all fields and values of a Java object. */
+    public static String dumpFields (Object object) {
+        StringBuilder sb = new StringBuilder();
+        Class clazz = object.getClass();
+        sb.append("Summarizing all public fields of an instance of class ");
+        sb.append(clazz);
+        sb.append('\n');
+        for (Field field : clazz.getFields()) {
+            sb.append(field.getName());
+            sb.append(" = ");
+            try {
+                String value = field.get(object).toString();
+                sb.append(value);
+            } catch (IllegalAccessException ex) {
+                sb.append("(non-public)");
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
     }
 
 }

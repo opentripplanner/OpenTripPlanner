@@ -28,6 +28,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.standalone.Router.LifecycleManager;
 import org.slf4j.Logger;
@@ -43,8 +44,6 @@ import com.google.common.io.ByteStreams;
 public class InputStreamGraphSource implements GraphSource {
 
     public static final String GRAPH_FILENAME = "Graph.obj";
-
-    public static final String CONFIG_FILENAME = "router-config.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(InputStreamGraphSource.class);
 
@@ -289,7 +288,7 @@ public class InputStreamGraphSource implements GraphSource {
 
         @Override
         public InputStream getConfigInputStream() throws IOException {
-            File configFile = new File(path, CONFIG_FILENAME);
+            File configFile = new File(path, OTPConfigurator.ROUTER_CONFIG_FILENAME);
             if (configFile.canRead()) {
                 LOG.debug("Loading config from file '{}'", configFile.getPath());
                 return new FileInputStream(configFile);
@@ -323,7 +322,7 @@ public class InputStreamGraphSource implements GraphSource {
 
         @Override
         public InputStream getConfigInputStream() {
-            File configFile = new File(path, CONFIG_FILENAME);
+            File configFile = new File(path, OTPConfigurator.ROUTER_CONFIG_FILENAME);
             LOG.debug("Trying to load config on classpath at '{}'", configFile.getPath());
             return Thread.currentThread().getContextClassLoader()
                     .getResourceAsStream(configFile.getPath());
