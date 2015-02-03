@@ -14,6 +14,7 @@
 package org.opentripplanner.scripting.api;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
 import org.opentripplanner.common.model.GenericLocation;
@@ -56,6 +57,14 @@ public class OtpsRoutingRequest {
         cal.set(Calendar.SECOND, sec);
         cal.set(Calendar.MILLISECOND, 0);
         req.setDateTime(cal.getTime());
+    }
+
+    public void setDateTime(Date dateTime) {
+        req.setDateTime(dateTime);
+    }
+
+    public void setDateTime(long epochSec) {
+        req.setDateTime(new Date(epochSec * 1000L));
     }
 
     public void setModes(String modesStr) {
