@@ -18,11 +18,16 @@ import java.io.IOException;
 import org.opentripplanner.analyst.batch.RasterPopulation;
 import org.opentripplanner.analyst.batch.SyntheticRasterPopulation;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.standalone.CommandLineParameters;
+import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
 
+import com.beust.jcommander.JCommander;
+
 /**
- * This is the main entry point (facade) for use by scripts. This bean is accessible through the
- * bean named "otp" in the various scripts.
+ * This is the main entry point (facade) for use by scripts. An instance of this facade is
+ * accessible through the bean named "otp" in the various scripts, or by creating one if using OTP
+ * as a library from an external script.
  * 
  * This facade allow a script to access / create OTP objects (routers, populations, ...)
  * 
@@ -39,6 +44,53 @@ public class OtpsEntryPoint {
 
     public OtpsEntryPoint(OTPServer otpServer) {
         this.otpServer = otpServer;
+    }
+
+    /**
+     * Create an OTP scripting entry point using the same command-line parameters as used by the OTP
+     * application. This is useful when using scripting from an outside environment, using OTP as a
+     * library. For example in jython the following script 'myscript.py':
+     * 
+     * <pre>
+     *   #!/usr/bin/jython
+     *   from org.opentripplanner.scripting.api import OtpsEntryPoint
+     *   otp = OtpsEntryPoint.fromArgs([ "-g", "." ])
+     *   ...
+     * </pre>
+     * 
+     * One can then run jython with:
+     * 
+     * <pre>
+     *   CLASSPATH=otp.jar jython myscript.py
+     * </pre>
+     * 
+     * @param args Command-line arguments, as used by the application.
+     * @return The "otp" scripting facade bean.
+     * @throws Exception
+     */
+    public static OtpsEntryPoint fromArgs(String[] args) throws Exception {
+        if (args == null)
+            args = new String[0];
+        CommandLineParameters params = new CommandLineParameters();
+        @SuppressWarnings("unused")
+        JCommander jc = new JCommander(params, args);
+        params.analyst = true; // Force analyst
+        params.infer();
+        OTPConfigurator configurator = new OTPConfigurator(params);
+        if (configurator.builderFromParameters() != null) // TODO Enable this
+            throw new IllegalArgumentException("Building from script is not supported.");
+        if (configurator.scriptFromParameters() != null) // This would be weird
+            throw new IllegalArgumentException("Scripting from script is not supported.");
+        if (configurator.visualizerFromParameters() != null) // Useless
+            throw new IllegalArgumentException("Vizualizer from script is not supported.");
+        if (configurator.serverFromParameters() != null) // Why not?
+            throw new IllegalArgumentException("Server from script is not supported.");
+        OTPServer otpServer = configurator.getServer();
+        return new OtpsEntryPoint(otpServer);
+    }
+
+    public static OtpsEntryPoint fromArgs() throws Exception {
+        return fromArgs(null);
     }
 
     /**
