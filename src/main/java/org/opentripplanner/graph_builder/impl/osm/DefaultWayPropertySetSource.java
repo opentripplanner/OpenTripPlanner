@@ -481,8 +481,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         /* and the notes */
         // TODO: The two entries below produce lots of spurrious notes (OSM mapper comments)
-        createNotes(props, "note=*", "{note}", StreetNotesService.ALWAYS_MATCHER);
-        createNotes(props, "notes=*", "{notes}", StreetNotesService.ALWAYS_MATCHER);
+        // createNotes(props, "note=*", "{note}", StreetNotesService.ALWAYS_MATCHER);
+        // createNotes(props, "notes=*", "{notes}", StreetNotesService.ALWAYS_MATCHER);
         createNotes(props, "RLIS:bicycle=caution_area", "note.caution", StreetNotesService.BICYCLE_MATCHER);
         createNotes(props, "CCGIS:bicycle=caution_area", "note.caution", StreetNotesService.BICYCLE_MATCHER);
         // TODO: Maybe we should apply the following notes only for car/bike
@@ -495,8 +495,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNotes(props, "surface=mud", "note.muddy_surface", StreetNotesService.ALWAYS_MATCHER);
         createNotes(props, "toll=yes", "note.toll", StreetNotesService.DRIVING_MATCHER);
         createNotes(props, "toll:motorcar=yes", "note.toll", StreetNotesService.DRIVING_MATCHER);
-        createNotes(props, "wheelchair:description=*", "{wheelchair:description}",
-                StreetNotesService.WHEELCHAIR_MATCHER);
+        // TODO: what do the curly brackets mean in the string below? They are being passed to the translation function.
+        // createNotes(props, "wheelchair:description=*", "{wheelchair:description}", StreetNotesService.WHEELCHAIR_MATCHER);
 
         /* and some names */
         // Basics
