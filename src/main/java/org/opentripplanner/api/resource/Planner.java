@@ -59,7 +59,7 @@ public class Planner extends RoutingResource {
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
          * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
          *       or vertex ids to planner (or error back to user)
-         * TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
+         * TODO: org.opentripplanner.routing.module.PathServiceImpl has COOORD parsing. Abstract that
          *       out so it's used here too...
          */
         

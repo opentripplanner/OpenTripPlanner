@@ -31,12 +31,12 @@ import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.graph_builder.AnnotationsToHTML;
 import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.graph_builder.impl.*;
-import org.opentripplanner.graph_builder.impl.ned.ElevationModule;
-import org.opentripplanner.graph_builder.impl.ned.GeotiffGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.*;
+import org.opentripplanner.graph_builder.module.ned.ElevationModule;
+import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
+import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
+import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -58,7 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import org.opentripplanner.graph_builder.impl.map.BusRouteStreetMatcher;
+import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 
 public class OTPConfigurator {
 

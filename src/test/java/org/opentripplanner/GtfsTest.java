@@ -28,7 +28,7 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.graph_builder.impl.GtfsModule;
+import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;

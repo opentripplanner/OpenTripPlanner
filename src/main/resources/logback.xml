@@ -16,7 +16,7 @@ depends on otp-routing.
     <appender-ref ref="STDOUT" />
   </root>
 
-  <logger name="org.opentripplanner.graph_builder.impl.DirectTransferGenerator" level="info" />
+  <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info" />
   <logger name="org.opentripplanner" level="info" />
   <logger name="org.opentripplanner.analyst" level="info" />
   <logger name="org.opentripplanner.routing" level="info" />

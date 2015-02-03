@@ -138,7 +138,7 @@ public class OSMWithTags {
 
     /**
      * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created by
-     * {@link org.opentripplanner.graph_builder.impl.osm.OpenStreetMapModule#processRelations processRelations}
+     * {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule#processRelations processRelations}
      */
     public String getAssumedName() {
         if (_tags.containsKey("name"))
