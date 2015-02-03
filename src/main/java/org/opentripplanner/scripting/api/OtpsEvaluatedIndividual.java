@@ -26,7 +26,6 @@ public class OtpsEvaluatedIndividual {
 
     private OtpsIndividual individual;
 
-    // TODO Add boardings, walk distance, etc...
     private long time;
 
     private int boardings;
