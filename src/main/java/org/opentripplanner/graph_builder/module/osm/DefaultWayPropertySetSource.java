@@ -480,7 +480,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.defaultProperties.setPermission(StreetTraversalPermission.ALL);
 
         /* and the notes */
-        // TODO: The two entries below produce lots of spurrious notes (OSM mapper comments)
+        // TODO: The curly brackets in the string below mean that the CreativeNamer should substitute in OSM tag values.
+        // However they are not taken into account when passed to the translation function.
+        // createNotes(props, "wheelchair:description=*", "{wheelchair:description}", StreetNotesService.WHEELCHAIR_MATCHER);
+        // TODO: The two entries below produce lots of spurious notes (because of OSM mapper comments)
         // createNotes(props, "note=*", "{note}", StreetNotesService.ALWAYS_MATCHER);
         // createNotes(props, "notes=*", "{notes}", StreetNotesService.ALWAYS_MATCHER);
         createNotes(props, "RLIS:bicycle=caution_area", "note.caution", StreetNotesService.BICYCLE_MATCHER);
@@ -495,8 +498,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNotes(props, "surface=mud", "note.muddy_surface", StreetNotesService.ALWAYS_MATCHER);
         createNotes(props, "toll=yes", "note.toll", StreetNotesService.DRIVING_MATCHER);
         createNotes(props, "toll:motorcar=yes", "note.toll", StreetNotesService.DRIVING_MATCHER);
-        // TODO: what do the curly brackets mean in the string below? They are being passed to the translation function.
-        // createNotes(props, "wheelchair:description=*", "{wheelchair:description}", StreetNotesService.WHEELCHAIR_MATCHER);
 
         /* and some names */
         // Basics
