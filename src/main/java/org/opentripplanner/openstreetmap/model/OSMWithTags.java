@@ -233,10 +233,11 @@ public class OSMWithTags {
     /**
      * Returns true if bikes are explicitly denied access.
      * 
+     * bicycle is denied if bicycle:no, bicycle:license or bicycle:use_sidepath
      * @return
      */
     public boolean isBicycleExplicitlyDenied() {
-        return isTagDeniedAccess("bicycle");
+        return isTagDeniedAccess("bicycle") || "use_sidepath".equals(getTag("bicycle"));
     }
 
     /**
