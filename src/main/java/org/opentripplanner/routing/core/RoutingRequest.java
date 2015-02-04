@@ -37,6 +37,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.routing.spt.DominanceFunction;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +104,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
 
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
-    public OptimizeType optimize = OptimizeType.QUICK;
+    public OptimizeType optimize = OptimizeType.QUICK; // TODO this should be completely removed and done only with individual cost parameters
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
@@ -403,7 +405,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean kissAndRide  = false;
 
     /* Whether we are in "long-distance mode". This is currently a server-wide setting, but it could be made per-request. */
+    // TODO remove
     public boolean longDistance = false;
+
+    /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
+    public DominanceFunction dominanceFunction = new DominanceFunction.MinimumWeight();
 
     /* CONSTRUCTORS */
 
@@ -628,24 +634,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public final static int MIN_SIMILARITY = 1000;
-
-    public int similarity(RoutingRequest options) {
-        int s = 0;
-
-        // TODO Check this: perfect equality between non-transit modes.
-        // For partial equality, should we return a smaller similarity score?
-        if (modes.getNonTransitSet().equals(options.modes.getNonTransitSet())) {
-            s += 1000;
-        }
-        if (optimize == options.optimize) {
-            s += 700;
-        }
-        if (wheelchairAccessible == options.wheelchairAccessible) {
-            s += 500;
-        }
-
-        return s;
-    }
 
     public void setFromString(String from) {
         this.from = GenericLocation.fromOldStyleString(from);
@@ -1192,4 +1180,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         return 40; // TODO find accurate max speeds
     }
 
+    /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
+    public ShortestPathTree getNewShortestPathTree() {
+        return this.dominanceFunction.getNewShortestPathTree(this);
+    }
 }

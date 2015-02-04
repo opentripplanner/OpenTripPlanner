@@ -66,10 +66,8 @@ public class MultiStateShortestPathTree extends ShortestPathTree {
         }
     }
 
-    public MultiStateShortestPathTree (RoutingRequest options) {
-        // For now we only have one multistate dominance function, so hard-wire it.
-        // You can always change it by setting the field directly with a new instance.
-        super(options, new DominanceFunction.ParetoTimeWeight());
+    public MultiStateShortestPathTree (RoutingRequest options, DominanceFunction dominanceFunction) {
+        super(options, dominanceFunction);
         stateSets = new IdentityHashMap<Vertex, List<State>>();
     }
 

@@ -1,41 +1,52 @@
 package org.opentripplanner.routing.spt;
 
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
- *
+ * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
+ * are retained. In the general case, one branch does not necessarily win out over the other, i.e. multiple states can
+ * coexist at a single Vertex.
  */
-public interface DominanceFunction {
+public abstract class DominanceFunction {
 
-    /** Return true if the first state is better than the second state. */
-    public boolean dominates(State a, State b);
+    /** Return true if the first state is "better" than the second state. */
+    public abstract boolean dominates(State a, State b);
 
-    public static class MinimumWeight implements DominanceFunction {
+    /**
+     * Create a new shortest path tree using this function, considering whether it allows co-dominant States.
+     * MultiShortestPathTree is the general case -- it will work with both single- and multi-state functions.
+     */
+     public ShortestPathTree getNewShortestPathTree(RoutingRequest routingRequest) {
+        return new MultiStateShortestPathTree(routingRequest, this);
+     }
 
+    /** A special case where one state is always better than the other. This allows some optimizations. */
+    public static abstract class SingleState extends DominanceFunction {
+        @Override
+        public ShortestPathTree getNewShortestPathTree(RoutingRequest routingRequest) {
+            return new SingleStateShortestPathTree(routingRequest, this);
+        }
+    }
+
+    public static class MinimumWeight extends DominanceFunction.SingleState {
         /** Return true if the first state has lower weight than the second state. */
         public boolean dominates(State a, State b) { return a.weight < b.weight; }
-
     }
 
     /**
      * This approach is more coherent in Analyst when we are extracting travel times from the optimal
      * paths. It also leads to less branching and faster response times when building large shortest path trees.
      */
-    public static class EarliestArrival implements DominanceFunction {
-
+    public static class EarliestArrival extends DominanceFunction.SingleState {
         /** Return true if the first state has lower elapsed time than the second state. */
         public boolean dominates(State a, State b) { return a.getElapsedTimeSeconds() < b.getElapsedTimeSeconds(); }
-
     }
 
-    /**
-     * In this implementation the relation is not symmetric.
-     * There are sets of states where none will dominate the others; they are co-dominant.
-     * Therefore this rule should be used with a multi-state shortest path tree.
-     */
-    public static class ParetoTimeWeight implements DominanceFunction {
+    /** In this implementation the relation is not symmetric. There are sets of mutually co-dominant states. */
+    public static class Pareto extends DominanceFunction {
 
         private static final double WALK_DIST_EPSILON = 0.05;
         private static final double WEIGHT_EPSILON = 0.02;

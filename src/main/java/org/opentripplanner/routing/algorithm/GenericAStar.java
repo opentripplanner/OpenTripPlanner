@@ -37,6 +37,7 @@ import com.beust.jcommander.internal.Lists;
 
 /**
  * Find the shortest path between graph vertices using A*.
+ * A basic Dijkstra search is a special case of AStar where the heuristic is always zero.
  *
  * NOTE this is now per-request scoped, which has caused some threading problems in the past.
  * Always make one new instance of this class per request, it contains a lot of state fields.
@@ -100,10 +101,7 @@ public class GenericAStar {
 
         runState = new RunState( options, terminationStrategy );
         runState.rctx = options.getRoutingContext();
-        // TODO this is a hackish way of communicating which mode we are in (since search mode is currently server-wide)
-        runState.spt = options.longDistance ?
-                new SingleStateShortestPathTree(runState.options, new DominanceFunction.MinimumWeight()) :
-                new MultiStateShortestPathTree(runState.options);
+        runState.spt = options.getNewShortestPathTree();
 
         // We want to reuse the heuristic instance in a series of requests for the same target to avoid repeated work.
         runState.heuristic = options.batch ?
@@ -130,16 +128,8 @@ public class GenericAStar {
         initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
         runState.pq = new BinHeap<State>(initialSize);
         runState.pq.insert(initialState, 0);
-
-//        options = options.clone();
-//        /** max walk distance cannot be less than distances to nearest transit stops */
-//        double minWalkDistance = origin.getVertex().getDistanceToNearestTransitStop()
-//                + target.getDistanceToNearestTransitStop();
-//        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), rctx.getMinWalkDistance()));
-
         runState.nVisited = 0;
         runState.targetAcceptedStates = Lists.newArrayList();
-
     }
 
     boolean iterate(){
