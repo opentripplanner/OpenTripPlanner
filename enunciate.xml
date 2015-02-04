@@ -6,6 +6,8 @@
   <disable-rule id="jaxb.noarg.constructor"/>
   <services> 
     <rest defaultRestSubcontext="/ws/">
+      <!-- Workaround for enunciate bug 678, for more info see: https://jira.codehaus.org/browse/ENUNCIATE-678 -->
+      <custom-resource-parameter-annotation qualifiedName="org.glassfish.jersey.media.multipart.FormDataParam" />
       <content-types> 
         <content-type type="text/plain" id="txt"/> 
       </content-types> 

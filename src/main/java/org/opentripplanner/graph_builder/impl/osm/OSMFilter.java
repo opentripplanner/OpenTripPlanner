@@ -222,6 +222,18 @@ public class OSMFilter {
             }
         }
 
+        //This needs to be after adding permissions for oneway:bicycle=no
+        //removes bicycle permission when bicycles need to use sidepath
+        //TAG: bicycle:forward=use_sidepath
+        if (way.isForwardDirectionSidepath()) {
+            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+        }
+
+        //TAG bicycle:backward=use_sidepath
+        if (way.isReverseDirectionSidepath()) {
+            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
+        }
+
         if (way.isOpposableCycleway()) {
             permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
         }
