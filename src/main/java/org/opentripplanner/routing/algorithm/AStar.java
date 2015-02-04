@@ -16,7 +16,6 @@ package org.opentripplanner.routing.algorithm;
 import java.util.Collection;
 import java.util.List;
 
-import com.sun.java.browser.plugin2.DOM;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
@@ -42,9 +41,9 @@ import com.beust.jcommander.internal.Lists;
  * NOTE this is now per-request scoped, which has caused some threading problems in the past.
  * Always make one new instance of this class per request, it contains a lot of state fields.
  */
-public class GenericAStar {
+public class AStar {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
     // FIXME this is not really a factory, it's a way to fake a global variable. This should be stored at the OTPServer level.
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
     private static final double OVERSEARCH_MULTIPLIER = 4.0;

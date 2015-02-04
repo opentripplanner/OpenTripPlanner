@@ -22,7 +22,7 @@ import org.opentripplanner.analyst.core.SampleSource;
 import org.opentripplanner.common.geometry.RecursiveGridIsolineBuilder;
 import org.opentripplanner.common.geometry.RecursiveGridIsolineBuilder.ZFunc;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -72,7 +72,7 @@ public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
         sptRequest.batch = true;
         sptRequest.setRoutingContext(graph);
         // TODO handle different path dominance conditions
-        final ShortestPathTree spt = new GenericAStar().getShortestPathTree(sptRequest);
+        final ShortestPathTree spt = new AStar().getShortestPathTree(sptRequest);
         sptRequest.cleanup();
 
         // 2. Compute the set of initial points

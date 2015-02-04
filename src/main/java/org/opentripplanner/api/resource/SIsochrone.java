@@ -28,7 +28,7 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.ReversibleLineStringWrapper;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -239,7 +239,7 @@ public class SIsochrone extends RoutingResource {
             sptRequestA.setMode(TraverseMode.WALK); // fall back to walk mode
             sptRequestA.setRoutingContext(router.graph);
         }
-        ShortestPathTree sptA = new GenericAStar().getShortestPathTree(sptRequestA);
+        ShortestPathTree sptA = new AStar().getShortestPathTree(sptRequestA);
         StreetLocation origin = (StreetLocation) sptRequestA.rctx.fromVertex;
         sptRequestA.cleanup(); // remove inserted points
 

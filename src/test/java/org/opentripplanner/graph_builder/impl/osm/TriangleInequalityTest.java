@@ -22,10 +22,8 @@ import java.net.URLDecoder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -70,7 +68,7 @@ public class TriangleInequalityTest {
         end = _graph.getVertex("osm:node:42448554");    
     }
 
-    private GraphPath getPath(GenericAStar aStar, RoutingRequest proto,
+    private GraphPath getPath(AStar aStar, RoutingRequest proto,
             Edge startBackEdge, Vertex u, Vertex v) {
         RoutingRequest options = proto.clone();
         options.setRoutingContext(_graph, startBackEdge, u, v);
@@ -106,7 +104,7 @@ public class TriangleInequalityTest {
         RoutingRequest options = prototypeOptions.clone();
         options.setRoutingContext(_graph, start, end);
         
-        GenericAStar aStar = new GenericAStar(); 
+        AStar aStar = new AStar();
         
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(end, false);

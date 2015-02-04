@@ -13,7 +13,6 @@
 
 package org.opentripplanner.analyst.batch;
 
-import java.io.IOException;
 import java.util.TimeZone;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -21,13 +20,11 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.annotation.Resource;
-
 import org.opentripplanner.analyst.batch.aggregator.Aggregator;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.GraphService;
@@ -248,7 +245,7 @@ public class BatchProcessor {
             LOG.debug("calling origin : {}", oi);
             RoutingRequest req = buildRequest(oi);
             if (req != null) {
-                ShortestPathTree spt = new GenericAStar().getShortestPathTree(req);
+                ShortestPathTree spt = new AStar().getShortestPathTree(req);
                 // ResultSet should be a local to avoid memory leak
                 ResultSet results = ResultSet.forTravelTimes(destinations, spt);
                 req.cleanup();

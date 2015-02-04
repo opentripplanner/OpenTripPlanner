@@ -22,9 +22,8 @@ import static org.opentripplanner.routing.automata.Nonterminal.plus;
 import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
 
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -43,8 +42,6 @@ import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +100,7 @@ public class GraphPathFinder {
             return null;
         }
         
-        GenericAStar aStar = new GenericAStar();
+        AStar aStar = new AStar();
         if (options.rctx == null) {
             options.setRoutingContext(graph);
             /* Use a pathparser that constrains the search to use SimpleTransfers. */

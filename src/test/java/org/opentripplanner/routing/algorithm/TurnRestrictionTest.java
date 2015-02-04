@@ -111,7 +111,7 @@ public class TurnRestrictionTest {
         options.walkSpeed = 1.0;
 
         options.setRoutingContext(_graph, topRight, bottomLeft);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
         assertNotNull(path);
@@ -136,7 +136,7 @@ public class TurnRestrictionTest {
         options.walkSpeed = 1.0;
         
         options.setRoutingContext(_graph, topRight, bottomLeft);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
         assertNotNull(path);
@@ -161,7 +161,7 @@ public class TurnRestrictionTest {
         options.carSpeed = 1.0;
 
         options.setRoutingContext(_graph, topRight, bottomLeft);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
         assertNotNull(path);
@@ -187,7 +187,7 @@ public class TurnRestrictionTest {
         options.carSpeed = 1.0;
 
         options.setRoutingContext(_graph, topRight, bottomLeft);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
         assertNotNull(path);

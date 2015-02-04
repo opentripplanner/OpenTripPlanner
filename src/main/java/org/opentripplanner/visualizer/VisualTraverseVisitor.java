@@ -13,7 +13,7 @@
 
 package org.opentripplanner.visualizer;
 
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.core.State;
@@ -65,8 +65,8 @@ public class VisualTraverseVisitor implements TraverseVisitor {
         return new GenericAStarFactory() {
 
             @Override
-            public GenericAStar createAStarInstance() {
-                GenericAStar astar = new GenericAStar();
+            public AStar createAStarInstance() {
+                AStar astar = new AStar();
                 astar.setTraverseVisitor(VisualTraverseVisitor.this);
                 return astar;
             }

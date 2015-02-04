@@ -15,10 +15,8 @@ package org.opentripplanner.graph_builder.impl.osm;
 
 import com.google.common.collect.Maps;
 import junit.framework.TestCase;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
@@ -42,7 +40,7 @@ public class TestUnroutable extends TestCase {
 
     private Graph graph = new Graph();
 
-    private GenericAStar aStar = new GenericAStar();
+    private AStar aStar = new AStar();
 
     public void setUp() throws Exception {
         OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl();

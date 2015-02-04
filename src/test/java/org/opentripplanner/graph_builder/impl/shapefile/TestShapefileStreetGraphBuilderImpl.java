@@ -20,7 +20,7 @@ import java.util.HashMap;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -162,7 +162,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         assertEquals(3, start.getDegreeOut());
         assertEquals(3, start.getDegreeIn());
 
-        GenericAStar aStar = new GenericAStar();
+        AStar aStar = new AStar();
         RoutingRequest opt = new RoutingRequest();
         opt.setRoutingContext(gg, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(opt);

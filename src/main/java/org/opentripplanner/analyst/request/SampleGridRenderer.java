@@ -23,7 +23,7 @@ import org.opentripplanner.common.geometry.IsolineBuilder;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.ZSampleGrid;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -82,7 +82,7 @@ public class SampleGridRenderer {
         sptRequest.setRoutingContext(graph);
         sptRequest.rctx.pathParsers = new PathParser[] { new BasicPathParser(), new NoThruTrafficPathParser() };
         // TODO swap in different state dominance logic (earliest arrival, pareto, etc.)
-        final ShortestPathTree spt = new GenericAStar().getShortestPathTree(sptRequest);
+        final ShortestPathTree spt = new AStar().getShortestPathTree(sptRequest);
 
         // 3. Create a sample grid based on the SPT.
         long t1 = System.currentTimeMillis();
