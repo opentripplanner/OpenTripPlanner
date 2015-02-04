@@ -16,6 +16,11 @@ package org.opentripplanner.openstreetmap.model;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.impl.osm.OSMFilter;
+import org.opentripplanner.graph_builder.impl.osm.WayProperties;
+import org.opentripplanner.graph_builder.impl.osm.WayPropertySet;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 public class OSMWayTest {
 
@@ -91,6 +96,21 @@ public class OSMWayTest {
     }
 
     @Test
+    public void testIsOneDirectionSidepath() {
+        OSMWay way = new OSMWay();
+        assertFalse(way.isForwardDirectionSidepath());
+        assertFalse(way.isReverseDirectionSidepath());
+
+        way.addTag("bicycle:forward", "use_sidepath");
+        assertTrue(way.isForwardDirectionSidepath());
+        assertFalse(way.isReverseDirectionSidepath());
+
+        way.addTag("bicycle:backward", "use_sidepath");
+        assertTrue(way.isForwardDirectionSidepath());
+        assertTrue(way.isReverseDirectionSidepath());
+    }
+
+    @Test
     public void testIsOpposableCycleway() {
         OSMWay way = new OSMWay();
         assertFalse(way.isOpposableCycleway());
@@ -107,5 +127,74 @@ public class OSMWayTest {
         way.addTag("cycleway", "nope");
         way.addTag("cycleway:left", "opposite_side");
         assertTrue(way.isOpposableCycleway());
+    }
+
+    private P2<StreetTraversalPermission> getWayProperties(OSMWay way) {
+        WayPropertySet wayPropertySet = new WayPropertySet();
+        WayProperties wayData = wayPropertySet.getDataForWay(way);
+
+        StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(way,
+                wayData.getPermission(), null);
+        return OSMFilter.getPermissions(permissions,
+                way);
+    }
+
+    @Test
+    public void testSidepathPermissions() {
+        OSMWay way = new OSMWay();
+        way.addTag("bicycle", "use_sidepath");
+        way.addTag("highway", "primary");
+        way.addTag("lanes", "2");
+        way.addTag("maxspeed", "70");
+        way.addTag("oneway", "yes");
+        P2<StreetTraversalPermission> permissionPair = getWayProperties(way);
+
+        assertFalse(permissionPair.first.allows(StreetTraversalPermission.BICYCLE));
+        assertFalse(permissionPair.second.allows(StreetTraversalPermission.BICYCLE));
+
+        assertTrue(permissionPair.first.allows(StreetTraversalPermission.CAR));
+        assertFalse(permissionPair.second.allows(StreetTraversalPermission.CAR));
+
+        way = new OSMWay();
+        way.addTag("bicycle:forward", "use_sidepath");
+        way.addTag("highway", "tertiary");
+        permissionPair = getWayProperties(way);
+
+        assertFalse(permissionPair.first.allows(StreetTraversalPermission.BICYCLE));
+        assertTrue(permissionPair.second.allows(StreetTraversalPermission.BICYCLE));
+
+        assertTrue(permissionPair.first.allows(StreetTraversalPermission.CAR));
+        assertTrue(permissionPair.second.allows(StreetTraversalPermission.CAR));
+
+        way = new OSMWay();
+        way.addTag("bicycle:backward", "use_sidepath");
+        way.addTag("highway", "tertiary");
+        permissionPair = getWayProperties(way);
+
+        assertTrue(permissionPair.first.allows(StreetTraversalPermission.BICYCLE));
+        assertFalse(permissionPair.second.allows(StreetTraversalPermission.BICYCLE));
+
+        assertTrue(permissionPair.first.allows(StreetTraversalPermission.CAR));
+        assertTrue(permissionPair.second.allows(StreetTraversalPermission.CAR));
+
+        way = new OSMWay();
+        way.addTag("highway", "tertiary");
+        way.addTag("oneway", "yes");
+        way.addTag("oneway:bicycle", "no");
+        permissionPair = getWayProperties(way);
+
+        assertTrue(permissionPair.first.allows(StreetTraversalPermission.BICYCLE));
+        assertTrue(permissionPair.second.allows(StreetTraversalPermission.BICYCLE));
+
+        assertTrue(permissionPair.first.allows(StreetTraversalPermission.CAR));
+        assertFalse(permissionPair.second.allows(StreetTraversalPermission.CAR));
+
+        way.addTag("bicycle:forward", "use_sidepath");
+        permissionPair = getWayProperties(way);
+        assertFalse(permissionPair.first.allows(StreetTraversalPermission.BICYCLE));
+        assertTrue(permissionPair.second.allows(StreetTraversalPermission.BICYCLE));
+
+        assertTrue(permissionPair.first.allows(StreetTraversalPermission.CAR));
+        assertFalse(permissionPair.second.allows(StreetTraversalPermission.CAR));
     }
 }
