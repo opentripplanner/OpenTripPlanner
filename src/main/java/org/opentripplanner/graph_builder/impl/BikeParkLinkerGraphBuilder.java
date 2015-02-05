@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
@@ -36,14 +36,16 @@ public class BikeParkLinkerGraphBuilder implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        //TODO: copy only BikeParkVertex vertices
+
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
 
-        NetworkLinker linker = (NetworkLinker) extra.get(NetworkLinker.class);
+        NetworkLinkerLibrary networkLinkerLibrary = (NetworkLinkerLibrary) extra.get(NetworkLinkerLibrary.class);
         LOG.info("Linking bike P+R stations...");
         for (BikeParkVertex bprv : Iterables.filter(vertices, BikeParkVertex.class)) {
-            if (!linker.connectVertexToStreets(bprv).getResult()) {
+            if (!networkLinkerLibrary.connectVertexToStreets(bprv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked(bprv)));
             }
         }

@@ -58,6 +58,8 @@ import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerBuilder;
+import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 
 public class TestPatternHopFactory extends TestCase {
 
@@ -85,8 +87,11 @@ public class TestPatternHopFactory extends TestCase {
             StreetEdge street2 = new StreetEdge(back, front, GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "street", 100, StreetTraversalPermission.ALL, true);
         }
 
-        NetworkLinker nl = new NetworkLinker(graph);
-        nl.createLinkage();
+        HashMap<Class<?>, Object> extra = new HashMap<>();
+        NetworkLinkerBuilder networkLinkerBuilder = new NetworkLinkerBuilder();
+        networkLinkerBuilder.buildGraph(graph, extra);
+        TransitToStreetNetworkGraphBuilderImpl transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkGraphBuilderImpl();
+        transitToStreetNetworkGraphBuilderImpl.buildGraph(graph, extra);
     }
 
     public void testAnnotation() {

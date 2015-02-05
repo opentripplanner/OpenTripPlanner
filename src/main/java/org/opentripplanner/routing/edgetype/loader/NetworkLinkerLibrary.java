@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype.loader;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -65,6 +66,14 @@ public class NetworkLinkerLibrary {
     EdgesForRoute edgesForRoute;
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
+    /**
+     * Gets read only view of list of edge pairs that are replaced
+     * @return 
+     */
+    public Map<HashSet<StreetEdge>, LinkedList<P2<StreetEdge>>> getReplacements() {
+        return Collections.unmodifiableMap(replacements);
+    }
 
     public NetworkLinkerLibrary(Graph graph, Map<Class<?>, Object> extra) {
         this.graph = graph;

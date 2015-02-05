@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +30,8 @@ public class NetworkLinkerBuilder implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        NetworkLinker linker = new NetworkLinker(graph, extra);
-        extra.put(NetworkLinker.class, linker);
+        NetworkLinkerLibrary networkLinkerLibrary = new NetworkLinkerLibrary(graph, extra);
+        extra.put(NetworkLinkerLibrary.class, networkLinkerLibrary);
     }
 
     @Override

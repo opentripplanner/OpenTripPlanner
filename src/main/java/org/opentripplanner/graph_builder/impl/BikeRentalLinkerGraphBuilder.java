@@ -18,9 +18,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
-import org.opentripplanner.graph_builder.impl.bike.BikeRentalGraphBuilder;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -37,15 +36,17 @@ public class BikeRentalLinkerGraphBuilder implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        //TODO: copy only BikeRentalStationVertex vertices
+
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
 
-        NetworkLinker linker = (NetworkLinker) extra.get(NetworkLinker.class);
+        NetworkLinkerLibrary networkLinkerLibrary = (NetworkLinkerLibrary) extra.get(NetworkLinkerLibrary.class);
         LOG.info("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : Iterables.filter(vertices,
                 BikeRentalStationVertex.class)) {
-            if (!linker.connectVertexToStreets(brsv).getResult()) {
+            if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
             }
         }
