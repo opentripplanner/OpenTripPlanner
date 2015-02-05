@@ -37,6 +37,7 @@ public class StopTime extends Entity implements Serializable {
     public int    pickup_type;
     public int    drop_off_type;
     public double shape_dist_traveled;
+    public int    timepoint;
 
     public static class Loader extends Entity.Loader<StopTime> {
 
@@ -56,6 +57,7 @@ public class StopTime extends Entity implements Serializable {
             st.pickup_type    = getIntField("pickup_type", false, 0, 3); // TODO add ranges as parameters
             st.drop_off_type  = getIntField("drop_off_type", false, 0, 3);
             st.shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
+            st.timepoint      = getIntField("timepoint", false, 0, 1);
             st.feed = null; // this could circular-serialize the whole feed
             feed.stop_times.put(new Fun.Tuple2(st.trip_id, st.stop_sequence), st);
 
@@ -77,7 +79,7 @@ public class StopTime extends Entity implements Serializable {
         @Override
         protected void writeHeaders() throws IOException {
             writer.writeRecord(new String[] {"trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "stop_headsign",
-                    "pickup_type", "drop_off_type", "shape_dist_traveled"});
+                    "pickup_type", "drop_off_type", "shape_dist_traveled", "timepoint"});
         }
 
         @Override
@@ -90,6 +92,7 @@ public class StopTime extends Entity implements Serializable {
             writeStringField(st.stop_headsign);
             writeIntField(st.pickup_type);
             writeIntField(st.drop_off_type);
+            writeIntField(st.timepoint);
             writeDoubleField(st.shape_dist_traveled);
             endRecord();
         }
