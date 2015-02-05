@@ -30,6 +30,7 @@ public class OSM {
             
     public OSM(boolean diskBacked) {
         // Using DB TreeMaps is observed not to be slower than memory.
+        // HashMaps are both bigger and slower.
         // It lets you run in 400MB instead of a few GB.
         if (diskBacked) {
             LOG.info("OSM backed by temporary file.");

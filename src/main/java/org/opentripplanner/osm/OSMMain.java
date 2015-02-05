@@ -38,9 +38,9 @@ import java.util.Map.Entry;
 public class OSMMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSMMain.class);
-    //static final String INPUT = "/var/otp/graphs/ny/new-york-latest.osm.pbf";
+    static final String INPUT = "/var/otp/graphs/ny/new-york-latest.osm.pbf";
     //static final String INPUT = "/var/otp/graphs/nl/netherlands-latest.osm.pbf";
-    static final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
+    //static final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
     static final Envelope ENV = new Envelope(4.4, 5.5, 52.2, 53.3);
 
     public static void main(String[] args) {

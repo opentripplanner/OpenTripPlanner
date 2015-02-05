@@ -20,24 +20,6 @@ import java.util.zip.GZIPOutputStream;
  */
 public class VexFormatCodec {
 
-    /*
-    Implemented in Java by reusing the Protobuf CodedOutputStream class.
-
-    Netherlands: 941M PBF vs. 620M VEX format. 5 minutes to convert to VEX file via MapDB in Java.
-    So about 35% reduction in space (likely more with embedded nodes)
-
-    New York: 130M PBF / 72M VEX format.
-    30 sec to write VEX file out of MapDB, 55% of the PBF size.
-    27 sec to convert it directly via a PBF Parser with no MapDB, file is same size.
-
-    Portland: 16MB PBF / 11MB VEX format.
-    10 sec to read PBF into MapDB, 4 sec to write VEX out from MapDB, about 68% of PBF size.
-    4 sec to convert directly from PBF to VEX without using MapDB.
-
-    Size increased to 77MB when I output the nodes along ways attempting to assist delta compression.
-    The order of the nodes and ways also matters, and by using a MapDB TreeMap we output them in order of increasing ID.
-    */
-
     public static final String HEADER = "VEXFMT";
     public static final int VEX_NODE = 0;
     public static final int VEX_WAY = 1;
@@ -343,8 +325,8 @@ public class VexFormatCodec {
     /** This main method will convert a PBF file to VEX in a streaming manner, without an intermediate datastore. */
     public static void main (String[] args) {
         // final String INPUT = "/var/otp/graphs/ny/new-york-latest.osm.pbf";
-        // final String INPUT = "/var/otp/graphs/nl/netherlands-latest.osm.pbf";
-        final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
+        final String INPUT = "/var/otp/graphs/nl/netherlands-latest.osm.pbf";
+        // final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
         Converter converter = new VexFormatCodec().new Converter();
         try {
             converter.streamBegin();
