@@ -63,7 +63,10 @@ public class TranslatedString implements I18NString, Serializable {
      */
     @Override
     public String toString(Locale locale) {
-        String language = locale.getLanguage().toLowerCase();
+        String language = null;
+        if (locale != null) {
+            language = locale.getLanguage().toLowerCase();
+        }
         return translations.containsKey(language) ? translations.get(language) : translations.get(null);
     }
 }
