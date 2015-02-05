@@ -29,15 +29,15 @@ public class StopTime extends Entity implements Serializable {
 
     /* StopTime cannot directly reference Trips or Stops because they would be serialized into the MapDB. */
     public String trip_id;
-    public int    arrival_time;
-    public int    departure_time;
+    public int    arrival_time = INT_MISSING;
+    public int    departure_time = INT_MISSING;
     public String stop_id;
     public int    stop_sequence;
     public String stop_headsign;
     public int    pickup_type;
     public int    drop_off_type;
     public double shape_dist_traveled;
-    public int    timepoint;
+    public int    timepoint = INT_MISSING;
 
     public static class Loader extends Entity.Loader<StopTime> {
 
