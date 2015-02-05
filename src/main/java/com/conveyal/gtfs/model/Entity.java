@@ -368,14 +368,19 @@ public abstract class Entity implements Serializable {
         }
 
         /**
-         * Write a double value, with precision 10^-7.
+         * Write a double value, with precision 10^-7. NaN is written as "".
          */
         protected void writeDoubleField (double val) throws IOException {
+            // NaN's represent missing values
+            if (Double.isNaN(val))
+                writeStringField("");
+            
             // control file size: don't use unnecessary precision
             // This is usually used for coordinates; one ten-millionth of a degree at the equator is 1.1cm,
             // and smaller elsewhere on earth, plenty precise enough.
             // On Jupiter, however, it's a different story.
-            writeStringField(String.format("%.7f", val));
+            else
+                writeStringField(String.format("%.7f", val));
         }
 
         /**
