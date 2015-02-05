@@ -61,6 +61,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import org.opentripplanner.graph_builder.impl.BikeParkLinkerGraphBuilder;
+import org.opentripplanner.graph_builder.impl.BikeRentalLinkerGraphBuilder;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerBuilder;
 import org.opentripplanner.graph_builder.impl.map.BusRouteStreetMatcher;
 
 public class OTPConfigurator {
@@ -199,6 +202,7 @@ public class OTPConfigurator {
             osmBuilder.skipVisibility = params.skipVisibility;
             graphBuilder.addGraphBuilder(osmBuilder);
             graphBuilder.addGraphBuilder(new PruneFloatingIslands());
+            graphBuilder.addGraphBuilder(new NetworkLinkerBuilder());
         }
         if ( hasGTFS ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
@@ -226,6 +230,10 @@ public class OTPConfigurator {
                 graphBuilder.addGraphBuilder(new DirectTransferGenerator());
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
+        }
+        if ( hasOSM ) {
+            graphBuilder.addGraphBuilder(new BikeRentalLinkerGraphBuilder());
+            graphBuilder.addGraphBuilder(new BikeParkLinkerGraphBuilder());
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();

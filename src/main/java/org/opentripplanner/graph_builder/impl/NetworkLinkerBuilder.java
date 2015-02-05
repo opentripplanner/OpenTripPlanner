@@ -9,14 +9,12 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package org.opentripplanner.graph_builder.impl;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Graph;
@@ -24,26 +22,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link GraphBuilder} plugin that links up the stops of a transit network to a street network.
- * Should be called after both the transit network and street network are loaded.
+ *
+ * @author mabu
  */
-public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkGraphBuilderImpl.class);
-
-    public List<String> provides() {
-        return Arrays.asList("street to transit", "linking");
-    }
-
-    public List<String> getPrerequisites() {
-        return Arrays.asList("network_linking", "streets"); // why not "transit" ?
-    }
+public class NetworkLinkerBuilder implements GraphBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(NetworkLinkerBuilder.class);
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        LOG.info("Linking transit stops to streets...");
-        NetworkLinker linker = (NetworkLinker) extra.get(NetworkLinker.class);
-        linker.createLinkage();
+        NetworkLinker linker = new NetworkLinker(graph, extra);
+        extra.put(NetworkLinker.class, linker);
+    }
+
+    @Override
+    public List<String> provides() {
+        return Arrays.asList("network_linking");
+    }
+
+    @Override
+    public List<String> getPrerequisites() {
+        return Arrays.asList("streets"); // why not "transit" ?
     }
 
     @Override

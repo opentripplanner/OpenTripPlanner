@@ -56,6 +56,14 @@ public class NetworkLinker {
         this(graph, new HashMap<Class<?>, Object>());
     }
 
+    public LinkRequest connectVertexToStreets(BikeRentalStationVertex v) {
+        return networkLinkerLibrary.connectVertexToStreets(v);
+    }
+
+    public LinkRequest connectVertexToStreets(BikeParkVertex v) {
+        return networkLinkerLibrary.connectVertexToStreets(v);
+    }
+
     /**
      * Link the transit network to the street network. Connect each transit vertex to the nearest
      * Street edge with a StreetTransitLink.
@@ -113,29 +121,6 @@ public class NetworkLinker {
                     edge2.getFromVertex().addOutgoing(edge2);
                     edge2.getToVertex().addIncoming(edge2);
                 }
-            }
-        }
-
-        /*
-         * TODO Those two steps should be in a separate builder, really. We re-use this builder to
-         * prevent having to spatially re-index several times the street network. Instead we could
-         * have a "spatial indexer" builder that add a spatial index to the graph, and make all
-         * builders that rely on spatial indexing to add a dependency to this builder. And we do not
-         * link stations directly in the OSM build as they can come from other builders (static bike
-         * rental or P+R builders) and street data can be coming from shapefiles.
-         */
-        LOG.debug("Linking bike rental stations...");
-        for (BikeRentalStationVertex brsv : Iterables.filter(vertices,
-                BikeRentalStationVertex.class)) {
-            if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
-                LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
-            }
-        }
-
-        LOG.debug("Linking bike P+R stations...");
-        for (BikeParkVertex bprv : Iterables.filter(vertices, BikeParkVertex.class)) {
-            if (!networkLinkerLibrary.connectVertexToStreets(bprv).getResult()) {
-                LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked(bprv)));
             }
         }
     }
