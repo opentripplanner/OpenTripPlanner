@@ -120,25 +120,29 @@ public abstract class Entity implements Serializable {
          * Fetch the given column of the current row, and interpret it as a time in the format HH:MM:SS.
          * @return the time value in seconds since midnight
          */
-        protected int getTimeField(String column) throws IOException {
-            String str = getFieldCheckRequired(column, true); // All time fields are required fields
+        protected int getTimeField(String column, boolean required) throws IOException {
+            String str = getFieldCheckRequired(column, required); // All time fields are required fields
             int val = INT_MISSING;
-            String[] fields = str.split(":");
-            if (fields.length != 3) {
-                feed.errors.add(new TimeParseError(tableName, row, column));
-            } else {
-                try {
-                    int hours = Integer.parseInt(fields[0]);
-                    int minutes = Integer.parseInt(fields[1]);
-                    int seconds = Integer.parseInt(fields[2]);
-                    checkRangeInclusive(0, 72, hours); // GTFS hours can go past midnight. Some trains run for 3 days.
-                    checkRangeInclusive(0, 59, minutes);
-                    checkRangeInclusive(0, 59, seconds);
-                    val = (hours * 60 * 60) + minutes * 60 + seconds;
-                } catch (NumberFormatException nfe) {
+            
+            if (str != null) {
+                String[] fields = str.split(":");
+                if (fields.length != 3) {
                     feed.errors.add(new TimeParseError(tableName, row, column));
+                } else {
+                    try {
+                        int hours = Integer.parseInt(fields[0]);
+                        int minutes = Integer.parseInt(fields[1]);
+                        int seconds = Integer.parseInt(fields[2]);
+                        checkRangeInclusive(0, 72, hours); // GTFS hours can go past midnight. Some trains run for 3 days.
+                        checkRangeInclusive(0, 59, minutes);
+                        checkRangeInclusive(0, 59, seconds);
+                        val = (hours * 60 * 60) + minutes * 60 + seconds;
+                    } catch (NumberFormatException nfe) {
+                        feed.errors.add(new TimeParseError(tableName, row, column));
+                    }
                 }
             }
+            
             return val;
         }
 
@@ -349,6 +353,11 @@ public abstract class Entity implements Serializable {
          * Take a time expressed in seconds since noon - 12h (midnight, usually) and write it in HH:MM:SS format.
          */
         protected void writeTimeField (int secsSinceMidnight) throws IOException {
+            if (secsSinceMidnight == INT_MISSING) {
+                writeStringField("");
+                return;
+            }
+            
             int seconds = secsSinceMidnight % 60;
             secsSinceMidnight -= seconds;
             // note that the minute and hour values are still expressed in seconds until we write it out, to avoid unnecessary division.

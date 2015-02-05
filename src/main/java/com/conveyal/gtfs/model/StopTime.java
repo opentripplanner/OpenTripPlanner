@@ -49,8 +49,10 @@ public class StopTime extends Entity implements Serializable {
         public void loadOneRow() throws IOException {
             StopTime st = new StopTime();
             st.trip_id        = getStringField("trip_id", true);
-            st.arrival_time   = getTimeField("arrival_time");
-            st.departure_time = getTimeField("departure_time");
+            // TODO: arrival_time and departure time are not required, but if one is present the other should be
+            // also, if this is the first or last stop, they are both required
+            st.arrival_time   = getTimeField("arrival_time", false);
+            st.departure_time = getTimeField("departure_time", false);
             st.stop_id        = getStringField("stop_id", true);
             st.stop_sequence  = getIntField("stop_sequence", true, 0, Integer.MAX_VALUE);
             st.stop_headsign  = getStringField("stop_headsign", false);
