@@ -1055,7 +1055,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /**
-     * @return The time it actually takes to board a vehicle. Could be significant eg. on airplanes and ferries
+     * @return The time it actually takes to alight a vehicle. Could be significant eg. on airplanes and ferries
      */
     public int getAlightTime(TraverseMode transitMode) {
         if (transitMode == TraverseMode.AIRPLANE) {
