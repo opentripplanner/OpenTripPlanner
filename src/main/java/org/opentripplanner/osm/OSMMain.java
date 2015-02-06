@@ -38,15 +38,15 @@ import java.util.Map.Entry;
 public class OSMMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSMMain.class);
-    static final String INPUT = "/var/otp/graphs/ny/new-york-latest.osm.pbf";
+    //static final String INPUT = "/var/otp/graphs/ny/new-york-latest.osm.pbf";
     //static final String INPUT = "/var/otp/graphs/nl/netherlands-latest.osm.pbf";
     //static final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
     static final Envelope ENV = new Envelope(4.4, 5.5, 52.2, 53.3);
 
     public static void main(String[] args) {
         /** This main method will convert a PBF file to VEX using an intermediate MapDB datastore. */
-        OSM osm = OSM.fromPBF(INPUT);//, ENV);
-        try (OutputStream fout = new FileOutputStream("/home/abyrd/test.vex")) {
+        OSM osm = OSM.fromPBF(args[0]);//, ENV);
+        try (OutputStream fout = new FileOutputStream("test.vex")) {
             LOG.info("begin writing vex");
             new VexFormatCodec().writeVex(osm, fout);
             LOG.info("end writing vex");

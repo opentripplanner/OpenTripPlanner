@@ -1,5 +1,6 @@
 package org.opentripplanner.osm;
 
+import java.io.File;
 import java.util.Map;
 
 import org.mapdb.DB;
@@ -34,7 +35,7 @@ public class OSM {
         // It lets you run in 400MB instead of a few GB.
         if (diskBacked) {
             LOG.info("OSM backed by temporary file.");
-            DB db = DBMaker.newTempFileDB()
+            DB db = DBMaker.newFileDB(new File("/mnt/ssd2/vex/osmdb")) // use newMemoryDB for higher speed?
                     .transactionDisable()
                     .asyncWriteEnable()
                     .compressionEnable()
