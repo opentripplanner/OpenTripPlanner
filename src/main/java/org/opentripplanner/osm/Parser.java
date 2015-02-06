@@ -45,8 +45,8 @@ public abstract class Parser extends BinaryParser {
     OSM osm;
     // no need to internalize strings. they will be serialized out to disk anyway.
     // private Map<String, String> stringTable = new HashMap<String, String>();    
-    int nodeCount = 0;
-    int wayCount = 0;
+    long nodeCount = 0;
+    long wayCount = 0;
     
     private static final String[] retainKeys = new String[] {
         "highway", "parking", "bicycle"
@@ -222,7 +222,7 @@ public abstract class Parser extends BinaryParser {
         LOG.info("Done parsing PBF.");
     }
 
-    private static String human(int n) {
+    private static String human(long n) {
         if (n > 1000000)
             return String.format("%.1fM", n / 1000000.0);
         if (n > 1000)
