@@ -94,8 +94,8 @@ public class StopTime extends Entity implements Serializable {
             writeStringField(st.stop_headsign);
             writeIntField(st.pickup_type);
             writeIntField(st.drop_off_type);
-            writeIntField(st.timepoint);
             writeDoubleField(st.shape_dist_traveled);
+            writeIntField(st.timepoint);
             endRecord();
         }
 
