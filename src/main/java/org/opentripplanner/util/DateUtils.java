@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author Frank Purcell (p u r c e l l f @ t r i m e t . o r g)
  * @date October 20, 2009
  */
-public class DateUtils implements DateConstants {
+public class DateUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(DateUtils.class);
 
@@ -202,7 +202,7 @@ public class DateUtils implements DateConstants {
     }
 
     public static String getAmPm(int time) {
-        return getAmPm(time, AM, PM);
+        return getAmPm(time, "am", "pm");
     }
 
     public static String getAmPm(int time, String am, String pm) {

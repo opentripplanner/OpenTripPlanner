@@ -27,6 +27,6 @@ public class DateUtilsTest {
         assertEquals(0, date.getTime());
 
         date = DateUtils.toDate(null, "00:00", TimeZone.getTimeZone("UTC"));
-        assertEquals(0, date.getTime() % DateUtils.ONE_DAY_MILLI);
+        assertEquals(0, date.getTime() % 86400000L); // Milliseconds in a day
     }
 }
