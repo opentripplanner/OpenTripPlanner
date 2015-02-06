@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import static com.google.common.collect.Iterables.filter;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerCleanerGraphBuilder;
 
 public class TestHalfEdges extends TestCase {
 
@@ -471,6 +472,8 @@ public class TestHalfEdges extends TestCase {
         networkLinkerBuilder.buildGraph(graph, extra);
         TransitToStreetNetworkGraphBuilderImpl transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkGraphBuilderImpl();
         transitToStreetNetworkGraphBuilderImpl.buildGraph(graph, extra);
+        NetworkLinkerCleanerGraphBuilder cleanerGraphBuilder = new NetworkLinkerCleanerGraphBuilder();
+        cleanerGraphBuilder.buildGraph(graph, extra);
 
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);

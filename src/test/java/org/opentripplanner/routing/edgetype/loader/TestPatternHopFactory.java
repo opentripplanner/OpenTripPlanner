@@ -59,6 +59,7 @@ import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.impl.NetworkLinkerBuilder;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerCleanerGraphBuilder;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 
 public class TestPatternHopFactory extends TestCase {
@@ -92,6 +93,8 @@ public class TestPatternHopFactory extends TestCase {
         networkLinkerBuilder.buildGraph(graph, extra);
         TransitToStreetNetworkGraphBuilderImpl transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkGraphBuilderImpl();
         transitToStreetNetworkGraphBuilderImpl.buildGraph(graph, extra);
+        NetworkLinkerCleanerGraphBuilder cleanerGraphBuilder = new NetworkLinkerCleanerGraphBuilder();
+        cleanerGraphBuilder.buildGraph(graph, extra);
     }
 
     public void testAnnotation() {

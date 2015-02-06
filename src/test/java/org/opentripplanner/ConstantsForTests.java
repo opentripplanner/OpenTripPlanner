@@ -19,6 +19,7 @@ import java.util.HashMap;
 
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.impl.NetworkLinkerBuilder;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerCleanerGraphBuilder;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -95,6 +96,8 @@ public class ConstantsForTests {
         networkLinkerBuilder.buildGraph(portlandGraph, extra);
         TransitToStreetNetworkGraphBuilderImpl transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkGraphBuilderImpl();
         transitToStreetNetworkGraphBuilderImpl.buildGraph(portlandGraph, extra);
+        NetworkLinkerCleanerGraphBuilder cleanerGraphBuilder = new NetworkLinkerCleanerGraphBuilder();
+        cleanerGraphBuilder.buildGraph(portlandGraph, extra);
     }
     
     public static Graph buildGraph(String path) {

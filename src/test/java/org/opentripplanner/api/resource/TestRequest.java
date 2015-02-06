@@ -92,6 +92,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.graph_builder.impl.NetworkLinkerBuilder;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerCleanerGraphBuilder;
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
@@ -192,6 +193,9 @@ class Context {
         TransitToStreetNetworkGraphBuilderImpl linker =
                 new TransitToStreetNetworkGraphBuilderImpl();
         linker.buildGraph(graph, extra);
+
+        NetworkLinkerCleanerGraphBuilder cleanerGraphBuilder = new NetworkLinkerCleanerGraphBuilder();
+        cleanerGraphBuilder.buildGraph(graph, extra);
 
     }
 

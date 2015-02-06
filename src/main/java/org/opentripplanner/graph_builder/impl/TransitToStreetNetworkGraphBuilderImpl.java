@@ -88,32 +88,6 @@ public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
         if (nUnlinked > 0) {
             LOG.warn("{} transit stops were not close enough to the street network to be connected to it.", nUnlinked);
         }
-
-        //TODO: This should probably run after all the Linkers
-
-        //remove replaced edges
-        for (HashSet<StreetEdge> toRemove : networkLinkerLibrary.getReplacements().keySet()) {
-            for (StreetEdge edge : toRemove) {
-                edge.getFromVertex().removeOutgoing(edge);
-                edge.getToVertex().removeIncoming(edge);
-            }
-        }
-        //and add back in replacements
-        for (LinkedList<P2<StreetEdge>> toAdd : networkLinkerLibrary.getReplacements().values()) {
-            for (P2<StreetEdge> edges : toAdd) {
-                StreetEdge edge1 = edges.first;
-                if (edge1.getToVertex().getLabel().startsWith("split ") || edge1.getFromVertex().getLabel().startsWith("split ")) {
-                    continue;
-                }
-                edge1.getFromVertex().addOutgoing(edge1);
-                edge1.getToVertex().addIncoming(edge1);
-                StreetEdge edge2 = edges.second;
-                if (edge2 != null) {
-                    edge2.getFromVertex().addOutgoing(edge2);
-                    edge2.getToVertex().addIncoming(edge2);
-                }
-            }
-        }
     }
 
     @Override

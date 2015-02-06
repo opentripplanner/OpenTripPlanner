@@ -64,6 +64,7 @@ import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.impl.BikeParkLinkerGraphBuilder;
 import org.opentripplanner.graph_builder.impl.BikeRentalLinkerGraphBuilder;
 import org.opentripplanner.graph_builder.impl.NetworkLinkerBuilder;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerCleanerGraphBuilder;
 import org.opentripplanner.graph_builder.impl.map.BusRouteStreetMatcher;
 
 public class OTPConfigurator {
@@ -234,6 +235,7 @@ public class OTPConfigurator {
         if ( hasOSM ) {
             graphBuilder.addGraphBuilder(new BikeRentalLinkerGraphBuilder());
             graphBuilder.addGraphBuilder(new BikeParkLinkerGraphBuilder());
+            graphBuilder.addGraphBuilder(new NetworkLinkerCleanerGraphBuilder());
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
