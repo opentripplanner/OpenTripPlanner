@@ -18,7 +18,7 @@ otp.modules.planner.defaultQueryParams = {
     startPlace                      : null,
     endPlace                        : null,
     time                            : moment().format(otp.config.locale.time.time_format),
-    date                            : moment().format(otp.config.locale.time.date_format),
+    date                            : moment().format("YYYY-MM-DD"),
     arriveBy                        : false,
     wheelchair                      : false,
     mode                            : "TRANSIT,WALK",
@@ -331,7 +331,7 @@ otp.modules.planner.PlannerModule =
                 toPlace: this.getEndOTPString(),
                 time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
-                date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
+                date : (this.date) ? this.date : moment().format("YYYY-MM-DD"),
                 mode: this.mode,
                 maxWalkDistance: this.maxWalkDistance
             };
@@ -387,7 +387,7 @@ otp.modules.planner.PlannerModule =
                 if(data.plan) {
                     // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
                     otp.config.timeOffset = (otp.config.timeOffset) ||
-                        (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
+                        (moment(queryParams.date+" "+queryParams.time, "YYYY-MM-DD h:mma") - moment(data.plan.date))/3600000;
 
                     var tripPlan = new otp.modules.planner.TripPlan(data.plan, queryParams);
 
