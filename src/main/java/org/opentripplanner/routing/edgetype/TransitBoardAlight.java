@@ -161,11 +161,20 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // arrives/departs, so previousStop is direction-dependent.
             s1.setPreviousStop(getStop()); 
             s1.setLastPattern(this.getPattern());
-            int alightTime = options.getAlightTime(this.getPattern().mode);
-            if (alightTime != 0) {
-                s1.incrementTimeInSeconds(alightTime);
-                s1.incrementWeight(alightTime * options.waitReluctance);
-                // TODO: should we have different cost for alighting and boarding?
+            if (boarding) {
+                int boardingTime = options.getBoardTime(this.getPattern().mode);
+                if (boardingTime != 0) {
+                    // When traveling backwards the time travels also backwards
+                    s1.incrementTimeInSeconds(boardingTime);
+                    s1.incrementWeight(boardingTime * options.waitReluctance);
+                }
+            } else {
+                int alightTime = options.getAlightTime(this.getPattern().mode);
+                if (alightTime != 0) {
+                    s1.incrementTimeInSeconds(alightTime);
+                    s1.incrementWeight(alightTime * options.waitReluctance);
+                    // TODO: should we have different cost for alighting and boarding?
+                }
             }
 
             /* Determine the wait. */
