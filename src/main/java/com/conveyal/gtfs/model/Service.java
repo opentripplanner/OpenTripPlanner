@@ -1,7 +1,9 @@
 package com.conveyal.gtfs.model;
 
 import com.google.common.collect.Maps;
+
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.util.Map;
 
@@ -14,7 +16,7 @@ public class Service {
 
     public String   service_id;
     public Calendar calendar;
-    public Map<DateTime, CalendarDate> calendar_dates = Maps.newHashMap();
+    public Map<LocalDate, CalendarDate> calendar_dates = Maps.newHashMap();
 
     public Service(String service_id) {
         this.service_id = service_id;
@@ -25,7 +27,7 @@ public class Service {
      * @param date
      * @return
      */
-    public boolean activeOn (DateTime date) {
+    public boolean activeOn (LocalDate date) {
         // first check for exceptions
         CalendarDate exception = calendar_dates.get(date);
 

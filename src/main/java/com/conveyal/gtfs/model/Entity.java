@@ -8,6 +8,7 @@ import com.conveyal.gtfs.error.*;
 import com.google.common.io.ByteStreams;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -148,14 +149,14 @@ public abstract class Entity implements Serializable {
 
         /**
          * Fetch the given column of the current row, and interpret it as a date in the format YYYYMMDD.
-         * @return the date value as Joda DateTime, or null if it could not be parsed.
+         * @return the date value as Joda LocalDate, or null if it could not be parsed.
          */
-        protected DateTime getDateField(String column, boolean required) throws IOException {
+        protected LocalDate getDateField(String column, boolean required) throws IOException {
             String str = getFieldCheckRequired(column, required);
-            DateTime dateTime = null;
+            LocalDate dateTime = null;
             if (str != null) try {
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
-                dateTime = formatter.parseDateTime(str);
+                dateTime = formatter.parseLocalDate(str);
                 checkRangeInclusive(2000, 2100, dateTime.getYear());
             } catch (IllegalArgumentException iae) {
                 feed.errors.add(new DateParseError(tableName, row, column));
@@ -345,7 +346,7 @@ public abstract class Entity implements Serializable {
             writeStringField(obj != null ? obj.toString() : "");
         }
 
-        protected void writeDateField (DateTime d) throws IOException {
+        protected void writeDateField (LocalDate d) throws IOException {
             writeStringField(String.format("%04d%02d%02d", d.getYear(), d.getMonthOfYear(), d.getDayOfMonth()));
         }
 

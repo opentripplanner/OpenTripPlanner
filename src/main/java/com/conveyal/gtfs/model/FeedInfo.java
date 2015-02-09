@@ -17,6 +17,7 @@ import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.error.GeneralError;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,13 +25,13 @@ import java.util.Iterator;
 
 public class FeedInfo extends Entity {
 
-    public String feed_id = "NONE";
-    public String   feed_publisher_name;
-    public URL      feed_publisher_url;
-    public String   feed_lang;
-    public DateTime feed_start_date;
-    public DateTime feed_end_date;
-    public String   feed_version;
+    public String    feed_id = "NONE";
+    public String    feed_publisher_name;
+    public URL       feed_publisher_url;
+    public String    feed_lang;
+    public LocalDate feed_start_date;
+    public LocalDate feed_end_date;
+    public String    feed_version;
 
     public static class Loader extends Entity.Loader<FeedInfo> {
 
