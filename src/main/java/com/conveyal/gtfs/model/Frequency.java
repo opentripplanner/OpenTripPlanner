@@ -36,8 +36,8 @@ public class Frequency extends Entity {
         public void loadOneRow() throws IOException {
             Frequency f = new Frequency();
             f.trip = getRefField("trip_id", true, feed.trips);
-            f.start_time = getTimeField("start_time");
-            f.end_time = getTimeField("end_time");
+            f.start_time = getTimeField("start_time", true);
+            f.end_time = getTimeField("end_time", true);
             f.headway_secs = getIntField("headway_secs", true, 1, 24 * 60 * 60);
             f.exact_times = getIntField("exact_times", false, 0, 1);
             f.feed = feed;
@@ -63,6 +63,7 @@ public class Frequency extends Entity {
             writeTimeField(f.end_time);
             writeIntField(f.headway_secs);
             writeIntField(f.exact_times);
+            endRecord();
         }
 
         @Override
