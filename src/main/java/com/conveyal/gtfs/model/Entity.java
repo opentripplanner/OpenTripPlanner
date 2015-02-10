@@ -122,7 +122,7 @@ public abstract class Entity implements Serializable {
          * @return the time value in seconds since midnight
          */
         protected int getTimeField(String column, boolean required) throws IOException {
-            String str = getFieldCheckRequired(column, required); // All time fields are required fields
+            String str = getFieldCheckRequired(column, required);
             int val = INT_MISSING;
             
             if (str != null) {
@@ -193,7 +193,7 @@ public abstract class Entity implements Serializable {
 
         /**
          * Used to check referential integrity.
-         * TODO Return value is not yet used, but could allow entities to point to each other directly rather than
+         * Return value is not used, but could allow entities to point to each other directly rather than
          * using indirection through string-keyed maps.
          */
         protected <K, V> V getRefField(String column, boolean required, Map<K, V> target) throws IOException {
