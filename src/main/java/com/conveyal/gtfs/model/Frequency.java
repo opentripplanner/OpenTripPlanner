@@ -63,6 +63,7 @@ public class Frequency extends Entity {
             writeTimeField(f.end_time);
             writeIntField(f.headway_secs);
             writeIntField(f.exact_times);
+            endRecord();
         }
 
         @Override
