@@ -283,10 +283,10 @@ public class TestRequest extends TestCase {
 
         assertNotNull(step0.alerts);
         assertEquals(1, step0.alerts.size());
-        assertEquals("SE", step0.alerts.get(0).alertHeaderText.getSomeTranslation());
+        assertEquals("SE", step0.alerts.get(0).alertHeaderText.toString());
 
         assertEquals(1, step1.alerts.size());
-        assertEquals("NE", step1.alerts.get(0).alertHeaderText.getSomeTranslation());
+        assertEquals("NE", step1.alerts.get(0).alertHeaderText.toString());
     }
 
     public void testIntermediate() throws Exception {

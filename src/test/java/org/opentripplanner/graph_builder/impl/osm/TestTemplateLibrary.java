@@ -41,34 +41,32 @@ public class TestTemplateLibrary extends TestCase {
         assertEquals("Wheelchair note: Wheelchair description EN",
                 TemplateLibrary.generate("Wheelchair note: {wheelchair:description}", osmTags));
 
-        assertEquals(null, TemplateLibrary.generateI18N(null, osmTags, "en"));
+        assertEquals(null, TemplateLibrary.generateI18N(null, osmTags));
         Map<String, String> expected = new HashMap<>();
 
-        expected.put("en", "");
-        assertEquals(expected, TemplateLibrary.generateI18N("", osmTags, "en"));
+        expected.put(null, "");
+        assertEquals(expected, TemplateLibrary.generateI18N("", osmTags));
 
         expected.clear();
-        expected.put("en", "Note: Note EN");
-        assertEquals(expected, TemplateLibrary.generateI18N("Note: {note}", osmTags, "en"));
+        expected.put(null, "Note: Note EN");
+        assertEquals(expected, TemplateLibrary.generateI18N("Note: {note}", osmTags));
 
         expected.clear();
-        expected.put("fr", "Note: Note EN");
-        assertEquals(expected, TemplateLibrary.generateI18N("Note: {note}", osmTags, "fr"));
-
-        expected.clear();
+        expected.put(null, "Desc: Description FR");
         expected.put("fr", "Desc: Description FR");
-        assertEquals(expected, TemplateLibrary.generateI18N("Desc: {description}", osmTags, "fr"));
+        assertEquals(expected, TemplateLibrary.generateI18N("Desc: {description}", osmTags));
 
         expected.clear();
-        expected.put("en", "Note: Note EN, Wheelchair description EN");
+        expected.put(null, "Note: Note EN, Wheelchair description EN");
         expected.put("fr", "Note: Note EN, Wheelchair description FR");
         assertEquals(expected, TemplateLibrary.generateI18N(
-                "Note: {note}, {wheelchair:description}", osmTags, "en"));
+                "Note: {note}, {wheelchair:description}", osmTags));
 
         expected.clear();
+        expected.put(null, "Note: Note EN, Wheelchair description EN, ");
         expected.put("fr", "Note: Note EN, Wheelchair description FR, ");
         assertEquals(expected, TemplateLibrary.generateI18N(
-                "Note: {note}, {wheelchair:description}, {foobar:description}", osmTags, "fr"));
+                "Note: {note}, {wheelchair:description}, {foobar:description}", osmTags));
 
     }
 

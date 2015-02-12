@@ -13,17 +13,15 @@
 
 package org.opentripplanner.updater.alerts;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
-import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.TranslatedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,14 +152,14 @@ public class AlertsUpdateHandler {
      *
      * @return A TranslatedString containing the same information as the input
      */
-    private TranslatedString deBuffer(GtfsRealtime.TranslatedString input) {
-        TranslatedString result = new TranslatedString();
+    private I18NString deBuffer(GtfsRealtime.TranslatedString input) {
+        Map<String, String> translations = new HashMap<>();
         for (GtfsRealtime.TranslatedString.Translation translation : input.getTranslationList()) {
             String language = translation.getLanguage();
             String string = translation.getText();
-            result.addTranslation(language, string);
+            translations.put(language, string);
         }
-        return result;
+        return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
     }
 
     public void setDefaultAgencyId(String defaultAgencyId) {

@@ -26,6 +26,11 @@ public class TranslatedString implements I18NString, Serializable {
         }
     }
 
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof TranslatedString) && this.translations.equals(((TranslatedString)other).translations);
+    }
+
     /**
      * Gets an interned I18NString.
      * If the translations only have a single value, return a NonTranslatedString, otherwise a TranslatedString
@@ -54,7 +59,7 @@ public class TranslatedString implements I18NString, Serializable {
      */
     @Override
     public String toString() {
-        return translations.get(null);
+        return translations.containsKey(null) ? translations.get(null) : translations.values().iterator().next();
     }
 
     /**
@@ -67,6 +72,6 @@ public class TranslatedString implements I18NString, Serializable {
         if (locale != null) {
             language = locale.getLanguage().toLowerCase();
         }
-        return translations.containsKey(language) ? translations.get(language) : translations.get(null);
+        return translations.containsKey(language) ? translations.get(language) : toString();
     }
 }

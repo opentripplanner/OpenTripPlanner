@@ -287,12 +287,12 @@ public class Leg {
         if (alerts == null) {
             alerts = new ArrayList<Alert>();
         }
-        String text = alert.alertHeaderText.getSomeTranslation();
+        String text = alert.alertHeaderText.toString();
         if (text == null) {
-            text = alert.alertDescriptionText.getSomeTranslation();
+            text = alert.alertDescriptionText.toString();
         }
         if (text == null) {
-            text = alert.alertUrl.getSomeTranslation();
+            text = alert.alertUrl.toString();
         }
         Note note = new Note(text);
         if (!notes.contains(note)) {

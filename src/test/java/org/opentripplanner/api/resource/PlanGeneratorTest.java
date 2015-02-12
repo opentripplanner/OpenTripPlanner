@@ -1364,7 +1364,7 @@ public class PlanGeneratorTest {
          * the arctic regions. Of course, longitude becomes meaningless at the poles themselves, but
          * walking towards the pole, past it, and then back again will now yield correct results.
          */
-        assertEquals(alertsExample, steps[7][0].alerts.get(0).alertHeaderText.getSomeTranslation());
+        assertEquals(alertsExample, steps[7][0].alerts.get(0).alertHeaderText.toString());
         assertEquals(AbsoluteDirection.SOUTH, steps[7][0].absoluteDirection);
         assertEquals(RelativeDirection.CONTINUE, steps[7][0].relativeDirection);
         assertEquals(SOUTH, steps[7][0].angle, EPSILON);

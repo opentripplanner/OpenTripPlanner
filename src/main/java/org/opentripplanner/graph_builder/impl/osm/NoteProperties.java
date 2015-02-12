@@ -18,8 +18,8 @@ import java.util.Map;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
+import org.opentripplanner.util.TranslatedString;
 
 public class NoteProperties {
 
@@ -33,13 +33,9 @@ public class NoteProperties {
     }
 
     public T2<Alert, NoteMatcher> generateNote(OSMWithTags way) {
-        Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way,
-                Alert.defaultLanguage);
+        Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
         Alert note = new Alert();
-        note.alertHeaderText = new TranslatedString();
-        for (Map.Entry<String, String> kv : noteText.entrySet()) {
-            note.alertHeaderText.addTranslation(kv.getKey(), kv.getValue());
-        }
+        note.alertHeaderText = TranslatedString.getI18NString(noteText);
         return new T2<>(note, noteMatcher);
     }
 }
