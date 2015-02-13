@@ -126,7 +126,7 @@ public class GeometryUtils {
 
     /**
      * Convert a org.geojson.Xxxx geometry to a JTS geometry.
-     * Only support Point, Polygon and MultiPolygon for now.
+     * Only support Point, Polygon, MultiPolygon, LineString and MultiLineString for now.
      * @param geoJsonGeom
      * @return The equivalent JTS geometry.
      * @throws UnsupportedGeometryException
