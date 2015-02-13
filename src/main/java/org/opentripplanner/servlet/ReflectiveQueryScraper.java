@@ -39,7 +39,9 @@ import com.google.common.primitives.Primitives;
  * (possibly even multiple times in different HTTP method handlers), we assume that all query parameters and JSON config
  * fields will have exactly the same names as the Java object fields. This is getting uncomfortably close to Spring
  * configuration, and we should be careful to only use it in places where it truly makes code more readable.
- * 
+ *
+ * TODO we should probably also use this for RoutingResource to make the system uniform between JSON and QParams.
+ *
  * An instance of the requested class is first instantiated via its 0-argument constructor. Any initialization and
  * defaults should be handled at this point (in the constructor or in field initializer expressions).
  * 
@@ -72,9 +74,9 @@ public class ReflectiveQueryScraper<T> {
             Target target = MethodTarget.instanceFor(method);
             if (target != null) targets.put(target.name, target);
         }
-        LOG.info("initialized query scraper for: {}", targetClass);
+        LOG.info("Created a query scraper for: {}", targetClass.getSimpleName());
         for (Target t : targets.values()) {
-            LOG.info("-- {}", t);
+            LOG.debug("-- {}", t);
         }
     }
 
@@ -83,6 +85,7 @@ public class ReflectiveQueryScraper<T> {
         T obj = null;
         try {
             obj = targetClass.newInstance();
+            // TODO iterate over incoming kv pairs rather than targets so we can warn when some don't match.
             for (Target t : targets.values()) {
                 t.apply(pairs, obj);
             }
@@ -117,6 +120,7 @@ public class ReflectiveQueryScraper<T> {
                 return false;
             try {
                 apply0(obj, constructor.newInstance(value));
+                LOG.info("Initialized '{}' with value {}.", name, value);
                 return true;
             } catch (Exception e) {
                 LOG.warn("exception {} while applying {}", e, this);

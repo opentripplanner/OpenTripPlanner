@@ -23,14 +23,6 @@ public class OTPServer {
     // Core OTP modules
     private GraphService graphService;
 
-    /**
-     * The prototype routing request which establishes default parameter values. Note: this need to
-     * be server-wide as we build the request before knowing which router it will be resolved to.
-     * This prevent from having default request values per router instance. Fix this if this is
-     * needed.
-     */
-    public RoutingRequest routingRequest;
-
     /** The directory under which graphs, caches, etc. will be stored. */
     public File basePath = null;
 
@@ -47,7 +39,6 @@ public class OTPServer {
 
         // Core OTP modules
         graphService = gs;
-        routingRequest = new RoutingRequest();
 
         // Optional Analyst Modules.
         if (params.analyst) {

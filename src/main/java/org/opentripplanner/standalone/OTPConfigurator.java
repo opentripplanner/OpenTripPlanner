@@ -150,7 +150,7 @@ public class OTPConfigurator {
         builderConfig = loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
         routerConfig = loadJson(new File(dir, ROUTER_CONFIG_FILENAME));
-        RouterParameters routerParams = new RouterParameters(routerConfig);
+        // We have loaded the router config JSON but will actually apply it only when a router starts up
         LOG.info(dumpFields(builderParams));
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
@@ -263,15 +263,7 @@ public class OTPConfigurator {
      */
     private Router.LifecycleManager routerLifecycleManager = new Router.LifecycleManager() {
 
-        /**
-         * Create a new Router, owning a Graph and all it's associated services.
-         * 
-         * TODO: We could parametrize some services based on the given graph "preferences" (ie
-         * Graph.properties) instead of the command-line parameters. That would help simplify the
-         * growing list of OTP command-line parameters and allow for different configuration based
-         * on the routers (for example picking different path services for each routers, or enabling
-         * analyst for some routers only).
-         */
+        /** Create a new Router, owning a Graph and all it's associated services. */
         @Override
         public void startupRouter(Router router, JsonNode config) {
 
@@ -292,7 +284,11 @@ public class OTPConfigurator {
                         router.sampleGridRenderer);
             }
 
-            // Setup graph from config (Graph.properties for example)
+            /* Create the default router parameters from the JSON router config. */
+            ReflectiveQueryScraper<RoutingRequest> scraper = new ReflectiveQueryScraper(RoutingRequest.class);
+            router.prototypeRoutingRequest = scraper.scrape(config.path("prototypeRoutingRequest"));
+
+            /* Create Graph updater modules from JSON config. */
             GraphUpdaterConfigurator.setupGraph(router.graph, config);
 
         }

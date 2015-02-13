@@ -327,7 +327,8 @@ public abstract class RoutingResource {
      * @throws ParameterException when there is a problem interpreting a query parameter
      */
     protected RoutingRequest buildRequest(int n) throws ParameterException {
-        RoutingRequest request = otpServer.routingRequest.clone();
+        Router router = otpServer.getRouter(routerId);
+        RoutingRequest request = router.prototypeRoutingRequest.clone();
         request.setFromString(get(fromPlace, n, request.getFromPlace().getRepresentation()));
         request.setToString(get(toPlace, n, request.getToPlace().getRepresentation()));
         request.routerId = routerId;
@@ -336,7 +337,6 @@ public abstract class RoutingResource {
             String d = get(date, n, null);
             String t = get(time, n, null);
             TimeZone tz;
-            Router router = otpServer.getRouter(request.routerId);
             tz = router.graph.getTimeZone();
             if (d == null && t != null) { // Time was provided but not date
                 LOG.debug("parsing ISO datetime {}", t);

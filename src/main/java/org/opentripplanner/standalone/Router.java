@@ -10,6 +10,7 @@ import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.SPTServiceFactory;
 import org.opentripplanner.routing.services.PathService;
@@ -61,6 +62,9 @@ public class Router {
     public Renderer renderer;
     public IsoChroneSPTRenderer isoChroneSPTRenderer;
     public SampleGridRenderer sampleGridRenderer;
+
+    // A RoutingRequest containing default parameters that will be cloned when handling each request
+    public RoutingRequest prototypeRoutingRequest;
 
     public Router(String id, Graph graph) {
         this.id = id;
