@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.servlet.ReflectiveQueryScraper;
 
 /**
  * These are parameters that can be applied to an individual Router at run time.
@@ -11,12 +13,15 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class RouterParameters {
 
+    RoutingRequest prototypeRoutingRequest;
+
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      */
     public RouterParameters (JsonNode config) {
-
+        ReflectiveQueryScraper<RoutingRequest> scraper = new ReflectiveQueryScraper(RoutingRequest.class);
+        prototypeRoutingRequest = scraper.scrape(config.path("prototypeRoutingRequest"));
     }
 
 }

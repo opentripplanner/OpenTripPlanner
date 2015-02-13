@@ -17,23 +17,31 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
+import com.beust.jcommander.internal.Maps;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.primitives.Primitives;
 
 /**
- * A Servlet filter that constructs new objects of a given class, using reflection to pull their 
- * field values directly from the query parameters in an HttpRequest. It then seeds the request 
- * scope by storing a reference to the constructed object as an attribute of the HttpRequest itself.
+ * This class constructs new instances of another class, then fills in the new instance's fields using
+ * key-value pairs of Strings. For the moment these may come from query parameters or Jackson JSON nodes,
+ * but in principle they could come from anywhere.
+ *
+ * The intended use is for objects representing incoming requests that have large numbers of parameters. Rather than
+ * referencing every field by name when setting up defaults, then referencing them all again when handling each request
+ * (possibly even multiple times in different HTTP method handlers), we assume that all query parameters and JSON config
+ * fields will have exactly the same names as the Java object fields. This is getting uncomfortably close to Spring
+ * configuration, and we should be careful to only use it in places where it truly makes code more readable.
  * 
- * An instance of the requested class is first instantiated via its 0-argument constructor. Any 
- * initialization and defaults should be handled at this point. 
+ * An instance of the requested class is first instantiated via its 0-argument constructor. Any initialization and
+ * defaults should be handled at this point (in the constructor or in field initializer expressions).
  * 
  * Next, field and setter method names are matched with query parameters in the incoming 
  * HttpRequest. Fields whose declared type has a constructor taking a single String argument 
@@ -45,59 +53,66 @@ import com.google.common.primitives.Primitives;
  * changing the first character to upper case and prepending 'set'. A setter method invocation will 
  * be preferred to directly setting the field with the corresponding name, if it exists.
  * 
- * @author andrewbyrd
+ * @author abyrd
  */
-public class ReflectiveQueryScraper {
+public class ReflectiveQueryScraper<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReflectiveQueryScraper.class);
-    protected final Class<?> targetClass;
-    private final Set<Target> targets;
+    protected final Class<T> targetClass;
+    private final Map<String, Target> targets = Maps.newHashMap();
     
-    public ReflectiveQueryScraper(Class<?> targetClass) {
+    public ReflectiveQueryScraper (Class<T> targetClass) {
         this.targetClass = targetClass;
-        targets = new HashSet<Target>();
         for (Field field : targetClass.getFields()) {
             Target target = FieldTarget.instanceFor(field);
-            if (target != null) targets.add(target);
+            if (target != null) targets.put(target.name, target);
         }
         /* Scan methods after fields, so they will override fields with the same name. */
         for (Method method : targetClass.getMethods()) {
             Target target = MethodTarget.instanceFor(method);
-            if (target != null) targets.add(target);
+            if (target != null) targets.put(target.name, target);
         }
         LOG.info("initialized query scraper for: {}", targetClass);
-        for (Target t : targets) {
+        for (Target t : targets.values()) {
             LOG.info("-- {}", t);
         }
     }
 
-    public Object scrape(ServletRequest request) {
-        Object obj = null;
+    /** Create a new instance of T, and set its field from the given key-value pairs. */
+    public T scrape (Map<String, String> pairs) {
+        T obj = null;
         try {
             obj = targetClass.newInstance();
-            for (Target t : targets) t.apply(request, obj);
-        } catch (Exception e) {
-            LOG.warn("exception {} while scraping {}", e, targetClass);
+            for (Target t : targets.values()) {
+                t.apply(pairs, obj);
+            }
+        } catch (Exception ex) {
+            LOG.warn("exception {} while scraping {}", ex, targetClass);
         }
         return obj;
     }
 
+    /** This converts everything to Strings and back, but it does work, and avoids a bunch of type conditionals. */
+    public T scrape(JsonNode rootNode) {
+        Map<String, String> pairs = Maps.newHashMap();
+        // Ugh, there has to be a better way to do this.
+        Iterator<Map.Entry<String, JsonNode>> fieldIterator = rootNode.fields();
+        while (fieldIterator.hasNext()) {
+            Map.Entry<String, JsonNode> field = fieldIterator.next();
+            pairs.put(field.getKey(), field.getValue().asText());
+        }
+        return scrape(pairs);
+    }
+
     private static abstract class Target {
-        final String param;
+        final String name;
         final Constructor<?> constructor;
-        private Target (String param, Constructor<?> constructor) { 
-            this.param = param; // upper/lower case?
+        private Target (String name, Constructor<?> constructor) {
+            this.name = name; // upper/lower case?
             this.constructor = constructor;
         }
-        // NOTE: hashCode and equals reference only the param name. Collisions are intentional.
-        @Override public int hashCode() { 
-            return param.hashCode(); 
-        }
-        @Override public boolean equals(Object other) { 
-            return other instanceof Target && ((Target)other).param == this.param; 
-        }
-        boolean apply(ServletRequest req, Object obj) throws Exception {
-            String value = req.getParameter(param);
+        boolean apply(Map<String, String> pairs, Object obj) throws Exception {
+            String value = pairs.get(name);
             if (value == null)
                 return false;
             try {
@@ -109,8 +124,7 @@ public class ReflectiveQueryScraper {
             }
         }
         abstract void apply0(Object obj, Object value) throws Exception;
-        abstract Member getTarget();
-    }    
+    }
 
     private static class FieldTarget extends Target {
         final Field target;
@@ -127,12 +141,10 @@ public class ReflectiveQueryScraper {
         void apply0(Object obj, Object value) throws Exception { 
             target.set(obj, value); 
         }
-        @Override 
-        Member getTarget () { return target; } 
         @Override
         public String toString () {
             return String.format("%s %s = %s('%s')", target.getType().getSimpleName(), 
-                   target.getName(), constructor.getName(), param);
+                   target.getName(), constructor.getName(), name);
         }
     }
     
@@ -163,11 +175,9 @@ public class ReflectiveQueryScraper {
         void apply0(Object obj, Object value) throws Exception {
             target.invoke(obj, value);
         }
-        @Override 
-        Member getTarget () { return target; } 
         @Override
         public String toString () {
-            return String.format("%s(%s('%s'))", target.getName(), constructor.getName(), param);
+            return String.format("%s(%s('%s'))", target.getName(), constructor.getName(), name);
         }
     }   
     

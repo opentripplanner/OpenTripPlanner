@@ -22,7 +22,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-public class QueryScraperFilter implements Filter {
+/**
+ * A Servlet filter that constructs new objects of a given class, using reflection to pull their
+ * field values directly from the query parameters in an HttpRequest. It then "seeds the request
+ * scope" by storing a reference to the constructed object as an attribute of the HttpRequest itself.
+ */
+ public class QueryScraperFilter implements Filter {
     
     private ReflectiveQueryScraper scraper;
 
@@ -37,7 +42,7 @@ public class QueryScraperFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        Object obj = scraper.scrape(request);
+        Object obj = scraper.scrape(request.getParameterMap());
         if (obj != null)
             request.setAttribute(scraper.targetClass.getSimpleName(), obj);
         // pass request and response through to the next filter/servlet in the chain

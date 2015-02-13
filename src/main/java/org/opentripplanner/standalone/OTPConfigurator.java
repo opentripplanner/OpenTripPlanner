@@ -44,6 +44,7 @@ import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFacto
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.impl.GenericAStarFactory;
@@ -52,6 +53,7 @@ import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.servlet.ReflectiveQueryScraper;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
