@@ -1,7 +1,5 @@
 package org.opentripplanner.analyst;
 
-import com.bedatadriven.geojson.GeometryDeserializer;
-import com.bedatadriven.geojson.GeometrySerializer;
 import com.csvreader.CsvReader;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -11,17 +9,14 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+import org.geojson.LngLatAlt;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.Query;
@@ -31,11 +26,9 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.type.PropertyType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opentripplanner.analyst.batch.Individual;
 import org.opentripplanner.analyst.pointset.PropertyMetadata;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
@@ -53,8 +46,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -365,7 +357,7 @@ public class PointSet implements Serializable{
                     jp.skipChildren(); // ignore all other keys except features
                 }
             }
-        } catch (Exception ex) {			
+        } catch (Exception ex) {
             LOG.error("GeoJSON parsing failure: {}", ex.toString());
             return null;
         }
@@ -670,9 +662,7 @@ public class PointSet implements Serializable{
      */
     private void writeFeature(int i, JsonGenerator jgen, Boolean forcePoints) throws IOException {
 
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel());
-
-        GeometrySerializer geomSerializer = new GeometrySerializer();
+        ObjectMapper geomSerializer = new ObjectMapper();
 
         jgen.writeStartObject();
         {
@@ -682,11 +672,16 @@ public class PointSet implements Serializable{
             {
 
                 if (!forcePoints && polygons != null && polygons.length >= i && polygons[i] != null) {
-                    geomSerializer.writeGeometry(jgen, polygons[i]);
+                    org.geojson.Polygon p = new org.geojson.Polygon();
+                    List<LngLatAlt> shell = new ArrayList<LngLatAlt>();
+                    for (Coordinate c : polygons[i].getExteriorRing().getCoordinates()) {
+                        shell.add(new LngLatAlt(c.x, c.y));
+                    }
+                    p.add(shell);
+                    geomSerializer.writeValue(jgen, p);
                 } else {
-
-                    Point p = geometryFactory.createPoint(new Coordinate(lons[i], lats[i]));
-                    geomSerializer.writeGeometry(jgen, p);
+                    org.geojson.Point p = new org.geojson.Point(lons[i], lats[i]);
+                    geomSerializer.writeValue(jgen, p);
                 }
 
             }
