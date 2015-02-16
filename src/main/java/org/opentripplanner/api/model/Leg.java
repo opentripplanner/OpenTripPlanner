@@ -226,14 +226,6 @@ public class Leg {
     @JsonProperty(value="steps")
     public List<WalkStep> walkSteps;
 
-    /**
-     * Deprecated field formerly used for notes -- will be removed.  See
-     * alerts
-     */
-    @XmlElement
-    @JsonSerialize
-    public List<Note> notes;
-
     @XmlElement
     @JsonSerialize
     public List<Alert> alerts;
@@ -281,22 +273,8 @@ public class Leg {
     }
 
     public void addAlert(Alert alert) {
-        if (notes == null) {
-            notes = new ArrayList<Note>();
-        }
         if (alerts == null) {
-            alerts = new ArrayList<Alert>();
-        }
-        String text = alert.alertHeaderText.toString();
-        if (text == null) {
-            text = alert.alertDescriptionText.toString();
-        }
-        if (text == null) {
-            text = alert.alertUrl.toString();
-        }
-        Note note = new Note(text);
-        if (!notes.contains(note)) {
-            notes.add(note);
+            alerts = new ArrayList<>();
         }
         if (!alerts.contains(alert)) {
             alerts.add(alert);

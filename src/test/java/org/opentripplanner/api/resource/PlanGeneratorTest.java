@@ -938,7 +938,6 @@ public class PlanGeneratorTest {
             assertNull(legs[0].agencyName);
             assertNull(legs[0].agencyUrl);
             assertEquals(2, legs[0].agencyTimeZoneOffset);
-            assertNull(legs[0].notes);
             assertNull(legs[0].alerts);
             assertEquals("", legs[0].route);
             assertNull(legs[0].routeId);
@@ -976,7 +975,6 @@ public class PlanGeneratorTest {
         assertEquals("John Train", legs[1].agencyName);
         assertEquals("http://www.train.org/", legs[1].agencyUrl);
         assertEquals(2, legs[1].agencyTimeZoneOffset);
-        assertNull(legs[1].notes);
         assertNull(legs[1].alerts);
         assertEquals("A", legs[1].route);
         assertEquals("A", legs[1].routeId);
@@ -1024,7 +1022,6 @@ public class PlanGeneratorTest {
         assertEquals("John Train", legs[2].agencyName);
         assertEquals("http://www.train.org/", legs[2].agencyUrl);
         assertEquals(2, legs[2].agencyTimeZoneOffset);
-        assertNull(legs[2].notes);
         assertNull(legs[2].alerts);
         assertEquals("B", legs[2].route);
         assertEquals("B", legs[2].routeId);
@@ -1059,7 +1056,6 @@ public class PlanGeneratorTest {
         assertNull(legs[3].agencyName);
         assertNull(legs[3].agencyUrl);
         assertEquals(2, legs[3].agencyTimeZoneOffset);
-        assertNull(legs[3].notes);
         assertNull(legs[3].alerts);
         assertEquals("", legs[3].route);
         assertNull(legs[3].routeId);
@@ -1099,8 +1095,6 @@ public class PlanGeneratorTest {
         assertEquals("Brian Ferry", legs[4].agencyName);
         assertEquals("http://www.ferry.org/", legs[4].agencyUrl);
         assertEquals(2, legs[4].agencyTimeZoneOffset);
-        assertEquals(1, legs[4].notes.size());
-        assertEquals(alertsExample, legs[4].notes.get(0).text);
         assertEquals(1, legs[4].alerts.size());
         assertEquals(Alert.createSimpleAlerts(alertsExample), legs[4].alerts.get(0));
         assertEquals("C", legs[4].route);
@@ -1136,7 +1130,6 @@ public class PlanGeneratorTest {
         assertNull(legs[5].agencyName);
         assertNull(legs[5].agencyUrl);
         assertEquals(2, legs[5].agencyTimeZoneOffset);
-        assertNull(legs[5].notes);
         assertNull(legs[5].alerts);
         assertEquals("", legs[5].route);
         assertNull(legs[5].routeId);
@@ -1171,7 +1164,6 @@ public class PlanGeneratorTest {
         assertNull(legs[6].agencyName);
         assertNull(legs[6].agencyUrl);
         assertEquals(2, legs[6].agencyTimeZoneOffset);
-        assertNull(legs[6].notes);
         assertNull(legs[6].alerts);
         assertEquals("", legs[6].route);
         assertNull(legs[6].routeId);
@@ -1206,8 +1198,6 @@ public class PlanGeneratorTest {
         assertNull(legs[7].agencyName);
         assertNull(legs[7].agencyUrl);
         assertEquals(2, legs[7].agencyTimeZoneOffset);
-        assertEquals(1, legs[7].notes.size());
-        assertEquals(alertsExample, legs[7].notes.get(0).text);
         assertEquals(1, legs[7].alerts.size());
         assertEquals(Alert.createSimpleAlerts(alertsExample), legs[7].alerts.get(0));
         assertEquals("", legs[7].route);
@@ -1243,7 +1233,6 @@ public class PlanGeneratorTest {
         assertNull(legs[8].agencyName);
         assertNull(legs[8].agencyUrl);
         assertEquals(2, legs[8].agencyTimeZoneOffset);
-        assertNull(legs[8].notes);
         assertNull(legs[8].alerts);
         assertEquals("", legs[8].route);
         assertNull(legs[8].routeId);
