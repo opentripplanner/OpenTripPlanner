@@ -435,6 +435,9 @@
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
             <version>1.2</version>
+            <!-- We explicitely exclude jackson-core/databind as we use a more recent
+                 version than the one geojson-jackson depends on, and the two seems to
+                 be somehow incompatible. -->
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
