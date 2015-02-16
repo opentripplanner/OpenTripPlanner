@@ -156,8 +156,11 @@ public class GTFSFeed {
         }
     }
 
-    // Bin all trips by the sequence of stops they visit.
-    public void findPatterns() {
+    /**
+     *  Bin all trips by the sequence of stops they visit.
+     * @return A map from a list of stop IDs to a list of Trip IDs that visit those stops in that sequence.
+     */
+    public Map<List<String>, List<String>> findPatterns() {
         // A map from a list of stop IDs (the pattern) to a list of trip IDs which fit that pattern.
         Map<List<String>, List<String>> tripsForPattern = Maps.newHashMap();
         int n = 0;
@@ -184,6 +187,8 @@ public class GTFSFeed {
             trips.add(trip_id);
         }
         LOG.info("Total patterns: {}", tripsForPattern.keySet().size());
+        
+        return tripsForPattern;
     }
 
     public Service getOrCreateService(String serviceId) {
