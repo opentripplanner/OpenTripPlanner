@@ -75,14 +75,12 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -283,10 +281,10 @@ public class TestRequest extends TestCase {
 
         assertNotNull(step0.alerts);
         assertEquals(1, step0.alerts.size());
-        assertEquals("SE", step0.alerts.get(0).alertHeaderText.toString());
+        assertEquals("SE", step0.alerts.get(0).getAlertHeaderText());
 
         assertEquals(1, step1.alerts.size());
-        assertEquals("NE", step1.alerts.get(0).alertHeaderText.toString());
+        assertEquals("NE", step1.alerts.get(0).getAlertHeaderText());
     }
 
     public void testIntermediate() throws Exception {

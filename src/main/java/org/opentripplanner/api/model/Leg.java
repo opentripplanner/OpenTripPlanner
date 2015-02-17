@@ -16,12 +16,14 @@ package org.opentripplanner.api.model;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -228,7 +230,7 @@ public class Leg {
 
     @XmlElement
     @JsonSerialize
-    public List<Alert> alerts;
+    public List<LocalizedAlert> alerts;
 
     @XmlAttribute
     @JsonSerialize
@@ -272,13 +274,16 @@ public class Leg {
         return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
     }
 
-    public void addAlert(Alert alert) {
+    public void addAlert(Alert alert, Locale locale) {
         if (alerts == null) {
             alerts = new ArrayList<>();
         }
-        if (!alerts.contains(alert)) {
-            alerts.add(alert);
+        for (LocalizedAlert a : alerts) {
+            if (a.alert.equals(alert)) {
+                return;
+            }
         }
+        alerts.add(new LocalizedAlert(alert, locale));
     }
 
     public void setTimeZone(TimeZone timeZone) {

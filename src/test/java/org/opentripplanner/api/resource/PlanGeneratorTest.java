@@ -1096,7 +1096,7 @@ public class PlanGeneratorTest {
         assertEquals("http://www.ferry.org/", legs[4].agencyUrl);
         assertEquals(2, legs[4].agencyTimeZoneOffset);
         assertEquals(1, legs[4].alerts.size());
-        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[4].alerts.get(0));
+        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[4].alerts.get(0).alert);
         assertEquals("C", legs[4].route);
         assertEquals("C", legs[4].routeId);
         assertEquals("C", legs[4].routeShortName);
@@ -1199,7 +1199,7 @@ public class PlanGeneratorTest {
         assertNull(legs[7].agencyUrl);
         assertEquals(2, legs[7].agencyTimeZoneOffset);
         assertEquals(1, legs[7].alerts.size());
-        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[7].alerts.get(0));
+        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[7].alerts.get(0).alert);
         assertEquals("", legs[7].route);
         assertNull(legs[7].routeId);
         assertNull(legs[7].routeShortName);
@@ -1353,7 +1353,7 @@ public class PlanGeneratorTest {
          * the arctic regions. Of course, longitude becomes meaningless at the poles themselves, but
          * walking towards the pole, past it, and then back again will now yield correct results.
          */
-        assertEquals(alertsExample, steps[7][0].alerts.get(0).alertHeaderText.toString());
+        assertEquals(alertsExample, steps[7][0].alerts.get(0).getAlertHeaderText());
         assertEquals(AbsoluteDirection.SOUTH, steps[7][0].absoluteDirection);
         assertEquals(RelativeDirection.CONTINUE, steps[7][0].relativeDirection);
         assertEquals(SOUTH, steps[7][0].angle, EPSILON);
