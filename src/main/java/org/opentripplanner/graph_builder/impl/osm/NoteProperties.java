@@ -14,11 +14,13 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
+import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.TranslatedString;
 
 public class NoteProperties {
@@ -33,9 +35,13 @@ public class NoteProperties {
     }
 
     public T2<Alert, NoteMatcher> generateNote(OSMWithTags way) {
-        Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
         Alert note = new Alert();
-        note.alertHeaderText = TranslatedString.getI18NString(noteText);
+        if (Pattern.compile("\\{(.*?)\\}").matcher(notePattern).matches()) {
+            Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
+            note.alertHeaderText = TranslatedString.getI18NString(noteText);
+        } else {
+            note.alertHeaderText = new LocalizedString(notePattern, way);
+        }
         return new T2<>(note, noteMatcher);
     }
 }
