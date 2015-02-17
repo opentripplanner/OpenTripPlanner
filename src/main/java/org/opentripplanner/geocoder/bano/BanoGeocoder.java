@@ -43,9 +43,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * Obviously, this geocoder will only work in France.
  *
- * TODO Can we unify JSON support? This uses org.geojson.FeatureCollection
- * but we also include BeDataDriven's GeoJSON support in OTP.
- *
  * @author laurent
  */
 public class BanoGeocoder implements Geocoder {
