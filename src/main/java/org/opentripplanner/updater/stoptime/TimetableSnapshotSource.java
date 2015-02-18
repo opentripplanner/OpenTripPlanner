@@ -152,9 +152,6 @@ public class TimetableSnapshotSource {
                     case CANCELED:
                         applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                         break;
-                    case REPLACEMENT:
-                        applied = handleReplacementTrip(tripUpdate, feedId, serviceDate);
-                        break;
                 }
             } else {
                 // Default
@@ -213,12 +210,6 @@ public class TimetableSnapshotSource {
     protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         // TODO: Handle unscheduled trip
         LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
-        return false;
-    }
-
-    protected boolean handleReplacementTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
-        // TODO: Handle replacement trip
-        LOG.warn("Replacement trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
