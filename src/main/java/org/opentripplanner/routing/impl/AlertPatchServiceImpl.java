@@ -37,7 +37,7 @@ import org.opentripplanner.standalone.OTPServer;
 
 public class AlertPatchServiceImpl implements AlertPatchService {
 
-    private Graph graph;
+    public Graph graph;
 
     private Map<String, AlertPatch> alertPatches = new HashMap<String, AlertPatch>();
     private ListMultimap<AgencyAndId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
