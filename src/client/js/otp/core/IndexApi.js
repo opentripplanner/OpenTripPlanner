@@ -106,6 +106,7 @@ otp.core.IndexApi = otp.Class({
         // load more details about route
         var url = otp.config.hostname + '/' + otp.config.restService + '/index/routes/' + agencyAndId ;
         $.ajax(url, {
+            async: false,
             success: function(data){
                 // index api does not return the mode yet...
                 routeMode = route.routeData.mode;
