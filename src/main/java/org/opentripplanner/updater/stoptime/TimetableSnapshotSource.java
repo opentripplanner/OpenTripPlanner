@@ -189,12 +189,17 @@ public class TimetableSnapshotSource {
         // This does not include Agency ID or feed ID, trips are feed-unique and we currently assume a single static feed.
         String tripId = tripDescriptor.getTripId();
         // Try to search for trip with the help of route, direction and start time
-        if (tripId == null && tripDescriptor.hasDirectionId() && tripDescriptor.hasRouteId() &&
+        if ((tripId == null || tripId.isEmpty()) && tripDescriptor.hasDirectionId() && tripDescriptor.hasRouteId() &&
                 tripDescriptor.hasStartTime() && tripDescriptor.hasStartDate()) {
             int time = StopTimeFieldMappingFactory.getStringAsSeconds(tripDescriptor.getStartTime());
             String direction = String.valueOf(tripDescriptor.getDirectionId());
             AgencyAndId routeId = new AgencyAndId(feedId, tripDescriptor.getRouteId());
-            tripId = graphIndex.getTripForRouteAndStartTime(routeId, direction, time, serviceDate).getId().getId();
+            Trip trip = graphIndex.getTripForRouteAndStartTime(routeId, direction, time, serviceDate);
+            if (trip != null) {
+                tripId = trip.getId().getId();
+            }
+            TripDescriptor newTrip = tripDescriptor.toBuilder().setTripId(tripId).build();
+            tripUpdate = tripUpdate.toBuilder().setTrip(newTrip).build();
         }
 
         TripPattern pattern = getPatternForTripId(tripId);
