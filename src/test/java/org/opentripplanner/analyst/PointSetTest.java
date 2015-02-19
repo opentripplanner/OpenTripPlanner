@@ -10,10 +10,10 @@ import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.io.OutputStream;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class PointSetTest extends TestCase {
 
@@ -75,6 +75,33 @@ public class PointSetTest extends TestCase {
     	assertEquals( lastHalf.getFeature(0).getId(), "XYZ0002" );
     }
 
-    /* TODO Round trip serialization and deserialization to GeoJSON. */
+    /**
+     * Load a point set from a GeoJson file, save it to a temporary file, then load it again. Assert
+     * that both versions are the same. This should test load and save.
+     */
+    public void testSaveGeoJson() throws IOException {
+        PointSet points1 = PointSet.fromGeoJson(new File(
+                "src/test/resources/pointset/population.geo.json"));
+        File tempFile = File.createTempFile("population", "geo.json");
+        tempFile.deleteOnExit();
+        OutputStream out = new FileOutputStream(tempFile);
+        points1.writeJson(out);
+        out.close();
+        PointSet points2 = PointSet.fromGeoJson(tempFile);
+        assertEquals(points1.id, points2.id);
+        assertEquals(points1.label, points2.label);
+        assertEquals(points1.featureCount(), points2.featureCount());
+        for (int i = 0; i < points1.featureCount(); i++) {
+            PointFeature p1 = points1.getFeature(i);
+            PointFeature p2 = points2.getFeature(i);
+            assertEquals(p1.getId(), p1.getId());
+            assertEquals(p1.getLat(), p2.getLat());
+            assertEquals(p1.getLon(), p2.getLon());
+            assertEquals(p1.getProperties().size(), p2.getProperties().size());
+            for (Map.Entry<String, Integer> kv : p1.getProperties().entrySet()) {
+                assertEquals(kv.getValue(), new Integer(p2.getProperty(kv.getKey())));
+            }
+        }
+    }
 
 }

@@ -1,17 +1,15 @@
 package org.opentripplanner.analyst;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import com.bedatadriven.geojson.GeometryDeserializer;
+import org.geojson.Feature;
+import org.opentripplanner.common.geometry.GeometryUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.google.common.collect.Lists;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -90,47 +88,24 @@ public class PointFeature implements Serializable {
         return id;
     }
 
-    public static PointFeature fromJsonNode(JsonNode feature) throws EmptyPolygonException, UnsupportedGeometryException {
-        if (feature.getNodeType() != JsonNodeType.OBJECT)
-            return null;
-        JsonNode type = feature.get("type");
-        if (type == null || !type.asText().equalsIgnoreCase("Feature"))
-            return null;
-        JsonNode props = feature.get("properties");
-        if (props == null || props.getNodeType() != JsonNodeType.OBJECT)
-            return null;
-        JsonNode structured = props.get("structured");
-        Map<String,Integer> properties = new HashMap<String,Integer>();
-        if (structured != null && structured.getNodeType() == JsonNodeType.OBJECT) {
-            Iterator<Entry<String, JsonNode>> catIter = structured.fields();
-            while (catIter.hasNext()) {
-                Entry<String, JsonNode> catEntry = catIter.next();
-                String catName = catEntry.getKey();
-                Integer value = catEntry.getValue().asInt();
-                properties.put(catName, value);
-            }
+    @SuppressWarnings("unchecked")
+    public static PointFeature fromJsonNode(JsonNode feature) throws EmptyPolygonException,
+            UnsupportedGeometryException {
+
+        ObjectMapper deserializer = new ObjectMapper();
+        Feature geoJsonFeature;
+        try {
+            geoJsonFeature = deserializer.readValue(feature.traverse(), Feature.class);
+        } catch (IOException e) {
+            throw new UnsupportedGeometryException(e.getMessage());
         }
-
-        String id = null;
-        JsonNode idNode = feature.get("id");
-        if (idNode != null)
-            id = idNode.asText();
-
-        Geometry jtsGeom = null;
-        JsonNode geom = feature.get("geometry");
-        if (geom != null && geom.getNodeType() == JsonNodeType.OBJECT) {
-            GeometryDeserializer deserializer = new GeometryDeserializer(); // FIXME
-            // lots
-            // of
-            // short-lived
-            // objects...
-            jtsGeom = deserializer.parseGeometry(geom);
-        }
-
-        PointFeature ret = new PointFeature(id);
-        ret.setGeom(jtsGeom);
-        ret.setAttributes(properties);
-
+        PointFeature ret = new PointFeature(geoJsonFeature.getId());
+        ret.setGeom(GeometryUtils.convertGeoJsonToJtsGeometry(geoJsonFeature.getGeometry()));
+        Object structured = geoJsonFeature.getProperty("structured");
+        if (structured == null || !(structured instanceof Map))
+            return null;
+        // The code below assume the structured map to have integers only
+        ret.setAttributes((Map<String, Integer>)(structured));
         return ret;
     }
 
