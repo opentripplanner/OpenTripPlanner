@@ -9,6 +9,7 @@ import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
@@ -96,6 +97,17 @@ public class GrizzlyServer {
         /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
         HttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/client/");
         httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
+
+        /*
+         * 3. A static content handler to serve local files from the filesystem, under the "local"
+         * path.
+         */
+        if (params.clientDirectory != null) {
+            StaticHttpHandler localHandler = new StaticHttpHandler(
+                    params.clientDirectory.getAbsolutePath());
+            localHandler.setFileCacheEnabled(false);
+            httpServer.getServerConfiguration().addHttpHandler(localHandler, "/local");
+        }
 
         /* 3. Test alternate method (no Jersey). */
         // As in servlets, * is needed in base path to identify the "rest" of the path.
