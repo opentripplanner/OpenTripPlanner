@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -378,7 +379,7 @@ public class State implements Cloneable {
      * right thing to do.
      */
     public Trip getBackTrip () {
-        if (backEdge instanceof TablePatternEdge) {
+        if (backEdge instanceof TablePatternEdge || backEdge instanceof PatternInterlineDwell) {
             return stateData.tripTimes.getTrip();
         }
         else {
