@@ -31,7 +31,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -43,12 +42,16 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerBuilder;
+import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Set;
 
 import static com.google.common.collect.Iterables.filter;
+import org.opentripplanner.graph_builder.impl.NetworkLinkerCleanerGraphBuilder;
 
 public class TestHalfEdges extends TestCase {
 
@@ -463,8 +466,15 @@ public class TestHalfEdges extends TestCase {
 
     public void testNetworkLinker() {
         int numVerticesBefore = graph.getVertices().size();
-        NetworkLinker nl = new NetworkLinker(graph);
-        nl.createLinkage();
+
+        HashMap<Class<?>, Object> extra = new HashMap<>();
+        NetworkLinkerBuilder networkLinkerBuilder = new NetworkLinkerBuilder();
+        networkLinkerBuilder.buildGraph(graph, extra);
+        TransitToStreetNetworkGraphBuilderImpl transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkGraphBuilderImpl();
+        transitToStreetNetworkGraphBuilderImpl.buildGraph(graph, extra);
+        NetworkLinkerCleanerGraphBuilder cleanerGraphBuilder = new NetworkLinkerCleanerGraphBuilder();
+        cleanerGraphBuilder.buildGraph(graph, extra);
+
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();
