@@ -54,6 +54,21 @@ public class Sample {
         return (m0 < m1) ? m0 : m1; 
     }
 
+    public double evalWalkDistance(ShortestPathTree spt) {
+        State s0 = spt.getState(v0);
+        State s1 = spt.getState(v1);
+        double m0 = Double.NaN;
+        double m1 = Double.NaN;
+        // TODO When using distance instead of t0/t1 times
+        // the computation will be made simpler.
+        double walkSpeed = spt.getOptions().walkSpeed;
+        if (s0 != null)
+            m0 = (s0.getWalkDistance() + t0 * walkSpeed);
+        if (s1 != null)
+            m1 = (s1.getWalkDistance() + t1 * walkSpeed);
+        return (m0 < m1) ? m0 : m1;
+    }
+
     /* DUPLICATES code in sampleSet.eval(). should be deduplicated using a common function of vertices/dists. */
     public long eval(TimeSurface surf) {
         int m0 = Integer.MAX_VALUE;

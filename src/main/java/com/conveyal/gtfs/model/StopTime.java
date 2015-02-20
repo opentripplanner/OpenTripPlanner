@@ -21,32 +21,23 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 
+/**
+ * Represents a GTFS StopTime. Note that once created and saved in a feed, stop times are by convention immutable
+ * because they are in a MapDB.
+ */
 public class StopTime extends Entity implements Serializable {
 
     /* StopTime cannot directly reference Trips or Stops because they would be serialized into the MapDB. */
-    public final String trip_id;
-    public final int    arrival_time;
-    public final int    departure_time;
-    public final String stop_id;
-    public final int    stop_sequence;
-    public final String stop_headsign;
-    public final int    pickup_type;
-    public final int    drop_off_type;
-    public final double shape_dist_traveled;
-
-    // we have a constructor because StopTimes need to be immutable for use in MapDB
-    public StopTime (String trip_id, int arrival_time, int departure_time, String stop_id, int stop_sequence,
-            String stop_headsign, int pickup_type, int drop_off_type, double shape_dist_traveled) {
-        this.trip_id = trip_id;
-        this.arrival_time = arrival_time;
-        this.departure_time = departure_time;
-        this.stop_id = stop_id;
-        this.stop_sequence = stop_sequence;
-        this.stop_headsign = stop_headsign;
-        this.pickup_type = pickup_type;
-        this.drop_off_type = drop_off_type;
-        this.shape_dist_traveled = shape_dist_traveled;
-    }
+    public String trip_id;
+    public int    arrival_time = INT_MISSING;
+    public int    departure_time = INT_MISSING;
+    public String stop_id;
+    public int    stop_sequence;
+    public String stop_headsign;
+    public int    pickup_type;
+    public int    drop_off_type;
+    public double shape_dist_traveled;
+    public int    timepoint = INT_MISSING;
 
     public static class Loader extends Entity.Loader<StopTime> {
 
@@ -56,17 +47,19 @@ public class StopTime extends Entity implements Serializable {
 
         @Override
         public void loadOneRow() throws IOException {
-            String trip_id        = getStringField("trip_id", true);
-            int arrival_time   = getTimeField("arrival_time");
-            int departure_time = getTimeField("departure_time");
-            String stop_id        = getStringField("stop_id", true);
-            int stop_sequence  = getIntField("stop_sequence", true, 0, Integer.MAX_VALUE);
-            String stop_headsign  = getStringField("stop_headsign", false);
-            int pickup_type    = getIntField("pickup_type", false, 0, 3); // TODO add ranges as parameters
-            int drop_off_type  = getIntField("drop_off_type", false, 0, 3);
-            double shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
-            StopTime st = new StopTime(trip_id, arrival_time, departure_time, stop_id, stop_sequence,
-                    stop_headsign, pickup_type, drop_off_type, shape_dist_traveled);
+            StopTime st = new StopTime();
+            st.trip_id        = getStringField("trip_id", true);
+            // TODO: arrival_time and departure time are not required, but if one is present the other should be
+            // also, if this is the first or last stop, they are both required
+            st.arrival_time   = getTimeField("arrival_time", false);
+            st.departure_time = getTimeField("departure_time", false);
+            st.stop_id        = getStringField("stop_id", true);
+            st.stop_sequence  = getIntField("stop_sequence", true, 0, Integer.MAX_VALUE);
+            st.stop_headsign  = getStringField("stop_headsign", false);
+            st.pickup_type    = getIntField("pickup_type", false, 0, 3); // TODO add ranges as parameters
+            st.drop_off_type  = getIntField("drop_off_type", false, 0, 3);
+            st.shape_dist_traveled = getDoubleField("shape_dist_traveled", false, 0D, Double.MAX_VALUE);
+            st.timepoint      = getIntField("timepoint", false, 0, 1);
             st.feed = null; // this could circular-serialize the whole feed
             feed.stop_times.put(new Fun.Tuple2(st.trip_id, st.stop_sequence), st);
 
@@ -88,7 +81,7 @@ public class StopTime extends Entity implements Serializable {
         @Override
         protected void writeHeaders() throws IOException {
             writer.writeRecord(new String[] {"trip_id", "arrival_time", "departure_time", "stop_id", "stop_sequence", "stop_headsign",
-                    "pickup_type", "drop_off_type", "shape_dist_traveled"});
+                    "pickup_type", "drop_off_type", "shape_dist_traveled", "timepoint"});
         }
 
         @Override
@@ -102,6 +95,7 @@ public class StopTime extends Entity implements Serializable {
             writeIntField(st.pickup_type);
             writeIntField(st.drop_off_type);
             writeDoubleField(st.shape_dist_traveled);
+            writeIntField(st.timepoint);
             endRecord();
         }
 

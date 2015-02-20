@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.apache.bsf.BSFException;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
@@ -55,6 +56,8 @@ import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.servlet.ReflectiveQueryScraper;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.scripting.impl.BSFOTPScript;
+import org.opentripplanner.scripting.impl.OTPScript;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -298,6 +301,13 @@ public class OTPConfigurator {
             GraphUpdaterConfigurator.shutdownGraph(router.graph);
         }
     };
+
+    public OTPScript scriptFromParameters() throws BSFException, IOException {
+        if (params.scriptFile != null) {
+            return new BSFOTPScript(getServer(), params.scriptFile);
+        } else
+            return null;
+    }
 
     /**
      * Represents the different types of input files for a graph build.

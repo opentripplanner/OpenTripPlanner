@@ -102,6 +102,10 @@ public class CommandLineParameters implements Cloneable {
             description = "Path to directory containing PointSets. Defaults to BASE_PATH/pointsets.")
     public File pointSetDirectory;
 
+    @Parameter(names = {"--clientFiles"}, validateWith = ReadableDirectory.class,
+            description = "Path to directory containing local client files to serve.")
+    public File clientDirectory = null;
+
     @Parameter(names = {"--router"}, validateWith = RouterId.class,
             description = "One or more router IDs to build and/or serve, first one being the default.")
     public List<String> routerIds;
@@ -122,6 +126,12 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--insecure"},
             description = "Allow unauthenticated access to sensitive API resources, e.g. /routers")
     public boolean insecure = false;
+
+    @Parameter(names = { "--script" }, description = "run the specified OTP script (groovy, python)")
+    public File scriptFile = null;
+
+    @Parameter(names = { "--enableScriptingWebService" }, description = "enable scripting through a web-service (Warning! Very unsafe for public facing servers)")
+    boolean enableScriptingWebService = false;
 
     /** Set some convenience parameters based on other parameters' values. */
     public void infer() {

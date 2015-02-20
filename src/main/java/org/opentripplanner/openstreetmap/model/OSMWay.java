@@ -109,6 +109,24 @@ public class OSMWay extends OSMWithTags {
     }
 
     /**
+     * Returns true if bikes must use sidepath in forward direction
+     * 
+     * @return 
+     */
+    public boolean isForwardDirectionSidepath() {
+        return "use_sidepath".equals(getTag("bicycle:forward"));
+    }
+
+    /**
+     * Returns true if bikes must use sidepath in reverse direction
+     * 
+     * @return 
+     */
+    public boolean isReverseDirectionSidepath() {
+        return "use_sidepath".equals(getTag("bicycle:backward"));
+    }
+
+    /**
      * Some cycleways allow contraflow biking.
      * 
      * @return

@@ -440,9 +440,11 @@ public class GTFSPatternHopFactory {
                 for (int i = 0; i < tripPattern.hopEdges.length; i++) {
                     tripPattern.hopEdges[i].setGeometry(geom[i]);
                 }
+                // Make a geometry for the whole TripPattern from all its constituent hops.
+                // This happens only if geometry is found in geometriesByTripPattern,
+                // because that means that geometry was created from shapes instead "as crow flies"
+                tripPattern.makeGeometry();
             }
-            // Make a geometry for the whole TripPattern from all its constituent hops.
-            tripPattern.makeGeometry();
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
         }
 

@@ -55,7 +55,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
-    private static final int CLAMP_ITINERARIES = 10;
+    private static final int CLAMP_ITINERARIES = 4;
 
     /**
      * The model that computes turn/traversal costs.
