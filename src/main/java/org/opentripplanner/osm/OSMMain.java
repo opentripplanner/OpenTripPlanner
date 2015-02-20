@@ -3,13 +3,12 @@ package org.opentripplanner.osm;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.protobuf.ByteString;
 import com.vividsolutions.jts.geom.Envelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -39,13 +38,25 @@ import java.util.Map.Entry;
 public class OSMMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSMMain.class);
+    //static final String INPUT = "/var/otp/graphs/ny/new-york-latest.osm.pbf";
     //static final String INPUT = "/var/otp/graphs/nl/netherlands-latest.osm.pbf";
-    static final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
+    //static final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
     static final Envelope ENV = new Envelope(4.4, 5.5, 52.2, 53.3);
 
     public static void main(String[] args) {
-        /* Load OSM PBF with spatial filtering. */
-        OSM osm = OSM.fromPBF(INPUT);//, ENV);
+        /** This main method will convert a PBF file to VEX using an intermediate MapDB datastore. */
+        OSM osm = OSM.fromPBF(args[0]);//, ENV);
+        try (OutputStream fout = new FileOutputStream("test.vex")) {
+            LOG.info("begin writing vex");
+            new VexFormatCodec().writeVex(osm, fout);
+            LOG.info("end writing vex");
+        } catch (FileNotFoundException ex) {
+            LOG.error("FNFEX");
+        } catch (IOException ex) {
+            LOG.error("IOEX");
+        }
+        System.exit(0);
+
         List<Edge> edges = makeEdges(osm);
         PrintStream ps;
         try {
