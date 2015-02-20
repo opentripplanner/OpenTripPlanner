@@ -409,7 +409,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean longDistance = false;
 
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
-    public DominanceFunction dominanceFunction = new DominanceFunction.MinimumWeight();
+    public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
     /* CONSTRUCTORS */
 
