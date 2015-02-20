@@ -54,13 +54,13 @@ import com.google.common.primitives.Primitives;
  * 
  * @author abyrd
  */
-public class ReflectiveQueryScraper<T> {
+public class ReflectiveInitializer<T> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ReflectiveQueryScraper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReflectiveInitializer.class);
     protected final Class<T> targetClass;
     private final Map<String, Target> targets = Maps.newHashMap();
     
-    public ReflectiveQueryScraper (Class<T> targetClass) {
+    public ReflectiveInitializer(Class<T> targetClass) {
         this.targetClass = targetClass;
         for (Field field : targetClass.getFields()) {
             Target target = FieldTarget.instanceFor(field);

@@ -43,6 +43,7 @@ import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFacto
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
+import org.opentripplanner.reflect.ReflectionLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
@@ -50,7 +51,7 @@ import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.reflect.ReflectiveQueryScraper;
+import org.opentripplanner.reflect.ReflectiveInitializer;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.scripting.impl.BSFOTPScript;
 import org.opentripplanner.scripting.impl.OTPScript;
@@ -150,7 +151,7 @@ public class OTPConfigurator {
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
         routerConfig = loadJson(new File(dir, ROUTER_CONFIG_FILENAME));
         // We have loaded the router config JSON but will actually apply it only when a router starts up
-        LOG.info(dumpFields(builderParams));
+        LOG.info(ReflectionLibrary.dumpFields(builderParams));
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
             case GTFS:
@@ -277,7 +278,7 @@ public class OTPConfigurator {
             }
 
             /* Create the default router parameters from the JSON router config. */
-            ReflectiveQueryScraper<RoutingRequest> scraper = new ReflectiveQueryScraper(RoutingRequest.class);
+            ReflectiveInitializer<RoutingRequest> scraper = new ReflectiveInitializer(RoutingRequest.class);
             JsonNode routingDefaultsNode = config.get("routingDefaults");
             if (routingDefaultsNode != null) {
                 LOG.info("Loading default routing parameters from JSON:");
@@ -352,27 +353,6 @@ public class OTPConfigurator {
             System.exit(42); // probably "should" be done with an exception
             return null;
         }
-    }
-
-    /** Concatenate all fields and values of a Java object. */
-    public static String dumpFields (Object object) {
-        StringBuilder sb = new StringBuilder();
-        Class clazz = object.getClass();
-        sb.append("Summarizing ");
-        sb.append(clazz.getSimpleName());
-        sb.append('\n');
-        for (Field field : clazz.getFields()) {
-            sb.append(field.getName());
-            sb.append(" = ");
-            try {
-                String value = field.get(object).toString();
-                sb.append(value);
-            } catch (IllegalAccessException ex) {
-                sb.append("(non-public)");
-            }
-            sb.append('\n');
-        }
-        return sb.toString();
     }
 
 }
