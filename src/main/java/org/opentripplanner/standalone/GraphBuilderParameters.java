@@ -83,7 +83,7 @@ public class GraphBuilderParameters {
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
         areaVisibility = config.path("areaVisibility").asBoolean(false);
-        matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(true);
+        matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         elevation = config.path("elevation").asBoolean(false);
 
     }
