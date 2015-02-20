@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.*;
 import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
@@ -37,10 +36,14 @@ import com.beust.jcommander.internal.Lists;
 
 /**
  * Find the shortest path between graph vertices using A*.
+ * A basic Dijkstra search is a special case of AStar where the heuristic is always zero.
+ *
+ * NOTE this is now per-request scoped, which has caused some threading problems in the past.
+ * Always make one new instance of this class per request, it contains a lot of state fields.
  */
-public class GenericAStar implements SPTService { // maybe this should be wrapped in a component SPT service 
+public class AStar {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
     // FIXME this is not really a factory, it's a way to fake a global variable. This should be stored at the OTPServer level.
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
     private static final double OVERSEARCH_MULTIPLIER = 4.0;
@@ -81,7 +84,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /**
      * Compute SPT using default timeout and termination strategy.
      */
-    @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
         return getShortestPathTree(req, -1, null); // negative timeout means no timeout
     }
@@ -89,7 +91,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /**
      * Compute SPT using default termination strategy.
      */
-    @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req, double relTimeoutSeconds) {
         return this.getShortestPathTree(req, relTimeoutSeconds, null);
     }
@@ -99,14 +100,15 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         runState = new RunState( options, terminationStrategy );
         runState.rctx = options.getRoutingContext();
-        // TODO this is a hackish way of communicating which mode we are in (since search mode is currently server-wide)
-        runState.spt = options.longDistance ?
-                new WeightOnlyShortestPathTree(runState.options) : new MultiShortestPathTree(runState.options);
+        runState.spt = options.getNewShortestPathTree();
+
+        // We want to reuse the heuristic instance in a series of requests for the same target to avoid repeated work.
         runState.heuristic = options.batch ?
-                new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic;
+                new TrivialRemainingWeightHeuristic() :
+                runState.rctx.remainingWeightHeuristic;
 
         // Since initial states can be multiple, heuristic cannot depend on the initial state.
-        runState.heuristic.initialize(runState.options, runState.rctx.origin, runState.rctx.target, abortTime);
+        runState.heuristic.initialize(runState.options, abortTime);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
             options.rctx.debugOutput.timedOut = true;
@@ -125,16 +127,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
         runState.pq = new BinHeap<State>(initialSize);
         runState.pq.insert(initialState, 0);
-
-//        options = options.clone();
-//        /** max walk distance cannot be less than distances to nearest transit stops */
-//        double minWalkDistance = origin.getVertex().getDistanceToNearestTransitStop()
-//                + target.getDistanceToNearestTransitStop();
-//        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), rctx.getMinWalkDistance()));
-
         runState.nVisited = 0;
         runState.targetAcceptedStates = Lists.newArrayList();
-
     }
 
     boolean iterate(){
@@ -188,7 +182,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 // lbs.getWeightDelta(), v.getWeightDelta(), edge);
                 // }
 
-                double remaining_w = computeRemainingWeight(runState.heuristic, v, runState.rctx.target, runState.options);
+                double remaining_w = runState.heuristic.estimateRemainingWeight(v);
                 if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                     continue;
                 }
@@ -313,17 +307,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             long memoryUsed = Runtime.getRuntime().totalMemory() -
                     Runtime.getRuntime().freeMemory();
             store.setLongMax("memoryUsed", memoryUsed);
-        }
-    }
-
-    private double computeRemainingWeight(final RemainingWeightHeuristic heuristic, State v,
-            Vertex target, RoutingRequest options) {
-        // actually, the heuristic could figure this out from the TraverseOptions.
-        // set private member back=options.isArriveBy() on initial weight computation.
-        if (options.arriveBy) {
-            return heuristic.computeReverseWeight(v, target);
-        } else {
-            return heuristic.computeForwardWeight(v, target);
         }
     }
 

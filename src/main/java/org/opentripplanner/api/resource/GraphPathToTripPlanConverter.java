@@ -14,9 +14,7 @@
 package org.opentripplanner.api.resource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -34,7 +32,6 @@ import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -46,21 +43,17 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
-import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.ExitVertex;
@@ -70,153 +63,24 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
-public class PlanGenerator {
+/**
+ * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
+ * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
+ * are also bundled together here.
+ */
+public abstract class GraphPathToTripPlanConverter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(GraphPathToTripPlanConverter.class);
     private static final double MAX_ZAG_DISTANCE = 30;
-
-    public PathService pathService;
-    public Graph graph;
-
-    public PlanGenerator(Graph graph, PathService pathService) {
-        this.graph = graph;
-        this.pathService = pathService;
-    }
-
-    /** Generates a TripPlan from a Request */
-    public TripPlan generate(RoutingRequest options) {
-
-        // TODO: this seems to only check the endpoints, which are usually auto-generated
-        //if ( ! options.isAccessible())
-        //    throw new LocationNotAccessible();
-        
-        // Copy options to keep originals
-        RoutingRequest originalOptions = options.clone();
-
-        /* try to plan the trip */
-        List<GraphPath> paths = null;
-        boolean tooSloped = false;
-        try {
-            paths = getPaths(options);
-            if (paths == null && options.wheelchairAccessible) {
-                // There are no paths that meet the user's slope restrictions.
-                // Try again without slope restrictions (and warn user).
-                options.maxSlope = Double.MAX_VALUE;
-                options.maxWalkDistance = originalOptions.maxWalkDistance;
-                paths = getPaths(options);
-                tooSloped = true;
-            }
-        } catch (VertexNotFoundException e) {
-            LOG.info("Vertex not found: " + options.from + " : " + options.to);
-            throw e;
-        }
-        options.rctx.debugOutput.finishedCalculating();
-
-        if (paths == null || paths.size() == 0) {
-            LOG.debug("Path not found: " + options.from + " : " + options.to);
-            options.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
-            throw new PathNotFoundException();
-        }
-
-        for (GraphPath graphPath : paths) {
-            if (originalOptions.arriveBy) {
-                if (graphPath.states.getLast().getTimeSeconds() > originalOptions.dateTime) {
-                    LOG.error("A graph path arrives after the requested time. This implies a bug.");
-                }
-            } else {
-                if (graphPath.states.getFirst().getTimeSeconds() < originalOptions.dateTime) {
-                    LOG.error("A graph path leaves before the requested time. This implies a bug.");
-                }
-            }
-        }
-
-        TripPlan plan = generatePlan(paths, originalOptions);
-        if (plan != null) {
-            for (Itinerary i : plan.itinerary) {
-                i.tooSloped = tooSloped;
-                /* fix up from/to on first/last legs */
-                if (i.legs.size() == 0) {
-                    LOG.warn("itinerary has no legs");
-                    continue;
-                }
-                Leg firstLeg = i.legs.get(0);
-                firstLeg.from.orig = plan.from.orig;
-                Leg lastLeg = i.legs.get(i.legs.size() - 1);
-                lastLeg.to.orig = plan.to.orig;
-            }
-        }
-        options.rctx.debugOutput.finishedRendering();
-        return plan;
-    }
-
-    /**
-     * Break up a RoutingRequest with intermediate places into separate requests, in the given order
-     */
-    private List<GraphPath> getPaths(RoutingRequest request) {
-        if (request.hasIntermediatePlaces()) {
-            long time = request.dateTime;
-            GenericLocation from = request.from;
-            List<GenericLocation> places = Lists.newLinkedList(request.intermediatePlaces);
-            places.add(request.to);
-            request.clearIntermediatePlaces();
-            List<GraphPath> paths = new ArrayList<>();
-
-            for (GenericLocation to : places) {
-                request.dateTime = time;
-                request.from = from;
-                request.to = to;
-                request.rctx = null;
-                request.setRoutingContext(graph);
-
-                List<GraphPath> partialPaths = pathService.getPaths(request);
-                if (partialPaths == null || partialPaths.size() == 0) {
-                    return null;
-                }
-
-                GraphPath path = partialPaths.get(0);
-                paths.add(path);
-                from = to;
-                time = path.getEndTime();
-            }
-
-            return Arrays.asList(joinPaths(paths));
-        } else {
-            return pathService.getPaths(request);
-        }
-    }
-
-    private GraphPath joinPaths(List<GraphPath> paths) {
-        State lastState = paths.get(0).states.getLast();
-        GraphPath newPath = new GraphPath(lastState, false);
-        Vertex lastVertex = lastState.getVertex();
-        for (GraphPath path : paths.subList(1, paths.size())) {
-            lastState = newPath.states.getLast();
-            // add a leg-switching state
-            LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
-            lastState = legSwitchingEdge.traverse(lastState);
-            newPath.edges.add(legSwitchingEdge);
-            newPath.states.add(lastState);
-            // add the next subpath
-            for (Edge e : path.edges) {
-                lastState = e.traverse(lastState);
-                newPath.edges.add(e);
-                newPath.states.add(lastState);
-            }
-            lastVertex = path.getEndVertex();
-        }
-        return newPath;
-    }
 
     /**
      * Generates a TripPlan from a set of paths
      */
-    TripPlan generatePlan(List<GraphPath> paths, RoutingRequest request) {
+    public static TripPlan generatePlan(List<GraphPath> paths, RoutingRequest request) {
 
         GraphPath exemplar = paths.get(0);
         Vertex tripStartVertex = exemplar.getStartVertex();
@@ -244,6 +108,22 @@ public class PlanGenerator {
             itinerary = adjustItinerary(request, itinerary);
             plan.addItinerary(itinerary);
         }
+        if (plan != null) {
+            for (Itinerary i : plan.itinerary) {
+                /* Communicate the fact that the only way we were able to get a response was by removing a slope limit. */
+                i.tooSloped = request.rctx.slopeRestrictionRemoved;
+                /* fix up from/to on first/last legs */
+                if (i.legs.size() == 0) {
+                    LOG.warn("itinerary has no legs");
+                    continue;
+                }
+                Leg firstLeg = i.legs.get(0);
+                firstLeg.from.orig = plan.from.orig;
+                Leg lastLeg = i.legs.get(i.legs.size() - 1);
+                lastLeg.to.orig = plan.to.orig;
+            }
+        }
+        request.rctx.debugOutput.finishedRendering();
         return plan;
     }
 
@@ -253,7 +133,7 @@ public class PlanGenerator {
      * @param request is the request containing the original trip planning options
      * @return the (adjusted) itinerary
      */
-    private Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
+    private static Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
         // Check walk limit distance
         if (itinerary.walkDistance > request.maxWalkDistance) {
             itinerary.walkLimitExceeded = true;
@@ -271,7 +151,7 @@ public class PlanGenerator {
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
      * @return The generated itinerary
      */
-    public Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
+    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
         if (path.states.size() < 2) {
             throw new TrivialPathException();
         }
@@ -321,7 +201,7 @@ public class PlanGenerator {
         return itinerary;
     }
 
-    private Calendar makeCalendar(State state) {
+    private static Calendar makeCalendar(State state) {
         RoutingContext rctx = state.getContext();
         TimeZone timeZone = rctx.graph.getTimeZone(); 
         Calendar calendar = Calendar.getInstance(timeZone);
@@ -362,7 +242,7 @@ public class PlanGenerator {
      * @param states The one-dimensional array of input states
      * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
      */
-    private State[][] sliceStates(State[] states) {
+    private static State[][] sliceStates(State[] states) {
         int[] legIndexPairs = {0, states.length - 1};
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
@@ -418,7 +298,7 @@ public class PlanGenerator {
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      * @return The generated leg
      */
-    private Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops) {
+    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops) {
         Leg leg = new Leg();
 
         Edge[] edges = new Edge[states.length - 1];
@@ -458,7 +338,7 @@ public class PlanGenerator {
         return leg;
     }
 
-    private void addFrequencyFields(State[] states, Leg leg) {
+    private static void addFrequencyFields(State[] states, Leg leg) {
         /* TODO adapt to new frequency handling.
         if (states[0].getBackEdge() instanceof FrequencyBoard) {
             State preBoardState = states[0].getBackState();
@@ -487,7 +367,7 @@ public class PlanGenerator {
      * @param legs The legs of the itinerary
      * @param legsStates The states that go with the legs
      */
-    private void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates) {
+    private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates) {
         WalkStep previousStep = null;
 
         for (int i = 0; i < legsStates.length; i++) {
@@ -507,7 +387,7 @@ public class PlanGenerator {
      * This was originally in TransitUtils.handleBoardAlightType.
      * Edges that always block traversal (forbidden pickups/dropoffs) are simply not ever created.
      */
-    public String getBoardAlightMessage (int boardAlightType) {
+    public static String getBoardAlightMessage (int boardAlightType) {
         switch (boardAlightType) {
         case 1:
             return "impossible";
@@ -529,7 +409,7 @@ public class PlanGenerator {
      * @param legs The legs of the itinerary
      * @param legsStates The states that go with the legs
      */
-    private void fixupLegs(List<Leg> legs, State[][] legsStates) {
+    private static void fixupLegs(List<Leg> legs, State[][] legsStates) {
         for (int i = 0; i < legsStates.length; i++) {
             boolean toOther = i + 1 < legsStates.length && legs.get(i + 1).interlineWithPreviousLeg;
             boolean fromOther = legs.get(i).interlineWithPreviousLeg;
@@ -584,7 +464,7 @@ public class PlanGenerator {
      * @param itinerary The itinerary to calculate the times for
      * @param states The states that go with the itinerary
      */
-    private void calculateTimes(Itinerary itinerary, State[] states) {
+    private static void calculateTimes(Itinerary itinerary, State[] states) {
         for (State state : states) {
             if (state.getBackMode() == null) continue;
 
@@ -612,7 +492,7 @@ public class PlanGenerator {
      * @param itinerary The itinerary to calculate the elevation changes for
      * @param edges The edges that go with the itinerary
      */
-    private void calculateElevations(Itinerary itinerary, Edge[] edges) {
+    private static void calculateElevations(Itinerary itinerary, Edge[] edges) {
         for (Edge edge : edges) {
             if (!(edge instanceof StreetEdge)) continue;
 
@@ -641,7 +521,7 @@ public class PlanGenerator {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private void addModeAndAlerts(Graph graph, Leg leg, State[] states) {
+    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = graph.streetNotesService.getNotes(state);
@@ -671,7 +551,7 @@ public class PlanGenerator {
      * @param leg The leg to add the trip-related fields to
      * @param states The states that go with the leg
      */
-    private void addTripFields(Leg leg, State[] states) {
+    private static void addTripFields(Leg leg, State[] states) {
         Trip trip = states[states.length - 1].getBackTrip();
 
         if (trip != null) {
@@ -714,7 +594,7 @@ public class PlanGenerator {
      * @param edges The edges that go with the leg
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      */
-    private void addPlaces(Leg leg, State[] states, Edge[] edges, boolean showIntermediateStops) {
+    private static void addPlaces(Leg leg, State[] states, Edge[] edges, boolean showIntermediateStops) {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
@@ -766,7 +646,7 @@ public class PlanGenerator {
      * @param tripTimes The {@link TripTimes} associated with the {@link Leg}.
      * @return The resulting {@link Place} object.
      */
-    private Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, TripTimes tripTimes) {
+    private static Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, TripTimes tripTimes) {
         // If no edge was given, it means we're at the end of this leg and need to work around that.
         boolean endOfLeg = (edge == null);
         Place place = new Place(vertex.getX(), vertex.getY(), vertex.getName(),
@@ -795,7 +675,7 @@ public class PlanGenerator {
      * @param leg The leg to add the real-time information to
      * @param states The states that go with the leg
      */
-    private void addRealTimeData(Leg leg, State[] states) {
+    private static void addRealTimeData(Leg leg, State[] states) {
         TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         if (tripTimes != null && !tripTimes.isScheduled()) {
@@ -1134,44 +1014,6 @@ public class PlanGenerator {
             out.add(new P2<Double>(coordArr[i].x + offset, coordArr[i].y));
         }
         return out;
-    }
-
-    /** Returns the first trip of the service day. Currently unused.
-     * TODO This should probably be done with a special time value. */
-    public TripPlan generateFirstTrip(RoutingRequest request) {
-        request.setArriveBy(false);
-
-        TimeZone tz = graph.getTimeZone();
-
-        GregorianCalendar calendar = new GregorianCalendar(tz);
-        calendar.setTimeInMillis(request.dateTime * 1000);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
-
-        request.dateTime = calendar.getTimeInMillis() / 1000;
-        return generate(request);
-    }
-
-    /** Return the last trip of the service day. Currently unused.
-     * TODO This should probably be done with a special time value. */
-    public TripPlan generateLastTrip(RoutingRequest request) {
-        request.setArriveBy(true);
-
-        TimeZone tz = graph.getTimeZone();
-
-        GregorianCalendar calendar = new GregorianCalendar(tz);
-        calendar.setTimeInMillis(request.dateTime * 1000);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.AM_PM, 0);
-        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-
-        request.dateTime = calendar.getTimeInMillis() / 1000;
-
-        return generate(request);
     }
 
 }

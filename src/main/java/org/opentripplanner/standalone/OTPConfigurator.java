@@ -26,10 +26,8 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import org.apache.bsf.BSFException;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.Renderer;
-import org.opentripplanner.analyst.request.SPTCache;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
-import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.graph_builder.AnnotationsToHTML;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.module.*;
@@ -48,10 +46,8 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
-import org.opentripplanner.routing.impl.GenericAStarFactory;
 import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
-import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.servlet.ReflectiveQueryScraper;
@@ -270,21 +266,14 @@ public class OTPConfigurator {
         @Override
         public void startupRouter(Router router, JsonNode config) {
 
-            router.sptServiceFactory = new GenericAStarFactory();
-            LongDistancePathService pathService = new LongDistancePathService(router.graph, router.sptServiceFactory);
-            router.pathService = pathService;
-            router.planGenerator = new PlanGenerator(router.graph, router.pathService);
             router.tileRendererManager = new TileRendererManager(router.graph);
 
             // Optional Analyst Modules.
             if (params.analyst) {
                 router.tileCache = new TileCache(router.graph);
-                router.sptCache = new SPTCache(router.sptServiceFactory, router.graph);
-                router.renderer = new Renderer(router.tileCache, router.sptCache);
-                router.sampleGridRenderer = new SampleGridRenderer(router.graph,
-                        router.sptServiceFactory);
-                router.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(
-                        router.sampleGridRenderer);
+                router.renderer = new Renderer(router.tileCache);
+                router.sampleGridRenderer = new SampleGridRenderer(router.graph);
+                router.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(router.sampleGridRenderer);
             }
 
             /* Create the default router parameters from the JSON router config. */

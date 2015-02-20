@@ -7,7 +7,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -221,7 +221,7 @@ public class AnalystProfileRouterPrototype {
         int minAccessTime = 0;
         int maxAccessTime = request.maxWalkTime;
         rr.worstTime = (rr.dateTime + maxAccessTime * 60);
-        GenericAStar astar = new GenericAStar();
+        AStar astar = new AStar();
         rr.longDistance = true; // this will cause an earliest arrival tree to be used
         rr.setNumItineraries(1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode, minAccessTime * 60);

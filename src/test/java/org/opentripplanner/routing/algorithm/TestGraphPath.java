@@ -37,7 +37,7 @@ public class TestGraphPath extends TestCase {
     
     private Graph graph;
 
-    private GenericAStar aStar = new GenericAStar();
+    private AStar aStar = new AStar();
 
     public void setUp() throws Exception {
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));

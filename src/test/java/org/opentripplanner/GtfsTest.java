@@ -26,7 +26,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.resource.PlanGenerator;
+import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -36,10 +36,8 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.impl.GenericAStarFactory;
-import org.opentripplanner.routing.impl.LongDistancePathService;
-import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.services.PathService;
+import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -52,9 +50,6 @@ public abstract class GtfsTest extends TestCase {
 
     public Graph graph;
     AlertsUpdateHandler alertsUpdateHandler;
-    PlanGenerator planGenerator;
-    PathService pathService;
-    GenericAStarFactory genericAStar;
     TimetableSnapshotSource timetableSnapshotSource;
     AlertPatchServiceImpl alertPatchServiceImpl;
 
@@ -99,14 +94,6 @@ public abstract class GtfsTest extends TestCase {
             timetableSnapshotSource.applyTripUpdates(updates, agencyId);
             alertsUpdateHandler.update(feedMessage);
         } catch (Exception exception) {}
-
-        genericAStar = new GenericAStarFactory();
-        if (isLongDistance()) {
-            pathService = new LongDistancePathService(null, genericAStar);
-        } else {
-            pathService = new RetryingPathServiceImpl(null, genericAStar);
-        }
-        planGenerator = new PlanGenerator(null, pathService);
     }
 
     public Leg plan(long dateTime, String fromVertex, String toVertex, String onTripId,
@@ -153,7 +140,8 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWaitReluctance(1);
         routingRequest.setWalkBoardCost(30);
 
-        TripPlan tripPlan = planGenerator.generate(routingRequest);
+        List<GraphPath> paths = new GraphPathFinder(graph).getPaths(routingRequest);
+        TripPlan tripPlan = GraphPathToTripPlanConverter.generatePlan(paths, routingRequest);
         // Stored in instance field for use in individual tests
         itinerary = tripPlan.itinerary.get(0);
 

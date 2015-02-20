@@ -3,14 +3,12 @@ package org.opentripplanner.profile;
 import com.google.common.collect.*;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -439,7 +437,7 @@ public class ProfileRouter {
         rr.worstTime = (rr.dateTime + worstElapsedTimeSeconds);
         // Note that the (forward) search is intentionally unlimited so it will reach the destination
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
-        GenericAStar astar = new GenericAStar();
+        AStar astar = new AStar();
         rr.setNumItineraries(1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode, minAccessTime * 60);
         astar.setTraverseVisitor(visitor);
@@ -487,7 +485,7 @@ public class ProfileRouter {
         rr.worstTime = (rr.dateTime + worstElapsedTime);
         rr.walkSpeed = request.walkSpeed;
         rr.bikeSpeed = request.bikeSpeed;
-        GenericAStar astar = new GenericAStar();
+        AStar astar = new AStar();
         rr.setNumItineraries(1);
         ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000); // FIXME timeout is absolute and in seconds ?
         State state = spt.getState(rr.rctx.target);

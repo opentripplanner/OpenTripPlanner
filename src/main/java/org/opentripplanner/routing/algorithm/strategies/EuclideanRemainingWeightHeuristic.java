@@ -33,10 +33,10 @@ import org.slf4j.LoggerFactory;
  * A Euclidean remaining weight strategy that takes into account transit boarding costs where applicable.
  * 
  */
-public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic {
+public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     private static final long serialVersionUID = -5172878150967231550L;
-    private static Logger LOG = LoggerFactory.getLogger(DefaultRemainingWeightHeuristic.class);
+    private static Logger LOG = LoggerFactory.getLogger(EuclideanRemainingWeightHeuristic.class);
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     private double lat;
@@ -48,15 +48,15 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     private double requiredWalkDistance;
 
     @Override
-    public void initialize(RoutingRequest options, Vertex origin, Vertex target, long abortTime) {
+    public void initialize(RoutingRequest options, long abortTime) {
         RoutingRequest req = options;
+        Vertex target = req.rctx.target;
         this.transit = req.modes.isTransit();
         maxStreetSpeed = req.getStreetSpeedUpperBound();
         maxTransitSpeed = req.getTransitSpeedUpperBound();
 
         if (target.getDegreeIn() == 1) {
             Edge edge = Iterables.getOnlyElement(target.getIncoming());
-
             if (edge instanceof FreeEdge) {
                 target = edge.getFromVertex();
             }
@@ -81,7 +81,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
      *     walking.
      */
     @Override
-    public double computeForwardWeight(State s, Vertex target) {
+    public double estimateRemainingWeight (State s) {
         Vertex sv = s.getVertex();
         double euclideanDistance = distanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
         if (transit) {
@@ -141,15 +141,6 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 distanceToClosestStop = 0;
             }
         }
-    }
-
-    /**
-     * computeForwardWeight and computeReverseWeight were identical (except that 
-     * computeReverseWeight did not have the localStreetService clause). They have been merged.
-     */
-    @Override
-    public double computeReverseWeight(State s, Vertex target) {
-        return computeForwardWeight(s, target);
     }
 
     @Override

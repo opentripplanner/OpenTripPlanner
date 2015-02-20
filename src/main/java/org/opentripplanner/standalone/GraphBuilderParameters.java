@@ -73,6 +73,8 @@ public class GraphBuilderParameters {
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
+     * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
+     * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
     public GraphBuilderParameters(JsonNode config) {
 

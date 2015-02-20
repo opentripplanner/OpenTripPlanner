@@ -98,7 +98,7 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.walkSpeed = 1.0;
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
 
@@ -123,7 +123,7 @@ public class AStarTest {
         options.setArriveBy(true);
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
                 _graph.getVertex("leary_20th"));
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(_graph.getVertex("56th_24th"), false);
 
@@ -165,7 +165,7 @@ public class AStarTest {
         new TemporaryConcreteEdge(_graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(_graph, from, to);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
         options.cleanup();
 
         GraphPath path = tree.getPath(to, false);
@@ -201,7 +201,7 @@ public class AStarTest {
         new TemporaryConcreteEdge(_graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(_graph, from, to);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
         options.cleanup();
 
         GraphPath path = tree.getPath(from, false);
@@ -235,7 +235,7 @@ public class AStarTest {
         targets.add(_graph.getVertex("leary_20th"));
 
         SearchTerminationStrategy strategy = new MultiTargetTerminationStrategy(targets);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options, -1, strategy);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options, -1, strategy);
 
         for (Vertex v : targets) {
             GraphPath path = tree.getPath(v, false);

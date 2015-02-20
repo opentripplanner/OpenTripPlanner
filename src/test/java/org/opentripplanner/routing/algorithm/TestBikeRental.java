@@ -50,7 +50,7 @@ public class TestBikeRental extends TestCase {
         Edge mustBike = new StreetEdge(v2, v3, GeometryUtils.makeLineString(-77.0492, 38.857,
                 -77.0492, 38.858), "S. Crystal Dr", 87, StreetTraversalPermission.BICYCLE, false);
 
-        GenericAStar aStar = new GenericAStar();
+        AStar aStar = new AStar();
 
         // it is impossible to get from v1 to v3 by walking
         RoutingRequest options = new RoutingRequest(new TraverseModeSet("WALK,TRANSIT"));

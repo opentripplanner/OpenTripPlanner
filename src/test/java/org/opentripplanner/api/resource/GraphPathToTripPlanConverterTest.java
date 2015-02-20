@@ -88,7 +88,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-public class PlanGeneratorTest {
+public class GraphPathToTripPlanConverterTest {
     private static final double F_DISTANCE[] = {3, 9996806.8, 3539050.5, 7, 2478638.8, 4, 2, 1, 0};
     private static final double O_DISTANCE = 7286193.2;
     private static final double OCTANT = Math.PI / 4;
@@ -104,8 +104,6 @@ public class PlanGeneratorTest {
     private static final String alertsExample =
             "Mine is the last voice that you will ever hear. Do not be alarmed.";
 
-    private static final PlanGenerator planGenerator = new PlanGenerator(null, null);
-
     /**
      * Test the generateItinerary() method. This test is intended to be comprehensive but fast.
      * Any future changes to the generateItinerary() method should be accompanied by changes in this
@@ -115,9 +113,9 @@ public class PlanGeneratorTest {
     public void testGenerateItinerary() {
         GraphPath[] graphPaths = buildPaths();
 
-        compare(planGenerator.generateItinerary(graphPaths[0], true), Type.FORWARD);
-        compare(planGenerator.generateItinerary(graphPaths[1], true), Type.BACKWARD);
-        compare(planGenerator.generateItinerary(graphPaths[2], true), Type.ONBOARD);
+        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[0], true), Type.FORWARD);
+        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[1], true), Type.BACKWARD);
+        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[2], true), Type.ONBOARD);
     }
 
     /**
@@ -129,7 +127,7 @@ public class PlanGeneratorTest {
         // Reuse testGenerateItinerary()'s graph path, but shorten it
         GraphPath graphPath = new GraphPath(buildPaths()[0].states.get(3), false);
 
-        Itinerary itinerary = planGenerator.generateItinerary(graphPath, false);
+        Itinerary itinerary = GraphPathToTripPlanConverter.generateItinerary(graphPath, false);
 
         assertEquals(1, itinerary.legs.size());
         assertEquals("WALK", itinerary.legs.get(0).mode);

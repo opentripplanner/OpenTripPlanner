@@ -32,15 +32,6 @@ public class ConstantsForTests {
 
     public static final String FAKE_GTFS = "src/test/resources/testagency.zip";
 
-    public static final String GENERATED_GTFS = "src/test/resources/generated.gtfs.zip";
-
-    public static final double WALKING_SPEED = 1.33; // meters/sec
-                                                     // (http://en.wikipedia.org/wiki/Walking),
-
-    // roughly 3mph
-
-    public static final String NY_GTFS = "src/test/resources/subway.zip";
-
     private static ConstantsForTests instance = null;
 
     private Graph portlandGraph = null;

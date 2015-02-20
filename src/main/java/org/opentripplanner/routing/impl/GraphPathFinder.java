@@ -22,7 +22,9 @@ import static org.opentripplanner.routing.automata.Nonterminal.plus;
 import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
 
-import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -31,52 +33,66 @@ import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import static org.opentripplanner.routing.automata.Nonterminal.*;
+import java.util.*;
 
 /**
- * This PathService is intended to provide faster response times when routing over longer
- * distances (e.g. across the entire Netherlands). It only uses the street network at the first
- * and last legs of the trip, and all other transfers between transit vehicles will occur via
- * SimpleTransfer edges which must be created by the graph builder.
+ * This class contains the logic for repeatedly building shortest path trees and accumulating paths through
+ * the graph until the requested number of them have been found.
+ * It is used in point-to-point (i.e. not one-to-many / analyst) routing.
+ *
+ * Its exact behavior will depend on whether the routing request allows transit.
+ *
+ * When using transit it will incorporate techniques from what we called "long distance" mode, which is designed to
+ * provide reasonable response times when routing over large graphs (e.g. the entire Netherlands or New York State).
+ * In this case it only uses the street network at the first and last legs of the trip, and all other transfers
+ * between transit vehicles will occur via SimpleTransfer edges which are pre-computed by the graph builder.
  * 
  * More information is available on the OTP wiki at:
- * https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs 
+ * https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs
+ *
+ * One instance of this class should be constructed per search (i.e. per RoutingRequest: it is request-scoped).
+ * Its behavior is undefined if it is reused for more than one search.
+ *
+ * It is very close to being an abstract library class with only static functions. However it turns out to be convenient
+ * and harmless to have the OTPServer object etc. in fields, to avoid passing context around in function parameters.
  */
-public class LongDistancePathService implements PathService {
+public class GraphPathFinder {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LongDistancePathService.class);
-
+    private static final Logger LOG = LoggerFactory.getLogger(GraphPathFinder.class);
     private static final double DEFAULT_MAX_WALK = 2000;
     private static final double CLAMP_MAX_WALK = 15000;
 
-    private Graph graph;
-    private SPTServiceFactory sptServiceFactory;
+    /**
+     * It seems to make sense to hold a reference to the higher-level OTPServer and/or Router in the GraphPathGenerator,
+     * but some tests currently use this class on a Graph without ever constructing an OTPServer or Router.
+     */
+    Graph graph;
 
-    public LongDistancePathService(Graph graph, SPTServiceFactory sptServiceFactory) {
+    public GraphPathFinder(Graph graph) {
         this.graph = graph;
-        this.sptServiceFactory = sptServiceFactory;
     }
 
     // Timeout in seconds relative to initial search begin time, for each new path found (generally decreasing)
     private static double[] timeouts = new double[] {5, 2, 1, 0.5, 0.25};
-	private SPTVisitor sptVisitor;
-    
-    @Override
+
+    /**
+     * Repeatedly build shortest path trees, retaining the best path to the destination after each try.
+     * For search N, all trips used in itineraries retained from trips 0..(N-1) are "banned" to create variety.
+     * The goal direction heuristic is reused between tries, which means the later tries have more information to
+     * work with (in the case of the more sophisticated bidirectional heuristic, which improves over time).
+     */
     public List<GraphPath> getPaths(RoutingRequest options) {
 
         if (options == null) {
@@ -84,8 +100,7 @@ public class LongDistancePathService implements PathService {
             return null;
         }
         
-        SPTService sptService = this.sptServiceFactory.instantiate();
-
+        AStar aStar = new AStar();
         if (options.rctx == null) {
             options.setRoutingContext(graph);
             /* Use a pathparser that constrains the search to use SimpleTransfers. */
@@ -101,7 +116,7 @@ public class LongDistancePathService implements PathService {
            // Only use the BiDi heuristic for transit.
             heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
         } else {
-            heuristic = new DefaultRemainingWeightHeuristic();
+            heuristic = new EuclideanRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
         /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see 
@@ -125,25 +140,21 @@ public class LongDistancePathService implements PathService {
         while (paths.size() < options.numItineraries && paths.size() < timeouts.length) {
             double timeout = searchBeginTime + (timeouts[paths.size()] * 1000) - System.currentTimeMillis();
             // if (timeout <= 0) break; ADD THIS LINE TO MAKE TIMEOUTS ACTUALLY WORK WHEN NEGATIVE
-            ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+            ShortestPathTree spt = aStar.getShortestPathTree(options, timeout);
             if (spt == null) { // timeout or other fail
                 LOG.warn("SPT was null.");
                 return null;
             }
             if (options.rctx.aborted) break;
-//            if( this.sptVisitor!=null ){
-//                this.sptVisitor.spt = spt;
-//            }
             List<GraphPath> newPaths = spt.getPaths();
             if (newPaths.isEmpty()) break;
-            // Find all trips used in this path and ban them
+            // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 for (State state : path.states) {
                     AgencyAndId tripId = state.getTripId();
                     if (tripId != null) options.banTrip(tripId);
                 }
             }
-            //spt.getPaths().get(0).dump();
             paths.addAll(newPaths);
             LOG.debug("we have {} paths", paths.size());
         }
@@ -151,6 +162,8 @@ public class LongDistancePathService implements PathService {
         Collections.sort(paths, new PathWeightComparator());
         return paths;
     }
+
+    /* TODO eliminate the need for pathparsers. They are theoretically efficient but arcane and problematic. */
 
     public static class Parser extends PathParser {
 
@@ -250,9 +263,148 @@ public class LongDistancePathService implements PathService {
 
     }
 
-	@Override
-	public void setSPTVisitor(SPTVisitor vis) {
-		this.sptVisitor = vis;
-	}
-    
+    /* Try to find N paths through the Graph */
+    public List<GraphPath> graphPathFinderEntryPoint (RoutingRequest request) {
+
+        // We used to perform a protective clone of the RoutingRequest here.
+        // There is no reason to do this if we don't modify the request.
+        // Any code that changes them should be performing the copy!
+
+        List<GraphPath> paths = null;
+        try {
+            paths = getGraphPathsConsideringIntermediates(request);
+            if (paths == null && request.wheelchairAccessible) {
+                // There are no paths that meet the user's slope restrictions.
+                // Try again without slope restrictions, and warn the user in the response.
+                RoutingRequest relaxedRequest = request.clone();
+                relaxedRequest.maxSlope = Double.MAX_VALUE;
+                request.rctx.slopeRestrictionRemoved = true;
+                paths = getGraphPathsConsideringIntermediates(relaxedRequest);
+            }
+            request.rctx.debugOutput.finishedCalculating();
+        } catch (VertexNotFoundException e) {
+            LOG.info("Vertex not found: " + request.from + " : " + request.to);
+            throw e;
+        }
+
+        if (paths == null || paths.size() == 0) {
+            LOG.debug("Path not found: " + request.from + " : " + request.to);
+            request.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
+            throw new PathNotFoundException();
+        }
+
+        for (GraphPath graphPath : paths) {
+            // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
+            if (request.arriveBy) {
+                if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
+                    LOG.error("A graph path arrives after the requested time. This implies a bug.");
+                }
+            } else {
+                if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
+                    LOG.error("A graph path leaves before the requested time. This implies a bug.");
+                }
+            }
+        }
+        return paths;
+    }
+
+    /**
+     * Break up a RoutingRequest with intermediate places into separate requests, in the given order.
+     * If there are no intermediate places, issue a single request.
+     */
+    private List<GraphPath> getGraphPathsConsideringIntermediates (RoutingRequest request) {
+        if (request.hasIntermediatePlaces()) {
+            long time = request.dateTime;
+            GenericLocation from = request.from;
+            List<GenericLocation> places = Lists.newLinkedList(request.intermediatePlaces);
+            places.add(request.to);
+            request.clearIntermediatePlaces();
+            List<GraphPath> paths = new ArrayList<>();
+
+            for (GenericLocation to : places) {
+                request.dateTime = time;
+                request.from = from;
+                request.to = to;
+                request.rctx = null;
+                request.setRoutingContext(graph);
+                // TODO request only one itinerary here
+
+                List<GraphPath> partialPaths = getPaths(request);
+                if (partialPaths == null || partialPaths.size() == 0) {
+                    return null;
+                }
+
+                GraphPath path = partialPaths.get(0);
+                paths.add(path);
+                from = to;
+                time = path.getEndTime();
+            }
+
+            return Arrays.asList(joinPaths(paths));
+        } else {
+            return getPaths(request);
+        }
+    }
+
+    private static GraphPath joinPaths(List<GraphPath> paths) {
+        State lastState = paths.get(0).states.getLast();
+        GraphPath newPath = new GraphPath(lastState, false);
+        Vertex lastVertex = lastState.getVertex();
+        for (GraphPath path : paths.subList(1, paths.size())) {
+            lastState = newPath.states.getLast();
+            // add a leg-switching state
+            LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
+            lastState = legSwitchingEdge.traverse(lastState);
+            newPath.edges.add(legSwitchingEdge);
+            newPath.states.add(lastState);
+            // add the next subpath
+            for (Edge e : path.edges) {
+                lastState = e.traverse(lastState);
+                newPath.edges.add(e);
+                newPath.states.add(lastState);
+            }
+            lastVertex = path.getEndVertex();
+        }
+        return newPath;
+    }
+
+/*
+    TODO reimplement
+    This should probably be done with a special value in the departure/arrival time.
+
+    public static TripPlan generateFirstTrip(RoutingRequest request) {
+        request.setArriveBy(false);
+
+        TimeZone tz = graph.getTimeZone();
+
+        GregorianCalendar calendar = new GregorianCalendar(tz);
+        calendar.setTimeInMillis(request.dateTime * 1000);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.AM_PM, 0);
+        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
+
+        request.dateTime = calendar.getTimeInMillis() / 1000;
+        return generate(request);
+    }
+
+    public static TripPlan generateLastTrip(RoutingRequest request) {
+        request.setArriveBy(true);
+
+        TimeZone tz = graph.getTimeZone();
+
+        GregorianCalendar calendar = new GregorianCalendar(tz);
+        calendar.setTimeInMillis(request.dateTime * 1000);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.AM_PM, 0);
+        calendar.set(Calendar.SECOND, graph.index.overnightBreak);
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+
+        request.dateTime = calendar.getTimeInMillis() / 1000;
+
+        return generate(request);
+    }
+*/
+
 }

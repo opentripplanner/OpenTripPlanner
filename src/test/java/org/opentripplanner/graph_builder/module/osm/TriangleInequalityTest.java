@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -31,7 +31,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -69,11 +68,11 @@ public class TriangleInequalityTest {
         end = _graph.getVertex("osm:node:42448554");    
     }
 
-    private GraphPath getPath(SPTService sptService, RoutingRequest proto,
+    private GraphPath getPath(AStar aStar, RoutingRequest proto,
             Edge startBackEdge, Vertex u, Vertex v) {
         RoutingRequest options = proto.clone();
         options.setRoutingContext(_graph, startBackEdge, u, v);
-        ShortestPathTree tree = sptService.getShortestPathTree(options);
+        ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(v, false);
         options.cleanup();
         return path;
@@ -105,7 +104,7 @@ public class TriangleInequalityTest {
         RoutingRequest options = prototypeOptions.clone();
         options.setRoutingContext(_graph, start, end);
         
-        GenericAStar aStar = new GenericAStar(); 
+        AStar aStar = new AStar();
         
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(end, false);

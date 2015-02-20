@@ -38,7 +38,7 @@ import org.opentripplanner.util.TestUtils;
 
 public class TestBanning extends TestCase {
 
-    GenericAStar aStar = new GenericAStar();
+    AStar aStar = new AStar();
 
     public void testBannedRoutes() {
 

@@ -36,7 +36,7 @@ import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -62,7 +62,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class TestPatternHopFactory extends TestCase {
 
     private Graph graph;
-    private GenericAStar aStar = new GenericAStar();
+    private AStar aStar = new AStar();
     private GtfsContext context;
 
     public void setUp() throws Exception {

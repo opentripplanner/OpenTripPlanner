@@ -3,7 +3,7 @@ package org.opentripplanner.profile;
 import com.beust.jcommander.internal.Maps;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -38,7 +38,7 @@ public class StopTreeCache {
             // RoutingReqeust dateTime defaults to currentTime.
             // If elapsed time is not capped, searches are very slow.
             rr.worstTime = (rr.dateTime + timeCutoffMinutes * 60);
-            GenericAStar astar = new GenericAStar();
+            AStar astar = new AStar();
             rr.longDistance = true; // this will cause an earliest arrival tree to be used
             rr.setNumItineraries(1);
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
