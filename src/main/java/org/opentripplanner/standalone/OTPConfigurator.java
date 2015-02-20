@@ -50,7 +50,7 @@ import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.servlet.ReflectiveQueryScraper;
+import org.opentripplanner.reflect.ReflectiveQueryScraper;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.scripting.impl.BSFOTPScript;
 import org.opentripplanner.scripting.impl.OTPScript;

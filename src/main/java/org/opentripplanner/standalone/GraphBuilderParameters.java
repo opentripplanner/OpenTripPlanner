@@ -1,9 +1,6 @@
 package org.opentripplanner.standalone;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.servlet.ReflectiveQueryScraper;
-
-import java.lang.reflect.Field;
 
 /**
  * These are parameters that when changed, necessitate a Graph rebuild.

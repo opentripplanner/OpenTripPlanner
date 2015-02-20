@@ -11,16 +11,13 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.servlet;
+package org.opentripplanner.reflect;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.servlet.ServletRequest;
 
 import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.databind.JsonNode;
