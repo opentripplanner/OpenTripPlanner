@@ -507,7 +507,7 @@ public class GTFSPatternHopFactory {
             for (TripTimes curr : blockTripTimes) {
                 if (prev != null) {
                     if (prev.getDepartureTime(prev.getNumStops() - 1) > curr.getArrivalTime(0)) {
-                        LOG.error("Trip times within block {} on service {} are not increasing on service {} after trip {}.",
+                        LOG.error("Trip times within block {} are not increasing on service {} after trip {}.",
                                 block.blockId, block.serviceId, prev.trip.getId());
                         continue SERVICE_BLOCK;
                     }
