@@ -289,7 +289,13 @@ public class OTPConfigurator {
 
             /* Create the default router parameters from the JSON router config. */
             ReflectiveQueryScraper<RoutingRequest> scraper = new ReflectiveQueryScraper(RoutingRequest.class);
-            router.prototypeRoutingRequest = scraper.scrape(config.path("prototypeRoutingRequest"));
+            JsonNode routingDefaultsNode = config.get("routingDefaults");
+            if (routingDefaultsNode != null) {
+                LOG.info("Loading default routing parameters from JSON:");
+                router.defaultRoutingRequest = scraper.scrape(routingDefaultsNode);
+            } else {
+                LOG.info("No default routing parameters were found in the router config JSON. Using built-in OTP defaults.");
+            }
 
             /* Create Graph updater modules from JSON config. */
             GraphUpdaterConfigurator.setupGraph(router.graph, config);

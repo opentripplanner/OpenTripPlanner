@@ -380,7 +380,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public boolean walkingBike;
 
-    public double heuristicWeight = 1.0;
+    public double heuristicWeight = 1.0; // FIXME what is this for?
 
     public boolean softWalkLimiting = true;
     public boolean softPreTransitLimiting = true;

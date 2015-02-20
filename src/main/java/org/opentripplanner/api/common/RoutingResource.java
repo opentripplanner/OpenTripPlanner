@@ -15,7 +15,6 @@ package org.opentripplanner.api.common;
 
 import java.util.*;
 
-import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -328,7 +327,7 @@ public abstract class RoutingResource {
      */
     protected RoutingRequest buildRequest(int n) throws ParameterException {
         Router router = otpServer.getRouter(routerId);
-        RoutingRequest request = router.prototypeRoutingRequest.clone();
+        RoutingRequest request = router.defaultRoutingRequest.clone();
         request.setFromString(get(fromPlace, n, request.getFromPlace().getRepresentation()));
         request.setToString(get(toPlace, n, request.getToPlace().getRepresentation()));
         request.routerId = routerId;
@@ -537,7 +536,7 @@ public abstract class RoutingResource {
  * This checks a query parameter field from Jersey (which is a list, one element for each occurrence
  * of the parameter in the query string) for the nth occurrence, or the one with the highest index.
  * If a parameter was supplied, it replaces the value in the RoutingRequest under construction 
- * (which was cloned from the prototypeRoutingRequest). If not, it uses the value already in that
+ * (which was cloned from the defaultRoutingRequest). If not, it uses the value already in that
  * RoutingRequest as a default (i.e. it uses the value cloned from the PrototypeRoutingRequest). 
  * 
  * @param l list of query parameter values

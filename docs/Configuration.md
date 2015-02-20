@@ -73,12 +73,20 @@ they become available. OTP can use both approaches.
 
 ```JSON
 {
+    // Routing defaults are any public field or setter in org.opentripplanner.routing.core.RoutingRequest
+    routingDefaults: {
+        numItineraries: 6,
+        walkSpeed: 2.0,
+        stairsReluctance: 4.0,
+        carDropoffTime: 240
+    },
+
     updaters: [
         // GTFS-RT service alerts (polling)
         {
             type: "real-time-alerts",
             frequencySec: 30,
-            url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/7D841E367D34BA85B11326EB3",
+            url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
             defaultAgencyId: "TriMet"
         },
 
@@ -99,7 +107,7 @@ they become available. OTP can use both approaches.
             frequencySec: 60,
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             sourceType: "gtfs-http",
-            url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/7D841E367D34BA85B11326EB3",
+            url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
             defaultAgencyId: "TriMet"
         },
 

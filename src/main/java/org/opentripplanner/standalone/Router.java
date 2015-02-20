@@ -64,7 +64,7 @@ public class Router {
     public SampleGridRenderer sampleGridRenderer;
 
     // A RoutingRequest containing default parameters that will be cloned when handling each request
-    public RoutingRequest prototypeRoutingRequest;
+    public RoutingRequest defaultRoutingRequest;
 
     public Router(String id, Graph graph) {
         this.id = id;

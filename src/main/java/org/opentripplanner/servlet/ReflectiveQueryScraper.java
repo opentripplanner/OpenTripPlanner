@@ -74,7 +74,7 @@ public class ReflectiveQueryScraper<T> {
             Target target = MethodTarget.instanceFor(method);
             if (target != null) targets.put(target.name, target);
         }
-        LOG.info("Created a query scraper for: {}", targetClass.getSimpleName());
+        LOG.debug("Created a query scraper for: {}", targetClass.getSimpleName());
         for (Target t : targets.values()) {
             LOG.debug("-- {}", t);
         }
