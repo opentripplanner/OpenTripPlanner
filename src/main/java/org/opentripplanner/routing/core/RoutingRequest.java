@@ -1035,7 +1035,29 @@ public class RoutingRequest implements Cloneable, Serializable {
             return walkBoardCost;
         return bikeBoardCost;
     }
-    
+
+    /**
+     * @return The time it actually takes to board a vehicle. Could be significant eg. on airplanes and ferries
+     */
+    public int getBoardTime(TraverseMode transitMode) {
+        if (transitMode == TraverseMode.AIRPLANE) {
+            return 45 * 60;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * @return The time it actually takes to alight a vehicle. Could be significant eg. on airplanes and ferries
+     */
+    public int getAlightTime(TraverseMode transitMode) {
+        if (transitMode == TraverseMode.AIRPLANE) {
+            return 20 * 60;
+        } else {
+            return 0;
+        }
+    }
+
     private String getRouteOrAgencyStr(HashSet<String> strings) {
         StringBuilder builder = new StringBuilder();
         for (String agency : strings) {

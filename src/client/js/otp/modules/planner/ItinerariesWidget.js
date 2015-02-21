@@ -322,6 +322,7 @@ otp.widgets.ItinerariesWidget =
         if(mode === "RAIL") return '#b00';
         if(mode === "BUS") return '#0f0';
         if(mode === "TRAM") return '#f00';
+        if(mode === "AIRPLANE") return '#f0f';
         return '#aaa';
     },
 
