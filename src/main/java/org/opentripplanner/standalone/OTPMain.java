@@ -357,11 +357,13 @@ public class OTPMain {
             }
 
             /* Apply single timeout. */
-            JsonNode timeoutNode = config.path("timeout");
-            if (timeoutNode.isNumber()) {
-                router.timeouts = new double[] {timeoutNode.doubleValue()};
-            } else {
-                LOG.error("The 'timeout' configuration option should be a number of seconds.");
+            JsonNode timeout = config.get("timeout");
+            if (timeout != null) {
+                if (timeout.isNumber()) {
+                    router.timeouts = new double[]{timeout.doubleValue()};
+                } else {
+                    LOG.error("The 'timeout' configuration option should be a number of seconds.");
+                }
             }
 
             /* Apply multiple timeouts. */
