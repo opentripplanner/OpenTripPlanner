@@ -30,7 +30,6 @@ import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.standalone.OTPMain;
 import org.opentripplanner.standalone.Router;
-import org.opentripplanner.standalone.Router.LifecycleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,8 +71,6 @@ public class InputStreamGraphSource implements GraphSource {
     // TODO Why do we need a factory? There is a single one implementation.
     private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
 
-    private Router.LifecycleManager routerLifecycleManager;
-
     /**
      * @param routerId
      * @param path
@@ -105,11 +102,6 @@ public class InputStreamGraphSource implements GraphSource {
     }
 
     @Override
-    public void setRouterLifecycleManager(LifecycleManager routerLifecycleManager) {
-        this.routerLifecycleManager = routerLifecycleManager;
-    }
-
-    @Override
     public Router getRouter() {
         /*
          * We synchronize on pre-evict mutex in case we are in the middle of reloading in pre-evict
@@ -132,8 +124,8 @@ public class InputStreamGraphSource implements GraphSource {
                 return true;
             if (preEvict) {
                 synchronized (preEvictMutex) {
-                    if (router != null && routerLifecycleManager != null) {
-                        routerLifecycleManager.shutdownRouter(router);
+                    if (router != null) {
+                        router.shutdown();
                     }
                     /*
                      * Forcing router to null here should remove any references to the graph once
@@ -147,16 +139,16 @@ public class InputStreamGraphSource implements GraphSource {
                 Router newRouter = loadGraph();
                 if (newRouter != null) {
                     // Load OK
-                    if (router != null && routerLifecycleManager != null) {
-                        routerLifecycleManager.shutdownRouter(router);
+                    if (router != null) {
+                        router.shutdown();
                     }
                     router = newRouter; // Assignment in java is atomic
                 } else {
                     // Load failed
                     if (force || router == null) {
                         LOG.warn("Unable to load data for router '{}'.", routerId);
-                        if (router != null && routerLifecycleManager != null) {
-                            routerLifecycleManager.shutdownRouter(router);
+                        if (router != null) {
+                            router.shutdown();
                         }
                         router = null;
                     } else {
@@ -204,9 +196,7 @@ public class InputStreamGraphSource implements GraphSource {
     public void evict() {
         synchronized (this) {
             if (router != null) {
-                if (routerLifecycleManager != null) {
-                    routerLifecycleManager.shutdownRouter(router);
-                }
+                router.shutdown();
                 router = null;
             }
         }
@@ -235,7 +225,7 @@ public class InputStreamGraphSource implements GraphSource {
             return null;
         }
 
-        // Decorate the graph (TODO how are we "decorating" it?).
+        // Decorate the graph TODO how are we "decorating" it? This appears to refer to loading its configuration.
         // Even if a config file is not present on disk one could be bundled inside.
         try (InputStream is = streams.getConfigInputStream()) {
             JsonNode config = MissingNode.getInstance();
@@ -247,9 +237,7 @@ public class InputStreamGraphSource implements GraphSource {
                 config = mapper.readTree(is);
             }
             Router newRouter = new Router(routerId, newGraph);
-            if (routerLifecycleManager != null) {
-                routerLifecycleManager.startupRouter(newRouter, config);
-            }
+            newRouter.startup(config);
             return newRouter;
         } catch (IOException e) {
             LOG.error("Can't read config file.");

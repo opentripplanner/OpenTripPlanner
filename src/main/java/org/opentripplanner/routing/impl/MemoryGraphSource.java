@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.standalone.Router;
-import org.opentripplanner.standalone.Router.LifecycleManager;
 
 /**
  * An implementation of GraphSource that store a transient graph in memory.
@@ -33,8 +32,6 @@ public class MemoryGraphSource implements GraphSource {
 
     private JsonNode config;
 
-    private Router.LifecycleManager routerLifecycleManager;
-
     public MemoryGraphSource(String routerId, Graph graph) {
         this(routerId, graph, MissingNode.getInstance());
     }
@@ -44,12 +41,6 @@ public class MemoryGraphSource implements GraphSource {
         router.graph.routerId = routerId;
         this.config = config;
         // We will startup the router later on
-    }
-
-    @Override
-    public void setRouterLifecycleManager(LifecycleManager routerLifecycleManager) {
-        this.routerLifecycleManager = routerLifecycleManager;
-        this.routerLifecycleManager.startupRouter(router, config);
     }
 
     @Override
@@ -69,9 +60,7 @@ public class MemoryGraphSource implements GraphSource {
     @Override
     public void evict() {
         if (router != null) {
-            if (routerLifecycleManager != null) {
-                routerLifecycleManager.shutdownRouter(router);
-            }
+            router.shutdown();
         }
         router = null;
     }

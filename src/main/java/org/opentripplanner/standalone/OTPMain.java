@@ -206,7 +206,6 @@ public class OTPMain {
         graphService = new GraphService(params.autoReload);
         InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory(params.graphDirectory);
         graphService.graphSourceFactory = graphSourceFactory;
-        graphService.routerLifecycleManager = routerLifecycleManager;
         if (params.graphDirectory != null) {
             graphSourceFactory.basePath = params.graphDirectory;
         }
@@ -324,73 +323,6 @@ public class OTPMain {
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;
     }
-
-    /**
-     * The default router lifecycle manager. Bind the services and delegates to
-     * GraphUpdaterConfigurator the real-time updater startup/shutdown.
-     */
-    private static Router.LifecycleManager routerLifecycleManager = new Router.LifecycleManager() {
-
-        /** Create a new Router, owning a Graph and all it's associated services. */
-        @Override
-        public void startupRouter(Router router, JsonNode config) {
-
-            router.tileRendererManager = new TileRendererManager(router.graph);
-
-            // Analyst Modules FIXME make these optional based on JSON?
-            {
-                router.tileCache = new TileCache(router.graph);
-                router.renderer = new Renderer(router.tileCache);
-                router.sampleGridRenderer = new SampleGridRenderer(router.graph);
-                router.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(router.sampleGridRenderer);
-            }
-
-            /* Create the default router parameters from the JSON router config. */
-            JsonNode routingDefaultsNode = config.get("routingDefaults");
-            if (routingDefaultsNode != null) {
-                LOG.info("Loading default routing parameters from JSON:");
-                ReflectiveInitializer<RoutingRequest> scraper = new ReflectiveInitializer(RoutingRequest.class);
-                router.defaultRoutingRequest = scraper.scrape(routingDefaultsNode);
-            } else {
-                LOG.info("No default routing parameters were found in the router config JSON. Using built-in OTP defaults.");
-                router.defaultRoutingRequest = new RoutingRequest();
-            }
-
-            /* Apply single timeout. */
-            JsonNode timeout = config.get("timeout");
-            if (timeout != null) {
-                if (timeout.isNumber()) {
-                    router.timeouts = new double[]{timeout.doubleValue()};
-                } else {
-                    LOG.error("The 'timeout' configuration option should be a number of seconds.");
-                }
-            }
-
-            /* Apply multiple timeouts. */
-            JsonNode timeouts = config.get("timeouts");
-            if (timeouts != null) {
-                if (timeouts.isArray() && timeouts.size() > 0) {
-                    router.timeouts = new double[timeouts.size()];
-                    int i = 0;
-                    for (JsonNode node : timeouts) {
-                        router.timeouts[i++] = node.doubleValue();
-                    }
-                } else {
-                    LOG.error("The 'timeouts' configuration option should be an array of values in seconds.");
-                }
-            }
-            LOG.info("Timeouts for router '{}': {}", router.id, router.timeouts);
-
-            /* Create Graph updater modules from JSON config. */
-            GraphUpdaterConfigurator.setupGraph(router.graph, config);
-
-        }
-
-        @Override
-        public void shutdownRouter(Router router) {
-            GraphUpdaterConfigurator.shutdownGraph(router.graph);
-        }
-    };
 
     /**
      * Represents the different types of input files for a graph build.

@@ -53,13 +53,6 @@ public interface GraphSource {
     }
 
     /**
-     * @param routerLifecycleManager Implementation responsible for starting-up and shutting-down a
-     *        Router when created/reloaded/evicted. Implementation must take care that this call is
-     *        optional (in unit testing for example), and defer Router creation.
-     */
-    public void setRouterLifecycleManager(Router.LifecycleManager routerLifecycleManager);
-
-    /**
      * @return The router containing a graph object. Delegates to the Router lifecycle manager the
      *         startup and shutdown of the graph.
      */

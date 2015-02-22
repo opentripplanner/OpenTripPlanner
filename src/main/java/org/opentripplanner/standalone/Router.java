@@ -3,13 +3,14 @@ package org.opentripplanner.standalone;
 import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
-import org.opentripplanner.analyst.request.Renderer;
-import org.opentripplanner.analyst.request.SampleGridRenderer;
-import org.opentripplanner.analyst.request.TileCache;
+import org.opentripplanner.analyst.request.*;
 import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.reflect.ReflectiveInitializer;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents the configuration of a single router (a single graph for a specific geographic area)
@@ -17,29 +18,7 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public class Router {
 
-    /**
-     * A manager responsible for setting-up and shutting-down a Router.
-     * 
-     * Current responsibility are: 1) Binding proper services (depending on configuration, such as
-     * command-line or properties file, etc...) and 2) starting / stopping real-time updaters
-     * (delegated to the GraphUpdaterConfigurator class).
-     * 
-     * @see org.opentripplanner.updater.GraphUpdaterConfigurator
-     */
-    public interface LifecycleManager {
-
-        /**
-         * Startup a router when it has been created.
-         * @param router The router to bind/setup
-         * @param config The configuration (loaded from Graph.properties for example).
-         */
-        public void startupRouter(Router router, JsonNode config);
-
-        /**
-         * Shutdown a router when evicted / (auto-)reloaded. Stop any real-time updaters threads.
-         */
-        public void shutdownRouter(Router router);
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(Router.class);
 
     public String id;
     public Graph graph;
@@ -62,6 +41,75 @@ public class Router {
     public Router(String id, Graph graph) {
         this.id = id;
         this.graph = graph;
+    }
+
+
+    /**
+     * Below is functionality moved into Router from the "router lifecycle manager" interface and implementation.
+     * Current responsibilities are: 1) Binding proper services (depending on the configuration from command-line or
+     * JSON config files) and 2) starting / stopping real-time updaters (delegated to the GraphUpdaterConfigurator class).
+     */
+
+    /**
+     * Start up a new router once it has been created.
+     * @param config The configuration (loaded from Graph.properties for example).
+     */
+    public void startup(JsonNode config) {
+
+        this.tileRendererManager = new TileRendererManager(this.graph);
+
+        // Analyst Modules FIXME make these optional based on JSON?
+        {
+            this.tileCache = new TileCache(this.graph);
+            this.renderer = new Renderer(this.tileCache);
+            this.sampleGridRenderer = new SampleGridRenderer(this.graph);
+            this.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(this.sampleGridRenderer);
+        }
+
+        /* Create the default router parameters from the JSON router config. */
+        JsonNode routingDefaultsNode = config.get("routingDefaults");
+        if (routingDefaultsNode != null) {
+            LOG.info("Loading default routing parameters from JSON:");
+            ReflectiveInitializer<RoutingRequest> scraper = new ReflectiveInitializer(RoutingRequest.class);
+            this.defaultRoutingRequest = scraper.scrape(routingDefaultsNode);
+        } else {
+            LOG.info("No default routing parameters were found in the router config JSON. Using built-in OTP defaults.");
+            this.defaultRoutingRequest = new RoutingRequest();
+        }
+
+        /* Apply single timeout. */
+        JsonNode timeout = config.get("timeout");
+        if (timeout != null) {
+            if (timeout.isNumber()) {
+                this.timeouts = new double[]{timeout.doubleValue()};
+            } else {
+                LOG.error("The 'timeout' configuration option should be a number of seconds.");
+            }
+        }
+
+        /* Apply multiple timeouts. */
+        JsonNode timeouts = config.get("timeouts");
+        if (timeouts != null) {
+            if (timeouts.isArray() && timeouts.size() > 0) {
+                this.timeouts = new double[timeouts.size()];
+                int i = 0;
+                for (JsonNode node : timeouts) {
+                    this.timeouts[i++] = node.doubleValue();
+                }
+            } else {
+                LOG.error("The 'timeouts' configuration option should be an array of values in seconds.");
+            }
+        }
+        LOG.info("Timeouts for router '{}': {}", this.id, this.timeouts);
+
+        /* Create Graph updater modules from JSON config. */
+        GraphUpdaterConfigurator.setupGraph(this.graph, config);
+
+    }
+
+    /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */
+    public void shutdown() {
+        GraphUpdaterConfigurator.shutdownGraph(this.graph);
     }
 
 }

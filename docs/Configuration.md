@@ -33,9 +33,26 @@ are found in `router-config.json`.
 ## Per-router configuration
 
 
-## Graph build configuration
+## Graph building
+
+### Graph Build Configuration
 
 By default this is `/var/otp/graphs/router_id/build-config.json`.
+
+### Launching a Graph Build
+
+`otp --build <router_id_1> <router_id_2> <router_id_3>` or `otp --build` to rebuild the graph for all routers.
+
+
+
+### Server-wide Configuration
+
+### Individual Router Configuration
+
+### Starting a Server
+
+`otp --serve <router_id_1> <router_id_2> <router_id_3>` or `otp --serve --autoScan` (inferred from an empty router ID list)
+
 
 ## Router runtime configuration
 
