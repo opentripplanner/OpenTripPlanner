@@ -42,6 +42,7 @@ import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,18 +75,13 @@ public class GraphPathFinder {
     private static final double DEFAULT_MAX_WALK = 2000;
     private static final double CLAMP_MAX_WALK = 15000;
 
-    /**
-     * It seems to make sense to hold a reference to the higher-level OTPServer and/or Router in the GraphPathGenerator,
-     * but some tests currently use this class on a Graph without ever constructing an OTPServer or Router.
-     */
-    Graph graph;
+    Router router;
 
-    public GraphPathFinder(Graph graph) {
-        this.graph = graph;
+    public GraphPathFinder(Router router) {
+        this.router = router;
     }
 
     // Timeout in seconds relative to initial search begin time, for each new path found (generally decreasing)
-    private static double[] timeouts = new double[] {5, 2, 1, 0.5, 0.25};
 
     /**
      * Repeatedly build shortest path trees, retaining the best path to the destination after each try.
@@ -102,7 +98,7 @@ public class GraphPathFinder {
         
         AStar aStar = new AStar();
         if (options.rctx == null) {
-            options.setRoutingContext(graph);
+            options.setRoutingContext(router.graph);
             /* Use a pathparser that constrains the search to use SimpleTransfers. */
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
@@ -137,8 +133,8 @@ public class GraphPathFinder {
         LOG.debug("BEGIN SEARCH");
         List<GraphPath> paths = Lists.newArrayList();
         Set<AgencyAndId> bannedTrips = Sets.newHashSet();
-        while (paths.size() < options.numItineraries && paths.size() < timeouts.length) {
-            double timeout = searchBeginTime + (timeouts[paths.size()] * 1000) - System.currentTimeMillis();
+        while (paths.size() < options.numItineraries && paths.size() < router.timeouts.length) {
+            double timeout = searchBeginTime + (router.timeouts[paths.size()] * 1000) - System.currentTimeMillis();
             // if (timeout <= 0) break; ADD THIS LINE TO MAKE TIMEOUTS ACTUALLY WORK WHEN NEGATIVE
             ShortestPathTree spt = aStar.getShortestPathTree(options, timeout);
             if (spt == null) { // timeout or other fail
@@ -326,7 +322,7 @@ public class GraphPathFinder {
                 request.from = from;
                 request.to = to;
                 request.rctx = null;
-                request.setRoutingContext(graph);
+                request.setRoutingContext(router.graph);
                 // TODO request only one itinerary here
 
                 List<GraphPath> partialPaths = getPaths(request);

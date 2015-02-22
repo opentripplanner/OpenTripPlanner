@@ -78,6 +78,7 @@ public class OTPConfigurator {
 
     public static final String BUILDER_CONFIG_FILENAME = "build-config.json";
     public static final String ROUTER_CONFIG_FILENAME = "router-config.json";
+    public static final String OTP_CONFIG_FILENAME = "otp-config.json";
 
     /**
      * We could even do this at Configurator construct time (rather than lazy initializing), using
@@ -278,14 +279,38 @@ public class OTPConfigurator {
             }
 
             /* Create the default router parameters from the JSON router config. */
-            ReflectiveInitializer<RoutingRequest> scraper = new ReflectiveInitializer(RoutingRequest.class);
             JsonNode routingDefaultsNode = config.get("routingDefaults");
             if (routingDefaultsNode != null) {
                 LOG.info("Loading default routing parameters from JSON:");
+                ReflectiveInitializer<RoutingRequest> scraper = new ReflectiveInitializer(RoutingRequest.class);
                 router.defaultRoutingRequest = scraper.scrape(routingDefaultsNode);
             } else {
                 LOG.info("No default routing parameters were found in the router config JSON. Using built-in OTP defaults.");
+                router.defaultRoutingRequest = new RoutingRequest();
             }
+
+            /* Apply single timeout. */
+            JsonNode timeoutNode = config.path("timeout");
+            if (timeoutNode.isNumber()) {
+                router.timeouts = new double[] {timeoutNode.doubleValue()};
+            } else {
+                LOG.error("The 'timeout' configuration option should be a number of seconds.");
+            }
+
+            /* Apply multiple timeouts. */
+            JsonNode timeouts = config.get("timeouts");
+            if (timeouts != null) {
+                if (timeouts.isArray() && timeouts.size() > 0) {
+                    router.timeouts = new double[timeouts.size()];
+                    int i = 0;
+                    for (JsonNode node : timeouts) {
+                        router.timeouts[i++] = node.doubleValue();
+                    }
+                } else {
+                    LOG.error("The 'timeouts' configuration option should be an array of values in seconds.");
+                }
+            }
+            LOG.info("Timeouts for router '{}': {}", router.id, router.timeouts);
 
             /* Create Graph updater modules from JSON config. */
             GraphUpdaterConfigurator.setupGraph(router.graph, config);

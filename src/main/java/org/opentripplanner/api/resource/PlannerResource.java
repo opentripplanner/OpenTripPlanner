@@ -38,11 +38,11 @@ import java.util.*;
  * This is the primary entry point for the trip planning web service.
  * All parameters are passed in the query string. These parameters are defined in the abstract
  * RoutingResource superclass, which also has methods for building routing requests from query
- * parameters. In order for inheritance to work, the REST resources are actually request-scoped 
- * rather than singleton-scoped.
+ * parameters. In order for inheritance to work, the REST resources are request-scoped (constructed at each request)
+ * rather than singleton-scoped (a single instance existing for the lifetime of the OTP server).
  * 
- * Some parameters may not be honored by the trip planner for some or all itineraries. For
- * example, maxWalkDistance may be relaxed if the alternative is to not provide a route.
+ * Some parameters may not be honored by the trip planner for some or all itineraries. For example, maxWalkDistance
+ * may be relaxed if the alternative is to not provide a route.
  * 
  * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
  *         client making the request.
@@ -67,7 +67,7 @@ public class PlannerResource extends RoutingResource {
          *       out so it's used here too...
          */
         
-        // create response object, containing a copy of all request parameters
+        // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
         Response response = new Response(uriInfo);
         RoutingRequest request = null;
         try {
@@ -77,7 +77,7 @@ public class PlannerResource extends RoutingResource {
 
             /* Find some good GraphPaths through the OTP Graph. */
             Router router = otpServer.getRouter(request.routerId);
-            GraphPathFinder gpFinder = new GraphPathFinder(router.graph); // or maybe get a persistent router-scoped GraphPathFinder?
+            GraphPathFinder gpFinder = new GraphPathFinder(router); // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(request);
 
             /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */

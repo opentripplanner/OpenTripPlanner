@@ -24,22 +24,16 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 /**
- * I originally considered configuring OTP server through Java properties, with one global
- * properties file at /etc/otp.properties for the whole server and one optional properties file per
- * graph, then allowing overriding or entirely replacing these settings with command line options.
- * 
- * However, there are not that many build/server settings. Rather than duplicating everything in
- * properties, a command line options class, and an internal configuration class, I am tentatively
- * just using command line parameters for everything. JCommander lets you use "@filename" notation
- * to load command line parameters from a file, which we can keep in /etc or wherever.
- * 
- * Graphs are sought by default in /var/otp/graphs.
+ * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up an OTP server
+ * depending on command line options.
  */
 public class OTPMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
 
+    /** ENTRY POINT: This is the main method that is called when running otp.jar from the command line. */
     public static void main(String[] args) {
+
         /* Parse and validate command line parameters */
         CommandLineParameters params = new CommandLineParameters();
         try {
