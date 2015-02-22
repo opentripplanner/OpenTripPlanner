@@ -137,12 +137,6 @@ public class CommandLineParameters implements Cloneable {
     public void infer() {
         server |= (inMemory || preFlight || port != null);
         if (basePath == null) basePath = DEFAULT_BASE_PATH;
-        if (routerIds == null) {
-            if (autoScan || inMemory || preFlight)
-                routerIds = Collections.emptyList();
-            else
-                routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
-        }
         /* If user has not overridden these paths, use default locations under the base path. */
         if (cacheDirectory == null) cacheDirectory = new File(basePath, "cache");
         if (graphDirectory == null) graphDirectory = new File(basePath, "graphs");

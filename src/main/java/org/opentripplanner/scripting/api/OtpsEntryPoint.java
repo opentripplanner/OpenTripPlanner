@@ -19,7 +19,7 @@ import org.opentripplanner.analyst.batch.RasterPopulation;
 import org.opentripplanner.analyst.batch.SyntheticRasterPopulation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.OTPConfigurator;
+import org.opentripplanner.standalone.OTPMain;
 import org.opentripplanner.standalone.OTPServer;
 
 import com.beust.jcommander.JCommander;
@@ -76,17 +76,16 @@ public class OtpsEntryPoint {
         JCommander jc = new JCommander(params, args);
         params.analyst = true; // Force analyst
         params.infer();
-        OTPConfigurator configurator = new OTPConfigurator(params);
-        if (configurator.builderFromParameters() != null) // TODO Enable this
-            throw new IllegalArgumentException("Building from script is not supported.");
-        if (configurator.scriptFromParameters() != null) // This would be weird
+        OTPMain otpMain = new OTPMain(params);
+        if (params.build != null) // TODO Enable this
+            throw new IllegalArgumentException("Building from script is not yet supported.");
+        if (params.scriptFile != null) // This would be weird
             throw new IllegalArgumentException("Scripting from script is not supported.");
-        if (configurator.visualizerFromParameters() != null) // Useless
+        if (params.visualize) // Useless
             throw new IllegalArgumentException("Vizualizer from script is not supported.");
-        if (configurator.serverFromParameters() != null) // Why not?
+        if (params.server) // Why not?
             throw new IllegalArgumentException("Server from script is not supported.");
-        OTPServer otpServer = configurator.getServer();
-        return new OtpsEntryPoint(otpServer);
+        return new OtpsEntryPoint(otpMain.otpServer);
     }
 
     public static OtpsEntryPoint fromArgs() throws Exception {

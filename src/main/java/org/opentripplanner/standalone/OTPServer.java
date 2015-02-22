@@ -8,13 +8,16 @@ import org.opentripplanner.analyst.DiskBackedPointSetCache;
 import org.opentripplanner.analyst.PointSetCache;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.routing.error.GraphNotFoundException;
+import org.opentripplanner.routing.impl.GraphScanner;
+import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.scripting.impl.ScriptingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is replacing a Spring application context.
+ * This is essentially replacing a Spring application context.
+ * It just bundles together references to all the OTP components so we can pass them around the system.
  */
 public class OTPServer {
 
@@ -39,7 +42,7 @@ public class OTPServer {
         this.params = params;
 
         // Core OTP modules
-        graphService = gs;
+        this.graphService = gs;
 
         // Optional Analyst Modules.
         if (params.analyst) {
