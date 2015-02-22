@@ -1,5 +1,38 @@
 # Configuration
 
+
+## Directory tree
+
+Here we describe where OTP will look for its configuration files and the inputs that describe the transportation
+network, as well as where it will store any temporary files or cached data. Most important is the OTP *base directory*
+which defaults to `/var/otp`. Unless you tell OTP otherwise, all other configuration, input and storage directories
+will be sought immediately beneath this one. This prefix follows UNIX conventions so it should work in Linux and Mac OSX
+environments, but it is inappropriate under Windows or where the user running OTP either cannot obtain permissions to
+`/var` or simply wishes to experiment within their home directory rather than deploy a system-wide server.
+In these cases one should use the baseDir switch when starting up OTP to override the default. For example: `--baseDir /home/username/otp`.
+
+### Routers
+
+
+## Per-router configuration
+
+Each OTP router is configured via two JSON files placed alongside the input files (OSM and GTFS) in the router directory.
+These files are named `build-config.json` and `router-config.json`. Each configuration option within each of these
+files is optional, as are both of the files themselves. If any option or an entire file is missing, reasonable defaults
+will be applied.
+
+Some parts of the process that loads the street and transit network description are time consuming and memory-hungry.
+To avoid repeating these slow steps every time OTP starts up, we can trigger them manually whenever the input files change,
+saving the resulting transportation network description to disk. We call this prepared product a `graph` following
+[mathematical terminology](https://en.wikipedia.org/wiki/Graph_%28mathematics%29)), and refer to these "heavier" steps as
+*graph building*. They are controlled by `build-config.json`.
+
+There are many other details of OTP operation that can be modified without requiring the potentially long operation of
+rebuilding the graph. These run-time configuration options are found in `router-config.json`.
+
+
+
+
 ## Elevation data 
 
 OpenTripPlanner can "drape" the OSM street network over a digital elevation model (DEM).
