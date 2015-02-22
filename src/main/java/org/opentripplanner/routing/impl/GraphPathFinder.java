@@ -133,17 +133,33 @@ public class GraphPathFinder {
         LOG.debug("BEGIN SEARCH");
         List<GraphPath> paths = Lists.newArrayList();
         Set<AgencyAndId> bannedTrips = Sets.newHashSet();
-        while (paths.size() < options.numItineraries && paths.size() < router.timeouts.length) {
-            double timeout = searchBeginTime + (router.timeouts[paths.size()] * 1000) - System.currentTimeMillis();
-            // if (timeout <= 0) break; ADD THIS LINE TO MAKE TIMEOUTS ACTUALLY WORK WHEN NEGATIVE
+        while (paths.size() < options.numItineraries) {
+            // TODO pull all this timeout logic into a function near org.opentripplanner.util.DateUtils.absoluteTimeout()
+            int timeoutIndex = paths.size();
+            if (timeoutIndex >= router.timeouts.length) {
+                timeoutIndex = router.timeouts.length - 1;
+            }
+            double timeout = searchBeginTime + (router.timeouts[timeoutIndex] * 1000);
+            timeout -= System.currentTimeMillis(); // absolute to relative
+            timeout /= 1000; // msec to seconds
+            if (timeout <= 0) {
+                // must catch this case where advancing to the next (lower) timeout value means the search is timed out
+                // before it even begins, because a negative relative timeout will mean "no timeout" in the SPT call.
+                options.rctx.aborted = true;
+                break;
+            }
             ShortestPathTree spt = aStar.getShortestPathTree(options, timeout);
-            if (spt == null) { // timeout or other fail
-                LOG.warn("SPT was null.");
+            if (spt == null) {
+                LOG.warn("SPT was null."); // unknown failure
                 return null;
             }
-            if (options.rctx.aborted) break;
+            if (options.rctx.aborted) {
+                break; // search timed out or was gracefully aborted for some other reason.
+            }
             List<GraphPath> newPaths = spt.getPaths();
-            if (newPaths.isEmpty()) break;
+            if (newPaths.isEmpty()) {
+                break;
+            }
             // Find all trips used in this path and ban them for the remaining searches
             for (GraphPath path : newPaths) {
                 for (State state : path.states) {
