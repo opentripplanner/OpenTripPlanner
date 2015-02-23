@@ -94,7 +94,7 @@ public class OTPMain {
         // TODO do params.infer() here to ensure coherency?
 
         /* Create the top-level objects that represent the OTP server. */
-        makeGraphService(); // FIXME this triggers graph scanning/loading even when we are only building a graph -- perform that scanning separately
+        makeGraphService();
         otpServer = new OTPServer(params, graphService);
 
         /* Start graph builder if requested */
@@ -106,8 +106,8 @@ public class OTPMain {
                 if (params.inMemory || params.preFlight) {
                     Graph graph = graphBuilder.getGraph();
                     graph.index(new DefaultStreetVertexIndexFactory());
-                    // FIXME pass in Router JSON config, set true router IDs.
-                    graphService.registerGraph("", new MemoryGraphSource("", graph, MissingNode.getInstance()));
+                    // FIXME set true router IDs
+                    graphService.registerGraph("", new MemoryGraphSource("", graph, graphBuilder.routerConfig));
                 }
             } else {
                 LOG.error("An error occurred while building the graph. Exiting.");
@@ -173,7 +173,8 @@ public class OTPMain {
      */
     public void makeGraphService () {
         graphService = new GraphService(params.autoReload);
-        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory(params.graphDirectory);
+        InputStreamGraphSource.FileFactory graphSourceFactory =
+                new InputStreamGraphSource.FileFactory(params.graphDirectory);
         graphService.graphSourceFactory = graphSourceFactory;
         if (params.graphDirectory != null) {
             graphSourceFactory.basePath = params.graphDirectory;
