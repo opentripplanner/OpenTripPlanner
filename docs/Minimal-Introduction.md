@@ -1,96 +1,72 @@
-# Minimal Introduction to OTP
+# Basic Usage of OpenTripPlanner
 
-Here's how to get an instance of OTP up and running quickly. In this tutorial you'll be using the "master" branch of OTP, the one on which most active development occurs.
+This page will get you up and running with your own OTP server. If all goes well it should only take a few minutes!
 
-Some things you'll need:
-* A Linux or Mac machine with over 1GB memory. OTP should work on any platform with Java, but the filenames and commands in this page use UNIX-like conventions.
-* A number of supporting software packages, including:
- * git (a version control system)
- * maven (a build system, install version 3 which is now common)
+## Get OTP
 
-#### Get OTP
+OpenTripPlanner is written in Java and distributed as a single runnable JAR file. These JARs are published
+[here](http://dev.opentripplanner.org/jars/). Grab one of these JARs for the
+[latest released version](http://dev.opentripplanner.org/jars/otp-0.13.0.jar)
+or if you're feeling adventurous try the
+[bleeding edge development code](http://dev.opentripplanner.org/jars/otp-1.0.0-SNAPSHOT.jar).
+You may also want to get your own copy of the OTP source code and [build the JAR from scratch](Building-From-Source),
+especially if you plan to do some development yourself.
 
-    $ cd /path/to/projects
-    $ git clone git://github.com/opentripplanner/OpenTripPlanner.git
-For normal usage latest stable version is recommended. Curently this is version 0.11
-To get it you need to switch to [0.11.x branch](https://github.com/opentripplanner/OpenTripPlanner/tree/0.11.x):
+## Get some data
 
-    $ git checkout 0.11.x
+First you'll need [GTFS data](https://developers.google.com/transit/gtfs/) to build a transit network.
+Transport agencies throughout the world provide GTFS
+schedules to the public. [GTFS data exchange](http://www.gtfs-data-exchange.com/) is an archive of feeds, Google
+maintains a [list of some public feeds](https://code.google.com/p/googletransitdatafeed/wiki/PublicFeeds) and
+[this site](http://transitfeeds.com/) also provides an extensive catalog. You'll usually want to fetch the data
+directly from transit operators or agencies to be sure you have the most up-to-date version. If you know of a feed you
+want to work with, download it and put it in an empty directory you have created for your OTP instance
+such as `/home/username/otp` on Linux, `/Users/username/otp` on OSX, or `C:\Users\username\otp` on Windows. If you
+don't have a particular feed in mind, the one for Portland, Oregon's
+[TriMet agency](http://developer.trimet.org/schedule/gtfs.zip) is a good option.
+It is a moderate-sized system and Portland's TriMet agency initiated OTP development and helped develop the GTFS format.
 
-If you want to try new unstable version or you want to help with developing you don't need to do anything, because master is development branch.
-More information about different versions in [[Version-Notes]].
+You'll also need OpenStreetMap data to build a road network for walking, cycling, and driving. This is necessary to
+accurately describe how to reach transit stops. OpenStreetMap is a massive database covering the entire planet, and in
+many places rivals or surpasses the quality of commercial maps. Several services extract smaller geographic
+regions from this database. Mapzen provides [Metro Extracts](https://mapzen.com/metro-extracts/) for many urban areas
+around the world, and [Geofabrik](http://download.geofabrik.de/) provides extracts for larger areas like countries or
+states, from which you can prepare your own smaller bounding-box extracts using
+[Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis#Extracting_bounding_boxes)
+or [osmconvert](http://wiki.openstreetmap.org/wiki/Osmconvert#Applying_Geographical_Borders).
+OSM data can be delivered in "traditional" XML or the more compact binary PBF format. OpenTripPlanner can consume both,
+but we usually work with PBF since it's smaller and faster.
 
-#### Build OTP
+Download OSM PBF data for the same geographic region as your GTFS feed. If you are using the TriMet feed,
+the [metro extract for Portland](https://s3.amazonaws.com/metro-extracts.mapzen.com/portland_oregon.osm.pbf)
+will do the job. Place this PBF file in the same directory you created for the OSM data.
 
-    $ cd OpenTripPlanner
-    $ mvn clean package
+## Start up OTP
 
-This stage takes a while. If it completes with a message like `BUILD FAILED`, then the rest of this tutorial won't work.
+As a Java program OTP must be run under a Java virtual machine (JVM), which is provided as part of the Java runtime
+(JRE) or Java development kit (JDK). Run `java -version` to check that you have version 1.7 or newer of the JVM installed.
+If you do not you will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
-#### Build a graph
+GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory
+when working with the Portland TriMet data set, and several gigabytes for larger inputs. A typical command to start OTP
+looks like `java -Xmx1G -jar otp-0.13.0.jar <options>`. The `-Xmx` parameter sets
+the limit on how much memory OTP is allowed to consume. If you have sufficient memory in your computer,
+set this to a couple of gigabytes; when OTP doesn't have enough "breathing room" it can grind to a halt.
 
-A graph is a file that combines and links transportation information from a number of sources into a form that's easy for OTP use. Basic graphs use OpenStreetMap road data, and public transport data in GTFS format.
+It's possible to analyze the GTFS, OSM and any other input data and save the resulting representation of the transit
+network (what we call a ['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29)) to disk.
+For simplicity we'll skip saving this file and start up an OTP server immediately. The command to do so is:
 
-First, download a GTFS from your favorite city. Here's the GTFS for Portland's Trimet system.
+`java -Xmx2G -jar otp-0.13.0.jar --build /home/username/otp --inMemory`
 
-    $ cd /path/to/downloads
-    $ mkdir pdx
-    $ cd pdx
-    $ wget "http://developer.trimet.org/schedule/gtfs.zip" -O trimet.gtfs.zip
+where `/home/username/otp` should be the directory where you put your input files. The graph build operation should
+take about one minute to complete, and then you'll see a `Grizzly server running` message. At this point you can open
+[http://localhost:8080/](http://localhost:8080/) in a web browser. You should be presented with a web client that will
+interact with your local OpenTripPlanner instance.
 
-Then, get a subset of OpenStreetMap data corresponding to the same area. There are many ways to get OSM data. One convenient way is a collection of "metro extracts" originally compiled by Michal Migurski and now maintained by Mapzen at [[https://mapzen.com/metro-extracts/]]. You'll want to get map data in the OSM PBF format, which is much more compact and faster to load than the older XML format.
+You can also try out some web service URLs to explore the transit data:
 
-    $ wget https://s3.amazonaws.com/metro-extracts.mapzen.com/portland.osm.pbf
+- `http://localhost:8080/otp/routers/default/`
 
-Current way to build the graph
-  
-    $ cd /path/to/projects/OpenTripPlanner
-    $ java -Xmx2G -jar target/otp.jar --build /path/to/downloads/pdx
-
-
-In version 0.11.x `otp.jar` is located in `otp-core/target/otp.jar `
-
-If you have old GraphBuilder.xml from previous versions or some specific settings that can't be represented yet in otp.jar parameters you can still use old [[GraphBuilder]] like:
-
-```shell
-mvn package -DskipTests
-./build-old /path/to/my/graph-config.xml
-```
-
-#### Run the server
-
-Make a `/var/otp/graphs` directory if necessary, and copy the graph there
-
-    $ sudo mkdir /var/otp/graphs
-    $ mv /path/to/downloads/pdx/Graph.obj /var/otp/graphs
-
-Then head over to the OTP directory and run the server:
-
-    $ cd /path/to/projects/OpenTripPlanner
-    $ java -Xmx2G -jar target/otp.jar --server
-
-This will take a minute. Once you see `Grizzly server running.` check out [http://localhost:8080/](http://localhost:8080/)
-
-**NOTE** Due to a known bug in our web server library, you will need to specify the document name explicitly [http://localhost:8080/index.html](http://localhost:8080/index.html) until we can switch to a newer version.
-
-Once the server starts up, you can also try some web service URLs to verify that it's working:
-- `http://localhost:8080/otp/routers/default/` 
 - `http://localhost:8080/otp/routers/default/index/routes`
 
-You could also do: 
-
-`java -jar target/otp.jar -p 9090 -r mexico --server`
-
-in order to run on port 9090 and load the graph for routerId 'mexico'. You can also specify the base directory for graphs with -g. As we continue to work on standalone mode, it should continue to function in the same way but just be enriched with more command line options. Try the `--help` option for a full list of command line parameters.
-
-#### Next Steps
-
-We need pages on advanced graph building topics (carshare, bikeshare, elevation &c) in standalone OTP.
-
-### ELEVATION DATA (TBC)
-
-If you want to add elevation data (for the U.S. only -- see [http://ned.usgs.gov](http://ned.usgs.gov) for more) to your graph, we'll again edit graph-builder.xml
-
-NOTE: NED downloads take a real long time, and the graph building is really slow...
-
-NOTE: Those outside the US can also potentially use another elevation data set...see  [[GraphBuilder#Elevationdata]] for (not much) more information.
