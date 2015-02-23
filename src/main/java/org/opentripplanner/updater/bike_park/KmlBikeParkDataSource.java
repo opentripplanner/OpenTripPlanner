@@ -50,7 +50,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
     public KmlBikeParkDataSource() {
         xmlDownloader = new XmlDataListDownloader<BikePark>();
         xmlDownloader
-                .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']");
+                .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']|//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Folder']/*[local-name()='Placemark']");
         xmlDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<BikePark>() {
             @Override
             public BikePark build(Map<String, String> attributes) {
