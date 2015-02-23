@@ -50,7 +50,7 @@ public class MavenVersion implements Serializable {
                                                     props.getProperty("git.commit.id.describe"),
                                                     props.getProperty("git.commit.time"),
                                                     props.getProperty("git.build.time"));
-            LOG.info("Parsed Maven artifact version: {}", version.toStringVerbose());
+            LOG.debug("Parsed Maven artifact version: {}", version.toStringVerbose());
             return version;
         } catch (Exception e) {
             LOG.error("Error reading version from properties file: {}", e.getMessage());
