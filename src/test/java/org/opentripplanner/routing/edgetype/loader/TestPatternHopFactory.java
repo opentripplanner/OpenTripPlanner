@@ -34,6 +34,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
+import org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -85,8 +86,11 @@ public class TestPatternHopFactory extends TestCase {
             StreetEdge street2 = new StreetEdge(back, front, GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "street", 100, StreetTraversalPermission.ALL, true);
         }
 
-        NetworkLinker nl = new NetworkLinker(graph);
-        nl.createLinkage();
+        TransitToStreetNetworkModule ttsnm = new TransitToStreetNetworkModule();
+        //Linkers aren't run otherwise
+        graph.hasStreets = true;
+        graph.hasTransit = true;
+        ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
     }
 
     public void testAnnotation() {
