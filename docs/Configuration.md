@@ -206,24 +206,21 @@ departure times for the remainder of the trip.
 - **VehiclePositions** give the location of some or all vehicles currently in service, in terms of geographic coordinates
 or position relative to their scheduled stops.
 
-These feeds can be provided using either a pull or push system. In a pull configuration, the GTFS-RT consumer (OTP) polls the
+Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental systems and parking availability.
+
+Real-time data can be provided using either a pull or push system. In a pull configuration, the GTFS-RT consumer (OTP) polls the
 real-time provider over HTTP. That is to say, it fetches a file from a web server every few minutes. In the push configuration,
 the consumer opens a persistent connection to the GTFS-RT provider, which then sends incremental updates immediately as
 they become available. OTP can use both approaches.
 
-
-### Alerts
-
-
-### Trip Updates
-
-
-### Vehicle Positions
-
+Real-time data sources are configured in `router-config.json`. The `updaters` section is an array of JSON objects, each
+of which has a `type` field and other configuration fields that depend on the type.
 
 ```JSON
+// router-config.json
 {
-    // Routing defaults are any public field or setter in org.opentripplanner.routing.core.RoutingRequest
+    // Routing defaults are any public field or setter in the Java class
+    // org.opentripplanner.routing.core.RoutingRequest
     routingDefaults: {
         numItineraries: 6,
         walkSpeed: 2.0,
@@ -232,6 +229,7 @@ they become available. OTP can use both approaches.
     },
 
     updaters: [
+
         // GTFS-RT service alerts (polling)
         {
             type: "real-time-alerts",
@@ -249,7 +247,9 @@ they become available. OTP can use both approaches.
         },
 
         // Bike parking availability
-        // bp.type=bike-park
+        {
+            type: "bike-park"
+        }
 
         // Stop Time Updates (polling GTFS-RT TripUpdates)
         {

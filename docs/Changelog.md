@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.14.0 (2015-02-25)
+- Coming soon...
+
 ## 0.13.0 (2014-12-05)
 - Detect apparent errors in GTFS interlining
 - Long distance mode: use a pure weight-based state comparison, and use trip-banning retrying logic to get multiple paths. This compromises correctness somewhat but brings search times back within reason for large regional graphs. Also, we create significantly less SimpleTransfers.
