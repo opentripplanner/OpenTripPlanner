@@ -263,7 +263,7 @@ public class AlertPatch implements Serializable {
         if (direction != null && direction.equals("")) {
             direction = null;
         }
-        this.direction = direction;
+        this.directionId = direction;
     }
 
     @XmlElement
