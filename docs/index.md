@@ -53,21 +53,11 @@ The **OTP Analyst Web Services** provide network analysis results such as travel
 The **OTP Analyst Batch Processor** is a command-line tool that handles more complex one-off network analysis tasks. It uses the same core routing library and data sources as other OTP services, but allows for very open-ended configuration and the inclusion of population or opportunity data. While configuration and use are currently somewhat opaque for non-developers, the "Batch Analyst" is becoming a powerful tool for visualizing how transportation networks affect access to urban opportunities. See [this article](http://www.theatlanticcities.com/commute/2013/01/best-maps-weve-seen-sandys-transit-outage-new-york/4488/) for an example case study on the effects of hurricane Sandy in New York.
 
 
-## OTP Quick Start
 
- * [A basic introduction to OTP](Minimal-Introduction)
+ * [Basic Usage (get started quickly)](Basic-Usage)
  * [Set up a development environment](Setting-up-a-development-environment)
  * [Available web app language translations](https://github.com/openplans/OpenTripPlanner/wiki/Translation)
  * [Developers Guide](https://github.com/openplans/OpenTripPlanner/wiki/DevelopersGuide) (code conventions, how to submit patches, etc)
-
-
-## Code Repository and Developer Information
-
-To browse the source online visit our [Github repository](https://github.com/opentripplanner/OpenTripPlanner).
-
-To create a local copy of the repository, use the following command:
-
-`$ git clone git://github.com/openplans/OpenTripPlanner.git`
 
 
 ## External Documentation
