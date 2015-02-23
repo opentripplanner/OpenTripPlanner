@@ -151,5 +151,14 @@ As of #206, we follow [Crockford's JavaScript code conventions](http://javascrip
      */
 ```
 
-*Note: There is still a lot of code following other style conventions. We are reformatting as we write new code and refactor.*
+*Note: There is still a lot of code following other style conventions, but please adhere to consistent style when you
+ write new code, and help clean up and reformat code as you refactor.*
+
+
+## Continuous Integration
+
+The OpenTripPlanner project has a [continuous integration (CI) server](http://ci.opentripplanner.org). Any time a change
+is pushed to the main OpenTripPlanner repository on GitHub, this server will compile and test the new code, providing
+feedback on the stability of the build. It is also configured to run a battery of speed tests so that we can track
+improvements due to optimizations and spot drops in performance as an unintended consequence of changes.
 

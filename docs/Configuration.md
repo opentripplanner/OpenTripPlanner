@@ -1,16 +1,54 @@
-# Configuration
+# Configuring OpenTripPlanner
 
-## Directory tree
+## Base directory
 
-Here we describe where OTP will look for its configuration files and the inputs that describe the transportation
-network, as well as where it will store any temporary files or cached data. Most important is the OTP *base directory*
-which defaults to `/var/otp`. Unless you tell OTP otherwise, all other configuration, input and storage directories
+The OTP *base directory* defaults to `/var/otp`. Unless you tell OTP otherwise, all other configuration,
+input files and storage directories
 will be sought immediately beneath this one. This prefix follows UNIX conventions so it should work in Linux and Mac OSX
-environments, but it is inappropriate under Windows or where the user running OTP either cannot obtain permissions to
-`/var` or simply wishes to experiment within their home directory rather than deploy a system-wide server.
+environments, but it is inappropriate in Windows and where the user running OTP either cannot obtain permissions to
+`/var` or simply wishes to experiment within his or her home directory rather than deploy a system-wide server.
 In these cases one should use the basePath switch when starting up OTP to override the default. For example:
 `--basePath /home/username/otp` on a Linux system, `--basePath /Users/username/otp` in Mac OSX, or
 `--basePath C:\Users\username\otp` in Windows.
+
+## Routers
+
+A single OTP instance can handle several regions independently. Each of these separate (but potentially geographically overlapping)
+services is called a *router* and is referred to by a short unique ID such as 'newyork' or 'paris'. Each router has its
+own subdirectory in a directory called 'graphs' directly under the OTP base directory, and each router's directory is
+always named after its router ID. Thus, by default the files for the router 'tokyo' will
+be located at `/var/otp/graphs/tokyo`. Here is an example directory layout for an OTP instance with two routers, one for
+New York City and one for Portland, Oregon:
+
+```
+/var/otp
+├── cache
+│   └── ned
+└── graphs
+    ├── nyc
+    │   ├── build-config.json
+    │   ├── Graph.obj
+    │   ├── long-island-rail-road_20140216_0114.zip
+    │   ├── mta-new-york-city-transit_20130212_0419.zip
+    │   ├── new-york-city.osm.pbf
+    │   └── port-authority-of-new-york-new-jersey_20150217_0111.zip
+    └── pdx
+        ├── build-config.json
+        ├── Graph.obj
+        ├── gtfs.zip
+        ├── portland_oregon.osm.pbf
+        └── router-config.json
+```
+
+You can see that each of these subdirectories contains one or more GTFS feeds (which are just zip files full of
+comma-separated tables), a PBF street map file, some JSON configuration files, and another file called `Graph.obj`.
+On startup, OTP scans router directories for input and configuration files,
+and can optionally store the resulting combined representation of the transportation network as Graph.obj in the
+same directory to avoid re-processing the data the next time it starts up. The `cache` directory is where OTP will
+store its local copies of resources fetched from the internet, such as US elevation tiles.
+
+
+## System-wide vs. graph build vs. router configuration
 
 OTP is configured via JSON files. The file `otp-config.json` is placed in the OTP base directory and contains settings
 that affect the entire OTP instance. Each router within that instance is configured using two other JSON files placed
@@ -18,15 +56,9 @@ alongside the input files (OSM, GTFS, elevation data etc.) in the router's direc
 are named `build-config.json` and `router-config.json`. Each configuration option within each of these files is optional,
 as are all three of the files themselves. If any option or an entire file is missing, reasonable defaults will be applied.
 
-## Routers
-
-
-
-## Graph build vs. router configuration
-
 Some parts of the process that loads the street and transit network description are time consuming and memory-hungry.
 To avoid repeating these slow steps every time OTP starts up, we can trigger them manually whenever the input files change,
-saving the resulting transportation network description to disk. We call this prepared product a `graph` following
+saving the resulting transportation network description to disk. We call this prepared product a *graph* (following
 [mathematical terminology](https://en.wikipedia.org/wiki/Graph_%28mathematics%29)), and refer to these "heavier" steps as
 *graph building*. They are controlled by `build-config.json`. There are many other details of OTP operation that can be
 modified without requiring the potentially long operation of rebuilding the graph. These run-time configuration options
@@ -112,9 +144,11 @@ directory:
 
 You may also want to add the `--cache <directory>` command line parameter to specify a custom NED tile cache location.
 
-The USGS will also deliver the whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA).
+NED downloads take quite a long time and slow down the graph building process. The USGS will also deliver the
+whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA).
 OpenTripPlanner contains another module that will then automatically fetch data in this format from an Amazon S3 copy of
 your bulk data.
+
 
 ### Other raster elevation data
 
