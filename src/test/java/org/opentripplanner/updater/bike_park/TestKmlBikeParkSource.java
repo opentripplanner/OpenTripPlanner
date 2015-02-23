@@ -28,9 +28,6 @@ public class TestKmlBikeParkSource extends TestCase {
         assertTrue(kmlDataSource.update());
         List<BikePark> bikeParks = kmlDataSource.getBikeParks();
         assertEquals(5, bikeParks.size());
-        for (BikePark bikePark : bikeParks) {
-            System.out.println(bikePark);
-        }
         BikePark alkmaar = bikeParks.get(0);
         BikePark zwolle = bikeParks.get(4);
         assertEquals("Station Alkmaar", alkmaar.name);
@@ -48,9 +45,6 @@ public class TestKmlBikeParkSource extends TestCase {
         assertTrue(kmlDataSource.update());
         List<BikePark> bikeParks = kmlDataSource.getBikeParks();
         assertEquals(5, bikeParks.size());
-        for (BikePark bikePark : bikeParks) {
-            System.out.println(bikePark);
-        }
         BikePark alkmaar = bikeParks.get(0);
         BikePark almere = bikeParks.get(4);
         assertEquals("Station Alkmaar", alkmaar.name);
