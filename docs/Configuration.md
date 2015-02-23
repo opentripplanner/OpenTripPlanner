@@ -18,6 +18,7 @@ alongside the input files (OSM, GTFS, elevation data etc.) in the router's direc
 are named `build-config.json` and `router-config.json`. Each configuration option within each of these files is optional,
 as are all three of the files themselves. If any option or an entire file is missing, reasonable defaults will be applied.
 
+
 ## Graph building vs. run time router configuration
 
 Some parts of the process that loads the street and transit network description are time consuming and memory-hungry.
@@ -28,30 +29,6 @@ saving the resulting transportation network description to disk. We call this pr
 modified without requiring the potentially long operation of rebuilding the graph. These run-time configuration options
 are found in `router-config.json`.
 
-
-### Routers
-
-
-## Per-router configuration
-
-
-## Graph building
-
-### Graph Build Configuration
-
-By default this is `/var/otp/graphs/router_id/build-config.json`.
-
-### Launching a Graph Build
-
-### Server-wide Configuration
-
-### Individual Router Configuration
-
-### Starting a Server
-
-## Router runtime configuration
-
-By default this is `/var/otp/graphs/router_id/router-config.json`.
 
 ### Timeouts
 
