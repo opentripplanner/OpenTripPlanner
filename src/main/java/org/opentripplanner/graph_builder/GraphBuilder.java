@@ -212,7 +212,7 @@ public class GraphBuilder implements Runnable {
                     }
                     break;
                 case OTHER:
-                    LOG.debug("Skipping file '{}'", file);
+                    LOG.warn("Skipping unrecognized file '{}'", file);
             }
         }
         boolean hasOSM  = builderParams.streets && !osmFiles.isEmpty();
@@ -282,9 +282,13 @@ public class GraphBuilder implements Runnable {
         return graphBuilder;
     }
 
-    /** Represents the different types of input files for a graph build. */
+    /**
+     * Represents the different types of files that might be present in a router / graph build directory.
+     * We want to detect even those that are not graph builder inputs so we can effectively warn when unrecognized file
+     * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
+     */
     private static enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, OTHER;
+        GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -299,6 +303,10 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif")) return DEM; // Digital elevation model (elevation raster)
+            if (name.equals("Graph.obj")) return GRAPH;
+            if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
+                return CONFIG;
+            }
             return OTHER;
         }
     }
