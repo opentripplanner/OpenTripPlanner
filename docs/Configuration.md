@@ -195,7 +195,7 @@ GTFS feeds contain *schedule* data that is is published by an agency or operator
  for unexpected service changes or traffic disruptions that occur from day to day. Thus, this kind of data is also
  referred to as 'static' data or 'theoretical' arrival and departure times.
 
-The [GTFS Realtime spec]() (GTFS-RT) complements GTFS with three additional kinds of feeds. In contrast to the
+The [GTFS Realtime spec](https://developers.google.com/transit/gtfs-realtime/) (GTFS-RT) complements GTFS with three additional kinds of feeds. In contrast to the
 base GTFS schedule feed, they provide *real-time* updates (*"dynamic"* data) and are are updated from minute to minute.
 
 - **Alerts** are text messages attached to GTFS objects, informing riders of disruptions and changes.
