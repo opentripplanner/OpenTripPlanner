@@ -47,11 +47,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.PatternDepartVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +116,7 @@ public class TripPattern implements Serializable {
     public String code;
 
     /* The vertices in the Graph that correspond to each Stop in this pattern. */
-    public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. are they even used?
+    public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. FIXME they appear to be all null. are they even used?
     public final PatternDepartVertex[] departVertices;
     public final PatternArriveVertex[] arriveVertices;
 
@@ -551,13 +547,9 @@ public class TripPattern implements Serializable {
             TransitStopDepart stopDepart = getStopOrParent(context.stopDepartNodes, s0, graph);
             TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
 
-            /* Add this pattern's route's mode to the modes for this Stop. */
-            // This is updating a TraverseModeSet (which is a bitmask).
-            // Maybe we should just store that mask in the pattern when it is created.
-            // Isn't this skipping the first stop in the pattern?
-            // Do we actually need a set of modes for each stop?
-            TraverseMode mode = GtfsLibrary.getTraverseMode(this.route);
-            stopArrive.getStopVertex().addMode(mode);
+            /* Record the transit stop vertices visited on this pattern. */
+            stopVertices[stop] = stopDepart.getStopVertex();
+            stopVertices[stop + 1] = stopArrive.getStopVertex(); // this will only have an effect on the last stop
 
             /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
             if (this.canBoard(stop)) {

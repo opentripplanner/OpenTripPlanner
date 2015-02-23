@@ -62,6 +62,7 @@ help identify problematic searches and improve our routing methods.
 The available timeout options are:
 
 ```JSON
+// router-config.json
 {
   timeout: 5.5
 }
@@ -72,6 +73,7 @@ paths already found are returned to the client. This is equivalent to specifying
 The alternative is:
 
 ```JSON
+// router-config.json
 {
   timeouts: [5, 4, 3, 1]
 }
@@ -87,6 +89,57 @@ response, providing more only when it won't hurt response time. The timeout valu
 reflect the decreasing marginal value of alternative itineraries: everyone wants at least one response, it's nice to
 have two for comparison, but we only care about having three, four, or more options if completing those extra searches
 doesn't cause annoyingly long response times.
+
+## Reaching and transferring within subway stations
+
+### Reaching a subway platform
+
+The boarding locations for some modes of transport such as subways and airplanes can be slow to reach from the street.
+When planning a trip, we need to allow additional time to reach these locations to properly inform the passenger. For
+example, this helps avoid suggesting short bus rides between two subway rides as a way to improve travel time. You can
+specify how long it takes to reach a subway platform
+
+```JSON
+// build-config.json
+{
+  subwayAccessTime: 2.5
+}
+```
+
+Stops in GTFS do not necessarily serve a single transit mode, but in practice this is usually the case. This additional
+access time will be added to any stop that is visited by trips on subway routes (GTFS route_type = 1).
+
+This setting does not generalize well to airplanes because you often need much longer to check in to a flight (2-3 hours
+for international flights) than to alight and exit the airport (perhaps 1 hour). Therefore there is currently no
+per-mode access time, it is subway-specific.
+
+### Transferring within stations
+
+Subway systems tend to exist in their own layer of the city separate from the surface, though there are exceptions where
+tracks lie right below the street and transfers happen via the surface. In systems where the subway is quite deep
+and transfers happen via tunnels, the time required for an in-station transfer is often less than that for a
+surface transfer. A proposal was made to provide detailed station pathways in GTFS but it is not in common use.
+
+One way to resolve this problem is by ensuring that the GTFS feed codes each platform as a separate stop, then
+micro-mapping stations in OSM. When OSM data contains a detailed description of walkways, stairs, and platforms within
+a station, GTFS stops can be linked to the nearest platform and transfers will happen via the OSM ways, which should
+yield very realistic transfer time expectations. This works particularly well in above-ground train stations where
+the layering of non-intersecting ways is less prevalent. Here's an example in the Netherlands:
+
+<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=4.70502644777298%2C52.01675028000761%2C4.7070810198783875%2C52.01813190694357&amp;layer=mapnik" style="border: 1px solid black"></iframe><small><a href="http://www.openstreetmap.org/#map=19/52.01744/4.70605">View Larger Map</a></small>
+
+When such micro-mapping data is not available, we need to rely on information from GTFS including how stops are grouped
+into stations and a table of transfer timings where available. During the graph build, OTP can create preferential
+connections between each pair of stops in the same station to favor in-station transfers:
+
+```JSON
+// build-config.json
+{
+  stationTransfers: true
+}
+```
+
+Note that this method is at odds with micro-mapping and might make some transfers artificially short.
 
 
 ## Elevation data 

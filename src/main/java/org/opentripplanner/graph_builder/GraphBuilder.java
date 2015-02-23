@@ -245,7 +245,8 @@ public class GraphBuilder implements Runnable {
                 if (builderParams.parentStopLinking) {
                     gtfsBundle.linkStopsToParentStations = true;
                 }
-                gtfsBundle.parentStationTransfers = builderParams.parentStationTransfers;
+                gtfsBundle.parentStationTransfers = builderParams.stationTransfers;
+                gtfsBundle.subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);

@@ -44,12 +44,13 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -290,7 +291,7 @@ public class GTFSPatternHopFactory {
 
     private GtfsStopContext context = new GtfsStopContext();
 
-    private int defaultStreetToStopTime;
+    public int subwayAccessTime = 0;
 
     private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -430,10 +431,9 @@ public class GTFSPatternHopFactory {
         /* Generate unique short IDs for all the TableTripPatterns. */
         TripPattern.generateUniqueIds(tripPatterns.values());
 
-        /* Loop over all new TripPatterns, setting the service codes. */
+        /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns.values()) {
             tripPattern.makePatternVerticesAndEdges(graph, context);
-            
             // Add the geometries to the hop edges.
             LineString[] geom = geometriesByTripPattern.get(tripPattern);
             if (geom != null) {
@@ -446,6 +446,16 @@ public class GTFSPatternHopFactory {
                 tripPattern.makeGeometry();
             }
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
+
+            /* Iterate over all stops in this pattern recording mode information. */
+            TraverseMode mode = GtfsLibrary.getTraverseMode(tripPattern.route);
+            for (TransitStop tstop : tripPattern.stopVertices) {
+                tstop.addMode(mode);
+                if (mode == TraverseMode.SUBWAY) {
+                    tstop.setStreetToStopTime(subwayAccessTime);
+                }
+            }
+
         }
 
         /* Identify interlined trips and create the necessary edges. */
@@ -898,9 +908,7 @@ public class GTFSPatternHopFactory {
                 context.stationStopNodes.put(stop, new TransitStation(graph, stop));
             } else {
                 TransitStop stopVertex = new TransitStop(graph, stop);
-                stopVertex.setStreetToStopTime(defaultStreetToStopTime);
                 context.stationStopNodes.put(stop, stopVertex);
-
                 if (locationType != 2) {
                     // Add a vertex representing arriving at the stop
                     TransitStopArrive arrive = new TransitStopArrive(graph, stop, stopVertex);
@@ -1294,7 +1302,7 @@ public class GTFSPatternHopFactory {
      * it's important to provide in-station transfers for fare computation).
      * 
      * This step used to be automatically applied whenever transfers.txt was used to create 
-     * transfers (rathen than or in addition to transfers through the street netowrk), 
+     * transfers (rather than or in addition to transfers through the street netowrk),
      * but has been separated out since it is really a separate process.
      */
     public void createParentStationTransfers () {
@@ -1397,14 +1405,6 @@ public class GTFSPatternHopFactory {
             LineString geometry = _geometryFactory.createLineString(sequence);
             transferEdge.setGeometry(geometry);
         }
-    }
-
-    public int getDefaultStreetToStopTime() {
-        return defaultStreetToStopTime;
-    }
-
-    public void setDefaultStreetToStopTime(int defaultStreetToStopTime) {
-        this.defaultStreetToStopTime = defaultStreetToStopTime;
     }
 
     public void setStopContext(GtfsStopContext context) {
