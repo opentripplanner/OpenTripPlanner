@@ -305,15 +305,20 @@ public class GraphPathFinder {
             throw new PathNotFoundException();
         }
 
-        for (GraphPath graphPath : paths) {
+        /* Detect and report that most obnoxious of bugs: path reversal asymmetry. */
+        Iterator<GraphPath> gpi = paths.iterator();
+        while (gpi.hasNext()) {
+            GraphPath graphPath = gpi.next();
             // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
             if (request.arriveBy) {
                 if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
                     LOG.error("A graph path arrives after the requested time. This implies a bug.");
+                    gpi.remove();
                 }
             } else {
                 if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
                     LOG.error("A graph path leaves before the requested time. This implies a bug.");
+                    gpi.remove();
                 }
             }
         }
