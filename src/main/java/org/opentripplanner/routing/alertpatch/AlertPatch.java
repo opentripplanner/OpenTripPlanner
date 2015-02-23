@@ -69,9 +69,9 @@ public class AlertPatch implements Serializable {
     private String direction;
 
     /**
-     * Direction of the trip as GTFS route direction
+     * Direction id of the GTFS trips this alert concerns, set to -1 if no direction.
      */
-    private String directionId;
+    private int directionId = -1;
 
     @XmlElement
     public Alert getAlert() {
@@ -123,7 +123,7 @@ public class AlertPatch implements Serializable {
                 if (direction != null && ! direction.equals(tripPattern.getDirection())) {
                     continue;
                 }
-                if (directionId != null && ! directionId.equals(tripPattern.getTrip(0).getDirectionId())) {
+                if (directionId != -1 && directionId == tripPattern.directionId) {
                     continue;
                 }
                 for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
@@ -177,7 +177,7 @@ public class AlertPatch implements Serializable {
                 if (direction != null && ! direction.equals(tripPattern.getDirection())) {
                     continue;
                 }
-                if (directionId != null && ! directionId.equals(tripPattern.getTrip(0).getDirectionId())) {
+                if (directionId != -1 && directionId != tripPattern.directionId) {
                     continue;
                 }
                 for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
@@ -259,10 +259,7 @@ public class AlertPatch implements Serializable {
         this.direction = direction;
     }
 
-    public void setDirectionId(String direction) {
-        if (direction != null && direction.equals("")) {
-            direction = null;
-        }
+    public void setDirectionId(int direction) {
         this.directionId = direction;
     }
 
@@ -272,7 +269,7 @@ public class AlertPatch implements Serializable {
     }
 
     @XmlElement
-    public String getDirectionId() {
+    public int getDirectionId() {
         return directionId;
     }
 
@@ -294,14 +291,8 @@ public class AlertPatch implements Serializable {
                 return false;
             }
         }
-        if (directionId == null) {
-            if (other.directionId != null) {
-                return false;
-            }
-        } else {
-            if (!directionId.equals(other.directionId)) {
-                return false;
-            }
+        if (directionId != other.directionId) {
+            return false;
         }
         if (agency == null) {
             if (other.agency != null) {
@@ -371,7 +362,7 @@ public class AlertPatch implements Serializable {
 
     public int hashCode() {
         return ((direction == null ? 0 : direction.hashCode()) +
-                (directionId == null ? 0 : directionId.hashCode()) +
+                directionId +
                 (agency == null ? 0 : agency.hashCode()) +
                 (trip == null ? 0 : trip.hashCode()) +
                 (stop == null ? 0 : stop.hashCode()) +

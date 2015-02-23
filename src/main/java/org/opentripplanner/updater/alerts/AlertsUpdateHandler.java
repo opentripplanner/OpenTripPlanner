@@ -96,9 +96,11 @@ public class AlertsUpdateHandler {
                 routeId = informed.getRouteId();
             }
 
-            String direction = null;
+            int direction;
             if (informed.hasTrip() && informed.getTrip().hasDirectionId()) {
-                direction = String.valueOf(informed.getTrip().getDirectionId());
+                direction = informed.getTrip().getDirectionId();
+            } else {
+                direction = -1;
             }
 
             // TODO: The other elements of a TripDescriptor are ignored...
@@ -127,7 +129,7 @@ public class AlertsUpdateHandler {
             if (routeId != null) {
                 patch.setRoute(new AgencyAndId(agencyId, routeId));
                 // Makes no sense to set direction if we don't have a route
-                if (direction != null) {
+                if (direction != -1) {
                     patch.setDirectionId(direction);
                 }
             }

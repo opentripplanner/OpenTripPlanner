@@ -381,9 +381,18 @@ public class GTFSPatternHopFactory {
                 continue TRIP;
             }
 
+            /* Try to get the direction id for the trip, set to -1 if not found */
+            int directionId;
+            try {
+                directionId = Integer.parseInt(trip.getDirectionId());
+            } catch (NumberFormatException e) {
+                LOG.debug("Trip {} does not have direction id, defaults to -1");
+                directionId = -1;
+            }
+
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
             StopPattern stopPattern = new StopPattern(stopTimes);
-            TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute());
+            TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
             TripTimes tripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
@@ -461,14 +470,15 @@ public class GTFSPatternHopFactory {
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
     }
 
-    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route) {
+    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, int directionId) {
         for(TripPattern tripPattern : tripPatterns.get(stopPattern)) {
-            if(tripPattern.route.equals(route)) {
+            if(tripPattern.route.equals(route) && tripPattern.directionId == directionId) {
                 return tripPattern;
             }
         }
 
         TripPattern tripPattern = new TripPattern(route, stopPattern);
+        tripPattern.directionId = directionId;
         tripPatterns.put(stopPattern, tripPattern);
         return tripPattern;
     }

@@ -65,9 +65,10 @@ import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 
 /**
- * Represents a group of trips on a route that all call at the same sequence of stops. For each stop, there
- * is a list of departure times, running times, arrival times, dwell times, and wheelchair
- * accessibility information (one of each of these per trip per stop).
+ * Represents a group of trips on a route, with the same direction id that all call at the same
+ * sequence of stops. For each stop, there is a list of departure times, running times, arrival
+ * times, dwell times, and wheelchair accessibility information (one of each of these per trip per
+ * stop).
  * Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a later trip.
  *
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
@@ -91,6 +92,12 @@ public class TripPattern implements Serializable {
      * The GTFS Route of all trips in this pattern.
      */
     public final Route route;
+
+    /**
+     * The direction id for all trips in this pattern.
+     * Use -1 for default direction id
+     */
+    public int directionId = -1;
 
     /**
      * The traverse mode for all trips in this pattern.
@@ -602,18 +609,19 @@ public class TripPattern implements Serializable {
     }
 
     /**
-     * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id, and an integer.
-     * We impose our assumption that all trips in the same pattern are on the same route.
+     * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id, the direction and
+     * an integer.
      * This only works if the Collection of TripPattern includes every TripPattern for the agency.
      */
     public static void generateUniqueIds(Collection<TripPattern> tripPatterns) {
-        Multimap<Route, TripPattern> patternsForRoute = HashMultimap.create();
+        Multimap<String, TripPattern> patternsForRoute = HashMultimap.create();
         for (TripPattern pattern : tripPatterns) {
             AgencyAndId routeId = pattern.route.getId();
-            patternsForRoute.put(pattern.route, pattern);
-            int count = patternsForRoute.get(pattern.route).size();
+            String direction = pattern.directionId != -1 ? String.valueOf(pattern.directionId) : "";
+            patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
+            int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
-            String id = String.format("%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), count);
+            String id = String.format("%s:%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), direction, count);
             pattern.code = (id);
         }
     }
