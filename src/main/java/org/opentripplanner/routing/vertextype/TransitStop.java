@@ -64,6 +64,11 @@ public class TransitStop extends TransitStationStop {
                 return true;
             }
         }
+        for (Edge e : this.getIncoming()) {
+            if (e instanceof PathwayEdge) {
+                return true;
+            }
+        }
         return false;
     }
 
