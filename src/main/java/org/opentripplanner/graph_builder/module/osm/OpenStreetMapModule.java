@@ -339,6 +339,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
             }
             LOG.info("Created " + n + " bike rental stations.");
+            if (n > 0) {
+                graph.hasBikeRental = true;
+            }
         }
 
         private void processBikeParkAndRideNodes() {
@@ -361,6 +364,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 new BikeParkEdge(parkVertex);
             }
             LOG.info("Created " + n + " bike P+R.");
+            if (n > 0) {
+                graph.hasBikeParkRide = true;
+            }
         }
 
         private void buildBikeParkAndRideAreas() {

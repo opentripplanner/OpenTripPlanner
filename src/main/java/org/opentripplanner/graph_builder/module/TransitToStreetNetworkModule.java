@@ -60,13 +60,18 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        LOG.info("Linking transit stops to streets...");
         this.networkLinkerLibrary = new NetworkLinkerLibrary(graph, extra);
         this.graph = graph;
-        if(graph.hasStreets && graph.hasTransit) {
-            linkTransit();
-            linkBikeRentalStations();
-            linkParkRideStations();
+        if(graph.hasStreets) {
+            if (graph.hasTransit) {
+                linkTransit();
+            }
+            if (graph.hasBikeRental) {
+                linkBikeRentalStations();
+            }
+            if (graph.hasBikeParkRide) {
+                linkParkRideStations();
+            }
             cleanGraph();
         }
     }
@@ -75,6 +80,7 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
      * Links transit stops to Streets
      */
     private void linkTransit() {
+        LOG.info("Linking transit stops to streets...");
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
@@ -123,7 +129,7 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
 
-        LOG.debug("Linking bike rental stations...");
+        LOG.info("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : Iterables.filter(vertices,
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
@@ -141,7 +147,7 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
 
-        LOG.debug("Linking bike P+R stations...");
+        LOG.info("Linking bike P+R stations...");
         for (BikeParkVertex bprv : Iterables.filter(vertices, BikeParkVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(bprv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked(bprv)));
