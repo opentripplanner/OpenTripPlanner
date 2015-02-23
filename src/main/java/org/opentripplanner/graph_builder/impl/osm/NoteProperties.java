@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.T2;
@@ -24,6 +25,8 @@ import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.TranslatedString;
 
 public class NoteProperties {
+
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
 
     public String notePattern;
 
@@ -36,7 +39,7 @@ public class NoteProperties {
 
     public T2<Alert, NoteMatcher> generateNote(OSMWithTags way) {
         Alert note = new Alert();
-        if (Pattern.compile("\\{(.*?)\\}").matcher(notePattern).matches()) {
+        if (patternMatcher.matcher(notePattern).matches()) {
             Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
             note.alertHeaderText = TranslatedString.getI18NString(noteText);
         } else {
