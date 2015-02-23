@@ -71,12 +71,12 @@ public class CommandLineParameters implements Cloneable {
 
     @Parameter(names = { "--version", },
             description = "Print the version, and then exit.")
-    public boolean outputVersion = false;
+    public boolean version = false;
 
-    @Parameter(names = { "--version-fragment", },
+    @Parameter(names = { "--version-fragment" },
             description = "Print the a fragment of the version, and then exit. Use one of [`version`, `major`, `minor`, `incremental`, " +
                     "`qualifier`, `commit` ] to specify which fragment")
-    public String version = DEFAULT_VERSION_FRAGMENT;
+    public String versionFragment = DEFAULT_VERSION_FRAGMENT;
 
     /* Options for the server sub-task. */
 

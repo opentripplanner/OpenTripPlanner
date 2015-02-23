@@ -71,14 +71,14 @@ public class OTPMain {
                 System.exit(0);
             }
 
-            if (params.outputVersion) {
+            if (params.version) {
                 // Disable logging, we don't want to see anything else than the intended output below.
                 ch.qos.logback.classic.Logger mavenVersionLogger =
                         (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(MavenVersion.class);
                 mavenVersionLogger.setLevel(Level.OFF);
 
                 MavenVersion version = MavenVersion.VERSION;
-                System.out.println(version.getVersion(params.version));
+                System.out.println(version.getVersion(params.versionFragment));
                 System.exit(0);
             }
 
