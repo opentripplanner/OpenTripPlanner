@@ -18,8 +18,11 @@ alongside the input files (OSM, GTFS, elevation data etc.) in the router's direc
 are named `build-config.json` and `router-config.json`. Each configuration option within each of these files is optional,
 as are all three of the files themselves. If any option or an entire file is missing, reasonable defaults will be applied.
 
+## Routers
 
-## Graph building vs. run time router configuration
+
+
+## Graph build vs. router configuration
 
 Some parts of the process that loads the street and transit network description are time consuming and memory-hungry.
 To avoid repeating these slow steps every time OTP starts up, we can trigger them manually whenever the input files change,
@@ -29,49 +32,9 @@ saving the resulting transportation network description to disk. We call this pr
 modified without requiring the potentially long operation of rebuilding the graph. These run-time configuration options
 are found in `router-config.json`.
 
+# Graph build configuration
 
-### Timeouts
-
-Path searches can sometimes take a long time to complete, especially certain problematic cases that have yet to be optimized.
-Often a first itinerary is found quickly, but it is time-consuming or impossible to find subsequent alternative itineraries
-and this delays the response. You can set timeouts to avoid tying up server resources on pointless searches and ensure that
-your users receive a timely response. When a search times out, a WARN level log entry is made with information that can
-help identify problematic searches and improve our routing methods.
-
-The available timeout options are:
-
-```JSON
-// router-config.json
-{
-  timeout: 5.5
-}
-```
-
-This specifies a single, simple timeout in (optionally fractional) seconds. Searching is aborted after this many seconds and any
-paths already found are returned to the client. This is equivalent to specifying a `timeouts` array with a single element.
-The alternative is:
-
-```JSON
-// router-config.json
-{
-  timeouts: [5, 4, 3, 1]
-}
-```
-
-Here, the configuration key is `timeouts` (plural) and we specify an array of times in floating-point seconds. The Nth
-element in the array applies to the Nth itinerary search, and importantly all values are relative to the beginning of the
-search for the *first* itinerary. If OTP is configured to find more itineraries than there are elements in the timeouts
-array, the final element in the timeouts array will apply to all remaining unmatched searches.
-
-This allows you to keep overall response time down while ensuring that the end user will get at least one
-response, providing more only when it won't hurt response time. The timeout values will typically be decreasing to
-reflect the decreasing marginal value of alternative itineraries: everyone wants at least one response, it's nice to
-have two for comparison, but we only care about having three, four, or more options if completing those extra searches
-doesn't cause annoyingly long response times.
-
-## Reaching and transferring within subway stations
-
-### Reaching a subway platform
+## Reaching a subway platform
 
 The boarding locations for some modes of transport such as subways and airplanes can be slow to reach from the street.
 When planning a trip, we need to allow additional time to reach these locations to properly inform the passenger. For
@@ -92,7 +55,7 @@ This setting does not generalize well to airplanes because you often need much l
 for international flights) than to alight and exit the airport (perhaps 1 hour). Therefore there is currently no
 per-mode access time, it is subway-specific.
 
-### Transferring within stations
+## Transferring within stations
 
 Subway systems tend to exist in their own layer of the city separate from the surface, though there are exceptions where
 tracks lie right below the street and transfers happen via the surface. In systems where the subway is quite deep
@@ -121,7 +84,7 @@ connections between each pair of stops in the same station to favor in-station t
 Note that this method is at odds with micro-mapping and might make some transfers artificially short.
 
 
-## Elevation data 
+## Elevation data
 
 OpenTripPlanner can "drape" the OSM street network over a digital elevation model (DEM).
 This allows OTP to draw an elevation profile for the on-street portion of itineraries, and helps provide better
@@ -153,7 +116,6 @@ The USGS will also deliver the whole dataset in bulk if you [send them a hard dr
 OpenTripPlanner contains another module that will then automatically fetch data in this format from an Amazon S3 copy of
 your bulk data.
 
-
 ### Other raster elevation data
 
 For other parts of the world you will need a GeoTIFF file containing the elevation data. These are often available from
@@ -166,14 +128,57 @@ Make sure the file has a `.tiff` extension, and the graph builder should detect 
 the elevation data to the streets.
 
 
+# Runtime router configuration
+
+## Timeouts
+
+Path searches can sometimes take a long time to complete, especially certain problematic cases that have yet to be optimized.
+Often a first itinerary is found quickly, but it is time-consuming or impossible to find subsequent alternative itineraries
+and this delays the response. You can set timeouts to avoid tying up server resources on pointless searches and ensure that
+your users receive a timely response. When a search times out, a WARN level log entry is made with information that can
+help identify problematic searches and improve our routing methods. The simplest timeout option is:
+
+```JSON
+// router-config.json
+{
+  timeout: 5.5
+}
+```
+
+This specifies a single timeout in (optionally fractional) seconds. Searching is aborted after this many seconds and any
+paths already found are returned to the client. This is equivalent to specifying a `timeouts` array with a single element.
+The alternative is:
+
+```JSON
+// router-config.json
+{
+  timeouts: [5, 4, 3, 1]
+}
+```
+
+Here, the configuration key is `timeouts` (plural) and we specify an array of times in floating-point seconds. The Nth
+element in the array applies to the Nth itinerary search, and importantly all values are relative to the beginning of the
+search for the *first* itinerary. If OTP is configured to find more itineraries than there are elements in the timeouts
+array, the final element in the timeouts array will apply to all remaining unmatched searches.
+
+This allows you to keep overall response time down while ensuring that the end user will get at least one
+response, providing more only when it won't hurt response time. The timeout values will typically be decreasing to
+reflect the decreasing marginal value of alternative itineraries: everyone wants at least one response, it's nice to
+have two for comparison, but we only care about having three, four, or more options if completing those extra searches
+doesn't cause annoyingly long response times.
+
+
 ## Real-time data
 
 GTFS feeds contain *schedule* data that is is published by an agency or operator in advance. The feed does not account
  for unexpected service changes or traffic disruptions that occur from day to day. Thus, this kind of data is also
  referred to as 'static' data or 'theoretical' arrival and departure times.
 
-The [GTFS Realtime spec](https://developers.google.com/transit/gtfs-realtime/) (GTFS-RT) complements GTFS with three additional kinds of feeds. In contrast to the
-base GTFS schedule feed, they provide *real-time* updates (*"dynamic"* data) and are are updated from minute to minute.
+### GTFS-Realtime
+
+The [GTFS-RT spec](https://developers.google.com/transit/gtfs-realtime/) complements GTFS with three additional kinds of
+feeds. In contrast to the base GTFS schedule feed, they provide *real-time* updates (*'dynamic'* data) and are are
+updated from minute to minute.
 
 - **Alerts** are text messages attached to GTFS objects, informing riders of disruptions and changes.
 
@@ -183,15 +188,23 @@ departure times for the remainder of the trip.
 - **VehiclePositions** give the location of some or all vehicles currently in service, in terms of geographic coordinates
 or position relative to their scheduled stops.
 
-Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental systems and parking availability.
+### Bicycle rental systems
 
-Real-time data can be provided using either a pull or push system. In a pull configuration, the GTFS-RT consumer (OTP) polls the
-real-time provider over HTTP. That is to say, it fetches a file from a web server every few minutes. In the push configuration,
-the consumer opens a persistent connection to the GTFS-RT provider, which then sends incremental updates immediately as
-they become available. OTP can use both approaches.
+Besides GTFS-RT transit data, OTP can also fetch real-time data about bicycle rental networks including the number
+of bikes and free parking spaces at each station. We support bike rental systems from JCDecaux, BCycle, VCub, Keolis,
+Bixi, and the Dutch OVFiets system. It is straightforward to extend OTP to support any bike rental system that
+exposes a JSON API or provides KML place markers, though it requires writing a little code.
+
+### Configuration
+
+Real-time data can be provided using either a pull or push system. In a pull configuration, the GTFS-RT consumer polls the
+real-time provider over HTTP. That is to say, OTP fetches a file from a web server every few minutes. In the push
+configuration, the consumer opens a persistent connection to the GTFS-RT provider, which then sends incremental updates
+immediately as they become available. OTP can use both approaches.
 
 Real-time data sources are configured in `router-config.json`. The `updaters` section is an array of JSON objects, each
-of which has a `type` field and other configuration fields that depend on the type.
+of which has a `type` field and other configuration fields specific to that type. Common to all updater entries that
+connect to a network resource is the `url` field.
 
 ```JSON
 // router-config.json
@@ -207,7 +220,7 @@ of which has a `type` field and other configuration fields that depend on the ty
 
     updaters: [
 
-        // GTFS-RT service alerts (polling)
+        // GTFS-RT service alerts (frequent polling)
         {
             type: "real-time-alerts",
             frequencySec: 30,
@@ -215,7 +228,8 @@ of which has a `type` field and other configuration fields that depend on the ty
             defaultAgencyId: "TriMet"
         },
 
-        // Bike rental updater for Citybikes (polling)
+        // Polling bike rental updater for Citybikes
+        // sourceType can be jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets, city-bikes, vcub
         {
             type: "bike-rental",
             frequencySec: 300,
@@ -228,7 +242,7 @@ of which has a `type` field and other configuration fields that depend on the ty
             type: "bike-park"
         }
 
-        // Stop Time Updates (polling GTFS-RT TripUpdates)
+        // Polling for GTFS-RT TripUpdates)
         {
             type: "stop-time-updater",
             frequencySec: 60,
@@ -238,7 +252,7 @@ of which has a `type` field and other configuration fields that depend on the ty
             defaultAgencyId: "TriMet"
         },
 
-        // Stop Time Updates (streaming differential GTFS-RT TripUpdates)
+        // Streaming differential GTFS-RT TripUpdates
         {
             type: "websocket-gtfs-rt-updater"
         }
