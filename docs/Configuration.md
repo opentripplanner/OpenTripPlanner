@@ -8,7 +8,9 @@ which defaults to `/var/otp`. Unless you tell OTP otherwise, all other configura
 will be sought immediately beneath this one. This prefix follows UNIX conventions so it should work in Linux and Mac OSX
 environments, but it is inappropriate under Windows or where the user running OTP either cannot obtain permissions to
 `/var` or simply wishes to experiment within their home directory rather than deploy a system-wide server.
-In these cases one should use the baseDir switch when starting up OTP to override the default. For example: `--baseDir /home/username/otp`.
+In these cases one should use the basePath switch when starting up OTP to override the default. For example:
+`--basePath /home/username/otp` on a Linux system, `--basePath /Users/username/otp` in Mac OSX, or
+`--basePath C:\Users\username\otp` in Windows.
 
 OTP is configured via JSON files. The file `otp-config.json` is placed in the OTP base directory and contains settings
 that affect the entire OTP instance. Each router within that instance is configured using two other JSON files placed
