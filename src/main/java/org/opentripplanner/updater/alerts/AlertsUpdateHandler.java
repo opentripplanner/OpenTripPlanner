@@ -95,6 +95,12 @@ public class AlertsUpdateHandler {
             if (informed.hasRouteId()) {
                 routeId = informed.getRouteId();
             }
+
+            String direction = null;
+            if (informed.hasTrip() && informed.getTrip().hasDirectionId()) {
+                direction = String.valueOf(informed.getTrip().getDirectionId());
+            }
+
             // TODO: The other elements of a TripDescriptor are ignored...
             String tripId = null;
             if (informed.hasTrip() && informed.getTrip().hasTripId()) {
@@ -120,6 +126,10 @@ public class AlertsUpdateHandler {
             AlertPatch patch = new AlertPatch();
             if (routeId != null) {
                 patch.setRoute(new AgencyAndId(agencyId, routeId));
+                // Makes no sense to set direction if we don't have a route
+                if (direction != null) {
+                    patch.setDirectionId(direction);
+                }
             }
             if (tripId != null) {
                 patch.setTrip(new AgencyAndId(agencyId, tripId));
@@ -144,9 +154,12 @@ public class AlertsUpdateHandler {
         return id + " "
             + (informed.hasAgencyId  () ? informed.getAgencyId  () : " null ") + " "
             + (informed.hasRouteId   () ? informed.getRouteId   () : " null ") + " "
+            + (informed.hasTrip() && informed.getTrip().hasDirectionId() ?
+                informed.getTrip().hasDirectionId() : " null ") + " "
             + (informed.hasRouteType () ? informed.getRouteType () : " null ") + " "
             + (informed.hasStopId    () ? informed.getStopId    () : " null ") + " "
-            + (informed.hasTrip() ? informed.getTrip().getTripId() : " null ");
+            + (informed.hasTrip() && informed.getTrip().hasTripId() ?
+                informed.getTrip().getTripId() : " null ");
     }
 
     /**
