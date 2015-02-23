@@ -50,7 +50,6 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.OTPMain;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
@@ -279,7 +278,7 @@ public class Routers {
         params.build = tempDir;
         params.inMemory = true;
         
-        GraphBuilder graphBuilder = new OTPMain(params).builderFromParameters();
+        GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, tempDir);
         
         graphBuilder.run();
         

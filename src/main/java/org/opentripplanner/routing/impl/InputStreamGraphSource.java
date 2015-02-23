@@ -277,7 +277,7 @@ public class InputStreamGraphSource implements GraphSource {
 
         @Override
         public InputStream getConfigInputStream() throws IOException {
-            File configFile = new File(path, OTPMain.ROUTER_CONFIG_FILENAME);
+            File configFile = new File(path, Router.ROUTER_CONFIG_FILENAME);
             if (configFile.canRead()) {
                 LOG.debug("Loading config from file '{}'", configFile.getPath());
                 return new FileInputStream(configFile);
@@ -311,7 +311,7 @@ public class InputStreamGraphSource implements GraphSource {
 
         @Override
         public InputStream getConfigInputStream() {
-            File configFile = new File(path, OTPMain.ROUTER_CONFIG_FILENAME);
+            File configFile = new File(path, Router.ROUTER_CONFIG_FILENAME);
             LOG.debug("Trying to load config on classpath at '{}'", configFile.getPath());
             return Thread.currentThread().getContextClassLoader()
                     .getResourceAsStream(configFile.getPath());
