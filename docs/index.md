@@ -13,7 +13,8 @@ _Note: this documentation is targeted primarily at the OTP development community
  * In November of 2014, Arlington, Virginia launched a new [commute planning site](http://mobilitylab.org/2014/11/07/the-who-what-when-where-whys-of-carfreeatoz/) for the Washington, DC metropolitan area.
  It depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of [profile routing]().
 
- * OpenTripPlanner was a focal point in the Dutch Transport Ministry's MMRI (MultiModal Travel Information) project which encouraged investment in trip planning platforms and services. A consortium of five companies worked together on extending OpenTripPlanner to improve performance in large regional transport networks and account for real-time vehicle delay. Plannerstack is now working toward hosting OpenTripPlanner and Bliksem RRRR as services, including high quality open data integration for the Netherlands.
+ * OpenTripPlanner was a focal point in the Dutch Transport Ministry's MMRI (MultiModal Travel Information) project which encouraged investment in trip planning platforms and services. A consortium of five companies worked together to improve OpenTripPlanner performance in large regional transport networks and account for real-time service modifications and delays. The resulting [Plannerstack Foundation](http://www.plannerstack.org/)
+ is now providing OpenTripPlanner and [Bliksem RRRR](https://github.com/bliksemlabs/rrrr) as hosted services including high quality open data integration for the Netherlands.
 
  * OpenTripPlanner has become <a href="http://sfconservancy.org/">Software Freedom Conservancy's</a> thirty-first member project. Conservancy is a non-profit public charity that provides a range of financial and administrative services to member projects that develop Free, Libre, and Open Source Software (FLOSS). By joining Conservancy, OpenTripPlanner obtains the benefits of a formal non-profit organizational structure while keeping the project focused on software development and documentation. See [[SFC]] for more details.
 
@@ -60,7 +61,7 @@ The **OTP Analyst Batch Processor** is a command-line tool that handles more com
  * [Developers Guide](https://github.com/openplans/OpenTripPlanner/wiki/DevelopersGuide) (code conventions, how to submit patches, etc)
 
 
-## External Documentation
+## Additional Documentation
 
 Some other types of documentation are generated for OTP from its source code:
 
