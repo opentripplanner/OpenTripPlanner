@@ -57,8 +57,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
-    private static final int CLAMP_ITINERARIES = 4;
-
     /**
      * The model that computes turn/traversal costs.
      * 
@@ -689,11 +687,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setNumItineraries(int numItineraries) {
-        if (numItineraries > CLAMP_ITINERARIES) {
-            numItineraries = CLAMP_ITINERARIES;
-        } else if (numItineraries < 1) {
-            numItineraries = 1;
-        }
         this.numItineraries = numItineraries;
     }
 
