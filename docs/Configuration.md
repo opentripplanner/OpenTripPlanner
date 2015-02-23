@@ -148,7 +148,8 @@ Note that this method is at odds with micro-mapping and might make some transfer
 
 OpenTripPlanner can "drape" the OSM street network over a digital elevation model (DEM).
 This allows OTP to draw an elevation profile for the on-street portion of itineraries, and helps provide better
-routing for bicyclists. DEMs are usually supplied as rasters (regular grids) stored in image formats such as GeoTIFF.
+routing for bicyclists. It even helps avoid hills for walking itineraries. DEMs are usually supplied as rasters
+(regular grids of numbers) stored in image formats such as GeoTIFF.
 
 ### U.S. National Elevation Dataset
 
@@ -159,12 +160,17 @@ service and download the proper tiles to completely cover your transit and stree
 slow (download is around 1.5 hours, then setting elevation for streets takes about 5 minutes for the Portland, Oregon region),
 but once the tiles are downloaded OTP will keep them in local cache for the next graph build operation.
 
-To auto-download NED tiles when building your graph, add the `--elevation` switch to the command line. You may also want
-to add the `--cache <directory>` parameter to specify a custom NED tile cache location. For example:
+To auto-download NED tiles when building your graph, add the following line to `build-config.json` in your router
+directory:
 
+```JSON
+// build-config.json
+{
+  fetchElevationUS: true
+}
 ```
-./otp --build --elevation --cache /home/myname/nedcache
-```
+
+You may also want to add the `--cache <directory>` command line parameter to specify a custom NED tile cache location.
 
 The USGS will also deliver the whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA).
 OpenTripPlanner contains another module that will then automatically fetch data in this format from an Amazon S3 copy of

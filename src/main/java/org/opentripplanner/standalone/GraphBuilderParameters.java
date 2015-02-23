@@ -70,10 +70,9 @@ public class GraphBuilderParameters {
     public final boolean matchBusRoutesToStreets;
 
     /**
-     * Download and use elevation data for the graph.
+     * Download US NED elevation data and apply it to the graph.
      */
-    public final boolean elevation;
-
+    public final boolean fetchElevationUS;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -93,7 +92,7 @@ public class GraphBuilderParameters {
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
         areaVisibility = config.path("areaVisibility").asBoolean(false);
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
-        elevation = config.path("elevation").asBoolean(false);
+        fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
 
     }
 
