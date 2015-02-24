@@ -204,7 +204,9 @@ otp.util.Itin = {
     },
 
     vertexTypeStrings : {
+        //TRANSLATORS: WALK/CYCLE distance to [Bicycle rental station]
         'BIKESHARE_EMPTY': _tr('Bicycle rental station'),
+        //TRANSLATORS: WALK/CYCLE distance to [Bicycle rental] {name}
         'BIKESHARE': _tr('Bicycle rental'),
     },
 
