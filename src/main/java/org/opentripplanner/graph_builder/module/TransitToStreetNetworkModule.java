@@ -50,6 +50,12 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
 
     private Graph graph;
 
+    private ArrayList<TransitStop> stopVertices;
+
+    private ArrayList<BikeRentalStationVertex> bikeRentalVertices;
+
+    private ArrayList<BikeParkVertex> bikeParkVertices;
+
     public List<String> provides() {
         return Arrays.asList("street to transit", "linking");
     }
@@ -63,6 +69,20 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
         this.networkLinkerLibrary = new NetworkLinkerLibrary(graph, extra);
         this.graph = graph;
         if(graph.hasStreets) {
+            //Copies vertices of specific type to specific lists
+            //because vertices will be modified
+            stopVertices = new ArrayList<>();
+            bikeRentalVertices = new ArrayList<>();
+            bikeParkVertices = new ArrayList<>();
+            for (Vertex v: graph.getVertices()) {
+                if (v instanceof TransitStop) {
+                    stopVertices.add((TransitStop)v);
+                } else if (v instanceof BikeRentalStationVertex) {
+                    bikeRentalVertices.add((BikeRentalStationVertex)v);
+                } else if (v instanceof BikeParkVertex) {
+                    bikeParkVertices.add((BikeParkVertex)v);
+                }
+            }
             if (graph.hasTransit) {
                 linkTransit();
             }
@@ -81,12 +101,8 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
      */
     private void linkTransit() {
         LOG.info("Linking transit stops to streets...");
-        // iterate over a copy of vertex list because it will be modified
-        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
-        vertices.addAll(graph.getVertices());
-
         int nUnlinked = 0;
-        for (TransitStop ts : Iterables.filter(vertices, TransitStop.class)) {
+        for (TransitStop ts : stopVertices) {
             // if the street is already linked there is no need to linked it again,
             // could happened if using the prune isolated island
             boolean alreadyLinked = false;
@@ -124,14 +140,8 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
      * Links Bike rental vertices to streets
      */
     private void linkBikeRentalStations() {
-        //TODO: copy only BikeRentalVertex vertices
-        // iterate over a copy of vertex list because it will be modified
-        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
-        vertices.addAll(graph.getVertices());
-
         LOG.info("Linking bike rental stations...");
-        for (BikeRentalStationVertex brsv : Iterables.filter(vertices,
-                BikeRentalStationVertex.class)) {
+        for (BikeRentalStationVertex brsv : bikeRentalVertices) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
             }
@@ -142,13 +152,8 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
      * Links P+R stations to streets
      */
     private void linkParkRideStations() {
-        //TODO: copy only BikeParkVertex vertices
-        // iterate over a copy of vertex list because it will be modified
-        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
-        vertices.addAll(graph.getVertices());
-
         LOG.info("Linking bike P+R stations...");
-        for (BikeParkVertex bprv : Iterables.filter(vertices, BikeParkVertex.class)) {
+        for (BikeParkVertex bprv : bikeParkVertices) {
             if (!networkLinkerLibrary.connectVertexToStreets(bprv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked(bprv)));
             }
