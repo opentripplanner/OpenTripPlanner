@@ -6,9 +6,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.analyst.request.*;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.reflect.ReflectiveInitializer;
+import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,9 @@ public class Router {
 
     // A RoutingRequest containing default parameters that will be cloned when handling each request
     public RoutingRequest defaultRoutingRequest;
+
+    /** A graphical window that is used for visualizing search progress (debugging). */
+    public GraphVisualizer graphVisualizer = null;
 
     public Router(String id, Graph graph) {
         this.id = id;

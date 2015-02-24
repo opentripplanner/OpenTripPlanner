@@ -115,7 +115,8 @@ public class OTPMain {
             }
         }
 
-        /* Scan for graphs to load from disk if requested FIXME eventually router IDs will be present even when just building a graph. */
+        /* Scan for graphs to load from disk if requested */
+        // FIXME eventually router IDs will be present even when just building a graph.
         if ((params.routerIds != null && params.routerIds.size() > 0) || params.autoScan) {
             /* Auto-register pre-existing graph on disk, with optional auto-scan. */
             GraphScanner graphScanner = new GraphScanner(graphService, params.graphDirectory, params.autoScan);
@@ -129,9 +130,10 @@ public class OTPMain {
 
         /* Start visualizer if requested */
         if (params.visualize) {
-            // FIXME get OTPServer into visualizer.
-            GraphVisualizer visualizer = new GraphVisualizer(graphService.getRouter().graph);
-            visualizer.run();
+            Router defaultRouter = graphService.getRouter();
+            defaultRouter.graphVisualizer = new GraphVisualizer(defaultRouter);
+            defaultRouter.graphVisualizer.run();
+            defaultRouter.timeouts = new double[] {60}; // avoid timeouts due to search animation
         }
 
         /* Start script if requested */

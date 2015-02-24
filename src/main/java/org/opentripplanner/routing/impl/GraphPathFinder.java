@@ -97,11 +97,16 @@ public class GraphPathFinder {
             return null;
         }
         
-        AStar aStar = new AStar();
+        AStar aStar = new AStar(); // this instance is being reused for all N requests, which happen sequentially
         if (options.rctx == null) {
             options.setRoutingContext(router.graph);
             /* Use a pathparser that constrains the search to use SimpleTransfers. */
             options.rctx.pathParsers = new PathParser[] { new Parser() };
+        }
+
+        // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
+        if (router.graphVisualizer != null) {
+            aStar.setTraverseVisitor(router.graphVisualizer.traverseVisitor);
         }
 
         // without transit, we'd just just return multiple copies of the same on-street itinerary
