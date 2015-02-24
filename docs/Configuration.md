@@ -234,7 +234,7 @@ exposes a JSON API or provides KML place markers, though it requires writing a l
 Real-time data can be provided using either a pull or push system. In a pull configuration, the GTFS-RT consumer polls the
 real-time provider over HTTP. That is to say, OTP fetches a file from a web server every few minutes. In the push
 configuration, the consumer opens a persistent connection to the GTFS-RT provider, which then sends incremental updates
-immediately as they become available. OTP can use both approaches.
+immediately as they become available. OTP can use both approaches. The [OneBusAway GTFS-realtime exporter project](https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter) provides this kind of streaming, incremental updates over a websocket rather than a single large file.
 
 Real-time data sources are configured in `router-config.json`. The `updaters` section is an array of JSON objects, each
 of which has a `type` field and other configuration fields specific to that type. Common to all updater entries that
@@ -286,7 +286,7 @@ connect to a network resource is the `url` field.
             defaultAgencyId: "TriMet"
         },
 
-        // Streaming differential GTFS-RT TripUpdates
+        // Streaming differential GTFS-RT TripUpdates over websockets
         {
             type: "websocket-gtfs-rt-updater"
         }
