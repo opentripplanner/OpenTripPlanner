@@ -44,6 +44,8 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, JsonConfigurab
 
     private String namePrefix = null;
 
+    private boolean zip;
+
     private XmlDataListDownloader<BikePark> xmlDownloader;
 
     private List<BikePark> bikeParks;
@@ -85,7 +87,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, JsonConfigurab
      */
     @Override
     public boolean update() {
-        List<BikePark> newBikeParks = xmlDownloader.download(url);
+        List<BikePark> newBikeParks = xmlDownloader.download(url, zip);
         if (newBikeParks != null) {
             synchronized (this) {
                 // Update atomically
@@ -114,6 +116,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, JsonConfigurab
         }
         this.url = url;
         this.namePrefix = config.path("namePrefix").asText();
+        this.zip = "true".equals(config.path("zip").asText());
     }
 
     public void setUrl (String url) {this.url = url;}

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -73,7 +74,7 @@ public class XmlDataListDownloader<T> {
         this.dataFactory = dataFactory;
     }
 
-    public List<T> download(String url) {
+    public List<T> download(String url, boolean zip) {
         try {
             InputStream inputStream;
             URL url2 = new URL(url);
@@ -87,6 +88,10 @@ public class XmlDataListDownloader<T> {
             if (inputStream == null) {
                 LOG.warn("Failed to get data from url " + url);
                 return null;
+            } else if (zip) {
+                ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+                zipInputStream.getNextEntry();
+                inputStream = zipInputStream;
             }
             return parseXML(inputStream);
         } catch (IOException e) {

@@ -52,7 +52,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
 
     @Override
     public boolean update() {
-        List<BikeRentalStation> newStations = xmlDownloader.download(url);
+        List<BikeRentalStation> newStations = xmlDownloader.download(url, false);
         if (newStations != null) {
             synchronized(this) {
                 stations = newStations;

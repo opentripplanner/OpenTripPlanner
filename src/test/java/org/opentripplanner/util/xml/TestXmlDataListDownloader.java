@@ -42,7 +42,7 @@ public class TestXmlDataListDownloader extends TestCase {
             }
         });
         List<DataTest> data = xmlDataListDownloader
-                .download("file:src/test/resources/xml/test-data.xml");
+                .download("file:src/test/resources/xml/test-data.xml", false);
         assertEquals(3, data.size());
         for (DataTest dt : data) {
             System.out.println(String.format("%s (%.6f,%.6f)", dt.name, dt.lat, dt.lon));
