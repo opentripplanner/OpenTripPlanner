@@ -17,6 +17,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -112,6 +113,13 @@ public class LocalizedString implements I18NString, Serializable {
             tag_names.add(tag_name);
         }
         return tag_names;
+    }
+
+    @Override
+    public boolean equals(Object other){
+        return other instanceof LocalizedString &&
+                key.equals(((LocalizedString) other).key) &&
+                Arrays.equals(params, ((LocalizedString) other).params);
     }
 
     /**

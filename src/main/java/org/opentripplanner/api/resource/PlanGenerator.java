@@ -19,7 +19,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -33,6 +32,7 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -660,13 +660,13 @@ public class PlanGenerator {
 
             if (alerts != null) {
                 for (Alert alert : alerts) {
-                    leg.addAlert(alert);
+                    leg.addAlert(alert, requestedLocale);
                 }
             }
 
             for (AlertPatch alertPatch : graph.getAlertPatches(edge)) {
                 if (alertPatch.displayDuring(state)) {
-                    leg.addAlert(alertPatch.getAlert());
+                    leg.addAlert(alertPatch.getAlert(), requestedLocale);
                 }
             }
         }
@@ -1088,7 +1088,7 @@ public class PlanGenerator {
 
             // increment the total length for this step
             step.distance += edge.getDistance();
-            step.addAlerts(graph.streetNotesService.getNotes(forwardState));
+            step.addAlerts(graph.streetNotesService.getNotes(forwardState), wantedLocale);
             lastAngle = DirectionUtils.getLastAngle(geom);
         }
         return steps;
@@ -1119,7 +1119,7 @@ public class PlanGenerator {
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
         step.bogusName = en.hasBogusName();
-        step.addAlerts(graph.streetNotesService.getNotes(s));
+        step.addAlerts(graph.streetNotesService.getNotes(s), wantedLocale);
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
         if (s.getBackEdge() instanceof AreaEdge) {
             step.area = true;

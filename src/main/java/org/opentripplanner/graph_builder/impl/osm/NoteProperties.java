@@ -14,14 +14,19 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
+import org.opentripplanner.util.LocalizedString;
+import org.opentripplanner.util.TranslatedString;
 
 public class NoteProperties {
+
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
 
     public String notePattern;
 
@@ -33,12 +38,12 @@ public class NoteProperties {
     }
 
     public T2<Alert, NoteMatcher> generateNote(OSMWithTags way) {
-        Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way,
-                Alert.defaultLanguage);
         Alert note = new Alert();
-        note.alertHeaderText = new TranslatedString();
-        for (Map.Entry<String, String> kv : noteText.entrySet()) {
-            note.alertHeaderText.addTranslation(kv.getKey(), kv.getValue());
+        if (patternMatcher.matcher(notePattern).matches()) {
+            Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
+            note.alertHeaderText = TranslatedString.getI18NString(noteText);
+        } else {
+            note.alertHeaderText = new LocalizedString(notePattern, way);
         }
         return new T2<>(note, noteMatcher);
     }

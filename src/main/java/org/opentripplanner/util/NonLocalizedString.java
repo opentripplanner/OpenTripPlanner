@@ -28,6 +28,11 @@ public class NonLocalizedString implements I18NString, Serializable {
     }
 
     @Override
+    public boolean equals(Object other) {
+        return other instanceof NonLocalizedString && this.name.equals(((NonLocalizedString)other).name);
+    }
+
+    @Override
     public String toString() {
         return this.name;
     }

@@ -42,6 +42,9 @@ public enum ResourceBundleSingleton {
         if (key == null) {
             return null;
         }
+        if (locale == null) {
+            locale = getDefaultLocale();
+        }
         try {
             ResourceBundle resourceBundle = null;
             if (key.equals("corner") || key.equals("unnamedStreet")) {
