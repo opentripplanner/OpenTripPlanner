@@ -394,19 +394,19 @@ public class PlanGeneratorTest {
         BikeRentalStation exitDropoffStation = new BikeRentalStation();
 
         enterPickupStation.id = "Enter pickup";
-        enterPickupStation.raw_name = new NonLocalizedString("Enter pickup station");
+        enterPickupStation.name = new NonLocalizedString("Enter pickup station");
         enterPickupStation.x = 180;
         enterPickupStation.y = 90;
         exitPickupStation.id = "Exit pickup";
-        exitPickupStation.raw_name = new NonLocalizedString("Exit pickup station");
+        exitPickupStation.name = new NonLocalizedString("Exit pickup station");
         exitPickupStation.x = 180;
         exitPickupStation.y = 90;
         enterDropoffStation.id = "Enter dropoff";
-        enterDropoffStation.raw_name = new NonLocalizedString("Enter dropoff station");
+        enterDropoffStation.name = new NonLocalizedString("Enter dropoff station");
         enterDropoffStation.x = 0;
         enterDropoffStation.y = 90;
         exitDropoffStation.id = "Exit dropoff";
-        exitDropoffStation.raw_name = new NonLocalizedString("Exit dropoff station");
+        exitDropoffStation.name = new NonLocalizedString("Exit dropoff station");
         exitDropoffStation.x = 0;
         exitDropoffStation.y = 90;
 

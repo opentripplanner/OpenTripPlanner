@@ -38,7 +38,8 @@ public class BikeRentalStationVertex extends Vertex {
     
     public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
-        super(g, "bike rental station " + station.id, station.x, station.y, station.raw_name);
+        super(g, "bike rental station " + station.id, station.x, station.y,
+                station.name);
         this.setId(station.id);
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);

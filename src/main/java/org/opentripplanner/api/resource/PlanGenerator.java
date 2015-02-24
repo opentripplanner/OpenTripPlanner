@@ -779,7 +779,7 @@ public class PlanGenerator {
     private Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, TripTimes tripTimes) {
         // If no edge was given, it means we're at the end of this leg and need to work around that.
         boolean endOfLeg = (edge == null);
-        Place place = new Place(vertex.getX(), vertex.getY(), vertex.getName(),
+        Place place = new Place(vertex.getX(), vertex.getY(), vertex.getName(this.requestedLocale),
                 makeCalendar(state), makeCalendar(state));
 
         if (endOfLeg) edge = state.getBackEdge();

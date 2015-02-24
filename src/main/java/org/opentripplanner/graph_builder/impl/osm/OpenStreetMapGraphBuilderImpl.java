@@ -303,7 +303,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             graph.putService(BikeRentalStationService.class, bikeRentalService);
             for (OSMNode node : osmdb.getBikeRentalNodes()) {
                 n++;
-                I18NString creativeName = wayPropertySet.getCreativeNameForWay(node);
+                //Gets name tag and translations if they exists
+                I18NString creativeName = node.getAssumedName();
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
@@ -327,10 +328,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
                 BikeRentalStation station = new BikeRentalStation();
                 station.id = "" + node.getId();
-                //FIXME: This is hack for translating bikeStation name
-                //Problem is what happens if this name is read from vertex.
-                //We have no idea from name that this is bikeRental
-                station.raw_name = creativeName;
+                station.name = creativeName;
                 station.x = node.lon;
                 station.y = node.lat;
                 // The following make sure that spaces+bikes=capacity, always.

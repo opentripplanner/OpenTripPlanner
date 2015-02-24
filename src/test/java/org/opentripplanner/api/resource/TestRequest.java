@@ -198,7 +198,7 @@ class Context {
         station.bikesAvailable = 5;
         station.spacesAvailable = 4;
         station.id = "1";
-        station.raw_name = new NonLocalizedString("bike rental station");
+        station.name = new NonLocalizedString("bike rental station");
         service.addBikeRentalStation(station);
     }
 

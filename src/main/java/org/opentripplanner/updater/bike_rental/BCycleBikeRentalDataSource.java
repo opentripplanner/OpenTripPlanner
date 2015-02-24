@@ -41,7 +41,7 @@ public class BCycleBikeRentalDataSource extends GenericJSONBikeRentalDataSource 
        brstation.id = kioskNode.path("Id").toString();
        brstation.x = kioskNode.path("Location").path("Longitude").asDouble();
        brstation.y = kioskNode.path("Location").path("Latitude").asDouble();
-       brstation.raw_name =  new NonLocalizedString(kioskNode.path("Name").asText());
+       brstation.name =  new NonLocalizedString(kioskNode.path("Name").asText());
        brstation.bikesAvailable = kioskNode.path("BikesAvailable").asInt();
        brstation.spacesAvailable = kioskNode.path("DocksAvailable").asInt();
 

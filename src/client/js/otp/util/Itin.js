@@ -203,6 +203,40 @@ otp.util.Itin = {
         return mode;
     },
 
+    vertexTypeStrings : {
+        'BIKESHARE_EMPTY': _tr('Bicycle rental station'),
+        'BIKESHARE': _tr('Bicycle rental'),
+    },
+
+    /**
+     * Returns localized place name
+     *
+     * based on vertexType and place name
+     *
+     * Currently only bike sharing is supported
+     * @param {string} place
+     * @return {string} localized place name
+     */
+    getName : function(place) {
+        if ('vertexType' in place) {
+            var vertexType = place.vertexType;
+            if (place.name === null) {
+                vertexType += "_EMPTY";
+            }
+            if (vertexType in this.vertexTypeStrings) {
+                return this.vertexTypeStrings[vertexType] +  " " + place.name;
+            } else {
+                if (vertexType !== "NORMAL") {
+                    console.log(vertexType + " not found in strings!");
+                }
+                return place.name;
+            }
+        } else {
+            console.log("vertexType missing in place");
+            return place.name;
+        }
+    },
+
     getLegStepText : function(step, asHtml) {
         asHtml = (typeof asHtml === "undefined") ? true : asHtml;
         var text = '';

@@ -29,12 +29,10 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     @JsonSerialize
     public String id;
+    //Serialized in TranslatedBikeRentalStation
     @XmlTransient
     @JsonIgnore
-    public I18NString raw_name;
-    @XmlAttribute
-    @JsonSerialize
-    public String name;
+    public I18NString name;
     @XmlAttribute
     @JsonSerialize
     public double x, y; //longitude, latitude

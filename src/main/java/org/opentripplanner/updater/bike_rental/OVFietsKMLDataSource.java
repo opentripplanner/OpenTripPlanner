@@ -30,7 +30,7 @@ public class OVFietsKMLDataSource extends GenericXmlBikeRentalDataSource {
         brstation.y = Double.parseDouble(coordinates[1]);
         if ( brstation.x == 0 || brstation.y == 0)
             return null;
-        brstation.raw_name = new NonLocalizedString(attributes.get("name"));
+        brstation.name = new NonLocalizedString(attributes.get("name"));
         return brstation;
     }
 }

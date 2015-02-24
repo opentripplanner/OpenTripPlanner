@@ -73,7 +73,7 @@ public class TestBikeRental extends TestCase {
         // so we add a bike share
         BikeRentalStation station = new BikeRentalStation();
         station.id = "id";
-        station.raw_name = new NonLocalizedString("station");
+        station.name = new NonLocalizedString("station");
         station.x = -77.049;
         station.y = 36.856;
         station.bikesAvailable = 5;
@@ -97,7 +97,7 @@ public class TestBikeRental extends TestCase {
 
         BikeRentalStation station2 = new BikeRentalStation();
         station2.id = "id2";
-        station2.raw_name = new NonLocalizedString("station2");
+        station2.name = new NonLocalizedString("station2");
         station2.x = -77.049;
         station2.y = 36.857;
         station2.bikesAvailable = 5;

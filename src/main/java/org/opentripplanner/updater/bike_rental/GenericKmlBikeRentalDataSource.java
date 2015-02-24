@@ -22,6 +22,7 @@ import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,14 +79,14 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
             return null;
         }
         BikeRentalStation brStation = new BikeRentalStation();
-        brStation.name = attributes.get("name").trim();
+        brStation.name = new NonLocalizedString(attributes.get("name").trim());
         if (namePrefix != null)
-            brStation.name = namePrefix + brStation.name;
+            brStation.name = new NonLocalizedString(namePrefix + brStation.name);
         String[] coords = attributes.get("Point").trim().split(",");
         brStation.x = Double.parseDouble(coords[0]);
         brStation.y = Double.parseDouble(coords[1]);
         // There is no ID in KML, assume unique names and location
-        brStation.id = String.format(Locale.US, "%s[%.3f-%.3f]", brStation.name.replace(" ", "_"),
+        brStation.id = String.format(Locale.US, "%s[%.3f-%.3f]", brStation.name.toString().replace(" ", "_"),
                 brStation.x, brStation.y);
         brStation.realTimeData = false;
         brStation.bikesAvailable = 1; // Unknown, always 1
