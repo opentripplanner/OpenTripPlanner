@@ -39,6 +39,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -103,6 +104,11 @@ public class GraphPathFinder {
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 
+        // without transit, we'd just just return multiple copies of the same on-street itinerary
+        if (!options.modes.isTransit()) {
+            options.numItineraries = 1;
+        }
+        options.dominanceFunction = new DominanceFunction.MinimumWeight();
         LOG.debug("rreq={}", options);
 
         RemainingWeightHeuristic heuristic;
