@@ -86,5 +86,5 @@ interact with your local OpenTripPlanner instance. You can also try out some web
 
 ## Advanced usage
 
-Try the `--help` option for a full list of command line parameters. See the [configuration] page for more advanced topics.
+Try the `--help` option for a full list of command line parameters. See the [configuration](Configuration) page for more advanced topics.
 
