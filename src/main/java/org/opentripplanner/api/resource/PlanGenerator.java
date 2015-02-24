@@ -76,6 +76,9 @@ import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 public class PlanGenerator {
 
@@ -791,6 +794,13 @@ public class PlanGenerator {
             if (tripTimes != null) {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
             }
+            place.vertexType = VertexType.TRANSIT;
+        } else if(vertex instanceof BikeRentalStationVertex) {
+            place.vertexType = VertexType.BIKESHARE;
+        } else if (vertex instanceof BikeParkVertex) {
+            place.vertexType = VertexType.BIKEPARK;
+        } else {
+            place.vertexType = VertexType.NORMAL;
         }
 
         return place;
