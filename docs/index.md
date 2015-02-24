@@ -12,7 +12,7 @@ The code is under active development with a variety of [deployments](Deployments
    It provides itineraries for public transit systems throughout the state in a single unified OTP instance.
 
  * In November of 2014, Arlington, Virginia launched a new [commute planning site](http://mobilitylab.org/2014/11/07/the-who-what-when-where-whys-of-carfreeatoz/) for the Washington, DC metropolitan area.
- It depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of [profile routing]().
+ It depends on OpenTripPlanner to weigh the costs and benefits of various travel options, making use of [profile routing](http://conveyal.com/blog/2015/02/24/what-is-profile-routing/).
 
  * OpenTripPlanner was a focal point in the Dutch Transport Ministry's MMRI (MultiModal Travel Information) project which encouraged investment in trip planning platforms and services. A consortium of five companies worked together to improve OpenTripPlanner performance in large regional transport networks and account for real-time service modifications and delays. The resulting [Plannerstack Foundation](http://www.plannerstack.org/)
  is now providing OpenTripPlanner and [Bliksem RRRR](https://github.com/bliksemlabs/rrrr) as hosted services including high quality open data integration for the Netherlands.
