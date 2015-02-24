@@ -6,7 +6,7 @@ _Note: this documentation is targeted primarily at the OTP development community
 **OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL](http://www.gnu.org/licenses/lgpl-3.0.txt) license.
 The code is under active development with a variety of [deployments](Deployments) around the world, and we are working toward a 1.0 release in the coming year.
 
-**Latest Project Updates:**
+**Latest Project Updates**
 
  * As of 2015, OTP powers the New York State department of transportation's [transit trip planner](http://511ny.org/tripplanner/default.aspx).
    It provides itineraries for public transit systems throughout the state in a single unified OTP instance.
@@ -17,7 +17,7 @@ The code is under active development with a variety of [deployments](Deployments
  * OpenTripPlanner was a focal point in the Dutch Transport Ministry's MMRI (MultiModal Travel Information) project which encouraged investment in trip planning platforms and services. A consortium of five companies worked together to improve OpenTripPlanner performance in large regional transport networks and account for real-time service modifications and delays. The resulting [Plannerstack Foundation](http://www.plannerstack.org/)
  is now providing OpenTripPlanner and [Bliksem RRRR](https://github.com/bliksemlabs/rrrr) as hosted services including high quality open data integration for the Netherlands.
 
- * OpenTripPlanner has become <a href="http://sfconservancy.org/">Software Freedom Conservancy's</a> thirty-first member project. Conservancy is a non-profit public charity that provides a range of financial and administrative services to member projects that develop Free, Libre, and Open Source Software (FLOSS). By joining Conservancy, OpenTripPlanner obtains the benefits of a formal non-profit organizational structure while keeping the project focused on software development and documentation. See [[SFC]] for more details.
+ * OpenTripPlanner has become <a href="http://sfconservancy.org/">Software Freedom Conservancy's</a> thirty-first member project. Conservancy is a non-profit public charity that provides a range of financial and administrative services to member projects that develop Free, Libre, and Open Source Software. By joining Conservancy, OpenTripPlanner obtains the benefits of a formal non-profit organizational structure while keeping the project focused on software development and documentation.
 
  * TriMet relaunched Portland Oregon's [official trip planner](http://ride.trimet.org) which is now powered by OTP. Read [more about the project](https://github.com/openplans/OpenTripPlanner/wiki/Portland-Regional-Trip-Planner), and see also TriMet's 2009-2011 [OTP Final Report](https://github.com/opentripplanner/OpenTripPlanner/wiki/Reports/OTP%20Final%20Report%20-%20Metro%202009-2011%20RTO%20Grant.pdf).
 
@@ -30,12 +30,12 @@ OpenTripPlanner is presently at **version 0.13.0**. See the [changelog](Changelo
  * Plans multi-modal walking, wheelchair, bicycle and transit trips
  * Takes travel time, road type, safety, and elevation into account, and allows users to customize the weighting of these three factors
  * Shows graphical elevation profiles for bike trips
- * Imports data from GTFS, OpenStreetMap, the US National Elevation Dataset, and other digital elevation models
+ * Imports data from GTFS, OpenStreetMap, and digital elevation models
  * Typically provides multiple itineraries in a fraction of a second even in large metropolitan networks
  * Exposes a web services API which other apps or front-ends can build on
  * Supports [GTFS-Realtime](https://developers.google.com/transit/gtfs-realtime/) for service changes and alerts in both polling (pull) and streaming (push) modes
  * Supports bike rental with dynamic availability information, as well as park-and-ride and kiss-and-ride
- * Supports one-to-many and many-to-many searches for planning, alternatives analysis, and accessibility research purposes.
+ * Supports one-to-many and many-to-many searches for planning, alternatives analysis, and accessibility research purposes
 
 See the [Milestones](https://github.com/opentripplanner/OpenTripPlanner/milestones) page to explore upcoming developments.
 
@@ -54,47 +54,32 @@ The **OTP Analyst Web Services** provide network analysis results such as travel
 
 The **OTP Analyst Batch Processor** is a command-line tool that handles more complex one-off network analysis tasks. It uses the same core routing library and data sources as other OTP services, but allows for very open-ended configuration and the inclusion of population or opportunity data. While configuration and use are currently somewhat opaque for non-developers, the "Batch Analyst" is becoming a powerful tool for visualizing how transportation networks affect access to urban opportunities. See [this article](http://www.theatlanticcities.com/commute/2013/01/best-maps-weve-seen-sandys-transit-outage-new-york/4488/) for an example case study on the effects of hurricane Sandy in New York.
 
+## Additional Documentation
+
  * [Basic Usage (get started quickly)](Basic-Usage)
  * [Set up a development environment](Setting-up-a-development-environment)
  * [Available web app language translations](https://github.com/openplans/OpenTripPlanner/wiki/Translation)
  * [Developers Guide](https://github.com/openplans/OpenTripPlanner/wiki/DevelopersGuide) (code conventions, how to submit patches, etc)
 
-
-## Additional Documentation
-
 Some other types of documentation are generated for OTP from its source code:
 
- * [Javadoc documentation for the entire project](http://docs.opentripplanner.org/javadoc/)
- * [Web service API documentation](http://docs.opentripplanner.org/apidoc) (automatically generated by [Enunciate](http://enunciate.codehaus.org/))
-
- * Here is the [OTP logo](Home/otp_logo.svg) in vector (SVG) format.
+ * [Javadoc documentation for the entire project](http://dev.opentripplanner.org/javadoc/)
+ * [Web service API documentation](http://dev.opentripplanner.org/apidoc) (automatically generated by [Enunciate](http://enunciate.codehaus.org/))
 
 
 ## Contact Info
 
-Send questions and comments to the [user mailing list](http://groups.google.com/group/opentripplanner-users).  
-
-Discuss internal developement details on the [dev mailing list](http://groups.google.com/group/opentripplanner-dev).  
-
-Chat with us via IRC on Freenode channel `#opentripplanner` or [chat through the web](http://webchat.freenode.net/?channels=opentripplanner) 
-
+Send questions and comments to the [user mailing list](http://groups.google.com/group/opentripplanner-users).
+Discuss internal development details on the [dev mailing list](http://groups.google.com/group/opentripplanner-dev).
+Chat with us via IRC on Freenode channel `#opentripplanner` or [through the web](http://webchat.freenode.net/?channels=opentripplanner)
 File bug reports via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). Note that the issue tracker is not intended for support questions or discussions. Please post them to one of the mailing lists instead.
 
 
 ## Background
 
 The project began a collaborative effort among [TriMet](http://trimet.org), [OpenPlans](http://openplans.org), and the developers of [FivePoints](http://fpdev.org/), [OneBusAway](https://github.com/OneBusAway/onebusaway/wiki) and [Graphserver](http://bmander.github.com/graphserver/), and has since grown to encompass a global community of users and developers. More information on OTP's origins is available at the [Project History](https://github.com/openplans/OpenTripPlanner/wiki/Project-History) page.
-
 In November of 2013, OpenTripPlanner became the thirty-first member project of the <a href="http://sfconservancy.org/">Software Freedom Conservancy.</a>
 
 ## Financial Support
 
-OpenTripPlanner is a member project of Software Freedom Conservancy, a 501(c)(3) organization incorporated in New York, and donations made to it are fully tax-deductible to the extent permitted by law. Donations can be made by credit card, wire transfer or paper check. Please contact <accounting@sfconservancy.org> for wire transfer instructions. Please be sure to note in the email what country the wire transfer will initiate from and what currency it will be in. Send paper check donations, drawn in USD and payable to Software Freedom Conservancy, Inc., to:
-
-```
-Software Freedom Conservancy, Inc.
-137 Montague ST STE 380
-Brooklyn, NY 11201-3548 USA
-```
-
-Please indicate "directed donation: OpenTripPlanner" in the memo field of the check.
+OpenTripPlanner is a member project of Software Freedom Conservancy, a 501(c)(3) organization incorporated in New York, and donations made to it are fully tax-deductible to the extent permitted by law. Donations can be made by credit card, wire transfer or paper check. Please contact <accounting@sfconservancy.org> for instructions. Be sure to note in the email what country the wire transfer will initiate from and what currency it will be in.
