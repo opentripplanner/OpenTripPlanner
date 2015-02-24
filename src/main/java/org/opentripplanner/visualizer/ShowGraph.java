@@ -742,22 +742,24 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	private void drawVertices() {
 		/* turn off vertex display when zoomed out */
 		final double METERS_PER_DEGREE_LAT = 111111.111111;
-		boolean closeEnough = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 4);
+		boolean closeEnough = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 5);
 		/* Draw selected visible vertices */
-		fill(60, 60, 200);
 		for (Vertex v : visibleVertices) {
-			if (drawTransitStopVertices && closeEnough && v instanceof TransitStationStop) {
-		        drawVertex(v, 5);
+            if (drawTransitStopVertices && closeEnough && v instanceof TransitStationStop) {
+                fill(60, 60, 200); // Make transit stops blue dots
+		        drawVertex(v, 7);
 			}
 			if (drawStreetVertices && v instanceof IntersectionVertex) {
 		        IntersectionVertex iv = (IntersectionVertex) v;
 		        if (iv.trafficLight) {
-		            drawVertex(v, 7);
-		        }
+                    fill(120, 60, 60); // Make traffic lights red dots
+                    drawVertex(v, 5);
+                }
 		    }
 			if (drawMultistateVertices && spt!=null){
 				List<? extends State> states = spt.getStates(v);
 				if(states != null){
+                    fill(100, 60, 100);
 					drawVertex( v, states.size()*2 );
 				}
 			}

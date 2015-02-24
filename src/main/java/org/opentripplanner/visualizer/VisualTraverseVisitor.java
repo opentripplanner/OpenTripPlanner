@@ -22,8 +22,8 @@ public class VisualTraverseVisitor implements TraverseVisitor {
 
     private ShowGraph gui;
 
-    private final int SLEEP_AFTER = 10;
-    private final int SLEEP_LEN = 1;
+    private final int SLEEP_AFTER = 50;
+    private final int SLEEP_LEN = 2;
     
     private int sleepAfter = SLEEP_AFTER;
     
