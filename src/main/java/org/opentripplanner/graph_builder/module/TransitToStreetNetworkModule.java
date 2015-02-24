@@ -86,12 +86,8 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
             if (graph.hasTransit) {
                 linkTransit();
             }
-            if (graph.hasBikeRental) {
-                linkBikeRentalStations();
-            }
-            if (graph.hasBikeParkRide) {
-                linkParkRideStations();
-            }
+            linkBikeRentalStations();
+            linkParkRideStations();
             cleanGraph();
         }
     }

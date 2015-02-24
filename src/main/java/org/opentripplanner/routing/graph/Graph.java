@@ -185,12 +185,6 @@ public class Graph implements Serializable {
     /** True if OSM data was loaded into this Graph. */
     public boolean hasStreets = false;
 
-    /** True if static bike rental vertices has been found from OSM data in this Graph. */
-    public boolean hasBikeRental = false;
-
-    /** True if static Bike P + R vertices has been found from OSM data in this Graph. */
-    public boolean hasBikeParkRide = false;
-
     /** True if GTFS data was loaded into this Graph. */
     public boolean hasTransit = false;
 
