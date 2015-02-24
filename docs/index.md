@@ -57,9 +57,8 @@ The **OTP Analyst Batch Processor** is a command-line tool that handles more com
 ## Additional Documentation
 
  * [Basic Usage (get started quickly)](Basic-Usage)
- * [Set up a development environment](Setting-up-a-development-environment)
- * [Available web app language translations](https://github.com/openplans/OpenTripPlanner/wiki/Translation)
- * [Developers Guide](https://github.com/openplans/OpenTripPlanner/wiki/DevelopersGuide) (code conventions, how to submit patches, etc)
+ * [Internationalization and Translations](Translation)
+ * [Developers Guide](Developers-Guide) (code conventions, how to submit patches, etc)
 
 Some other types of documentation are generated for OTP from its source code:
 
@@ -77,7 +76,7 @@ File bug reports via the Github [issue tracker](https://github.com/openplans/Ope
 
 ## Background
 
-The project began a collaborative effort among [TriMet](http://trimet.org), [OpenPlans](http://openplans.org), and the developers of [FivePoints](http://fpdev.org/), [OneBusAway](https://github.com/OneBusAway/onebusaway/wiki) and [Graphserver](http://bmander.github.com/graphserver/), and has since grown to encompass a global community of users and developers. More information on OTP's origins is available at the [Project History](https://github.com/openplans/OpenTripPlanner/wiki/Project-History) page.
+The project began a collaborative effort among [TriMet](http://trimet.org), [OpenPlans](http://openplans.org), and the developers of FivePoints, [OneBusAway](https://github.com/OneBusAway/onebusaway/wiki) and [Graphserver](http://bmander.github.com/graphserver/), and has since grown to encompass a global community of users and developers. More information on OTP's origins is available at the [Project History](Project-History) page.
 In November of 2013, OpenTripPlanner became the thirty-first member project of the <a href="http://sfconservancy.org/">Software Freedom Conservancy.</a>
 
 ## Financial Support
