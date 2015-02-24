@@ -156,12 +156,13 @@ otp.config = {
      *       the user-specifed address string
      */
 
-    geocoders : [
-        {
-            name: 'OTP built-in geocoder',
-            className: 'otp.core.GeocoderBuiltin'
-            // URL and query parameter do not need to be set for built-in geocoder.
-        }
+     geocoders : [
+         {
+             'name': 'geocoder',
+             'className': 'otp.core.Geocoder',
+             'url': 'http://bunet.5t.torino.it/otp-geocoder/geocode',
+             'addressParam': 'address'
+         }
     ],
 
     
