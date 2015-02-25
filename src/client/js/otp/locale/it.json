@@ -111,7 +111,7 @@
     "Set as End Location": "Imposta Arrivo",
     "Destination": "Destinazione",
     "Error %(error_id)d": "Errore %(error_id)d",
-    "No Trip Found": "nessun percoro trovato",
+    "No Trip Found": "nessun percorso trovato",
     "Your %(bike_share_name)s route": "Percorso con %(bike_share_name)s ",
     "Your bike route": "Percorso in bici",
     "Walk to the %(bike_share_name)s dock.": "A piedi verso la stazione %(bike_share_name)s",
