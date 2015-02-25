@@ -16,7 +16,6 @@ package org.opentripplanner.routing.algorithm.strategies;
 import java.util.List;
 
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -59,9 +58,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance(); // TODO make non-pluggable
-
-    /* 
+    /*
      * http://en.wikipedia.org/wiki/Train_routes_in_the_Netherlands
      * http://en.wikipedia.org/wiki/File:Baanvaksnelheden.png 
      */
@@ -220,7 +217,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (weight == Double.POSITIVE_INFINITY) {
             // A non-street vertex that was not yet touched by the reverse heuristic search.
             // Return the maximum of the Euclidean heuristic or the highest weight yet found by the heuristic search.
-            double dist = distanceLibrary.fastDistance(v.getY(), v.getX(), target.getY(), target.getX());
+            double dist = SphericalDistanceLibrary.fastDistance(v.getY(), v.getX(), target.getY(), target.getX());
             double time = dist / MAX_TRANSIT_SPEED;
             return Math.max(maxFound, time);
         }

@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.onebusaway.gtfs.model.Route;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -63,8 +63,6 @@ public class LinkRequest {
 
     private List<Edge> edgesAdded = new ArrayList<Edge>();
 
-    private DistanceLibrary distanceLibrary;
-
     /**
      * A generic factory of street link to link a particular type of vertex to the street network
      * during linking stage.
@@ -76,7 +74,6 @@ public class LinkRequest {
 
     public LinkRequest(NetworkLinkerLibrary linker) {
         this.linker = linker;
-        this.distanceLibrary = linker.getDistanceLibrary();
     }
     
     public boolean getResult() {
@@ -131,7 +128,7 @@ public class LinkRequest {
             StreetVertex atIntersection = linker.index.getIntersectionAt(coordinate);
             if (atIntersection != null) {
                 // if so, the stop can be linked directly to all vertices at the intersection
-                if (edges.getScore() > distanceLibrary.distance(atIntersection.getCoordinate(), coordinate))
+                if (edges.getScore() > SphericalDistanceLibrary.distance(atIntersection.getCoordinate(), coordinate))
                     return Arrays.asList(atIntersection);
             }
             return getSplitterVertices(vertexLabel, edges.toEdgeList(), coordinate);

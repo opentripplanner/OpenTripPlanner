@@ -49,7 +49,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
 
     public double getDistance() {
-        return SphericalDistanceLibrary.getInstance().distance(begin.getLat(), begin.getLon(), end.getLat(),
+        return SphericalDistanceLibrary.distance(begin.getLat(), begin.getLon(), end.getLat(),
                 end.getLon());
     }
 

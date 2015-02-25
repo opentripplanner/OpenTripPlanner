@@ -17,7 +17,6 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.LuceneIndex;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -179,8 +178,6 @@ public class GraphIndex {
         // of simple indexes in GraphIndex.
     }
 
-    private static DistanceLibrary distlib = new SphericalDistanceLibrary();
-
     /** Get all trip patterns running through any stop in the given stop cluster. */
     private Set<TripPattern> patternsForStopCluster(StopCluster sc) {
         Set<TripPattern> tripPatterns = Sets.newHashSet();
@@ -267,7 +264,7 @@ public class GraphIndex {
                 SphericalDistanceLibrary.metersToDegrees(radius));
         for (StopCluster cluster : stopClusterSpatialIndex.query(env)) {
             // TODO this should account for area-like nature of clusters. Use size of bounding boxes.
-            double distance = distlib.distance(sc.lat, sc.lon, cluster.lat, cluster.lon);
+            double distance = SphericalDistanceLibrary.distance(sc.lat, sc.lon, cluster.lat, cluster.lon);
             if (distance < radius) ret.put(cluster, distance);
         }
         return ret;
@@ -471,7 +468,8 @@ public class GraphIndex {
                     SphericalDistanceLibrary.metersToDegrees(CLUSTER_RADIUS));
             for (TransitStop ts1 : stopSpatialIndex.query(env)) {
                 Stop s1 = ts1.getStop();
-                double geoDistance = SphericalDistanceLibrary.getInstance().fastDistance(s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
+                double geoDistance = SphericalDistanceLibrary.fastDistance(
+                        s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
                 if (geoDistance < CLUSTER_RADIUS) {
                     String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
                     // LOG.info("   --> {}", s1normalizedName);

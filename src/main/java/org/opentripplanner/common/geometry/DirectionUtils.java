@@ -23,7 +23,6 @@ import com.vividsolutions.jts.geom.MultiLineString;
 public class DirectionUtils {
 
     public static DirectionUtils instance;
-    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private DirectionUtils() {
     }
@@ -60,7 +59,7 @@ public class DirectionUtils {
         Coordinate coord1 = line.getCoordinateN(numPoints - 1);
         int i = numPoints - 3;
         int minDistance = 10;  // Meters        
-        while (distanceLibrary.fastDistance(coord0, coord1) < minDistance && i >= 0) {
+        while (SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance && i >= 0) {
             coord0 = line.getCoordinateN(i--);
         }
 
@@ -86,7 +85,7 @@ public class DirectionUtils {
         Coordinate coord1 = line.getCoordinateN(1);
         int i = 2;
         int minDistance = 10;  // Meters 
-        while (distanceLibrary.fastDistance(coord0, coord1) < minDistance
+        while (SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance
                 && i < line.getNumPoints()) {
             coord1 = line.getCoordinateN(i++);
         }

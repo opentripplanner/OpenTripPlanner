@@ -37,7 +37,6 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -158,14 +157,13 @@ class IndexedLineSegment {
     int index;
     Coordinate start;
     Coordinate end;
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     private double lineLength;
 
     public IndexedLineSegment(int index, Coordinate start, Coordinate end) {
         this.index = index;
         this.start = start;
         this.end = end;
-        this.lineLength = distanceLibrary.fastDistance(start, end);
+        this.lineLength = SphericalDistanceLibrary.fastDistance(start, end);
     }
 
     // in radians
@@ -180,7 +178,7 @@ class IndexedLineSegment {
     }
 
     double crossTrackError(Coordinate coord) {
-        double distanceFromStart = distanceLibrary.fastDistance(start, coord);
+        double distanceFromStart = SphericalDistanceLibrary.fastDistance(start, coord);
         double bearingToCoord = bearing(start, coord);
         double bearingToEnd = bearing(start, end);
         return FastMath.asin(FastMath.sin(distanceFromStart / RADIUS)
@@ -192,8 +190,8 @@ class IndexedLineSegment {
         double cte = crossTrackError(coord);
         double atd = alongTrackDistance(coord, cte);
         double inverseAtd = inverseAlongTrackDistance(coord, -cte);
-        double distanceToStart = distanceLibrary.fastDistance(coord, start);
-        double distanceToEnd = distanceLibrary.fastDistance(coord, end);
+        double distanceToStart = SphericalDistanceLibrary.fastDistance(coord, start);
+        double distanceToEnd = SphericalDistanceLibrary.fastDistance(coord, end);
 
         if (distanceToStart < distanceToEnd) {
             //we might be behind the line start
@@ -217,7 +215,7 @@ class IndexedLineSegment {
     }
 
     private double inverseAlongTrackDistance(Coordinate coord, double inverseCrossTrackError) {
-        double distanceFromEnd = distanceLibrary.fastDistance(end, coord);
+        double distanceFromEnd = SphericalDistanceLibrary.fastDistance(end, coord);
         double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromEnd / RADIUS)
             / FastMath.cos(inverseCrossTrackError / RADIUS))
             * RADIUS;
@@ -226,8 +224,8 @@ class IndexedLineSegment {
 
     public double fraction(Coordinate coord) {
         double cte = crossTrackError(coord);
-        double distanceToStart = distanceLibrary.fastDistance(coord, start);
-        double distanceToEnd = distanceLibrary.fastDistance(coord, end);
+        double distanceToStart = SphericalDistanceLibrary.fastDistance(coord, start);
+        double distanceToEnd = SphericalDistanceLibrary.fastDistance(coord, end);
 
         if (cte < distanceToStart && cte < distanceToEnd) {
             double atd = alongTrackDistance(coord, cte);
@@ -242,7 +240,7 @@ class IndexedLineSegment {
     }
 
     private double alongTrackDistance(Coordinate coord, double crossTrackError) {
-        double distanceFromStart = distanceLibrary.fastDistance(start, coord);
+        double distanceFromStart = SphericalDistanceLibrary.fastDistance(start, coord);
         double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromStart / RADIUS)
             / FastMath.cos(crossTrackError / RADIUS))
             * RADIUS;
@@ -292,8 +290,6 @@ public class GTFSPatternHopFactory {
     private GtfsStopContext context = new GtfsStopContext();
 
     public int subwayAccessTime = 0;
-
-    private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private double maxStopToShapeSnapDistance = 150;
 
@@ -525,7 +521,7 @@ public class GTFSPatternHopFactory {
                     TripPattern currPattern = patternForTripTimes.get(curr);
                     Stop fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
                     Stop toStop   = currPattern.getStop(0);
-                    double teleportationDistance = distanceLibrary.fastDistance(
+                    double teleportationDistance = SphericalDistanceLibrary.fastDistance(
                                         fromStop.getLat(), fromStop.getLon(), toStop.getLat(), toStop.getLon());
                     if (teleportationDistance > 200) {
                         // FIXME Trimet data contains a lot of these -- in their data, two trips sharing a block ID just
@@ -834,7 +830,7 @@ public class GTFSPatternHopFactory {
                     st1.setArrivalTime(st0.getDepartureTime());
                 }
             }
-            double hopDistance = distanceLibrary.fastDistance(
+            double hopDistance = SphericalDistanceLibrary.fastDistance(
                    st0.getStop().getLat(), st0.getStop().getLon(),
                    st1.getStop().getLat(), st1.getStop().getLon());
             double hopSpeed = hopDistance/runningTime;
@@ -1129,9 +1125,9 @@ public class GTFSPatternHopFactory {
         
         Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
         Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
-        if (distanceLibrary.fastDistance(startCoord, geometryStartCoord) > maxStopToShapeSnapDistance) {
+        if (SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord) > maxStopToShapeSnapDistance) {
             return false;
-        } else if (distanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance) {
+        } else if (SphericalDistanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance) {
             return false;
         }
         return true;
@@ -1391,7 +1387,7 @@ public class GTFSPatternHopFactory {
             TransitStationStop fromv = context.stationStopNodes.get(transfer.getFromStop());
             TransitStationStop tov = context.stationStopNodes.get(transfer.getToStop());
 
-            double distance = distanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
+            double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
             int time;
             if (transfer.getTransferType() == 2) {
                 time = transfer.getMinTransferTime();

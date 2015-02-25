@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.StopTransfer;
@@ -35,7 +34,6 @@ import com.vividsolutions.jts.geom.LineString;
 public class TransferGraphLinker {
 
     private Graph graph;
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public TransferGraphLinker(Graph graph) {
         this.graph = graph;
@@ -57,7 +55,7 @@ public class TransferGraphLinker {
             TransitStationStop fromVertex = stopNodes.get(transfer.fromStopId);
             TransitStationStop toVertex = stopNodes.get(transfer.toStopId);
 
-            double distance = distanceLibrary.distance(fromVertex.getCoordinate(), 
+            double distance = SphericalDistanceLibrary.distance(fromVertex.getCoordinate(),
                     toVertex.getCoordinate());
             TransferEdge edge = null;
             switch (transfer.seconds) {

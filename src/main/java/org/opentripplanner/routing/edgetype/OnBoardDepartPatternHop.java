@@ -79,7 +79,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge, Tempor
          * Do not multiply by positionInHop, as it is already taken into account by the from vertex
          * location.
          */
-        return SphericalDistanceLibrary.getInstance().distance(getFromVertex().getY(),
+        return SphericalDistanceLibrary.distance(getFromVertex().getY(),
                 getFromVertex().getX(), endStop.getLat(), endStop.getLon());
     }
 

@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -96,8 +95,6 @@ public class WalkableAreaBuilder {
     private Handler __handler;
 
     private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
-
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
             StreetEdgeFactory edgeFactory, Handler __handler) {
@@ -373,7 +370,7 @@ public class WalkableAreaBuilder {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(areaEntity, false);
 
-            double length = distanceLibrary.distance(startEndpoint.getCoordinate(),
+            double length = SphericalDistanceLibrary.distance(startEndpoint.getCoordinate(),
                     endEndpoint.getCoordinate());
 
             int cls = StreetEdge.CLASS_OTHERPATH;

@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -77,12 +76,11 @@ public class ParkAndRideLinkEdge extends Edge {
     }
 
     private void initGeometry() {
-        DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
         Coordinate fromc = fromv.getCoordinate();
         Coordinate toc = tov.getCoordinate();
         geometry = GeometryUtils.getGeometryFactory().createLineString(
                 new Coordinate[] { fromc, toc });
-        linkDistance = distanceLibrary.distance(fromc, toc);
+        linkDistance = SphericalDistanceLibrary.distance(fromc, toc);
     }
 
     @Override

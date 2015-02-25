@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -239,8 +238,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         // a null vertex reference for multilevel nodes. the individual vertices
         // for each level of a multilevel node are includeed in endpoints.
         private ArrayList<IntersectionVertex> endpoints = new ArrayList<IntersectionVertex>();
-
-        private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
         public Handler(Graph graph, OSMDatabase osmdb) {
             this.graph = graph;
@@ -966,7 +963,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             Coordinate[] coordinates = geometry.getCoordinates();
             double d = 0;
             for (int i = 1; i < coordinates.length; ++i) {
-                d += distanceLibrary.distance(coordinates[i - 1], coordinates[i]);
+                d += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
             }
             return d;
         }

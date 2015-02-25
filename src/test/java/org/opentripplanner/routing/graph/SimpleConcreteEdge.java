@@ -56,7 +56,6 @@ public class SimpleConcreteEdge extends Edge {
 
     @Override
     public double getDistance() {
-        return SphericalDistanceLibrary.getInstance().distance(getFromVertex().getCoordinate(), getToVertex()
-                .getCoordinate());
+        return SphericalDistanceLibrary.distance(getFromVertex().getCoordinate(), getToVertex().getCoordinate());
     }
 }

@@ -196,8 +196,7 @@ public class TestStreetMatcher {
 
         @Override
         public double getDistance() {
-            return SphericalDistanceLibrary.getInstance().distance(getFromVertex().getCoordinate(),
-                    getToVertex().getCoordinate());
+            return SphericalDistanceLibrary.distance(getFromVertex().getCoordinate(), getToVertex().getCoordinate());
         }
 
         @Override
