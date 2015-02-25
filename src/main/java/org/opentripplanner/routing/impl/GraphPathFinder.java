@@ -96,24 +96,25 @@ public class GraphPathFinder {
             LOG.error("PathService was passed a null routing request.");
             return null;
         }
-        
-        AStar aStar = new AStar(); // this instance is being reused for all N requests, which happen sequentially
+
+        // Reuse one instance of AStar for all N requests, which are carried out sequentially
+        AStar aStar = new AStar();
         if (options.rctx == null) {
             options.setRoutingContext(router.graph);
             /* Use a pathparser that constrains the search to use SimpleTransfers. */
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
-
         // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
         if (router.graphVisualizer != null) {
             aStar.setTraverseVisitor(router.graphVisualizer.traverseVisitor);
+            // options.disableRemainingWeightHeuristic = true; // DEBUG
         }
 
         // without transit, we'd just just return multiple copies of the same on-street itinerary
         if (!options.modes.isTransit()) {
             options.numItineraries = 1;
         }
-        options.dominanceFunction = new DominanceFunction.MinimumWeight();
+        options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
         RemainingWeightHeuristic heuristic;
@@ -125,6 +126,8 @@ public class GraphPathFinder {
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
         }
+        // heuristic = new TrivialRemainingWeightHeuristic(); // DEBUG
+
         options.rctx.remainingWeightHeuristic = heuristic;
         /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see 
          * itineraries with far more transfers. We do not expect transfer limiting to improve
