@@ -15,14 +15,10 @@ package org.opentripplanner.updater.stoptime;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.*;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +71,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      */
     private String agencyId;
 
+    /**
+     * Set only if we should attempt to match the trip_id from other data in TripDescriptor
+     */
+    private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -111,6 +112,9 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
             this.maxSnapshotFrequency = maxSnapshotFrequency;
         }
         this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
+        if (config.path("fuzzyTripMatching").asBoolean(false)) {
+            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
+        }
         LOG.info("Creating stop time updater running every {} seconds : {}", frequencySec, updateSource);
     }
 
@@ -137,6 +141,9 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
                 }
                 if (purgeExpiredData != null) {
                     snapshotSource.purgeExpiredData = (purgeExpiredData);
+                }
+                if (fuzzyTripMatcher != null) {
+                    snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
                 }
             }
         });
