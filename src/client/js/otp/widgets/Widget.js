@@ -98,7 +98,8 @@ otp.widgets.Widget = otp.Class({
                 this_.minimize();
             });
         }
-
+        /*raf no popup menu sui box */
+        /*
         // set up context menu
         this.contextMenu = new otp.core.ContextMenu(this.mainDiv, function() {
             //console.log("widget cm clicked");
@@ -113,7 +114,7 @@ otp.widgets.Widget = otp.Class({
         }).addItem(_tr("Send to back"), function() {
             this_.sendToBack();            
         });
-        
+        */
         this.header.dblclick(function() {
             this_.bringToFront();            
         });
