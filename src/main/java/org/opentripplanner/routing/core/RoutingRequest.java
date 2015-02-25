@@ -690,10 +690,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.numItineraries = numItineraries;
     }
 
-    public String toHtmlString() {
-        return toString("<br/>");
-    }
-
     public String toString() {
         return toString(" ");
     }
@@ -755,13 +751,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setTriangleTimeFactor(double triangleTimeFactor) {
         this.triangleTimeFactor = triangleTimeFactor;
         bikeWalkingOptions.triangleTimeFactor = triangleTimeFactor;
-    }
-
-    public void setMaxTransfers(int maxTransfers) {
-        // if (maxTransfers > CLAMP_TRANSFERS) {
-        // maxTransfers = CLAMP_TRANSFERS;
-        // }
-        this.maxTransfers = maxTransfers;
     }
 
     public NamedPlace getFromPlace() {
@@ -1040,38 +1029,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             builder.setLength(builder.length() - 1);
         }
         return builder.toString();
-    }
-
-    public String getPreferredRouteStr() {
-        return preferredRoutes.asString();
-    }
-    
-    public String getPreferredAgenciesStr() {
-        return getRouteOrAgencyStr(preferredAgencies);
-    }
-
-    public String getUnpreferredRouteStr() {
-        return unpreferredRoutes.asString();
-    }
-    
-    public String getUnpreferredAgenciesStr() {
-        return getRouteOrAgencyStr(unpreferredAgencies);
-    }
-
-    public String getBannedRouteStr() {
-        return bannedRoutes.asString();
-    }
-
-    public String getBannedStopsStr() {
-        return bannedStops.asString();
-    }
-    
-    public String getBannedStopsHardStr() {
-        return bannedStopsHard.asString();
-    }
-    
-    public String getBannedAgenciesStr() {
-        return getRouteOrAgencyStr(bannedAgencies);
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
