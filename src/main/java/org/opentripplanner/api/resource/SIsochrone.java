@@ -207,7 +207,7 @@ public class SIsochrone extends RoutingResource {
                 this.maxUserSpeed = sptRequestA.walkSpeed;
             } else if (modes.getBicycle()) {
                 this.maxUserSpeed = sptRequestA.bikeSpeed;
-            } else if (modes.getDriving()) {
+            } else if (modes.getCar()) {
                 this.maxUserSpeed = sptRequestA.carSpeed;
                 this.usesCar = true;
             }

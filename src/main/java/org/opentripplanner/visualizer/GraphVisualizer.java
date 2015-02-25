@@ -359,8 +359,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JCheckBox carCheckBox;
 
-    private JCheckBox cmvCheckBox;
-
     private JTextField searchDate;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -623,9 +621,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(transitCheckBox);
         carCheckBox = new JCheckBox("car");
         pane.add(carCheckBox);
-        cmvCheckBox = new JCheckBox("custom vehicle");
-        pane.add(cmvCheckBox);
-        
+
         // row: arrive by?
         JLabel arriveByLabel = new JLabel("Arrive by?:");
         pane.add(arriveByLabel);
@@ -1416,7 +1412,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         modeSet.setTrainish(trainCheckBox.isSelected());
         modeSet.setBusish(busCheckBox.isSelected());
         modeSet.setCar(carCheckBox.isSelected());
-        modeSet.setCustomMotorVehicle(cmvCheckBox.isSelected());
         // must set generic transit mode last, and only when it is checked
         // otherwise 'false' will clear trainish and busish
         if (transitCheckBox.isSelected())

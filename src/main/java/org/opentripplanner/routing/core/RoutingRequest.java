@@ -493,7 +493,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.bikeSwitchTime = bikeSwitchTime;
             bikeWalkingOptions.bikeSwitchCost = bikeSwitchCost;
             bikeWalkingOptions.stairsReluctance = stairsReluctance * 5; // carrying bikes on stairs is awful
-        } else if (modes.getDriving()) {
+        } else if (modes.getCar()) {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.arriveBy);
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
@@ -981,8 +981,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             return bikeSpeed;
         case CAR:
             return carSpeed;
-        case CUSTOM_MOTOR_VEHICLE:
-            return carSpeed;
         default:
             break;
         }
@@ -992,7 +990,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** @return The highest speed for all possible road-modes. */
     public double getStreetSpeedUpperBound() {
         // Assume carSpeed > bikeSpeed > walkSpeed
-        if (modes.getDriving())
+        if (modes.getCar())
             return carSpeed;
         if (modes.getBicycle())
             return bikeSpeed;

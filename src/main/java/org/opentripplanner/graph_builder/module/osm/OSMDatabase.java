@@ -778,13 +778,12 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             return;
         }
 
-        TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR,
-                TraverseMode.CUSTOM_MOTOR_VEHICLE);
+        TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR);
         String exceptModes = relation.getTag("except");
         if (exceptModes != null) {
             for (String m : exceptModes.split(";")) {
                 if (m.equals("motorcar")) {
-                    modes.setDriving(false);
+                    modes.setCar(false);
                 } else if (m.equals("bicycle")) {
                     modes.setBicycle(false);
                     LOG.debug(addBuilderAnnotation(new TurnRestrictionException(via, from)));
