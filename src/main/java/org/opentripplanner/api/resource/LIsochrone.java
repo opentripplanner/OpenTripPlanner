@@ -177,7 +177,7 @@ public class LIsochrone extends RoutingResource {
         if (coordinateOrigin != null)
             isoChroneRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin)
                     .getCoordinate();
-        RoutingRequest sptRequest = buildRequest(0);
+        RoutingRequest sptRequest = buildRequest();
 
         if (maxTimeSec != null) {
             isoChroneRequest.maxTimeSec = maxTimeSec;

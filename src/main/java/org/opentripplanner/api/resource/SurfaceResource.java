@@ -64,7 +64,7 @@ public class SurfaceResource extends RoutingResource {
 
         // Build the request
         try {
-            RoutingRequest req = buildRequest(0); // batch must be true
+            RoutingRequest req = buildRequest(); // batch must be true
            
             // routerId is optional -- select default graph if not set
             Router router = otpServer.getRouter(routerId);

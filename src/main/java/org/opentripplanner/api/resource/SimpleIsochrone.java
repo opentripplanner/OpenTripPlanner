@@ -158,7 +158,7 @@ public class SimpleIsochrone extends RoutingResource {
     /** @return a map from each vertex to minimum travel time over the course of the day. */
     private Map<Vertex, Double> makePoints () throws Exception {
         rangeCheckParameters();
-        request = buildRequest(0);
+        request = buildRequest();
         Router router = otpServer.getRouter(routerId);
         Graph graph = router.graph;
         //double speed = request.getWalkSpeed();

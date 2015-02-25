@@ -36,16 +36,11 @@ import java.util.*;
 
 /**
  * This is the primary entry point for the trip planning web service.
- * All parameters are passed in the query string. These parameters are defined in the abstract
+ * All parameters are passed in the query string. These parameters are defined as fields in the abstract
  * RoutingResource superclass, which also has methods for building routing requests from query
- * parameters. In order for inheritance to work, the REST resources are request-scoped (constructed at each request)
+ * parameters. This allows multiple web services to have the same set of query parameters.
+ * In order for inheritance to work, the REST resources are request-scoped (constructed at each request)
  * rather than singleton-scoped (a single instance existing for the lifetime of the OTP server).
- * 
- * Some parameters may not be honored by the trip planner for some or all itineraries. For example, maxWalkDistance
- * may be relaxed if the alternative is to not provide a route.
- * 
- * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
- *         client making the request.
  */
 @Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
 public class PlannerResource extends RoutingResource {
@@ -94,7 +89,7 @@ public class PlannerResource extends RoutingResource {
                 if (request.rctx != null) {
                     response.debugOutput = request.rctx.debugOutput;
                 }
-                request.cleanup(); // TODO verify that this is being done on Analyst web services
+                request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
             }       
         }
         return response;
