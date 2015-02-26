@@ -3,17 +3,24 @@
 ## Working on OTP in an IDE
 
 Most people writing or modifying OTP code use an Integrated Development Environment (IDE). Some of the most popular IDEs for
-Java development are Eclipse, IntelliJ IDEA, and NetBeans. All three of these environments are good for working on OTP,
-and any IDE with Maven build support should also work. Git integration is a plus. Ensure you have the Maven and Git
-plugins installed for whatever IDE you choose to use.
+Java development are [Eclipse](http://eclipse.org), [IntelliJ IDEA](https://www.jetbrains.com/idea/), and
+[NetBeans](https://netbeans.org). All three of these environments are good for working on OTP,
+and any IDE with Maven build support should also work (ensure that you have the Maven plugins installed and enabled).
+Git integration is a plus since OTP is under Git version control.
 
 IntelliJ IDEA is a commercial product, but its authors give free licenses to open source projects and the OpenTripPlanner
 development community has received such a license. If you want to use IntelliJ just ask us for the license key. It's
 an excellent IDE, and in my experience is quicker and more stable than the competition.
 
+Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP Github
+repository manually (on the command line or using some other Git interface tool), then import the resulting local OTP
+repository into my IDE as a Maven project. The IDE should then take care of fetching all the libraries OTP depends on,
+based on the Maven project description (POM file) in the base of the OTP repository. This step can take a long time because
+it involves downloading a lot of JAR files.
+
 When running your local copy of the OTP source within an IDE, all command line switches and configuration options will
 be identical to the ones used when running the OTP JAR from the command line (as described in the
-[basic introduction](Basic-Introduction) and [configuration reference](Configuration). The only difference is that you need to
+[basic introduction](Basic-Usage) and [configuration reference](Configuration). The only difference is that you need to
 manually specify the main class. When you run a JAR from the command line, the JVM automatically knows which class
 contains the entry point into the program (the `main` function), but in IDEs you must create a "run configuration".
 
