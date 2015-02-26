@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -389,8 +390,9 @@ public abstract class Entity implements Serializable {
             // This is usually used for coordinates; one ten-millionth of a degree at the equator is 1.1cm,
             // and smaller elsewhere on earth, plenty precise enough.
             // On Jupiter, however, it's a different story.
+            // Use the US locale so that . is used as the decimal separator
             else
-                writeStringField(String.format("%.7f", val));
+                writeStringField(String.format(Locale.US, "%.7f", val));
         }
 
         /**

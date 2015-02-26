@@ -39,7 +39,7 @@ public class Calendar extends Entity {
     public static class Loader extends Entity.Loader<Calendar> {
 
         public Loader(GTFSFeed feed) {
-            super(feed, "calendars");
+            super(feed, "calendar");
         }
 
         @Override
@@ -60,8 +60,9 @@ public class Calendar extends Entity {
                 c.friday = getIntField("friday", true, 0, 1);
                 c.saturday = getIntField("saturday", true, 0, 1);
                 c.sunday = getIntField("sunday", true, 0, 1);
-                c.start_date = getIntField("start_date", true, 0, 1);
-                c.end_date = getIntField("end_date", true, 0, 1);
+                // TODO check valid dates
+                c.start_date = getIntField("start_date", true, 18500101, 22001231);
+                c.end_date = getIntField("end_date", true, 18500101, 22001231);
                 c.feed = feed;
                 service.calendar = c;
             }
