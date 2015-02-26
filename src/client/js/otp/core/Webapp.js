@@ -177,6 +177,8 @@ otp.core.Webapp = otp.Class({
             this_.widgetManagerMenu.show(); // showWidgetManagerMenu();
         });
 
+        // complete the language-switcher - 5T
+        $('#language-switcher').append(otp.config.languageMenu());
 
         // create the info widgets and links along header bar
 

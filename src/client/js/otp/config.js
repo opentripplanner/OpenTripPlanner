@@ -17,12 +17,12 @@ otp.config = {
     //value is name of settings file for localization in locale subfolder
     //File should be loaded in index.html
     locales : {
-        'en': otp.locale.English,
-        'de': otp.locale.German,
-        'sl': otp.locale.Slovenian,
-        'fr': otp.locale.French,
         'it': otp.locale.Italian,
-        'ca_ES': otp.locale.Catalan
+        'en': otp.locale.English,
+        'fr': otp.locale.French,
+        'de': otp.locale.German,
+        //'sl': otp.locale.Slovenian,
+        //'ca_ES': otp.locale.Catalan
     },
 
     languageChooser : function() {
@@ -39,7 +39,16 @@ otp.config = {
         str += "</ul>";
         return str;
     },
-
+    languageMenu : function() {
+        var active_locales = _.keys(otp.config.locales);
+        var str = '';
+         _.each(active_locales, function(loc, i){
+             if (i==0) str += '<span>';
+             str += '<li><a href="?setLng=' + loc+ '">' + loc +'</a></li>';
+             if (i==0) str += '</span>';
+        });
+        return str;
+    },
 
     /**
      * The OTP web service locations
@@ -65,28 +74,28 @@ otp.config = {
      *       applicable
      *       
      */
-
-    baseLayers: [
-	{
-	   name: 'OSM',
-	   //tileUrl : 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-	   tileUrl : 'http://{s}.mz.5t.torino.it/hot/{z}/{x}/{y}.png',
-	   subdomains : ['a','b','c'],
-	   attribution : 'Data, imagery and map information provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-	},
-        {
-            name: 'MapQuest OSM',
-            tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
-            subdomains : ['otile1','otile2','otile3','otile4'],
-            attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-        },
-        {
-            name: 'Mappa Rete TPL',
-            tileUrl: 'http://185.27.252.211/tilegen/{z}/{x}/{y}.png',
-            attribution : 'Lines map courtesy of <a href="http://www.öpnvkarte.de" target="_blank">ÖPNV Karte</a>. Data, imagery and map information provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors. '
-        },
-    ],
-
+     
+     baseLayers: [
+     {
+         name: 'OSM',
+         //tileUrl : 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+         tileUrl : 'http://{s}.mz.5t.torino.it/hot/{z}/{x}/{y}.png',
+         subdomains : ['a','b','c'],
+         attribution : 'Data, imagery and map information provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+     },
+     {
+         name: 'MapQuest OSM',
+         tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
+         subdomains : ['otile1','otile2','otile3','otile4'],
+         attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+     },
+     {
+         name: 'Mappa Rete TPL',
+         tileUrl: 'http://185.27.252.211/tilegen/{z}/{x}/{y}.png',
+         attribution : 'Lines map courtesy of <a href="http://www.öpnvkarte.de" target="_blank">ÖPNV Karte</a>. Data, imagery and map information provided by <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors. '
+     },
+     ],
+    
 
     /**
      * Map start location and zoom settings: by default, the client uses the
@@ -135,7 +144,7 @@ otp.config = {
         {
             id : 'planner',
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
-            defaultBaseLayer : 'OSM',
+            defaultBaseLayer : 'MapQuest OSM',
             isDefault: true
         }/*,
         {
@@ -163,7 +172,7 @@ otp.config = {
              'url': 'http://bunet.5t.torino.it/otp-geocoder/geocode',
              'addressParam': 'address'
          }
-    ],
+     ],
 
     
 
