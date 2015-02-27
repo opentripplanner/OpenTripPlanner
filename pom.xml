@@ -449,6 +449,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- Used for parsing GTFS-RT protobuf -->
+        <dependency>
+            <groupId>com.google.transit</groupId>
+            <artifactId>gtfs-realtime-bindings</artifactId>
+            <version>0.0.4</version>
+        </dependency>
+
 
         <!-- TESTING -->
         <dependency>
