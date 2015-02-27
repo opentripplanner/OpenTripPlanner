@@ -65,8 +65,6 @@ public class GraphService {
 
     public GraphSource.Factory graphSourceFactory;
 
-    public Router.LifecycleManager routerLifecycleManager;
-
     private ScheduledExecutorService scanExecutor;
 
     public GraphService() {
@@ -179,9 +177,6 @@ public class GraphService {
                     "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
                     routerId);
             return false;
-        }
-        if (routerLifecycleManager != null) {
-            graphSource.setRouterLifecycleManager(routerLifecycleManager);
         }
         graphSource.reload(true, false);
         if (graphSource.getRouter() == null) {

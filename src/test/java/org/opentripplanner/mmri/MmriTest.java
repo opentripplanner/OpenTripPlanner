@@ -13,39 +13,7 @@
 
 package org.opentripplanner.mmri;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.resource.PlanGenerator;
-import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.routing.algorithm.GenericAStar;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.impl.LongDistancePathService;
-import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-
-import com.google.transit.realtime.GtfsRealtime.FeedEntity;
-import com.google.transit.realtime.GtfsRealtime.FeedMessage;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 /** Common base class for all the MMRI tests (see package-info). */
 abstract class MmriTest extends GtfsTest {

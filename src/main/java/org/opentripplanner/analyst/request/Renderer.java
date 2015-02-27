@@ -37,11 +37,9 @@ public class Renderer {
     private static final Logger LOG = LoggerFactory.getLogger(Renderer.class);
 
     private TileCache tileCache;
-    private SPTCache sptCache;
 
-    public Renderer(TileCache tileCache, SPTCache sptCache) {
+    public Renderer(TileCache tileCache) {
         this.tileCache = tileCache;
-        this.sptCache = sptCache;
     }
 
     public Response getResponse (

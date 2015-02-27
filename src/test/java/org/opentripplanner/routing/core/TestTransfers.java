@@ -36,7 +36,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -65,7 +65,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.Schedu
 class Context {
     public Graph graph;
 
-    public GenericAStar aStar;
+    public AStar aStar;
 
     private static Context instance = null;
 
@@ -78,7 +78,7 @@ class Context {
 
     public Context() throws IOException {
         // Create a star search
-        aStar = new GenericAStar();
+        aStar = new AStar();
 
         // Create graph
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
@@ -128,7 +128,7 @@ class Context {
 public class TestTransfers extends TestCase {
     private Graph graph;
 
-    private GenericAStar aStar;
+    private AStar aStar;
 
     public void setUp() throws Exception {
         // Get graph and a star from singleton class

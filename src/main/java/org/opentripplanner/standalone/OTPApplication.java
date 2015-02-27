@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.common.OTPExceptionMapper;
@@ -68,7 +69,7 @@ public class OTPApplication extends Application {
         Set<Class<?>> classes = Sets.newHashSet();
         classes.addAll(Arrays.asList(
             /* Jersey resource classes: define web services, i.e. an HTTP API. */
-            Planner.class,
+            PlannerResource.class,
             IndexAPI.class,
             ExternalGeocoderResource.class,
             GeocoderResource.class,
@@ -79,7 +80,7 @@ public class OTPApplication extends Application {
             ExternalGeocoderResource.class,
             TimeGridWs.class,
             AlertPatcher.class,
-            Planner.class,
+            PlannerResource.class,
             SIsochrone.class,
             Routers.class,
             Raster.class,
@@ -91,9 +92,11 @@ public class OTPApplication extends Application {
             SurfaceResource.class,
             PointSetResource.class,
             GraphInspectorTileResource.class,
+            ScriptResource.class,
             UpdaterStatusResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
-            CorsFilter.class
+            CorsFilter.class,
+            MultiPartFeature.class
         ));
         
         if (this.secure) {

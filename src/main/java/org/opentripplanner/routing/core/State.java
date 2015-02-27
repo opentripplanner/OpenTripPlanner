@@ -319,14 +319,6 @@ public class State implements Cloneable {
         return stateData.lastNextArrivalDelta;
     }
 
-    /**
-     * Returns true if this state's weight is lower than the other one. Considers only weight and
-     * not time or other criteria.
-     */
-    public boolean betterThan(State other) {
-        return this.weight < other.weight;
-    }
-
     public double getWeight() {
         return this.weight;
     }

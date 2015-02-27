@@ -34,7 +34,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -53,7 +53,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 public class TimetableTest {
     
     private static Graph graph;
-    private GenericAStar aStar = new GenericAStar();
+    private AStar aStar = new AStar();
     private static GtfsContext context;
     private static Map<AgencyAndId, TripPattern> patternIndex;
     private static TripPattern pattern;

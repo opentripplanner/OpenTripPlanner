@@ -26,16 +26,17 @@ import org.opentripplanner.routing.graph.Vertex;
 public interface RemainingWeightHeuristic extends Serializable {
 	
     /** 
-     * Perform any one-time setup and pre-computation that will be needed by later calls to 
-     * computeForwardWeight/computeReverseWeight. 
+     * Perform any one-time setup and pre-computation that will be needed by later calls to
+     * computeForwardWeight/computeReverseWeight. We may want to start from multiple origin states, so initialization
+     * cannot depend on the origin vertex or state.
+     * @param abortTime time since the Epoch in milliseconds at which we should bail out of initialization,
+     *                  or Long.MAX_VALUE for no limit.
      */
-    public void initialize(RoutingRequest options, Vertex origin, Vertex target, long abortTime);
+    public void initialize (RoutingRequest options, long abortTime);
 
-    public double computeForwardWeight(State s, Vertex target);
+    public double estimateRemainingWeight (State s);
 
-    public double computeReverseWeight(State s, Vertex target);
-    
-    /** Reset any cached data in the heuristic, e.g. between rounds of a retrying path service. */
+    /** Reset any cached data in the heuristic, before reuse in a search with the same destination. */
     public void reset();
     
     /** 

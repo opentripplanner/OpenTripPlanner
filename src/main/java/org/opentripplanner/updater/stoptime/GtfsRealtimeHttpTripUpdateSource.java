@@ -18,7 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
-import org.opentripplanner.updater.PreferencesConfigurable;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
-public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, PreferencesConfigurable {
+public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonConfigurable {
     private static final Logger LOG =
             LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
 
@@ -40,13 +41,13 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
     private String url;
 
     @Override
-    public void configure(Graph graph, Preferences preferences) throws Exception {
-        String url = preferences.get("url", null);
+    public void configure(Graph graph, JsonNode config) throws Exception {
+        String url = config.path("url").asText();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
-        this.agencyId = preferences.get("defaultAgencyId", null);
+        this.agencyId = config.path("defaultAgencyId").asText();
     }
 
     @Override

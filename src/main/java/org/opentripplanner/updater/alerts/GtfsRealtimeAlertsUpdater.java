@@ -16,6 +16,7 @@ package org.opentripplanner.updater.alerts;
 import java.io.InputStream;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -64,19 +65,18 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    protected void configurePolling(Graph graph, Preferences preferences) throws Exception {
+    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
         // TODO: add options to choose different patch services
         AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
         this.alertPatchService = alertPatchService;
-        String url = preferences.get("url", null);
+        String url = config.path("url").asText();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
-        this.earlyStart = preferences.getInt("earlyStartSec", 0);
-        this.defaultAgencyId = preferences.get("defaultAgencyId", null);
-        LOG.info("Creating real-time alert updater running every {} seconds : {}",
-        		frequencySec, url);
+        this.earlyStart = config.path("earlyStartSec").asInt(0);
+        this.defaultAgencyId = config.path("defaultAgencyId").asText();
+        LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec, url);
     }
 
     @Override

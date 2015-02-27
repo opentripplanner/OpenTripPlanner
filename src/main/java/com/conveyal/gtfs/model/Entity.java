@@ -8,6 +8,7 @@ import com.conveyal.gtfs.error.*;
 import com.google.common.io.ByteStreams;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -120,38 +121,42 @@ public abstract class Entity implements Serializable {
          * Fetch the given column of the current row, and interpret it as a time in the format HH:MM:SS.
          * @return the time value in seconds since midnight
          */
-        protected int getTimeField(String column) throws IOException {
-            String str = getFieldCheckRequired(column, true); // All time fields are required fields
+        protected int getTimeField(String column, boolean required) throws IOException {
+            String str = getFieldCheckRequired(column, required);
             int val = INT_MISSING;
-            String[] fields = str.split(":");
-            if (fields.length != 3) {
-                feed.errors.add(new TimeParseError(tableName, row, column));
-            } else {
-                try {
-                    int hours = Integer.parseInt(fields[0]);
-                    int minutes = Integer.parseInt(fields[1]);
-                    int seconds = Integer.parseInt(fields[2]);
-                    checkRangeInclusive(0, 72, hours); // GTFS hours can go past midnight. Some trains run for 3 days.
-                    checkRangeInclusive(0, 59, minutes);
-                    checkRangeInclusive(0, 59, seconds);
-                    val = (hours * 60 * 60) + minutes * 60 + seconds;
-                } catch (NumberFormatException nfe) {
+            
+            if (str != null) {
+                String[] fields = str.split(":");
+                if (fields.length != 3) {
                     feed.errors.add(new TimeParseError(tableName, row, column));
+                } else {
+                    try {
+                        int hours = Integer.parseInt(fields[0]);
+                        int minutes = Integer.parseInt(fields[1]);
+                        int seconds = Integer.parseInt(fields[2]);
+                        checkRangeInclusive(0, 72, hours); // GTFS hours can go past midnight. Some trains run for 3 days.
+                        checkRangeInclusive(0, 59, minutes);
+                        checkRangeInclusive(0, 59, seconds);
+                        val = (hours * 60 * 60) + minutes * 60 + seconds;
+                    } catch (NumberFormatException nfe) {
+                        feed.errors.add(new TimeParseError(tableName, row, column));
+                    }
                 }
             }
+            
             return val;
         }
 
         /**
          * Fetch the given column of the current row, and interpret it as a date in the format YYYYMMDD.
-         * @return the date value as Joda DateTime, or null if it could not be parsed.
+         * @return the date value as Joda LocalDate, or null if it could not be parsed.
          */
-        protected DateTime getDateField(String column, boolean required) throws IOException {
+        protected LocalDate getDateField(String column, boolean required) throws IOException {
             String str = getFieldCheckRequired(column, required);
-            DateTime dateTime = null;
+            LocalDate dateTime = null;
             if (str != null) try {
                 DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
-                dateTime = formatter.parseDateTime(str);
+                dateTime = formatter.parseLocalDate(str);
                 checkRangeInclusive(2000, 2100, dateTime.getYear());
             } catch (IllegalArgumentException iae) {
                 feed.errors.add(new DateParseError(tableName, row, column));
@@ -188,7 +193,7 @@ public abstract class Entity implements Serializable {
 
         /**
          * Used to check referential integrity.
-         * TODO Return value is not yet used, but could allow entities to point to each other directly rather than
+         * Return value is not used, but could allow entities to point to each other directly rather than
          * using indirection through string-keyed maps.
          */
         protected <K, V> V getRefField(String column, boolean required, Map<K, V> target) throws IOException {
@@ -341,7 +346,7 @@ public abstract class Entity implements Serializable {
             writeStringField(obj != null ? obj.toString() : "");
         }
 
-        protected void writeDateField (DateTime d) throws IOException {
+        protected void writeDateField (LocalDate d) throws IOException {
             writeStringField(String.format("%04d%02d%02d", d.getYear(), d.getMonthOfYear(), d.getDayOfMonth()));
         }
 
@@ -349,6 +354,11 @@ public abstract class Entity implements Serializable {
          * Take a time expressed in seconds since noon - 12h (midnight, usually) and write it in HH:MM:SS format.
          */
         protected void writeTimeField (int secsSinceMidnight) throws IOException {
+            if (secsSinceMidnight == INT_MISSING) {
+                writeStringField("");
+                return;
+            }
+            
             int seconds = secsSinceMidnight % 60;
             secsSinceMidnight -= seconds;
             // note that the minute and hour values are still expressed in seconds until we write it out, to avoid unnecessary division.
@@ -368,14 +378,19 @@ public abstract class Entity implements Serializable {
         }
 
         /**
-         * Write a double value, with precision 10^-7.
+         * Write a double value, with precision 10^-7. NaN is written as "".
          */
         protected void writeDoubleField (double val) throws IOException {
+            // NaN's represent missing values
+            if (Double.isNaN(val))
+                writeStringField("");
+            
             // control file size: don't use unnecessary precision
             // This is usually used for coordinates; one ten-millionth of a degree at the equator is 1.1cm,
             // and smaller elsewhere on earth, plenty precise enough.
             // On Jupiter, however, it's a different story.
-            writeStringField(String.format("%.7f", val));
+            else
+                writeStringField(String.format("%.7f", val));
         }
 
         /**

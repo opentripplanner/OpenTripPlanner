@@ -14,6 +14,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.spt;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
@@ -21,17 +23,28 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
- * An interface for classes that track which graph vertices are visited and their associated states,
+ * An abstract base class for classes that track which graph vertices have been visited and their associated states,
  * so that decisions can be made about whether new states should be enqueued for later exploration.
  * It also allows states to be retrieved for a given target vertex.
  * 
- * Different implementations of this interface allow the routing algorithm to switch from a basic
- * Dijkstra search (which is sufficient for non-time-dependent modes e.g. bicycle) and the more
- * complex label-setting approaches needed for time-dependent public transit routing.
- * 
- * @author andrewbyrd
+ * Different implementations of this interface allow the routing algorithm to switch from a basic Dijkstra search
+ * (which is sufficient for non-time-dependent modes e.g. bicycle) and the more complex label-setting approaches needed
+ * for time-dependent public transit routing.
  */
-public interface ShortestPathTree {
+public abstract class ShortestPathTree {
+
+    public final RoutingRequest options;
+
+    protected ShortestPathTree () {
+        this (null, new DominanceFunction.EarliestArrival());
+    }
+
+    protected ShortestPathTree (RoutingRequest options, DominanceFunction dominanceFunction) {
+        this.options = options;
+        this.dominanceFunction = dominanceFunction;
+    }
+
+    public DominanceFunction dominanceFunction = new DominanceFunction.EarliestArrival();
 
     /**
      * The add method checks a new State to see if it is non-dominated and thus worth visiting
@@ -44,7 +57,7 @@ public interface ShortestPathTree {
      * @return a boolean value indicating whether the state was added to the tree and should
      *         therefore be enqueued
      */
-    public boolean add(State s);
+    public abstract boolean add(State s);
 
     /**
      * The visit method should generally be called upon extracting a State from a priority queue. It
@@ -62,56 +75,63 @@ public interface ShortestPathTree {
      *            - the state about to be visited
      * @return - whether this state is still considered worth visiting.
      */
-    public boolean visit(State s);
+    public abstract boolean visit(State s);
 
     /**
      * Returns a collection of 'interesting' states for the given Vertex. Depending on the
      * implementation, this could contain a single optimal state, a set of Pareto-optimal states, or
      * even states that are not known to be optimal but are judged interesting by some other
      * criteria.
-     * 
-     * @param dest
-     *            - the vertex of interest
+     * TODO there are no subclasses of state. Why do we accept them here?
+     *
+     * @param dest the vertex of interest
      * @return a collection of 'interesting' states at that vertex
      */
-    public List<? extends State> getStates(Vertex dest);
+    public abstract List<? extends State> getStates(Vertex dest);
 
     /**
      * Returns the 'best' state for the given Vertex, where 'best' depends on the implementation.
      * 
-     * @param dest
-     *            - the vertex of interest
+     * @param dest the vertex of interest
      * @return a 'best' state at that vertex
      */
-    public State getState(Vertex dest);
+    public abstract State getState(Vertex dest);
 
-    /**
-     * This should probably be somewhere else (static method on GraphPath?), 
-     * but leaving it here for now for backward compat.
-     * 
-     * @return a list of GraphPaths, sometimes empty but never null.
-     */
-    public List<GraphPath> getPaths(Vertex dest, boolean optimize);
+    /** @return a list of GraphPaths, sometimes empty but never null. */
+    public List<GraphPath> getPaths(Vertex dest, boolean optimize) {
+        List<? extends State> stateList = getStates(dest);
+        if (stateList == null)
+            return Collections.emptyList();
+        List<GraphPath> ret = new LinkedList<GraphPath>();
+        for (State s : stateList) {
+            if (s.isFinal() && s.allPathParsersAccept())
+                ret.add(new GraphPath(s, optimize));
+        }
+        return ret;
+    }
 
-    /** Return a default set of back-optimized paths to the target vertex */
-    public List<GraphPath> getPaths();
+    /** @return a default set of back-optimized paths to the target vertex. */
+    public List<GraphPath> getPaths() { return getPaths(options.getRoutingContext().target, true); }
 
-    public GraphPath getPath(Vertex dest, boolean optimize);
+    /** @return a single optimal, optionally back-optimized path to the given vertex. */
+    public GraphPath getPath(Vertex dest, boolean optimize) {
+        State s = getState(dest);
+        if (s == null) {
+            return null;
+        } else {
+            return new GraphPath(s, optimize);
+        }
+    }
 
-    /**
-     * How many vertices are referenced in this SPT?
-     * 
-     * @return number of vertices
-     */
-    int getVertexCount();
+    /** @return number of vertices referenced in this SPT */
+    public abstract int getVertexCount();
 
     /** @return the routing context for the search that produced this tree */
-    public RoutingRequest getOptions();
+    public RoutingRequest getOptions() {
+        return options;
+    }
 
     /** @return every state in this tree */
-    public Collection<? extends State> getAllStates();
-
-    /** Visit a vertex after it has been settled */
-    public void postVisit(State u);
+    public abstract Collection<? extends State> getAllStates();
 
 }

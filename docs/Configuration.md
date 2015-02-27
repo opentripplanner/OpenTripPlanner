@@ -1,5 +1,94 @@
 # Configuration
 
+## Directory tree
+
+Here we describe where OTP will look for its configuration files and the inputs that describe the transportation
+network, as well as where it will store any temporary files or cached data. Most important is the OTP *base directory*
+which defaults to `/var/otp`. Unless you tell OTP otherwise, all other configuration, input and storage directories
+will be sought immediately beneath this one. This prefix follows UNIX conventions so it should work in Linux and Mac OSX
+environments, but it is inappropriate under Windows or where the user running OTP either cannot obtain permissions to
+`/var` or simply wishes to experiment within their home directory rather than deploy a system-wide server.
+In these cases one should use the baseDir switch when starting up OTP to override the default. For example: `--baseDir /home/username/otp`.
+
+OTP is configured via JSON files. The file `otp-config.json` is placed in the OTP base directory and contains settings
+that affect the entire OTP instance. Each router within that instance is configured using two other JSON files placed
+alongside the input files (OSM, GTFS, elevation data etc.) in the router's directory. These router-level config files
+are named `build-config.json` and `router-config.json`. Each configuration option within each of these files is optional,
+as are all three of the files themselves. If any option or an entire file is missing, reasonable defaults will be applied.
+
+## Graph building vs. run time router configuration
+
+Some parts of the process that loads the street and transit network description are time consuming and memory-hungry.
+To avoid repeating these slow steps every time OTP starts up, we can trigger them manually whenever the input files change,
+saving the resulting transportation network description to disk. We call this prepared product a `graph` following
+[mathematical terminology](https://en.wikipedia.org/wiki/Graph_%28mathematics%29)), and refer to these "heavier" steps as
+*graph building*. They are controlled by `build-config.json`. There are many other details of OTP operation that can be
+modified without requiring the potentially long operation of rebuilding the graph. These run-time configuration options
+are found in `router-config.json`.
+
+
+### Routers
+
+
+## Per-router configuration
+
+
+## Graph building
+
+### Graph Build Configuration
+
+By default this is `/var/otp/graphs/router_id/build-config.json`.
+
+### Launching a Graph Build
+
+### Server-wide Configuration
+
+### Individual Router Configuration
+
+### Starting a Server
+
+## Router runtime configuration
+
+By default this is `/var/otp/graphs/router_id/router-config.json`.
+
+### Timeouts
+
+Path searches can sometimes take a long time to complete, especially certain problematic cases that have yet to be optimized.
+Often a first itinerary is found quickly, but it is time-consuming or impossible to find subsequent alternative itineraries
+and this delays the response. You can set timeouts to avoid tying up server resources on pointless searches and ensure that
+your users receive a timely response. When a search times out, a WARN level log entry is made with information that can
+help identify problematic searches and improve our routing methods.
+
+The available timeout options are:
+
+```JSON
+{
+  timeout: 5.5
+}
+```
+
+This specifies a single, simple timeout in (optionally fractional) seconds. Searching is aborted after this many seconds and any
+paths already found are returned to the client. This is equivalent to specifying a `timeouts` array with a single element.
+The alternative is:
+
+```JSON
+{
+  timeouts: [5, 4, 3, 1]
+}
+```
+
+Here, the configuration key is `timeouts` (plural) and we specify an array of times in floating-point seconds. The Nth
+element in the array applies to the Nth itinerary search, and importantly all values are relative to the beginning of the
+search for the *first* itinerary. If OTP is configured to find more itineraries than there are elements in the timeouts
+array, the final element in the timeouts array will apply to all remaining unmatched searches.
+
+This allows you to keep overall response time down while ensuring that the end user will get at least one
+response, providing more only when it won't hurt response time. The timeout values will typically be decreasing to
+reflect the decreasing marginal value of alternative itineraries: everyone wants at least one response, it's nice to
+have two for comparison, but we only care about having three, four, or more options if completing those extra searches
+doesn't cause annoyingly long response times.
+
+
 ## Elevation data 
 
 OpenTripPlanner can "drape" the OSM street network over a digital elevation model (DEM).
@@ -69,3 +158,52 @@ they become available. OTP can use both approaches.
 
 
 ### Vehicle Positions
+
+
+```JSON
+{
+    // Routing defaults are any public field or setter in org.opentripplanner.routing.core.RoutingRequest
+    routingDefaults: {
+        numItineraries: 6,
+        walkSpeed: 2.0,
+        stairsReluctance: 4.0,
+        carDropoffTime: 240
+    },
+
+    updaters: [
+        // GTFS-RT service alerts (polling)
+        {
+            type: "real-time-alerts",
+            frequencySec: 30,
+            url: "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
+            defaultAgencyId: "TriMet"
+        },
+
+        // Bike rental updater for Citybikes (polling)
+        {
+            type: "bike-rental",
+            frequencySec: 300,
+            sourceType: "city-bikes",
+            url: "http://host.domain.tld"
+        },
+
+        // Bike parking availability
+        // bp.type=bike-park
+
+        // Stop Time Updates (polling GTFS-RT TripUpdates)
+        {
+            type: "stop-time-updater",
+            frequencySec: 60,
+            // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
+            sourceType: "gtfs-http",
+            url: "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
+            defaultAgencyId: "TriMet"
+        },
+
+        // Stop Time Updates (streaming differential GTFS-RT TripUpdates)
+        {
+            type: "websocket-gtfs-rt-updater"
+        }
+    ]
+}
+```

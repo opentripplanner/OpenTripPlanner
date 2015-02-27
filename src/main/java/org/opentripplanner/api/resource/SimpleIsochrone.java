@@ -51,13 +51,12 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opentripplanner.api.common.RoutingResource;
-import org.opentripplanner.routing.algorithm.EarliestArrivalSPTService;
+import org.opentripplanner.routing.algorithm.EarliestArrivalSearch;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -96,7 +95,7 @@ public class SimpleIsochrone extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(SimpleIsochrone.class);
 
-    private static final SPTService sptService = new EarliestArrivalSPTService();
+    private static final EarliestArrivalSearch sptService = new EarliestArrivalSearch();
 
     /* Parameters shared between all methods. */
     @QueryParam("requestSpacingMinutes") @DefaultValue("30") 

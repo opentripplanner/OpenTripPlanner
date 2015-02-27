@@ -20,15 +20,16 @@ import com.google.common.collect.Iterators;
 import com.sun.org.apache.xerces.internal.impl.dv.xs.DateTimeDV;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.io.IOException;
 import java.util.Iterator;
 
 public class CalendarDate extends Entity {
 
-    public Service  service;
-    public DateTime date;
-    public int      exception_type;
+    public Service   service;
+    public LocalDate date;
+    public int       exception_type;
 
     public static class Loader extends Entity.Loader<CalendarDate> {
 
@@ -41,14 +42,14 @@ public class CalendarDate extends Entity {
             /* Calendars and Fares are special: they are stored as joined tables rather than simple maps. */
             String service_id = getStringField("service_id", true);
             Service service = feed.getOrCreateService(service_id);
-            DateTime date = getDateField("date", true);
+            LocalDate date = getDateField("date", true);
             if (service.calendar_dates.containsKey(date)) {
                 feed.errors.add(new DuplicateKeyError(tableName, row, "(service_id, date)"));
             } else {
                 CalendarDate cd = new CalendarDate();
                 cd.service = service;
                 cd.date = date;
-                cd.exception_type = getIntField("exception_type", true, 0, 1);
+                cd.exception_type = getIntField("exception_type", true, 1, 2);
                 cd.feed = feed;
                 service.calendar_dates.put(date, cd);
             }

@@ -24,13 +24,17 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.graph_builder.impl.map.BusRouteStreetMatcher;
+import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.impl.osm.DebugNamer;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
+import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule;
+import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -73,7 +77,7 @@ public class FromToLinkerTest {
 
         graph = new Graph();
 
-        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        OpenStreetMapModule loader = new OpenStreetMapModule();
         //names streets based on osm ids (osm:way:osmid)
         loader.customNamer = new DebugNamer();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
@@ -106,7 +110,7 @@ public class FromToLinkerTest {
             gtfsBundle.setTransfersTxtDefinesStationPaths(false);
             gtfsBundles.add(gtfsBundle);
             
-            GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
+            GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);
         
             BusRouteStreetMatcher matcher = new BusRouteStreetMatcher();
             
@@ -116,12 +120,12 @@ public class FromToLinkerTest {
         }
         
         if (taggedBuilder) {
-            TransitToTaggedStopsGraphBuilderImpl transitToTaggedStopsGraphBuilderImpl = new TransitToTaggedStopsGraphBuilderImpl();
+            TransitToTaggedStopsModule transitToTaggedStopsGraphBuilderImpl = new TransitToTaggedStopsModule();
             transitToTaggedStopsGraphBuilderImpl.buildGraph(graph, extra);
         }
         
         if (normalBuilder) {
-            TransitToStreetNetworkGraphBuilderImpl transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkGraphBuilderImpl();
+            TransitToStreetNetworkModule transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkModule();
             transitToStreetNetworkGraphBuilderImpl.buildGraph(graph, extra);
         }
         graph.index(new DefaultStreetVertexIndexFactory());
@@ -191,7 +195,7 @@ public class FromToLinkerTest {
         assertNotNull(options.rctx.toVertex);
         assertNotNull(options.rctx.fromVertex);
         
-        GenericAStar aStar = new GenericAStar();
+        AStar aStar = new AStar();
         ShortestPathTree spt;
         GraphPath path;
         

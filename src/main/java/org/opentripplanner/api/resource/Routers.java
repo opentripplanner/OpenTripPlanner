@@ -42,7 +42,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
-import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
@@ -50,13 +50,11 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
@@ -274,15 +272,13 @@ public class Routers {
             return Response.status(Response.Status.BAD_REQUEST).entity("Could not extract zip file: " + ex.getMessage()).build();
         }
 
-           
         // set up the build, using default parameters
         // this is basically simulating calling otp -b on the command line
         CommandLineParameters params = otpServer.params.clone();
-        params.build = Lists.newArrayList();
-        params.build.add(tempDir);
+        params.build = tempDir;
         params.inMemory = true;
         
-        GraphBuilderTask graphBuilder = new OTPConfigurator(params).builderFromParameters();
+        GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, tempDir);
         
         graphBuilder.run();
         

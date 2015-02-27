@@ -24,7 +24,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.FileCsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
-import org.opentripplanner.graph_builder.impl.DownloadableGtfsInputSource;
+import org.opentripplanner.graph_builder.module.DownloadableGtfsInputSource;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.updater;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     /**
      * Mirrors GraphUpdater.configure method.
      */
-    abstract protected void configurePolling(Graph graph, Preferences preferences) throws Exception;
+    abstract protected void configurePolling(Graph graph, JsonNode config) throws Exception;
 
     /**
      * The number of seconds between two polls
@@ -61,7 +62,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     @Override
     final public void run() {
         try {
-            LOG.info("Polling updater {}@{} started.", this.getClass().getName(), this.hashCode());
+            LOG.info("Polling updater started: {}", this);
             // Run "forever"
             while (true) {
                 try {
@@ -86,12 +87,13 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         }
     }
 
+    /** Shared configuration code for all polling graph updaters. */
     @Override
-    final public void configure(Graph graph, Preferences preferences) throws Exception {
+    final public void configure (Graph graph, JsonNode config) throws Exception {
         // Configure polling system
-        frequencySec = preferences.getInt("frequencySec", 60);
-        type = preferences.get("type", "");
-        // Configure concrete class
-        configurePolling(graph, preferences);
+        frequencySec = config.path("frequencySec").asInt(60);
+        type = config.path("type").asText("");
+        // Additional configuration for the concrete subclass
+        configurePolling(graph, config);
     }
 }

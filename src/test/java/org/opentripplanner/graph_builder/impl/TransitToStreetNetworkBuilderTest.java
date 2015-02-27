@@ -6,7 +6,6 @@
 package org.opentripplanner.graph_builder.impl;
 
 import org.opentripplanner.util.StreetType;
-import com.bedatadriven.geojson.GeoJsonModule;
 import com.csvreader.CsvWriter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -52,9 +51,13 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.graph_builder.impl.osm.DebugNamer;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
+import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule;
+import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.model.json_serialization.SerializerUtils;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
@@ -103,7 +106,7 @@ public class TransitToStreetNetworkBuilderTest {
 
         Graph gg = new Graph();
 
-        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        OpenStreetMapModule loader = new OpenStreetMapModule();
         //names streets based on osm ids (osm:way:osmid)
         loader.customNamer = new DebugNamer();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
@@ -122,7 +125,7 @@ public class TransitToStreetNetworkBuilderTest {
         gtfsBundle.setTransfersTxtDefinesStationPaths(false);
         gtfsBundles.add(gtfsBundle);
         
-        GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
+        GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);
 
         provider.setPath(file);
         loader.setProvider(provider);
@@ -138,12 +141,12 @@ public class TransitToStreetNetworkBuilderTest {
         gtfsBuilder.buildGraph(gg, extra);
         
         if (taggedBuilder) {
-            TransitToTaggedStopsGraphBuilderImpl transitToTaggedStopsGraphBuilderImpl = new TransitToTaggedStopsGraphBuilderImpl();
+            TransitToTaggedStopsModule transitToTaggedStopsGraphBuilderImpl = new TransitToTaggedStopsModule();
             transitToTaggedStopsGraphBuilderImpl.buildGraph(gg, extra);
         }
         
         if (normalBuilder) {
-            TransitToStreetNetworkGraphBuilderImpl transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkGraphBuilderImpl();
+            TransitToStreetNetworkModule transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkModule();
             transitToStreetNetworkGraphBuilderImpl.buildGraph(gg, extra);
         }
         
@@ -516,15 +519,18 @@ public class TransitToStreetNetworkBuilderTest {
      */
     private void writeGeoJson(String filePath,
         StreetFeatureCollection streetFeatureCollection) throws FileNotFoundException, IOException {
+        return;
+        /*
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);
         PrintStream out = new PrintStream(fileOutputStream);
         ObjectMapper mapper = SerializerUtils.getMapper();
         
-        GeoJsonModule module = new GeoJsonModule();
-        module.addSerializer(new StreetFeatureSerializer());
-        module.addSerializer(new FeatureCollectionSerializer());
+        //TODO: change this to geojson-jackson
+        //GeoJsonModule module = new GeoJsonModule();
+        //module.addSerializer(new StreetFeatureSerializer());
+        //module.addSerializer(new FeatureCollectionSerializer());
         
-        mapper.registerModule(module);
+        //mapper.registerModule(module);
         
         JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(out);
         
@@ -532,6 +538,7 @@ public class TransitToStreetNetworkBuilderTest {
 
         
         mapper.writeValue(jsonGenerator, streetFeatureCollection);        
+                */
     }   
     private static T2<Double, Integer> getMax(List<Double> list) {
         Double max = Double.MIN_VALUE;

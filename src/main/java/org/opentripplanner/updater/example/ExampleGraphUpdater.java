@@ -16,6 +16,7 @@ package org.opentripplanner.updater.example;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -55,9 +56,9 @@ public class ExampleGraphUpdater implements GraphUpdater {
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     @Override
-    public void configure(Graph graph, Preferences preferences) throws Exception {
-        frequencySec = preferences.getInt("frequencySec", 5);
-        url = preferences.get("url", null);
+    public void configure(Graph graph, JsonNode config) throws Exception {
+        frequencySec = config.path("frequencySec").asInt(5);
+        url = config.path("url").asText();
         LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
     }
 

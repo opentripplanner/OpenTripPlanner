@@ -28,7 +28,7 @@ package org.opentripplanner.updater;
  * @see GraphUpdaterManager.execute
  * @see GraphUpdaterConfigurator
  */
-public interface GraphUpdater extends PreferencesConfigurable {
+public interface GraphUpdater extends JsonConfigurable {
 
     /**
      * Graph updaters must be aware of their manager to be able to execute GraphWriterRunnables.

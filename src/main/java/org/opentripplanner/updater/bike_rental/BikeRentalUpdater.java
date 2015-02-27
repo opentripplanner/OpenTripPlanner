@@ -25,19 +25,19 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.loader.LinkRequest;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.PreferencesConfigurable;
+import org.opentripplanner.updater.JsonConfigurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,10 +80,11 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    protected void configurePolling(Graph graph, Preferences preferences) throws Exception {
-        // Set source from preferences
-        String sourceType = preferences.get("sourceType", null);
-        String apiKey = preferences.get("apiKey", null);
+    protected void configurePolling (Graph graph, JsonNode config) throws Exception {
+
+        // Set data source type from config JSON
+        String sourceType =config.path("sourceType").asText();
+        String apiKey =config.path("apiKey").asText();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
             if (sourceType.equals("jcdecaux")) {
@@ -105,15 +106,15 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
         if (source == null) {
             throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
-        } else if (source instanceof PreferencesConfigurable) {
-            ((PreferencesConfigurable) source).configure(graph, preferences);
+        } else if (source instanceof JsonConfigurable) {
+            ((JsonConfigurable) source).configure(graph, config);
         }
 
         // Configure updater
         LOG.info("Setting up bike rental updater.");
         this.graph = graph;
         this.source = source;
-        this.network = preferences.get("networks", DEFAULT_NETWORK_LIST);
+        this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
         LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec, source);
     }
 

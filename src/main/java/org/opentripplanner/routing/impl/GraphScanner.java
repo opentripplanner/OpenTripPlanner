@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Scan for graphs under the base directory and auto-register them.
- * 
- * @see GraphServiceImpl
  */
 public class GraphScanner {
 

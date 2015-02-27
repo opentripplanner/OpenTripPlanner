@@ -1,17 +1,8 @@
 package org.opentripplanner.profile;
 
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.WalkStep;
-import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.util.model.EncodedPolylineBean;
-
-import java.util.List;
 
 /**
  * A stop associated with its elapsed time from a search location and the path for reaching it.

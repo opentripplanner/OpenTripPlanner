@@ -71,7 +71,7 @@ public class TestParkAndRide extends TestCase {
     
     public void testCar() throws Exception {
 
-        GenericAStar aStar = new GenericAStar();
+        AStar aStar = new AStar();
 
         // It is impossible to get from A to C in WALK mode,
         RoutingRequest options = new RoutingRequest(new TraverseModeSet("WALK"));
@@ -122,7 +122,7 @@ public class TestParkAndRide extends TestCase {
 
     public void testBike() throws Exception {
 
-        GenericAStar aStar = new GenericAStar();
+        AStar aStar = new AStar();
 
         // Impossible to get from B to D in BIKE+WALK (no bike P+R).
         RoutingRequest options = new RoutingRequest("BICYCLE_PARK,TRANSIT");

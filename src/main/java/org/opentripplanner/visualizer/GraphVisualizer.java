@@ -82,13 +82,10 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.GenericAStarFactory;
-import org.opentripplanner.routing.impl.LongDistancePathService;
-import org.opentripplanner.routing.impl.ParetoPathService;
+import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.SPTVisitor;
-import org.opentripplanner.routing.services.PathService;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
@@ -413,10 +410,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JList<GraphBuilderAnnotation> annotationMatches;
     
-    private PathService pathservice;
+    private GraphPathFinder pathservice;
         
-    private GenericAStarFactory sptServiceFactory = new GenericAStarFactory();
-
     private DefaultListModel<String> metadataModel;
 
     private HashSet<Vertex> closed;
@@ -522,7 +517,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         LOG.info("Starting up graph visualizer...");
         
         this.graph = graph;
-        this.pathservice = new ParetoPathService(graph, sptServiceFactory);
+        this.pathservice = null; // FIXME
         setTitle("GraphVisualizer");
         
         init();
@@ -609,11 +604,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         dominateButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				State s1 = firstComparePathStates.getSelectedValue();
+                State s1 = firstComparePathStates.getSelectedValue();
 				State s2 = secondComparePathStates.getSelectedValue();
-				
-				System.out.println("s1 dominates s2:"+MultiShortestPathTree.dominates(s1,s2));
-				System.out.println("s2 dominates s1:"+MultiShortestPathTree.dominates(s2,s1));
+                DominanceFunction pareto = new DominanceFunction.Pareto();
+				System.out.println("s1 dominates s2:" + pareto.dominates(s1, s2));
+				System.out.println("s2 dominates s1:" + pareto.dominates(s2, s1));
 			}
         });
         pane.add(dominateButton);
@@ -647,7 +642,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // init center graphical panel
         showGraph = new ShowGraph(this, getGraph());
         pane.add(showGraph, BorderLayout.CENTER);
-        sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
 
         // init left panel
         leftPanel = new JPanel();
@@ -835,9 +829,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 	
 	protected void setLongDistanceMode(boolean selected) {
 		if( selected ){
-			this.pathservice = new LongDistancePathService(graph, sptServiceFactory);
+            // FIXME there is no OTPServer in the visualizer! Maybe just don't use a GraphPathFinder (ex-pathservice) at all and call the GenericAStar directly.
+			this.pathservice = null; // new GraphPathFinder(otpServer);
 		} else {
-			this.pathservice = new ParetoPathService(graph, sptServiceFactory);
+            // FIXME there is now only one path service
+			this.pathservice = null; // new ParetoPathService(graph, sptServiceFactory);
 		}
 	}
 
@@ -1823,15 +1819,19 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.numItineraries = ( Integer.parseInt( this.nPaths.getText() ) );
         
         // apply callback if the options call for it
+        /*
+            TODO apply this to the GenericAStar directly instaed of a wrapping "service"
         if( dontUseGraphicalCallbackCheckBox.isSelected() ){
         	sptServiceFactory.setTraverseVisitor(null);
         } else {
         	sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
         }
-        
+     */
+
         // set up a visitor to the path service so we can get the SPT as it's generated
         SPTVisitor vis = new SPTVisitor();
-        pathservice.setSPTVisitor(vis);
+        // pathservice.setSPTVisitor(vis);
+        // TODO set visitor -- perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
         
         long t0 = System.currentTimeMillis();
         // TODO: check options properly intialized (AMB)
