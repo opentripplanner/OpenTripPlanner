@@ -13,19 +13,16 @@ package org.opentripplanner.osm;
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import crosby.binary.BinaryParser;
+import crosby.binary.Osmformat;
+import crosby.binary.file.BlockInputStream;
 import org.opentripplanner.osm.Relation.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import crosby.binary.BinaryParser;
-import crosby.binary.Osmformat;
-import crosby.binary.file.BlockInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Parser for the OpenStreetMap PBF Format. Implements callbacks for the crosby.binary OSMPBF
@@ -38,7 +35,7 @@ import crosby.binary.file.BlockInputStream;
  * parseDense, etc. rather than the corresponding handle* methods to avoid ever converting the
  * low-level PBF objects into objects using OTP's internal OSM model.
  */
-public abstract class Parser extends BinaryParser {
+public class Parser extends BinaryParser {
 
     protected static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
@@ -47,7 +44,15 @@ public abstract class Parser extends BinaryParser {
     // private Map<String, String> stringTable = new HashMap<String, String>();    
     long nodeCount = 0;
     long wayCount = 0;
-    
+
+    public Parser () {
+        osm = new OSM(null);
+    }
+
+    public Parser (String diskPath) {
+        osm = new OSM(diskPath);
+    }
+
     private static final String[] retainKeys = new String[] {
         "highway", "parking", "bicycle"
     };
@@ -61,7 +66,7 @@ public abstract class Parser extends BinaryParser {
         // Not storing elements that lack interesting tags
         // reduces size by 80%.
         // return true;
-        return false;
+        return true;
     }
 
     // Load ways first, then skip loading all nodes which are not tracked.

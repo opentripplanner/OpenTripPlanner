@@ -1,15 +1,16 @@
 package org.opentripplanner.osm;
 
-import java.io.File;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import com.vividsolutions.jts.geom.Envelope;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
-import com.vividsolutions.jts.geom.Envelope;
+import java.io.File;
+import java.util.Map;
+import java.util.NavigableSet;
 
 /**
  * OTP representation of a subset of OpenStreetMap. One or more PBF files can be loaded into this
@@ -22,20 +23,19 @@ public class OSM {
     public Map<Long, Node> nodes;
     public Map<Long, Way> ways;
     public Map<Long, Relation> relations;
+    public NavigableSet<Tuple3<Integer, Integer, Long>> index; // (x, y, wayId)
 
-    /** The nodes which are referenced more than once by ways in this OSM. */
-    public NodeTracker intersections;
-    
     /** The MapDB backing this OSM, if any. */
     DB db = null; // db.close(); ?
-            
-    public OSM(boolean diskBacked) {
+
+    /** If diskPath is null, OSM will be loaded into memory. */
+    public OSM(String diskPath) {
         // Using DB TreeMaps is observed not to be slower than memory.
         // HashMaps are both bigger and slower.
         // It lets you run in 400MB instead of a few GB.
-        if (diskBacked) {
-            LOG.info("OSM backed by temporary file.");
-            DB db = DBMaker.newFileDB(new File("/mnt/ssd2/vex/osmdb")) // use newMemoryDB for higher speed?
+        if (diskPath != null) {
+            LOG.info("OSM backed by file.");
+            DB db = DBMaker.newFileDB(new File(diskPath))
                     .transactionDisable()
                     .asyncWriteEnable()
                     .compressionEnable()
@@ -43,25 +43,27 @@ public class OSM {
             nodes = db.getTreeMap("nodes");
             ways = db.getTreeMap("ways");
             relations = db.getTreeMap("relations");
+            index = db.getTreeSet("spatial_index");
         } else {
             // In-memory version
+            // use newMemoryDB for higher speed?
             nodes = Maps.newHashMap();
             ways = Maps.newHashMap();
-            relations = Maps.newHashMap();            
+            relations = Maps.newHashMap();
         }
     }
     
     // boolean filterTags
     public static OSM fromPBF(String pbfFile) {
         LOG.info("Reading entire PBF file '{}'", pbfFile);
-        FullParser fp = new FullParser();
-        fp.parse(pbfFile);
-        return fp.osm;
+        Parser parser = new Parser(null);
+        parser.parse(pbfFile);
+        return parser.osm;
     }
 
     public static OSM fromPBF(String pbfFile, Envelope env) {
         LOG.info("Reading PBF file '{}' filtering with envelope {}", pbfFile, env);
-        OSM osm = new OSM(true);
+        OSM osm = new OSM("/var/vex/osm");
         LOG.info("Finding nodes within the bounding geometry.");
         NodeGeomFilter ngf = new NodeGeomFilter(env);
         ngf.parse(pbfFile);
@@ -74,26 +76,7 @@ public class OSM {
         LOG.info("Loading relations (which ones?)");
         return osm;
     }
-    
-    /**
-     * Find nodes referenced by more than one way. NodeTracker intersections will be null until this
-     * is called. MapDB TreeSets are much faster than MapDB HashSets, but in-memory NodeTrackers are
-     * much faster than MapDB TreeSets.
-     */
-    public void findIntersections() {
-        LOG.info("Finding intersections.");
-        intersections = new NodeTracker();
-        NodeTracker referenced = new NodeTracker();
-        for (Way way : ways.values()) {
-            for (long nid : way.nodes) {
-                if (referenced.contains(nid)) {
-                    intersections.add(nid); // seen more than once
-                } else {
-                    referenced.add(nid); // seen for the first time
-                }
-            }
-        }
-        LOG.info("Done finding intersections.");        
-    }
+
+
 
 }
