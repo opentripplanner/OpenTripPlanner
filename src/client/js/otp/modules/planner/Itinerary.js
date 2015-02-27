@@ -42,8 +42,7 @@ otp.modules.planner.Itinerary = otp.Class({
 
     getFirstStopID : function() {
         if(this.firstStopIDs.length == 0) return null;
-        //console.log(this.firstStopIDs[0].agencyId+"_"+this.firstStopIDs[0].id);
-        return this.firstStopIDs[0].agencyId+"_"+this.firstStopIDs[0].id;
+        return this.firstStopIDs[0].replace(':','_');
     },
 
     getIconSummaryHTML : function(padding) {
