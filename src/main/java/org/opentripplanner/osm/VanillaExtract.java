@@ -82,6 +82,8 @@ public class VanillaExtract {
                     response.setStatus(HttpStatus.OK_200);
                     return;
                 }
+                /* TODO filter out buildings on the server side. */
+                boolean buildings = coords.length > 4 && "buildings".equalsIgnoreCase(coords[4]);
                 VexPbfParser.WebMercatorTile minTile = new VexPbfParser.WebMercatorTile(minLat, minLon);
                 VexPbfParser.WebMercatorTile maxTile = new VexPbfParser.WebMercatorTile(maxLat, maxLon);
 
