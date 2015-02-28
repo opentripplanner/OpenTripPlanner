@@ -13,45 +13,10 @@
 
 package org.opentripplanner.graph_builder.module.ned;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Formatter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
-import org.opentripplanner.openstreetmap.impl.OSMDownloader;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +25,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.vividsolutions.jts.geom.Envelope;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.*;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Downloads tiles from the National Elevation Dataset. 
@@ -113,15 +90,23 @@ public class NEDDownloader implements NEDTileSource {
         return path;
     }
 
+    public static double floor(double value, double step) {
+        return step * Math.floor(value / step);
+    }
+
+    public static double ceil(double value, double step) {
+        return step * Math.ceil(value / step);
+    }
+
     private List<String> getValidateElements() {
         Envelope extent = graph.getExtent();
 
         List<String> elements = new ArrayList<String>();
 
-        double minY = OSMDownloader.floor(extent.getMinY(), _latYStep);
-        double maxY = OSMDownloader.ceil(extent.getMaxY(), _latYStep);
-        double minX = OSMDownloader.floor(extent.getMinX(), _lonXStep);
-        double maxX = OSMDownloader.ceil(extent.getMaxX(), _lonXStep);
+        double minY = floor(extent.getMinY(), _latYStep);
+        double maxY = ceil(extent.getMaxY(), _latYStep);
+        double minX = floor(extent.getMinX(), _lonXStep);
+        double maxX = ceil(extent.getMaxX(), _lonXStep);
 
         for (double y = minY; y < maxY; y += _latYStep) {
             for (double x = minX; x < maxX; x += _lonXStep) {
