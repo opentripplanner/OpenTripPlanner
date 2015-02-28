@@ -40,7 +40,7 @@ public abstract class Tagged implements Serializable {
         return (value.equals(getTag(key)));
     }
 
-    public boolean tagless() {
+    public boolean hasNoTags() {
         return tags == null || tags.isEmpty();
     }
 
