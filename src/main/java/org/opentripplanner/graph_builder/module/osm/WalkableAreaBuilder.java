@@ -13,18 +13,10 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -33,11 +25,7 @@ import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.NamedArea;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -51,15 +39,7 @@ import org.opentripplanner.visibility.VisibilityPolygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.util.*;
 
 /**
  * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas
@@ -92,17 +72,17 @@ public class WalkableAreaBuilder {
     private StreetEdgeFactory edgeFactory;
 
     // This is an awful hack, but this class (WalkableAreaBuilder) ought to be rewritten.
-    private Handler __handler;
+    private OpenStreetMapModule osmModule;
 
     private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
-            StreetEdgeFactory edgeFactory, Handler __handler) {
+            StreetEdgeFactory edgeFactory, OpenStreetMapModule osmModule) {
         this.graph = graph;
         this.osmdb = osmdb;
         this.wayPropertySet = wayPropertySet;
         this.edgeFactory = edgeFactory;
-        this.__handler = __handler;
+        this.osmModule = osmModule;
     }
 
     public void build(AreaGroup group) {
@@ -211,9 +191,9 @@ public class WalkableAreaBuilder {
                     if (alreadyAddedEdges.contains(nodePair))
                         continue;
 
-                    IntersectionVertex startEndpoint = __handler.getVertexForOsmNode(nodeI,
+                    IntersectionVertex startEndpoint = osmModule.getVertexForOsmNode(nodeI,
                             areaEntity);
-                    IntersectionVertex endEndpoint = __handler.getVertexForOsmNode(nodeJ,
+                    IntersectionVertex endEndpoint = osmModule.getVertexForOsmNode(nodeJ,
                             areaEntity);
 
                     Coordinate[] coordinates = new Coordinate[] { startEndpoint.getCoordinate(),
@@ -332,8 +312,8 @@ public class WalkableAreaBuilder {
             return;
         }
         alreadyAddedEdges.add(nodePair);
-        IntersectionVertex startEndpoint = __handler.getVertexForOsmNode(node, area.parent);
-        IntersectionVertex endEndpoint = __handler.getVertexForOsmNode(nextNode, area.parent);
+        IntersectionVertex startEndpoint = osmModule.getVertexForOsmNode(node, area.parent);
+        IntersectionVertex endEndpoint = osmModule.getVertexForOsmNode(nextNode, area.parent);
 
         createSegments(node, nextNode, startEndpoint, endEndpoint, Arrays.asList(area), edgeList,
                 edges);
@@ -378,7 +358,7 @@ public class WalkableAreaBuilder {
 
             String label = "way (area) " + areaEntity.getId() + " from " + startEndpoint.getLabel()
                     + " to " + endEndpoint.getLabel();
-            String name = __handler.getNameForWay(areaEntity, label);
+            String name = osmModule.getNameForWay(areaEntity, label);
 
             AreaEdge street = edgeFactory.createAreaEdge(startEndpoint, endEndpoint, line, name,
                     length, areaPermissions, false, edgeList);
@@ -397,7 +377,7 @@ public class WalkableAreaBuilder {
 
             label = "way (area) " + areaEntity.getId() + " from " + endEndpoint.getLabel() + " to "
                     + startEndpoint.getLabel();
-            name = __handler.getNameForWay(areaEntity, label);
+            name = osmModule.getNameForWay(areaEntity, label);
 
             AreaEdge backStreet = edgeFactory.createAreaEdge(endEndpoint, startEndpoint,
                     (LineString) line.reverse(), name, length, areaPermissions, true, edgeList);
@@ -415,7 +395,7 @@ public class WalkableAreaBuilder {
             edges.add(backStreet);
 
             WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
-            __handler.applyWayProperties(street, backStreet, wayData, areaEntity);
+            osmModule.applyWayProperties(street, backStreet, wayData, areaEntity);
 
         } else {
             // take the part that intersects with the start vertex
@@ -485,7 +465,7 @@ public class WalkableAreaBuilder {
             namedArea.setStreetClass(cls);
 
             String id = "way (area) " + areaEntity.getId() + " (splitter linking)";
-            String name = __handler.getNameForWay(areaEntity, id);
+            String name = osmModule.getNameForWay(areaEntity, id);
             namedArea.setName(name);
 
             WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
