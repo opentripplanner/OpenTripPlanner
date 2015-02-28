@@ -38,7 +38,7 @@ public class VexPbfParser extends Parser {
         if (firstNode == null) {
             LOG.error("A way referenced a node that was not yet included in the input.");
         } else {
-            WebMercatorTile tile = new WebMercatorTile(firstNode.lat, firstNode.lon);
+            WebMercatorTile tile = new WebMercatorTile(firstNode.getLat(), firstNode.getLon());
             // We could also insert using ((float)lat, (float)lon) as a key
             // but depending on whether MapDB does tree path compression this might take more space
             osm.index.add(new Tuple3(tile.xtile, tile.ytile, wayId));

@@ -1,5 +1,6 @@
 package org.opentripplanner.osm;
 
+import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.server.*;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.mapdb.Fun;
@@ -75,6 +76,11 @@ public class VanillaExtract {
                 double maxLon = Double.parseDouble(coords[3]);
                 if (minLat >= maxLat || minLon >= maxLon) {
                     throw new IllegalArgumentException();
+                }
+                /* Respond to head requests to let the client know the server is alive and the request is valid. */
+                if (request.getMethod() == Method.HEAD) {
+                    response.setStatus(HttpStatus.OK_200);
+                    return;
                 }
                 VexPbfParser.WebMercatorTile minTile = new VexPbfParser.WebMercatorTile(minLat, minLon);
                 VexPbfParser.WebMercatorTile maxTile = new VexPbfParser.WebMercatorTile(maxLat, maxLon);

@@ -50,9 +50,9 @@ public class OSMTextOutput {
         print.print(nodeId);
         print.print(' ');
         Node node = osm.nodes.get(nodeId);
-        print.printf(Locale.US, "%2.6f", node.lat);
+        print.printf(Locale.US, "%2.6f", node.getLat());
         print.print(' ');
-        print.printf(Locale.US, "%3.6f", node.lon);
+        print.printf(Locale.US, "%3.6f", node.getLon());
         print.print(' ');
         print.print(node.tags);
         print.print('\n');

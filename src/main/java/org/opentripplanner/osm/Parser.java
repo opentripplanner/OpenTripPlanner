@@ -92,9 +92,7 @@ public class Parser extends BinaryParser {
             if (nodeCount++ % 10000000 == 0) {
                 LOG.info("node {}", human(nodeCount));
             }
-            Node node = new Node();
-            node.lat = (float) parseLat(n.getLat());
-            node.lon = (float) parseLon(n.getLon());
+            Node node = new Node(parseLat(n.getLat()), parseLon(n.getLon()));
             sb.setLength(0); // empty buffer
             for (int k = 0; k < n.getKeysCount(); k++) {
                 String key = getStringById(n.getKeys(k));
@@ -122,8 +120,7 @@ public class Parser extends BinaryParser {
             lastId  = id;
             lastLat = lat;
             lastLon = lon;
-            node.lat = (float) parseLat(lat);
-            node.lon = (float) parseLon(lon);
+            node.setLatLon(parseLat(lat), parseLon(lon));
             // Check whether any node has tags.
             if (nodes.getKeysValsCount() > 0) {
                 sb.setLength(0); // empty buffer

@@ -60,7 +60,7 @@ public class OSMMain {
             for (Edge edge : edges) {
                 Node fromNode = osm.nodes.get(edge.from);
                 Node toNode = osm.nodes.get(edge.to);
-                ps.printf("LINESTRING(%f %f,%f %f))\n", fromNode.lon, fromNode.lat, toNode.lon, toNode.lat);
+                ps.printf("LINESTRING(%f %f,%f %f))\n", fromNode.getLon(), fromNode.getLat(), toNode.getLon(), toNode.getLat());
             }   
         } catch (FileNotFoundException e1) {
             // TODO Auto-generated catch block
