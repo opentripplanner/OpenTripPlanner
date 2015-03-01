@@ -17,8 +17,14 @@ import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.primitives.Longs;
 import com.vividsolutions.jts.geom.*;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -26,14 +32,12 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.openstreetmap.model.*;
+import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
-import org.opentripplanner.openstreetmap.services.OSMStorage;
 import org.opentripplanner.osm.*;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,24 +45,26 @@ import java.util.*;
 
 /**
  * abyrd: I am turning this into a set of indexes wrapping a new MapDB OSM dataset.
+ * This used to be an implementation of OSMContentHandler (now called OSMStorage) but it's going to be the only
+ * implementation so I've cut it off from that interface.
  */
-public class OSMDatabase implements OSMStorage {
+public class OSMDatabase {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
     /* The new-style MapDB-based OSM dataset that is indexed in this wrapper class. */
-    private OSM osm;
+    public OSM osm;
 
-    /* Map of all bike-rental nodes, keyed by their OSM ID */ // TODO use Trove TLongSet?
-    private Set<Long> bikeRentalNodes = Sets.newHashSet();
+    /* Map of all bike-rental nodes, keyed by their OSM ID */ // TODO use Trove TLongSet? Be careful of get()==null.
+    public final Set<Long> bikeRentalNodes = Sets.newHashSet();
 
     /* Map of all bike parking nodes, keyed by their OSM ID */
-    private Set<Long> bikeParkingNodes = Sets.newHashSet();
+    public final Set<Long> bikeParkingNodes = Sets.newHashSet();
 
     /* Set of IDs of all area ways. */
     private Set<Long> areaWayIds = Sets.newHashSet();
 
-    /* All walkable areas */
+    /* All walkable areas. These are OTP Area objects, not the source way or relation IDs. */
     private List<Area> walkableAreas = new ArrayList<Area>();
 
     /* All P+R area objects (for visibility graph construction) */
@@ -73,7 +79,10 @@ public class OSMDatabase implements OSMStorage {
     /* Set of IDs for areas that are composed of a single OSM Way. */
     private Set<Long> singleWayAreas = Sets.newHashSet();
 
-    private Set<Long> processedAreas = Sets.newHashSet();
+    /* Track which ways and relations have been processed as areas (TODO define "processed") */
+    // TODO use more trove collections elsewhere
+    private TLongSet processedAreaWays = new TLongHashSet();
+    private TLongSet processedAreaRelations = new TLongHashSet();
 
     /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
     private Set<Long> waysNodeIds = new HashSet<Long>(); // TODO change name, it's confusing
@@ -82,7 +91,8 @@ public class OSMDatabase implements OSMStorage {
     private Set<Long> areaNodeIds = new HashSet<Long>();
 
     /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-    private Map<Long, OSMLevel> wayLevels = Maps.newHashMap();
+    public final Map<Long, OSMLevel> wayLevels = Maps.newHashMap();
+    // TODO make another one for relations, use Trove w/ defaults
 
     /* Set of turn restrictions for each turn "from" way ID */
     private Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
@@ -93,9 +103,12 @@ public class OSMDatabase implements OSMStorage {
 
     /*
      * Map of all transit stop nodes that lie within an area and which are connected to the area by
-     * a relation. Keyed by the area's OSM way.
+     * a relation. Keyed on the area's OSM way.
+     * FIXME actually it was keyed on any OSM entity, with identity equality.
+     * This is because the areas can come from ways or relations. Could we use the Area object itself?
+     * In its current state this can't work because the key is a transient OSM object rather than a true key.
      */
-    private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
+    private Map<Tagged, Set<Long>> stopsInAreas = Maps.newHashMap();
 
     /* List of graph annotations registered during building, to add to the graph. */
     private List<GraphBuilderAnnotation> annotations = new ArrayList<>();
@@ -111,6 +124,10 @@ public class OSMDatabase implements OSMStorage {
      * in the United States. This does not affect floor names from level maps.
      */
     public boolean noZeroLevels = true;
+
+    public OSMDatabase (OSM osm) {
+        this.osm = osm;
+    }
 
     public Collection<Area> getWalkableAreas() {
         return Collections.unmodifiableCollection(walkableAreas);
@@ -134,14 +151,6 @@ public class OSMDatabase implements OSMStorage {
 
     public Collection<TurnRestrictionTag> getToWayTurnRestrictions(Long toWayId) {
         return turnRestrictionsByToWay.get(toWayId);
-    }
-
-    public Collection<OSMNode> getStopsInArea(OSMWithTags areaParent) {
-        return stopsInAreas.get(areaParent);
-    }
-
-    public OSMLevel getLevelForWay(OSMWithTags way) {
-        return wayLevels.get(way);
     }
 
     public boolean isNodeSharedByMultipleAreas(Long nodeId) {
@@ -232,35 +241,34 @@ public class OSMDatabase implements OSMStorage {
         }
     }
 
-    @Override
     public void doneFirstPhaseRelations() {
         // TODO There is no special work to be done after the first phase, maybe eliminate this interface function
     }
 
-    @Override
     public void doneSecondPhaseWays() {
-        // This copies tags (e.g. highway=*) such that nodes are not later purged. (abyrd: Why? What does this mean?)
+        // TODO There is no special work to be done after the second phase, maybe eliminate this interface function
+        // It used to "mark nodes for keeping" which makes no sense when using a random-access MapDB
+    }
+
+    /**
+     * After all relations, ways, and nodes are loaded, handle multipolygon and single-way areas.
+     * TODO merge this into the post-load function and remove the possibility of multiple OSM sources
+     */
+    public void doneThirdPhaseNodes() {
+        // This copies tags (highway=*) such that nodes are not later purged. (abyrd: Why? What does this mean?)
         // Multipolygons may be processed more than once, which may be needed since
         // some member might be in different files for the same multipolygon.
         // NOTE (abyrd): this purging phase may not be necessary if highway tags are not
         // copied over from multipolygon relations. Perhaps we can get by with
         // only 2 steps -- ways+relations, followed by used nodes.
         // Ways can be tag-filtered in phase 1.
-        markNodesForKeeping(waysById.values(), waysNodeIds);
-        markNodesForKeeping(areaWaysById.values(), areaNodeIds);
-    }
-
-    /**
-     * After all relations, ways, and nodes are loaded, handle multipolygon and single-way areas.
-     */
-    @Override
-    public void doneThirdPhaseNodes() {
         processMultipolygonRelations();
         processSingleWayAreas();
     }
 
     /**
      * After all loading is done (from multiple OSM sources), post-process.
+     * TODO merge this into third-phase-done function, and remove the possibility of multiple OSM sources
      */
     public void postLoad() {
 
@@ -272,9 +280,9 @@ public class OSMDatabase implements OSMStorage {
     }
 
     /**
-     * Connect areas with ways when unconnected (areas outer rings crossing with ways at the same
-     * level, but with no common nodes). Currently process P+R areas only, but could easily be
-     * extended to others areas as well.
+     * An "unconnected area" is an area whose outer ring crosses one or more ways on the same OSM level without
+     * sharing any nodes. Currently we process only park and ride areas, but this could easily be extended to
+     * other areas as well.
      */
     private void processUnconnectedAreas() {
         LOG.info("Intersecting unconnected areas...");
@@ -282,12 +290,11 @@ public class OSMDatabase implements OSMStorage {
         // Simple holder for the spatial index
         class RingSegment {
             Area area;
-
             Ring ring;
-
-            OSMNode nA;
-
-            OSMNode nB;
+            long nAid;
+            Node nA;
+            long nBid;
+            Node nB;
         }
 
         /*
@@ -300,16 +307,18 @@ public class OSMDatabase implements OSMStorage {
         HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
         for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
             for (Ring ring : area.outermostRings) {
-                for (int j = 0; j < ring.nodes.size(); j++) {
-                    RingSegment ringSegment = new RingSegment();
+                for (int j = 0; j < ring.nodeIds.size(); j++) {
+                    RingSegment ringSegment = new RingSegment(); // TODO RingSegment(area, ring, i);
                     ringSegment.area = area;
                     ringSegment.ring = ring;
-                    ringSegment.nA = ring.nodes.get(j);
-                    ringSegment.nB = ring.nodes.get((j + 1) % ring.nodes.size());
-                    Envelope env = new Envelope(ringSegment.nA.lon, ringSegment.nB.lon,
-                            ringSegment.nA.lat, ringSegment.nB.lat);
-                    P2<Long> key1 = new P2<>(ringSegment.nA.getId(), ringSegment.nB.getId());
-                    P2<Long> key2 = new P2<>(ringSegment.nB.getId(), ringSegment.nA.getId());
+                    ringSegment.nAid = ring.nodeIds.get(j);
+                    ringSegment.nA = osm.nodes.get(ringSegment.nAid);
+                    ringSegment.nBid = ring.nodeIds.get((j + 1) % ring.nodeIds.size());
+                    ringSegment.nB = osm.nodes.get(ringSegment.nBid);
+                    Envelope env = new Envelope(ringSegment.nA.getLon(), ringSegment.nB.getLat(),
+                            ringSegment.nA.getLat(), ringSegment.nB.getLon());
+                    P2<Long> key1 = new P2<>(ringSegment.nAid, ringSegment.nBid);
+                    P2<Long> key2 = new P2<>(ringSegment.nBid, ringSegment.nAid);
                     if (!commonSegments.contains(key1) && !commonSegments.contains(key2)) {
                         spndx.insert(env, ringSegment);
                         commonSegments.add(key1);
@@ -321,41 +330,45 @@ public class OSMDatabase implements OSMStorage {
 
         // For each way, intersect with areas
         int nCreatedNodes = 0;
-        for (OSMWay way : waysById.values()) {
-            OSMLevel wayLevel = getLevelForWay(way);
+        for (Map.Entry<Long, Way> entry : osm.ways.entrySet()) {
+            long wayId = entry.getKey();
+            Way way = entry.getValue();
+            OSMLevel wayLevel = wayLevels.get(wayId);
 
             // For each segment of the way
-            for (int i = 0; i < way.getNodeRefs().size() - 1; i++) {                
-                OSMNode nA = nodesById.get(way.getNodeRefs().get(i));
-                OSMNode nB = nodesById.get(way.getNodeRefs().get(i + 1));
+            for (int i = 0; i < way.nodes.length - 1; i++) {
+                long nAid = way.nodes[i];
+                long nBid = way.nodes[i + 1];
+                Node nA = osm.nodes.get(nAid);
+                Node nB = osm.nodes.get(nBid);
                 if (nA == null || nB == null) {
                     continue;
                 }
-
-                Envelope env = new Envelope(nA.lon, nB.lon, nA.lat, nB.lat);
+                Envelope env = new Envelope(nA.getLon(), nB.getLon(), nA.getLat(), nB.getLat());
                 List<RingSegment> ringSegments = spndx.query(env);
                 if (ringSegments.size() == 0)
                     continue;
-                LineString seg = GeometryUtils.makeLineString(nA.lon, nA.lat, nB.lon, nB.lat);
+                LineString seg = GeometryUtils.makeLineString(nA.getLon(), nA.getLat(), nB.getLon(), nB.getLat());
                 
                 for (RingSegment ringSegment : ringSegments) {
                 	boolean wayWasSplit = false;
 
                     // Skip if both segments share a common node
-                    if (ringSegment.nA.getId() == nA.getId()
-                            || ringSegment.nA.getId() == nB.getId()
-                            || ringSegment.nB.getId() == nA.getId()
-                            || ringSegment.nB.getId() == nB.getId())
+                    if (ringSegment.nAid == nAid
+                            || ringSegment.nAid == nBid
+                            || ringSegment.nBid == nAid
+                            || ringSegment.nBid == nBid)
                         continue;
                     
                     // Skip if area and way are from "incompatible" levels
-                    OSMLevel areaLevel = getLevelForWay(ringSegment.area.parent);
+                    OSMLevel areaLevel = wayLevels.get(ringSegment.area.describeParent());
                     if (!wayLevel.equals(areaLevel))
                         continue;
 
                     // Check for real intersection
-                    LineString seg2 = GeometryUtils.makeLineString(ringSegment.nA.lon,
-                            ringSegment.nA.lat, ringSegment.nB.lon, ringSegment.nB.lat);
+                    LineString seg2 = GeometryUtils.makeLineString(
+                            ringSegment.nA.getLon(), ringSegment.nA.getLat(),
+                            ringSegment.nB.getLon(), ringSegment.nB.getLat());
                     Geometry intersection = seg2.intersection(seg);
                     Point p = null;
                     if (intersection.isEmpty()) {
@@ -373,9 +386,9 @@ public class OSMDatabase implements OSMStorage {
                         continue;
                     }
                     
-                    // if the intersection is extremely close to one of the nodes of the road or the parking lot, just use that node
-                    // rather than splitting anything. See issue 1605.
-                    OSMNode splitNode;
+                    // if the intersection is extremely close to one of the nodes of the road or the parking lot,
+                    // just use that node rather than splitting anything. See issue 1605.
+                    long splitNodeId;
                     double epsilon = 0.0000001;
                     
                     // note that the if . . . else if structure of this means that if a node at one end of a (way|ring) segment is snapped,
@@ -384,9 +397,9 @@ public class OSMDatabase implements OSMStorage {
                     // prefer inserting into the ring segment to inserting into the way, so as to reduce graph complexity
                     if (checkIntersectionDistance(p, nA, epsilon)) {
                     	// insert node A into the ring segment
-                        splitNode = nA;
+                        splitNodeId = nAid;
                         
-                        if (ringSegment.ring.nodes.contains(splitNode))
+                        if (ringSegment.ring.nodeIds.contains(splitNodeId))
                         	// This node is already a part of this ring (perhaps we inserted it previously). No need to connect again.
                         	// Note that this may not be a safe assumption to make in all cases; suppose a way were to cross exactly over a node *twice*,
                         	// we would only add it the first time.
@@ -394,32 +407,31 @@ public class OSMDatabase implements OSMStorage {
                         
                         if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nB, nA, epsilon))
                                 LOG.info("Node {} in way {} is coincident but disconnected with area {}",
-                                    	nA.getId(), way.getId(), ringSegment.area.parent.getId());
+                                    	nAid, wayId, ringSegment.area.describeParent());
                     }
                     else if (checkIntersectionDistance(p, nB, epsilon)) {
                     	// insert node B into the ring segment
-                        splitNode = nB;
+                        splitNodeId = nBid;
                         
-                        if (ringSegment.ring.nodes.contains(splitNode))
+                        if (ringSegment.ring.nodeIds.contains(splitNodeId))
                         	continue;
                         
                         if (checkDistance(ringSegment.nA, nB, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
                             LOG.info("Node {} in way {} is coincident but disconnected with area {}",
-                                	nB.getId(), way.getId(), ringSegment.area.parent.getId());
+                                	nBid, wayId, ringSegment.area.describeParent());
                     }
                     else if (checkIntersectionDistance(p, ringSegment.nA, epsilon)) {
                     	// insert node A into the road, if it's not already there
-                    	
                     	// don't insert the same node twice. This is not always safe; suppose a way crosses over the same node in the parking area twice.
                     	// but we assume it doesn't (and even if it does, it's not a huge deal, as it is still connected elsewhere on the same way).
-                    	if (way.getNodeRefs().contains(ringSegment.nA.getId()))
+                    	if (Longs.contains(way.nodes, ringSegment.nAid))
                     		continue;
                     	
-                    	way.addNodeRef(ringSegment.nA.getId(), i + 1);
+                    	insertNodeReference(wayId, way, ringSegment.nAid, i + 1);
                     	
                         if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nA, nB, epsilon))
                             LOG.info("Node {} in area {} is coincident but disconnected with way {}",
-                                	ringSegment.nA.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
+                                	ringSegment.nAid, wayId, ringSegment.area.describeParent(), wayId);
                     	
                     	// restart loop over way segments as we may have more intersections
                         // as we haven't modified the ring, there is no need to modify the spatial index, so breaking here is fine 
@@ -428,28 +440,28 @@ public class OSMDatabase implements OSMStorage {
                     }
                     else if (checkIntersectionDistance(p, ringSegment.nB, epsilon)) {
                     	// insert node B into the road, if it's not already there
-                    	
-                    	if (way.getNodeRefs().contains(ringSegment.nB.getId()))
+
+                    	if (Longs.contains(way.nodes, ringSegment.nBid))
                     		continue;
                     	
-                    	way.addNodeRef(ringSegment.nB.getId(), i + 1);
+                    	insertNodeReference(wayId, way, ringSegment.nBid, i + 1);
                     	
                         if (checkDistance(ringSegment.nB, nA, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
                             LOG.info("Node {} in area {} is coincident but disconnected with way {}",
-                                	ringSegment.nB.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
+                                	ringSegment.nBid, wayId, ringSegment.area.describeParent(), wayId);
                     	
                     	i--;
                     	break;
                     }
                     else {
-                    	// create a node
-                    	splitNode = createVirtualNode(p.getCoordinate());
+                    	// Create a new node with a negative ID
+                    	splitNodeId = createVirtualNode(p.getCoordinate());
                         nCreatedNodes++;
                         LOG.debug(
-                                "Adding virtual {}, intersection of {} ({}--{}) and area {} ({}--{}) at {}.",
-                                splitNode, way, nA, nB, ringSegment.area.parent, ringSegment.nA,
+                                "Adding virtual node {}, intersection of {} ({}--{}) and area {} ({}--{}) at {}.",
+                                splitNodeId, way, nA, nB, ringSegment.area.parent, ringSegment.nA,
                                 ringSegment.nB, p);
-                        way.addNodeRef(splitNode.getId(), i + 1);
+                        insertNodeReference(wayId, way, splitNodeId, i + 1);
                         
                         /*
                          * If we split the way, re-start the way segments loop as the newly created segments
@@ -462,24 +474,27 @@ public class OSMDatabase implements OSMStorage {
                      * The line below is O(n^2) but we do not insert often and ring size should be
                      * rather small.
                      */
-                    int j = ringSegment.ring.nodes.indexOf(ringSegment.nB);
-                    ringSegment.ring.nodes.add(j, splitNode);
+                    int j = ringSegment.ring.nodeIds.indexOf(ringSegment.nBid);
+                    ringSegment.ring.nodeIds.add(j, splitNodeId);
+                    // TODO make this a method on Ring, especially if we keep parallel node and nodeId arrays in rings.
 
                     /*
-                     * Update spatial index as we just split a ring segment. Note: we do not update
-                     * the first segment envelope, but as the new envelope is smaller than the
-                     * previous one this is harmless, apart from increasing a bit false positives
-                     * count.
+                     * Update the spatial index because we just split a ring segment. Note: we do not update
+                     * the first segment's envelope, but as the new envelope is smaller than the
+                     * previous one this is harmless, apart from increasing the false positives count a bit.
                      */
                     RingSegment ringSegment2 = new RingSegment();
                     ringSegment2.area = ringSegment.area;
                     ringSegment2.ring = ringSegment.ring;
-                    ringSegment2.nA = splitNode;
+                    ringSegment2.nAid = splitNodeId;
+                    ringSegment2.nA = osm.nodes.get(splitNodeId);
+                    ringSegment2.nBid = ringSegment.nBid;
                     ringSegment2.nB = ringSegment.nB;
-                    Envelope env2 = new Envelope(ringSegment2.nA.lon, ringSegment2.nB.lon,
-                            ringSegment2.nA.lat, ringSegment2.nB.lat);
+                    Envelope env2 = new Envelope(ringSegment2.nA.getLon(), ringSegment2.nB.getLon(),
+                            ringSegment2.nA.getLat(), ringSegment2.nB.getLat());
                     spndx.insert(env2, ringSegment2);
-                    ringSegment.nB = splitNode;
+                    ringSegment.nBid = splitNodeId;
+                    ringSegment.nB = osm.nodes.get(splitNodeId);
 
                     // if we split the way, backtrack over it again to check for additional splits
                     // otherwise, we just continue the loop over ring segments
@@ -507,6 +522,19 @@ public class OSMDatabase implements OSMStorage {
         return nodeId;
     }
 
+    /**
+     * Insert a node ID in a way at the given index. This makes a round trip through a List and is therefore slow
+     * but called very rarely. Side effect: this also updates the MapDB so it is coherent with the object on the heap.
+     */
+    public void insertNodeReference (long wayId, Way way, long nodeRef, int index) {
+        List<Long> newNodes = Lists.newArrayList();
+        newNodes.addAll(Longs.asList(way.nodes)); // fixed-length list backed by existing array, copy into new arraylist
+        newNodes.add(index, nodeRef);
+        way.nodes = Longs.toArray(newNodes);
+        osm.ways.put(wayId, way);
+    }
+
+
     // FIXME This function is being called on both relations and ways.
     // It used to work fine because the keys of the level-for-way map were OSM entity objects with identity equality.
     // Now the keys must be long integer IDs, which could (albeit rarely) lead to ID collisions across entity types.
@@ -533,26 +561,16 @@ public class OSMDatabase implements OSMStorage {
                 LOG.warn(addBuilderAnnotation(new LevelAmbiguous(levelName, entityId)));
                 level = OSMLevel.DEFAULT;
             }
+            // FIXME this is storing a level for every way! Can we use a Trove map with DEFAULT value?
             wayLevels.put(entityId, level);
         }
     }
 
-    private void markNodesForKeeping(Collection<OSMWay> osmWays, Set<Long> nodeSet) {
-        for (Iterator<OSMWay> it = osmWays.iterator(); it.hasNext();) {
-            OSMWay way = it.next();
-            // Since the way is kept, update nodes-with-neighbors
-            List<Long> nodes = way.getNodeRefs();
-            if (nodes.size() > 1) {
-                nodeSet.addAll(nodes);
-            }
-        }
-    }
-
-    /** Create areas from single ways. */
+    /** Create Area objects from single ways (i.e. rather than multipolygon relations). */
     private void processSingleWayAreas() {
         AREA: for (long wayId : singleWayAreas) {
             Way way = osm.ways.get(wayId);
-            if (processedAreas.contains(wayId)) {
+            if (processedAreaWays.contains(wayId)) { // why are we checking this? are some areas processed elsewhere?
                 continue;
             }
             for (long nodeId : way.nodes) {
@@ -561,7 +579,7 @@ public class OSMDatabase implements OSMStorage {
                 }
             }
             try {
-                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay>emptyList(), nodesById));
+                newArea(new Area(way, new TLongArrayList(new long[] {wayId}), new TLongArrayList(), osm.nodes));
             } catch (Area.AreaConstructionException e) {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
@@ -570,83 +588,104 @@ public class OSMDatabase implements OSMStorage {
                 // This occurs when there are an invalid number of points in a LinearRing
                 // Mark the ring as processed so we don't retry it.
             }
-            processedAreas.add(wayId);
+            processedAreaWays.add(wayId);
         }
     }
 
     /**
      * Copies useful metadata from multipolygon relations to the relevant ways, or to the area map.
+     * TODO what is "the area map"? This is also obviously doing more than just copying the tags.
      * This is done at a different time than processRelations(), so that way purging doesn't remove
      * the used ways.
      * FIXME should there really be any "way purging" at all? Can't we just skip some ways based on their tags
      * while turning them into edges?
      */
     private void processMultipolygonRelations() {
-        RELATION: for (OSMRelation relation : relationsById.values()) {
-            if (processedAreas.contains(relation)) {
+        RELATION: for (Map.Entry<Long, Relation> entry : osm.relations.entrySet()) {
+            long relationId = entry.getKey();
+            Relation relation = entry.getValue();
+            if (processedAreaRelations.contains(relationId)) {
                 continue;
             }
-            if (!(relation.isTag("type", "multipolygon") && (OSMFilter
-                    .isOsmEntityRoutable(relation) || relation.isParkAndRide()))) {
+            if (!(relation.hasTag("type", "multipolygon")
+                    && (OSMFilter.isOsmEntityRoutable(relation) || OSMFilter.isParkAndRide(relation)))) {
                 continue;
             }
             // Area multipolygons -- pedestrian plazas
-            ArrayList<OSMWay> innerWays = new ArrayList<OSMWay>();
-            ArrayList<OSMWay> outerWays = new ArrayList<OSMWay>();
-            for (OSMRelationMember member : relation.getMembers()) {
-                String role = member.getRole();
-                OSMWay way = areaWaysById.get(member.getRef());
-                if (way == null) {
-                    // relation includes way which does not exist in the data. Skip.
+            TLongList innerWays = new TLongArrayList();
+            TLongList outerWays = new TLongArrayList();
+            for (Relation.Member member : relation.members) {
+                if (member.type != Relation.Type.WAY) {
+                    // Below we expect the relation members to be ways. If one is not, skip this relation.
                     continue RELATION;
                 }
-                for (Long nodeId : way.getNodeRefs()) {
-                    if (!nodesById.containsKey(nodeId)) {
-                        // this area is missing some nodes, perhaps because it is on
+                Way way = osm.ways.get(member.id);
+                if (way == null) {
+                    // This relation includes a way which does not exist in the input data. Skip it.
+                    continue RELATION;
+                }
+                for (long nodeId : way.nodes) {
+                    if ( ! osm.nodes.containsKey(nodeId)) {
+                        // This area is missing some nodes, perhaps because it is on
                         // the edge of the region, so we will simply not route on it.
                         continue RELATION;
                     }
-                    MapUtils.addToMapSet(areasForNode, nodeId, way);
+                    areasContainingNode.put(nodeId, member.id);
                 }
-                if (role.equals("inner")) {
-                    innerWays.add(way);
-                } else if (role.equals("outer")) {
-                    outerWays.add(way);
+                if (member.role.equalsIgnoreCase("inner")) {
+                    innerWays.add(member.id);
+                } else if (member.role.equalsIgnoreCase("outer")) {
+                    outerWays.add(member.id);
                 } else {
-                    LOG.warn("Unexpected role " + role + " in multipolygon");
+                    LOG.warn("Unexpected role '{}' in multipolygon", member.role);
                 }
             }
-            processedAreas.add(relation);
+            processedAreaRelations.add(relationId);
             try {
-                newArea(new Area(relation, outerWays, innerWays, nodesById));
+                newArea(new Area(relation, outerWays, innerWays, osm.nodes));
             } catch (Area.AreaConstructionException e) {
                 continue;
             }
 
-            for (OSMRelationMember member : relation.getMembers()) {
+            for (Relation.Member member : relation.members) {
                 // multipolygons for attribute mapping
-                if (!("way".equals(member.getType()) && waysById.containsKey(member.getRef()))) {
+                if (member.type != Relation.Type.WAY || ! osm.ways.containsKey(member.id)) {
                     continue;
                 }
-
-                OSMWithTags way = waysById.get(member.getRef());
+                Way way = osm.ways.get(member.id);
                 if (way == null) {
                     continue;
                 }
-                String[] relationCopyTags = { "highway", "name", "ref" };
-                for (String tag : relationCopyTags) {
-                    if (relation.hasTag(tag) && !way.hasTag(tag)) {
-                        way.addTag(tag, relation.getTag(tag));
+                for (String tagKey : new String[] {"highway", "name", "ref" }) {
+                    String tagValue = relation.getTag(tagKey);
+                    if (tagValue != null) {
+                        setTagNoOverwrite(tagKey, tagValue, member.id, way);
                     }
                 }
-                if (relation.isTag("railway", "platform") && !way.hasTag("railway")) {
-                    way.addTag("railway", "platform");
+                if (relation.hasTag("railway", "platform")) {
+                    setTagNoOverwrite("railway", "platform", member.id, way);
                 }
-                if (relation.isTag("public_transport", "platform")
-                        && !way.hasTag("public_transport")) {
-                    way.addTag("public_transport", "platform");
+                if (relation.hasTag("public_transport", "platform")) {
+                    setTagNoOverwrite("public_transport", "platform", member.id, way);
                 }
             }
+        }
+    }
+
+    /**
+     * Sets the given key-value pair on the given OSM entity, unless the key is already present.
+     * Stores the way back to the MapDB as needed to keep it coherent with the Way object on the heap.
+     * FIXME we should probably not be modifying tags on the source data. We could use a Map<long, Tagged.Tag>.
+     * Set<Tag> inheritedTags, or map<String, String> inheritedTags.
+     */
+    public void setTagNoOverwrite (String key, String value, long wayId, Way way) {
+        if ( ! way.hasTag(key)) {
+            if (way.hasNoTags()) {
+                way.tags = key + "=" + value;
+            } else {
+                way.tags = way.tags + ";" + key + "=" + value;
+            }
+            osm.ways.put(wayId, way);
         }
     }
 
@@ -654,57 +693,55 @@ public class OSMDatabase implements OSMStorage {
     private void newArea(Area area) {
         StreetTraversalPermission permissions = OSMFilter.getPermissionsForEntity(area.parent,
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-        if (OSMFilter.isOsmEntityRoutable(area.parent)
-                && permissions != StreetTraversalPermission.NONE) {
+        if (OSMFilter.isOsmEntityRoutable(area.parent) && permissions != StreetTraversalPermission.NONE) {
             walkableAreas.add(area);
         }
         // Please note: the same area can be both car P+R AND bike park.
-        if (area.parent.isParkAndRide()) {
+        if (OSMFilter.isParkAndRide(area.parent)) {
             parkAndRideAreas.add(area);
         }
-        if (area.parent.isBikeParking()) {
+        if (OSMFilter.isBikeParking(area.parent)) {
             bikeParkingAreas.add(area);
         }
     }
 
     /**
-     * Copies useful metadata from relations to the relevant ways/nodes.
+     * Copies useful metadata (tags) from relations to their constituent ways and nodes.
      */
     private void processRelations() {
         LOG.debug("Processing relations...");
-
-        for (OSMRelation relation : relationsById.values()) {
-            if (relation.isTag("type", "restriction")) {
-                processRestriction(relation);
-            } else if (relation.isTag("type", "level_map")) {
-                processLevelMap(relation);
-            } else if (relation.isTag("type", "route")) {
-                processRoad(relation);
-            } else if (relation.isTag("type", "public_transport")) {
-                processPublicTransportStopArea(relation);
+        for (Map.Entry<Long, Relation> entry : osm.relations.entrySet()) {
+            long relationId = entry.getKey();
+            Relation relation = entry.getValue();
+            if (relation.hasTag("type", "restriction")) {
+                processRestriction(relationId, relation);
+            } else if (relation.hasTag("type", "level_map")) {
+                processLevelMap(relationId, relation);
+            } else if (relation.hasTag("type", "route")) {
+                processRoad(relationId, relation);
+            } else if (relation.hasTag("type", "public_transport")) {
+                processPublicTransportStopArea(relationId, relation);
             }
         }
     }
 
-    /**
-     * Store turn restrictions.
-     * 
-     * @param relation
-     */
-    private void processRestriction(OSMRelation relation) {
+    /** Store turn restrictions. */
+    private void processRestriction(long relationId, Relation relation) {
         long from = -1, to = -1, via = -1;
-        for (OSMRelationMember member : relation.getMembers()) {
-            String role = member.getRole();
-            if (role.equals("from")) {
-                from = member.getRef();
-            } else if (role.equals("to")) {
-                to = member.getRef();
-            } else if (role.equals("via")) {
-                via = member.getRef();
+        for (Relation.Member member : relation.members) {
+            if (member.role.equals("from")) {
+                from = member.id;
+            }
+            else if (member.role.equals("to")) {
+                to = member.id;
+            }
+            else if (member.role.equals("via")) {
+                via = member.id;
             }
         }
         if (from == -1 || to == -1 || via == -1) {
-            LOG.warn(addBuilderAnnotation(new TurnRestrictionBad(relation.getId())));
+            // FIXME clarify "bad" in error message (restriction was missing a role)
+            LOG.warn(addBuilderAnnotation(new TurnRestrictionBad(relationId)));
             return;
         }
 
@@ -722,21 +759,21 @@ public class OSMDatabase implements OSMStorage {
         }
 
         TurnRestrictionTag tag;
-        if (relation.isTag("restriction", "no_right_turn")) {
+        if (relation.hasTag("restriction", "no_right_turn")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.RIGHT);
-        } else if (relation.isTag("restriction", "no_left_turn")) {
+        } else if (relation.hasTag("restriction", "no_left_turn")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.LEFT);
-        } else if (relation.isTag("restriction", "no_straight_on")) {
+        } else if (relation.hasTag("restriction", "no_straight_on")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.STRAIGHT);
-        } else if (relation.isTag("restriction", "no_u_turn")) {
+        } else if (relation.hasTag("restriction", "no_u_turn")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.U);
-        } else if (relation.isTag("restriction", "only_straight_on")) {
+        } else if (relation.hasTag("restriction", "only_straight_on")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.STRAIGHT);
-        } else if (relation.isTag("restriction", "only_right_turn")) {
+        } else if (relation.hasTag("restriction", "only_right_turn")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.RIGHT);
-        } else if (relation.isTag("restriction", "only_left_turn")) {
+        } else if (relation.hasTag("restriction", "only_left_turn")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.LEFT);
-        } else if (relation.isTag("restriction", "only_u_turn")) {
+        } else if (relation.hasTag("restriction", "only_u_turn")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U);
         } else {
             LOG.warn(addBuilderAnnotation(new TurnRestrictionUnknown(relation.getTag("restriction"))));
@@ -753,7 +790,7 @@ public class OSMDatabase implements OSMStorage {
                         relation.getTag("day_on"), relation.getTag("day_off"),
                         relation.getTag("hour_on"), relation.getTag("hour_off"));
             } catch (NumberFormatException e) {
-                LOG.info("Unparseable turn restriction: " + relation.getId());
+                LOG.info("Unparseable turn restriction: " + relationId);
             }
         }
 
@@ -762,25 +799,21 @@ public class OSMDatabase implements OSMStorage {
     }
 
     /**
-     * Process an OSM level map.
-     * 
-     * @param relation
+     * Process an OSM level map. TODO what does "process" mean here?
      */
-    private void processLevelMap(OSMRelation relation) {
-        Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"),
-                Source.LEVEL_MAP, true);
-        for (OSMRelationMember member : relation.getMembers()) {
-            if ("way".equals(member.getType()) && waysById.containsKey(member.getRef())) {
-                OSMWay way = waysById.get(member.getRef());
+    private void processLevelMap(long relationId, Relation relation) {
+        Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"), Source.LEVEL_MAP, true);
+        for (Relation.Member member : relation.members) {
+            if (member.type == Relation.Type.WAY && osm.ways.containsKey(member.id)) {
+                Way way = osm.ways.get(member.id);
                 if (way != null) {
-                    String role = member.getRole();
                     // if the level map relation has a role:xyz tag, this way is something
                     // more complicated than a single level (e.g. ramp/stairway).
-                    if (!relation.hasTag("role:" + role)) {
-                        if (levels.containsKey(role)) {
-                            wayLevels.put(way, levels.get(role));
+                    if (!relation.hasTag("role:" + member.role)) {
+                        if (levels.containsKey(member.role)) {
+                            wayLevels.put(member.id, levels.get(member.role));
                         } else {
-                            LOG.warn(member.getRef() + " has undefined level " + role);
+                            LOG.warn(member.id + " has undefined level " + member.role);
                         }
                     }
                 }
@@ -789,21 +822,23 @@ public class OSMDatabase implements OSMStorage {
     }
 
     /**
-     * Handle route=road relations.
-     * 
-     * @param relation
+     * Handle route=road relations. TODO what does "handle" mean here?
+     * All ways that are members of these relations should inherit name and ref tags.
      */
-    private void processRoad(OSMRelation relation) {
-        for (OSMRelationMember member : relation.getMembers()) {
-            if (!("way".equals(member.getType()) && waysById.containsKey(member.getRef()))) {
+    private void processRoad(long relationId, Relation relation) {
+        for (Relation.Member member : relation.members) {
+            if ( ! (member.type == Relation.Type.WAY && osm.ways.containsKey(member.id))) {
                 continue;
             }
 
-            OSMWithTags way = waysById.get(member.getRef());
+            Way way = osm.ways.get(member.id);
             if (way == null) {
                 continue;
             }
 
+            // FIXME why is this being done by modifying the tags on the source OSM data?
+            // This is a text-based implementation of SetMultimap<Long, String>.
+            /*
             if (relation.hasTag("name")) {
                 if (way.hasTag("otp:route_name")) {
                     way.addTag("otp:route_name",
@@ -820,56 +855,52 @@ public class OSMDatabase implements OSMStorage {
                     way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
                 }
             }
+            */
         }
     }
 
     /**
      * Process an OSM public transport stop area relation.
      * 
-     * This goes through all public_transport=stop_area relations and adds the parent (either an
-     * area or multipolygon relation) as the key and a Set of transit stop nodes that should be
-     * included in the parent area as the value into stopsInAreas. This improves
-     * TransitToTaggedStopsGraphBuilder by enabling us to have unconnected stop nodes within the
-     * areas by creating relations .
-     * 
-     * @param relation
+     * This goes through all public_transport=stop_area relations and adds a mapping to stopsInAreas,
+     * from the parent (either an area or multipolygon relation) to a a Set of transit stop nodes
+     * that should be included in the parent area. TODO document: what happens when they are "included"?
+     * This improves TransitToTaggedStopsGraphBuilder by enabling us to have unconnected stop nodes within the
+     * areas by creating relations.
+     * TODO document: what is an "unconnected stop node"? Why would we want to have them?
+     *
      * @author hannesj
      * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
      */
-    private void processPublicTransportStopArea(OSMRelation relation) {
-        OSMWithTags platformArea = null;
-        Set<OSMNode> platformsNodes = new HashSet<>();
-        for (OSMRelationMember member : relation.getMembers()) {
-            if ("way".equals(member.getType()) && "platform".equals(member.getRole())
-                    && areaWayIds.contains(member.getRef())) {
-                if (platformArea == null)
-                    platformArea = areaWaysById.get(member.getRef());
-                else
-                    LOG.warn("Too many areas in relation " + relation.getId());
-            } else if ("relation".equals(member.getType()) && "platform".equals(member.getRole())
-                    && relationsById.containsKey(member.getRef())) {
-                if (platformArea == null)
-                    platformArea = relationsById.get(member.getRef());
-                else
-                    LOG.warn("Too many areas in relation " + relation.getId());
-            } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
-                platformsNodes.add(nodesById.get(member.getRef()));
+    private void processPublicTransportStopArea(long relationId, Relation relation) {
+        Tagged platformArea = null;
+        Set<Long> platformNodes = Sets.newHashSet();
+        for (Relation.Member member : relation.members) {
+            if (member.type == Relation.Type.WAY && "platform".equals(member.role)
+                    && areaWayIds.contains(member.id)) {
+                if (platformArea == null) {
+                    platformArea = osm.ways.get(member.id);
+                } else
+                    LOG.warn("Too many areas in relation " + relationId); {
+                }
+            }
+            else if (member.type == Relation.Type.RELATION && "platform".equals(member.role)
+                    && osm.relations.containsKey(member.id)) {
+                if (platformArea == null) {
+                    platformArea = osm.relations.get(member.id);
+                } else {
+                    LOG.warn("Too many areas in relation " + relationId);
+                }
+            }
+            else if (member.type == Relation.Type.NODE && osm.nodes.containsKey(member.id)) {
+                platformNodes.add(member.id);
             }
         }
-        if (platformArea != null && !platformsNodes.isEmpty())
-            stopsInAreas.put(platformArea, platformsNodes);
-        else
-            LOG.warn("Unable to process public transportation relation " + relation.getId());
-    }
-
-    private String addUniqueName(String routes, String name) {
-        String[] names = routes.split(", ");
-        for (String existing : names) {
-            if (existing.equals(name)) {
-                return routes;
-            }
+        if (platformArea != null && !platformNodes.isEmpty()) {
+            stopsInAreas.put(platformArea, platformNodes);
+        } else {
+            LOG.warn("Unable to process public transportation relation " + relationId);
         }
-        return routes + ", " + name;
     }
 
     private String addBuilderAnnotation(GraphBuilderAnnotation annotation) {
@@ -877,25 +908,13 @@ public class OSMDatabase implements OSMStorage {
         return annotation.getMessage();
     }
     
-    /**
-     * Check if a point is within an epsilon of a node.
-     * @param p
-     * @param n
-     * @param epsilon
-     * @return
-     */
-    private static boolean checkIntersectionDistance(Point p, OSMNode n, double epsilon) {
-    	return Math.abs(p.getY() - n.lat) < epsilon && Math.abs(p.getX() - n.lon) < epsilon;
+    /** Check if a point is within an epsilon of a node. */
+    private static boolean checkIntersectionDistance(Point p, Node n, double epsilon) {
+    	return Math.abs(p.getY() - n.getLat()) < epsilon && Math.abs(p.getX() - n.getLon()) < epsilon;
     }
     
-    /**
-     * Check if two nodes are within an epsilon.
-     * @param a
-     * @param b
-     * @param epsilon
-     * @return
-     */
-    private static boolean checkDistance(OSMNode a, OSMNode b, double epsilon) {
-    	return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;
+    /** Check if two nodes are within an epsilon. */
+    private static boolean checkDistance(Node a, Node b, double epsilon) {
+    	return Math.abs(a.getLat() - b.getLat()) < epsilon && Math.abs(a.getLon()- b.getLon()) < epsilon;
 	}
 }

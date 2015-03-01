@@ -13,20 +13,20 @@
 
 package org.opentripplanner.graph_builder.services.osm;
 
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.Tagged;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
  * For when CreativeNamePicker/WayPropertySet is just not powerful enough.
- * 
- * @author novalis
- * 
+ * TODO can we somehow merge CreativeNamer and CustomNamer?
  */
 public interface CustomNamer {
-    public String name(OSMWithTags way, String defaultName);
 
-    public void nameWithEdge(OSMWithTags way, StreetEdge edge);
+    public String name(Tagged way, String defaultName);
+
+    public void nameWithEdge(Tagged way, StreetEdge edge);
 
     public void postprocess(Graph graph);
+
 }

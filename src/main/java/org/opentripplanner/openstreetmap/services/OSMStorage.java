@@ -21,8 +21,9 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 
 /**
  * An interface to process/store parsed OpenStreetMap data.
- *
- * @see org.opentripplanner.openstreetmap.services.OpenStreetMapProvider
+ * There were two implementations of OSMStorage, but there will eventually just be one single class with no interface
+ * (OSMDatabase)
+ * @see org.opentripplanner.openstreetmap.services.OpenStreetMapProvider which feeds this thing OSM data
  */
 
 public interface OSMStorage {

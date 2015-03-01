@@ -16,6 +16,7 @@ public class Relation extends Tagged implements Serializable {
     public List<Member> members = Lists.newArrayList();
     
     public static enum Type {
+        // TODO move this to Tagged (which should be called OSMEntity), also add getType to subclasses
         NODE, WAY, RELATION;
     }
     

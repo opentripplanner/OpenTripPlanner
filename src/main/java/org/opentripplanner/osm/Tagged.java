@@ -10,6 +10,10 @@ public abstract class Tagged implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // Format: key1=val1;key2=val2
+    // TODO MapDB can probably serialize these efficiently even if it's a Map<String,String> or a List<Tag>
+    // Also OSM allows multimap tags using the semicolon:
+    // http://wiki.openstreetmap.org/wiki/Talk:Semi-colon_value_separator
+    // Implementing a Set<Pair<String>> with a single string is not necessarily a good idea...
     public String tags;
 
     public static class Tag {
@@ -57,6 +61,15 @@ public abstract class Tagged implements Serializable {
             }
         }
         return ret;
+    }
+
+    public void addTag (String key, String value) {
+        String newTag = key + "=" + value;
+        if (tags == null) {
+            tags = newTag;
+        } else {
+            tags = tags + ";" + newTag;
+        }
     }
 
     public boolean tagIsTrue (String key) {

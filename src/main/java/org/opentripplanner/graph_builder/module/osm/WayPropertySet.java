@@ -13,23 +13,21 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.Tagged;
+import org.opentripplanner.osm.Way;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc. to edges based on OSM tags.
@@ -177,13 +175,14 @@ public class WayPropertySet {
         result.setSafetyFeatures(new P2<Double>(first, second));
     }
 
-    public String getCreativeNameForWay(OSMWithTags way) {
+    // TODO rename all of this, we are passing things other than ways in here
+    public String getCreativeNameForWay(Tagged tagged) {
         CreativeNamer bestNamer = null;
         int bestScore = 0;
         for (CreativeNamerPicker picker : creativeNamers) {
             OSMSpecifier specifier = picker.specifier;
             CreativeNamer namer = picker.namer;
-            int score = specifier.matchScore(way);
+            int score = specifier.matchScore(tagged);
             if (score > bestScore) {
                 bestNamer = namer;
                 bestScore = score;
@@ -192,13 +191,13 @@ public class WayPropertySet {
         if (bestNamer == null) {
             return null;
         }
-        return bestNamer.generateCreativeName(way);
+        return bestNamer.generateCreativeName(tagged);
     }
     
     /**
      * Calculate the automobile speed, in meters per second, for this way.
      */
-    public float getCarSpeedForWay(OSMWithTags way, boolean back) {
+    public float getCarSpeedForWay(Way way, boolean back) {
         // first, check for maxspeed tags
         Float speed = null;
         Float currentSpeed;
@@ -258,7 +257,7 @@ public class WayPropertySet {
             return this.defaultSpeed;
     }
 
-    public Set<T2<Alert, NoteMatcher>> getNoteForWay(OSMWithTags way) {
+    public Set<T2<Alert, NoteMatcher>> getNoteForWay(Way way) {
         HashSet<T2<Alert, NoteMatcher>> out = new HashSet<>();
         for (NotePicker picker : notes) {
             OSMSpecifier specifier = picker.specifier;
@@ -273,7 +272,7 @@ public class WayPropertySet {
         return out;
     }
 
-    public boolean getSlopeOverride(OSMWithTags way) {
+    public boolean getSlopeOverride(Way way) {
         boolean result = false;
         int bestScore = 0;
         for (SlopeOverridePicker picker : slopeOverrides) {

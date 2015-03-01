@@ -13,13 +13,13 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.Map;
-
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.Way;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
+
+import java.util.Map;
 
 public class NoteProperties {
 
@@ -32,9 +32,8 @@ public class NoteProperties {
         this.noteMatcher = noteMatcher;
     }
 
-    public T2<Alert, NoteMatcher> generateNote(OSMWithTags way) {
-        Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way,
-                Alert.defaultLanguage);
+    public T2<Alert, NoteMatcher> generateNote(Way way) {
+        Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way, Alert.defaultLanguage);
         Alert note = new Alert();
         note.alertHeaderText = new TranslatedString();
         for (Map.Entry<String, String> kv : noteText.entrySet()) {

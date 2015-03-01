@@ -16,10 +16,12 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.ArrayListMultimap;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+import gnu.trove.list.TLongList;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.Node;
+import org.opentripplanner.osm.Relation;
+import org.opentripplanner.osm.Tagged;
 
 import java.util.*;
 
@@ -27,6 +29,9 @@ import java.util.*;
  * Stores information about an OSM area needed for visibility graph construction. Algorithm based on
  * http://wiki.openstreetmap.org/wiki/Relation:multipolygon/Algorithm but generally done in a
  * quick/dirty way.
+ *
+ * TODO store source and its ID as string (since it can be way or relation) and store Level directly in the Area
+ * parent field is not only used in error messages?
  */
 class Area {
 
@@ -34,14 +39,22 @@ class Area {
         private static final long serialVersionUID = 1L;
     }
 
-    // This is the way or relation that has the relevant tags for the area
-    OSMWithTags parent;
+    // The way or relation from which this Area was created, and which holds the relevant tags for this Area
+    Tagged parent;
+
+    long parentId; // TODO set me
+
+    /** @return a string describing the class and identifier of this area's parent entity, for use in error messages. */
+    public String describeParent () {
+        return parent.getClass().getSimpleName() + " " + parentId;
+    }
 
     List<Ring> outermostRings = new ArrayList<Ring>();
 
     private MultiPolygon jtsMultiPolygon;
 
-    Area(OSMWithTags parent, List<OSMWay> outerRingWays, List<OSMWay> innerRingWays, Map<Long, OSMNode> _nodes) {
+    /** Construct a new Area */
+    Area(Tagged parent, TLongList outerRingWays, TLongList innerRingWays, Map<Long, Node> _nodes) {
         this.parent = parent;
         // ring assignment
         List<List<Long>> innerRingNodes = constructRings(innerRingWays);

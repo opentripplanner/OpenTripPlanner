@@ -13,17 +13,18 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
+import org.opentripplanner.osm.Tagged;
+import org.opentripplanner.osm.Way;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
-
 public class TemplateLibrary {
     private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
 
-    public static String generate(String pattern, OSMWithTags way) {
+    public static String generate(String pattern, Tagged way) {
 
         if (pattern == null) {
             return null;
@@ -61,8 +62,7 @@ public class TemplateLibrary {
      * @return A map language code -> text, with at least one entry for the default language, and
      *         any other language found in OSM tag.
      */
-    public static Map<String, String> generateI18N(String pattern, OSMWithTags way,
-            String defaultLang) {
+    public static Map<String, String> generateI18N(String pattern, Way way, String defaultLang) {
 
         if (pattern == null)
             return null;

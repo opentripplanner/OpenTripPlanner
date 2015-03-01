@@ -36,8 +36,9 @@ public abstract class OSMGraphBuilderModule implements GraphBuilderModule {
      */
     public void build () {
 
-        OSMDatabase storage = new OSMDatabase(); // there are two implementations of OSMStorage.
-        storage.osm = osm;
+        // The OSMDatabase is a bunch of indexes on the OSM,
+        // and does some cleanup and filtering while building those indexes.
+        OSMDatabase storage = new OSMDatabase(osm);
 
         // Move (and inline) all these calls into the OSMDatabase constructor,
         // or a method like OSMDatabase.index(osm)
@@ -56,6 +57,7 @@ public abstract class OSMGraphBuilderModule implements GraphBuilderModule {
         }
         storage.doneThirdPhaseNodes();
 
+        storage.postLoad();
     }
 
     public static class PBFModule extends OSMGraphBuilderModule {

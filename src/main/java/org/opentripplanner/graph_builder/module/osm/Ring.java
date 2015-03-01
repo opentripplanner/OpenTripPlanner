@@ -13,68 +13,44 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
+import com.beust.jcommander.internal.Lists;
+import com.vividsolutions.jts.geom.*;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.osm.Node;
+import org.opentripplanner.visibility.VLPoint;
+import org.opentripplanner.visibility.VLPolygon;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.visibility.VLPoint;
-import org.opentripplanner.visibility.VLPolygon;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
-
 public class Ring {
-    public List<OSMNode> nodes;
+
+    public List<Long> nodeIds;
+
+    // public List<Node> nodes;
 
     public VLPolygon geometry;
 
-    public List<Ring> holes = new ArrayList<Ring>();
+    public List<Ring> holes = Lists.newArrayList();
 
     // equivalent to the ring representation, but used for JTS operations
     private Polygon jtsPolygon;
 
-    /**
-     * Why is there a boolean parameter called javaSucks? Because otherwise the two constructors
-     * have the same erasure, meaning that even though Java has enough information at compile-time
-     * to figure out which constructor I am talking about, it intentionally throws this away in the
-     * interest of having worse run-time performance. Thanks, Java!
-     * <p/>
-     * Oh, and most people would solve this problem by making a static factory method but that won't
-     * work because then all of this class's outer classes would have to be static.
-     * 
-     * @param osmNodes
-     * @param javaSucks
-     */
-    public Ring(List<OSMNode> osmNodes, boolean javaSucks) {
-        ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
-        nodes = osmNodes;
-        for (OSMNode node : osmNodes) {
-            VLPoint point = new VLPoint(node.lon, node.lat);
-            vertices.add(point);
-        }
-        geometry = new VLPolygon(vertices);
-    }
-
-    public Ring(List<Long> osmNodes, Map<Long, OSMNode> _nodes) {
-        ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
-        nodes = new ArrayList<OSMNode>(osmNodes.size());
-        for (long nodeId : osmNodes) {
-            OSMNode node = _nodes.get(nodeId);
-            if (nodes.contains(node)) {
+    public Ring(List<Long> osmNodeIds, Map<Long, Node> nodeForId) {
+        List<VLPoint> vertices = Lists.newArrayList(osmNodeIds.size());
+        nodeIds = Lists.newArrayList(osmNodeIds);
+        for (long nodeId : osmNodeIds) {
+            if (nodeIds.contains(nodeId)) {
                 // hopefully, this only happens in order to
-                // close polygons
+                // close polygons TODO couldn't we check that by position in the list?
                 continue;
             }
-            VLPoint point = new VLPoint(node.lon, node.lat);
-            nodes.add(node);
+            Node node = nodeForId.get(nodeId);
+            VLPoint point = new VLPoint(node.getLon(), node.getLat());
             vertices.add(point);
+            //nodes.add(node);
         }
         geometry = new VLPolygon(vertices);
     }
