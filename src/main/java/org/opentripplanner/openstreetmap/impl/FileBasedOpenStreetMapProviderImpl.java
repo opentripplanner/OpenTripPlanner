@@ -19,7 +19,7 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OSMStorage;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 
 public class FileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
@@ -31,7 +31,7 @@ public class FileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider
     }
 
     @Override
-    public void readOSM(OpenStreetMapContentHandler handler) {
+    public void readOSM(OSMStorage handler) {
         try {
             OpenStreetMapParser parser = new OpenStreetMapParser();
             if (_path.getName().endsWith(".gz")) {

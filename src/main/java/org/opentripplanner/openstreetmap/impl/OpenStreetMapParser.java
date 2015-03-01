@@ -13,7 +13,7 @@
 
 package org.opentripplanner.openstreetmap.impl;
 
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OSMStorage;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMNodeRef;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
@@ -38,13 +38,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class OpenStreetMapParser {
 
-    public void parseMap(File path, OpenStreetMapContentHandler map) throws IOException,
+    public void parseMap(File path, OSMStorage map) throws IOException,
             SAXException {
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(path));
         parseMap(in, map);
     }
 
-    public void parseMap(InputStream in, OpenStreetMapContentHandler map) throws IOException,
+    public void parseMap(InputStream in, OSMStorage map) throws IOException,
             SAXException {
 
         try {
@@ -61,7 +61,7 @@ public class OpenStreetMapParser {
         }
     }
 
-    private void processDocument(Document doc, OpenStreetMapContentHandler map, int phase) {
+    private void processDocument(Document doc, OSMStorage map, int phase) {
         Node osm = doc.getFirstChild();
         Node node = osm.getFirstChild();
         while (node != null) {

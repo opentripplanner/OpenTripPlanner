@@ -1,5 +1,6 @@
 package org.opentripplanner.osm;
 
+import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
@@ -13,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public abstract class OSMGraphBuilderModule implements GraphBuilderModule {
 
@@ -25,6 +27,35 @@ public abstract class OSMGraphBuilderModule implements GraphBuilderModule {
         VexServerModule module = new VexServerModule("localhost", 45.506055,-122.602763,45.518,-122.586004);
         module.checkInputs();
         module.buildGraph(graph, new HashMap<Class<?>, Object>());
+    }
+
+    /**
+     * Common graph build code that should be called after the osm field is initialized and OSM data is loaded into it.
+     * This top-level entry point is adapted from the OpenStreetMapProvider implementations, all of which would load
+     * all Relations, then all Ways, then all Nodes, calling a callback function after each of the three phases.
+     */
+    public void build () {
+
+        OSMDatabase storage = new OSMDatabase(); // there are two implementations of OSMStorage.
+        storage.osm = osm;
+
+        // Move (and inline) all these calls into the OSMDatabase constructor,
+        // or a method like OSMDatabase.index(osm)
+        for (Map.Entry<Long, Relation> entry : osm.relations.entrySet()) {
+            storage.addRelation(entry.getKey(), entry.getValue());
+        }
+        storage.doneFirstPhaseRelations();
+
+        for (Map.Entry<Long, Way> entry : osm.ways.entrySet()) {
+            storage.addWay(entry.getKey(), entry.getValue());
+        }
+        storage.doneSecondPhaseWays();
+
+        for (Map.Entry<Long, Node> entry : osm.nodes.entrySet()) {
+            storage.addNode(entry.getKey(), entry.getValue());
+        }
+        storage.doneThirdPhaseNodes();
+
     }
 
     public static class PBFModule extends OSMGraphBuilderModule {

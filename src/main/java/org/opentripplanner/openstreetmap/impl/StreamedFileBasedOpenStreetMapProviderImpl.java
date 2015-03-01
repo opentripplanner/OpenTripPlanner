@@ -13,7 +13,7 @@
 
 package org.opentripplanner.openstreetmap.impl;
 
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OSMStorage;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMap
      * @see org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider#readOSM(org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler)
      */
     @Override
-    public void readOSM(OpenStreetMapContentHandler handler) {
+    public void readOSM(OSMStorage handler) {
         try {
             if (_path.getName().endsWith(".gz")) {
                 InputStream in = new GZIPInputStream(new FileInputStream(_path));

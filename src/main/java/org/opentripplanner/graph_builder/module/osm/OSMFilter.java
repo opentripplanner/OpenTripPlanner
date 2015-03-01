@@ -17,6 +17,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.Tagged;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -24,11 +25,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ *  Lots of static functions to check whether certain tags are set.
+ *  TODO rename this class to something library-ish (Tags?)
  */
-public class OSMFilter {
+public abstract class OSMFilter {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMFilter.class);
+
+    /** @return true if the given key is explicitly denied access to the given entity. */
+    private static boolean keyExplicitlyDeniesAccess(Tagged entity, String key) {
+        String tagValue = entity.getTag(key);
+        return "no".equals(tagValue) || "license".equals(tagValue);
+    }
+
+    /** @return true if the given key is explicitly allowed access to the given entity. */
+    public static boolean keyExplicitlyAllowsAccess(Tagged entity, String key) {
+        if (entity.hasNoTags()) {
+            return false;
+        }
+        if (entity.tagIsTrue(key)) {
+            return true;
+        }
+        String value = entity.getTag(key);
+        return ("designated".equalsIgnoreCase(value) || "official".equalsIgnoreCase(value)
+                || "permissive".equalsIgnoreCase(value) || "unknown".equalsIgnoreCase(value));
+    }
+
+    /** @return true if access is generally denied to this element (potentially with exceptions). */
+    public static boolean isGeneralAccessDenied(Tagged entity) {
+        return keyExplicitlyDeniesAccess(entity, "access");
+    }
 
     /**
      * Determine whether any mode can or should ever traverse the given way. If not, we leave the
@@ -38,26 +64,27 @@ public class OSMFilter {
      * But not conveyers, proposed highways/roads or those still under construction, and raceways
      * (as well as ways where all access is specifically forbidden to the public).
      * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dproposed
+     *
+     * TODO why is this separate from isOsmEntityRoutable? It's being applied to relations as well.
      */
-    public static boolean isWayRoutable(OSMWithTags way) {
-        if (!isOsmEntityRoutable(way))
+    public static boolean isWayRoutable (Tagged way) {
+        if (!isOsmEntityRoutable(way)) {
             return false;
-
-        String highway = way.getTag("highway");
-        if (highway != null
-                && (highway.equals("conveyer") || highway.equals("proposed")
-                        || highway.equals("construction") || highway.equals("raceway") || highway
-                            .equals("unbuilt")))
-            return false;
-
-        if (way.isGeneralAccessDenied()) {
-            // There are exceptions.
-            return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
-                    .isPedestrianExplicitlyAllowed());
         }
-
+        String highway = way.getTag("highway");
+        if (highway != null && (highway.equals("conveyer") || highway.equals("proposed")
+            || highway.equals("construction") || highway.equals("raceway") || highway.equals("unbuilt"))) {
+            return false;
+        }
+        if (isGeneralAccessDenied(way)) {
+            // Check for exceptions to general denial of access
+            return keyExplicitlyAllowsAccess(way, "motorcar")
+                    || keyExplicitlyAllowsAccess(way, "bicycle")
+                    || keyExplicitlyAllowsAccess(way, "pedestrian");
+        }
         return true;
     }
+
 
     /**
      * Determines whether this OSM way is considered routable. The majority of routable ways are
@@ -67,14 +94,38 @@ public class OSMFilter {
      * usage=tourism. This prevents miniature tourist railways like the one in Portland's Zoo from
      * receiving a better score and pulling search endpoints away from real transit stops.
      */
-    public static boolean isOsmEntityRoutable(OSMWithTags osmEntity) {
-        if (osmEntity.hasTag("highway"))
+    public static boolean isOsmEntityRoutable(Tagged osmEntity) {
+        if (osmEntity.hasTag("highway")) {
             return true;
-        if (osmEntity.isTag("public_transport", "platform")
-                || osmEntity.isTag("railway", "platform")) {
-            return !("tourism".equals(osmEntity.getTag("usage")));
+        }
+        if (osmEntity.hasTag("public_transport", "platform") || osmEntity.hasTag("railway", "platform")) {
+            if (osmEntity.hasTag("usage", "tourism")) {
+                return false;
+            } else {
+                return true;
+            }
         }
         return false;
+    }
+
+    /** @return true if this node / area is a park-and-ride lot. */
+    public static boolean isParkAndRide(Tagged entity) {
+        String parkingType = entity.getTag("parking");
+        String parkAndRide = entity.getTag("park_ride");
+        return entity.hasTag("amenity", "parking")
+                && (parkingType != null && parkingType.contains("park_and_ride"))
+                || (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"));
+    }
+
+    /** @return true if this node / area is a bike parking. */
+    public static boolean isBikeParking (Tagged entity) {
+        return entity.hasTag("amenity", "bicycle_parking")
+                && !entity.hasTag("access", "private") && !entity.hasTag("access", "no");
+    }
+
+    /** @return True if this node is a bike rental station. */
+    public static boolean isBikeRental(Tagged entity) {
+        return entity.hasTag("amenity", "bicycle_rental");
     }
 
     public static StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity,
@@ -133,13 +184,7 @@ public class OSMFilter {
         return permission;
     }
 
-    /**
-     * Computes permissions for an OSMWay.
-     * 
-     * @param way
-     * @param def
-     * @return
-     */
+    /** Computes permissions for an OSMWay. */
     public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
             StreetTraversalPermission def, Graph graph) {
         StreetTraversalPermission permissions = getPermissionsForEntity(way, def);

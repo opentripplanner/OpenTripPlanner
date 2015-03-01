@@ -16,7 +16,7 @@ package org.opentripplanner.openstreetmap.services;
 
 
 public interface OpenStreetMapProvider {
-    public void readOSM(OpenStreetMapContentHandler handler);
+    public void readOSM(OSMStorage handler);
 
     /** @see GraphBuilder.checkInputs() */
     public void checkInputs();

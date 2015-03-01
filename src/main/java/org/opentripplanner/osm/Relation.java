@@ -1,9 +1,9 @@
 package org.opentripplanner.osm;
 
+import com.google.common.collect.Lists;
+
 import java.io.Serializable;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 public class Relation extends Tagged implements Serializable {
 
@@ -13,7 +13,7 @@ public class Relation extends Tagged implements Serializable {
 //    Way ways;
 //    Relation relations;
 
-    List<Member> members = Lists.newArrayList();
+    public List<Member> members = Lists.newArrayList();
     
     public static enum Type {
         NODE, WAY, RELATION;
@@ -21,9 +21,9 @@ public class Relation extends Tagged implements Serializable {
     
     public static class Member implements Serializable {
         private static final long serialVersionUID = 1L;
-        Type type;
-        long id;
-        String role;
+        public Type type;
+        public long id;
+        public String role;
         @Override
         public String toString() {
             return String.format("%s %s %d", role, type.toString(), id);

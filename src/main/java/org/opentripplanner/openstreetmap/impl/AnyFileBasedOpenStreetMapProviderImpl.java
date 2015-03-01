@@ -15,7 +15,7 @@ package org.opentripplanner.openstreetmap.impl;
 
 import java.io.File;
 
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OSMStorage;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 
 public class AnyFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
@@ -33,7 +33,7 @@ public class AnyFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvi
     public AnyFileBasedOpenStreetMapProviderImpl() { };
 
     @Override
-    public void readOSM(OpenStreetMapContentHandler handler) {
+    public void readOSM(OSMStorage handler) {
         try {
             if (_path.getName().endsWith(".pbf")) {
                 BinaryFileBasedOpenStreetMapProviderImpl p = new BinaryFileBasedOpenStreetMapProviderImpl();

@@ -13,14 +13,8 @@
 
 package org.opentripplanner.openstreetmap.impl;
 
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.model.*;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.opentripplanner.openstreetmap.services.OSMStorage;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -29,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.*;
 
 /**
  * @author Vincent Privat
@@ -52,7 +47,7 @@ public class StreamedOpenStreetMapParser {
     private static final QName qType = new QName("type");
     private static final QName qRole = new QName("role");
 
-    public static void parseMap(final File path, OpenStreetMapContentHandler map)
+    public static void parseMap(final File path, OSMStorage map)
             throws IOException, XMLStreamException {
 
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(path));
@@ -68,7 +63,7 @@ public class StreamedOpenStreetMapParser {
         map.doneThirdPhaseNodes();
     }
 
-    public static void parseMap(final InputStream in, OpenStreetMapContentHandler map, int phase) throws IOException,
+    public static void parseMap(final InputStream in, OSMStorage map, int phase) throws IOException,
             XMLStreamException {
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();

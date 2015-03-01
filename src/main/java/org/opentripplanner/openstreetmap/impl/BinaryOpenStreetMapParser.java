@@ -13,7 +13,7 @@
 
 package org.opentripplanner.openstreetmap.impl;
 
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OSMStorage;
 import org.opentripplanner.openstreetmap.model.*;
 
 import java.util.HashMap;
@@ -29,13 +29,13 @@ import crosby.binary.Osmformat;
  * @since 0.4
  */
 public class BinaryOpenStreetMapParser extends BinaryParser {
-    private OpenStreetMapContentHandler _handler;
+    private OSMStorage _handler;
     private boolean _parseWays = true;
     private boolean _parseRelations = true;
     private boolean _parseNodes = true;
     private Map<String, String> stringTable = new HashMap<String, String>();
 
-    public BinaryOpenStreetMapParser(OpenStreetMapContentHandler handler) {
+    public BinaryOpenStreetMapParser(OSMStorage handler) {
         _handler = handler;
     }
 

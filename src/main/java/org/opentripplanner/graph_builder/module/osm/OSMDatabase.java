@@ -13,37 +13,23 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Sets;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionException;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionUnknown;
+import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
+import org.opentripplanner.openstreetmap.model.*;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMRelation;
-import org.opentripplanner.openstreetmap.model.OSMRelationMember;
-import org.opentripplanner.openstreetmap.model.OSMTag;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OSMStorage;
+import org.opentripplanner.osm.*;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -51,65 +37,52 @@ import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import java.util.*;
 
-public class OSMDatabase implements OpenStreetMapContentHandler {
+/**
+ * abyrd: I am turning this into a set of indexes wrapping a new MapDB OSM dataset.
+ */
+public class OSMDatabase implements OSMStorage {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
-    /* Map of all nodes used in ways/areas keyed by their OSM ID */
-    private Map<Long, OSMNode> nodesById = new HashMap<Long, OSMNode>();
+    /* The new-style MapDB-based OSM dataset that is indexed in this wrapper class. */
+    private OSM osm;
 
-    /* Map of all bike-rental nodes, keyed by their OSM ID */
-    private Map<Long, OSMNode> bikeRentalNodes = new HashMap<Long, OSMNode>();
+    /* Map of all bike-rental nodes, keyed by their OSM ID */ // TODO use Trove TLongSet?
+    private Set<Long> bikeRentalNodes = Sets.newHashSet();
 
     /* Map of all bike parking nodes, keyed by their OSM ID */
-    private Map<Long, OSMNode> bikeParkingNodes = new HashMap<Long, OSMNode>();
+    private Set<Long> bikeParkingNodes = Sets.newHashSet();
 
-    /* Map of all non-area ways keyed by their OSM ID */
-    private Map<Long, OSMWay> waysById = new HashMap<Long, OSMWay>();
-
-    /* Map of all area ways keyed by their OSM ID */
-    private Map<Long, OSMWay> areaWaysById = new HashMap<Long, OSMWay>();
-
-    /* Map of all relations keyed by their OSM ID */
-    private Map<Long, OSMRelation> relationsById = new HashMap<Long, OSMRelation>();
+    /* Set of IDs of all area ways. */
+    private Set<Long> areaWayIds = Sets.newHashSet();
 
     /* All walkable areas */
     private List<Area> walkableAreas = new ArrayList<Area>();
 
-    /* All P+R areas */
+    /* All P+R area objects (for visibility graph construction) */
     private List<Area> parkAndRideAreas = new ArrayList<Area>();
 
-    /* All bike parking areas */
+    /* All bike parking area objects (for visibility graph construction) */
     private List<Area> bikeParkingAreas = new ArrayList<Area>();
 
     /* Map of all area OSMWay for a given node */
-    private Map<Long, Set<OSMWay>> areasForNode = new HashMap<Long, Set<OSMWay>>();
+    private Multimap<Long, Long> areasContainingNode = ArrayListMultimap.create();
 
-    /* Map of all area OSMWay for a given node */
-    private List<OSMWay> singleWayAreas = new ArrayList<OSMWay>();
+    /* Set of IDs for areas that are composed of a single OSM Way. */
+    private Set<Long> singleWayAreas = Sets.newHashSet();
 
-    private Set<OSMWithTags> processedAreas = new HashSet<OSMWithTags>();
-
-    /* Set of area way IDs */
-    private Set<Long> areaWayIds = new HashSet<Long>();
+    private Set<Long> processedAreas = Sets.newHashSet();
 
     /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
-    private Set<Long> waysNodeIds = new HashSet<Long>();
+    private Set<Long> waysNodeIds = new HashSet<Long>(); // TODO change name, it's confusing
 
     /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
     private Set<Long> areaNodeIds = new HashSet<Long>();
 
     /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-    private Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<OSMWithTags, OSMLevel>();
+    private Map<Long, OSMLevel> wayLevels = Maps.newHashMap();
 
     /* Set of turn restrictions for each turn "from" way ID */
     private Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
@@ -138,22 +111,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      * in the United States. This does not affect floor names from level maps.
      */
     public boolean noZeroLevels = true;
-
-    public OSMNode getNode(Long nodeId) {
-        return nodesById.get(nodeId);
-    }
-
-    public Collection<OSMWay> getWays() {
-        return Collections.unmodifiableCollection(waysById.values());
-    }
-
-    public Collection<OSMNode> getBikeRentalNodes() {
-        return Collections.unmodifiableCollection(bikeRentalNodes.values());
-    }
-
-    public Collection<OSMNode> getBikeParkingNodes() {
-        return Collections.unmodifiableCollection(bikeParkingNodes.values());
-    }
 
     public Collection<Area> getWalkableAreas() {
         return Collections.unmodifiableCollection(walkableAreas);
@@ -188,7 +145,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     }
 
     public boolean isNodeSharedByMultipleAreas(Long nodeId) {
-        Set<OSMWay> areas = areasForNode.get(nodeId);
+        Collection<Long> areas = areasContainingNode.get(nodeId);
         if (areas == null) {
             return false;
         }
@@ -203,125 +160,98 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         return Collections.unmodifiableList(annotations);
     }
 
-    @Override
-    public void addNode(OSMNode node) {
-        if (node.isBikeRental()) {
-            bikeRentalNodes.put(node.getId(), node);
-            return;
+    // abyrd: OK updated for new MapDB OSM
+    // TODO this is really minimal work, and there are a lot of nodes. Time this operation and maybe perform it elsewhere.
+    /** Called repeatedly with every OSM Node during the third loading phase. */
+    public void addNode(long nodeId, Node node) {
+        if (OSMFilter.isBikeRental(node)) {
+            bikeRentalNodes.add(nodeId);
+        } else if (OSMFilter.isBikeParking(node)) {
+            bikeParkingNodes.add(nodeId);
         }
-        if (node.isBikeParking()) {
-            bikeParkingNodes.put(node.getId(), node);
-            return;
-        }
-        if (!(waysNodeIds.contains(node.getId()) || areaNodeIds.contains(node.getId()) || node
-                .isStop()))
-            return;
-
-        if (nodesById.containsKey(node.getId()))
-            return;
-
-        nodesById.put(node.getId(), node);
-
-        if (nodesById.size() % 100000 == 0)
-            LOG.debug("nodes=" + nodesById.size());
     }
 
-    @Override
-    public void addWay(OSMWay way) {
-        /* only add ways once */
-        long wayId = way.getId();
-        if (waysById.containsKey(wayId) || areaWaysById.containsKey(wayId))
-            return;
+    // abyrd: OK updated for new MapDB OSM
+    /** Called repeatedly with every OSM Way during the second loading phase. */
+    public void addWay(long wayId, Way way) {
 
-        if (areaWayIds.contains(wayId)) {
-            areaWaysById.put(wayId, way);
-        }
+        applyLevelsForWay(wayId, way);
 
-        applyLevelsForWay(way);
-
-        /* filter out ways that are not relevant for routing */
-        if (!(OSMFilter.isWayRoutable(way) || way.isParkAndRide() || way.isBikeParking())) {
+        /* Filter out ways that are not relevant for routing. */
+        if (!(OSMFilter.isWayRoutable(way) || OSMFilter.isParkAndRide(way) || OSMFilter.isBikeParking(way))) {
+            osm.ways.remove(wayId);
             return;
         }
-        /* An area can be specified as such, or be one by default as an amenity */
-        if ((way.isTag("area", "yes") || way.isTag("amenity", "parking") || way.isTag("amenity",
-                "bicycle_parking")) && way.getNodeRefs().size() > 2) {
+
+        /* A way may be explicitly tagged as an area, or an amenity tag may imply that it is an area. */
+        if ((way.hasTag("area", "yes") || way.hasTag("amenity", "parking")
+            || way.hasTag("amenity", "bicycle_parking")) && way.nodes.length > 2) {
             // this is an area that's a simple polygon. So we can just add it straight
             // to the areas, if it's not part of a relation.
+            // TODO was there a check above whether this way belonged to a multipolygon or relation?
+            // perhaps the fact that it doesn't appear yet in the map means it wasn't set by the relation handler?
             if (!areaWayIds.contains(wayId)) {
-                singleWayAreas.add(way);
-                areaWaysById.put(wayId, way);
+                singleWayAreas.add(wayId);
                 areaWayIds.add(wayId);
-                for (Long node : way.getNodeRefs()) {
-                    MapUtils.addToMapSet(areasForNode, node, way);
+                for (long nodeId : way.nodes) {
+                    areasContainingNode.put(nodeId, wayId);
                 }
             }
-            return;
+            osm.ways.remove(wayId); // this is imitating existing behavior... but why were we doing it?
         }
 
-        waysById.put(wayId, way);
-
-        if (waysById.size() % 10000 == 0)
-            LOG.debug("ways=" + waysById.size());
     }
 
-    @Override
-    public void addRelation(OSMRelation relation) {
-        if (relationsById.containsKey(relation.getId()))
-            return;
+    // abyrd: OK updated for new MapDB OSM
+    /** Called repeatedly with every OSM Relation during the first loading phase. */
+    public void addRelation(long relationId, Relation relation) {
 
-        if (relation.isTag("type", "multipolygon")
-                && (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide())) {
+        if (relation.hasTag("type", "multipolygon") &&
+            (OSMFilter.isOsmEntityRoutable(relation) || OSMFilter.isParkAndRide(relation))) {
             // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
             // without reference to the ways that compose them. Accordingly, we will merely
             // mark the ways for preservation here, and deal with the details once we have
             // the ways loaded.
-            if (!OSMFilter.isWayRoutable(relation) && !relation.isParkAndRide()) {
+            if (!OSMFilter.isWayRoutable(relation) && ! OSMFilter.isParkAndRide(relation)) {
                 return;
             }
-            for (OSMRelationMember member : relation.getMembers()) {
-                areaWayIds.add(member.getRef());
+            for (Relation.Member member : relation.members) {
+                if (member.type == Relation.Type.WAY) {
+                    areaWayIds.add(member.id);
+                }
             }
-            applyLevelsForWay(relation);
-        } else if (!(relation.isTag("type", "restriction"))
-                && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
-                && !(relation.isTag("type", "multipolygon") && OSMFilter
-                        .isOsmEntityRoutable(relation))
-                && !(relation.isTag("type", "level_map"))
-                && !(relation.isTag("type", "public_transport") && relation.isTag(
-                        "public_transport", "stop_area"))) {
+            applyLevelsForWay(relationId, relation);
             return;
         }
-
-        relationsById.put(relation.getId(), relation);
-
-        if (relationsById.size() % 100 == 0)
-            LOG.debug("relations=" + relationsById.size());
+        if ( ! (relation.hasTag("type", "restriction")
+            || (relation.hasTag("type", "route") && relation.hasTag("route", "road"))
+            || (relation.hasTag("type", "level_map"))
+            || (relation.hasTag("type", "public_transport") && relation.hasTag("public_transport", "stop_area")))) {
+            // remove relation, it's not interesting
+            osm.relations.remove(relationId);
+        }
     }
 
     @Override
     public void doneFirstPhaseRelations() {
-        // nothing to do here
+        // TODO There is no special work to be done after the first phase, maybe eliminate this interface function
     }
 
     @Override
     public void doneSecondPhaseWays() {
-        // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
-        // the way purging keeps the needed way around.
+        // This copies tags (e.g. highway=*) such that nodes are not later purged. (abyrd: Why? What does this mean?)
         // Multipolygons may be processed more than once, which may be needed since
         // some member might be in different files for the same multipolygon.
-
-        // NOTE (AMB): this purging phase may not be necessary if highway tags are not
+        // NOTE (abyrd): this purging phase may not be necessary if highway tags are not
         // copied over from multipolygon relations. Perhaps we can get by with
         // only 2 steps -- ways+relations, followed by used nodes.
         // Ways can be tag-filtered in phase 1.
-
         markNodesForKeeping(waysById.values(), waysNodeIds);
         markNodesForKeeping(areaWaysById.values(), areaNodeIds);
     }
 
     /**
-     * After all relations, ways, and nodes are loaded, handle areas.
+     * After all relations, ways, and nodes are loaded, handle multipolygon and single-way areas.
      */
     @Override
     public void doneThirdPhaseNodes() {
@@ -567,40 +497,43 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      * Create a virtual OSM node, using a negative unique ID.
      * 
      * @param c The location of the node to create.
-     * @return The created node.
+     * @return The created node's ID.
      */
-    private OSMNode createVirtualNode(Coordinate c) {
-        OSMNode node = new OSMNode();
-        node.lon = c.x;
-        node.lat = c.y;
-        node.setId(virtualNodeId);
-        virtualNodeId--;
-        waysNodeIds.add(node.getId());
-        nodesById.put(node.getId(), node);
-        return node;
+    private long createVirtualNode(Coordinate c) {
+        Node node = new Node(c.y, c.x);
+        long nodeId = virtualNodeId--;
+        waysNodeIds.add(nodeId);
+        osm.nodes.put(nodeId, node);
+        return nodeId;
     }
 
-    private void applyLevelsForWay(OSMWithTags way) {
+    // FIXME This function is being called on both relations and ways.
+    // It used to work fine because the keys of the level-for-way map were OSM entity objects with identity equality.
+    // Now the keys must be long integer IDs, which could (albeit rarely) lead to ID collisions across entity types.
+    // FIXME this is not really "applying" the levels, it's recording them
+    private void applyLevelsForWay(long entityId, Tagged entity) {
+
         /* Determine OSM level for each way, if it was not already set */
-        if (!wayLevels.containsKey(way)) {
+        if (!wayLevels.containsKey(entityId)) {
             // if this way is not a key in the wayLevels map, a level map was not
             // already applied in processRelations
 
             /* try to find a level name in tags */
             String levelName = null;
             OSMLevel level = OSMLevel.DEFAULT;
-            if (way.hasTag("level")) { // TODO: floating-point levels &c.
-                levelName = way.getTag("level");
+            if (entity.hasTag("level")) { // TODO: floating-point levels &c.
+                levelName = entity.getTag("level");
                 level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels);
-            } else if (way.hasTag("layer")) {
-                levelName = way.getTag("layer");
+            } else if (entity.hasTag("layer")) {
+                levelName = entity.getTag("layer");
                 level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels);
             }
             if (level == null || (!level.reliable)) {
-                LOG.warn(addBuilderAnnotation(new LevelAmbiguous(levelName, way.getId())));
+                // FIXME this may also be storing (and thus reporting) Relation IDs as Way IDs.
+                LOG.warn(addBuilderAnnotation(new LevelAmbiguous(levelName, entityId)));
                 level = OSMLevel.DEFAULT;
             }
-            wayLevels.put(way, level);
+            wayLevels.put(entityId, level);
         }
     }
 
@@ -615,21 +548,20 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         }
     }
 
-    /**
-     * Create areas from single ways.
-     */
+    /** Create areas from single ways. */
     private void processSingleWayAreas() {
-        AREA: for (OSMWay way : singleWayAreas) {
-            if (processedAreas.contains(way)) {
+        AREA: for (long wayId : singleWayAreas) {
+            Way way = osm.ways.get(wayId);
+            if (processedAreas.contains(wayId)) {
                 continue;
             }
-            for (Long nodeRef : way.getNodeRefs()) {
-                if (!nodesById.containsKey(nodeRef)) {
+            for (long nodeId : way.nodes) {
+                if (!osm.nodes.containsKey(nodeId)) {
                     continue AREA;
                 }
             }
             try {
-                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(), nodesById));
+                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay>emptyList(), nodesById));
             } catch (Area.AreaConstructionException e) {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
@@ -638,7 +570,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 // This occurs when there are an invalid number of points in a LinearRing
                 // Mark the ring as processed so we don't retry it.
             }
-            processedAreas.add(way);
+            processedAreas.add(wayId);
         }
     }
 
@@ -646,6 +578,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      * Copies useful metadata from multipolygon relations to the relevant ways, or to the area map.
      * This is done at a different time than processRelations(), so that way purging doesn't remove
      * the used ways.
+     * FIXME should there really be any "way purging" at all? Can't we just skip some ways based on their tags
+     * while turning them into edges?
      */
     private void processMultipolygonRelations() {
         RELATION: for (OSMRelation relation : relationsById.values()) {
@@ -716,11 +650,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         }
     }
 
-    /**
-     * Handler for a new Area (single way area or multipolygon relations)
-     * 
-     * @param area
-     */
+    /** Handler for a new Area (from single-way areas or multipolygon relations) */
     private void newArea(Area area) {
         StreetTraversalPermission permissions = OSMFilter.getPermissionsForEntity(area.parent,
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);

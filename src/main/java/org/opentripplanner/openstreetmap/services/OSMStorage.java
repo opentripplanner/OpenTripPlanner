@@ -25,7 +25,7 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
  * @see org.opentripplanner.openstreetmap.services.OpenStreetMapProvider
  */
 
-public interface OpenStreetMapContentHandler {
+public interface OSMStorage {
 
   /**
    * Stores a node.

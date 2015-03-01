@@ -13,20 +13,15 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
+import java.util.*;
 
 /**
  * Stores information about an OSM area needed for visibility graph construction. Algorithm based on
@@ -46,8 +41,7 @@ class Area {
 
     private MultiPolygon jtsMultiPolygon;
 
-    Area(OSMWithTags parent, List<OSMWay> outerRingWays, List<OSMWay> innerRingWays,
-            Map<Long, OSMNode> _nodes) {
+    Area(OSMWithTags parent, List<OSMWay> outerRingWays, List<OSMWay> innerRingWays, Map<Long, OSMNode> _nodes) {
         this.parent = parent;
         // ring assignment
         List<List<Long>> innerRingNodes = constructRings(innerRingWays);

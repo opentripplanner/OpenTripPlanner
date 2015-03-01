@@ -13,7 +13,7 @@
 
 package org.opentripplanner.openstreetmap.impl;
 
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OSMStorage;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class BinaryFileBasedOpenStreetMapProviderImpl implements OpenStreetMapPr
 
     private File _path;
 
-    public void readOSM(OpenStreetMapContentHandler handler) {
+    public void readOSM(OSMStorage handler) {
         try {
             BinaryOpenStreetMapParser parser = new BinaryOpenStreetMapParser(handler);
 

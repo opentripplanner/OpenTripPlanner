@@ -15,19 +15,19 @@
 
 package org.opentripplanner.openstreetmap.model;
 
+import org.opentripplanner.openstreetmap.services.OSMStorage;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 
 /**
  * A simplistic implementation of OSMContentHandler that simply stores all of the ways, nodes, and
  * relations in maps keyed by ids. For memory usage reasons, this is only used in tests.
  * 
  */
-public class OSMMap implements OpenStreetMapContentHandler {
+public class OSMMap implements OSMStorage {
 
   private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
 
@@ -61,7 +61,7 @@ public class OSMMap implements OpenStreetMapContentHandler {
   }
 
   /****
-   * {@link OpenStreetMapContentHandler} Interface
+   * {@link org.opentripplanner.openstreetmap.services.OSMStorage} Interface
    ****/
 
   public void addNode(OSMNode node) {
