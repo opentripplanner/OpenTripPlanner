@@ -54,6 +54,9 @@ public class OSM {
             .transactionDisable()
             .asyncWriteEnable()
             .compressionEnable()
+            .closeOnJvmShutdown()
+            .cacheSize(1024 * 1024)
+            .mmapFileEnableIfSupported()
             .make();
         nodes = db.getTreeMap("nodes");
         ways = db.getTreeMap("ways");
