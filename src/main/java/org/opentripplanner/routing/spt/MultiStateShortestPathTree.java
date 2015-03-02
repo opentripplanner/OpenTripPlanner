@@ -13,26 +13,17 @@
 
 package org.opentripplanner.routing.spt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.opentripplanner.routing.core.State;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
+import java.util.*;
 
 /**
- * TODO add turn restriction logic!
  * Note that turn restrictions make all searches multi-state; however turn restrictions do not apply when walking.
  * The turn restriction handling should be done in the SPT implementation, independent of the dominance function.
  * It essentially splits each vertex into N vertices depending on the incoming edge being taken.
@@ -75,10 +66,6 @@ public class MultiStateShortestPathTree extends ShortestPathTree {
         return stateSets.keySet();
     }
 
-    /****
-     * {@link ShortestPathTree} Interface
-     ****/
-
     @Override
     public boolean add(State newState) {
         Vertex vertex = newState.getVertex();
@@ -105,7 +92,7 @@ public class MultiStateShortestPathTree extends ShortestPathTree {
                 it.remove();
         }
         
-        // any states remaining are codominent with the new state
+        // any states remaining are co-dominant with the new state
         states.add(newState);
         return true;
     }

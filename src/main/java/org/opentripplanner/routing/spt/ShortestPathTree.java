@@ -13,14 +13,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.routing.spt;
 
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Vertex;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * An abstract base class for classes that track which graph vertices have been visited and their associated states,
@@ -30,6 +30,8 @@ import org.opentripplanner.routing.graph.Vertex;
  * Different implementations of this interface allow the routing algorithm to switch from a basic Dijkstra search
  * (which is sufficient for non-time-dependent modes e.g. bicycle) and the more complex label-setting approaches needed
  * for time-dependent public transit routing.
+ * 
+ * TODO merge this into MultiState shortest path tree, we only need one implementation.
  */
 public abstract class ShortestPathTree {
 

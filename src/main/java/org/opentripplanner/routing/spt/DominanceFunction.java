@@ -9,12 +9,47 @@ import org.opentripplanner.routing.graph.Graph;
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
  * are retained. In the general case, one branch does not necessarily win out over the other, i.e. multiple states can
  * coexist at a single Vertex.
+ * 
+ * Even functions where one state always wins (least weight, fastest travel time) are applied within a multi-state
+ * shortest path tree because bike rental, car or bike parking, and turn restrictions all require multiple incomparable 
+ * states at the same vertex. These need the graph to be "replicated" into separate layers, which is achieved by 
+ * applying the main dominance logic (lowest weight, lowest cost, Pareto) conditionally, only when the two states
+ * have identical bike/car/turn direction status.
  */
 public abstract class DominanceFunction {
 
-    /** Return true if the first state is "better" than the second state. */
-    public abstract boolean dominates(State a, State b);
+    /** Return true if the first state "defeats" the second state. Provide this custom logic in subclasses. */
+    protected abstract boolean dominates0 (State a, State b);
 
+    /**
+     * For bike rental, parking, and approaching turn-restricted intersections states are incomparable:
+     * they exist on separate planes. The core state dominance logic is wrapped in this public function and only
+     * applied when the two states have all these variables in common (are on the same plane).
+     */
+    public boolean dominates(State a, State b) {
+
+        // Does one state represent riding a rented bike and the other represent walking before/after rental?
+        if (a.isBikeRenting() != b.isBikeRenting()) {
+            return false;
+        }
+
+        // Does one state represent driving a car and the other represent walking after the car was parked?
+        if (a.isCarParked() != b.isCarParked()) {
+            return false;
+        }
+        
+        // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
+        if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
+            if (! a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {
+                return false;
+            }
+        }
+        
+        // These two states are comparable (they are on the same "plane" or "copy" of the graph).
+        return dominates0 (a, b);
+        
+    }
+    
     /**
      * Create a new shortest path tree using this function, considering whether it allows co-dominant States.
      * MultiShortestPathTree is the general case -- it will work with both single- and multi-state functions.
@@ -23,26 +58,18 @@ public abstract class DominanceFunction {
         return new MultiStateShortestPathTree(routingRequest, this);
      }
 
-    /** A special case where one state is always better than the other. This allows some optimizations. */
-    public static abstract class SingleState extends DominanceFunction {
-        @Override
-        public ShortestPathTree getNewShortestPathTree(RoutingRequest routingRequest) {
-            return new SingleStateShortestPathTree(routingRequest, this);
-        }
-    }
-
-    public static class MinimumWeight extends DominanceFunction.SingleState {
+    public static class MinimumWeight extends DominanceFunction {
         /** Return true if the first state has lower weight than the second state. */
-        public boolean dominates(State a, State b) { return a.weight < b.weight; }
+        public boolean dominates0 (State a, State b) { return a.weight < b.weight; }
     }
 
     /**
      * This approach is more coherent in Analyst when we are extracting travel times from the optimal
      * paths. It also leads to less branching and faster response times when building large shortest path trees.
      */
-    public static class EarliestArrival extends DominanceFunction.SingleState {
+    public static class EarliestArrival extends DominanceFunction {
         /** Return true if the first state has lower elapsed time than the second state. */
-        public boolean dominates(State a, State b) { return a.getElapsedTimeSeconds() < b.getElapsedTimeSeconds(); }
+        public boolean dominates0 (State a, State b) { return a.getElapsedTimeSeconds() < b.getElapsedTimeSeconds(); }
     }
 
     /** In this implementation the relation is not symmetric. There are sets of mutually co-dominant states. */
@@ -56,7 +83,7 @@ public abstract class DominanceFunction {
 
         // You would think this could be static, but in Java for some reason calling a static function will
         // call the one on the declared type, not the instance type.
-        public boolean dominates(State a, State b) {
+        public boolean dominates0 (State a, State b) {
 
             if (b.weight == 0) {
                 return false;
