@@ -18,8 +18,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.prefs.Preferences;
-
 /**
  * This abstract class implements logic that is shared between all polling updaters.
  * 
@@ -68,6 +66,11 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
                 try {
                     // Run concrete class' method
                     runPolling();
+                    if (frequencySec < 0) {
+                        LOG.info("As requested in configuration, updater {} has run only once and will now stop.",
+                                this.getClass().getSimpleName());
+                        break;
+                    }
                 } catch (InterruptedException e) {
                     // Throw further up the stack
                     throw e;
@@ -76,7 +79,6 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
                     // TODO Should we cancel the task? Or after n consecutive failures?
                     // cancel();
                 }
-
                 // Sleep a given number of seconds
                 Thread.sleep(frequencySec * 1000);
             }

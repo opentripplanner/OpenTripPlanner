@@ -262,7 +262,7 @@ connect to a network resource is the `url` field.
             defaultAgencyId: "TriMet"
         },
 
-        // Polling bike rental updater for Citybikes
+        // Polling bike rental updater.
         // sourceType can be jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets, city-bikes, vcub
         {
             type: "bike-rental",
@@ -270,6 +270,15 @@ connect to a network resource is the `url` field.
             sourceType: "city-bikes",
             url: "http://host.domain.tld"
         },
+
+        // Polling bike rental updater for DC bikeshare (a Bixi system)
+        // Negative update frequency means to run once and then stop updating (essentially static data)
+        {
+            type: "bike-rental",
+            sourceType: "bixi",
+            url: "https://www.capitalbikeshare.com/data/stations/bikeStations.xml",
+            frequencySec: -1
+		},
 
         // Bike parking availability
         {
