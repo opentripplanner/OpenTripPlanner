@@ -13,27 +13,15 @@
 
 package org.opentripplanner.common;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.graph_builder.annotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.ElevatorEdge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -41,8 +29,9 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.*;
 
 public class StreetUtils {
 
@@ -125,7 +114,7 @@ public class StreetUtils {
                 islands.add(subgraph);
             }
         }
-        LOG.info(islands.size() + " sub graphs found");
+        LOG.info(islands.size() + " disconnected sub-graphs found.");
         /* remove all tiny subgraphs and large subgraphs without stops */
         for (Subgraph island : islands) {
             boolean hadRemoved = false;

@@ -185,6 +185,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         initIntersectionNodes();
 
         buildBasicGraph();
+
         if (skipVisibility) {
             LOG.info("Skipping visibility graph construction for walkable areas.");
         } else {
@@ -348,14 +349,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
 
     private void buildParkAndRideAreas() {
-        LOG.info("Building P+R areas");
+        LOG.info("Building park-and-ride areas...");
         List<AreaGroup> areaGroups = groupAreas(osmdb.parkAndRideAreas, osmdb.osm);
         int n = 0;
         for (AreaGroup group : areaGroups) {
             if (buildParkAndRideAreasForGroup(group))
                 n++;
         }
-        LOG.info("Created {} P+R.", n);
+        LOG.info("Created {} park-and-ride areas.", n);
     }
 
     private boolean buildParkAndRideAreasForGroup(AreaGroup group) {
@@ -446,18 +447,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     /** Build the basic graph, with one edge per OSM way segment between intersections with other ways. */
     private void buildBasicGraph() {
 
+        LOG.info("Converting OSM ways to OTP graph edges...");
         long wayIndex = 0;
         long wayCount = osmdb.osm.ways.size(); // TODO is this going to iterate over the whole map?
 
         WAY:
         for (Map.Entry<Long, Way> entry : osmdb.osm.ways.entrySet()) {
-
             long wayId = entry.getKey();
             Way way = entry.getValue();
-
-            if (wayIndex % 10000 == 0)
-                LOG.debug("ways=" + wayIndex + "/" + wayCount);
-            wayIndex++;
 
             WayProperties wayData = wayPropertySet.getDataForWay(way);
             setWayName(way);
@@ -592,6 +589,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 edgeFromNode = osmdb.osm.nodes.get(edgeFromNodeId);
             }
         } // END loop over OSM ways
+        LOG.debug("Done converting OSM ways to OTP graph edges.");
     }
 
     protected void applyWayProperties(StreetEdge street, StreetEdge backStreet, WayProperties wayData, Way way) {
@@ -806,6 +804,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     /** Find all nodes where ways intersect one another or intersect areas. TODO do this at load time. */
     private void initIntersectionNodes() {
+        LOG.info("Finding OSM way intersections...");
         Set<Long> possibleIntersectionNodes = new HashSet<Long>(); // FIXME use a NodeTracker, this is very inefficient
         for (Way way : osmdb.osm.ways.values()) {
             for (long node : way.nodes) {
@@ -828,6 +827,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
             }
         }
+        LOG.debug("Done finding intersections.");
     }
 
     /**
@@ -1030,6 +1030,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     /** Mark a node as being present at the level of the given way. */
     private IntersectionVertex recordLevel(long nodeId, Node node, long wayId) {
         OSMLevel level = osmdb.wayLevels.get(wayId);
+        if (level == null) {
+            level = OSMLevel.DEFAULT; // FIXME: HACK. We're getting nulls here for some reason
+        }
         Map<OSMLevel, IntersectionVertex> vertices;
         if (multiLevelNodes.containsKey(nodeId)) {
             vertices = multiLevelNodes.get(nodeId);

@@ -13,15 +13,15 @@
 
 package org.opentripplanner.graph_builder.module;
 
+import org.opentripplanner.common.StreetUtils;
+import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
-import org.opentripplanner.common.StreetUtils;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.graph.Graph;
-import org.slf4j.*;
 
 /**
  * this module is part of the  {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} process. it design to remove small isolated
@@ -69,7 +69,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        LOG.info("Pruning isolated islands in street network");
+        LOG.info("Removing disconnected islands in street network...");
         
         StreetUtils.pruneFloatingIslands(graph, islandWithoutStopsMaxSize, 
                 islandWithStopsMaxSize, islandLogFile);
@@ -79,7 +79,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
             //reconnect stops on small islands (that removed)
             transitToStreetNetwork.buildGraph(graph,extra);
         }
-        LOG.debug("Done pruning isolated islands");
+        LOG.debug("Done removing isolated islands.");
     }
 
     @Override

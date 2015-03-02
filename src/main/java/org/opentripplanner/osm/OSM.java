@@ -50,12 +50,14 @@ public class OSM {
                 dbMaker = DBMaker.newFileDB(new File(diskPath));
             }
         }
+        // Most execution time on small PBFs seems to come from PBF loading, not MapDB options
         db = dbMaker
             .transactionDisable()
             .asyncWriteEnable()
             .compressionEnable()
             .closeOnJvmShutdown()
-            .cacheSize(1024 * 1024)
+            .cacheSize(100 * 1024 * 1024)
+            .cacheLRUEnable()
             .mmapFileEnableIfSupported()
             .make();
         nodes = db.getTreeMap("nodes");
@@ -112,14 +114,14 @@ public class OSM {
                 nodesInWay.clear();
                 currentWayId = id;
                 if (fields.length > 2) {
-                    way.tags = fields[2];
+                    way.setTagsFromString(fields[2]);
                 }
             } else if ("N".equals(fields[0])) {
                 double lat = Double.parseDouble(fields[2]);
                 double lon = Double.parseDouble(fields[3]);
                 Node node = new Node(lat, lon);
                 if (fields.length > 4) {
-                    node.tags = fields[4];
+                    node.setTagsFromString(fields[4]);
                 }
                 nodes.put(id, node);
                 nodesInWay.add(id);

@@ -160,9 +160,9 @@ public class VexFormatCodec {
     }
 
     public void writeTags (Tagged tagged) throws IOException {
-        List<Tagged.Tag> tags = tagged.getTags();
+        List<Tagged.Tag> tags = tagged.tags;
         vout.writeUInt32NoTag(tags.size());
-        for (Tagged.Tag tag : tagged.getTags()) {
+        for (Tagged.Tag tag : tagged.tags) {
             if (tag.value == null) tag.value = "";
             vout.writeStringNoTag(tag.key);
             vout.writeStringNoTag(tag.value);
@@ -196,19 +196,15 @@ public class VexFormatCodec {
         return false;
     }
 
-    public String readTags() throws IOException {
-        StringBuilder sb = new StringBuilder();
+    public List<Tagged.Tag> readTags() throws IOException {
+        Tagged tagged = new Node();
         int nTags = vin.readUInt32();
         for (int i = 0; i < nTags; i++) {
-            if (i > 0) {
-                sb.append(';');
-            }
-            sb.append(vin.readString());
-            sb.append('=');
-            sb.append(vin.readString());
+            String key = vin.readString();
+            String val = vin.readString();
+            tagged.addTag(key, val);
         }
-        if (sb.length() == 0) return null;
-        return sb.toString();
+        return tagged.tags;
     }
 
 

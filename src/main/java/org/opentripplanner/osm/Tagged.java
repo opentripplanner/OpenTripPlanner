@@ -1,6 +1,6 @@
 package org.opentripplanner.osm;
 
-import com.google.common.collect.Lists;
+import com.beust.jcommander.internal.Lists;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,23 +14,23 @@ public abstract class Tagged implements Serializable {
     // Also OSM allows multimap tags using the semicolon:
     // http://wiki.openstreetmap.org/wiki/Talk:Semi-colon_value_separator
     // Implementing a Set<Pair<String>> with a single string is not necessarily a good idea...
-    public String tags;
 
-    public static class Tag {
+    public List<Tag> tags;
+
+    public static class Tag implements Serializable {
         public String key, value;
+        public Tag (String key, String value) {
+            this.key = key;
+            this.value = value != null ? value : "";
+        }
     }
 
     /** Return the tag value for the given key. Returns null if the tag key is not present. */
     public String getTag(String key) {
         if (tags == null) return null;
-        for (String tag : tags.split(";")) {
-            String[] kv = tag.split("=", 2);
-            if (kv[0].equals(key)) {
-                if (kv.length == 2) {
-                    return kv[1];
-                } else {
-                    return ""; // key is present but has no value
-                }
+        for (Tag tag : tags) {
+            if (tag.key.equals(key)) {
+                return tag.value;
             }
         }
         return null;
@@ -48,30 +48,6 @@ public abstract class Tagged implements Serializable {
         return tags == null || tags.isEmpty();
     }
 
-    public List<Tag> getTags() {
-        List<Tag> ret = Lists.newArrayList();
-        if (tags != null) {
-            for (String tag : tags.split(";")) {
-                String[] kv = tag.split("=");
-                if (kv.length < 1) continue;
-                Tag t = new Tag();
-                t.key = kv[0];
-                if (kv.length > 1) t.value = kv[1];
-                ret.add(t);
-            }
-        }
-        return ret;
-    }
-
-    public void addTag (String key, String value) {
-        String newTag = key + "=" + value;
-        if (tags == null) {
-            tags = newTag;
-        } else {
-            tags = tags + ";" + newTag;
-        }
-    }
-
     public boolean tagIsTrue (String key) {
         String value = getTag(key);
         return value != null && ("yes".equalsIgnoreCase(value) || "true".equalsIgnoreCase(value) || "1".equals(value));
@@ -80,6 +56,25 @@ public abstract class Tagged implements Serializable {
     public boolean tagIsFalse (String key) {
         String value = getTag(key);
         return value != null && ("no".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value) || "0".equals(value));
+    }
+
+    /** Set the tags from a string in the format key=value;key=value */
+    public void setTagsFromString (String s) {
+        for (String tag : s.split(";")) {
+            String[] kv = tag.split("=", 2);
+            if (kv.length == 2) {
+                addTag(kv[0], kv[1]);
+            } else {
+                addTag(kv[0], "");
+            }
+        }
+    }
+
+    public void addTag (String key, String value) {
+        if (tags == null) {
+            tags = Lists.newArrayList();
+        }
+        tags.add(new Tag(key, value));
     }
 
 }

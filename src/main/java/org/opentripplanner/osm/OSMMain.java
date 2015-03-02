@@ -71,7 +71,7 @@ public class OSMMain {
     public static void analyzeTags(OSM osm) {
         Multimap<String, String> kv = HashMultimap.create();
         for (Way way : osm.ways.values()) {
-            for (Tagged.Tag tag : way.getTags()) {
+            for (Tagged.Tag tag : way.tags) {
                 kv.put(tag.key, tag.value);
             }
         }

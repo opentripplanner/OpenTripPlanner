@@ -270,7 +270,7 @@ public class OSMDatabase {
      * other areas as well.
      */
     private void processUnconnectedAreas() {
-        LOG.info("Intersecting unconnected areas...");
+        LOG.info("Intersecting disconnected OSM areas with nearby ways...");
 
         // Simple holder for the spatial index
         class RingSegment {
@@ -490,7 +490,7 @@ public class OSMDatabase {
                 }
             }
         }
-        LOG.info("Created {} virtual intersection nodes.", nCreatedNodes);
+        LOG.info("Created {} virtual intersection nodes between areas and ways.", nCreatedNodes);
     }
 
 	/**
@@ -665,11 +665,7 @@ public class OSMDatabase {
      */
     public void setTagNoOverwrite (String key, String value, long wayId, Way way) {
         if ( ! way.hasTag(key)) {
-            if (way.hasNoTags()) {
-                way.tags = key + "=" + value;
-            } else {
-                way.tags = way.tags + ";" + key + "=" + value;
-            }
+            way.addTag(key, value);
             osm.ways.put(wayId, way);
         }
     }
@@ -694,7 +690,7 @@ public class OSMDatabase {
      * Copies useful metadata (tags) from relations to their constituent ways and nodes.
      */
     private void processRelations() {
-        LOG.debug("Processing relations...");
+        LOG.info("Processing OSM relations...");
         for (Map.Entry<Long, Relation> entry : osm.relations.entrySet()) {
             long relationId = entry.getKey();
             Relation relation = entry.getValue();
@@ -708,6 +704,7 @@ public class OSMDatabase {
                 processPublicTransportStopArea(relationId, relation);
             }
         }
+        LOG.debug("Done processing relations.");
     }
 
     /** Store turn restrictions. */

@@ -450,7 +450,7 @@ public abstract class OSMFilter {
     /** @return a map of key-value pairs for all tags whose keys begin with the given prefix and a colon. */
     public static Map<String, String> getTagsByPrefix (Tagged entity, String prefix) {
         Map<String, String> out = Maps.newHashMap();
-        for (Tagged.Tag tag : entity.getTags()) {
+        for (Tagged.Tag tag : entity.tags) {
             if (tag.key.equals(prefix) || tag.key.startsWith(prefix + ":")) {
                 out.put(tag.key, tag.value);
             }

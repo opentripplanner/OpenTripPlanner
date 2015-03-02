@@ -55,6 +55,7 @@ public class OSMSpecifier {
      * http://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right
      * TODO: we should probably support forward/backward as well.
      * TODO: simply count the number of full, partial, and wildcard matches instead of using a scoring system.
+     * FIXME: this is a hot spot during OSM graph building (50% of run time)
      *
      * @param entity an OSM entity to compare to this specifier
      */
@@ -64,8 +65,8 @@ public class OSMSpecifier {
         for (P2<String> pair : kvpairs) {
             // TODO why are we repeatedly converting these to lower case every time they are used?
             // Probably because it used to be possible to set them from Spring XML.
-            String tag = pair.first.toLowerCase();
-            String value = pair.second.toLowerCase();
+            String tag = pair.first;
+            String value = pair.second;
             String leftMatchValue = entity.getTag(tag + ":left");
             String rightMatchValue = entity.getTag(tag + ":right");
             String matchValue = entity.getTag(tag);

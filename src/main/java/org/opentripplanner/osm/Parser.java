@@ -87,19 +87,16 @@ public class Parser extends BinaryParser {
     /** Note that in many PBF files this never gets called because nodes are dense. */
     @Override
     protected void parseNodes(List<Osmformat.Node> nodes) {
-        StringBuilder sb = new StringBuilder();
         for (Osmformat.Node n : nodes) {
             if (nodeCount++ % 10000000 == 0) {
                 LOG.info("node {}", human(nodeCount));
             }
             Node node = new Node(parseLat(n.getLat()), parseLon(n.getLon()));
-            sb.setLength(0); // empty buffer
             for (int k = 0; k < n.getKeysCount(); k++) {
                 String key = getStringById(n.getKeys(k));
                 String val = getStringById(n.getVals(k));
-                addTag(sb, key, val);
+                node.addTag(key, val);
             }
-            node.tags = sb.toString();
             handleNode(n.getId(), node);
         }
     }
@@ -108,7 +105,6 @@ public class Parser extends BinaryParser {
     protected void parseDense(Osmformat.DenseNodes nodes) {
         long lastId = 0, lastLat = 0, lastLon = 0;
         int kv = 0; // index into the keysvals array
-        StringBuilder sb = new StringBuilder();
         for (int n = 0; n < nodes.getIdCount(); n++) {
             if (nodeCount++ % 5000000 == 0) {
                 LOG.info("node {}", human(nodeCount));
@@ -123,37 +119,32 @@ public class Parser extends BinaryParser {
             node.setLatLon(parseLat(lat), parseLon(lon));
             // Check whether any node has tags.
             if (nodes.getKeysValsCount() > 0) {
-                sb.setLength(0); // empty buffer
                 while (nodes.getKeysVals(kv) != 0) {
                     int kid = nodes.getKeysVals(kv++);
                     int vid = nodes.getKeysVals(kv++);
                     String key = getStringById(kid);
                     String val = getStringById(vid);
-                    addTag(sb, key, val);
+                    node.addTag(key, val);
                 }
                 kv++; // Skip over the '0' delimiter.
             }
-            node.tags = sb.toString();
             handleNode(id, node);
         }
     }
 
     @Override
     protected void parseWays(List<Osmformat.Way> ways) {
-        StringBuilder sb = new StringBuilder();
         for (Osmformat.Way w : ways) {
             if (wayCount++ % 1000000 == 0) {
                 LOG.info("way {}", human(wayCount));
             }
             Way way = new Way();
             /* Handle tags */
-            sb.setLength(0); // empty buffer
             for (int k = 0; k < w.getKeysCount(); k++) {
                 String key = getStringById(w.getKeys(k));
                 String val = getStringById(w.getVals(k));
-                addTag(sb, key, val);
+                way.addTag(key, val);
             }
-            way.tags = sb.toString();
             /* Handle nodes */
             List<Long> rl = w.getRefsList();
             long[] nodes = new long[rl.size()];
@@ -169,17 +160,14 @@ public class Parser extends BinaryParser {
 
     @Override
     protected void parseRelations(List<Osmformat.Relation> rels) {
-        StringBuilder sb = new StringBuilder();
         for (Osmformat.Relation r : rels) {
             Relation rel = new Relation();
-            sb.setLength(0);
             /* Handle Tags */
             for (int k = 0; k < r.getKeysCount(); k++) {
                 String key = getStringById(r.getKeys(k));
                 String val = getStringById(r.getVals(k));
-                addTag(sb, key, val);
+                rel.addTag(key, val);
             }
-            rel.tags = sb.toString();
             /* Handle members of the relation */
             long mid = 0; // member ids, delta coded
             for (int m = 0; m < r.getMemidsCount(); m++) {
