@@ -487,7 +487,11 @@ public class Graph implements Serializable {
             throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
 
-        List<Edge> edges = new ArrayList<Edge>(vertex.getDegreeIn() + vertex.getDegreeOut());
+        /*
+         * Note: We have to handle the removal of looping edges (for example RentABikeOn/OffEdge),
+         * we use a set to prevent having multiple times the same edge.
+         */
+        Set<Edge> edges = new HashSet<Edge>(vertex.getDegreeIn() + vertex.getDegreeOut());
         edges.addAll(vertex.getIncoming());
         edges.addAll(vertex.getOutgoing());
 
