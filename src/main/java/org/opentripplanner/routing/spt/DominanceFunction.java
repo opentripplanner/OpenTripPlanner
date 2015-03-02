@@ -55,7 +55,7 @@ public abstract class DominanceFunction {
      * MultiShortestPathTree is the general case -- it will work with both single- and multi-state functions.
      */
      public ShortestPathTree getNewShortestPathTree(RoutingRequest routingRequest) {
-        return new MultiStateShortestPathTree(routingRequest, this);
+        return new ShortestPathTree(routingRequest, this);
      }
 
     public static class MinimumWeight extends DominanceFunction {
