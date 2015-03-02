@@ -188,7 +188,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         if (skipVisibility) {
             LOG.info("Skipping visibility graph construction for walkable areas.");
         } else {
-            buildWalkableAreas();
+            LOG.warn("Visibility graph construction for walkable areas is temporarily removed.");
         }
 
         if (staticParkAndRide) {
@@ -334,9 +334,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private void buildWalkableAreas() {
         LOG.info("Building visibility graphs for walkable areas.");
         List<AreaGroup> areaGroups = groupAreas(osmdb.walkableAreas, osmdb.osm);
-        WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(graph, osmdb, wayPropertySet, edgeFactory, this);
+        // FIXME walkable area builder disabled, it is not cooperating well with new OSM loader
+        // WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(graph, osmdb, wayPropertySet, edgeFactory, this);
         for (AreaGroup group : areaGroups) {
-            walkableAreaBuilder.build(group);
+            // walkableAreaBuilder.build(group);
         }
 
         // running a request caches the timezone; we need to clear it now so that when agencies are loaded
@@ -513,7 +514,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             for (int i = 0; i < nodes.size() - 1; i++) {
 
-                Node segmentStartNode = osmdb.osm.nodes.get(i);
+                long segmentStartNodeId = nodes.get(i);
+                Node segmentStartNode = osmdb.osm.nodes.get(segmentStartNodeId);
                 if (segmentStartNode == null) {
                     continue;
                 }
