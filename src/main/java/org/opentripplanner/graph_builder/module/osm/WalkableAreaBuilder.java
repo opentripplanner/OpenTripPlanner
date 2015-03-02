@@ -111,29 +111,24 @@ public class WalkableAreaBuilder {
                 }
 
                 // Add stops from public transit relations into the area
-                Collection<OSMNode> nodes = osmdb.getStopsInArea(area.parent);
-                if (nodes != null) {
-                    for (OSMNode node : nodes) {
-                        addtoVisibilityAndStartSets(startingNodes, visibilityPoints,
-                                visibilityNodes, node);
+                Collection<Long> nodeIds = osmdb.stopsInAreas.get(area.parentId);
+                if (nodeIds != null) {
+                    for (OSMNode nodId : nodeIds) {
+                        addtoVisibilityAndStartSets(startingNodes, visibilityPoints, visibilityNodes, nodeId);
                     }
                 }
 
                 for (Ring outerRing : area.outermostRings) {
-                    for (int i = 0; i < outerRing.nodes.size(); ++i) {
-                        OSMNode node = outerRing.nodes.get(i);
-                        createEdgesForRingSegment(edges, edgeList, area, outerRing, i,
-                                alreadyAddedEdges);
-                        addtoVisibilityAndStartSets(startingNodes, visibilityPoints,
-                                visibilityNodes, node);
+                    for (int i = 0; i < outerRing.nodeIds.size(); ++i) {
+                        long node = outerRing.nodeIds.get(i);
+                        createEdgesForRingSegment(edges, edgeList, area, outerRing, i, alreadyAddedEdges);
+                        addtoVisibilityAndStartSets(startingNodes, visibilityPoints, visibilityNodes, nodeId);
                     }
                     for (Ring innerRing : outerRing.holes) {
-                        for (int j = 0; j < innerRing.nodes.size(); ++j) {
-                            OSMNode node = innerRing.nodes.get(j);
-                            createEdgesForRingSegment(edges, edgeList, area, innerRing, j,
-                                    alreadyAddedEdges);
-                            addtoVisibilityAndStartSets(startingNodes, visibilityPoints,
-                                    visibilityNodes, node);
+                        for (int j = 0; j < innerRing.nodeIds.size(); ++j) {
+                            long node = innerRing.nodeIds.get(j);
+                            createEdgesForRingSegment(edges, edgeList, area, innerRing, j, alreadyAddedEdges);
+                            addtoVisibilityAndStartSets(startingNodes, visibilityPoints, visibilityNodes, nodeId);
                         }
                     }
                 }
@@ -142,8 +137,7 @@ public class WalkableAreaBuilder {
             List<VLPoint> vertices = new ArrayList<VLPoint>();
             accumulateRingNodes(ring, nodes, vertices);
             VLPolygon polygon = makeStandardizedVLPolygon(vertices, nodes, false);
-            accumulateVisibilityPoints(ring.nodes, polygon, visibilityPoints, visibilityNodes,
-                    false);
+            accumulateVisibilityPoints(ring.nodeIds, polygon, visibilityPoints, visibilityNodes, false);
 
             ArrayList<VLPolygon> polygons = new ArrayList<VLPolygon>();
             polygons.add(polygon);
@@ -153,8 +147,7 @@ public class WalkableAreaBuilder {
                 vertices = new ArrayList<VLPoint>();
                 accumulateRingNodes(innerRing, holeNodes, vertices);
                 VLPolygon hole = makeStandardizedVLPolygon(vertices, holeNodes, true);
-                accumulateVisibilityPoints(innerRing.nodes, hole, visibilityPoints,
-                        visibilityNodes, true);
+                accumulateVisibilityPoints(innerRing.nodeIds, hole, visibilityPoints, visibilityNodes, true);
                 nodes.addAll(holeNodes);
                 polygons.add(hole);
             }

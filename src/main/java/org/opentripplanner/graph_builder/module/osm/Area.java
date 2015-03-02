@@ -13,15 +13,15 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.primitives.Longs;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-import gnu.trove.list.TLongList;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.osm.Node;
-import org.opentripplanner.osm.Relation;
+import org.opentripplanner.osm.OSM;
 import org.opentripplanner.osm.Tagged;
+import org.opentripplanner.osm.Way;
 
 import java.util.*;
 
@@ -54,11 +54,11 @@ class Area {
     private MultiPolygon jtsMultiPolygon;
 
     /** Construct a new Area */
-    Area(Tagged parent, TLongList outerRingWays, TLongList innerRingWays, Map<Long, Node> _nodes) {
+    Area(Tagged parent, List<Long> outerRingWays, List<Long> innerRingWays, OSM osm) {
         this.parent = parent;
         // ring assignment
-        List<List<Long>> innerRingNodes = constructRings(innerRingWays);
-        List<List<Long>> outerRingNodes = constructRings(outerRingWays);
+        List<List<Long>> innerRingNodes = constructRings(innerRingWays, osm);
+        List<List<Long>> outerRingNodes = constructRings(outerRingWays, osm);
         if (innerRingNodes == null || outerRingNodes == null) {
             throw new AreaConstructionException();
         }
@@ -68,10 +68,10 @@ class Area {
         List<Ring> innerRings = new ArrayList<Ring>();
         List<Ring> outerRings = new ArrayList<Ring>();
         for (List<Long> ring : innerRingNodes) {
-            innerRings.add(new Ring(ring, _nodes));
+            innerRings.add(new Ring(ring, osm));
         }
         for (List<Long> ring : outerRingNodes) {
-            outerRings.add(new Ring(ring, _nodes));
+            outerRings.add(new Ring(ring, osm));
         }
 
         // now, ring grouping
@@ -113,83 +113,88 @@ class Area {
         return jtsMultiPolygon;
     }
 
-    public List<List<Long>> constructRings(List<OSMWay> ways) {
-        if (ways.size() == 0) {
+    // TODO in Java 8 use TLongList.foreach()
+    // TODO More documentation!
+    public List<List<Long>> constructRings(List<Long> wayIds, OSM osm) {
+        if (wayIds.size() == 0) {
             // no rings is no rings
             return Collections.emptyList();
         }
 
-        List<List<Long>> closedRings = new ArrayList<List<Long>>();
+        List<List<Long>> closedRings = Lists.newArrayList();
+        ArrayListMultimap<Long, Long> waysByEndpointNode = ArrayListMultimap.create();
 
-        ArrayListMultimap<Long, OSMWay> waysByEndpoint = ArrayListMultimap.create();
-        for (OSMWay way : ways) {
-            List<Long> refs = way.getNodeRefs();
+        for (long wayId : wayIds) {
+            Way way = osm.ways.get(wayId);
+            long[] refs = way.nodes;
 
-            long start = refs.get(0);
-            long end = refs.get(refs.size() - 1);
+            long start = way.nodes[0];
+            long end = way.nodes[way.nodes.length - 1];
             if (start == end) {
-                ArrayList<Long> ring = new ArrayList<Long>(refs);
+                List<Long> ring = Longs.asList(way.nodes); // fixed length, not a copy...
                 closedRings.add(ring);
             } else {
-                waysByEndpoint.put(start, way);
-                waysByEndpoint.put(end, way);
+                waysByEndpointNode.put(start, wayId);
+                waysByEndpointNode.put(end, wayId);
             }
         }
 
         // precheck for impossible situations
         List<Long> toRemove = new ArrayList<Long>();
-        for (Long endpoint : waysByEndpoint.keySet()) {
-            Collection<OSMWay> list = waysByEndpoint.get(endpoint);
+        for (Long endpoint : waysByEndpointNode.keySet()) {
+            Collection<Long> list = waysByEndpointNode.get(endpoint);
             if (list.size() % 2 == 1) {
                 return null;
             }
         }
         for (Long key : toRemove) {
-            waysByEndpoint.removeAll(key);
+            waysByEndpointNode.removeAll(key);
         }
 
         List<Long> partialRing = new ArrayList<Long>();
-        if (waysByEndpoint.size() == 0) {
+        if (waysByEndpointNode.size() == 0) {
             return closedRings;
         }
 
         long firstEndpoint = 0, otherEndpoint = 0;
-        OSMWay firstWay = null;
-        for (Long endpoint : waysByEndpoint.keySet()) {
-            List<OSMWay> list = waysByEndpoint.get(endpoint);
-            firstWay = list.get(0);
-            List<Long> nodeRefs = firstWay.getNodeRefs();
-            partialRing.addAll(nodeRefs);
-            firstEndpoint = nodeRefs.get(0);
-            otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
+        long firstWayId = 0;
+        for (Long endpoint : waysByEndpointNode.keySet()) {
+            firstWayId = waysByEndpointNode.get(endpoint).get(0);
+            Way firstWay = osm.ways.get(firstWayId);
+            partialRing.addAll(Longs.asList(firstWay.nodes));
+            firstEndpoint = firstWay.nodes[0];
+            otherEndpoint = firstWay.nodes[firstWay.nodes.length - 1];
             break;
         }
-        waysByEndpoint.get(firstEndpoint).remove(firstWay);
-        waysByEndpoint.get(otherEndpoint).remove(firstWay);
-        if (constructRingsRecursive(waysByEndpoint, partialRing, closedRings, firstEndpoint)) {
+        waysByEndpointNode.get(firstEndpoint).remove(firstWayId);
+        waysByEndpointNode.get(otherEndpoint).remove(firstWayId);
+        if (constructRingsRecursive(waysByEndpointNode, partialRing, closedRings, firstEndpoint, osm)) {
             return closedRings;
         } else {
             return null;
         }
     }
 
-    private boolean constructRingsRecursive(ArrayListMultimap<Long, OSMWay> waysByEndpoint,
-            List<Long> ring, List<List<Long>> closedRings, long endpoint) {
+    // TODO in Java 8 use TLongList.foreach()
+    // TODO More documentation!
+    private boolean constructRingsRecursive(ArrayListMultimap<Long, Long> waysByEndpointNode,
+            List<Long> ring, List<List<Long>> closedRings, long endpointNodeId, OSM osm) {
 
-        List<OSMWay> ways = new ArrayList<OSMWay>(waysByEndpoint.get(endpoint));
+        List<Long> ways = Lists.newArrayList(waysByEndpointNode.get(endpointNodeId));
 
-        for (OSMWay way : ways) {
+        for (long wayId : ways) {
             // remove this way from the map
-            List<Long> nodeRefs = way.getNodeRefs();
+            Way way = osm.ways.get(wayId);
+            List<Long> nodeRefs = Longs.asList(way.nodes);
             long firstEndpoint = nodeRefs.get(0);
             long otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
 
-            waysByEndpoint.remove(firstEndpoint, way);
-            waysByEndpoint.remove(otherEndpoint, way);
+            waysByEndpointNode.remove(firstEndpoint, way);
+            waysByEndpointNode.remove(otherEndpoint, way);
 
             ArrayList<Long> newRing = new ArrayList<Long>(ring.size() + nodeRefs.size());
             long newFirstEndpoint;
-            if (firstEndpoint == endpoint) {
+            if (firstEndpoint == endpointNodeId) {
                 for (int j = nodeRefs.size() - 1; j >= 1; --j) {
                     newRing.add(nodeRefs.get(j));
                 }
@@ -204,46 +209,47 @@ class Area {
                 // ring closure
                 closedRings.add(newRing);
                 // if we're out of endpoints, then we have succeeded
-                if (waysByEndpoint.size() == 0) {
+                if (waysByEndpointNode.size() == 0) {
                     return true; // success
                 }
 
                 // otherwise, we need to start a new partial ring
                 newRing = new ArrayList<Long>();
-                OSMWay firstWay = null;
-                for (Long entry : waysByEndpoint.keySet()) {
-                    List<OSMWay> list = waysByEndpoint.get(entry);
-                    firstWay = list.get(0);
-                    nodeRefs = firstWay.getNodeRefs();
+                long firstWayId = 0;
+                Way firstWay = null;
+                for (Long entry : waysByEndpointNode.keySet()) {
+                    List<Long> list = waysByEndpointNode.get(entry);
+                    firstWayId = list.get(0);
+                    firstWay = osm.ways.get(firstWayId);
+                    nodeRefs = Longs.asList(firstWay.nodes);
                     newRing.addAll(nodeRefs);
                     firstEndpoint = nodeRefs.get(0);
                     otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
                     break;
                 }
 
-                waysByEndpoint.remove(firstEndpoint, firstWay);
-                waysByEndpoint.remove(otherEndpoint, firstWay);
+                waysByEndpointNode.remove(firstEndpoint, firstWay);
+                waysByEndpointNode.remove(otherEndpoint, firstWay);
 
-                if (constructRingsRecursive(waysByEndpoint, newRing, closedRings, firstEndpoint)) {
+                if (constructRingsRecursive(waysByEndpointNode, newRing, closedRings, firstEndpoint, osm)) {
                     return true;
                 }
 
-                waysByEndpoint.remove(firstEndpoint, firstWay);
-                waysByEndpoint.remove(otherEndpoint, firstWay);
+                waysByEndpointNode.remove(firstEndpoint, firstWay);
+                waysByEndpointNode.remove(otherEndpoint, firstWay);
 
             } else {
                 // continue with this ring
-                if (waysByEndpoint.get(newFirstEndpoint) != null) {
-                    if (constructRingsRecursive(waysByEndpoint, newRing, closedRings,
-                            newFirstEndpoint)) {
+                if (waysByEndpointNode.get(newFirstEndpoint) != null) {
+                    if (constructRingsRecursive(waysByEndpointNode, newRing, closedRings, newFirstEndpoint, osm)) {
                         return true;
                     }
                 }
             }
-            if (firstEndpoint == endpoint) {
-                waysByEndpoint.put(otherEndpoint, way);
+            if (firstEndpoint == endpointNodeId) {
+                waysByEndpointNode.put(otherEndpoint, wayId);
             } else {
-                waysByEndpoint.put(firstEndpoint, way);
+                waysByEndpointNode.put(firstEndpoint, wayId);
             }
         }
         return false;

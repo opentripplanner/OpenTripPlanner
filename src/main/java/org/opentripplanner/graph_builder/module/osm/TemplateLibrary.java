@@ -80,7 +80,7 @@ public class TemplateLibrary {
             // and then the value for the match
             String defKey = matcher.group(1);
             // scan all translated tags
-            Map<String, String> i18nTags = way.getTagsByPrefix(defKey);
+            Map<String, String> i18nTags = OSMFilter.getTagsByPrefix(way, defKey);
             if (i18nTags != null) {
                 for (Map.Entry<String, String> kv : i18nTags.entrySet()) {
                     if (!kv.getKey().equals(defKey)) {

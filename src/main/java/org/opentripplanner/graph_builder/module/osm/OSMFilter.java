@@ -13,10 +13,9 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
+import com.beust.jcommander.internal.Maps;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.osm.Node;
 import org.opentripplanner.osm.Tagged;
 import org.opentripplanner.osm.Way;
@@ -25,6 +24,8 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  *  Lots of static functions to check whether certain tags are set.
@@ -260,42 +261,36 @@ public abstract class OSMFilter {
         StreetTraversalPermission permissionsBack = permissions;
 
         // Check driving direction restrictions.
-        if (way.isOneWayForwardDriving() || isRoundabout(way)) {
+        if (isOneWayForwardDriving(way) || isRoundabout(way)) {
             permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
         }
-        if (way.isOneWayReverseDriving()) {
+        if (isOneWayReverseDriving(way)) {
             permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
         }
 
         // Check bike direction restrictions.
-        if (way.isOneWayForwardBicycle()) {
+        if (isOneWayForwardBicycle(way)) {
             permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
         }
-        if (way.isOneWayReverseBicycle()) {
+        if (isOneWayReverseBicycle(way)) {
             permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
         }
-
-        String oneWayBicycle = way.getTag("oneway:bicycle");
-        if (OSMWithTags.isFalse(oneWayBicycle) || way.tagIsTrue("bicycle:backwards")) {
+        if (way.tagIsFalse("oneway:bicycle") || way.tagIsTrue("bicycle:backwards")) {
             if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
                 permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
                 permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
         }
 
-        //This needs to be after adding permissions for oneway:bicycle=no
-        //removes bicycle permission when bicycles need to use sidepath
-        //TAG: bicycle:forward=use_sidepath
-        if (way.isForwardDirectionSidepath()) {
+        // Remove bicycle permission where bicycles need to use a sidepath.
+        // This needs to be done after adding permissions based on oneway:bicycle
+        if (isForwardDirectionSidepath(way)) {
             permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
         }
-
-        //TAG bicycle:backward=use_sidepath
-        if (way.isReverseDirectionSidepath()) {
+        if (isReverseDirectionSidepath(way)) {
             permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
         }
-
-        if (way.isOpposableCycleway()) {
+        if (isOpposableCycleway(way)) {
             permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
         }
         return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
@@ -389,5 +384,82 @@ public abstract class OSMFilter {
 
     }
 
+    /**
+     * Currently returns true only for elevators. TODO inline this?
+     * @return whether the node is multi-level one that should be decomposed to multiple coincident nodes.
+     */
+    public static boolean isMultiLevel(Node node) {
+        return "elevator".equals(node.getTag("highway"));
+    }
+
+    /** TODO inline this? */
+    public static boolean hasTrafficLight(Node node) {
+        return "traffic_signals".equals(node.getTag("highway"));
+    }
+
+    /** @return true if through traffic is not allowed. */
+    public static boolean throughTrafficDisallowed(Tagged entity) {
+        String access = entity.getTag("access");
+        return "destination".equals(access) || "private".equals(access)
+                || "customers".equals(access) || "delivery".equals(access)
+                || "forestry".equals(access) || "agricultural".equals(access);
+    }
+
+
+    /** @return true if this is a one-way street for driving. */
+    public static boolean isOneWayForwardDriving(Tagged entity) {
+        return entity.tagIsTrue("oneway");
+    }
+
+    /** @return true if this way is one-way in the opposite direction of its definition. */
+    public static boolean isOneWayReverseDriving(Tagged entity) {
+        return entity.hasTag("oneway", "-1");
+    }
+
+    /** @return true if bikes can only go forward. */
+    public static boolean isOneWayForwardBicycle(Tagged entity) {
+        return entity.tagIsTrue("oneway:bicycle") || entity.tagIsFalse("bicycle:backwards");
+    }
+
+    /** @return true if bikes can only go in the reverse direction. */
+    public static boolean isOneWayReverseBicycle(Tagged entity) {
+        return entity.hasTag("oneway:bicycle", "-1");
+    }
+
+    /** @return true if bikes must use a separate sidepath in the forward direction of travel. */
+    public static boolean isForwardDirectionSidepath(Tagged entity) {
+        return entity.hasTag("bicycle:forward", "use_sidepath");
+    }
+
+    /** @return true if bikes must use a separate sidepath in the reverse direction of travel. */
+    public static boolean isReverseDirectionSidepath(Tagged entity) {
+        return entity.hasTag("bicycle:backward", "use_sidepath");
+    }
+
+    /** @return whether there is a contraflow cycle path here. */
+    public static boolean isOpposableCycleway(Tagged entity) {
+        // any cycleway which is opposite* allows contraflow biking
+        String cycleway = entity.getTag("cycleway");
+        String cyclewayLeft = entity.getTag("cycleway:left");
+        String cyclewayRight = entity.getTag("cycleway:right");
+        return (cycleway != null && cycleway.startsWith("opposite"))
+                || (cyclewayLeft != null && cyclewayLeft.startsWith("opposite"))
+                || (cyclewayRight != null && cyclewayRight.startsWith("opposite"));
+    }
+
+    /** @return a map of key-value pairs for all tags whose keys begin with the given prefix and a colon. */
+    public static Map<String, String> getTagsByPrefix (Tagged entity, String prefix) {
+        Map<String, String> out = Maps.newHashMap();
+        for (Tagged.Tag tag : entity.getTags()) {
+            if (tag.key.equals(prefix) || tag.key.startsWith(prefix + ":")) {
+                out.put(tag.key, tag.value);
+            }
+        }
+        if (out.isEmpty()) {
+            return null;
+        }
+        return out;
+    }
 
 }
+

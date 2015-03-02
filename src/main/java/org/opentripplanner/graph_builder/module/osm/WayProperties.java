@@ -20,7 +20,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  * Parameters applied to OSM ways, usually based on their tags:
  * - Which modes can traverse it
  * - Dangerousness on a bicycle in both directions (OSM ways can be bidirectional).
- *
+ * TODO rename to PermissionAndDanger
  * @author novalis
  */
 public class WayProperties implements Cloneable {

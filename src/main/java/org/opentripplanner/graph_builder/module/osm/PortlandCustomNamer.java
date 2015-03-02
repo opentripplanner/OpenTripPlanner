@@ -13,14 +13,14 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.HashSet;
-
 import com.google.common.collect.Iterables;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.osm.Tagged;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+
+import java.util.HashSet;
 
 /**
  * These rules were developed in consultation with Grant Humphries, PJ Houser, and Mele Sax-Barnett.
@@ -43,13 +43,13 @@ public class PortlandCustomNamer implements CustomNamer {
     private HashSet<StreetEdge> nameByDestination = new HashSet<StreetEdge>();
 
     @Override
-    public String name(OSMWithTags way, String defaultName) {
+    public String name(Tagged way, String defaultName) {
         if (!way.hasTag("name")) {
             // this is already a generated name, so there's no need to add any
             // additional data
             return defaultName;
         }
-        if (way.isTag("footway", "sidewalk") || way.isTag("path", "sidewalk")) {
+        if (way.hasTag("footway", "sidewalk") || way.hasTag("path", "sidewalk")) {
             if (isStreet(defaultName)) {
                 return sidewalk(defaultName);
             }
@@ -108,7 +108,7 @@ public class PortlandCustomNamer implements CustomNamer {
     }
 
     @Override
-    public void nameWithEdge(OSMWithTags way, StreetEdge edge) {
+    public void nameWithEdge(Tagged way, StreetEdge edge) {
         if (!edge.hasBogusName()) {
             return; // this edge already has a real name so there is nothing to do
         }

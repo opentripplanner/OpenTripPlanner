@@ -13,30 +13,20 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.osm.Node;
+import org.opentripplanner.osm.OSM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Polygon;
+import java.util.*;
 
 /**
  * A group of possibly-contiguous areas sharing the same level
@@ -53,9 +43,11 @@ class AreaGroup {
     /**
      * The joined outermost rings of the areas (with inner rings for holes as necessary).
      */
-    List<Ring> outermostRings = new ArrayList<Ring>();
+    List<Ring> outermostRings = Lists.newArrayList();
 
-    public AreaGroup(Collection<Area> areas) {
+    /** A group of areas that share at least one node and are on the same OSM level. */
+    public AreaGroup(Collection<Area> areas, OSM osm) {
+
         this.areas = areas;
 
         // Merging non-convex polygons is complicated, so we need to convert to JTS, let JTS do the
@@ -64,16 +56,18 @@ class AreaGroup {
         List<Polygon> allRings = new ArrayList<Polygon>();
 
         // However, JTS will lose the coord<->osmnode mapping, and we will have to reconstruct it.
-        HashMap<Coordinate, OSMNode> nodeMap = new HashMap<Coordinate, OSMNode>();
+        Map<Coordinate, Long> nodeMap = Maps.newHashMap();
         for (Area area : areas) {
             for (Ring ring : area.outermostRings) {
                 allRings.add(ring.toJtsPolygon());
-                for (OSMNode node : ring.nodes) {
-                    nodeMap.put(new Coordinate(node.lon, node.lat), node);
+                for (long nodeId : ring.nodeIds) {
+                    Node node = osm.nodes.get(nodeId);
+                    nodeMap.put(new Coordinate(node.getLon(), node.getLat()), nodeId);
                 }
                 for (Ring inner : ring.holes) {
-                    for (OSMNode node : inner.nodes) {
-                        nodeMap.put(new Coordinate(node.lon, node.lat), node);
+                    for (long nodeId : inner.nodeIds) {
+                        Node node = osm.nodes.get(nodeId);
+                        nodeMap.put(new Coordinate(node.getLon(), node.getLat()), nodeId);
                     }
                 }
             }
@@ -91,36 +85,40 @@ class AreaGroup {
                     LOG.warn("Unexpected non-polygon when merging areas: " + poly);
                     continue;
                 }
-                outermostRings.add(toRing((Polygon) poly, nodeMap));
+                outermostRings.add(toRing((Polygon) poly, nodeMap, osm));
             }
         } else if (u instanceof Polygon) {
-            outermostRings.add(toRing((Polygon) u, nodeMap));
+            outermostRings.add(toRing((Polygon) u, nodeMap, osm));
         } else {
             LOG.warn("Unexpected non-polygon when merging areas: " + u);
         }
     }
 
-    public static List<AreaGroup> groupAreas(Map<Area, OSMLevel> areasLevels) {
+    /**
+     * Group areas together into AreaGroups if they share at least one node and are on the same level.
+     * TODO call this with a pre-built Map<Area, OSMLevel> in OSMDB.
+     */
+    public static List<AreaGroup> groupAreas(Map<Area, OSMLevel> areasLevels, OSM osm) {
         DisjointSet<Area> groups = new DisjointSet<Area>();
-        Multimap<OSMNode, Area> areasForNode = LinkedListMultimap.create();
+        Multimap<Long, Area> areasForNode = LinkedListMultimap.create(); // Why linked list? Are we inserting?
         for (Area area : areasLevels.keySet()) {
             for (Ring ring : area.outermostRings) {
                 for (Ring inner : ring.holes) {
-                    for (OSMNode node : inner.nodes) {
-                        areasForNode.put(node, area);
+                    for (long nodeId : inner.nodeIds) {
+                        areasForNode.put(nodeId, area);
                     }
                 }
-                for (OSMNode node : ring.nodes) {
-                    areasForNode.put(node, area);
+                for (long nodeId : ring.nodeIds) {
+                    areasForNode.put(nodeId, area);
                 }
             }
         }
 
         // areas that can be joined must share nodes and levels
-        for (OSMNode osmNode : areasForNode.keySet()) {
-            for (Area area1 : areasForNode.get(osmNode)) {
+        for (long osmNodeId : areasForNode.keySet()) {
+            for (Area area1 : areasForNode.get(osmNodeId)) {
                 OSMLevel level1 = areasLevels.get(area1);
-                for (Area area2 : areasForNode.get(osmNode)) {
+                for (Area area2 : areasForNode.get(osmNodeId)) {
                     OSMLevel level2 = areasLevels.get(area2);
                     if ((level1 == null && level2 == null)
                             || (level1 != null && level1.equals(level2))) {
@@ -133,13 +131,13 @@ class AreaGroup {
         List<AreaGroup> out = new ArrayList<AreaGroup>();
         for (Set<Area> areaSet : groups.sets()) {
             try {
-                out.add(new AreaGroup(areaSet));
+                out.add(new AreaGroup(areaSet, osm));
             } catch (AreaGroup.RingConstructionException e) {
                 for (Area area : areaSet) {
                     LOG.debug("Failed to create merged area for "
                             + area
                             + ".  This area might not be at fault; it might be one of the other areas in this list.");
-                    out.add(new AreaGroup(Arrays.asList(area)));
+                    out.add(new AreaGroup(Arrays.asList(area), osm));
                 }
             }
         }
@@ -150,34 +148,35 @@ class AreaGroup {
         private static final long serialVersionUID = 1L;
     }
 
-    private Ring toRing(Polygon polygon, HashMap<Coordinate, OSMNode> nodeMap) {
-        List<OSMNode> shell = new ArrayList<OSMNode>();
+    private Ring toRing(Polygon polygon, Map<Coordinate, Long> nodeMap, OSM osm) {
+        List<Long> shell = Lists.newArrayList();
         for (Coordinate coord : polygon.getExteriorRing().getCoordinates()) {
-            OSMNode node = nodeMap.get(coord);
-            if (node == null) {
+            Long nodeId = nodeMap.get(coord);
+            if (nodeId == null) {
                 throw new RingConstructionException();
             }
-            shell.add(node);
+            shell.add(nodeId);
         }
-        Ring ring = new Ring(shell, true);
+        Ring ring = new Ring(shell, osm);
         // now the holes
         for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
             LineString interior = polygon.getInteriorRingN(i);
-            List<OSMNode> hole = new ArrayList<OSMNode>();
+            List<Long> hole = Lists.newArrayList();
             for (Coordinate coord : interior.getCoordinates()) {
-                OSMNode node = nodeMap.get(coord);
-                if (node == null) {
+                Long nodeId = nodeMap.get(coord);
+                if (nodeId == null) {
                     throw new RingConstructionException();
                 }
-                hole.add(node);
+                hole.add(nodeId);
             }
-            ring.holes.add(new Ring(hole, true));
+            ring.holes.add(new Ring(hole, osm));
         }
 
         return ring;
     }
 
-    public OSMWithTags getSomeOSMObject() {
-        return areas.iterator().next().parent;
+    // FIXME result is not of a known type (way or relation)
+    public long getSomeOSMObject() {
+        return areas.iterator().next().parentId;
     }
 }

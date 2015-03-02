@@ -17,13 +17,13 @@ import com.beust.jcommander.internal.Lists;
 import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.osm.Node;
+import org.opentripplanner.osm.OSM;
 import org.opentripplanner.visibility.VLPoint;
 import org.opentripplanner.visibility.VLPolygon;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class Ring {
 
@@ -38,7 +38,7 @@ public class Ring {
     // equivalent to the ring representation, but used for JTS operations
     private Polygon jtsPolygon;
 
-    public Ring(List<Long> osmNodeIds, Map<Long, Node> nodeForId) {
+    public Ring(List<Long> osmNodeIds, OSM osm) {
         List<VLPoint> vertices = Lists.newArrayList(osmNodeIds.size());
         nodeIds = Lists.newArrayList(osmNodeIds);
         for (long nodeId : osmNodeIds) {
@@ -47,7 +47,7 @@ public class Ring {
                 // close polygons TODO couldn't we check that by position in the list?
                 continue;
             }
-            Node node = nodeForId.get(nodeId);
+            Node node = osm.nodes.get(nodeId);
             VLPoint point = new VLPoint(node.getLon(), node.getLat());
             vertices.add(point);
             //nodes.add(node);

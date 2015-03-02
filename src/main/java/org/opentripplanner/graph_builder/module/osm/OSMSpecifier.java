@@ -14,7 +14,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.osm.Tagged;
 
 import java.util.ArrayList;
@@ -57,9 +56,9 @@ public class OSMSpecifier {
      * TODO: we should probably support forward/backward as well.
      * TODO: simply count the number of full, partial, and wildcard matches instead of using a scoring system.
      *
-     * @param match an OSM tagged object to compare to this specifier
+     * @param entity an OSM entity to compare to this specifier
      */
-    public P2<Integer> matchScores(OSMWithTags match) {
+    public P2<Integer> matchScores(Tagged entity) {
         int leftScore = 0, rightScore = 0;
         int leftMatches = 0, rightMatches = 0;
         for (P2<String> pair : kvpairs) {
@@ -67,9 +66,9 @@ public class OSMSpecifier {
             // Probably because it used to be possible to set them from Spring XML.
             String tag = pair.first.toLowerCase();
             String value = pair.second.toLowerCase();
-            String leftMatchValue = match.getTag(tag + ":left");
-            String rightMatchValue = match.getTag(tag + ":right");
-            String matchValue = match.getTag(tag);
+            String leftMatchValue = entity.getTag(tag + ":left");
+            String rightMatchValue = entity.getTag(tag + ":right");
+            String matchValue = entity.getTag(tag);
             if (leftMatchValue == null) {
                 leftMatchValue = matchValue;
             }

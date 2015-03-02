@@ -17,7 +17,7 @@ public abstract class Tagged implements Serializable {
     public String tags;
 
     public static class Tag {
-        String key, value;
+        public String key, value;
     }
 
     /** Return the tag value for the given key. Returns null if the tag key is not present. */

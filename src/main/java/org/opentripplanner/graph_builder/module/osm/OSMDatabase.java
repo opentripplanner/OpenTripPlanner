@@ -21,8 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Longs;
 import com.vividsolutions.jts.geom.*;
-import gnu.trove.list.TLongList;
-import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
@@ -62,22 +60,22 @@ public class OSMDatabase {
     public final Set<Long> bikeParkingNodes = Sets.newHashSet();
 
     /* Set of IDs of all area ways. */
-    private Set<Long> areaWayIds = Sets.newHashSet();
+    public final Set<Long> areaWayIds = Sets.newHashSet();
 
     /* All walkable areas. These are OTP Area objects, not the source way or relation IDs. */
-    private List<Area> walkableAreas = new ArrayList<Area>();
+    public final List<Area> walkableAreas = new ArrayList<Area>();
 
     /* All P+R area objects (for visibility graph construction) */
-    private List<Area> parkAndRideAreas = new ArrayList<Area>();
+    public final List<Area> parkAndRideAreas = new ArrayList<Area>();
 
     /* All bike parking area objects (for visibility graph construction) */
-    private List<Area> bikeParkingAreas = new ArrayList<Area>();
+    public final List<Area> bikeParkingAreas = new ArrayList<Area>();
 
     /* Map of all area OSMWay for a given node */
-    private Multimap<Long, Long> areasContainingNode = ArrayListMultimap.create();
+    public final Multimap<Long, Long> areasContainingNode = ArrayListMultimap.create();
 
     /* Set of IDs for areas that are composed of a single OSM Way. */
-    private Set<Long> singleWayAreas = Sets.newHashSet();
+    public final Set<Long> singleWayAreas = Sets.newHashSet();
 
     /* Track which ways and relations have been processed as areas (TODO define "processed") */
     // TODO use more trove collections elsewhere
@@ -85,21 +83,20 @@ public class OSMDatabase {
     private TLongSet processedAreaRelations = new TLongHashSet();
 
     /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
-    private Set<Long> waysNodeIds = new HashSet<Long>(); // TODO change name, it's confusing
+    public final Set<Long> waysNodeIds = new HashSet<Long>(); // TODO change name, it's confusing
 
     /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
-    private Set<Long> areaNodeIds = new HashSet<Long>();
+    public final Set<Long> areaNodeIds = new HashSet<Long>();
 
     /* Track which vertical level each OSM way belongs to, for building elevators etc. */
     public final Map<Long, OSMLevel> wayLevels = Maps.newHashMap();
     // TODO make another one for relations, use Trove w/ defaults
 
     /* Set of turn restrictions for each turn "from" way ID */
-    private Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
-            .create();
+    public final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap.create();
 
     /* Set of turn restrictions for each turn "to" way ID */
-    private Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
+    public final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
 
     /*
      * Map of all transit stop nodes that lie within an area and which are connected to the area by
@@ -108,7 +105,7 @@ public class OSMDatabase {
      * This is because the areas can come from ways or relations. Could we use the Area object itself?
      * In its current state this can't work because the key is a transient OSM object rather than a true key.
      */
-    private Map<Tagged, Set<Long>> stopsInAreas = Maps.newHashMap();
+    public final Map<Tagged, Set<Long>> stopsInAreas = Maps.newHashMap();
 
     /* List of graph annotations registered during building, to add to the graph. */
     private List<GraphBuilderAnnotation> annotations = new ArrayList<>();
@@ -127,18 +124,6 @@ public class OSMDatabase {
 
     public OSMDatabase (OSM osm) {
         this.osm = osm;
-    }
-
-    public Collection<Area> getWalkableAreas() {
-        return Collections.unmodifiableCollection(walkableAreas);
-    }
-
-    public Collection<Area> getParkAndRideAreas() {
-        return Collections.unmodifiableCollection(parkAndRideAreas);
-    }
-
-    public Collection<Area> getBikeParkingAreas() {
-        return Collections.unmodifiableCollection(bikeParkingAreas);
     }
 
     public Collection<Long> getTurnRestrictionWayIds() {
@@ -579,7 +564,7 @@ public class OSMDatabase {
                 }
             }
             try {
-                newArea(new Area(way, new TLongArrayList(new long[] {wayId}), new TLongArrayList(), osm.nodes));
+                newArea(new Area(way, Collections.singletonList(wayId), Collections.<Long>emptyList(), osm));
             } catch (Area.AreaConstructionException e) {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
@@ -612,8 +597,8 @@ public class OSMDatabase {
                 continue;
             }
             // Area multipolygons -- pedestrian plazas
-            TLongList innerWays = new TLongArrayList();
-            TLongList outerWays = new TLongArrayList();
+            List<Long> innerWays = Lists.newArrayList();
+            List<Long> outerWays = Lists.newArrayList();
             for (Relation.Member member : relation.members) {
                 if (member.type != Relation.Type.WAY) {
                     // Below we expect the relation members to be ways. If one is not, skip this relation.
@@ -642,7 +627,7 @@ public class OSMDatabase {
             }
             processedAreaRelations.add(relationId);
             try {
-                newArea(new Area(relation, outerWays, innerWays, osm.nodes));
+                newArea(new Area(relation, outerWays, innerWays, osm));
             } catch (Area.AreaConstructionException e) {
                 continue;
             }

@@ -15,7 +15,6 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.osm.Tagged;
 import org.opentripplanner.osm.Way;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -24,8 +23,10 @@ import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,8 +92,9 @@ public class WayPropertySet {
     /**
      * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties that are mixins
      * will have their safety values applied if they match at all.
+     * TODO does it /apply/ them or just find and return them? Rename, "data" is not clear enough.
      */
-    public WayProperties getDataForWay(OSMWithTags way) {
+    public WayProperties getDataForWay(Way way) {
         WayProperties leftResult = defaultProperties;
         WayProperties rightResult = defaultProperties;
         int bestLeftScore = 0;
@@ -138,27 +140,9 @@ public class WayPropertySet {
         }
         if ((bestLeftScore == 0 || bestRightScore == 0)
                 && (leftMixins.size() == 0 || rightMixins.size() == 0)) {
-            String all_tags = dumpTags(way);
-            LOG.debug("Used default permissions: " + all_tags);
+            LOG.debug("Used default permissions: " + way.tags);
         }
         return result;
-    }
-
-    private String dumpTags(OSMWithTags way) {
-        /* generate warning message */
-        String all_tags = null;
-        Map<String, String> tags = way.getTags();
-        for (Entry<String, String> entry : tags.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            String tag = key + "=" + value;
-            if (all_tags == null) {
-                all_tags = tag;
-            } else {
-                all_tags += "; " + tag;
-            }
-        }
-        return all_tags;
     }
 
     private void applyMixins(WayProperties result, List<WayProperties> mixins, boolean right) {
