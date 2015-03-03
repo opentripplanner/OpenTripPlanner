@@ -409,11 +409,19 @@ public class GraphIndex {
      */
     public List<StopTimesInPattern> getStopTimesForStop(Stop stop, ServiceDate serviceDate) {
         List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableResolver timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+        TimetableResolver timetableResolver = null;
+        if (graph.timetableSnapshotSource != null) {
+            timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+        }
         Collection<TripPattern> patterns = patternsForStop.get(stop);
         for (TripPattern pattern : patterns) {
             StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
-            Timetable tt = timetableResolver.resolve(pattern, serviceDate);
+            Timetable tt;
+            if (timetableResolver != null){
+                tt = timetableResolver.resolve(pattern, serviceDate);
+            } else {
+                tt = pattern.scheduledTimetable;
+            }
             ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
             int sidx = 0;
             for (Stop currStop : pattern.stopPattern.stops) {
