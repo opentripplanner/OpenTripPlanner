@@ -19,12 +19,15 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import com.google.common.collect.Maps;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,9 +155,6 @@ public class TimetableSnapshotSource {
                     case CANCELED:
                         applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                         break;
-                    case REPLACEMENT:
-                        applied = handleReplacementTrip(tripUpdate, feedId, serviceDate);
-                        break;
                 }
             } else {
                 // Default
@@ -188,6 +188,20 @@ public class TimetableSnapshotSource {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
         // This does not include Agency ID or feed ID, trips are feed-unique and we currently assume a single static feed.
         String tripId = tripDescriptor.getTripId();
+        // Try to search for trip with the help of route, direction and start time
+        if ((tripId == null || tripId.isEmpty()) && tripDescriptor.hasDirectionId() && tripDescriptor.hasRouteId() &&
+                tripDescriptor.hasStartTime() && tripDescriptor.hasStartDate()) {
+            int time = StopTimeFieldMappingFactory.getStringAsSeconds(tripDescriptor.getStartTime());
+            String direction = String.valueOf(tripDescriptor.getDirectionId());
+            AgencyAndId routeId = new AgencyAndId(feedId, tripDescriptor.getRouteId());
+            Trip trip = graphIndex.getTripForRouteAndStartTime(routeId, direction, time, serviceDate);
+            if (trip != null) {
+                tripId = trip.getId().getId();
+            }
+            TripDescriptor newTrip = tripDescriptor.toBuilder().setTripId(tripId).build();
+            tripUpdate = tripUpdate.toBuilder().setTrip(newTrip).build();
+        }
+
         TripPattern pattern = getPatternForTripId(tripId);
 
         if (pattern == null) {
@@ -213,12 +227,6 @@ public class TimetableSnapshotSource {
     protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         // TODO: Handle unscheduled trip
         LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
-        return false;
-    }
-
-    protected boolean handleReplacementTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
-        // TODO: Handle replacement trip
-        LOG.warn("Replacement trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 

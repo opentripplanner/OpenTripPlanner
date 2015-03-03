@@ -13,16 +13,21 @@
 
 package org.opentripplanner.updater.alerts;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.serialization.mappings.StopTimeFieldMappingFactory;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TranslatedString;
+import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,37 +94,58 @@ public class AlertsUpdateHandler {
             periods.add(new TimePeriod(0, Long.MAX_VALUE));
         }
         for (EntitySelector informed : alert.getInformedEntityList()) {
-            String patchId = createId(id, informed);
-
-            String routeId = null;
-            if (informed.hasRouteId()) {
-                routeId = informed.getRouteId();
-            }
-            // TODO: The other elements of a TripDescriptor are ignored...
-            String tripId = null;
-            if (informed.hasTrip() && informed.getTrip().hasTripId()) {
-                tripId = informed.getTrip().getTripId();
-            }
-            String stopId = null;
-            if (informed.hasStopId()) {
-                stopId = informed.getStopId();
-            }
-
-            String agencyId = informed.getAgencyId();
+            String agencyId;
             if (informed.hasAgencyId()) {
                 agencyId = informed.getAgencyId().intern();
             } else {
                 agencyId = defaultAgencyId;
             }
             if (agencyId == null) {
-                log.error("Empty agency id (and no default set) in feed; other ids are route "
-                        + routeId + " and stop " + stopId);
+                log.error("Empty agency id (and no default set) in feed; entity is " + informed.toString());
                 continue;
+            }
+
+            String routeId = null;
+            if (informed.hasRouteId()) {
+                routeId = informed.getRouteId();
+            }
+
+            String direction = null;
+            if (informed.hasTrip() && informed.getTrip().hasDirectionId()) {
+                direction = String.valueOf(informed.getTrip().getDirectionId());
+            }
+
+            String tripId = null;
+            if (informed.hasTrip()) {
+                GtfsRealtime.TripDescriptor trip = informed.getTrip();
+                if (trip.hasTripId()) {
+                    tripId = trip.getTripId();
+                } else if (trip.hasDirectionId() && trip.hasRouteId() && trip.hasStartTime() && trip.hasStartDate()) {
+                    int time = StopTimeFieldMappingFactory.getStringAsSeconds(trip.getStartTime());
+                    ServiceDate date;
+                    try {
+                        date = ServiceDate.parseString(trip.getStartDate());
+                    } catch (ParseException e) {
+                        continue;
+                    }
+                    //TODO: We should access GraphIndex in some nicer way
+                    GraphIndex index = ((AlertPatchServiceImpl) alertPatchService).graph.index;
+                    tripId = index.getTripForRouteAndStartTime(
+                            new AgencyAndId(agencyId, routeId), direction, time, date).getId().getId();
+                }
+            }
+            String stopId = null;
+            if (informed.hasStopId()) {
+                stopId = informed.getStopId();
             }
 
             AlertPatch patch = new AlertPatch();
             if (routeId != null) {
                 patch.setRoute(new AgencyAndId(agencyId, routeId));
+                // Makes no sense to set direction if we don't have a route
+                if (direction != null) {
+                    patch.setDirectionId(direction);
+                }
             }
             if (tripId != null) {
                 patch.setTrip(new AgencyAndId(agencyId, tripId));
@@ -133,6 +159,7 @@ public class AlertsUpdateHandler {
             patch.setTimePeriods(periods);
             patch.setAlert(alertText);
 
+            String patchId = createId(id, agencyId, routeId, direction, tripId, stopId);
             patch.setId(patchId);
             patchIds.add(patchId);
 
@@ -140,13 +167,13 @@ public class AlertsUpdateHandler {
         }
     }
 
-    private String createId(String id, EntitySelector informed) {
+    private String createId(String id, String agencyId, String routeId, String direction, String tripId, String stopId) {
         return id + " "
-            + (informed.hasAgencyId  () ? informed.getAgencyId  () : " null ") + " "
-            + (informed.hasRouteId   () ? informed.getRouteId   () : " null ") + " "
-            + (informed.hasRouteType () ? informed.getRouteType () : " null ") + " "
-            + (informed.hasStopId    () ? informed.getStopId    () : " null ") + " "
-            + (informed.hasTrip() ? informed.getTrip().getTripId() : " null ");
+            + (agencyId  != null ? agencyId  : " null ") + " "
+            + (routeId   != null ? routeId   : " null ") + " "
+            + (direction != null ? direction : " null ") + " "
+            + (stopId    != null ? stopId    : " null ") + " "
+            + (tripId    != null ? tripId    : " null ");
     }
 
     /**

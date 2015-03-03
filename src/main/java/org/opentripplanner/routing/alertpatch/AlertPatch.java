@@ -63,7 +63,15 @@ public class AlertPatch implements Serializable {
 
     private AgencyAndId stop;
 
+    /**
+     * The headsign of the alert
+     */
     private String direction;
+
+    /**
+     * Direction of the trip as GTFS route direction
+     */
+    private String directionId;
 
     @XmlElement
     public Alert getAlert() {
@@ -112,7 +120,7 @@ public class AlertPatch implements Serializable {
             }
 
             for (TripPattern tripPattern : tripPatterns) {
-                if (direction != null && ! direction.equals(tripPattern.getDirection())) {
+                if (directionId != null && ! directionId.equals(tripPattern.getTrip(0).getDirectionId())) {
                     continue;
                 }
                 for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
@@ -163,7 +171,7 @@ public class AlertPatch implements Serializable {
             }
 
             for (TripPattern tripPattern : tripPatterns) {
-                if (direction != null && ! direction.equals(tripPattern.getDirection())) {
+                if (directionId != null && ! directionId.equals(tripPattern.getTrip(0).getDirectionId())) {
                     continue;
                 }
                 for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
@@ -252,6 +260,10 @@ public class AlertPatch implements Serializable {
 
     public void setStop(AgencyAndId stop) {
         this.stop = stop;
+    }
+
+    public void setDirectionId(String directionId) {
+        this.directionId = directionId;
     }
 
     public boolean equals(Object o) {

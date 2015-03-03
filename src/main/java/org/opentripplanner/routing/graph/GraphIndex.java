@@ -448,6 +448,37 @@ public class GraphIndex {
         return stopTreeCache;
     }
 
+    public Trip getTripForRouteAndStartTime(AgencyAndId routeId, String direction, int startTime, ServiceDate date) {
+        Route route = routeForId.get(routeId);
+        if (route == null) {
+            return null;
+        }
+        Set<AgencyAndId> services = calendarService.getServiceIdsOnDate(date);
+        for (TripPattern pattern : patternsForRoute.get(route)) {
+            for (TripTimes times : pattern.scheduledTimetable.tripTimes) {
+                if (times.getScheduledDepartureTime(0) == startTime &&
+                        times.trip.getDirectionId().equals(direction) &&
+                        services.contains(times.trip.getServiceId())) {
+                    return times.trip;
+                }
+            }
+        }
+        // Check if the trip is carried over from previous day
+        date = date.previous();
+        startTime += 24*60*60;
+        services = calendarService.getServiceIdsOnDate(date);
+        for (TripPattern pattern : patternsForRoute.get(route)) {
+            for (TripTimes times : pattern.scheduledTimetable.tripTimes) {
+                if (times.getScheduledDepartureTime(0) == startTime &&
+                        times.trip.getDirectionId().equals(direction) &&
+                        services.contains(times.trip.getServiceId())) {
+                    return times.trip;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * FIXME OBA parentStation field is a string, not an AgencyAndId, so it has no agency/feed scope
      * But the DC regional graph has no parent stations pre-defined, so no use dealing with them for now.
