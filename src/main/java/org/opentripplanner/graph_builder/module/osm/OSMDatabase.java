@@ -101,12 +101,18 @@ public class OSMDatabase {
     /*
      * Map of all transit stop nodes that lie within an area and which are connected to the area by
      * a relation. Keyed on the area's OSM way.
-     * FIXME actually it was keyed on any OSM entity, with identity equality.
+     * 
+     * abyrd: FIXME actually it was keyed on any OSM entity, with identity equality.
      * This is because the areas can come from ways or relations. Could we use the Area object itself?
      * In its current state this can't work because the key is a transient OSM object rather than a true key.
+     * 
+     * hannesj: 
+     * Items are added to this list when relations are looped through in the beginning, so Area objects do not exist 
+     * yet at that point. Also values are only used when creating the Area objects (to see if any unconnected nodes 
+     * within the area should be part of the Area), so it doesn't matter if they are lost after that.
      */
     public final Map<Tagged, Set<Long>> stopsInAreas = Maps.newHashMap();
-
+    
     /* List of graph annotations registered during building, to add to the graph. */
     private List<GraphBuilderAnnotation> annotations = new ArrayList<>();
 
@@ -846,10 +852,14 @@ public class OSMDatabase {
      * 
      * This goes through all public_transport=stop_area relations and adds a mapping to stopsInAreas,
      * from the parent (either an area or multipolygon relation) to a a Set of transit stop nodes
-     * that should be included in the parent area. TODO document: what happens when they are "included"?
-     * This improves TransitToTaggedStopsGraphBuilder by enabling us to have unconnected stop nodes within the
-     * areas by creating relations.
-     * TODO document: what is an "unconnected stop node"? Why would we want to have them?
+     * that should be included in the parent area. This improves TransitToTaggedStopsGraphBuilder by enabling us to 
+     * have unconnected stop nodes within the areas by creating relations.
+     * 
+     * An unconnected stop is a bus stop/railway station node that is contained within an area, but is not part of
+     * that area. In OSM, there is no way to tell that these two entities are connected without having a relation 
+     * between them (as they could be in different levels if we just do an intersection between the geometries). 
+     * It is used so that we can do transit to street linking correctly using the ref from the OSM node and stop_code 
+     * from GTFS. See http://www.openstreetmap.org/relation/3994129 for an example of this type of relation.
      *
      * @author hannesj
      * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
