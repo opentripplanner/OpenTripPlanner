@@ -96,7 +96,8 @@ otp.widgets.transit.StopViewerWidget =
     runTimesQuery : function() {
         var this_ = this;
         var startTime = moment(this.datePicker.val(), otp.config.locale.time.date_format).add("hours", -otp.config.timeOffset).unix();
-        this.module.webapp.indexApi.runStopTimesQuery(this.agencyId, this.stopId, startTime+10800, startTime+97200, this, function(data) {
+        //this.module.webapp.indexApi.runStopTimesQuery(this.agencyId, this.stopId, startTime+10800, startTime+97200, this, function(data) {
+        this.module.webapp.indexApi.runStopTimesQuery(this.stopId, this.datePicker.datepicker("getDate"), this, function(data) {
             this_.times = [];
             /*
             for(var i=0; i < data.stopTimes.length; i++) {
