@@ -54,35 +54,21 @@ public class Parser extends BinaryParser {
     }
 
     private static final String[] retainKeys = new String[] {
-        "highway", "parking", "bicycle"
+        "highway", "parking", "bicycle", "name"
     };
 
+    // Accepting all tags increases size by about 15 percent when storing all elements.
+    // Not storing elements that lack interesting tags reduces size by 80%.
+    // return true; DEBUG
     private boolean retainTag(String key) {
         for (String s : retainKeys) {
             if (s.equals(key)) return true;
         }
-        // Accepting all tags increases size by < 1/10
-        // when storing all elements.
-        // Not storing elements that lack interesting tags
-        // reduces size by 80%.
-        // return true;
-        return true;
+        return false;
     }
 
     // Load ways first, then skip loading all nodes which are not tracked.
     // Also include bounding box filter.
-
-    // move to Tagged
-    private void addTag(StringBuilder sb, String key, String val) {
-        if (retainTag(key)) {
-            if (sb.length() > 0) sb.append(';');
-            sb.append(key);
-            if (val != null && ! val.isEmpty()) {
-                sb.append('=');
-                sb.append(val);
-            }
-        }
-    }
 
     /** Note that in many PBF files this never gets called because nodes are dense. */
     @Override
@@ -95,7 +81,7 @@ public class Parser extends BinaryParser {
             for (int k = 0; k < n.getKeysCount(); k++) {
                 String key = getStringById(n.getKeys(k));
                 String val = getStringById(n.getVals(k));
-                node.addTag(key, val);
+                if (retainTag(key)) node.addTag(key, val);
             }
             handleNode(n.getId(), node);
         }
@@ -124,7 +110,7 @@ public class Parser extends BinaryParser {
                     int vid = nodes.getKeysVals(kv++);
                     String key = getStringById(kid);
                     String val = getStringById(vid);
-                    node.addTag(key, val);
+                    if (retainTag(key)) node.addTag(key, val);
                 }
                 kv++; // Skip over the '0' delimiter.
             }
@@ -143,7 +129,7 @@ public class Parser extends BinaryParser {
             for (int k = 0; k < w.getKeysCount(); k++) {
                 String key = getStringById(w.getKeys(k));
                 String val = getStringById(w.getVals(k));
-                way.addTag(key, val);
+                if (retainTag(key)) way.addTag(key, val);
             }
             /* Handle nodes */
             List<Long> rl = w.getRefsList();
@@ -166,7 +152,7 @@ public class Parser extends BinaryParser {
             for (int k = 0; k < r.getKeysCount(); k++) {
                 String key = getStringById(r.getKeys(k));
                 String val = getStringById(r.getVals(k));
-                rel.addTag(key, val);
+                if (retainTag(key)) rel.addTag(key, val);
             }
             /* Handle members of the relation */
             long mid = 0; // member ids, delta coded

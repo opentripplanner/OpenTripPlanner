@@ -12,13 +12,13 @@ public class OSMTextOutput {
     OutputStream out;
     PrintStream print;
     OSM osm;
-    NodeTracker nodesSeen;
+    // NodeTracker nodesSeen;
 
     public OSMTextOutput (OutputStream out, OSM osm) {
         this.osm = osm;
         this.out = out;
         this.print = new PrintStream(out);
-        nodesSeen = new NodeTracker();
+        // nodesSeen = new NodeTracker();
     }
 
     public void printWay(long wayId) {
@@ -26,16 +26,15 @@ public class OSMTextOutput {
         print.print("W ");
         print.print(wayId);
         print.print(' ');
-        print.print(way.tags);
+        printTags(way);
         print.print('\n');
         for (long nodeId : way.nodes) {
-            if (nodesSeen.contains(nodeId)) {
-                printNodeFull(nodeId);
-//                printNodeRef(nodeId);
-            } else {
-                printNodeFull(nodeId);
-                nodesSeen.add(nodeId);
-            }
+            // if (nodesSeen.contains(nodeId)) {
+            //     printNodeRef(nodeId);
+            // }
+            // } else {
+            printNodeFull(nodeId);
+            //  nodesSeen.add(nodeId);
         }
     }
 
@@ -54,8 +53,19 @@ public class OSMTextOutput {
         print.print(' ');
         print.printf(Locale.US, "%3.6f", node.getLon());
         print.print(' ');
-        print.print(node.tags);
+        printTags(node);
         print.print('\n');
     }
 
+    public void printTags (Tagged tagged) {
+        if (tagged.hasNoTags()) {
+            return;
+        }
+        for (Tagged.Tag tag : tagged.tags) {
+            print.print(tag.key);
+            print.print("=");
+            print.print(tag.value);
+            print.print(";");
+        }
+    }
 }

@@ -34,6 +34,8 @@ public class VanillaExtract {
         VexPbfParser parser = new VexPbfParser(args[0]);
         parser.parse(args[1]);
 
+        // FIXME Calling db.compact() at this point only reduces file size by a few MB but it DOUBLES the read speed.
+        
         LOG.info("Starting VEX HTTP server on port {} of interface {}", PORT, BIND_ADDRESS);
         HttpServer httpServer = new HttpServer();
         httpServer.addListener(new NetworkListener("vanilla_extract", BIND_ADDRESS, PORT));

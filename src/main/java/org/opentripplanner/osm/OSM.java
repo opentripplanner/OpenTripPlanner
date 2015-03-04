@@ -3,9 +3,12 @@ package org.opentripplanner.osm;
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Longs;
 import com.vividsolutions.jts.geom.Envelope;
+import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple3;
+import org.opentripplanner.osm.serializer.NodeSerializer;
+import org.opentripplanner.osm.serializer.WaySerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +32,9 @@ public class OSM {
     public NavigableSet<Tuple3<Integer, Integer, Long>> index; // (x_tile, y_tile, wayId)
 
     /** The MapDB backing this OSM, if any. */
-    DB db = null; // db.close(); ?
+    DB db = null;
 
-    // Using DB TreeMaps is observed not to be slower than memory.
-    // HashMaps are both bigger and slower.
-    // It lets you run in 400MB instead of a few GB.
+    // Using DB TreeMaps is observed not to be slower than memory. HashMaps are both bigger and slower.
 
     /** If diskPath is null, OSM will be loaded into memory. */
     public OSM (String diskPath) {
@@ -44,26 +45,39 @@ public class OSM {
         } else {
             if (diskPath.equals("__MEMORY__")) {
                 LOG.info("OSM will be stored in memory.");
-                dbMaker = DBMaker.newMemoryDB();
+                dbMaker = DBMaker.newMemoryDirectDB(); // off-heap, no garbage collection
             } else {
                 LOG.info("OSM will be stored in file {}.", diskPath);
                 dbMaker = DBMaker.newFileDB(new File(diskPath));
             }
         }
-        // Most execution time on small PBFs seems to come from PBF loading, not MapDB options
-        db = dbMaker
-            .transactionDisable()
-            .asyncWriteEnable()
-            .compressionEnable()
-            .closeOnJvmShutdown()
-            .cacheSize(100 * 1024 * 1024)
-            .cacheLRUEnable()
-            .mmapFileEnableIfSupported()
-            .make();
-        nodes = db.getTreeMap("nodes");
-        ways = db.getTreeMap("ways");
-        relations = db.getTreeMap("relations");
-        index = db.getTreeSet("spatial_index");
+        
+        // Compression has no appreciable effect on speed but reduces file size by about 16 percent.
+        
+        db = dbMaker.asyncWriteEnable()
+                .transactionDisable()
+                .compressionEnable()
+                .cacheSize(100 * 1024 * 1024)
+                .mmapFileEnableIfSupported()
+                .closeOnJvmShutdown()
+                .make();
+
+        nodes = db.createTreeMap("nodes")
+                .valueSerializer(new NodeSerializer())
+                .makeLongMap();
+        
+        ways =  db.createTreeMap("ways")
+                .valueSerializer(new WaySerializer())
+                .makeLongMap();
+        
+        relations = db.createTreeMap("relations")
+                .makeLongMap();
+
+        // Serializer delta compresses the tuple as a whole and packs ints, 
+        // but does not recursively delta-code its elements.
+        index = db.createTreeSet("spatial_index")
+                .serializer(BTreeKeySerializer.TUPLE3) 
+                .make();
     }
     
     // boolean filterTags
