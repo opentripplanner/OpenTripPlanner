@@ -62,8 +62,23 @@ otp.core.Webapp = otp.Class({
             decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
             query  = window.location.search.substring(1);
 
-        while (match = search.exec(query))
-            this.urlParams[decode(match[1])] = decode(match[2]);
+        //Parser URL query string
+        while (match = search.exec(query)) {
+            var currentKey = decode(match[1]);
+            //Same key already appeared in parameters
+            //We need to change values from string to to list of values
+            if (currentKey in this.urlParams) {
+                var tmpValues = this.urlParams[currentKey];
+                if ($.isArray(tmpValues)) {
+                    tmpValues.push(decode(match[2]));
+                } else {
+                    tmpValues = [tmpValues, decode(match[2])];
+                }
+                this.urlParams[currentKey] = tmpValues;
+            } else {
+                this.urlParams[currentKey] = decode(match[2]);
+            }
+        }
 
 
         // init siteUrl, if necessary
