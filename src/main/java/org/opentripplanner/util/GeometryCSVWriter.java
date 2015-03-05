@@ -66,13 +66,13 @@ public class GeometryCSVWriter {
 
         if (testWriter != null) {
             csvWriter = new CsvWriter(testWriter, ',');
-            try {
-                csvWriter.writeRecord(csvColumns.toArray(new String[csvColumns.size()]));
-            } catch (IOException ex) {
-                Logger.getLogger(GeometryCSVWriter.class.getName()).log(Level.SEVERE, null, ex);
-            }
         } else {
             csvWriter = new CsvWriter(file, ',', Charset.forName("UTF8"));
+        }
+        try {
+            csvWriter.writeRecord(csvColumns.toArray(new String[csvColumns.size()]));
+        } catch (IOException ex) {
+            Logger.getLogger(GeometryCSVWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
