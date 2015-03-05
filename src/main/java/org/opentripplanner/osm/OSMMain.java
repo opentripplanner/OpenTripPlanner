@@ -41,7 +41,8 @@ public class OSMMain {
 
     public static void main(String[] args) {
         /** This main method will convert a PBF file to VEX using an intermediate MapDB datastore. */
-        OSM osm = OSM.fromPBF(args[0]);//, ENV);
+        OSM osm = new OSM(null);  //, ENV);
+        osm.loadFromPBFFile(args[0]);
         try (OutputStream fout = new FileOutputStream("test.vex")) {
             LOG.info("begin writing vex");
             new VexFormatCodec().writeVex(osm, fout);

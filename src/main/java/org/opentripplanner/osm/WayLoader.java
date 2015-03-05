@@ -1,8 +1,8 @@
 package org.opentripplanner.osm;
 
-import java.util.List;
-
 import crosby.binary.Osmformat;
+
+import java.util.List;
 
 public class WayLoader extends Parser {
 
@@ -11,7 +11,8 @@ public class WayLoader extends Parser {
 
     /**
      * Load all ways that include at least one node whose ID is marked in the specified NodeTracker.
-     * Supply a NodeTracker.acceptEverything() to load all ways. TODO optimization: use null to mean "accept everything"
+     * Supply a NodeTracker.acceptEverything() to load all ways. 
+     * TODO optimization: use null to mean "accept everything"
      */
     public WayLoader(OSM osm, NodeTracker nodesInGeom) {
         this.osm = osm;

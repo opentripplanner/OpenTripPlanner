@@ -31,7 +31,8 @@ public class VanillaExtract {
 
     public static void main(String[] args) {
 
-        VexPbfParser parser = new VexPbfParser(args[0]);
+        OSM osm = new OSM(args[0]);
+        VexPbfParser parser = new VexPbfParser(osm);
         parser.parse(args[1]);
 
         // FIXME Calling db.compact() at this point only reduces file size by a few MB but it DOUBLES the read speed.
@@ -41,7 +42,7 @@ public class VanillaExtract {
         httpServer.addListener(new NetworkListener("vanilla_extract", BIND_ADDRESS, PORT));
         // Bypass Jersey etc. and add a low-level Grizzly handler.
         // As in servlets, * is needed in base path to identify the "rest" of the path.
-        httpServer.getServerConfiguration().addHttpHandler(new VexHttpHandler(parser), "/*");
+        httpServer.getServerConfiguration().addHttpHandler(new VexHttpHandler(osm), "/*");
         try {
             httpServer.start();
             LOG.info("VEX server running.");
@@ -59,10 +60,10 @@ public class VanillaExtract {
 
     private static class VexHttpHandler extends HttpHandler {
 
-        private static VexPbfParser parser;
+        private static OSM osm;
 
-        public VexHttpHandler(VexPbfParser parser) {
-            this.parser = parser;
+        public VexHttpHandler(OSM osm) {
+            this.osm = osm;
         }
 
         @Override
@@ -96,14 +97,14 @@ public class VanillaExtract {
                 int maxY = minTile.ytile;
 
                 OutputStream zipOut = new GZIPOutputStream(out);
-                OSMTextOutput tout = new OSMTextOutput(zipOut, parser.osm);
+                OSMTextOutput tout = new OSMTextOutput(zipOut, osm);
 
                 // SortedSet provides one-dimensional ordering and iteration. Tuple3 gives an odometer-like ordering.
                 // Therefore we must vary one of the dimensions "manually". Consider a set containing all the integers
                 // from 00 to 99 at 2-tuples. The range from (1,1) to (2,2) does not contain the four
                 // elements (1,1) (1,2) (2,1) (2,2). It contains the elements (1,1) (1,2) (1,3) (1,4) ... (2,2).
                 for (int x = minX; x <= maxX; x++) {
-                    SortedSet<Tuple3<Integer, Integer, Long>> xSubset = parser.osm.index.subSet(
+                    SortedSet<Tuple3<Integer, Integer, Long>> xSubset = osm.index.subSet(
                         new Tuple3(x, minY, null  ), true, // inclusive lower bound, null tests lower than anything
                         new Tuple3(x, maxY, Fun.HI), true  // inclusive upper bound, HI tests higher than anything
                     );

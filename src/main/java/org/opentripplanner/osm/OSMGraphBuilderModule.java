@@ -70,7 +70,8 @@ public abstract class OSMGraphBuilderModule implements GraphBuilderModule {
 
         @Override
         public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-            osm = OSM.fromPBF(pbfFilePath);
+            osm = new OSM(null);
+            osm.loadFromPBFFile(pbfFilePath);
         }
 
         @Override

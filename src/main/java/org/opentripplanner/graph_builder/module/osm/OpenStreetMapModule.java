@@ -159,7 +159,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         // TODO instead of passing in "extra" give the builder modules a reference to the Builder, and have an inter-module map there.
         this.graph = graph;
-        OSM osm = OSM.fromPBF(osmFiles.get(0).getAbsolutePath()); // TODO merge files
+        OSM osm = new OSM(null);
+        osm.loadFromPBFFile(osmFiles.get(0).getAbsolutePath()); // TODO merge files
         osmdb = new OSMDatabase(osm);
         // phases etc.
         osmdb.postLoad();

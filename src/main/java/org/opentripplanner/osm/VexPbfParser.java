@@ -13,8 +13,8 @@ public class VexPbfParser extends Parser {
     /** The nodes which are referenced more than once by ways in this OSM. */
     NodeTracker intersections = new NodeTracker();
 
-    public VexPbfParser (String diskPath) {
-        super(diskPath);
+    public VexPbfParser (OSM osm) {
+        super(osm);
     }
 
     @Override
