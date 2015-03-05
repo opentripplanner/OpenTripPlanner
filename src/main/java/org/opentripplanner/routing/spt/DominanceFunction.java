@@ -3,7 +3,6 @@ package org.opentripplanner.routing.spt;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * A class that determines when one search branch prunes another at the same Vertex, and ultimately which solutions
@@ -85,33 +84,11 @@ public abstract class DominanceFunction {
         // call the one on the declared type, not the instance type.
         public boolean dominates0 (State a, State b) {
 
-            if (b.weight == 0) {
-                return false;
-            }
-            // Multi-state (bike rental, P+R) - no domination for different states
-            if (a.isBikeRenting() != b.isBikeRenting())
-                return false;
-            if (a.isCarParked() != b.isCarParked())
-                return false;
-            if (a.isBikeParked() != b.isBikeParked())
-                return false;
-
-            Graph graph = a.getOptions().rctx.graph;
-            if (a.backEdge != b.getBackEdge() && ((a.backEdge instanceof StreetEdge)
-                    && (!graph.getTurnRestrictions(a.backEdge).isEmpty())))
-                return false;
-
-            if (a.routeSequenceSubset(b)) {
-                // TODO subset is not really the right idea
-                return a.weight <= b.weight &&
-                        a.getElapsedTimeSeconds() <= b.getElapsedTimeSeconds();
-                // && this.getNumBoardings() <= other.getNumBoardings();
-            }
-
-            // If returning more than one result from GenericAStar, the search can be very slow
-            // unless you replace the following code with:
-            // return false;
-
+            // The key problem in pareto-dominance in OTP is that the elements of the state vector are not orthogonal.
+            // When walk distance increases, weight increases. When time increases weight increases.
+            // It's easy to get big groups of very similar states that don't represent significantly different outcomes.
+            // So this probably all deserves to be rethought.
+            
             boolean walkDistanceIsHopeful = a.walkDistance / b.getWalkDistance() < 1+WALK_DIST_EPSILON;
 
             double weightRatio = a.weight / b.weight;
@@ -124,7 +101,7 @@ public abstract class DominanceFunction {
 
             // only dominate if everything is at least hopeful
             return walkDistanceIsHopeful && weightIsHopeful && timeIsHopeful;
-            // return this.weight < other.weight;
+
         }
 
     }
