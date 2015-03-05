@@ -548,8 +548,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                 State s1 = firstComparePathStates.getSelectedValue();
 				State s2 = secondComparePathStates.getSelectedValue();
                 DominanceFunction pareto = new DominanceFunction.Pareto();
-				System.out.println("s1 dominates s2:" + pareto.dominates(s1, s2));
-				System.out.println("s2 dominates s1:" + pareto.dominates(s2, s1));
+				System.out.println("s1 dominates s2:" + pareto.betterOrEqualAndComparable(s1, s2));
+				System.out.println("s2 dominates s1:" + pareto.betterOrEqualAndComparable(s2, s1));
 			}
         });
         pane.add(dominateButton);

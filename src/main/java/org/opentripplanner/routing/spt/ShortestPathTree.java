@@ -140,9 +140,9 @@ public class ShortestPathTree {
             State oldState = it.next();
             // order is important, because in the case of a tie
             // we want to reject the new state
-            if (dominanceFunction.dominates(oldState, newState))
+            if (dominanceFunction.betterOrEqualAndComparable(oldState, newState))
                 return false;
-            if (dominanceFunction.dominates(newState, oldState))
+            if (dominanceFunction.betterOrEqualAndComparable(newState, oldState))
                 it.remove();
         }
 

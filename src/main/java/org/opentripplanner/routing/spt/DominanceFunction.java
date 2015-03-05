@@ -17,15 +17,20 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
  */
 public abstract class DominanceFunction {
 
-    /** Return true if the first state "defeats" the second state. Provide this custom logic in subclasses. */
-    protected abstract boolean dominates0 (State a, State b);
+    /** 
+     * Return true if the first state "defeats" the second state or at least ties with it in terms of suitability. 
+     * In the case that they are tied, we still want to return true so that an existing state will kick out a new one.
+     * Provide this custom logic in subclasses. You would think this could be static, but in Java for some reason 
+     * calling a static function will call the one on the declared type, not the runtime instance type. 
+     */
+    protected abstract boolean betterOrEqual(State a, State b);
 
     /**
      * For bike rental, parking, and approaching turn-restricted intersections states are incomparable:
      * they exist on separate planes. The core state dominance logic is wrapped in this public function and only
      * applied when the two states have all these variables in common (are on the same plane).
      */
-    public boolean dominates(State a, State b) {
+    public boolean betterOrEqualAndComparable(State a, State b) {
 
         // Does one state represent riding a rented bike and the other represent walking before/after rental?
         if (a.isBikeRenting() != b.isBikeRenting()) {
@@ -45,7 +50,7 @@ public abstract class DominanceFunction {
         }
         
         // These two states are comparable (they are on the same "plane" or "copy" of the graph).
-        return dominates0 (a, b);
+        return betterOrEqual(a, b);
         
     }
     
@@ -59,7 +64,8 @@ public abstract class DominanceFunction {
 
     public static class MinimumWeight extends DominanceFunction {
         /** Return true if the first state has lower weight than the second state. */
-        public boolean dominates0 (State a, State b) { return a.weight < b.weight; }
+        @Override
+        public boolean betterOrEqual (State a, State b) { return a.weight <= b.weight; }
     }
 
     /**
@@ -68,7 +74,8 @@ public abstract class DominanceFunction {
      */
     public static class EarliestArrival extends DominanceFunction {
         /** Return true if the first state has lower elapsed time than the second state. */
-        public boolean dominates0 (State a, State b) { return a.getElapsedTimeSeconds() < b.getElapsedTimeSeconds(); }
+        @Override
+        public boolean betterOrEqual (State a, State b) { return a.getElapsedTimeSeconds() <= b.getElapsedTimeSeconds(); }
     }
 
     /** In this implementation the relation is not symmetric. There are sets of mutually co-dominant states. */
@@ -80,9 +87,8 @@ public abstract class DominanceFunction {
         private static final double TIME_EPSILON = 0.02;
         private static final int TIME_DIFF_MARGIN = 30;
 
-        // You would think this could be static, but in Java for some reason calling a static function will
-        // call the one on the declared type, not the instance type.
-        public boolean dominates0 (State a, State b) {
+        @Override
+        public boolean betterOrEqual (State a, State b) {
 
             // The key problem in pareto-dominance in OTP is that the elements of the state vector are not orthogonal.
             // When walk distance increases, weight increases. When time increases weight increases.
