@@ -26,11 +26,30 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class GeoJSONSerializer extends JsonSerializer<Geometry> {
 
+    private final int decimals;
+
+    /**
+     *
+     * @param decimals Wanted number of decimal places in coordinates
+     */
+    public GeoJSONSerializer(int decimals) {
+        this.decimals = decimals;
+    }
+
+    public GeoJSONSerializer() {
+        decimals = 0;
+    }
+
     @Override
     public void serialize(Geometry value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonProcessingException {
         
-        GeometryJSON json = new GeometryJSON();
+        GeometryJSON json;
+        if (decimals > 0) {
+            json = new GeometryJSON(decimals);
+        } else {
+            json = new GeometryJSON();
+        }
         
         jgen.writeRawValue(json.toString(value));
     }

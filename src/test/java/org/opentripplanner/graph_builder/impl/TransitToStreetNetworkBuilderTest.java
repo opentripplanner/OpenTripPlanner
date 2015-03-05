@@ -8,6 +8,7 @@ package org.opentripplanner.graph_builder.impl;
 import org.opentripplanner.util.StreetType;
 import com.csvreader.CsvWriter;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -58,6 +59,7 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
+import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 import org.opentripplanner.model.json_serialization.SerializerUtils;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
@@ -519,26 +521,21 @@ public class TransitToStreetNetworkBuilderTest {
      */
     private void writeGeoJson(String filePath,
         StreetFeatureCollection streetFeatureCollection) throws FileNotFoundException, IOException {
-        return;
-        /*
+
         FileOutputStream fileOutputStream = new FileOutputStream(filePath);
         PrintStream out = new PrintStream(fileOutputStream);
         ObjectMapper mapper = SerializerUtils.getMapper();
-        
-        //TODO: change this to geojson-jackson
-        //GeoJsonModule module = new GeoJsonModule();
-        //module.addSerializer(new StreetFeatureSerializer());
-        //module.addSerializer(new FeatureCollectionSerializer());
-        
-        //mapper.registerModule(module);
+
+        SimpleModule module = new SimpleModule("GeoJSONSerializer", new Version(1, 0, 0, null, "com.fasterxml.jackson.module", "jackson-module-jaxb-annotations"));
+        module.addSerializer(new GeoJSONSerializer(15));
+        module.addSerializer(new StreetFeatureSerializer());
+        module.addSerializer(new FeatureCollectionSerializer());
+
+        mapper.registerModule(module);
         
         JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(out);
-        
         //jsonGenerator.setPrettyPrinter(new DefaultPrettyPrinter());
-
-        
-        mapper.writeValue(jsonGenerator, streetFeatureCollection);        
-                */
+        mapper.writeValue(jsonGenerator, streetFeatureCollection);
     }   
     private static T2<Double, Integer> getMax(List<Double> list) {
         Double max = Double.MIN_VALUE;
