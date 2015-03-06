@@ -1,8 +1,10 @@
 package org.opentripplanner.profile;
 
 import com.google.common.collect.*;
+
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.resource.SimpleIsochrone;
@@ -18,6 +20,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -417,6 +420,7 @@ public class ProfileRouter {
         // Set batch after context, so both origin and dest vertices will be found.
         rr.batch = (true);
         rr.walkSpeed = request.walkSpeed;
+        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
         int minAccessTime = 0;
@@ -479,6 +483,7 @@ public class ProfileRouter {
         rr.to = new GenericLocation(request.toLat, request.toLon);
         rr.setArriveBy(false);
         rr.setRoutingContext(graph);
+        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         // This is not a batch search, it is a point-to-point search with goal direction.
         // Impose a max time to protect against very slow searches.
         int worstElapsedTime = request.streetTime * 60;
