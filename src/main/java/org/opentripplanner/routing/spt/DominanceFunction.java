@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.spt;
 
+import java.io.Serializable;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -14,8 +16,12 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
  * states at the same vertex. These need the graph to be "replicated" into separate layers, which is achieved by 
  * applying the main dominance logic (lowest weight, lowest cost, Pareto) conditionally, only when the two states
  * have identical bike/car/turn direction status.
+ * 
+ * Dominance functions are serializable so that routing requests may passed between machines in different JVMs, for instance
+ * in OTPA Cluster.
  */
-public abstract class DominanceFunction {
+public abstract class DominanceFunction implements Serializable {
+    private static final long serialVersionUID = 1;
 
     /** 
      * Return true if the first state "defeats" the second state or at least ties with it in terms of suitability. 
