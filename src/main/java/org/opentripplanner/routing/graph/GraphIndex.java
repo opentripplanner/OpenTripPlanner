@@ -428,7 +428,7 @@ public class GraphIndex {
                 if (currStop == stop) {
                     for (TripTimes t : tt.tripTimes) {
                         if (!sd.serviceRunning(t.serviceCode)) continue;
-                        stopTimes.times.add(new TripTimeShort(t, sidx, stop));
+                        stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
                     }
                 }
                 sidx++;
