@@ -78,7 +78,7 @@ public class OTPMain {
                 mavenVersionLogger.setLevel(Level.OFF);
 
                 MavenVersion version = MavenVersion.VERSION;
-                System.out.println(version.getVersion(params.versionFragment));
+                System.out.println(version.getVersion());
                 System.exit(0);
             }
 

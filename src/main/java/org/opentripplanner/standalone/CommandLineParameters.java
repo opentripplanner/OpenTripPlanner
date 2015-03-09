@@ -35,7 +35,6 @@ public class CommandLineParameters implements Cloneable {
     private static final int    DEFAULT_SECURE_PORT = 8081;
     private static final String DEFAULT_BASE_PATH   = "/var/otp";
     private static final String DEFAULT_ROUTER_ID   = "";
-    private static final String DEFAULT_VERSION_FRAGMENT = "all";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
 
@@ -72,11 +71,6 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = { "--version", },
             description = "Print the version, and then exit.")
     public boolean version = false;
-
-    @Parameter(names = { "--version-fragment" },
-            description = "Print the a fragment of the version, and then exit. Use one of [`version`, `major`, `minor`, `incremental`, " +
-                    "`qualifier`, `commit` ] to specify which fragment")
-    public String versionFragment = DEFAULT_VERSION_FRAGMENT;
 
     /* Options for the server sub-task. */
 

@@ -20,8 +20,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-
 public class MavenVersion implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MavenVersion.class);
@@ -113,28 +111,9 @@ public class MavenVersion implements Serializable {
         return String.format("%s => %s UID=%d", version, this.toString(), getUID());
     }
 
-    public String getVersion(String fragment) {
-        String f = Strings.isNullOrEmpty(fragment) ? "all" : fragment;
-
-        switch (f) {
-            case "version":
-                return version;
-            case "major":
-                return String.valueOf(major);
-            case "minor":
-                return String.valueOf(minor);
-            case "incremental":
-                return String.valueOf(incremental);
-            case "qualifier":
-                return qualifier;
-            case "commit":
-                return commit;
-
-            case "all":
-            default:
-                String format = "version: %s\nmajor: %s\nminor: %s\npatch: %s\nqualifier: %s\ncommit: %s\n";
-                return String.format(format, version, major, minor, incremental, qualifier, commit);
-        }
+    public String getVersion() {
+        String format = "version: %s\nmajor: %s\nminor: %s\npatch: %s\nqualifier: %s\ncommit: %s\n";
+        return String.format(format, version, major, minor, incremental, qualifier, commit);
     }
 
     public int hashCode () {
