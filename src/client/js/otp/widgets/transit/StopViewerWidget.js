@@ -106,6 +106,7 @@ otp.widgets.transit.StopViewerWidget =
                     pushTime.routeShortName = this_.module.webapp.indexApi.routes[routeId].routeData.shortName;
                     pushTime.routeLongName = this_.module.webapp.indexApi.routes[routeId].routeData.longName;
                     pushTime.time = time.realtimeDeparture;
+                    pushTime.serviceDay = time.serviceDay;
                     this_.times.push(pushTime);
                 });
             });
@@ -133,13 +134,13 @@ otp.widgets.transit.StopViewerWidget =
             time.to = to_trans;
             time.block = block_trans;
             ich['otp-stopViewer-timeListItem'](time).appendTo(this.timeList);
-            var diff = Math.abs(this.activeTime - time.time*1000);
+            var diff = Math.abs(this.activeTime - (time.time + time.serviceDay)*1000);
             if(diff < minDiff) {
                 minDiff = diff;
                 bestIndex = i;
             }
         }
-        this.timeList.scrollTop(((bestIndex/this.times.length) * this.timeList[0].scrollHeight) - this.timeList.height()/2 + $(this.timeList.find(".otp-stopViewer-timeListItem")[0]).height()/2);
+        this.timeList.scrollTop(this.timeList.find(".otp-stopViewer-timeListItem")[bestIndex].offsetTop);
     },
 
     setActiveTime : function(activeTime) {
