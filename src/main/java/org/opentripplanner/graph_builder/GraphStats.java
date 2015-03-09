@@ -46,6 +46,12 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
+import org.geotools.math.Statistics;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
 
 public class GraphStats {
 
@@ -70,7 +76,9 @@ public class GraphStats {
     
     private CommandSpeedStats commandSpeedStats = new CommandSpeedStats();  
 
-    private CommandPatternStats commandPatternStats = new CommandPatternStats();  
+    private CommandPatternStats commandPatternStats = new CommandPatternStats(); 
+
+    private CommandTransitLinkStats commandTransitLinkStats = new CommandTransitLinkStats();
 
     private JCommander jc;
     
@@ -88,6 +96,7 @@ public class GraphStats {
         jc.addCommand(commandEndpoints);
         jc.addCommand(commandSpeedStats);
         jc.addCommand(commandPatternStats);
+        jc.addCommand(commandTransitLinkStats);
         
         try {
             jc.parse(args);
@@ -134,6 +143,8 @@ public class GraphStats {
             commandSpeedStats.run();
         } else if (command.equals("patternstats")) {
             commandPatternStats.run();
+        } else if (command.equals("transitlinkstats")) {
+            commandTransitLinkStats.run();
         }
         writer.close();
 
@@ -297,6 +308,68 @@ public class GraphStats {
             LOG.info("done.");
         }
 
+    }
+
+    @Parameters(commandNames = "transitlinkstats", commandDescription = "Distances of transitLinks")
+    class CommandTransitLinkStats {
+
+        public void run() {
+            //This is heuristics ratio between median length and current length
+            //Which shows which links are suspiciosly long and are probably wrongly connected
+            double ratio_good = 5.145294604844843/20.254192280700618;
+            try {
+                LOG.info("Distance of transitLinks");
+                Statistics stats = new Statistics();
+                TDoubleList distances = new TDoubleArrayList(1000);
+                List<String> stops = new ArrayList<>(1000);
+                DistanceLibrary distanceLibrary = new SphericalDistanceLibrary();
+                writer.writeRecord(new String[]{"length", "transitStop", "should_check"});
+                //Saves all the distances and transitStops to lists
+                for (StreetTransitLink stl: Iterables.filter(graph.getEdges(), StreetTransitLink.class)) {
+                    //This is to save only one link per transitStop direction
+                    if (stl.getFromVertex() instanceof TransitStop) {
+                        double d = distanceLibrary.distance(stl.getFromVertex().getCoordinate(), stl.getToVertex().getCoordinate());
+                        stats.add(d);
+                        distances.add(d);
+                        stops.add(stl.getTransitStop().toString());
+                    }
+                }
+                //We need sort for calculating median
+                distances.sort();
+                double median;
+                if(distances.size()%2==1) {
+                    median = distances.get(distances.size()/2);
+                } else {
+                    median = (distances.get(distances.size()/2) + distances.get(distances.size()/2 -1))/2;
+                }
+                System.out.print(stats.toString());
+                System.out.println("Median:             "+ Double.toString(median));
+                //Here we calculate heuristics which distance is too long to be correct stret to transit link
+                //This links should be checked by hand because it is very likely that they are wrongly connected
+                double longest_correct_distance = median/ratio_good;
+                int to_check = 0;
+                for (int i = 0; i < distances.size(); i++) {
+                    double current = distances.get(i);
+                    String should_check = "0";
+                    if (current > longest_correct_distance) {
+                        should_check = "1";
+                        to_check++;
+                    }
+                    writer.writeRecord(new String[]{Double.toString(current), stops.get(i), should_check});
+                }
+                for (String line: stats.toString().split("\n")) {
+                    writer.writeComment(line);
+                }
+                writer.writeComment("Median:             " + Double.toString(median));
+                writer.writeComment("To check:           " + Integer.toString(to_check));
+                System.out.println("To check:            " + Integer.toString(to_check));
+
+            } catch (IOException e) {
+                LOG.error("Exception writing CSV: {}", e.getMessage());
+                return;
+            }
+            LOG.info("done.");
+        }
     }
 
 }

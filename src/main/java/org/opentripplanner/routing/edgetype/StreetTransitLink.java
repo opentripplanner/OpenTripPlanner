@@ -74,6 +74,10 @@ public class StreetTransitLink extends Edge {
         return "street transit link";
     }
 
+    public TransitStop getTransitStop() {
+        return transitStop;
+    }
+
     public State traverse(State s0) {
         RoutingRequest req = s0.getOptions();
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
