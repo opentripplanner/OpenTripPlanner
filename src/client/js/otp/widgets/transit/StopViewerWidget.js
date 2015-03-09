@@ -96,23 +96,15 @@ otp.widgets.transit.StopViewerWidget =
     runTimesQuery : function() {
         var this_ = this;
         var startTime = moment(this.datePicker.val(), otp.config.locale.time.date_format).add("hours", -otp.config.timeOffset).unix();
-        //this.module.webapp.indexApi.runStopTimesQuery(this.agencyId, this.stopId, startTime+10800, startTime+97200, this, function(data) {
         this.module.webapp.indexApi.runStopTimesQuery(this.stopId, this.datePicker.datepicker("getDate"), this, function(data) {
             this_.times = [];
-            /*
-            for(var i=0; i < data.stopTimes.length; i++) {
-                var time = data.stopTimes[i];
-                if(time.phase == "departure") {
-                    this_.times.push(time);
-                }
-            }*/
-            // here we are rearranging a bit the stoptimes, flatting and sorting;
+            // rearrange stoptimes, flattening and sorting;
             _.each(data, function(stopTime){
                 var routeId = stopTime.pattern.id.substring(0,stopTime.pattern.id.lastIndexOf(':'));
-                var pushTime = {};
-                pushTime.routeShortName = this_.module.webapp.indexApi.routes[routeId].routeData.shortName;
-                pushTime.routeLongName = this_.module.webapp.indexApi.routes[routeId].routeData.longName;
                 _.each(stopTime.times,function(time){
+                    var pushTime = {};
+                    pushTime.routeShortName = this_.module.webapp.indexApi.routes[routeId].routeData.shortName;
+                    pushTime.routeLongName = this_.module.webapp.indexApi.routes[routeId].routeData.longName;
                     pushTime.time = time.realtimeDeparture;
                     this_.times.push(pushTime);
                 });
