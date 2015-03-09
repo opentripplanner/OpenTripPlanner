@@ -31,8 +31,6 @@ import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.Level;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -72,11 +70,6 @@ public class OTPMain {
             }
 
             if (params.version) {
-                // Disable logging, we don't want to see anything else than the intended output below.
-                ch.qos.logback.classic.Logger mavenVersionLogger =
-                        (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(MavenVersion.class);
-                mavenVersionLogger.setLevel(Level.OFF);
-
                 MavenVersion version = MavenVersion.VERSION;
                 System.out.println(version.getVersion());
                 System.exit(0);
