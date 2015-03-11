@@ -81,13 +81,13 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testGetSnapshot() throws InvalidProtocolBufferException {
-        updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
 
         TimetableResolver resolver = updater.getTimetableSnapshot();
         assertNotNull(resolver);
         assertSame(resolver, updater.getTimetableSnapshot());
 
-        updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
         assertSame(resolver, updater.getTimetableSnapshot());
 
         updater.maxSnapshotFrequency = (-1);
@@ -105,7 +105,7 @@ public class TimetableSnapshotSourceTest {
         int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
         int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
-        updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
 
         TimetableResolver resolver = updater.getTimetableSnapshot();
         Timetable forToday = resolver.resolve(pattern, serviceDate);
@@ -154,7 +154,7 @@ public class TimetableSnapshotSourceTest {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(Arrays.asList(tripUpdate), "agency");
+        updater.applyTripUpdates(graph, Arrays.asList(tripUpdate), "agency");
 
         TimetableResolver resolver = updater.getTimetableSnapshot();
         Timetable forToday = resolver.resolve(pattern, serviceDate);
@@ -176,7 +176,7 @@ public class TimetableSnapshotSourceTest {
         updater.maxSnapshotFrequency = (0);
         updater.purgeExpiredData = (false);
 
-        updater.applyTripUpdates(Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
         TimetableResolver resolverA = updater.getTimetableSnapshot();
 
         updater.purgeExpiredData = (true);
@@ -193,7 +193,7 @@ public class TimetableSnapshotSourceTest {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(Arrays.asList(tripUpdate), "agency");
+        updater.applyTripUpdates(graph, Arrays.asList(tripUpdate), "agency");
         TimetableResolver resolverB = updater.getTimetableSnapshot();
 
         assertNotSame(resolverA, resolverB);
