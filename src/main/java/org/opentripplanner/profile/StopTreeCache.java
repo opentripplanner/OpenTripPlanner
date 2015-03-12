@@ -1,14 +1,17 @@
 package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Maps;
+
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -39,7 +42,8 @@ public class StopTreeCache {
             // If elapsed time is not capped, searches are very slow.
             rr.worstTime = (rr.dateTime + timeCutoffMinutes * 60);
             AStar astar = new AStar();
-            rr.longDistance = true; // this will cause an earliest arrival tree to be used
+            rr.longDistance = true;
+            rr.dominanceFunction = new DominanceFunction.EarliestArrival();
             rr.setNumItineraries(1);
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
             TObjectIntMap<Vertex> distanceToVertex = new TObjectIntHashMap<>(1000, 0.5f, Integer.MAX_VALUE);

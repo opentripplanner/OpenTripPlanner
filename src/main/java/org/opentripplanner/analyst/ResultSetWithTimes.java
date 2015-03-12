@@ -11,8 +11,8 @@ public class ResultSetWithTimes extends ResultSet {
     }
 
     public ResultSetWithTimes(SampleSet samples, TimeSurface surface) {
-        id = samples.pset.id + "_" + surface.id + "_times";
-
+        super(samples, surface);
+        
         // Evaluate the surface at all points in the pointset
         times = samples.eval(surface);
     }
