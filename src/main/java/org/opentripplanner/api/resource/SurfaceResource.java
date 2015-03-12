@@ -116,7 +116,6 @@ public class SurfaceResource extends RoutingResource {
                                   @QueryParam("detail")   boolean detail) {
 
         final TimeSurface surf = otpServer.surfaceCache.get(surfaceId);
-
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
         final PointSet pset = otpServer.pointSetCache.get(targetPointSetId);
         if (pset == null) return badRequest("Missing or invalid target PointSet ID.");
