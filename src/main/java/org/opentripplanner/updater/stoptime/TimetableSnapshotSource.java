@@ -19,8 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import jersey.repackaged.com.google.common.base.Preconditions;
+
 import com.google.common.collect.Maps;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -153,7 +156,7 @@ public class TimetableSnapshotSource {
                         applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
                         break;
                     case ADDED:
-                        applied = handleAddedTrip(graph, tripUpdate, serviceDate);
+                        applied = validateAndHandleAddedTrip(graph, tripUpdate, feedId, serviceDate);
                         break;
                     case UNSCHEDULED:
                         applied = handleUnscheduledTrip(tripUpdate, feedId, serviceDate);
@@ -214,16 +217,24 @@ public class TimetableSnapshotSource {
     }
 
     /**
-     * Handle GTFS-RT TripUpdate message containing an ADDED trip.
+     * Validate and handle GTFS-RT TripUpdate message containing an ADDED trip.
      * 
      * @param graph graph to update 
      * @param tripUpdate GTFS-RT TripUpdate message
+     * @param feedId
      * @param serviceDate
      * @return true iff successful
      */
-    protected boolean handleAddedTrip(final Graph graph, final TripUpdate tripUpdate,
-            final ServiceDate serviceDate) {
+    protected boolean validateAndHandleAddedTrip(final Graph graph, final TripUpdate tripUpdate,
+            final String feedId, final ServiceDate serviceDate) {
+        // Preconditions
+        Preconditions.checkNotNull(graph);
+        Preconditions.checkNotNull(tripUpdate);
+        Preconditions.checkNotNull(serviceDate);
+        
+        //
         // Validate added trip
+        //
         
         // Check whether trip id of ADDED trip is available
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
@@ -234,20 +245,42 @@ public class TimetableSnapshotSource {
         
         // Check whether trip id already exists in graph
         String tripId = tripDescriptor.getTripId();
-        if (graph.index.tripForId.containsKey(tripId)) {
+        Trip trip = getTripForTripId(tripId);
+        if (trip != null) {
             // TODO: should we support this?
             LOG.warn("Graph already contains trip id of ADDED trip, skipping.");
+            return false;
+        }
+        
+        // Check whether at least two stop updates exist
+        if (tripUpdate.getStopTimeUpdateCount() < 2) {
+            LOG.warn("ADDED trip has less then two stops, skipping.");
             return false;
         }
         
         // Check whether all stop times are available and all stops exist
         Long previousTime = null;
         List<StopTimeUpdate> stopTimeUpdates = tripUpdate.getStopTimeUpdateList();
-        List<TransitStop> transitStops = new ArrayList<>(stopTimeUpdates.size()); 
+        List<Stop> stops = new ArrayList<>(stopTimeUpdates.size()); 
         for (int index = 0; index < stopTimeUpdates.size(); ++index) {
             StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
             
-            // TODO: find Transit stops?
+            // Find transit stops
+            if (stopTimeUpdate.hasStopId()) {
+                // Find stop
+                Stop stop = getStopForStopId(stopTimeUpdate.getStopId());
+                if (stop != null) {
+                    // Remember stop
+                    stops.add(stop);
+                } else {
+                    LOG.warn("Graph doesn't contain stop id \"{}\" of ADDED trip, skipping.",
+                            stopTimeUpdate.getStopId());
+                    return false;
+                }
+            } else {
+                LOG.warn("ADDED trip misses some stop ids, skipping.");
+                return false;
+            }
             
             // Check arrival time
             if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
@@ -259,7 +292,8 @@ public class TimetableSnapshotSource {
                 }
                 previousTime = time;
             } else {
-                // First stop is allowed to miss arrival time
+                // Only first stop is allowed to miss arrival time
+                // TODO: should we support only requiring an arrival time on the last stop and interpolate? 
                 if (index > 0) {
                     LOG.warn("ADDED trip misses arrival time, skipping.");
                     return false;
@@ -276,7 +310,8 @@ public class TimetableSnapshotSource {
                 }
                 previousTime = time;
             } else {
-                // Last stop is allowed to miss departure time
+                // Only last stop is allowed to miss departure time
+                // TODO: should we support only requiring a departure time on the first stop and interpolate? 
                 if (index < stopTimeUpdates.size() - 1) {
                     LOG.warn("ADDED trip misses departure time, skipping.");
                     return false;
@@ -291,6 +326,32 @@ public class TimetableSnapshotSource {
             }
         }
         
+        //
+        // Handle added trip
+        //
+        
+        boolean success = handleAddedTrip(graph, tripUpdate, stops, feedId, serviceDate);
+        return success;
+    }
+
+    /**
+     * Handle GTFS-RT TripUpdate message containing an ADDED trip.
+     * 
+     * @param graph graph to update 
+     * @param tripUpdate GTFS-RT TripUpdate message
+     * @param stops the stops of each StopTimeUpdate in the TripUpdate message
+     * @param feedId
+     * @param serviceDate
+     * @return true iff successful
+     */
+    private boolean handleAddedTrip(final Graph graph, final TripUpdate tripUpdate, final List<Stop> stops,
+            final String feedId, final ServiceDate serviceDate) {
+        // Preconditions
+        Preconditions.checkNotNull(stops);
+        Preconditions.checkArgument(tripUpdate.getStopTimeUpdateCount() == stops.size(),
+                "number of stop should match the number of stop time updates");
+        
+        // TODO: check whether trip id has been used for previous ADDED trip message
         
         // TODO: Handle added trip
         LOG.warn("Added trips are currently unsupported. Skipping TripUpdate.");
@@ -339,19 +400,56 @@ public class TimetableSnapshotSource {
         return buffer.purgeExpiredData(previously);
     }
 
-    protected TripPattern getPatternForTripId(String tripIdWithoutAgency) {
+    private TripPattern getPatternForTripId(String tripIdWithoutAgency) {
+        Trip trip = getTripForTripId(tripIdWithoutAgency);
+        TripPattern pattern = graphIndex.patternForTrip.get(trip);
+        return pattern;
+    }
+
+    /**
+     * Retrieve trip given a trip id without an agency
+     * 
+     * @param tripId trip id without the agency
+     * @return trip or null if trip doesn't exist
+     */
+    private Trip getTripForTripId(String tripId) {
         /* Lazy-initialize a separate index that ignores agency IDs.
          * Stopgap measure assuming no cross-feed ID conflicts, until we get GTFS loader replaced. */
         if (graphIndex.tripForIdWithoutAgency == null) {
             Map<String, Trip> map = Maps.newHashMap();
             for (Trip trip : graphIndex.tripForId.values()) {
-                map.put(trip.getId().getId(), trip);
+                Trip previousValue = map.put(trip.getId().getId(), trip);
+                if (previousValue != null) {
+                    LOG.warn("Duplicate trip id detected when agency is ignored for realtime updates: {}", tripId);
+                }
             }
             graphIndex.tripForIdWithoutAgency = map;
         }
-        Trip trip = graphIndex.tripForIdWithoutAgency.get(tripIdWithoutAgency);
-        TripPattern pattern = graphIndex.patternForTrip.get(trip);
-        return pattern;
+        Trip trip = graphIndex.tripForIdWithoutAgency.get(tripId);
+        return trip;
     }
 
+    /**
+     * Retrieve stop given a stop id without an agency
+     * 
+     * @param stopId trip id without the agency
+     * @return stop or null if stop doesn't exist
+     */
+    private Stop getStopForStopId(String stopId) {
+        /* Lazy-initialize a separate index that ignores agency IDs.
+         * Stopgap measure assuming no cross-feed ID conflicts, until we get GTFS loader replaced. */
+        if (graphIndex.stopForIdWithoutAgency == null) {
+            Map<String, Stop> map = Maps.newHashMap();
+            for (Stop stop : graphIndex.stopForId.values()) {
+                Stop previousValue = map.put(stop.getId().getId(), stop);
+                if (previousValue != null) {
+                    LOG.warn("Duplicate stop id detected when agency is ignored for realtime updates: {}", stopId);
+                }
+            }
+            graphIndex.stopForIdWithoutAgency = map;
+        }
+        Stop stop = graphIndex.stopForIdWithoutAgency.get(stopId);
+        return stop;
+    }
+    
 }
