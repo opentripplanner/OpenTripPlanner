@@ -15,6 +15,7 @@ package org.opentripplanner.updater.stoptime;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -23,14 +24,17 @@ import jersey.repackaged.com.google.common.base.Preconditions;
 
 import com.google.common.collect.Maps;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +50,16 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.Schedu
  */
 public class TimetableSnapshotSource {
     private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
+
+    /**
+     * Number of milliseconds per second 
+     */
+    private static final int MILLIS_PER_SECOND = 1000;
+
+    /**
+     * Maximum time in seconds since midnight for arrivals and departures
+     */
+    private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
 
     public int logFrequency = 2000;
 
@@ -252,6 +266,13 @@ public class TimetableSnapshotSource {
             return false;
         }
         
+        // Check whether a start date exists
+        if (!tripDescriptor.hasStartDate()) {
+            // TODO: should we support this and just use the current day?
+            LOG.warn("ADDED trip doesn't have a start date in TripDescriptor, skipping.");
+            return false;
+        }
+        
         // Check whether at least two stop updates exist
         if (tripUpdate.getStopTimeUpdateCount() < 2) {
             LOG.warn("ADDED trip has less then two stops, skipping.");
@@ -259,13 +280,35 @@ public class TimetableSnapshotSource {
         }
         
         // Check whether all stop times are available and all stops exist
+        Integer previousStopSequence = null;
         Long previousTime = null;
         List<StopTimeUpdate> stopTimeUpdates = tripUpdate.getStopTimeUpdateList();
         List<Stop> stops = new ArrayList<>(stopTimeUpdates.size()); 
         for (int index = 0; index < stopTimeUpdates.size(); ++index) {
             StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
             
-            // Find transit stops
+            // Check stop sequence
+            if (stopTimeUpdate.hasStopSequence()) {
+                Integer stopSequence = stopTimeUpdate.getStopSequence();
+                
+                // Check non-negative
+                if (stopSequence < 0) {
+                    LOG.warn("ADDED trip contains negative stop sequence, skipping.");
+                    return false;
+                }
+                
+                // Check whether sequence is increasing
+                if (previousStopSequence != null && previousStopSequence > stopSequence) {
+                    LOG.warn("ADDED trip contains decreasing stop sequence, skipping.");
+                    return false;
+                }
+                previousStopSequence = stopSequence;
+            } else {
+                LOG.warn("ADDED trip misses some stop sequences, skipping.");
+                return false;
+            }
+            
+            // Find stops
             if (stopTimeUpdate.hasStopId()) {
                 // Find stop
                 Stop stop = getStopForStopId(stopTimeUpdate.getStopId());
@@ -341,7 +384,7 @@ public class TimetableSnapshotSource {
      * @param tripUpdate GTFS-RT TripUpdate message
      * @param stops the stops of each StopTimeUpdate in the TripUpdate message
      * @param feedId
-     * @param serviceDate
+     * @param serviceDate service date for added trip 
      * @return true iff successful
      */
     private boolean handleAddedTrip(final Graph graph, final TripUpdate tripUpdate, final List<Stop> stops,
@@ -351,11 +394,85 @@ public class TimetableSnapshotSource {
         Preconditions.checkArgument(tripUpdate.getStopTimeUpdateCount() == stops.size(),
                 "number of stop should match the number of stop time updates");
         
-        // TODO: check whether trip id has been used for previous ADDED trip message
+        // TODO: check whether trip id has been used for previously ADDED trip message
         
-        // TODO: Handle added trip
-        LOG.warn("Added trips are currently unsupported. Skipping TripUpdate.");
-        return false;
+        //
+        // Handle added trip
+        //
+        
+        // Create new Route
+        Route route = null; // TODO: create Route?
+        
+        // Create new Trip
+        Trip trip = new Trip();
+        trip.setId(new AgencyAndId("", tripUpdate.getTrip().getTripId()));
+        trip.setRoute(route);
+        trip.setServiceId(null); // TODO: create ServiceId?
+        
+        // Calculate 
+        Calendar serviceCalendar = serviceDate.getAsCalendar(graph.getTimeZone());
+        final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
+        
+        // Create StopTimes
+        List<StopTime> stopTimes = new ArrayList<>(tripUpdate.getStopTimeUpdateCount());
+        for (int index = 0; index < tripUpdate.getStopTimeUpdateCount(); ++index) {
+            StopTimeUpdate stopTimeUpdate = tripUpdate.getStopTimeUpdate(index);
+            Stop stop = stops.get(index);
+            
+            // Create stop time
+            StopTime stopTime = new StopTime();
+            stopTime.setTrip(trip);
+            stopTime.setStop(stop);
+            // Set arrival time
+            if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
+                long arrivalTime = stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch;
+                if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
+                    LOG.warn("ADDED trip has invalid arrival time (compared to start date in "
+                            + "TripDescriptor), skipping.");
+                    return false;
+                }
+                stopTime.setArrivalTime((int) arrivalTime);
+            }
+            // Set departure time
+            if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
+                long departureTime = stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch;
+                if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
+                    LOG.warn("ADDED trip has invalid departure time (compared to start date in "
+                            + "TripDescriptor), skipping.");
+                    return false;
+                }
+                stopTime.setDepartureTime((int) departureTime);
+            }
+            stopTime.setTimepoint(1); // Exact time
+            stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
+            // Set pickup type
+            if (index == tripUpdate.getStopTimeUpdateCount() - 1) {
+                stopTime.setPickupType(1); // No pickup available
+            } else {
+                stopTime.setPickupType(0); // Regularly scheduled pickup
+            }
+            // Set drop off type
+            if (index == 0) {
+                stopTime.setDropOffType(1); // No drop off available
+            } else {
+                stopTime.setDropOffType(0); // Regularly scheduled drop off
+            }
+            
+            // Add stop time to list
+            stopTimes.add(stopTime);
+        }
+        
+        // TODO: filter/interpolate stop times like in GTFSPatternHopFactory?
+        
+        // Create StopPattern
+        StopPattern stopPattern = new StopPattern(stopTimes);
+
+        // Create TripPattern
+        // TODO: make a cache for newly created trip patterns?
+        TripPattern tripPattern = new TripPattern(trip.getRoute(), stopPattern);
+        
+        
+        return true;
     }
 
     protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
