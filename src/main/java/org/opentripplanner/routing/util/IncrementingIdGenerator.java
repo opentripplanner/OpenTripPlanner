@@ -24,7 +24,7 @@ public class IncrementingIdGenerator<T> implements UniqueIdGenerator<T> {
     private int next;
     
     public IncrementingIdGenerator() {
-        this(0);
+        this(1);
     }
     
     /**

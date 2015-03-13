@@ -92,6 +92,15 @@ public abstract class Vertex implements Serializable, Cloneable {
     public int hashCode() {
         return index;
     }
+    
+    public void initEdges() {
+        if (incoming == null) {
+            incoming = new Edge[0];
+        }
+        if (outgoing == null) {
+            outgoing = new Edge[0];
+        }
+    }
 
     /* EDGE UTILITY METHODS (use arrays to eliminate copy-on-write set objects) */
 

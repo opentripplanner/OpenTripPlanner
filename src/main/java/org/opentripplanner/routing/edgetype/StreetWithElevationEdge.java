@@ -41,8 +41,13 @@ public class StreetWithElevationEdge extends StreetEdge {
     private boolean flattened;
 
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
+                                   String name, double length, StreetTraversalPermission permission, boolean back) {
+        this(0, -1L, v1, v2, geometry, name, length, permission, back);
+    }
+
+    public StreetWithElevationEdge(int id, long osmId, StreetVertex v1, StreetVertex v2, LineString geometry,
             String name, double length, StreetTraversalPermission permission, boolean back) {
-        super(v1, v2, geometry, name, length, permission, back);
+        super(id, osmId, v1, v2, geometry, name, length, permission, back);
     }
 
     @Override

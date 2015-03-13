@@ -13,13 +13,7 @@
 
 package org.opentripplanner.routing.graph;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlTransient;
-
+import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -27,7 +21,11 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
 
-import com.vividsolutions.jts.geom.LineString;
+import javax.xml.bind.annotation.XmlTransient;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances; all standard OTP edges are subclasses of this.
@@ -45,12 +43,18 @@ public abstract class Edge implements Serializable {
      * Identifier of the edge. Negative means not set.
      */
     private int id;
+    
+    private long osmId;
 
     protected Vertex fromv;
 
     protected Vertex tov;
-
+    
     protected Edge(Vertex v1, Vertex v2) {
+        this(0, -1L, v1, v2, false);
+    }
+
+    protected Edge(int fwdId, long osmId, Vertex v1, Vertex v2, boolean back) {
         if (v1 == null || v2 == null) {
             String err = String.format("%s constructed with null vertex : %s %s", this.getClass(),
                     v1, v2);
@@ -59,7 +63,15 @@ public abstract class Edge implements Serializable {
 
         this.fromv = v1;
         this.tov = v2;
-        this.id = idGenerator.getId(this);
+        this.osmId = osmId;
+        if (fwdId > 0 && back) {
+            this.id = -fwdId;
+        } else if (fwdId == 0) {
+            int genId = idGenerator.getId(this);
+            this.id = back ? -genId : genId;
+        } else {
+            throw new IllegalArgumentException(String.format("Incorrect forward id %s", id));
+        }
 
         // if (! vertexTypesValid()) {
         // throw new IllegalStateException(this.getClass() +
@@ -77,6 +89,8 @@ public abstract class Edge implements Serializable {
     public Vertex getToVertex() {
         return tov;
     }
+    
+    public long getOsmId() { return osmId; }
     
     /**
      * Returns true if this edge is partial - overriden by subclasses.
