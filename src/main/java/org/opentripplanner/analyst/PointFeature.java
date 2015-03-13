@@ -19,6 +19,8 @@ public class PointFeature implements Serializable {
 
     private static final long serialVersionUID = -613136927314702334L;
 
+    private static final ObjectMapper deserializer = new ObjectMapper();
+    
     private String id;
     private Geometry geom;
     private Map<String,Integer> properties;
@@ -91,8 +93,6 @@ public class PointFeature implements Serializable {
     @SuppressWarnings("unchecked")
     public static PointFeature fromJsonNode(JsonNode feature) throws EmptyPolygonException,
             UnsupportedGeometryException {
-
-        ObjectMapper deserializer = new ObjectMapper();
         Feature geoJsonFeature;
         try {
             geoJsonFeature = deserializer.readValue(feature.traverse(), Feature.class);
