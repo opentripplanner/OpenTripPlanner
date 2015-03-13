@@ -20,15 +20,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TimeZone;
 import java.util.TreeSet;
+
+import jersey.repackaged.com.google.common.base.Preconditions;
 
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 // this is only currently in edgetype because that's where Trippattern is.
 // move these classes elsewhere.
@@ -84,10 +83,19 @@ public class TimetableResolver {
     }
 
     /**
+     * Update the trip times of one trip in a timetable of a trip pattern. If the trip of the trip
+     * times does not exist yet in the timetable, add it.
+     * 
+     * @param pattern trip pattern
+     * @param updatedTripTimes updated trip times
+     * @param serviceDate service day for which this update is valid
      * @return whether or not the update was actually applied
      */
-    public boolean update(TripPattern pattern, TripUpdate tripUpdate, String agencyId,
-            TimeZone timeZone, ServiceDate serviceDate) {
+    public boolean update(TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
+        // Preconditions
+        Preconditions.checkNotNull(pattern);
+        Preconditions.checkNotNull(serviceDate);
+        
         // synchronization prevents commits/snapshots while update is in progress
         synchronized(this) {
             if (dirty == null)
@@ -113,26 +121,21 @@ public class TimetableResolver {
                 timetables.put(pattern, sortedTimetables);
                 dirty.add(tt);
             }
-            // Assume all trips in a pattern are from the same feed, which should be the case.
             
-            // Create updated trip times
-            TripTimes updatedTripTimes = tt.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
-            if (updatedTripTimes != null) {
-                // Find trip index
-                String tripId = tripUpdate.getTrip().getTripId();
-                int tripIndex = tt.getTripIndex(tripId);
-                if (tripIndex == -1) {
-                    LOG.info("tripId {} not found in pattern.", tripId);
-                    return false;
-                }
-                
-                // Apply updated trip times
-                tt.setTripTimes(tripIndex, updatedTripTimes);
-                
-                return true;
+            // Assume all trips in a pattern are from the same feed, which should be the case.
+            // Find trip index
+            int tripIndex = tt.getTripIndex(updatedTripTimes.trip.getId());
+            if (tripIndex == -1) {
+                // Trip not found, add it
+                tt.addTripTimes(updatedTripTimes);
             } else {
-                return false;
+                // Set updated trip times of trip
+                tt.setTripTimes(tripIndex, updatedTripTimes);
             }
+            
+            // The time tables are finished during the commit
+            
+            return true;
         }
     }
 

@@ -35,6 +35,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,8 +227,11 @@ public class TimetableSnapshotSource {
             return false;
         }
 
-        // we have a message we actually want to apply
-        return buffer.update(pattern, tripUpdate, feedId, timeZone, serviceDate);
+        // Apply update on the *scheduled* time table and set the updated trip times in the buffer
+        TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
+                timeZone, serviceDate);
+        boolean success = buffer.update(pattern, updatedTripTimes, serviceDate); 
+        return success;
     }
 
     /**
@@ -405,7 +409,8 @@ public class TimetableSnapshotSource {
         
         // Create new Trip
         Trip trip = new Trip();
-        trip.setId(new AgencyAndId("", tripUpdate.getTrip().getTripId()));
+        // TODO: which Agency ID to use? Currently use feed id.
+        trip.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getTripId()));
         trip.setRoute(route);
         trip.setServiceId(null); // TODO: create ServiceId?
         
@@ -475,9 +480,11 @@ public class TimetableSnapshotSource {
         // TODO: purge these vertices and edges once in a while
         pattern.makePatternVerticesAndEdges(graph, graphIndex.stopVertexForStop);
         
-        // Update buffer with new trip 
-        boolean success = buffer.update(pattern, tripUpdate, feedId, timeZone, serviceDate);
+        // Create new trip times
+        TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
         
+        // Add new trip times to the buffer
+        boolean success = buffer.update(pattern, newTripTimes, serviceDate); 
         return success;
     }
 
@@ -504,7 +511,11 @@ public class TimetableSnapshotSource {
             return false;
         }
 
-        return buffer.update(pattern, tripUpdate, agencyId, timeZone, serviceDate);
+        // Apply update on the *scheduled* time table and set the updated trip times in the buffer
+        TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
+                timeZone, serviceDate);
+        boolean success = buffer.update(pattern, updatedTripTimes, serviceDate); 
+        return success;
     }
 
     protected boolean purgeExpiredData() {
