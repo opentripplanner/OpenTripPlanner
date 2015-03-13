@@ -125,15 +125,19 @@ public class TimetableSnapshotSource {
     }
 
     /**
-     * Method to apply a trip update list to the most recent version of the timetable snapshot.
-     * A GTFS-RT feed is always applied against a single static feed (indicated by feedId).
-     * However, multi-feed support is not completed and we currently assume there is only one static feed when matching IDs.
+     * Method to apply a trip update list to the most recent version of the timetable snapshot. A
+     * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
      * 
-     * @param graph graph to update (only needed for changing stop patterns) 
-     * @param updates GTFS-RT TripUpdate's
+     * However, multi-feed support is not completed and we currently assume there is only one static
+     * feed when matching IDs.
+     * 
+     * TODO: is this necessary? This method is synchronized to make sure updates happen atomically.
+     * 
+     * @param graph graph to update (needed for adding/changing stop patterns)
+     * @param updates GTFS-RT TripUpdate's that should be applied atomically
      * @param feedId
      */
-    public void applyTripUpdates(Graph graph, final List<TripUpdate> updates, final String feedId) {
+    public synchronized void applyTripUpdates(Graph graph, final List<TripUpdate> updates, final String feedId) {
         if (updates == null) {
             LOG.warn("updates is null");
             return;
