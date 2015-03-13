@@ -631,8 +631,9 @@ public class GraphPathToTripPlanConverterTest {
 
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        timetableSnapshotSource.getTimetableSnapshot().update(
-                thirdTripPattern, tripUpdate, "Ferry", timeZone, serviceDate);
+        TripTimes updatedTripTimes = thirdTripPattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
+                timeZone, serviceDate);
+        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, updatedTripTimes, serviceDate);
 
         // Further graph initialization
         graph.putService(CalendarServiceData.class, calendarServiceData);
