@@ -409,8 +409,8 @@ public class TimetableSnapshotSource {
         trip.setRoute(route);
         trip.setServiceId(null); // TODO: create ServiceId?
         
-        // Calculate 
-        Calendar serviceCalendar = serviceDate.getAsCalendar(graph.getTimeZone());
+        // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date 
+        Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
         final long midnightSecondsSinceEpoch = serviceCalendar.getTimeInMillis() / MILLIS_PER_SECOND;
         
         // Create StopTimes
@@ -469,10 +469,16 @@ public class TimetableSnapshotSource {
 
         // Create TripPattern
         // TODO: make a cache for newly created trip patterns?
-        TripPattern tripPattern = new TripPattern(trip.getRoute(), stopPattern);
+        TripPattern pattern = new TripPattern(trip.getRoute(), stopPattern);
         
+        // Create vertices and edges for new TripPattern
+        // TODO: purge these vertices and edges once in a while
+        pattern.makePatternVerticesAndEdges(graph, graphIndex.stopVertexForStop);
         
-        return true;
+        // Update buffer with new trip 
+        boolean success = buffer.update(pattern, tripUpdate, feedId, timeZone, serviceDate);
+        
+        return success;
     }
 
     protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {

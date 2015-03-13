@@ -42,7 +42,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -498,33 +497,15 @@ public class TripPattern implements Serializable {
     }
 
     /**
-     * Repetitive logic pulled out of makePatternVerticesAndEdges().
-     * No longer works because we don't have access to the DAO here.
-     * But moving the makePatternVerticesAndEdges into TripPattern seems cleaner (certainly looks cleaner).
-     */
-    private <T> T getStopOrParent(Map<Stop, T> map, Stop stop, Graph graph) {
-        T vertex = map.get(stop);
-        if (vertex == null) {
-            Stop parent = null; //_dao.getStopForId(new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()));
-            vertex = map.get(parent);
-            /* FIXME: this is adding an annotation for a specific problem, but all we know is that the stop vertex does not exist. */
-            if (vertex == null) {
-                //LOG.warn(graph.addBuilderAnnotation(new StopAtEntrance(stop, false)));
-            } else {
-                //LOG.warn(graph.addBuilderAnnotation(new StopAtEntrance(stop, true)));
-            }
-        }
-        return vertex;
-    }
-
-    /**
      * Create the PatternStop vertices and PatternBoard/Hop/Dwell/Alight edges corresponding to a
      * StopPattern/TripPattern. StopTimes are passed in instead of Stops only because they are
      * needed for shape distances (actually, stop sequence numbers?).
      *
-     * TODO move GtfsStopContext into Graph.
+     * @param graph graph to create vertices and edges in
+     * @param transitStops map of transit stops given the stop; it is assumed all stops of this trip
+     *        pattern are included in this map and refer to TransitStops
      */
-    public void makePatternVerticesAndEdges(Graph graph, GtfsStopContext context) {
+    public void makePatternVerticesAndEdges(Graph graph, Map<Stop, ? extends TransitStationStop> transitStops) {
 
         /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */
         PatternArriveVertex pav0, pav1 = null;
@@ -544,8 +525,8 @@ public class TripPattern implements Serializable {
             hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
 
             /* Get the arrive and depart vertices for the current stop (not pattern stop). */
-            TransitStopDepart stopDepart = getStopOrParent(context.stopDepartNodes, s0, graph);
-            TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
+            TransitStopDepart stopDepart = ((TransitStop) transitStops.get(s0)).departVertex;
+            TransitStopArrive stopArrive = ((TransitStop) transitStops.get(s1)).arriveVertex;
 
             /* Record the transit stop vertices visited on this pattern. */
             stopVertices[stop] = stopDepart.getStopVertex();

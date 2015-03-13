@@ -429,7 +429,7 @@ public class GTFSPatternHopFactory {
 
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns.values()) {
-            tripPattern.makePatternVerticesAndEdges(graph, context);
+            tripPattern.makePatternVerticesAndEdges(graph, context.stationStopNodes);
             // Add the geometries to the hop edges.
             LineString[] geom = geometriesByTripPattern.get(tripPattern);
             if (geom != null) {
