@@ -24,6 +24,7 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +114,25 @@ public class TimetableResolver {
                 dirty.add(tt);
             }
             // Assume all trips in a pattern are from the same feed, which should be the case.
-            return tt.update(tripUpdate, timeZone, serviceDate);
+            
+            // Create updated trip times
+            TripTimes updatedTripTimes = tt.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate);
+            if (updatedTripTimes != null) {
+                // Find trip index
+                String tripId = tripUpdate.getTrip().getTripId();
+                int tripIndex = tt.getTripIndex(tripId);
+                if (tripIndex == -1) {
+                    LOG.info("tripId {} not found in pattern.", tripId);
+                    return false;
+                }
+                
+                // Apply updated trip times
+                tt.setTripTimes(tripIndex, updatedTripTimes);
+                
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
