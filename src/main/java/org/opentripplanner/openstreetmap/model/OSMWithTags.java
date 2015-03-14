@@ -15,6 +15,8 @@
 
 package org.opentripplanner.openstreetmap.model;
 
+import com.google.common.collect.Maps;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +27,7 @@ import java.util.Map;
 public class OSMWithTags {
 
     /* To save memory this is only created when an entity actually has tags. */
-    private Map<String, String> _tags;
+    private Map<String, String> _tags = Maps.newHashMap();;
 
     protected long id;
 

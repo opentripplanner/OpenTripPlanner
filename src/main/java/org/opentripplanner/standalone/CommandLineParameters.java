@@ -104,7 +104,7 @@ public class CommandLineParameters implements Cloneable {
 
     @Parameter(names = { "--skipVisibility"},
             description = "skip area visibility calculations, which are often time consuming.")
-    boolean skipVisibility;
+    public boolean skipVisibility;
 
     /* Options for the server sub-task. */
 

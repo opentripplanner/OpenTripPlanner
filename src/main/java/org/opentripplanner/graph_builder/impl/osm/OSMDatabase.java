@@ -13,36 +13,19 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionException;
-import org.opentripplanner.graph_builder.annotation.TurnRestrictionUnknown;
+import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.impl.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
+import org.opentripplanner.openstreetmap.model.*;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
-import org.opentripplanner.openstreetmap.model.OSMNode;
-import org.opentripplanner.openstreetmap.model.OSMRelation;
-import org.opentripplanner.openstreetmap.model.OSMRelationMember;
-import org.opentripplanner.openstreetmap.model.OSMTag;
-import org.opentripplanner.openstreetmap.model.OSMWay;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -51,14 +34,7 @@ import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Multimap;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import java.util.*;
 
 public class OSMDatabase implements OpenStreetMapContentHandler {
 
@@ -147,6 +123,12 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         return Collections.unmodifiableCollection(waysById.values());
     }
 
+    public Collection<OSMWay> getAllWays() {
+        ArrayList<OSMWay> result = new ArrayList<>(waysById.values());
+        result.addAll(areaWaysById.values());
+        return Collections.unmodifiableCollection(result);
+    }
+    
     public Collection<OSMNode> getBikeRentalNodes() {
         return Collections.unmodifiableCollection(bikeRentalNodes.values());
     }
@@ -689,13 +671,17 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
             for (OSMRelationMember member : relation.getMembers()) {
                 // multipolygons for attribute mapping
-                if (!("way".equals(member.getType()) && waysById.containsKey(member.getRef()))) {
+                if (!("way".equals(member.getType()) && ( 
+                        waysById.containsKey(member.getRef()) || areaWaysById.containsKey(member.getRef()) ) )) {
                     continue;
                 }
 
                 OSMWithTags way = waysById.get(member.getRef());
                 if (way == null) {
-                    continue;
+                    way = areaWaysById.get(member.getRef());
+                    if (way == null) {
+                        continue;
+                    }
                 }
                 String[] relationCopyTags = { "highway", "name", "ref" };
                 for (String tag : relationCopyTags) {
