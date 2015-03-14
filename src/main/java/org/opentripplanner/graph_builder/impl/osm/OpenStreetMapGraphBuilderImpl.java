@@ -967,11 +967,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             StreetTraversalPermission permissionsBack = permissionPair.second;
 
             if (permissionsFront.allowsAnything()) {
-                street = getEdgeForStreet(start, end, way, index, startNode, endNode, length,
+                street = getEdgeForStreet(0, way.getId(), start, end, way, index, startNode, endNode, length,
                         permissionsFront, geometry, false);
             }
             if (permissionsBack.allowsAnything()) {
-                backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, length,
+                int fwdId = street == null ? 0 : street.getId();
+                backStreet = getEdgeForStreet(fwdId, way.getId(), end, start, way, index, endNode, startNode, length,
                         permissionsBack, backGeometry, true);
             }
             if (street != null && backStreet != null) {
@@ -989,7 +990,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return new P2<StreetEdge>(street, backStreet);
         }
 
-        private StreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
+        private StreetEdge getEdgeForStreet(int id, long osmId, IntersectionVertex start, IntersectionVertex end,
                                                  OSMWay way, int index, long startNode, long endNode, double length,
                                                  StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
@@ -1005,7 +1006,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
-            StreetEdge street = edgeFactory.createEdge(0, way.getId(), start, end, geometry, name, length,
+            StreetEdge street = edgeFactory.createEdge(id, osmId, start, end, geometry, name, length,
                     permissions, back);
             street.setCarSpeed(carSpeed);
 
