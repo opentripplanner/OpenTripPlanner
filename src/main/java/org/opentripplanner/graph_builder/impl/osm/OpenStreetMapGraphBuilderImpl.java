@@ -1035,7 +1035,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
-            StreetEdge street = edgeFactory.createEdge(start, end, geometry, name, length,
+            StreetEdge street = edgeFactory.createEdge(0, way.getId(), start, end, geometry, name, length,
                     permissions, back);
             street.setCarSpeed(carSpeed);
 

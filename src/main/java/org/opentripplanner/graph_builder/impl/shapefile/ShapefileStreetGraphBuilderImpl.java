@@ -205,10 +205,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
 
                 // TODO Set appropriate car speed from shapefile source.
-                StreetEdge street = edgeFactory.createEdge(startIntersection, endIntersection,
+                StreetEdge street = edgeFactory.createEdge(0, -1, startIntersection, endIntersection,
                         geom, name, length, permissions.first, false);
                 LineString reversed = (LineString) geom.reverse();
-                StreetEdge backStreet = edgeFactory.createEdge(endIntersection, startIntersection,
+                StreetEdge backStreet = edgeFactory.createEdge(street.getId(), street.getOsmId(), endIntersection, startIntersection,
                         reversed, name, length, permissions.second, true);
                 backStreet.shareData(street);
 
