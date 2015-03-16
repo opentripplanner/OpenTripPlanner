@@ -131,7 +131,8 @@ public class TimetableSnapshotSource {
      * However, multi-feed support is not completed and we currently assume there is only one static
      * feed when matching IDs.
      * 
-     * TODO: is this necessary? This method is synchronized to make sure updates happen atomically.
+     * TODO: is this necessary?
+     * This method is synchronized to make sure updates happen atomically.
      * 
      * @param graph graph to update (needed for adding/changing stop patterns)
      * @param updates GTFS-RT TripUpdate's that should be applied atomically
