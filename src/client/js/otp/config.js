@@ -214,6 +214,7 @@ var options = {
 	debug: true,
 	getAsync: false, //TODO: make async
 	fallbackOnEmpty: true,
+    load: 'unspecific',
 };
 var _tr = null; //key
 var ngettext = null; // singular, plural, value
