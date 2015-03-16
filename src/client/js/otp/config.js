@@ -41,13 +41,19 @@ otp.config = {
     },
     languageMenu : function() {
         var active_locales = _.keys(otp.config.locales);
-        var str = '';
+        var active = '';
+        var others = '<ul>';
+        var style  = '';
          _.each(active_locales, function(loc, i){
-             if (i==0) str += '<span>';
-             str += '<li><a href="?setLng=' + loc+ '">' + loc +'</a></li>';
-             if (i==0) str += '</span>';
+             if (loc == i18n.lng()){
+                 active = '<span>' + loc + '</span>';
+                 style = 'style="display:none"';
+             }
+             else style = '';
+             others += '<li ' + style + '><a href="?setLng=' + loc+ '">' + loc + '</a></li>'
         });
-        return str;
+        others += '</ul>';
+        return active + others;
     },
 
     /**

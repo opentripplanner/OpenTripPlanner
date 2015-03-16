@@ -41,9 +41,9 @@ a:focus{outline:none}
 
 
 .language-switcher{float:left;margin-left:8px;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;text-transform:uppercase;background:#3e6a94;overflow:hidden;}
-.language-switcher span, .language-switcher a{text-align:right;width:25px;padding-right:22px;cursor:pointer;height:28px;display:block;font-weight:bold;font-size:1.08em;line-height:28px;color:#fff}
-.language-switcher a{display:none}
-.language-switcher:hover a{display:block}
+.language-switcher span, .language-switcher li a{text-align:right;width:25px;padding-right:22px;cursor:pointer;height:28px;display:block;font-weight:bold;font-size:1.08em;line-height:28px;color:#fff}
+.language-switcher ul{display:none}
+.language-switcher:hover ul{display:block}
 .language-switcher a:hover{background:#5580a9}
 /*.language-switcher span .fonticon:before{display:inline-block;content:"\e800";font-size:16px;color:#fff;padding:0;position:absolute;top:1px;right:8px;} */
 
