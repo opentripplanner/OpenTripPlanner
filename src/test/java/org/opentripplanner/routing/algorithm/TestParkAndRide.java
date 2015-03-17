@@ -14,19 +14,13 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -156,7 +150,7 @@ public class TestParkAndRide extends TestCase {
         // assertTrue(s.isBackWalkingBike());
         assertTrue(s.getBackMode() == TraverseMode.WALK);
 
-        // But we can go from B to D with BICYCLE+WALK mode using bike P+R.
+        // But we can go from B to D using bike P+R.
         options = new RoutingRequest("BICYCLE_PARK,WALK,TRANSIT");
         options.setRoutingContext(graph, B, D);
         tree = aStar.getShortestPathTree(options);
