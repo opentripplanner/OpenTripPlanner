@@ -532,7 +532,6 @@ public class TimetableSnapshotSource {
         }
 
         LOG.debug("purging expired realtime data");
-        // TODO: purge expired realtime data
 
         lastPurgeDate = previously;
 
