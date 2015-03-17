@@ -80,7 +80,7 @@ a:focus{outline:none}
 /* ----------  WIDGETS ----------*/
 .otp-widget-nonTransparent{box-shadow:0 0 7px -3px #000;z-index:11000;position:absolute;background:#fff}
     .handle{cursor:move}
-    .otp-widget-header{cursor:move;height:18px;padding:20px 36px 0 18px}
+    .otp-widget-header{cursor:move;height:18px;padding:5px 36px 0 10px}
     .box-title-close{padding-top:13px;height:25px}
     .otp-widget-header h2{float:left;_font-size:1.25em;text-transform:uppercase;color:#000000;font-weight:bold;font-family:roboto,sans-serif}
     .otp-widget-header h2 span{color:#6a9308} 
