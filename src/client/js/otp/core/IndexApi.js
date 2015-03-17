@@ -203,30 +203,22 @@ otp.core.IndexApi = otp.Class({
             }
         });
     },
-/* to be implemented
+    
     loadStopsById : function(agencyId, id, callbackTarget, callback) {
-        var params = {
-            id : id,
-            extended : true
-        };
-        if(agencyId !== null) {
-            params.agency = agencyId;
-        }
-        if(typeof otp.config.routerId !== 'undefined') {
-            params.routerId = otp.config.routerId;
-        }
-
-        var url = otp.config.hostname + '/' + otp.config.restService + '/transit/stopData';
+        var stopId = agencyId + ':' + id;
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/'+ stopId;
         $.ajax(url, {
-            data:       params,
-            dataType:   'jsonp',
-
             success: function(data) {
                 callback.call(callbackTarget, data);
-            }
+            },
+            error: function(xhr) {
+                //if no stop found, pass an empty array of stops...
+                if(xhr.status == '404')
+                    callback.call(callbackTarget, []);
+            },
         });
     },
-
+/* to be implemented
     loadStopsByName : function(agencyId, name, callbackTarget, callback) {
         var params = {
             name: name,
