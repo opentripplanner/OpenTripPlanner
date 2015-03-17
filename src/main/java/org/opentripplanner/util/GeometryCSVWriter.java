@@ -50,6 +50,8 @@ public class GeometryCSVWriter {
     /**
      * Finds geo field index and writes header into CSV file
      *
+     * With help of {@link #constructor(java.util.List, String, String)}
+     *
      * @param csvColumns Name of csv columns together with geo field name
      * @param geo_field Name of geo field
      * @param file Path to csv file where this will be saved
@@ -58,6 +60,15 @@ public class GeometryCSVWriter {
         constructor(csvColumns, geo_field, file);
     }
 
+    /**
+     * Initializes writer, finds out index of geometry and writes header
+     *
+     * It writes to file, or to testWriter if it isn't null
+     *
+     * @param csvColumns Name of csv columns together with geo field name
+     * @param geo_field_name Name of geo field
+     * @param file Path to csv file where this will be saved
+     */
     private void constructor(List<String> csvColumns, String geo_field_name, String file) {
         int index = 0;
         for (String key : csvColumns) {
@@ -82,6 +93,8 @@ public class GeometryCSVWriter {
 
     /**
      * Finds geo field index and writes header into writer
+     *
+     * With help of {@link #constructor(java.util.List, String, String)}
      *
      * @param csvColumns Name of csv columns together with geo field name
      * @param geo_field Name of geo field
