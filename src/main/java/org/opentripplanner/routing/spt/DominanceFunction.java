@@ -47,7 +47,12 @@ public abstract class DominanceFunction implements Serializable {
         if (a.isCarParked() != b.isCarParked()) {
             return false;
         }
-        
+
+        // Does one state represent riding a bike and the other represent walking after the bike was parked?
+        if (a.isBikeParked() != b.isBikeParked()) {
+            return false;
+        }
+
         // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
         if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
             if (! a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {
