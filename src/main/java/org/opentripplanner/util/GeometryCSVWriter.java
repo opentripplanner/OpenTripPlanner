@@ -19,9 +19,13 @@ import com.vividsolutions.jts.io.WKTWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opentripplanner.routing.impl.CandidateEdge;
+import org.opentripplanner.routing.impl.CandidateEdgeBundle;
 
 /**
  * This class is used primary for debugging puproses.
@@ -120,6 +124,49 @@ public class GeometryCSVWriter {
         } catch (IOException ex) {
             Logger.getLogger(GeometryCSVWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    /**
+     * Writes CSV with edges in bundle information.
+     *
+     * It is useful to see which edges are in which bundles.
+     *
+     * For each edge in bundle:
+     * - edge name
+     * - bundle index
+     * - index of edge in bundle
+     * - distance from stop to edge
+     * - {@link org.opentripplanner.routing.impl.CandidateEdge} score
+     * - {@link org.opentripplanner.routing.impl.CandidateEdge} endwise (1 - true, 0 - false)
+     * - {@link org.opentripplanner.routing.impl.CandidateEdge} geometry (WKT)
+     *
+     * @param bundles Collection of {@link CandidateEdgeBundle} to be written
+     * @param filename of csv file
+     */
+    public static void writeCandidateBundle(Collection <CandidateEdgeBundle> bundles,
+            String filename) {
+        GeometryCSVWriter myWriter = new GeometryCSVWriter(
+                Arrays.asList("edge_name", "bundle_index", "index", "distance", "score",
+                        "endwise", "geo"), "geo", filename);
+        int bundle_index=0;
+        for (CandidateEdgeBundle bundle: bundles) {
+            int index = 0;
+            for (CandidateEdge ce : bundle) {
+                String endwise;
+                if (ce.endwise()) {
+                    endwise = "1";
+                } else {
+                    endwise = "0";
+                }
+                myWriter.add(Arrays.asList(ce.edge.getName(),
+                        Integer.toString(bundle_index), Integer.toString(index),
+                        Double.toString(ce.distance), Double.toString(ce.score),
+                        endwise), ce.edge.getGeometry());
+                index++;
+            }
+            bundle_index++;
+        }
+        myWriter.close();
     }
 
     /**
