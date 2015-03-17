@@ -16,7 +16,7 @@ package org.opentripplanner.scripting.api;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -68,7 +68,7 @@ public class OtpsRoutingRequest {
     }
 
     public void setModes(String modesStr) {
-        new QualifiedModeSetSequence(modesStr).applyToRequest(req);
+        new QualifiedModeSet(modesStr).applyToRoutingRequest(req);
     }
 
     public void setArriveBy(boolean arriveBy) {

@@ -29,7 +29,7 @@ import com.google.common.base.Objects;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
@@ -428,14 +428,14 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.setModes(modes);
     }
 
-    public RoutingRequest(QualifiedModeSetSequence qmodes) {
+    public RoutingRequest(QualifiedModeSet qmodes) {
         this();
-        qmodes.applyToRequest(this);
+        qmodes.applyToRoutingRequest(this);
     }
 
     public RoutingRequest(String qmodes) {
         this();
-        new QualifiedModeSetSequence(qmodes).applyToRequest(this);
+        new QualifiedModeSet(qmodes).applyToRoutingRequest(this);
     }
 
     public RoutingRequest(TraverseMode mode) {

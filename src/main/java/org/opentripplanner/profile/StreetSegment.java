@@ -1,16 +1,18 @@
 package org.opentripplanner.profile;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.util.PolylineEncoder;
@@ -21,12 +23,16 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 
-/** A response object describing a non-transit part of an option (usually access/egress). */
+/** 
+ * A response object describing a non-transit part of an Option. This is either an access/egress leg of a transit
+ * trip, or a direct path to the destination that does not use transit.
+ */
 public class StreetSegment {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreetSegment.class);
 
-    public TraverseMode mode;
+    @JsonSerialize(using = ToStringSerializer.class) // as a string (e.g. "BICYCLE_RENT" instead of a nested object)
+    public QualifiedMode qmode;
     public int time;
     public EncodedPolylineBean geometry;
     public List<WalkStep> walkSteps = Lists.newArrayList();
@@ -61,7 +67,7 @@ public class StreetSegment {
     /** A StreetSegment is very similar to a StopAtDistance but it's a response object so the State has to be rendered into walksteps. */
     public StreetSegment (StopAtDistance sd) {
         this(sd.state);
-        mode = sd.mode; // Intended mode is known more reliably in a StopAtDistance than from a State.
+        qmode = sd.qmode; // Intended mode is known more reliably in a StopAtDistance than from a State.
     }
 
     /** Make a collections of StreetSegments from a collection of StopAtDistance. */

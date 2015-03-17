@@ -1,19 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import com.beust.jcommander.internal.Maps;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.analyst.TimeSurface;
@@ -21,14 +7,21 @@ import org.opentripplanner.api.param.HourMinuteSecond;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.QueryParameter;
 import org.opentripplanner.api.param.YearMonthDay;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.profile.*;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.util.Map;
 
 /**
  * A Jersey resource class which exposes OTP profile routing functionality as a web service.
@@ -68,9 +61,9 @@ public class ProfileResource {
             @QueryParam("orderBy")      @DefaultValue("AVG")   Option.SortOrder orderBy,
             @QueryParam("limit")        @DefaultValue("10")    int limit,       // max options to return PER ACCESS MODE
             @QueryParam("suboptimal")   @DefaultValue("5")     int suboptimalMinutes,
-            @QueryParam("accessModes")  @DefaultValue("WALK,BICYCLE") TraverseModeSet accessModes,
-            @QueryParam("egressModes")  @DefaultValue("WALK")         TraverseModeSet egressModes,
-            @QueryParam("directModes")  @DefaultValue("WALK,BICYCLE") TraverseModeSet directModes,
+            @QueryParam("accessModes")  @DefaultValue("WALK,BICYCLE") QualifiedModeSet accessModes,
+            @QueryParam("egressModes")  @DefaultValue("WALK")         QualifiedModeSet egressModes,
+            @QueryParam("directModes")  @DefaultValue("WALK,BICYCLE") QualifiedModeSet directModes,
             @QueryParam("transitModes") @DefaultValue("TRANSIT")      TraverseModeSet transitModes)
             throws Exception {
 

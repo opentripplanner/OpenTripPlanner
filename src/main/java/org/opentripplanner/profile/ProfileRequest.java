@@ -1,7 +1,8 @@
 package org.opentripplanner.profile;
 
 import org.joda.time.LocalDate;
-import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.io.Serializable;
 
@@ -34,7 +35,8 @@ public class ProfileRequest implements Serializable, Cloneable {
     public LocalDate date;
     public Option.SortOrder orderBy;
     public int limit; // the maximum number of options presented PER ACCESS MODE
-    public QualifiedModeSetSequence accessModes, egressModes, directModes, transitModes;
+    public QualifiedModeSet accessModes, egressModes, directModes;
+    public TraverseModeSet transitModes;
     public boolean analyst = false; // if true, propagate travel times out to street network
 
     /*

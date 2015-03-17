@@ -15,7 +15,6 @@ package org.opentripplanner.api.common;
 
 import java.util.*;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -25,7 +24,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -166,7 +165,7 @@ public abstract class RoutingResource {
     
     /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
     @QueryParam("mode")
-    protected QualifiedModeSetSequence modes;
+    protected QualifiedModeSet modes;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -513,7 +512,7 @@ public abstract class RoutingResource {
             request.setOptimize(optimize);
 
         /* Temporary code to get bike/car parking and renting working. */
-        if (modes != null) modes.applyToRequest(request);
+        if (modes != null) modes.applyToRoutingRequest(request);
 
         if (request.allowBikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
