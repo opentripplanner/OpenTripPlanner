@@ -131,14 +131,14 @@ public class TimetableSnapshotSource {
      * However, multi-feed support is not completed and we currently assume there is only one static
      * feed when matching IDs.
      * 
-     * TODO: is this necessary?
-     * This method is synchronized to make sure updates happen atomically.
+     * TODO: synchronize method to make sure updates happen atomically. Note that {@link
+     * #getTimetableSnaphot(boolean)} should not block when this method is busy.
      * 
      * @param graph graph to update (needed for adding/changing stop patterns)
      * @param updates GTFS-RT TripUpdate's that should be applied atomically
      * @param feedId
      */
-    public synchronized void applyTripUpdates(Graph graph, final List<TripUpdate> updates, final String feedId) {
+    public void applyTripUpdates(Graph graph, final List<TripUpdate> updates, final String feedId) {
         if (updates == null) {
             LOG.warn("updates is null");
             return;
@@ -456,12 +456,14 @@ public class TimetableSnapshotSource {
             stopTime.setTimepoint(1); // Exact time
             stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
             // Set pickup type
+            // Set different pickup type for last stop 
             if (index == tripUpdate.getStopTimeUpdateCount() - 1) {
                 stopTime.setPickupType(1); // No pickup available
             } else {
                 stopTime.setPickupType(0); // Regularly scheduled pickup
             }
             // Set drop off type
+            // Set different drop off type for first stop 
             if (index == 0) {
                 stopTime.setDropOffType(1); // No drop off available
             } else {
