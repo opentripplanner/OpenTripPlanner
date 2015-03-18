@@ -16,6 +16,7 @@ package org.opentripplanner.api.resource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -370,8 +371,14 @@ public abstract class GraphPathToTripPlanConverter {
     private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates) {
         WalkStep previousStep = null;
 
+        String lastMode = null;
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep);
+            String legMode = legs.get(i).mode;
+            if(legMode != lastMode) {
+                walkSteps.get(0).newMode = legMode;
+                lastMode = legMode;
+            }
 
             legs.get(i).walkSteps = walkSteps;
 
@@ -962,6 +969,8 @@ public abstract class GraphPathToTripPlanConverter {
             step.distance += edge.getDistance();
             step.addAlerts(graph.streetNotesService.getNotes(forwardState));
             lastAngle = DirectionUtils.getLastAngle(geom);
+
+            step.edges.add(edge);
         }
         return steps;
     }

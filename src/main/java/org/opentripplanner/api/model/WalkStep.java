@@ -24,8 +24,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.graph.Edge;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.collect.Lists;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -118,6 +120,18 @@ public class WalkStep {
     public List<Alert> alerts;
 
     public transient double angle;
+
+    /**
+     * The walkStep's mode; only populated if this is the first step of that mode in the leg.
+     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
+     */
+    public transient String newMode;
+
+    /**
+     * The street edges that make up this walkStep.
+     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
+     */
+    public transient List<Edge> edges = Lists.newArrayList();
 
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);

@@ -36,6 +36,7 @@ public class StreetSegment {
     public int time;
     public EncodedPolylineBean geometry;
     public List<WalkStep> walkSteps = Lists.newArrayList();
+    public List<StreetEdgeInfo> streetEdges = Lists.newArrayList();
 
     /**
      * Build the walksteps from the final State of a path.
@@ -60,6 +61,24 @@ public class StreetSegment {
         Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false);
         for (Leg leg : itin.legs) {
             walkSteps.addAll(leg.walkSteps);
+            // populate the streetEdges array
+            for(WalkStep walkStep : leg.walkSteps) {
+                boolean firstEdge = true;
+                for(Edge edge : walkStep.edges) {
+                    StreetEdgeInfo edgeInfo = new StreetEdgeInfo(edge);
+                    if(firstEdge) {
+                        edgeInfo.mode = walkStep.newMode;
+                        edgeInfo.streetName = walkStep.streetName;
+                        edgeInfo.absoluteDirection = walkStep.absoluteDirection;
+                        edgeInfo.relativeDirection = walkStep.relativeDirection;
+                        edgeInfo.stayOn = walkStep.stayOn;
+                        edgeInfo.area = walkStep.area;
+                        edgeInfo.bogusName = walkStep.bogusName;
+                        firstEdge = false;
+                    }
+                    streetEdges.add(edgeInfo);
+                }
+            }
         }
         time = (int) (state.getElapsedTimeSeconds());
     }
