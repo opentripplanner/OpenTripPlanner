@@ -81,6 +81,11 @@ public class TimetableSnapshotSource {
 
     /** The working copy of the timetable resolver. Should not be visible to routing threads. */
     private TimetableResolver buffer = new TimetableResolver();
+    
+    /**
+     * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
+     */
+    private TripPatternCache tripPatternCache = new TripPatternCache(); 
 
     /** Should expired realtime data be purged from the graph. */
     public boolean purgeExpiredData = true;
@@ -410,7 +415,10 @@ public class TimetableSnapshotSource {
         //
         
         // Create new Route
-        Route route = null; // TODO: create Route?
+        Route route = new Route();
+        route.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getTripId()));
+        // TODO: how should the route type be determined?
+        route.setType(3); // Bus. Used for short- and long-distance bus routes. 
         
         // Create new Trip
         Trip trip = new Trip();
@@ -479,13 +487,8 @@ public class TimetableSnapshotSource {
         // Create StopPattern
         StopPattern stopPattern = new StopPattern(stopTimes);
 
-        // Create TripPattern
-        // TODO: make a cache for newly created trip patterns?
-        TripPattern pattern = new TripPattern(trip.getRoute(), stopPattern);
-        
-        // Create vertices and edges for new TripPattern
-        // TODO: purge these vertices and edges once in a while
-        pattern.makePatternVerticesAndEdges(graph, graphIndex.stopVertexForStop);
+        // Get cached trip pattern or create one if it doesn't exist yet
+        TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
         
         // Create new trip times
         TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
