@@ -20,6 +20,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -42,6 +44,8 @@ public class GraphPath {
 
     // don't really need to save this (available through State) but why not
     private RoutingContext rctx;
+    
+    private boolean isTransport = false;
 
     /**
      * Construct a GraphPath based on the given state by following back-edge fields all the way back
@@ -98,7 +102,11 @@ public class GraphPath {
             
             // Record the edge if it exists and this is not the first state in the path.
             if (cur.getBackEdge() != null && cur.getBackState() != null) {
-                edges.addFirst(cur.getBackEdge());
+                Edge e = cur.getBackEdge();
+                if (checkTransport(e)) {
+                    isTransport = true;
+                }
+                edges.addFirst(e);
             }
         }
         // dump();
@@ -207,5 +215,12 @@ public class GraphPath {
     public RoutingContext getRoutingContext() {
         return rctx;
     }
+    
+    private boolean checkTransport(Edge e) {
+        return !(e instanceof StreetEdge || e instanceof FreeEdge);
+    }
 
+    public boolean isTransport() {
+        return isTransport;
+    }
 }
