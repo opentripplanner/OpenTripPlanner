@@ -16,7 +16,6 @@ package org.opentripplanner.api.resource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -34,6 +33,7 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -57,6 +57,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
@@ -378,6 +379,26 @@ public abstract class GraphPathToTripPlanConverter {
             if(legMode != lastMode && !walkSteps.isEmpty()) {
                 walkSteps.get(0).newMode = legMode;
                 lastMode = legMode;
+            }
+
+            if(legMode == "BICYCLE") {
+                // check if leg starts with a bike station
+                Edge firstEdge = legsStates[i][0].backEdge;
+                if(firstEdge.getFromVertex() instanceof BikeRentalStationVertex) {
+                    walkSteps.get(0).bikeRentalOnStation = new BikeRentalStationInfo((BikeRentalStationVertex) firstEdge.getFromVertex());
+                }
+                else if(firstEdge.getToVertex() instanceof BikeRentalStationVertex) {
+                    walkSteps.get(0).bikeRentalOnStation = new BikeRentalStationInfo((BikeRentalStationVertex) firstEdge.getToVertex());
+                }
+
+                // check if leg ends with a bike station
+                Edge lastEdge = legsStates[i][legsStates[i].length - 1].backEdge;
+                if(lastEdge.getFromVertex() instanceof BikeRentalStationVertex) {
+                    walkSteps.get(walkSteps.size()-1).bikeRentalOffStation = new BikeRentalStationInfo((BikeRentalStationVertex) lastEdge.getFromVertex());
+                }
+                else if(lastEdge.getToVertex() instanceof BikeRentalStationVertex) {
+                    walkSteps.get(walkSteps.size()-1).bikeRentalOffStation = new BikeRentalStationInfo((BikeRentalStationVertex) lastEdge.getToVertex());
+                }
             }
 
             legs.get(i).walkSteps = walkSteps;

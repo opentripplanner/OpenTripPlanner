@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.graph.Edge;
 
@@ -132,6 +133,12 @@ public class WalkStep {
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
     public transient List<Edge> edges = Lists.newArrayList();
+
+    /**
+     * The bike rental on/off station info.
+     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
+     */
+    public transient BikeRentalStationInfo bikeRentalOnStation, bikeRentalOffStation;
 
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);

@@ -63,10 +63,10 @@ public class StreetSegment {
             walkSteps.addAll(leg.walkSteps);
             // populate the streetEdges array
             for(WalkStep walkStep : leg.walkSteps) {
-                boolean firstEdge = true;
+                int i = 0;
                 for(Edge edge : walkStep.edges) {
                     StreetEdgeInfo edgeInfo = new StreetEdgeInfo(edge);
-                    if(firstEdge) {
+                    if(i == 0) {
                         edgeInfo.mode = walkStep.newMode;
                         edgeInfo.streetName = walkStep.streetName;
                         edgeInfo.absoluteDirection = walkStep.absoluteDirection;
@@ -74,9 +74,13 @@ public class StreetSegment {
                         edgeInfo.stayOn = walkStep.stayOn;
                         edgeInfo.area = walkStep.area;
                         edgeInfo.bogusName = walkStep.bogusName;
-                        firstEdge = false;
+                        edgeInfo.bikeRentalOnStation = walkStep.bikeRentalOnStation;
+                    }
+                    if(i == walkStep.edges.size() - 1) {
+                        edgeInfo.bikeRentalOffStation = walkStep.bikeRentalOffStation;
                     }
                     streetEdges.add(edgeInfo);
+                    i++;
                 }
             }
         }

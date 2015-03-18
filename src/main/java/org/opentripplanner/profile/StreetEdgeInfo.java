@@ -6,8 +6,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 public class StreetEdgeInfo {
 
     public Integer edgeId;
@@ -20,7 +18,10 @@ public class StreetEdgeInfo {
     public Boolean stayOn; 
     public Boolean area; 
     public Boolean bogusName; 
-
+    
+    public BikeRentalStationInfo bikeRentalOnStation;
+    public BikeRentalStationInfo bikeRentalOffStation;
+    
     public StreetEdgeInfo(Edge edge) {
         this.edgeId = edge.getId();
         this.distance = (int) edge.getDistance();
