@@ -375,7 +375,7 @@ public abstract class GraphPathToTripPlanConverter {
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep);
             String legMode = legs.get(i).mode;
-            if(legMode != lastMode) {
+            if(legMode != lastMode && !walkSteps.isEmpty()) {
                 walkSteps.get(0).newMode = legMode;
                 lastMode = legMode;
             }
