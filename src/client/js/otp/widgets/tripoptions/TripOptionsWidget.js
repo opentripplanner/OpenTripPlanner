@@ -178,7 +178,7 @@ otp.widgets.tripoptions.LocationsSelector =
 
         ich['otp-tripOptions-locations']({
             widgetId : this.id,
-            showGeocoders : (this.geocoders && this.geocoders.length > 1),
+            showGeocoders : (false && this.geocoders && this.geocoders.length > 1),
             geocoders : this.geocoders,
             //TODO: Maybe change to Start and Destination
             start: pgettext('template', "Start"),
