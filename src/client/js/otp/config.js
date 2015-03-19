@@ -176,7 +176,7 @@ otp.config = {
          {
              'name': 'google',
              'className': 'otp.core.Geocoder',
-             'url': 'http://supremo.5t.torino.it/otp-geocoder/geocode',
+             'url': 'http://www.5t.torino.it/otp-geocoder/geocode',
              'addressParam': 'address'
          }
          ,{
