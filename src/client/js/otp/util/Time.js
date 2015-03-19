@@ -24,15 +24,13 @@ otp.util.Time = {
         //TODO: momentjs.duration could be used
         var hrs = Math.floor(secs / 3600);
         var mins = Math.floor(secs / 60) % 60;
-       
+
         //TRANSLATORS: n hour/hours use short form  
-        var str = (hrs > 0 ? (" " + ngettext("%d hr", "%d hrs", hrs) ) : "");
-        if (mins > 0) {
-            str += ", "
-            //TRANSLATORS: n minute/minutes use short form
-            str += ngettext("%d min", "%d mins", mins);
-        }
-    
+        var str = (hrs > 0 ? (ngettext("%d hr", "%d hrs", hrs) + " " ) : "");
+
+        //TRANSLATORS: n minute/minutes use short form
+        str += ngettext("%d min", "%d mins", mins);
+
         return str;
     },
     
