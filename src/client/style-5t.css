@@ -1,52 +1,8 @@
-
-/* ------- MEDIA SCREEN ------- */	
-
-@media screen{
-    
-/* ----------- RESET DEFAULT STYLES ----------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-html{_font-size:62.5%;width:100%;height:100%}body{font-family:arial,helvetica,sans-serif;position:relative;width:100%;height:100%;_font-size:1.2em;margin:0;padding:0}
-div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outline:0;font-size:1em;vertical-align:baseline;background:transparent}body{line-height:1}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}nav ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}a{margin:0;padding:0;vertical-align:baseline;background:transparent}ins{background-color:#ff9;color:#000;text-decoration:none}mark{background-color:#ff9;color:#000;font-style:italic;font-weight:bold}del{text-decoration:line-through}abbr[title],dfn[title]{border-bottom:1px dotted;cursor:help}table{border-collapse:collapse;border-spacing:0}hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0}input,select{vertical-align:middle}
-html { overflow-y: hidden; }
-
-/* ----------- COMMON CLASSES ----------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-.alt,.navigation {position:absolute;top:-9999px;left:-9999px}
-.hidden, hr{display:none}
-img,fieldset{border:0}
-p,ul,ol,li,form,fieldset,table,td,th,h1,h2,h3,h4,h5,sup{margin:0;padding:0}
-ul{list-style-type:none}
-a {color:#ccc;text-decoration:none}
-a:hover {text-decoration:none;color:#ccc}
-a:focus{outline:none}
-.clear{clear:both}
-.ext{text-indent:-9999px;font-size:0;display:block;line-height:0}
-.aux{position:relative;width:1000px}
-
-
-/* ----------- STRUCTURE --------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-
-#branding{
-    box-shadow: 0 0 10px -6px #000;
-    height: 64px;
-    background: #29547c;
-    
-}
-#logo{position:relative;margin:0px;width:177px;height:54px}
-#logo h1{width:290px;height:64px;text-indent:-9999px;font-size:0;line-height:0;background:url(images/5t/logo-pronto-tpl.gif) 0 0 no-repeat}
-
-.partner{display:none;}
-.main-menu-container{display:none;font-size:0.9em;}
-
-
-.language-switcher{float:left;margin-left:8px;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;text-transform:uppercase;background:#3e6a94;overflow:hidden;}
-.language-switcher span, .language-switcher li a{text-align:right;width:25px;padding-right:22px;cursor:pointer;height:28px;display:block;font-weight:bold;font-size:1.08em;line-height:28px;color:#fff}
-.language-switcher ul{display:none}
-.language-switcher:hover ul{display:block}
-.language-switcher a:hover{background:#5580a9}
-/*.language-switcher span .fonticon:before{display:inline-block;content:"\e800";font-size:16px;color:#fff;padding:0;position:absolute;top:1px;right:8px;} */
-
+/* --------------------------------------------------
+Theme Name: TPL
+file: style-5t.css
+author: Madeincima.it
+---------------------------------------------------*/
 
 @font-face {
     font-family: 'icons-5t';
@@ -61,33 +17,99 @@ a:focus{outline:none}
 .fonticon{font-family:'icons-5t';vertical-align:middle;speak:none;text-align:center;line-height:1;font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
 
-#map{top:64px}
+@media screen{
+    
+    /* ----------- RESET DEFAULT STYLES ----------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-.powered-by {
-    cursor: pointer;
-    z-index: 1000;
-    width: 134px;
-    height: 33px;
-    display: block;
-    position: absolute;
-    right: 0;
-    bottom: 15px;
-    background: url(../images/5t/powered-by-5t.png) 0 0 no-repeat;
-    text-indent: -9999px;
-    line-height: 0;
-    font-size: 0;
-}
-/* ----------  WIDGETS ----------*/
-.otp-widget-nonTransparent{box-shadow:0 0 7px -3px #000;z-index:11000;position:absolute;background:#fff}
-    .handle{cursor:move}
-    .otp-widget-header{cursor:move;height:18px;padding:5px 36px 0 10px}
-    .box-title-close{padding-top:13px;height:25px}
-    .otp-widget-header h2{float:left;_font-size:1.25em;text-transform:uppercase;color:#000000;font-weight:bold;font-family:roboto,sans-serif}
-    .otp-widget-header h2 span{color:#6a9308} 
+    html{_font-size:62.5%;width:100%;height:100%}body{font-family:arial,helvetica,sans-serif;position:relative;width:100%;height:100%;_font-size:1.2em;margin:0;padding:0}
+    div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outline:0;font-size:1em;vertical-align:baseline;background:transparent}body{line-height:1}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}nav ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}a{margin:0;padding:0;vertical-align:baseline;background:transparent}ins{background-color:#ff9;color:#000;text-decoration:none}mark{background-color:#ff9;color:#000;font-style:italic;font-weight:bold}del{text-decoration:line-through}abbr[title],dfn[title]{border-bottom:1px dotted;cursor:help}table{border-collapse:collapse;border-spacing:0}hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padding:0}input,select{vertical-align:middle}
+    html { overflow-y: hidden; }
+
+    /* ----------- COMMON CLASSES ----------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+    .alt,.navigation {position:absolute;top:-9999px;left:-9999px}
+    .hidden, hr{display:none}
+    img,fieldset{border:0}
+    p,ul,ol,li,form,fieldset,table,td,th,h1,h2,h3,h4,h5,sup{margin:0;padding:0}
+    ul{list-style-type:none}
+    a {color:#ccc;text-decoration:none}
+    a:hover {text-decoration:none;color:#ccc}
+    a:focus{outline:none}
+    .clear{clear:both}
+    .ext{text-indent:-9999px;font-size:0;display:block;line-height:0}
+    .aux{position:relative;width:1000px}
+
+    #otp-widgetManager{display:none;}
+
+
+    /* ----------- STRUCTURE --------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+
+    #branding{box-shadow: 0 0 10px -6px #000;height: 64px;background: #29547c}
+
+    #logo{position:relative;display:block;margin:0px;width:177px;height:54px}
+        #logo h1{width:290px;height:64px;text-indent:-9999px;font-size:0;line-height:0;background:url(images/5t/logo-pronto-tpl.gif) 0 0 no-repeat}
+
+    .partner{display:none;}
+    .main-menu-container{display:none;font-size:0.9em;}
+
+    .language-switcher{float:left;margin-left:8px;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;text-transform:uppercase;background:#3e6a94;overflow:hidden;}
+        .language-switcher span, .language-switcher a{text-align:right;width:25px;padding-right:22px;cursor:pointer;height:28px;display:block;font-weight:bold;font-size:1.08em;line-height:28px;color:#fff}
+        .language-switcher a{display:none}
+        .language-switcher span a{display:block}
+        .language-switcher:hover a{display:block}
+        .language-switcher a:hover{background:#5580a9}
+        /*.language-switcher span .fonticon:before{display:inline-block;content:"\e800";font-size:16px;color:#fff;padding:0;position:absolute;top:1px;right:8px;} */
+
+    #map{top:64px}
+
+    .powered-by {cursor: pointer;z-index: 1000;width: 134px;height: 33px;display: block;position: absolute;right: 0;bottom: 15px;background: url(../images/5t/powered-by-5t.png) 0 0 no-repeat;text-indent: -9999px;line-height: 0;font-size: 0;}
+
+    /* ----------  WIDGETS ----------*/
+    .otp-widget-nonTransparent{box-shadow:0 0 7px -3px #000;z-index:11000;position:absolute;background:#fff}
+        .handle{cursor:move}
+        .box-title-close{padding-top:13px;height:25px}
+        .otp-widget-header h2{float:left;_font-size:1.25em;text-transform:uppercase;color:#000000;font-weight:bold;font-family:roboto,sans-serif}
+        .otp-widget-header h2 span{color:#6a9308} 
+
+    /* Box Trip planner */
+    .otp-defaultTripWidget{padding:20px 25px 25px 25px;}
+    .otp-defaultTripWidget input{background:#fbfbfb;padding: 0 9px 0 5px;color: #151515;box-shadow: 0 0 10px -4px #e3e3e3 inset;border: 1px solid #ebebeb;}
+    .otp-defaultTripWidget select{background:#fbfbfb;border: 1px solid #ebebeb;padding:3px 10px 3px 3px}
+    .otp-defaultTripWidget hr,#otp-planner-optionsWidget-locSelector-startDropdown,#otp-planner-optionsWidget-locSelector-endDropdown{display:none;}
+    .otp-widget-header{cursor:move;height:18px;padding:0 36px 0 0;margin-bottom:10px;text-transform:uppercase;;font-size:1.1em;color:#1f4168;}
+    .otp-widget-header-buttons{top:13px;right:13px;width:auto;}
+    .otp-widget-header-buttons div{background:#efefef;font-size:1.3em;padding:2px 9px 4px 7px;}
+    .otp-widget-header-buttons div:hover{background:#e6e6e6;color:#666;text-shadow:none;}/*#1f4168  #fb9922*/
+    .otp-widget-header-buttons div:first-child{display:none;}
+    .otp-widget-header-button{margin-left:4px;font-weight:normal;}
+
+    #otp-planner-optionsWidget-locSelector-reverseButton{background: #fff url(images/5t/arrow-revert-fields.gif) -27px 0 no-repeat;cursor: pointer;display: block;height:45px;width: 30px;}
+    #otp-planner-optionsWidget-locSelector-reverseButton:hover{background-position:0 0;}
+    #otp-planner-optionsWidget-locSelector-reverseButton img{display:none;}
+
+    #otp-planner-optionsWidget-submit-button{background:#fb9922;font-family:arial,sans-serif;border:0;margin-top:1.5em;color:#fff;font-weight:600;text-transform:uppercase;font-size:1em;text-shadow:-1px -1px 0px rgba(0,0,0,0.1);padding:2px 4px;float:right;}
+    #otp-planner-optionsWidget-submit-button:hover{opacity:.9;}
+    #otp-planner-optionsWidget-timeSelector-nowButton,.ui-button-text-only{background:#efefef;border:0;color:#666;padding:6px 12px;border-radius:4px;}
+    .ui-button-text-only{padding:0;}
+    #otp-planner-optionsWidget-timeSelector-nowButton:hover,.ui-button-text-only:hover{background:#e6e6e6;}
+    #otp-planner-optionsWidget-timeSelector-depArr{margin-right:5px;}
+    #otp-planner-optionsWidget-timeSelector-timeSelector input{margin-right:5px;padding:5px 10px 5px 0;}
+    .ui-button-text-only{font-size:.9em;}
+
+    /* elementi nascosti -> valutare se servono o se vanno invece rimossi da codice*/
+    /*.otp-tripViewer-select{display:none;}*/
+
 
 
 
 }/* END MEDIA SCREEN*/	
+
+
+
+@media only screen and (min-width:21.250em){  /* 340px */
+
+}
 
 
 
