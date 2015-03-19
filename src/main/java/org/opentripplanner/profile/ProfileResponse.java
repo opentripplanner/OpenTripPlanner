@@ -53,7 +53,7 @@ public class ProfileResponse {
         ListMultimap<TraverseMode, Option> transitOptionsByAccessMode = ArrayListMultimap.create();
         for (Option option : transitOptions) {
             for (StreetSegment segment : option.access) {
-                transitOptionsByAccessMode.put(segment.qmode.mode, option);
+                transitOptionsByAccessMode.put(segment.mode.mode, option);
             }
         }
         // Retain the top N transit options for each access mode. Duplicates may be present, but options is a Set.

@@ -32,7 +32,7 @@ public class StreetSegment {
     private static final Logger LOG = LoggerFactory.getLogger(StreetSegment.class);
 
     @JsonSerialize(using = ToStringSerializer.class) // as a string (e.g. "BICYCLE_RENT" instead of a nested object)
-    public QualifiedMode qmode;
+    public QualifiedMode mode;
     public int time;
     public EncodedPolylineBean geometry;
     public List<WalkStep> walkSteps = Lists.newArrayList();
@@ -90,7 +90,7 @@ public class StreetSegment {
     /** A StreetSegment is very similar to a StopAtDistance but it's a response object so the State has to be rendered into walksteps. */
     public StreetSegment (StopAtDistance sd) {
         this(sd.state);
-        qmode = sd.qmode; // Intended mode is known more reliably in a StopAtDistance than from a State.
+        mode = sd.qmode; // Intended mode is known more reliably in a StopAtDistance than from a State.
     }
 
     /** Make a collections of StreetSegments from a collection of StopAtDistance. */
