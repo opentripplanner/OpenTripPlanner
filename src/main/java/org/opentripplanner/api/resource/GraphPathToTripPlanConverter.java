@@ -373,6 +373,9 @@ public abstract class GraphPathToTripPlanConverter {
         WalkStep previousStep = null;
 
         String lastMode = null;
+
+        BikeRentalStationVertex onVertex = null, offVertex = null;
+
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep);
             String legMode = legs.get(i).mode;
@@ -381,23 +384,35 @@ public abstract class GraphPathToTripPlanConverter {
                 lastMode = legMode;
             }
 
-            if(legMode == "BICYCLE" && !walkSteps.isEmpty()) {
+            if(!walkSteps.isEmpty()) {
                 // check if leg starts with a bike station
                 Edge firstEdge = legsStates[i][0].backEdge;
-                if(firstEdge.getFromVertex() instanceof BikeRentalStationVertex) {
-                    walkSteps.get(0).bikeRentalOnStation = new BikeRentalStationInfo((BikeRentalStationVertex) firstEdge.getFromVertex());
-                }
-                else if(firstEdge.getToVertex() instanceof BikeRentalStationVertex) {
-                    walkSteps.get(0).bikeRentalOnStation = new BikeRentalStationInfo((BikeRentalStationVertex) firstEdge.getToVertex());
-                }
+                if(firstEdge != null && onVertex == null) {
+                    if(firstEdge.getFromVertex() instanceof BikeRentalStationVertex) {
+                        onVertex = (BikeRentalStationVertex) firstEdge.getFromVertex();
+                    }
+                    else if(firstEdge.getToVertex() instanceof BikeRentalStationVertex) {
+                        onVertex = (BikeRentalStationVertex) firstEdge.getToVertex();                        
+                    }
 
+                    if(onVertex != null) {
+                        walkSteps.get(0).bikeRentalOnStation = new BikeRentalStationInfo(onVertex);
+                    }
+                }
+                
                 // check if leg ends with a bike station
                 Edge lastEdge = legsStates[i][legsStates[i].length - 1].backEdge;
-                if(lastEdge.getFromVertex() instanceof BikeRentalStationVertex) {
-                    walkSteps.get(walkSteps.size()-1).bikeRentalOffStation = new BikeRentalStationInfo((BikeRentalStationVertex) lastEdge.getFromVertex());
-                }
-                else if(lastEdge.getToVertex() instanceof BikeRentalStationVertex) {
-                    walkSteps.get(walkSteps.size()-1).bikeRentalOffStation = new BikeRentalStationInfo((BikeRentalStationVertex) lastEdge.getToVertex());
+                if(lastEdge != null && onVertex != null && offVertex == null) {
+                    if(lastEdge.getFromVertex() instanceof BikeRentalStationVertex) {
+                        offVertex = (BikeRentalStationVertex) lastEdge.getFromVertex();
+                    }
+                    else if(lastEdge.getToVertex() instanceof BikeRentalStationVertex) {
+                        offVertex = (BikeRentalStationVertex) lastEdge.getToVertex();
+                    }
+
+                    if(offVertex != null) {
+                        walkSteps.get(walkSteps.size()-1).bikeRentalOffStation = new BikeRentalStationInfo(offVertex);
+                    }
                 }
             }
 
