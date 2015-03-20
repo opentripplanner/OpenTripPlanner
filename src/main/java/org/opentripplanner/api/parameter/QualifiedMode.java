@@ -1,14 +1,17 @@
 package org.opentripplanner.api.parameter;
 
 import com.beust.jcommander.internal.Sets;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 
+import java.io.Serializable;
 import java.security.InvalidParameterException;
 import java.util.Set;
 
-public class QualifiedMode {
-
+public class QualifiedMode implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     public final TraverseMode mode;
     public final Set<Qualifier> qualifiers = Sets.newHashSet();
     
