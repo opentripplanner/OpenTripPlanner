@@ -32,6 +32,11 @@ public class TripPatternCache {
         // Create TripPattern if it doesn't exist yet
         if (tripPattern == null) {
             tripPattern = new TripPattern(route, stopPattern);
+            // Create an empty bitset for service codes (because the new pattern does not contain any trips)
+            tripPattern.setServiceCodes(graph.serviceCodes);
+            
+            // Finish scheduled time table
+            tripPattern.scheduledTimetable.finish();
             
             // Create vertices and edges for new TripPattern
             // TODO: purge these vertices and edges once in a while?

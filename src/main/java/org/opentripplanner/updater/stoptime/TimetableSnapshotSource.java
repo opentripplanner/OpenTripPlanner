@@ -18,12 +18,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import jersey.repackaged.com.google.common.base.Preconditions;
 
 import com.google.common.collect.Maps;
 
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -31,6 +33,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
@@ -85,7 +88,7 @@ public class TimetableSnapshotSource {
     /**
      * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
      */
-    private TripPatternCache tripPatternCache = new TripPatternCache(); 
+    private TripPatternCache tripPatternCache = new TripPatternCache();
 
     /** Should expired realtime data be purged from the graph. */
     public boolean purgeExpiredData = true;
@@ -97,10 +100,17 @@ public class TimetableSnapshotSource {
     private final TimeZone timeZone;
 
     private GraphIndex graphIndex;
+    
+    private Agency dummyAgency;
 
     public TimetableSnapshotSource(Graph graph) {
         timeZone = graph.getTimeZone();
         graphIndex = graph.index;
+        
+        // Create dummy agency for added trips
+        dummyAgency = new Agency();
+        dummyAgency.setId("");
+        dummyAgency.setName("");
     }
 
     /**
@@ -275,14 +285,15 @@ public class TimetableSnapshotSource {
         String tripId = tripDescriptor.getTripId();
         Trip trip = getTripForTripId(tripId);
         if (trip != null) {
-            // TODO: should we support this?
+            // TODO: should we support this and add a new instantiation of this trip (making it
+            // frequency based)?
             LOG.warn("Graph already contains trip id of ADDED trip, skipping.");
             return false;
         }
         
         // Check whether a start date exists
         if (!tripDescriptor.hasStartDate()) {
-            // TODO: should we support this and just use the current day?
+            // TODO: should we support this and apply update to all days?
             LOG.warn("ADDED trip doesn't have a start date in TripDescriptor, skipping.");
             return false;
         }
@@ -408,7 +419,24 @@ public class TimetableSnapshotSource {
         Preconditions.checkArgument(tripUpdate.getStopTimeUpdateCount() == stops.size(),
                 "number of stop should match the number of stop time updates");
         
-        // TODO: check whether trip id has been used for previously ADDED trip message
+        // Check whether trip id has been used for previously ADDED trip message and cancel
+        // previously created trip
+        String tripId = tripUpdate.getTrip().getTripId();
+        {
+            TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
+            if (pattern != null) {
+                // Cancel trip times for this trip in this pattern
+                Timetable timetable = buffer.resolve(pattern, serviceDate);
+                int tripIndex = timetable.getTripIndex(tripId);
+                if (tripIndex == -1) {
+                    LOG.warn("Could not cancel previously added trip {}", tripId);
+                } else {
+                    TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
+                    newTripTimes.cancel();
+                    buffer.update(pattern, newTripTimes, serviceDate);
+                }
+            }
+        }
         
         //
         // Handle added trip
@@ -416,16 +444,29 @@ public class TimetableSnapshotSource {
         
         // Create new Route
         Route route = new Route();
-        route.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getTripId()));
+        route.setId(new AgencyAndId(feedId, tripId));
+        route.setAgency(dummyAgency);
         // TODO: how should the route type be determined?
-        route.setType(3); // Bus. Used for short- and long-distance bus routes. 
+        route.setType(3); // Bus. Used for short- and long-distance bus routes.
+        // Create route name
+        route.setLongName(tripId);
         
         // Create new Trip
         Trip trip = new Trip();
         // TODO: which Agency ID to use? Currently use feed id.
         trip.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getTripId()));
         trip.setRoute(route);
-        trip.setServiceId(null); // TODO: create ServiceId?
+        
+        // Find service ID running on this service date
+        Set<AgencyAndId> serviceIds = graph.getCalendarService().getServiceIdsOnDate(serviceDate);
+        if (serviceIds.isEmpty()) {
+            // No service id exists: return error for now
+            LOG.warn("ADDED trip has service date for which no service id is available, skipping.");
+            return false;
+        } else {
+            // Just use first service id of set
+            trip.setServiceId(serviceIds.iterator().next());
+        }
         
         // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date 
         Calendar serviceCalendar = serviceDate.getAsCalendar(timeZone);
@@ -490,8 +531,21 @@ public class TimetableSnapshotSource {
         // Get cached trip pattern or create one if it doesn't exist yet
         TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
         
+        // Add service code to bitset of pattern
+        int serviceCode = graph.serviceCodes.get(trip.getServiceId());
+        pattern.getServices().set(serviceCode);
+        
         // Create new trip times
         TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
+        
+        // Update all times to mark trip times as realtime
+        for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
+            newTripTimes.updateArrivalTime(stopIndex, newTripTimes.getScheduledArrivalTime(stopIndex));
+            newTripTimes.updateDepartureTime(stopIndex, newTripTimes.getScheduledDepartureTime(stopIndex));
+        }
+        
+        // Set service code of new trip times
+        newTripTimes.serviceCode = serviceCode;
         
         // Add new trip times to the buffer
         boolean success = buffer.update(pattern, newTripTimes, serviceDate); 

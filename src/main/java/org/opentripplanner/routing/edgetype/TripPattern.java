@@ -572,6 +572,13 @@ public class TripPattern implements Serializable {
         }
         scheduledTimetable.setServiceCodes (serviceCodes);
     }
+    
+    /**
+     * @return bitset of service codes
+     */
+    public BitSet getServices() {
+        return services;
+    }
 
     public String getDirection() {
         return trips.get(0).getTripHeadsign();
