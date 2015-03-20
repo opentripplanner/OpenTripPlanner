@@ -381,7 +381,7 @@ public abstract class GraphPathToTripPlanConverter {
                 lastMode = legMode;
             }
 
-            if(legMode == "BICYCLE") {
+            if(legMode == "BICYCLE" && !walkSteps.isEmpty()) {
                 // check if leg starts with a bike station
                 Edge firstEdge = legsStates[i][0].backEdge;
                 if(firstEdge.getFromVertex() instanceof BikeRentalStationVertex) {
