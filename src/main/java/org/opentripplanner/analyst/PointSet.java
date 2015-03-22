@@ -158,7 +158,11 @@ public class PointSet implements Serializable {
         return ret;
     }
 
-    public static PointSet fromShapefile( File file ) throws IOException, NoSuchAuthorityCodeException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
+    public static PointSet fromShapefile(File file) throws NoSuchAuthorityCodeException, IOException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
+    	return fromShapefile(file, null, null);
+    }
+    
+    public static PointSet fromShapefile(File file, String originIDField, List<String> propertyFields) throws IOException, NoSuchAuthorityCodeException, FactoryException, EmptyPolygonException, UnsupportedGeometryException {
         if ( ! file.exists())
             throw new RuntimeException("Shapefile does not exist.");
 
@@ -173,7 +177,24 @@ public class PointSet implements Serializable {
         query.setCoordinateSystemReproject(WGS84);
         SimpleFeatureCollection featureCollection = featureSource.getFeatures(query);
 
+        // Set up fields based on first feature in collection
+        // This assumes that all features have the same set of properties, which I think is always the case for shapefiles
         SimpleFeatureIterator it = featureCollection.features();
+        SimpleFeature protoFt = it.next();
+        if (propertyFields == null) {
+        	propertyFields = new ArrayList<String>();
+        	// No property fields specified, so use all property fields
+        	for (Property p : protoFt.getProperties()) {
+        		propertyFields.add(p.getName().toString());
+        	}
+        	// If ID field is specified, don't use it as a property
+        	if (originIDField != null && propertyFields.contains(originIDField)) {
+        		propertyFields.remove(originIDField);
+        	}
+        }
+        
+        // Reset iterator
+        it = featureCollection.features();
 
         PointSet ret = new PointSet(featureCollection.size());
         int i=0;
@@ -183,33 +204,53 @@ public class PointSet implements Serializable {
 
             PointFeature ft = new PointFeature();
             ft.setGeom(geom);
+            
+            // Set feature's ID to the specified ID field, or to index if none is specified
+            if (originIDField == null) {
+            	ft.setId(Integer.toString(i));
+            } else {
+            	ft.setId(feature.getProperty(originIDField).getValue().toString());
+            }
+            
             for(Property prop : feature.getProperties() ){
-                Object binding = prop.getType().getBinding();
-
-                //attempt to coerce the prop's value into an integer
-                int val;
-                if(binding.equals(Integer.class)){
-                    val = (Integer)prop.getValue();
-                } else if(binding.equals(Long.class)){
-                    val = ((Long)prop.getValue()).intValue();
-                } else if(binding.equals(String.class)){
-                    try{
-                        val = Integer.parseInt((String)prop.getValue());
-                    } catch (NumberFormatException ex ){
-                        continue;
-                    }
-                } else {
-                    continue;
-                }
-
-                ft.addAttribute(prop.getName().toString(), val);
+            	String propName = prop.getName().toString();
+            	if (propertyFields.contains(propName)) {
+	                Object binding = prop.getType().getBinding();
+	
+	                //attempt to coerce the prop's value into an integer
+	                int val;
+	                if(binding.equals(Integer.class)){
+	                    val = (Integer)prop.getValue();
+	                } else if(binding.equals(Long.class)){
+	                    val = ((Long)prop.getValue()).intValue();
+	                } else if(binding.equals(String.class)){
+	                    try{
+	                        val = Integer.parseInt((String)prop.getValue());
+	                    } catch (NumberFormatException ex ){
+	                        continue;
+	                    }
+	                } else {
+	                	LOG.debug("Property {} of feature {} could not be interpreted as int, skipping", prop.getName().toString(), ft.getId());
+	                    continue;
+	                }
+	
+	                ft.addAttribute(propName, val);
+            	} else {
+            		LOG.debug("Property {} not requested; igoring", propName); 
+            	}
+            	
             }
 
             ret.addFeature(ft, i);
 
             i++;
         }
-
+        
+        ArrayList<String> IDlist = new ArrayList<String>();
+        for (String id : ret.ids) {
+        	IDlist.add(id);
+        }
+        LOG.debug("Created PointSet from shapefile with IDs {}", IDlist);
         return ret;
     }
 
