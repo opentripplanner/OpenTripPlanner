@@ -36,7 +36,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -81,10 +81,10 @@ public class TimetableSnapshotSource {
      * The last committed snapshot that was handed off to a routing thread. This snapshot may be
      * given to more than one routing thread if the maximum snapshot frequency is exceeded.
      */
-    private TimetableResolver snapshot = null;
+    private TimetableSnapshot snapshot = null;
 
     /** The working copy of the timetable resolver. Should not be visible to routing threads. */
-    private TimetableResolver buffer = new TimetableResolver();
+    private TimetableSnapshot buffer = new TimetableSnapshot();
     
     /**
      * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
@@ -120,11 +120,11 @@ public class TimetableSnapshotSource {
      *         thread is provided a consistent view of all TripTimes. The routing thread need only
      *         release its reference to the snapshot to release resources.
      */
-    public TimetableResolver getTimetableSnapshot() {
+    public TimetableSnapshot getTimetableSnapshot() {
         return getTimetableSnapshot(false);
     }
 
-    protected synchronized TimetableResolver getTimetableSnapshot(boolean force) {
+    protected synchronized TimetableSnapshot getTimetableSnapshot(boolean force) {
         long now = System.currentTimeMillis();
         if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
             if (force || buffer.isDirty()) {

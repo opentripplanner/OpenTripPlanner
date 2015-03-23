@@ -44,7 +44,7 @@ import com.google.common.base.Preconditions;
  *
  * At this point, only one writing thread at a time is supported.
  */
-public class TimetableResolver {
+public class TimetableSnapshot {
 
     protected static class SortedTimetableComparator implements Comparator<Timetable> {
         @Override
@@ -94,7 +94,7 @@ public class TimetableResolver {
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(TimetableResolver.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
 
     // Use HashMap not Map so we can clone.
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
@@ -169,7 +169,7 @@ public class TimetableResolver {
         // synchronization prevents commits/snapshots while update is in progress
         synchronized(this) {
             if (dirty == null)
-                throw new ConcurrentModificationException("This TimetableResolver is read-only.");
+                throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
             Timetable tt = resolve(pattern, serviceDate);
             // we need to perform the copy of Timetable here rather than in Timetable.update()
             // to avoid repeatedly copying in case several updates are applied to the same timetable
@@ -221,19 +221,19 @@ public class TimetableResolver {
      * the same timetable in rapid succession. This compromise is expressed by the
      * maxSnapshotFrequency property of StoptimeUpdater. The indexing could be made much more
      * efficient as well.
-     * @return an immutable copy of this TimetableResolver with all updates applied
+     * @return an immutable copy of this TimetableSnapshot with all updates applied
      */
-    public TimetableResolver commit() {
+    public TimetableSnapshot commit() {
         return commit(false);
     }
 
     @SuppressWarnings("unchecked")
-    public TimetableResolver commit(boolean force) {
-        TimetableResolver ret = new TimetableResolver();
+    public TimetableSnapshot commit(boolean force) {
+        TimetableSnapshot ret = new TimetableSnapshot();
         // synchronization prevents updates while commit/snapshot in progress
         synchronized(this) {
             if (dirty == null) {
-                throw new ConcurrentModificationException("This TimetableResolver is read-only.");
+                throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
             }
             if (!force && !this.isDirty()) return null;
             for (Timetable tt : dirty) {
@@ -254,7 +254,7 @@ public class TimetableResolver {
     public boolean purgeExpiredData(ServiceDate serviceDate) {
         synchronized(this) {
             if (dirty == null) {
-                throw new ConcurrentModificationException("This TimetableResolver is read-only.");
+                throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
             }
 
             boolean modified = false;

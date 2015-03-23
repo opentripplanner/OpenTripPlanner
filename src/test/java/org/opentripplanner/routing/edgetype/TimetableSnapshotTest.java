@@ -46,7 +46,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 
-public class TimetableResolverTest {
+public class TimetableSnapshotTest {
     private static Graph graph;
     private static GtfsContext context;
     private static Map<AgencyAndId, TripPattern> patternIndex;
@@ -79,10 +79,10 @@ public class TimetableResolverTest {
         Timetable orig = new Timetable(null);
         Timetable a = new Timetable(orig, new ServiceDate().previous());
         Timetable b = new Timetable(orig, new ServiceDate());
-        assertEquals(-1, (new TimetableResolver.SortedTimetableComparator()).compare(a, b));
+        assertEquals(-1, (new TimetableSnapshot.SortedTimetableComparator()).compare(a, b));
     }
     
-    private boolean updateResolver(TimetableResolver resolver, TripPattern pattern, TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
+    private boolean updateResolver(TimetableSnapshot resolver, TripPattern pattern, TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
                 timeZone, serviceDate);
         return resolver.update(pattern, updatedTripTimes, serviceDate);
@@ -94,7 +94,7 @@ public class TimetableResolverTest {
         ServiceDate yesterday = today.previous();
         ServiceDate tomorrow = today.next();
         TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
-        TimetableResolver resolver = new TimetableResolver();
+        TimetableSnapshot resolver = new TimetableSnapshot();
 
         Timetable scheduled = resolver.resolve(pattern, today);
         assertEquals(scheduled, resolver.resolve(pattern, null));
@@ -133,7 +133,7 @@ public class TimetableResolverTest {
         ServiceDate yesterday = today.previous();
         TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
 
-        TimetableResolver resolver = new TimetableResolver();
+        TimetableSnapshot resolver = new TimetableSnapshot();
         Timetable origNow = resolver.resolve(pattern, today);
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -162,7 +162,7 @@ public class TimetableResolverTest {
         assertNotSame(updatedNow, resolver.resolve(pattern, yesterday));
 
         // exception if we try to modify a snapshot
-        TimetableResolver snapshot = resolver.commit();
+        TimetableSnapshot snapshot = resolver.commit();
         updateResolver(snapshot, pattern, tripUpdate, "agency", yesterday);
     }
 
@@ -172,10 +172,10 @@ public class TimetableResolverTest {
         ServiceDate yesterday = today.previous();
         TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
 
-        TimetableResolver resolver = new TimetableResolver();
+        TimetableSnapshot resolver = new TimetableSnapshot();
 
         // only return a new snapshot if there are changes
-        TimetableResolver snapshot = resolver.commit();
+        TimetableSnapshot snapshot = resolver.commit();
         assertNull(snapshot);
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -230,7 +230,7 @@ public class TimetableResolverTest {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        TimetableResolver resolver = new TimetableResolver();
+        TimetableSnapshot resolver = new TimetableSnapshot();
         updateResolver(resolver, pattern, tripUpdate, "agency", today);
         updateResolver(resolver, pattern, tripUpdate, "agency", yesterday);
 

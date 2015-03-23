@@ -39,7 +39,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -93,17 +93,17 @@ public class TimetableSnapshotSourceTest {
     public void testGetSnapshot() throws InvalidProtocolBufferException {
         updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
 
-        TimetableResolver resolver = updater.getTimetableSnapshot();
-        assertNotNull(resolver);
-        assertSame(resolver, updater.getTimetableSnapshot());
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        assertNotNull(snapshot);
+        assertSame(snapshot, updater.getTimetableSnapshot());
 
         updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
-        assertSame(resolver, updater.getTimetableSnapshot());
+        assertSame(snapshot, updater.getTimetableSnapshot());
 
         updater.maxSnapshotFrequency = (-1);
-        TimetableResolver newResolver = updater.getTimetableSnapshot();
-        assertNotNull(newResolver);
-        assertNotSame(resolver, newResolver);
+        TimetableSnapshot newSnapshot = updater.getTimetableSnapshot();
+        assertNotNull(newSnapshot);
+        assertNotSame(snapshot, newSnapshot);
     }
 
     @Test
@@ -117,9 +117,9 @@ public class TimetableSnapshotSourceTest {
 
         updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
 
-        TimetableResolver resolver = updater.getTimetableSnapshot();
-        Timetable forToday = resolver.resolve(pattern, serviceDate);
-        Timetable schedule = resolver.resolve(pattern, null);
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        Timetable forToday = snapshot.resolve(pattern, serviceDate);
+        Timetable schedule = snapshot.resolve(pattern, null);
         assertNotSame(forToday, schedule);
         assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
         assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
@@ -166,9 +166,9 @@ public class TimetableSnapshotSourceTest {
 
         updater.applyTripUpdates(graph, Arrays.asList(tripUpdate), "agency");
 
-        TimetableResolver resolver = updater.getTimetableSnapshot();
-        Timetable forToday = resolver.resolve(pattern, serviceDate);
-        Timetable schedule = resolver.resolve(pattern, null);
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        Timetable forToday = snapshot.resolve(pattern, serviceDate);
+        Timetable schedule = snapshot.resolve(pattern, null);
         assertNotSame(forToday, schedule);
         assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
         assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
@@ -272,9 +272,9 @@ public class TimetableSnapshotSourceTest {
         TripPattern tripPattern = ((TransitBoardAlight) outgoingEdges.get(outgoingEdges.size() - 1)).getPattern();
         assertNotNull("Added trip pattern should be found", tripPattern);
         
-        TimetableResolver resolver = updater.getTimetableSnapshot();
-        Timetable forToday = resolver.resolve(tripPattern, serviceDate);
-        Timetable schedule = resolver.resolve(tripPattern, null);
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
+        Timetable schedule = snapshot.resolve(tripPattern, null);
         
         assertNotSame(forToday, schedule);
         
@@ -293,7 +293,7 @@ public class TimetableSnapshotSourceTest {
         updater.purgeExpiredData = (false);
 
         updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
-        TimetableResolver resolverA = updater.getTimetableSnapshot();
+        TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
         updater.purgeExpiredData = (true);
 
@@ -310,14 +310,14 @@ public class TimetableSnapshotSourceTest {
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
         updater.applyTripUpdates(graph, Arrays.asList(tripUpdate), "agency");
-        TimetableResolver resolverB = updater.getTimetableSnapshot();
+        TimetableSnapshot snapshotB = updater.getTimetableSnapshot();
 
-        assertNotSame(resolverA, resolverB);
+        assertNotSame(snapshotA, snapshotB);
 
-        assertSame   (resolverA.resolve(pattern, null ), resolverB.resolve(pattern, null ));
-        assertSame   (resolverA.resolve(pattern, serviceDate),
-                resolverB.resolve(pattern, serviceDate));
-        assertNotSame(resolverA.resolve(pattern, null ), resolverA.resolve(pattern, serviceDate));
-        assertSame   (resolverB.resolve(pattern, null ), resolverB.resolve(pattern, previously));
+        assertSame   (snapshotA.resolve(pattern, null ), snapshotB.resolve(pattern, null ));
+        assertSame   (snapshotA.resolve(pattern, serviceDate),
+                snapshotB.resolve(pattern, serviceDate));
+        assertNotSame(snapshotA.resolve(pattern, null ), snapshotA.resolve(pattern, serviceDate));
+        assertSame   (snapshotB.resolve(pattern, null ), snapshotB.resolve(pattern, previously));
     }
 }
