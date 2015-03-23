@@ -18,6 +18,7 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
@@ -62,6 +63,14 @@ public class TimetableResolver {
         public TripIdAndServiceDate(final String tripId, final ServiceDate serviceDate) {
             this.tripId = tripId;
             this.serviceDate = serviceDate;
+        }
+        
+        public String getTripId() {
+            return tripId;
+        }
+
+        public ServiceDate getServiceDate() {
+            return serviceDate;
         }
 
         @Override
@@ -266,6 +275,16 @@ public class TimetableResolver {
                     it.remove();
                 } else {
                     timetables.put(pattern, toKeepTimetables);
+                }
+            }
+            
+            // Also remove last added trip pattern for days that are purged
+            for (Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator = lastAddedTripPattern
+                    .entrySet().iterator(); iterator.hasNext();) {
+                TripIdAndServiceDate tripIdAndServiceDate = iterator.next().getKey();
+                if (serviceDate.compareTo(tripIdAndServiceDate.getServiceDate()) >= 0) {
+                    iterator.remove();
+                    modified = true;
                 }
             }
 
