@@ -84,7 +84,7 @@ author: Madeincima.it
     .otp-widget-header-buttons div:first-child{display:none;}
     .otp-widget-header-button{margin-left:4px;font-weight:normal;}
 
-    #otp-planner-optionsWidget-locSelector-reverseButton{background: #fff url(images/5t/arrow-revert-fields.gif) -27px 0 no-repeat;cursor: pointer;display: block;height:45px;width: 30px;}
+    #otp-planner-optionsWidget-locSelector-reverseButton{background: #fff url(images/5t/arrow-revert-fields.gif) -27px 0 no-repeat;cursor: pointer;display: block;height:25px;width:20px;border:0;position:absolute;top:27%;left:90%;}
     #otp-planner-optionsWidget-locSelector-reverseButton:hover{background-position:0 0;}
     #otp-planner-optionsWidget-locSelector-reverseButton img{display:none;}
 
@@ -100,7 +100,14 @@ author: Madeincima.it
     /* elementi nascosti -> valutare se servono o se vanno invece rimossi da codice*/
     /*.otp-tripViewer-select{display:none;}*/
 
+    .address-fields{float:left;width:97%;max-width:370px;margin-bottom:10px;position:relative;}
+    .address-fields .field{float:left;width:88%;margin-bottom:8px;}
+    .address-fields label{float:left;width:20%;min-width:50px;text-align:right;margin-right:10px;padding-top:6px;margin-bottom:5px;}
+    .address-fields input{float:left;width:75%;padding:5px 10px 5px 5px;}
 
+    #otp-planner-optionsWidget-timeSelector-timeSelector{width:100%;clear:both;margin-bottom:5px;}
+    #otp-planner-optionsWidget-modeSelector{margin-left:10px;width:80%;max-width:255px;}
+    .otp-minimized-tab{background:#fff;border:#fff;text-transform:uppercase;color:#1f4168;padding:9px 10px;font-size:1em;text-align:center;}
 
 
 }/* END MEDIA SCREEN*/	

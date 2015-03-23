@@ -2,34 +2,25 @@
 
 <script id="otp-tripOptions-locations" type="text/html">
 
-    <div style="width: 2.5em; float:left;">
-        <div style="height: 2em;">{{start}}:</div>
-        <div>{{end}}:</div>
-    </div>
         
-    <div class="notDraggable" style="position: relative; margin-left: 4em; height: 3.6em; overflow: hidden;">
-        <div style="position: absolute; left:0px; right: 30px; height: 20px;">
-            <div style="position: absolute; left:0px; right: 16px; top:1px; bottom: 0px;">
-                <input id="{{widgetId}}-start" class="borderBox otp-tripOptions-loc-input">
-            </div>
-            <div style="position: absolute; top:0px; bottom: 0px; right: 0px; width: 16px;">
-                <button id="{{widgetId}}-startDropdown" class="borderBox otp-tripOptions-loc-dropdownBtn">&#x25BC;</button>
-            </div>
+    <div class="address-fields notDraggable">
+        
+        <div class="field">
+            <label>{{start}}:</label>
+            <input id="{{widgetId}}-start" class="borderBox otp-tripOptions-loc-input">
+            <!-- button id="{{widgetId}}-startDropdown" class="borderBox otp-tripOptions-loc-dropdownBtn">&#x25BC;</button-->
         </div>
-        <div style="position: absolute; top: 1.8em; left:0px; right: 30px; height: 20px;">
-            <div style="position: absolute; left:0px; right: 16px; top:1px; bottom: 0px;">
-                <input id="{{widgetId}}-end" class="borderBox otp-tripOptions-loc-input">
-            </div>
-            <div style="position: absolute; top:0px; bottom: 0px; right: 0px; width: 16px;">
-                <button id="{{widgetId}}-endDropdown" class="borderBox otp-tripOptions-loc-dropdownBtn">&#x25BC;</button>
-            </div>
+
+        <div class="field">
+            <label>{{end}}:</label>
+            <input id="{{widgetId}}-end" class="borderBox otp-tripOptions-loc-input">
+            <!-- button id="{{widgetId}}-endDropdown" class="borderBox otp-tripOptions-loc-dropdownBtn">&#x25BC;</button-->
         </div>
-        <div style="position: absolute; top: 10px; right:0px; width: 20px; height: 20px; background: red;">
-            <button id="{{widgetId}}-reverseButton" class="otp-tripOptions-loc-reverseBtn"><img src="images/reverse.png" /></button>
-        </div>
+
+        <button id="{{widgetId}}-reverseButton" class="otp-tripOptions-loc-reverseBtn"></button>
+
     </div>
 
-    <div style="clear:both;"></div>
 
     {{#showGeocoders}}
         <div style="margin-top:5px;">
