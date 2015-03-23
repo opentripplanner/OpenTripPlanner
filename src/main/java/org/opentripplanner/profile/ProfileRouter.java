@@ -163,6 +163,13 @@ public class ProfileRouter {
         while ( ! queue.empty()) {
             /* Get the minimum-time unfinished ride off the queue. */
             Ride ride = queue.extract_min();
+            
+            // retainedRides must contain the key of this stop cluster, because it either contains this ride
+            // or another ride that dominated this ride
+            // note that domination is only done once rides are finished
+            if (!retainedRides.get(ride.from).contains(ride) && !ride.equals(initialRides.get(ride.from)))
+                continue;
+            
             //LOG.info("dequeued ride {}", ride);
             //ride.dump();
             // maybe when ride is complete, then find transfers here, but that makes for more queue operations.
