@@ -376,6 +376,9 @@ otp.modules.planner.PlannerModule =
         this.currentRequest = $.ajax(url, {
             data:       queryParams,
             dataType:   'JSON',
+            //Sends arrays as &b=1&b=2 instead of b[]=1&b[]=2 which is what
+            //Jersey expects
+            traditional: true,
 
             success: function(data) {
                 $('#otp-spinner').hide();
