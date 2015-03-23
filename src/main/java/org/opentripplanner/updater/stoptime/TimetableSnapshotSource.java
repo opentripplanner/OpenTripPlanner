@@ -426,17 +426,30 @@ public class TimetableSnapshotSource {
         cancelPreviouslyAddedTrip(tripId, serviceDate);
         
         //
-        // Handle added trip
+        // Create added trip
         //
         
-        // Create new Route
-        Route route = new Route();
-        route.setId(new AgencyAndId(feedId, tripId));
-        route.setAgency(dummyAgency);
-        // TODO: how should the route type be determined?
-        route.setType(3); // Bus. Used for short- and long-distance bus routes.
-        // Create route name
-        route.setLongName(tripId);
+        Route route = null;
+        if (tripUpdate.getTrip().hasRouteId()) {
+            // Try to find route
+            route = getRouteForRouteId(tripUpdate.getTrip().getRouteId());
+        }
+        
+        if (route == null) {
+            // Create new Route
+            route = new Route();
+            // Use route id of trip descriptor if available
+            if (tripUpdate.getTrip().hasRouteId()) {
+                route.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getRouteId()));
+            } else {
+                route.setId(new AgencyAndId(feedId, tripId));
+            }
+            route.setAgency(dummyAgency);
+            // Guess the route type as it doesn't exist yet in the specifications
+            route.setType(3); // Bus. Used for short- and long-distance bus routes.
+            // Create route name
+            route.setLongName(tripId);
+        }
         
         // Create new Trip
         Trip trip = new Trip();
@@ -628,10 +641,34 @@ public class TimetableSnapshotSource {
     }
 
     /**
+     * Retrieve route given a route id without an agency
+     * 
+     * @param routeId route id without the agency
+     * @return route or null if route can't be found in graph index
+     */
+    private Route getRouteForRouteId(String routeId) {
+        /* Lazy-initialize a separate index that ignores agency IDs.
+         * Stopgap measure assuming no cross-feed ID conflicts, until we get GTFS loader replaced. */
+        if (graphIndex.routeForIdWithoutAgency == null) {
+            Map<String, Route> map = Maps.newHashMap();
+            for (Route route : graphIndex.routeForId.values()) {
+                Route previousValue = map.put(route.getId().getId(), route);
+                if (previousValue != null) {
+                    LOG.warn("Duplicate route id detected when agency is ignored for "
+                            + "realtime updates: {}", route.getId().getId());
+                }
+            }
+            graphIndex.routeForIdWithoutAgency = map;
+        }
+        Route route = graphIndex.routeForIdWithoutAgency.get(routeId);
+        return route;
+    }
+    
+    /**
      * Retrieve trip given a trip id without an agency
      * 
      * @param tripId trip id without the agency
-     * @return trip or null if trip doesn't exist
+     * @return trip or null if trip can't be found in graph index
      */
     private Trip getTripForTripId(String tripId) {
         /* Lazy-initialize a separate index that ignores agency IDs.
@@ -641,7 +678,8 @@ public class TimetableSnapshotSource {
             for (Trip trip : graphIndex.tripForId.values()) {
                 Trip previousValue = map.put(trip.getId().getId(), trip);
                 if (previousValue != null) {
-                    LOG.warn("Duplicate trip id detected when agency is ignored for realtime updates: {}", tripId);
+                    LOG.warn("Duplicate trip id detected when agency is ignored for realtime"
+                            + "updates: {}", trip.getId().getId());
                 }
             }
             graphIndex.tripForIdWithoutAgency = map;

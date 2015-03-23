@@ -26,9 +26,7 @@ import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
@@ -88,6 +86,7 @@ public class GraphIndex {
     private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex = null;
 
     /* Extra indices for applying realtime updates (lazy-initialized). */
+    public Map<String, Route> routeForIdWithoutAgency = null;
     public Map<String, Trip> tripForIdWithoutAgency = null;
     public Map<String, Stop> stopForIdWithoutAgency = null;
 
