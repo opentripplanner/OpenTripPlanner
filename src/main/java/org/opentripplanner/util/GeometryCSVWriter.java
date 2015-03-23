@@ -54,6 +54,20 @@ public class GeometryCSVWriter {
      *
      * @param csvColumns Name of csv columns together with geo field name
      * @param geo_field Name of geo field
+     * @param csvWriter existing csvWriter
+     */
+    public GeometryCSVWriter(List<String> csvColumns, String geo_field, CsvWriter csvWriter) {
+        this.csvWriter = csvWriter;
+        constructor(csvColumns, geo_field, null);
+    }
+
+    /**
+     * Finds geo field index and writes header into CSV file
+     *
+     * With help of {@link #constructor(java.util.List, String, String)}
+     *
+     * @param csvColumns Name of csv columns together with geo field name
+     * @param geo_field Name of geo field
      * @param file Path to csv file where this will be saved
      */
     public GeometryCSVWriter(List<String> csvColumns, String geo_field, String file) {
@@ -79,10 +93,12 @@ public class GeometryCSVWriter {
         }
         this.csvColumns = csvColumns;
 
-        if (testWriter != null) {
-            csvWriter = new CsvWriter(testWriter, ',');
-        } else {
-            csvWriter = new CsvWriter(file, ',', Charset.forName("UTF8"));
+        if (file != null) {
+            if (testWriter != null) {
+                csvWriter = new CsvWriter(testWriter, ',');
+            } else {
+                csvWriter = new CsvWriter(file, ',', Charset.forName("UTF8"));
+            }
         }
         try {
             csvWriter.writeRecord(csvColumns.toArray(new String[csvColumns.size()]));
