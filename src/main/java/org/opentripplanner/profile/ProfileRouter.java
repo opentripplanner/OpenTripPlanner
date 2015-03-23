@@ -310,7 +310,9 @@ public class ProfileRouter {
         }
         if (newRide.durationLowerBound() > MAX_DURATION) return false;
         // Check whether any existing rides at the same location (stop cluster) dominate the new one.
-        for (Ride oldRide : retainedRides.get(cluster)) {
+        for (Iterator<Ride> it = retainedRides.get(cluster).iterator(); it.hasNext();) {
+            Ride oldRide = it.next();
+            
             if (oldRide.to == null) oldRide = oldRide.previous; // rides may be unfinished
             // New rides must be strictly better (min and max) than any existing one with less transfers.
             // This avoids alternatives formed by simply inserting extra unnecessary rides.
@@ -323,6 +325,12 @@ public class ProfileRouter {
             // In this case we want to keep it as long as it's sometimes better than all the others (time ranges overlap).
             if (newRide.durationLowerBound() > oldRide.durationUpperBound() + request.suboptimalMinutes) {
                 return false;
+            }
+            
+            if (oldRide.durationLowerBound() > newRide.durationUpperBound() + request.suboptimalMinutes) {
+                // old ride is dominated by new ride, remove it
+                // TODO: remove propagation from old ride at this location? Or do we want to do this?
+                it.remove();
             }
         }
         retainedRides.put(cluster, newRide);
