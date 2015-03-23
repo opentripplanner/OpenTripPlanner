@@ -111,6 +111,11 @@ public class MavenVersion implements Serializable {
         return String.format("%s => %s UID=%d", version, this.toString(), getUID());
     }
 
+    public String getVersion() {
+        String format = "version: %s\nmajor: %s\nminor: %s\npatch: %s\nqualifier: %s\ncommit: %s\n";
+        return String.format(format, version, major, minor, incremental, qualifier, commit);
+    }
+
     public int hashCode () {
         return (qualifier.equals("SNAPSHOT") ? -1 : +1) *
                 (1000000 * major + 1000 * minor + incremental);

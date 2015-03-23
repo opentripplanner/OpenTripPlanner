@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import jersey.repackaged.com.google.common.collect.Lists;
@@ -69,6 +67,10 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--preFlight"},
             description = "Pass the graph to the server in-memory after building it, and saving to disk.")
     public boolean preFlight;
+
+    @Parameter(names = { "--version", },
+            description = "Print the version, and then exit.")
+    public boolean version = false;
 
     /* Options for the server sub-task. */
 
