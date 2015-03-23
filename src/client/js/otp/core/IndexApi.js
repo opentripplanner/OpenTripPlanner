@@ -162,24 +162,10 @@ otp.core.IndexApi = otp.Class({
         callback.call(callbackTarget, variantData);
     },
 
-
-    runStopTimesQuery : function(agencyId, stopId, startTime, endTime, callbackTarget, callback) {
-
-        if(otp.config.useLegacyMillisecondsApi) {
-            startTime *= 1000;
-            endTime *= 1000;
-        }
-        /*
-        var params = {
-            startTime : startTime,
-            endTime : endTime,
-            extended : true,
-        };
-        if(otp.config.routerId !== undefined) {
-            params.routerId = otp.config.routerId;
-        }
-        */
-        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' + stopId + '/stoptimes';
+    //runStopTimesQuery : function(agencyId, stopId, startTime, endTime, callbackTarget, callback) {
+    runStopTimesQuery : function( stopId, date, callbackTarget, callback) {
+        date = moment(date).format('YYYYMMDD');
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' + stopId + '/stoptimes/' + date;
         $.ajax(url, {
             //data:       params,
 

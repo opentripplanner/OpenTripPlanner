@@ -95,24 +95,18 @@ otp.widgets.transit.StopViewerWidget =
 
     runTimesQuery : function() {
         var this_ = this;
-        var startTime = moment(this.datePicker.val(), otp.config.locale.time.date_format).add("hours", -otp.config.timeOffset).unix();
-        this.module.webapp.indexApi.runStopTimesQuery(this.agencyId, this.stopId, startTime+10800, startTime+97200, this, function(data) {
+        //var startTime = moment(this.datePicker.val(), otp.config.locale.time.date_format).add("hours", -otp.config.timeOffset).unix();
+        this.module.webapp.indexApi.runStopTimesQuery(this.stopId, this.datePicker.datepicker("getDate"), this, function(data) {
             this_.times = [];
-            /*
-            for(var i=0; i < data.stopTimes.length; i++) {
-                var time = data.stopTimes[i];
-                if(time.phase == "departure") {
-                    this_.times.push(time);
-                }
-            }*/
-            // here we are rearranging a bit the stoptimes, flatting and sorting;
+            // rearrange stoptimes, flattening and sorting;
             _.each(data, function(stopTime){
                 var routeId = stopTime.pattern.id.substring(0,stopTime.pattern.id.lastIndexOf(':'));
-                var pushTime = {};
-                pushTime.routeShortName = this_.module.webapp.indexApi.routes[routeId].routeData.shortName;
-                pushTime.routeLongName = this_.module.webapp.indexApi.routes[routeId].routeData.longName;
                 _.each(stopTime.times,function(time){
+                    var pushTime = {};
+                    pushTime.routeShortName = this_.module.webapp.indexApi.routes[routeId].routeData.shortName;
+                    pushTime.routeLongName = this_.module.webapp.indexApi.routes[routeId].routeData.longName;
                     pushTime.time = time.realtimeDeparture;
+                    pushTime.serviceDay = time.serviceDay;
                     this_.times.push(pushTime);
                 });
             });
@@ -133,19 +127,20 @@ otp.widgets.transit.StopViewerWidget =
 
         for(var i = 0; i < this.times.length; i++) {
             var time = this.times[i];
-            time.formattedTime = otp.util.Time.formatItinTime(time.time*1000, otp.config.locale.time.time_format);
+            //time.formattedTime = otp.util.Time.formatItinTime(time.time*1000, otp.config.locale.time.time_format);
+            time.formattedTime = moment.utc(time.time*1000).format(otp.config.locale.time.time_format);
             //FIXME: There is probably a better way to translate to and block
             //then in each call separately
             time.to = to_trans;
             time.block = block_trans;
             ich['otp-stopViewer-timeListItem'](time).appendTo(this.timeList);
-            var diff = Math.abs(this.activeTime - time.time*1000);
+            var diff = Math.abs(this.activeTime - (time.time + time.serviceDay)*1000);
             if(diff < minDiff) {
                 minDiff = diff;
                 bestIndex = i;
             }
         }
-        this.timeList.scrollTop(((bestIndex/this.times.length) * this.timeList[0].scrollHeight) - this.timeList.height()/2 + $(this.timeList.find(".otp-stopViewer-timeListItem")[0]).height()/2);
+        this.timeList.scrollTop(this.timeList.find(".otp-stopViewer-timeListItem")[bestIndex].offsetTop);
     },
 
     setActiveTime : function(activeTime) {
