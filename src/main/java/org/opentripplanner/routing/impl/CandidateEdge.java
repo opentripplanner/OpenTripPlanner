@@ -201,7 +201,7 @@ public class CandidateEdge {
             out |= StreetEdge.CLASS_TRAIN_PLATFORM;
         }
         if (mode.getBusish() ) { 
-            // includes CABLE_CAR
+            // includes CABLECAR
             out |= StreetEdge.CLASS_OTHER_PLATFORM;
         }
         return out;

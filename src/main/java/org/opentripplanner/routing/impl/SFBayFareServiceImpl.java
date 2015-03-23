@@ -41,7 +41,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     public static final int SFMTA_TRANSFER_DURATION = 60 * 90;
     public static final int BART_TRANSFER_DURATION =  60 * 60;
     public static final float SFMTA_BASE_FARE = 2.00f;
-    public static final float CABLE_CAR_FARE = 5.00f;
+    public static final float CABLECAR_FARE = 5.00f;
     public static final float AIRBART_FARE = 3.00f;
     public static final float SFMTA_BART_TRANSFER_FARE = 1.75f;
     public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<String>(Arrays.asList(
@@ -72,9 +72,9 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
                     bartBlock = null;
                 }
                 if (agencyId.equals("SFMTA")) {
-                    if (ride.classifier == TraverseMode.CABLE_CAR) {
+                    if (ride.classifier == TraverseMode.CABLECAR) {
                         // no transfers issued or accepted
-                        cost += CABLE_CAR_FARE;
+                        cost += CABLECAR_FARE;
                     } else if (sfmtaTransferIssued == null || 
                         sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.endTime) {
                         sfmtaTransferIssued = ride.startTime;

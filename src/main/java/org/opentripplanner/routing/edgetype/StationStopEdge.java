@@ -50,7 +50,7 @@ public class StationStopEdge extends Edge {
     @Override
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);
-        s1.setBackMode(TraverseMode.LEG_SWITCH);
+        s1.setBackMode(TraverseMode.LEGSWITCH);
         s1.incrementWeight(1);
         // Increment weight, but not time. See Javadoc on this class.
         return s1.makeState();

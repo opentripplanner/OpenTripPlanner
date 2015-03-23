@@ -36,7 +36,7 @@ public class LegSwitchingEdge extends Edge {
 	@Override
 	public State traverse(State s0) {
 		StateEditor editor = s0.edit(this);
-		editor.setBackMode(TraverseMode.LEG_SWITCH);
+		editor.setBackMode(TraverseMode.LEGSWITCH);
 		return editor.makeState();
 	}
 

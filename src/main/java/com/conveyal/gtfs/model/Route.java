@@ -26,7 +26,7 @@ public class Route extends Entity { // implements Entity.Factory<Route>
     public static final int RAIL = 2;
     public static final int BUS = 3;
     public static final int FERRY = 4;
-    public static final int CABLE_CAR = 4;
+    public static final int CABLECAR = 4;
     public static final int GONDOLA = 4;
     public static final int FUNICULAR = 5;
 

@@ -119,8 +119,8 @@ public class GraphPathToTripPlanConverterTest {
     }
 
     /**
-     * Test that a LEG_SWITCH mode at the end of a graph path does not generate an extra leg.
-     * Also test that such a LEG_SWITCH mode does not show up as part of the itinerary.
+     * Test that a LEGSWITCH mode at the end of a graph path does not generate an extra leg.
+     * Also test that such a LEGSWITCH mode does not show up as part of the itinerary.
      */
     @Test
     public void testEndWithLegSwitch() {
