@@ -47,5 +47,8 @@ public class ProfileRequest implements Serializable, Cloneable {
       alternatives out a bit to account for the fact that they don't always run on schedule.
     */
     public int suboptimalMinutes;
-
+    
+    public ProfileRequest clone () throws CloneNotSupportedException {
+        return (ProfileRequest) super.clone();
+    }
 }

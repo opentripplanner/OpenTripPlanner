@@ -1,9 +1,11 @@
 package org.opentripplanner.api.parameter;
 
 import com.beust.jcommander.internal.Sets;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -16,8 +18,9 @@ import java.util.Set;
  * language of mode specifications that may be given in the mode query parameter. They are then converted
  * into more efficient and useful representation in the routing request.
  */
-public class QualifiedModeSet {
-
+public class QualifiedModeSet implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     public Set<QualifiedMode> qModes = Sets.newHashSet();
 
     public QualifiedModeSet(String s) {
