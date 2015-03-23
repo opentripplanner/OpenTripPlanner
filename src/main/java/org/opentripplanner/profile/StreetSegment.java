@@ -64,6 +64,9 @@ public class StreetSegment {
             // populate the streetEdges array
             for(WalkStep walkStep : leg.walkSteps) {
                 int i = 0;
+                // TODO this initialization logic seems like it should be in the walkStep constructor,
+                // or walkstep and edgeInfo should be merged. We are also iterating over the edges twice (see above)
+                // to build up the geometry separately.
                 for(Edge edge : walkStep.edges) {
                     StreetEdgeInfo edgeInfo = new StreetEdgeInfo(edge);
                     if(i == 0) {
