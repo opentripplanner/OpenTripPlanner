@@ -179,7 +179,9 @@ public class TimetableSnapshotSourceTest {
     @Test
     public void testHandleAddedTrip() throws ParseException {
         // GIVEN
-        ServiceDate serviceDate = ServiceDate.parseString("20150317");
+        
+        // Get service date of today because old dates will be purged after applying updates
+        ServiceDate serviceDate = new ServiceDate(Calendar.getInstance());
         
         String addedTripId = "added_trip";
         
