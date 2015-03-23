@@ -34,6 +34,7 @@ import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.annotation.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.annotation.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
+import org.opentripplanner.graph_builder.services.DefaultPublicTransitEdgeFactory;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
@@ -60,6 +61,7 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.NamedArea;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
+import org.opentripplanner.routing.edgetype.PublicTransitEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -128,6 +130,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * around.
      */
     public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
+
+    public DefaultPublicTransitEdgeFactory ptEdgeFactory = new DefaultPublicTransitEdgeFactory();
 
     /**
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
@@ -536,8 +540,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
                 StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(way,
                         wayData.getPermission(), graph);
-                if (!OSMFilter.isWayRoutable(way) || permissions.allowsNothing())
-                    continue;
+                if (!OSMFilter.isWayRoutable(way) || permissions.allowsNothing()) {
+                    //do not skip over public transport ways even if they are not routable (they are used in linking)
+                    if (!way.isPublicTransport()) {
+                        continue;
+                    }
+                }
 
                 // handle duplicate nodes in OSM ways
                 // this is a workaround for crappy OSM data quality
@@ -647,14 +655,22 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             elevationData.put(endEndpoint, elevation);
                         }
                     }
-                    P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
-                            way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
+                    if (way.isPublicTransport()) {
+                        P2<PublicTransitEdge> streets = getEdgesForPT(startEndpoint, endEndpoint,
+                                way, i, osmStartNode.getId(), osmEndNode.getId(), geometry);
 
-                    StreetEdge street = streets.first;
-                    StreetEdge backStreet = streets.second;
-                    applyWayProperties(street, backStreet, wayData, way);
+                    } else {
+                        P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
+                                way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
-                    applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
+                        StreetEdge street = streets.first;
+                        StreetEdge backStreet = streets.second;
+                        applyWayProperties(street, backStreet, wayData, way);
+
+                        applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
+                    }
+
+
                     startNode = endNode;
                     osmStartNode = osmdb.getNode(startNode);
                 }
@@ -1082,6 +1098,43 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             return street;
         }
 
+        /**
+         * Creates graph edges for public transport (rail, tram, subway)
+         * @return
+         */
+        private P2<PublicTransitEdge> getEdgesForPT(IntersectionVertex start,
+                                                    IntersectionVertex end, OSMWay way, int index, long startNode, long endNode,
+                                                    LineString geometry) {
+            LineString backGeometry = (LineString) geometry.reverse();
+            PublicTransitEdge street = null, backStreet = null;
+            double length = this.getGeometryLengthMeters(geometry);
+
+            String label = "way " + way.getId() + " from " + index;
+            label = unique(label);
+            String name = getNameForWay(way, label);
+
+            TraverseMode ptype = way.getPublicTransitType();
+            if (!ptype.isTransit()) {
+                LOG.warn("Way {} has unknown railway: {}", way.getId(), way.getTag("railway"));
+            }
+
+            street = ptEdgeFactory.createEdge(start, end, geometry, name, length, ptype, false);
+
+            OSMLevel level = osmdb.getLevelForWay(way);
+            street.setLevel(level);
+            /*if (customNamer != null) {
+                customNamer.nameWithEdge(way, street);
+            }*/
+            backStreet = ptEdgeFactory.createEdge(end, start, backGeometry, name, length, ptype, true);
+            backStreet.setLevel(level);
+
+            if (street != null && backStreet != null) {
+                backStreet.shareData(street);
+            }
+
+            return new P2<PublicTransitEdge>(street, backStreet);
+
+        }
         // TODO Set this to private once WalkableAreaBuilder is gone
         protected String getNameForWay(OSMWithTags way, String id) {
             String name = way.getAssumedName();

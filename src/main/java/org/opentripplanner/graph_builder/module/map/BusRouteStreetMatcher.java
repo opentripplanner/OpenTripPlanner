@@ -78,7 +78,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
                     if (pattern.geometry == null) {
                         continue;
                     }
-                    List<Edge> edges = matcher.match(pattern.geometry);
+                    List<Edge> edges = matcher.match(pattern.geometry, pattern.mode);
                     if (edges == null || edges.isEmpty()) {
                         log.warn("Could not match to street network: {}", pattern);
                         continue;
