@@ -15,6 +15,7 @@ package org.opentripplanner.updater.stoptime;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -422,21 +423,7 @@ public class TimetableSnapshotSource {
         // Check whether trip id has been used for previously ADDED trip message and cancel
         // previously created trip
         String tripId = tripUpdate.getTrip().getTripId();
-        {
-            TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
-            if (pattern != null) {
-                // Cancel trip times for this trip in this pattern
-                Timetable timetable = buffer.resolve(pattern, serviceDate);
-                int tripIndex = timetable.getTripIndex(tripId);
-                if (tripIndex == -1) {
-                    LOG.warn("Could not cancel previously added trip {}", tripId);
-                } else {
-                    TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
-                    newTripTimes.cancel();
-                    buffer.update(pattern, newTripTimes, serviceDate);
-                }
-            }
-        }
+        cancelPreviouslyAddedTrip(tripId, serviceDate);
         
         //
         // Handle added trip
@@ -531,9 +518,11 @@ public class TimetableSnapshotSource {
         // Get cached trip pattern or create one if it doesn't exist yet
         TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
         
-        // Add service code to bitset of pattern
+        // Add service code to bitset of pattern (using copy on write)
         int serviceCode = graph.serviceCodes.get(trip.getServiceId());
-        pattern.getServices().set(serviceCode);
+        BitSet services = (BitSet) pattern.getServices().clone();
+        services.set(serviceCode);
+        pattern.setServices(services);
         
         // Create new trip times
         TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
@@ -549,6 +538,35 @@ public class TimetableSnapshotSource {
         
         // Add new trip times to the buffer
         boolean success = buffer.update(pattern, newTripTimes, serviceDate); 
+        return success;
+    }
+
+    /**
+     * Cancel previously added trip from buffer if there is a previously added trip with given trip
+     * id (without agency id) on service date
+     * 
+     * @param tripId trip id without agency id
+     * @param serviceDate service date
+     * @return true if a previously added trip was cancelled
+     */
+    private boolean cancelPreviouslyAddedTrip(String tripId, final ServiceDate serviceDate) {
+        boolean success = false;
+        
+        TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
+        if (pattern != null) {
+            // Cancel trip times for this trip in this pattern
+            Timetable timetable = buffer.resolve(pattern, serviceDate);
+            int tripIndex = timetable.getTripIndex(tripId);
+            if (tripIndex == -1) {
+                LOG.warn("Could not cancel previously added trip {}", tripId);
+            } else {
+                TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
+                newTripTimes.cancel();
+                buffer.update(pattern, newTripTimes, serviceDate);
+                success = true;
+            }
+        }
+        
         return success;
     }
 
@@ -570,15 +588,21 @@ public class TimetableSnapshotSource {
         String tripId = tripDescriptor.getTripId(); // This does not include Agency ID, trips are feed-unique.
         TripPattern pattern = getPatternForTripId(tripId);
 
-        if (pattern == null) {
-            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
-            return false;
+        boolean success;
+        if (pattern != null) {
+            // Apply update on the *scheduled* time table and set the updated trip times in the buffer
+            TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
+                    timeZone, serviceDate);
+            success = buffer.update(pattern, updatedTripTimes, serviceDate); 
+        } else {
+            // Try to cancel previously added trip
+            success = cancelPreviouslyAddedTrip(tripId, serviceDate);
+            
+            if (!success) {
+                LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
+            }
         }
 
-        // Apply update on the *scheduled* time table and set the updated trip times in the buffer
-        TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
-                timeZone, serviceDate);
-        boolean success = buffer.update(pattern, updatedTripTimes, serviceDate); 
         return success;
     }
 

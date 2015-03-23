@@ -579,6 +579,13 @@ public class TripPattern implements Serializable {
     public BitSet getServices() {
         return services;
     }
+    
+    /**
+     * @param services bitset of service codes
+     */
+    public void setServices(BitSet services) {
+        this.services = services;
+    }
 
     public String getDirection() {
         return trips.get(0).getTripHeadsign();
