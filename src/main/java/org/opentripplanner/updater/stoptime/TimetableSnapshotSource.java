@@ -227,7 +227,7 @@ public class TimetableSnapshotSource {
                         applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                         break;
                     case MODIFIED:
-                        applied = handleModifiedTrip(tripUpdate, feedId, serviceDate);
+                        applied = validateAndHandleModifiedTrip(graph, tripUpdate, feedId, serviceDate);
                         break;
                 }
 
@@ -534,22 +534,22 @@ public class TimetableSnapshotSource {
             trip.setServiceId(serviceIds.iterator().next());
         }
         
-        boolean success = addTripToGraphAndBuffer(trip, tripUpdate, stops, serviceDate, graph); 
+        boolean success = addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate); 
         return success;
     }
 
     /**
      * Add a (new) trip to the graph and the buffer
-     * 
+     * @param graph graph
      * @param trip trip
      * @param tripUpdate trip update containing stop time updates
      * @param stops list of stops corresponding to stop time updates
      * @param serviceDate service date of trip
-     * @param graph graph
+     * 
      * @return true iff successful
      */
-    private boolean addTripToGraphAndBuffer(Trip trip, final TripUpdate tripUpdate,
-            final List<Stop> stops, final ServiceDate serviceDate, final Graph graph) {
+    private boolean addTripToGraphAndBuffer(final Graph graph, Trip trip,
+            final TripUpdate tripUpdate, final List<Stop> stops, final ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(stops);
         Preconditions.checkArgument(tripUpdate.getStopTimeUpdateCount() == stops.size(),
@@ -708,7 +708,16 @@ public class TimetableSnapshotSource {
         return false;
     }
 
-    private boolean handleModifiedTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
+    /**
+     * Validate and handle GTFS-RT TripUpdate message containing a MODIFIED trip.
+     * 
+     * @param graph graph to update 
+     * @param tripUpdate GTFS-RT TripUpdate message
+     * @param feedId
+     * @param serviceDate
+     * @return true iff successful
+     */
+    private boolean validateAndHandleModifiedTrip(Graph graph, TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         // TODO: Handle modified trip
         
         // TODO: change service date of trip?
