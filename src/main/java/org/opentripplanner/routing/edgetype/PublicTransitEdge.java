@@ -42,6 +42,8 @@ public class PublicTransitEdge extends Edge {
 
     private String name;
 
+    private long osmID;
+
     private int[] compactGeometry;
 
     private boolean isBack;
@@ -139,6 +141,14 @@ public class PublicTransitEdge extends Edge {
 	    }
 	}
 
+    public long getOsmID() {
+        return osmID;
+    }
+
+    public void setOsmID(long osmID) {
+        this.osmID = osmID;
+    }
+
     @Override
     public double getDistance() {
         return length_mm / 1000.0; // CONVERT FROM FIXED MILLIMETERS TO FLOAT METERS
@@ -186,5 +196,22 @@ public class PublicTransitEdge extends Edge {
             return Integer.toString(floorNumber) + " [" + Boolean.toString(reliableLevel) + "]";
         }
 
+    }
+
+    public Integer getLevel() {
+        return floorNumber;
+    }
+
+    public Boolean isReliableLevel() {
+        return reliableLevel;
+    }
+
+    @Override
+    public String toString() {
+        return "PublicTransitEdge{" +
+                "name='" + name + '\'' +
+                ", publicTransitType=" + publicTransitType +
+                ", level='" + getNiceLevel() + '\'' +
+                '}';
     }
 }
