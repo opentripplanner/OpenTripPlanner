@@ -404,8 +404,7 @@ public class ProfileRouter {
      */
     private Collection<StopAtDistance> findClosestStops(final QualifiedMode qmode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        RoutingRequest rr = new RoutingRequest();
-        rr.setModes(new TraverseModeSet());
+        RoutingRequest rr = new RoutingRequest(new TraverseModeSet());
         qmode.applyToRoutingRequest(rr, request.transitModes.isTransit());
         rr.from = (new GenericLocation(request.fromLat, request.fromLon));
         // FIXME requires destination to be set, not necessary for analyst
@@ -472,8 +471,7 @@ public class ProfileRouter {
     /** Look for an option connecting origin to destination without using transit. */
     private void findDirectOption(QualifiedMode qmode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        RoutingRequest rr = new RoutingRequest();
-        rr.setModes(new TraverseModeSet());
+        RoutingRequest rr = new RoutingRequest(new TraverseModeSet());
         qmode.applyToRoutingRequest(rr, false); // force no transit
         rr.from = (new GenericLocation(request.fromLat, request.fromLon));
         rr.to = new GenericLocation(request.toLat, request.toLon);
