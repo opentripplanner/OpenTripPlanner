@@ -224,8 +224,8 @@ public class TimetableSnapshotSource {
                         case CANCELED:
                             applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
                             break;
-                        case REPLACEMENT:
-                            applied = handleReplacementTrip(tripUpdate, feedId, serviceDate);
+                        case MODIFIED:
+                            applied = handleModifiedTrip(tripUpdate, feedId, serviceDate);
                             break;
                     }
                 } else {
@@ -618,9 +618,9 @@ public class TimetableSnapshotSource {
         return false;
     }
 
-    private boolean handleReplacementTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
-        // TODO: Handle replacement trip
-        LOG.warn("Replacement trips are currently unsupported. Skipping TripUpdate.");
+    private boolean handleModifiedTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
+        // TODO: Handle modified trip
+        LOG.warn("Modified trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
