@@ -12,6 +12,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package org.opentripplanner.util;
 
+import com.csvreader.CsvWriter;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import java.io.StringWriter;
@@ -86,5 +87,39 @@ public class GeometryCSVWriterTest {
                 + "POINT (1 3.4),first,0,55\n"
                 + "POINT (2 2.8),second,1,12\n";
         assertEquals(expected, writer.testWriter.toString());
+    }
+
+    /**
+     * Test of GeometryCSVWriter with Geometry as first column. Adding Coordinates.
+     */
+    @Test
+    public void testCoordinateAdd() {
+        GeometryCSVWriter writer = new GeometryCSVWriter(Arrays.asList("geo", "name", "type", "height"), "geo", new StringWriter());
+        writer.add(Arrays.asList("first", "0", "55"), geometries.get(0).getCoordinate());
+        writer.add(Arrays.asList("second", "1", "12"), geometries.get(1).getCoordinate());
+        writer.close();
+        //System.out.println(writer.test_writer.toString());
+        String expected = "geo,name,type,height\n"
+                + "POINT (1 3.4),first,0,55\n"
+                + "POINT (2 2.8),second,1,12\n";
+        assertEquals(expected, writer.testWriter.toString());
+    }
+
+    /**
+     * Test of GeometryCSVWriter with Geometry as first column and using external csvwriter.
+     */
+    @Test
+    public void testExternalCsvWriter() {
+        StringWriter testWriter = new StringWriter();
+        CsvWriter csvWriter = new CsvWriter(testWriter, ',');
+        GeometryCSVWriter writer = new GeometryCSVWriter(Arrays.asList("geo", "name", "type", "height"), "geo", csvWriter);
+        writer.add(Arrays.asList("first", "0", "55"), geometries.get(0));
+        writer.add(Arrays.asList("second", "1", "12"), geometries.get(1));
+        writer.close();
+        //System.out.println(writer.test_writer.toString());
+        String expected = "geo,name,type,height\n"
+                + "POINT (1 3.4),first,0,55\n"
+                + "POINT (2 2.8),second,1,12\n";
+        assertEquals(expected, testWriter.toString());
     }
 }
