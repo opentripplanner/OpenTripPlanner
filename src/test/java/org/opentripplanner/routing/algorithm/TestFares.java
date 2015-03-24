@@ -13,10 +13,7 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import java.io.File;
-
 import junit.framework.TestCase;
-
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -32,6 +29,8 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
+
+import java.io.File;
 
 public class TestFares extends TestCase {
 

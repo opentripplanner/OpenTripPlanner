@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Edge;
@@ -38,8 +37,6 @@ import com.vividsolutions.jts.geom.LineString;
  * number of points, size distribution, edge names size, etc...)
  */
 public class GraphStatisticsModule implements GraphBuilderModule {
-
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     /**
      * An set of ids which identifies what stages this graph builder provides (i.e. streets,
@@ -76,7 +73,7 @@ public class GraphStatisticsModule implements GraphBuilderModule {
             if (e.getGeometry() != null) {
                 LineString geometry = e.getGeometry();
                 geomSizeDistribution.add(new NumberQuantifiable<Integer>(geometry.getNumPoints()));
-                double lenMeters = distanceLibrary.fastLength(geometry);
+                double lenMeters = SphericalDistanceLibrary.fastLength(geometry);
                 geomLenDistribution.add(new LogQuantifiable<Double>(lenMeters, 5.0));
             }
         }

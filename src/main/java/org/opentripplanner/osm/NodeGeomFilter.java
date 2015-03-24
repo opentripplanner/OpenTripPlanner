@@ -1,10 +1,9 @@
 package org.opentripplanner.osm;
 
-import java.util.List;
-
 import com.vividsolutions.jts.geom.Envelope;
-
 import crosby.binary.Osmformat;
+
+import java.util.List;
 
 /**
  * Scans through the whole PBF file to find which nodes are inside a bounding geometry.
@@ -46,7 +45,7 @@ public class NodeGeomFilter extends Parser {
     /** For each node or dense node, just check whether it is in the bounding geom. */
     @Override 
     public void handleNode(long id, Node node) {
-        if (inGeom(node.lat, node.lon)) {
+        if (inGeom(node.getLat(), node.getLon())) {
             nodesInGeom.add(id);
         }
     };

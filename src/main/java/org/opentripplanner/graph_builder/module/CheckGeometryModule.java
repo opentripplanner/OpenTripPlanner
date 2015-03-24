@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.annotation.BogusEdgeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusVertexGeometry;
@@ -41,9 +40,6 @@ import com.vividsolutions.jts.geom.Geometry;
  * because the cost is small compared to the pain of debugging.
  */
 public class CheckGeometryModule implements GraphBuilderModule {
-
-
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     /** An set of ids which identifies what stages this graph builder provides (i.e. streets, elevation, transit) */
     public List<String> provides() {
@@ -87,9 +83,9 @@ public class CheckGeometryModule implements GraphBuilderModule {
                     }
                     Coordinate geometryStartCoord = geometryCoordinates[0];
                     Coordinate geometryEndCoord = geometryCoordinates[geometryCoordinates.length - 1];
-                    if (getDistanceLibrary().distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
+                    if (SphericalDistanceLibrary.distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
                         LOG.warn(graph.addBuilderAnnotation(new VertexShapeError(e)));
-                    } else if (getDistanceLibrary().distance(edgeEndCoord, geometryEndCoord) > MAX_VERTEX_SHAPE_ERROR) {
+                    } else if (SphericalDistanceLibrary.distance(edgeEndCoord, geometryEndCoord) > MAX_VERTEX_SHAPE_ERROR) {
                         LOG.warn(graph.addBuilderAnnotation(new VertexShapeError(e)));
                     }
                 }
@@ -103,11 +99,4 @@ public class CheckGeometryModule implements GraphBuilderModule {
         //no inputs to check
     }
 
-    public DistanceLibrary getDistanceLibrary() {
-        return distanceLibrary;
-    }
-
-    public void setDistanceLibrary(DistanceLibrary distanceLibrary) {
-        this.distanceLibrary = distanceLibrary;
-    }
 }

@@ -20,12 +20,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.beust.jcommander.internal.Lists;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
@@ -127,7 +125,7 @@ public class GtfsModule implements GraphBuilderModule {
                 CalendarServiceData data = csfactory.createData();
                 service.addData(data, dao);
 
-                hf.setDefaultStreetToStopTime(gtfsBundle.getDefaultStreetToStopTime());
+                hf.subwayAccessTime = gtfsBundle.subwayAccessTime;
                 hf.run(graph);
 
                 if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {

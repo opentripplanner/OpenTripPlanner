@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -42,6 +41,8 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.DominanceFunction;
+import org.opentripplanner.routing.spt.DominanceFunction.EarliestArrival;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -96,8 +97,6 @@ public class WalkableAreaBuilder {
     private Handler __handler;
 
     private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
-
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
             StreetEdgeFactory edgeFactory, Handler __handler) {
@@ -276,6 +275,7 @@ public class WalkableAreaBuilder {
         }
         RoutingRequest options = new RoutingRequest(mode);
         options.setDummyRoutingContext(graph);
+        options.dominanceFunction = new DominanceFunction.EarliestArrival();
         GenericDijkstra search = new GenericDijkstra(options);
         search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
         Set<Edge> usedEdges = new HashSet<Edge>();
@@ -373,7 +373,7 @@ public class WalkableAreaBuilder {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(areaEntity, false);
 
-            double length = distanceLibrary.distance(startEndpoint.getCoordinate(),
+            double length = SphericalDistanceLibrary.distance(startEndpoint.getCoordinate(),
                     endEndpoint.getCoordinate());
 
             int cls = StreetEdge.CLASS_OTHERPATH;

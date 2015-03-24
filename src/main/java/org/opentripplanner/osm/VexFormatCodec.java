@@ -129,8 +129,11 @@ public class VexFormatCodec {
 
     private void writeNode(long id, Node node) throws IOException {
         writeTagged(id, node);
-        long fixedLat = (long) (node.lat * 1000000);
-        long fixedLon = (long) (node.lon * 1000000);
+        // plain ints should be fine rather than longs:
+        // 2**31 = 2147483648
+        // 180e7 = 1800000000.0
+        long fixedLat = (long) (node.fixedLat);
+        long fixedLon = (long) (node.fixedLon);
         vout.writeSInt64NoTag(prevFixedLat - fixedLat);
         vout.writeSInt64NoTag(prevFixedLon - fixedLon);
         prevFixedLat = fixedLat;
@@ -218,8 +221,7 @@ public class VexFormatCodec {
         node.tags = readTags();
         lat += vin.readSInt64() * 1000000d;
         lon += vin.readSInt64() * 1000000d;
-        node.lat = (float) lat;
-        node.lon = (float) lon;
+        node.setLatLon(lat, lon);
         osm.nodes.put(id, node);
         return false;
     }

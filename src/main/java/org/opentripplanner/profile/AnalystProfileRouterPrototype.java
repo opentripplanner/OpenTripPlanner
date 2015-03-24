@@ -1,9 +1,11 @@
 package org.opentripplanner.profile;
 
 import com.google.common.collect.*;
+
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.common.model.GenericLocation;
@@ -18,6 +20,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -222,7 +225,7 @@ public class AnalystProfileRouterPrototype {
         int maxAccessTime = request.maxWalkTime;
         rr.worstTime = (rr.dateTime + maxAccessTime * 60);
         AStar astar = new AStar();
-        rr.longDistance = true; // this will cause an earliest arrival tree to be used
+        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         rr.setNumItineraries(1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode, minAccessTime * 60);
         astar.setTraverseVisitor(visitor);

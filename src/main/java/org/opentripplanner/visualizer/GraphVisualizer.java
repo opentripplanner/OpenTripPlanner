@@ -74,6 +74,7 @@ import javax.swing.event.ListSelectionListener;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
+import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -83,11 +84,11 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.impl.SPTVisitor;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -372,7 +373,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JPanel leftPanel;
 
+    /* The Processing applet that actually displays the graph. */
     private ShowGraph showGraph;
+
+    /* The set of callbacks that display search progress on the showGraph Processing applet. */
+    public TraverseVisitor traverseVisitor;
 
     public JList<DisplayVertex> nearbyVertices;
 
@@ -398,8 +403,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JCheckBox carCheckBox;
 
-    private JCheckBox cmvCheckBox;
-
     private JTextField searchDate;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -410,8 +413,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JList<GraphBuilderAnnotation> annotationMatches;
     
-    private GraphPathFinder pathservice;
-        
     private DefaultListModel<String> metadataModel;
 
     private HashSet<Vertex> closed;
@@ -441,7 +442,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     private StationsListModel stationsStreetLinkModel;
     
     private JList<TransitStopConnToWantedEdge> stationsStreetLinkList;
-    
+
+    /* The router we are visualizing. */
+    private final Router router;
+
+    /* The graph from the router we are visualizing, note that it will not be updated if the router reloads. */
     private final Graph graph;
 
 	private JRadioButton opQuick;
@@ -512,14 +517,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	private JCheckBox longDistanceModeCheckbox;
 
-    public GraphVisualizer(Graph graph) {
+    public GraphVisualizer(Router router) {
         super();
         LOG.info("Starting up graph visualizer...");
-        
-        this.graph = graph;
-        this.pathservice = null; // FIXME
         setTitle("GraphVisualizer");
-        
+        this.router = router;
+        this.graph = router.graph;
         init();
     }
 
@@ -607,8 +610,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                 State s1 = firstComparePathStates.getSelectedValue();
 				State s2 = secondComparePathStates.getSelectedValue();
                 DominanceFunction pareto = new DominanceFunction.Pareto();
-				System.out.println("s1 dominates s2:" + pareto.dominates(s1, s2));
-				System.out.println("s2 dominates s1:" + pareto.dominates(s2, s1));
+				System.out.println("s1 dominates s2:" + pareto.betterOrEqualAndComparable(s1, s2));
+				System.out.println("s2 dominates s1:" + pareto.betterOrEqualAndComparable(s2, s1));
 			}
         });
         pane.add(dominateButton);
@@ -642,6 +645,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // init center graphical panel
         showGraph = new ShowGraph(this, getGraph());
         pane.add(showGraph, BorderLayout.CENTER);
+        traverseVisitor = new VisualTraverseVisitor(showGraph);
 
         // init left panel
         leftPanel = new JPanel();
@@ -679,9 +683,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(transitCheckBox);
         carCheckBox = new JCheckBox("car");
         pane.add(carCheckBox);
-        cmvCheckBox = new JCheckBox("custom vehicle");
-        pane.add(cmvCheckBox);
-        
+
         // row: arrive by?
         JLabel arriveByLabel = new JLabel("Arrive by?:");
         pane.add(arriveByLabel);
@@ -811,32 +813,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         
         pane.add(optimizeTypePane);
         
-        // long distance mode
-        ItemListener onChangeLongDistanceMode = new ItemListener(){
-        	@Override
-        	public void itemStateChanged(ItemEvent e) {
-        		JCheckBox item = (JCheckBox) e.getItem();
-        		setLongDistanceMode( item.isSelected() );
-        	}
-        };
-        longDistanceModeCheckbox = new JCheckBox("long distance mode");
-        longDistanceModeCheckbox.setSelected(false);
-        longDistanceModeCheckbox.addItemListener( onChangeLongDistanceMode );
-        pane.add(longDistanceModeCheckbox);
-        
 		return pane;
 	}
 	
-	protected void setLongDistanceMode(boolean selected) {
-		if( selected ){
-            // FIXME there is no OTPServer in the visualizer! Maybe just don't use a GraphPathFinder (ex-pathservice) at all and call the GenericAStar directly.
-			this.pathservice = null; // new GraphPathFinder(otpServer);
-		} else {
-            // FIXME there is now only one path service
-			this.pathservice = null; // new ParetoPathService(graph, sptServiceFactory);
-		}
-	}
-
 	OptimizeType getSelectedOptimizeType(){
 		if(opQuick.isSelected()){
 			return OptimizeType.QUICK;
@@ -1788,7 +1767,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         modeSet.setTrainish(trainCheckBox.isSelected());
         modeSet.setBusish(busCheckBox.isSelected());
         modeSet.setCar(carCheckBox.isSelected());
-        modeSet.setCustomMotorVehicle(cmvCheckBox.isSelected());
         // must set generic transit mode last, and only when it is checked
         // otherwise 'false' will clear trainish and busish
         if (transitCheckBox.isSelected())
@@ -1819,31 +1797,26 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.numItineraries = ( Integer.parseInt( this.nPaths.getText() ) );
         
         // apply callback if the options call for it
-        /*
-            TODO apply this to the GenericAStar directly instaed of a wrapping "service"
-        if( dontUseGraphicalCallbackCheckBox.isSelected() ){
-        	sptServiceFactory.setTraverseVisitor(null);
-        } else {
-        	sptServiceFactory.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
-        }
-     */
+        // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
+        // TODO perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
+        // TODO perhaps instead of giving the pathservice a callback, we can just put the visitor in the routing request
+        GraphPathFinder finder = new GraphPathFinder(router);
 
-        // set up a visitor to the path service so we can get the SPT as it's generated
-        SPTVisitor vis = new SPTVisitor();
-        // pathservice.setSPTVisitor(vis);
-        // TODO set visitor -- perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
-        
         long t0 = System.currentTimeMillis();
         // TODO: check options properly intialized (AMB)
-        List<GraphPath> paths = pathservice.getPaths(options);
+        List<GraphPath> paths = finder.graphPathFinderEntryPoint(options);
         long dt = System.currentTimeMillis() - t0;
         searchTimeElapsedLabel.setText( "search time elapsed: "+dt+"ms" );
         
         // grab the spt from the visitor
+        // TODO somehow yank the SPT out of the depths of the call stack... but there multiple SPTs here.
+        // This is why we should probably just use AStar directly.
+        /*
         spt = vis.spt;
         showGraph.setSPT(spt);
         System.out.println( "got spt:"+spt );
-        
+        */
+
         if (paths == null) {
             System.out.println("no path");
             showGraph.highlightGraphPath(null);

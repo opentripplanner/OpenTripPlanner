@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
@@ -56,8 +55,6 @@ public class AreaEdgeList implements Serializable {
 
     private List<NamedArea> areas = new ArrayList<NamedArea>();
 
-    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-
     public List<AreaEdge> getEdges() {
         return edges;
     }
@@ -85,8 +82,6 @@ public class AreaEdgeList implements Serializable {
 
     /**
      * Safely add a vertex to this area. This creates edges to all other vertices unless those edges would cross one of the original edges.
-     * 
-     * @param v
      */
     public void addVertex(IntersectionVertex newVertex, Graph graph) {
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
@@ -134,7 +129,7 @@ public class AreaEdgeList implements Serializable {
         if (intersects.size() == 1) {
             NamedArea area = intersects.get(0);
 
-            double length = distanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
+            double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
             AreaEdge forward = new AreaEdge(from, to, line, area.getName(), length,
                     area.getPermission(), false, this);

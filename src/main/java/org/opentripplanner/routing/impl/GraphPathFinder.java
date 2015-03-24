@@ -39,6 +39,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -95,14 +96,25 @@ public class GraphPathFinder {
             LOG.error("PathService was passed a null routing request.");
             return null;
         }
-        
+
+        // Reuse one instance of AStar for all N requests, which are carried out sequentially
         AStar aStar = new AStar();
         if (options.rctx == null) {
             options.setRoutingContext(router.graph);
             /* Use a pathparser that constrains the search to use SimpleTransfers. */
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
+        // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
+        if (router.graphVisualizer != null) {
+            aStar.setTraverseVisitor(router.graphVisualizer.traverseVisitor);
+            // options.disableRemainingWeightHeuristic = true; // DEBUG
+        }
 
+        // without transit, we'd just just return multiple copies of the same on-street itinerary
+        if (!options.modes.isTransit()) {
+            options.numItineraries = 1;
+        }
+        options.dominanceFunction = new DominanceFunction.MinimumWeight(); // FORCING the dominance function to weight only
         LOG.debug("rreq={}", options);
 
         RemainingWeightHeuristic heuristic;
@@ -114,13 +126,15 @@ public class GraphPathFinder {
         } else {
             heuristic = new EuclideanRemainingWeightHeuristic();
         }
+        // heuristic = new TrivialRemainingWeightHeuristic(); // DEBUG
+
         options.rctx.remainingWeightHeuristic = heuristic;
         /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see 
          * itineraries with far more transfers. We do not expect transfer limiting to improve
          * search times on the LongDistancePathService, so we set it to the maximum we ever expect
          * to see. Because people may use either the traditional path services or the 
          * LongDistancePathService, we do not change the global default but override it here. */
-        options.setMaxTransfers(4);
+        options.maxTransfers = 4;
         options.longDistance = true;
 
         /* In long distance mode, maxWalk has a different meaning. It's the radius around the origin or destination
@@ -305,15 +319,20 @@ public class GraphPathFinder {
             throw new PathNotFoundException();
         }
 
-        for (GraphPath graphPath : paths) {
+        /* Detect and report that most obnoxious of bugs: path reversal asymmetry. */
+        Iterator<GraphPath> gpi = paths.iterator();
+        while (gpi.hasNext()) {
+            GraphPath graphPath = gpi.next();
             // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
             if (request.arriveBy) {
                 if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
                     LOG.error("A graph path arrives after the requested time. This implies a bug.");
+                    gpi.remove();
                 }
             } else {
                 if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
                     LOG.error("A graph path leaves before the requested time. This implies a bug.");
+                    gpi.remove();
                 }
             }
         }

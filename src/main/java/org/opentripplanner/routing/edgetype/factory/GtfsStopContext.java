@@ -27,11 +27,15 @@ import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
-/** Retains graph-wide information between GTFSPatternHopFactory runs on different feeds. */
+/**
+ *  Retains graph-wide information between GTFSPatternHopFactory runs on different feeds.
+ *  FIXME is there any legitimate reason to even do that? Wouldn't it be better to keep each GTFS completely isolated?
+ */
 public class GtfsStopContext {
 
     public HashSet<AgencyAndId> stops = new HashSet<AgencyAndId>();
 
+    // "stationStopNodes" means nodes that are either a station or a stop TODO clarify this name
     public Map<Stop, TransitStationStop> stationStopNodes = new HashMap<Stop, TransitStationStop>();
 
     public Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>(); // FIXME these are stored in the stop vertices now, can remove

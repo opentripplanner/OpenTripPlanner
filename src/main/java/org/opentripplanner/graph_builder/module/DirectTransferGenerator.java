@@ -16,8 +16,6 @@ package org.opentripplanner.graph_builder.module;
 import java.util.*;
 
 import com.google.common.collect.Iterables;
-import org.opentripplanner.common.geometry.DistanceLibrary;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.*;
@@ -42,8 +40,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     private static Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
 
     int maxDuration = 60 * 10;
-
-    DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public List<String> provides() {
         return Arrays.asList("linking");

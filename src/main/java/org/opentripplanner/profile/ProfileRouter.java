@@ -1,10 +1,14 @@
 package org.opentripplanner.profile;
 
 import com.google.common.collect.*;
+
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
+import org.opentripplanner.api.parameter.QualifiedMode;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.pqueue.BinHeap;
@@ -18,6 +22,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -46,10 +51,6 @@ public class ProfileRouter {
     private static final int TIMEOUT = 10; // in seconds, maximum computation time
     public static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
     private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
-    private static final List<TraverseMode> ACCESS_MODES =
-            Lists.newArrayList(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR);
-    private static final List<TraverseMode> EGRESS_MODES =
-            Lists.newArrayList(TraverseMode.WALK);
 
     public final Graph graph;
     public final ProfileRequest request;
@@ -123,9 +124,9 @@ public class ProfileRouter {
             toStopPaths = findClosestStops(true);
             toStops = findClosestPatterns(toStopPaths);
             // Also look for options connecting origin to destination with no transit.
-            for (TraverseMode mode : ACCESS_MODES) {
-                LOG.info("Finding non-transit path for mode {}", mode);
-                if (request.directModes.contains(mode)) findStreetOption(mode); // TODO rename function
+            for (QualifiedMode qmode : request.directModes.qModes) {
+                LOG.info("Finding non-transit path for mode {}", qmode);
+                findDirectOption(qmode);
             }
         }
         LOG.info("Done finding access/egress paths.");
@@ -386,12 +387,11 @@ public class ProfileRouter {
      */
     private Multimap<StopCluster, StopAtDistance> findClosestStops(boolean dest) {
         Multimap<StopCluster, StopAtDistance> pathsByStop = ArrayListMultimap.create();
-        for (TraverseMode mode: (dest ? EGRESS_MODES : ACCESS_MODES)) {
-            if ((dest ? request.egressModes : request.accessModes).contains(mode)) {
-                LOG.info("{} mode {}", dest ? "egress" : "access", mode);
-                for (StopAtDistance sd : findClosestStops(mode, dest)) {
-                    pathsByStop.put(sd.stop, sd);
-                }
+        QualifiedModeSet qModes = dest ? request.egressModes : request.accessModes;
+        for (QualifiedMode qmode : qModes.qModes) {
+            LOG.info("{} mode {}", dest ? "egress" : "access", qmode);
+            for (StopAtDistance sd : findClosestStops(qmode, dest)) {
+                pathsByStop.put(sd.stop, sd);
             }
         }
         return pathsByStop;
@@ -401,31 +401,28 @@ public class ProfileRouter {
      * Perform an on-street search around a point with a specific mode to find nearby stops.
      * @param dest : whether to search at the destination instead of the origin.
      */
-    private Collection<StopAtDistance> findClosestStops(final TraverseMode mode, boolean dest) {
+    private Collection<StopAtDistance> findClosestStops(final QualifiedMode qmode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        RoutingRequest rr = new RoutingRequest(mode);
-        if (mode == TraverseMode.CAR) {
-            //rr.kissAndRide = true; // allow car->walk transition. we are assuming that someone will drop you off.
-            rr.parkAndRide = true; // allow car->walk transition only at tagged park and ride facilities.
-            rr.modes.setWalk(true); // need to walk after dropping the car off
-        }
+        RoutingRequest rr = new RoutingRequest();
+        qmode.applyToRoutingRequest(rr, request.transitModes.isTransit());
         rr.from = (new GenericLocation(request.fromLat, request.fromLon));
-        // FIXME requires destination to be set, not necesary for analyst
+        // FIXME requires destination to be set, not necessary for analyst
         rr.to = new GenericLocation(request.toLat, request.toLon);
         rr.setArriveBy(dest);
         rr.setRoutingContext(graph);
         // Set batch after context, so both origin and dest vertices will be found.
         rr.batch = (true);
         rr.walkSpeed = request.walkSpeed;
+        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
         int minAccessTime = 0;
         int maxAccessTime = request.maxWalkTime;
-        if (mode == TraverseMode.BICYCLE) {
+        if (qmode.mode == TraverseMode.BICYCLE) {
             rr.bikeSpeed = request.bikeSpeed;
             minAccessTime = request.minBikeTime;
             maxAccessTime = request.maxBikeTime;
-        } else if (mode == TraverseMode.CAR) {
+        } else if (qmode.mode == TraverseMode.CAR) {
             rr.carSpeed = request.carSpeed;
             minAccessTime = request.minCarTime;
             maxAccessTime = request.maxCarTime;
@@ -439,7 +436,7 @@ public class ProfileRouter {
         // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         AStar astar = new AStar();
         rr.setNumItineraries(1);
-        StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(mode, minAccessTime * 60);
+        StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(qmode, minAccessTime * 60);
         astar.setTraverseVisitor(visitor);
         astar.getShortestPathTree(rr, 5); // timeout in seconds
         // Save the routing context for later cleanup. We need its temporary edges to render street segments at the end.
@@ -448,11 +445,11 @@ public class ProfileRouter {
     }
 
     static class StopFinderTraverseVisitor implements TraverseVisitor {
-        TraverseMode mode;
+        QualifiedMode qmode;
         int minTravelTimeSeconds = 0;
         Map<StopCluster, StopAtDistance> stopClustersFound = Maps.newHashMap();
-        public StopFinderTraverseVisitor(TraverseMode mode, int minTravelTimeSeconds) {
-            this.mode = mode;
+        public StopFinderTraverseVisitor(QualifiedMode qmode, int minTravelTimeSeconds) {
+            this.qmode = qmode;
             this.minTravelTimeSeconds = minTravelTimeSeconds;
         }
         @Override public void visitEdge(Edge edge, State state) { }
@@ -461,9 +458,8 @@ public class ProfileRouter {
         @Override public void visitVertex(State state) {
             Vertex vertex = state.getVertex();
             if (vertex instanceof TransitStop) {
-                StopAtDistance sd = new StopAtDistance(state);
-                sd.mode = mode; // Override final mode from State, since driving to transit ends in walking.
-                if (sd.mode == TraverseMode.CAR && sd.etime < minTravelTimeSeconds) return;
+                StopAtDistance sd = new StopAtDistance(state, qmode);
+                if (qmode.mode == TraverseMode.CAR && sd.etime < minTravelTimeSeconds) return;
                 if (stopClustersFound.containsKey(sd.stop)) return; // record only the closest stop in each cluster
                 LOG.debug("found stop cluster: {}", sd);
                 stopClustersFound.put(sd.stop, sd);
@@ -472,13 +468,15 @@ public class ProfileRouter {
     }
 
     /** Look for an option connecting origin to destination without using transit. */
-    private void findStreetOption(TraverseMode mode) {
+    private void findDirectOption(QualifiedMode qmode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        RoutingRequest rr = new RoutingRequest(mode);
+        RoutingRequest rr = new RoutingRequest();
+        qmode.applyToRoutingRequest(rr, false); // force no transit
         rr.from = (new GenericLocation(request.fromLat, request.fromLon));
         rr.to = new GenericLocation(request.toLat, request.toLon);
         rr.setArriveBy(false);
         rr.setRoutingContext(graph);
+        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         // This is not a batch search, it is a point-to-point search with goal direction.
         // Impose a max time to protect against very slow searches.
         int worstElapsedTime = request.streetTime * 60;
@@ -487,11 +485,11 @@ public class ProfileRouter {
         rr.bikeSpeed = request.bikeSpeed;
         AStar astar = new AStar();
         rr.setNumItineraries(1);
-        ShortestPathTree spt = astar.getShortestPathTree(rr, System.currentTimeMillis() + 5000); // FIXME timeout is absolute and in seconds ?
+        ShortestPathTree spt = astar.getShortestPathTree(rr, 5);
         State state = spt.getState(rr.rctx.target);
         if (state != null) {
-            LOG.info("Found non-transit option for mode {}", mode);
-            directPaths.add(new StopAtDistance(state));
+            LOG.info("Found non-transit option for {}", qmode);
+            directPaths.add(new StopAtDistance(state, qmode));
         }
         routingContexts.add(rr.rctx); // save context for later cleanup so temp edges remain available
     }

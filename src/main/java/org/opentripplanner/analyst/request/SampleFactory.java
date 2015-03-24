@@ -18,7 +18,6 @@ import java.util.List;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
@@ -30,8 +29,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
 public class SampleFactory implements SampleSource {
-
-    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public SampleFactory(GeometryIndex index) {
         this.index = index;
@@ -144,7 +141,7 @@ public class SampleFactory implements SampleSource {
         }
 
         public double distanceTo(Coordinate c) {
-            return distanceLibrary.fastDistance(y, x, c.y, c.x);
+            return SphericalDistanceLibrary.fastDistance(y, x, c.y, c.x);
         }
         
         public double distanceAlong() {
@@ -155,11 +152,11 @@ public class SampleFactory implements SampleSource {
             for (int s = 1; s < seg; s++) { 
                 double x1 = cs.getX(s);
                 double y1 = cs.getY(s);
-                dist += distanceLibrary.fastDistance(y0, x0, y1, x1);
+                dist += SphericalDistanceLibrary.fastDistance(y0, x0, y1, x1);
                 x0 = x1;
                 y0 = y1;
             }
-            dist += distanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment 
+            dist += SphericalDistanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment
             return dist;
         }
 
@@ -168,12 +165,12 @@ public class SampleFactory implements SampleSource {
             int s = seg + 1;
             double x0 = cs.getX(s);
             double y0 = cs.getY(s);
-            double dist = distanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment
+            double dist = SphericalDistanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment
             int nc = cs.size();
             for (; s < nc; s++) { 
                 double x1 = cs.getX(s);
                 double y1 = cs.getY(s);
-                dist += distanceLibrary.fastDistance(y0, x0, y1, x1);
+                dist += SphericalDistanceLibrary.fastDistance(y0, x0, y1, x1);
                 x0 = x1;
                 y0 = y1;
             }

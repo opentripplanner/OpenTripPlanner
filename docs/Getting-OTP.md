@@ -22,7 +22,9 @@ You may also choose to build OTP from its source code. If you will be modifying 
 
  
 You will also need a reliable internet connection so Maven can fetch all of OTP's dependencies (the libraries it uses). 
-To install these software packages on a Debian or Ubuntu system, run `sudo apt-get install openjdk-7-jdk maven git`.
+To install these software packages on a Debian or Ubuntu system, run:
+
+    sudo apt-get install openjdk-7-jdk maven git
 
 Once you have these packages installed, create and/or switch to the directory where you will keep your Git repositories and make a local copy of the OTP source code:
 
@@ -112,23 +114,14 @@ After each successful build, our continuous integration (CI) server deploys the 
 to our Maven repository as a "SNAPSHOT" build. This means that a Maven project depending on OTP as a library can 
 always fetch the latest work in progress by specifying the following artifact:
  
- ```XML
+```XML
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
   <version>1.0.0-SNAPSHOT</version>
 </dependency>
- ```
+```
  
 We may eventually migrate to the Gradle build system, but Gradle uses the same dependency management and 
 repository system as Maven.
-
-
-## Continuous Integration
-
-This section does not belong here, but can be moved later.
-The OpenTripPlanner project has a continuous integration (CI) server at http://ci.opentripplanner.org. Any time a change
-is pushed to the main OpenTripPlanner repository on GitHub, this server will compile and test the new code, providing
-feedback on the stability of the build. It is also configured to run a battery of speed tests so that we can track
-improvements due to optimizations and spot drops in performance as an unintended consequence of changes.
 

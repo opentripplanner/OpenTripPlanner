@@ -21,7 +21,14 @@ import java.util.Iterator;
 
 public class Route extends Entity { // implements Entity.Factory<Route>
 
-    public static final int BUS = 0;
+    public static final int TRAM = 0;
+    public static final int SUBWAY = 1;
+    public static final int RAIL = 2;
+    public static final int BUS = 3;
+    public static final int FERRY = 4;
+    public static final int CABLE_CAR = 4;
+    public static final int GONDOLA = 4;
+    public static final int FUNICULAR = 5;
 
     public String route_id;
     public Agency agency;

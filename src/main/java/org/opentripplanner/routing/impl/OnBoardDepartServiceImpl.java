@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -61,7 +60,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
 
     @Override
     public Vertex setupDepartOnBoard(RoutingContext ctx) {
-        DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
         RoutingRequest opt = ctx.opt;
         opt.rctx = ctx;
 
@@ -95,7 +94,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             double minDist = Double.MAX_VALUE;
             for (PatternHop hop : hops) {
                 LineString line = hop.getGeometry();
-                double dist = distanceLibrary.fastDistance(point, line);
+                double dist = SphericalDistanceLibrary.fastDistance(point, line);
                 if (dist < minDist) {
                     minDist = dist;
                     bestHop = hop;
@@ -115,8 +114,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             LineString geometry = bestHop.getGeometry();
             P2<LineString> geomPair = GeometryUtils.splitGeometryAtPoint(geometry, point);
             geomRemaining = geomPair.second;
-            double total = distanceLibrary.fastLength(geometry);
-            double remaining = distanceLibrary.fastLength(geomRemaining);
+            double total = SphericalDistanceLibrary.fastLength(geometry);
+            double remaining = SphericalDistanceLibrary.fastLength(geomRemaining);
             fractionCovered = total > 0.0 ? (double) (1.0 - remaining / total) : 0.0;
 
             nextStop = (PatternStopVertex) bestHop.getToVertex();

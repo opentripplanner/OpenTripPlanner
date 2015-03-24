@@ -1,7 +1,7 @@
 package org.opentripplanner.profile;
 
+import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 /**
@@ -12,16 +12,20 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 public class StopAtDistance implements Comparable<StopAtDistance> {
 
     public StopCluster stop; // TODO rename to stopCluster, use StopCluster objects not strings?
-    public TraverseMode mode;
+    public QualifiedMode qmode;
     public int etime;
     public State state;
 
-    /** @param state a state at a TransitStop */
-    public StopAtDistance (State state) {
+    /** 
+     * @param state a state at a TransitStop, at the tail of a path
+     * @param qmode the qualified mode (e.g. BICYCLE_RENT) used to produce this path
+     */
+    public StopAtDistance (State state, QualifiedMode qmode) {
         this.state = state;
         etime = (int) state.getElapsedTimeSeconds();
-        /* This mode is not reliable for drive to transit (which ends with walking), reset in caller. */
-        mode = state.getNonTransitMode();
+        // The mode from the state is not reliable for drive to transit or bicycle rental (which end with walking).
+        // Use the more specific mode passed in from the caller.
+        this.qmode = qmode;
         if (state.getVertex() instanceof TransitStop) {
             TransitStop tstop = (TransitStop) state.getVertex();
             stop = state.getOptions().rctx.graph.index.stopClusterForStop.get(tstop.getStop());
@@ -34,7 +38,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     }
 
     public String toString() {
-        return String.format("stop cluster %s via mode %s at %d min", stop, mode, etime / 60);
+        return String.format("stop cluster %s via mode %s at %d min", stop, qmode, etime / 60);
     }
 
 }

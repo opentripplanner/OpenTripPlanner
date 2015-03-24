@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -63,8 +62,6 @@ public class SPTWalker {
         public void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speed);
     }
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-
     private ShortestPathTree spt;
 
     public SPTWalker(ShortestPathTree spt) {
@@ -73,9 +70,6 @@ public class SPTWalker {
 
     /**
      * Walk over a SPT. Call a visitor for each visited point.
-     * 
-     * @param spt
-     * @return
      */
     public void walk(SPTVisitor visitor, double d0) {
         int nTotal = 0, nSkippedDupEdge = 0, nSkippedNoGeometry = 0;
@@ -138,7 +132,7 @@ public class SPTWalker {
                     }
 
                     // Length of linestring
-                    double lineStringLen = distanceLibrary.fastLength(lineString);
+                    double lineStringLen = SphericalDistanceLibrary.fastLength(lineString);
                     visitor.visit(e, vx0.getCoordinate(), s0, s1, 0.0, lineStringLen, speedAlongEdge);
                     visitor.visit(e, vx1.getCoordinate(), s0, s1, lineStringLen, 0.0, speedAlongEdge);
                     nTotal += 2;
@@ -154,7 +148,7 @@ public class SPTWalker {
                         for (int i = 0; i < pList.length - 1; i++) {
                             Coordinate p0 = pList[i];
                             Coordinate p1 = pList[i + 1];
-                            double segLen = distanceLibrary.fastDistance(p0, p1);
+                            double segLen = SphericalDistanceLibrary.fastDistance(p0, p1);
                             while (curLen - startLen < segLen) {
                                 double k = (curLen - startLen) / segLen;
                                 Coordinate p = new Coordinate(p0.x * (1 - k) + p1.x * k, p0.y

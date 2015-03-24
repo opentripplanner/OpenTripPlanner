@@ -100,7 +100,6 @@ public class TraversalRequirements {
                 return false;
             }
         }
-        
         return e.getPermission().allows(modes);        
     }
 

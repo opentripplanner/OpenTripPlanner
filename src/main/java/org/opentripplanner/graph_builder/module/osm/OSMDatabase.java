@@ -639,12 +639,14 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 }
             }
             try {
-                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(),
-                        nodesById));
+                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(), nodesById));
             } catch (Area.AreaConstructionException e) {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
                 // the area; we'll mark it as processed so that we don't retry.
+            } catch (IllegalArgumentException iae) {
+                // This occurs when there are an invalid number of points in a LinearRing
+                // Mark the ring as processed so we don't retry it.
             }
             processedAreas.add(way);
         }
@@ -786,13 +788,12 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             return;
         }
 
-        TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR,
-                TraverseMode.CUSTOM_MOTOR_VEHICLE);
+        TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR);
         String exceptModes = relation.getTag("except");
         if (exceptModes != null) {
             for (String m : exceptModes.split(";")) {
                 if (m.equals("motorcar")) {
-                    modes.setDriving(false);
+                    modes.setCar(false);
                 } else if (m.equals("bicycle")) {
                     modes.setBicycle(false);
                     LOG.debug(addBuilderAnnotation(new TurnRestrictionException(via, from)));

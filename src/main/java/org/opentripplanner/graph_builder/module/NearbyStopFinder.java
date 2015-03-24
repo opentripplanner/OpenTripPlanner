@@ -7,7 +7,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.api.resource.SimpleIsochrone;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -58,7 +57,6 @@ public class NearbyStopFinder {
 
     /* Fields used when finding stops without a street network. */
     private StreetVertexIndexService streetIndex;
-    private DistanceLibrary distanceLibrary;
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
@@ -82,7 +80,6 @@ public class NearbyStopFinder {
             earliestArrivalSearch.maxDuration = (int) radius; // FIXME assuming 1 m/sec, use hard distance limiting to match straight-line mode
         } else {
             streetIndex = new StreetVertexIndexServiceImpl(graph); // FIXME use the one already in the graph if it exists
-            distanceLibrary = SphericalDistanceLibrary.getInstance();
         }
     }
 
@@ -169,7 +166,7 @@ public class NearbyStopFinder {
         List<StopAtDistance> stopsFound = Lists.newArrayList();
         Coordinate c0 = originVertex.getCoordinate();
         for (TransitStop ts1 : streetIndex.getNearbyTransitStops(c0, radius)) {
-            double distance = distanceLibrary.distance(c0, ts1.getCoordinate());
+            double distance = SphericalDistanceLibrary.distance(c0, ts1.getCoordinate());
             if (distance < radius) {
                 Coordinate coordinates[] = new Coordinate[] {c0, ts1.getCoordinate()};
                 StopAtDistance sd = new StopAtDistance(ts1, distance);

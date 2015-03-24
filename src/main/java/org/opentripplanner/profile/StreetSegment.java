@@ -1,16 +1,18 @@
 package org.opentripplanner.profile;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.util.PolylineEncoder;
@@ -21,15 +23,20 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 
-/** A response object describing a non-transit part of an option (usually access/egress). */
+/** 
+ * A response object describing a non-transit part of an Option. This is either an access/egress leg of a transit
+ * trip, or a direct path to the destination that does not use transit.
+ */
 public class StreetSegment {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreetSegment.class);
 
-    public TraverseMode mode;
+    @JsonSerialize(using = ToStringSerializer.class) // as a string (e.g. "BICYCLE_RENT" instead of a nested object)
+    public QualifiedMode mode;
     public int time;
     public EncodedPolylineBean geometry;
     public List<WalkStep> walkSteps = Lists.newArrayList();
+    public List<StreetEdgeInfo> streetEdges = Lists.newArrayList();
 
     /**
      * Build the walksteps from the final State of a path.
@@ -54,6 +61,31 @@ public class StreetSegment {
         Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false);
         for (Leg leg : itin.legs) {
             walkSteps.addAll(leg.walkSteps);
+            // populate the streetEdges array
+            for(WalkStep walkStep : leg.walkSteps) {
+                int i = 0;
+                // TODO this initialization logic seems like it should be in the walkStep constructor,
+                // or walkstep and edgeInfo should be merged. We are also iterating over the edges twice (see above)
+                // to build up the geometry separately.
+                for(Edge edge : walkStep.edges) {
+                    StreetEdgeInfo edgeInfo = new StreetEdgeInfo(edge);
+                    if(i == 0) {
+                        edgeInfo.mode = walkStep.newMode;
+                        edgeInfo.streetName = walkStep.streetName;
+                        edgeInfo.absoluteDirection = walkStep.absoluteDirection;
+                        edgeInfo.relativeDirection = walkStep.relativeDirection;
+                        edgeInfo.stayOn = walkStep.stayOn;
+                        edgeInfo.area = walkStep.area;
+                        edgeInfo.bogusName = walkStep.bogusName;
+                        edgeInfo.bikeRentalOnStation = walkStep.bikeRentalOnStation;
+                    }
+                    if(i == walkStep.edges.size() - 1) {
+                        edgeInfo.bikeRentalOffStation = walkStep.bikeRentalOffStation;
+                    }
+                    streetEdges.add(edgeInfo);
+                    i++;
+                }
+            }
         }
         time = (int) (state.getElapsedTimeSeconds());
     }
@@ -61,7 +93,7 @@ public class StreetSegment {
     /** A StreetSegment is very similar to a StopAtDistance but it's a response object so the State has to be rendered into walksteps. */
     public StreetSegment (StopAtDistance sd) {
         this(sd.state);
-        mode = sd.mode; // Intended mode is known more reliably in a StopAtDistance than from a State.
+        mode = sd.qmode; // Intended mode is known more reliably in a StopAtDistance than from a State.
     }
 
     /** Make a collections of StreetSegments from a collection of StopAtDistance. */

@@ -49,7 +49,6 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.geotools.math.Statistics;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 
@@ -322,13 +321,12 @@ public class GraphStats {
                 Statistics stats = new Statistics();
                 TDoubleList distances = new TDoubleArrayList(1000);
                 List<String> stops = new ArrayList<>(1000);
-                DistanceLibrary distanceLibrary = new SphericalDistanceLibrary();
                 writer.writeRecord(new String[]{"length", "transitStop", "should_check"});
                 //Saves all the distances and transitStops to lists
                 for (StreetTransitLink stl: Iterables.filter(graph.getEdges(), StreetTransitLink.class)) {
                     //This is to save only one link per transitStop direction
                     if (stl.getFromVertex() instanceof TransitStop) {
-                        double d = distanceLibrary.distance(stl.getFromVertex().getCoordinate(), stl.getToVertex().getCoordinate());
+                        double d = SphericalDistanceLibrary.distance(stl.getFromVertex().getCoordinate(), stl.getToVertex().getCoordinate());
                         stats.add(d);
                         distances.add(d);
                         stops.add(stl.getTransitStop().toString());

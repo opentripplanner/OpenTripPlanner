@@ -18,7 +18,6 @@ import static org.apache.commons.math3.util.FastMath.toRadians;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler.AccumulativeMetric;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.IsolineBuilder;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -55,7 +54,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class SampleGridRenderer {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleGridRenderer.class);
-    private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private Graph graph;
 
@@ -252,7 +250,7 @@ public class SampleGridRenderer {
             double t = z.wTime / z.w;
             double b = z.wBoardings / z.w;
             double wd = z.wWalkDist / z.w;
-            double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
+            double d = SphericalDistanceLibrary.fastDistance(C0, Cs, cosLat);
             // additionnal time
             double dt = d / offRoadSpeed;
             // t weight

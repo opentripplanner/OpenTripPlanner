@@ -13,13 +13,17 @@
 
 package org.opentripplanner.standalone;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.*;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.GraphScanner;
+import org.opentripplanner.routing.impl.InputStreamGraphSource;
+import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.scripting.impl.BSFOTPScript;
 import org.opentripplanner.scripting.impl.OTPScript;
@@ -29,10 +33,10 @@ import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 
 /**
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up an OTP server
@@ -64,6 +68,13 @@ public class OTPMain {
                 jc.usage();
                 System.exit(0);
             }
+
+            if (params.version) {
+                MavenVersion version = MavenVersion.VERSION;
+                System.out.println(version.getVersion());
+                System.exit(0);
+            }
+
             params.infer();
         } catch (ParameterException pex) {
             LOG.error("Parameter error: {}", pex.getMessage());
@@ -94,7 +105,7 @@ public class OTPMain {
         // TODO do params.infer() here to ensure coherency?
 
         /* Create the top-level objects that represent the OTP server. */
-        makeGraphService(); // FIXME this triggers graph scanning/loading even when we are only building a graph -- perform that scanning separately
+        makeGraphService();
         otpServer = new OTPServer(params, graphService);
 
         /* Start graph builder if requested */
@@ -106,8 +117,8 @@ public class OTPMain {
                 if (params.inMemory || params.preFlight) {
                     Graph graph = graphBuilder.getGraph();
                     graph.index(new DefaultStreetVertexIndexFactory());
-                    // FIXME pass in Router JSON config, set true router IDs.
-                    graphService.registerGraph("", new MemoryGraphSource("", graph, MissingNode.getInstance()));
+                    // FIXME set true router IDs
+                    graphService.registerGraph("", new MemoryGraphSource("", graph, graphBuilder.routerConfig));
                 }
             } else {
                 LOG.error("An error occurred while building the graph. Exiting.");
@@ -115,7 +126,8 @@ public class OTPMain {
             }
         }
 
-        /* Scan for graphs to load from disk if requested FIXME eventually router IDs will be present even when just building a graph. */
+        /* Scan for graphs to load from disk if requested */
+        // FIXME eventually router IDs will be present even when just building a graph.
         if ((params.routerIds != null && params.routerIds.size() > 0) || params.autoScan) {
             /* Auto-register pre-existing graph on disk, with optional auto-scan. */
             GraphScanner graphScanner = new GraphScanner(graphService, params.graphDirectory, params.autoScan);
@@ -129,9 +141,10 @@ public class OTPMain {
 
         /* Start visualizer if requested */
         if (params.visualize) {
-            // FIXME get OTPServer into visualizer.
-            GraphVisualizer visualizer = new GraphVisualizer(graphService.getRouter().graph);
-            visualizer.run();
+            Router defaultRouter = graphService.getRouter();
+            defaultRouter.graphVisualizer = new GraphVisualizer(defaultRouter);
+            defaultRouter.graphVisualizer.run();
+            defaultRouter.timeouts = new double[] {60}; // avoid timeouts due to search animation
         }
 
         /* Start script if requested */
@@ -173,7 +186,8 @@ public class OTPMain {
      */
     public void makeGraphService () {
         graphService = new GraphService(params.autoReload);
-        InputStreamGraphSource.FileFactory graphSourceFactory = new InputStreamGraphSource.FileFactory(params.graphDirectory);
+        InputStreamGraphSource.FileFactory graphSourceFactory =
+                new InputStreamGraphSource.FileFactory(params.graphDirectory);
         graphService.graphSourceFactory = graphSourceFactory;
         if (params.graphDirectory != null) {
             graphSourceFactory.basePath = params.graphDirectory;

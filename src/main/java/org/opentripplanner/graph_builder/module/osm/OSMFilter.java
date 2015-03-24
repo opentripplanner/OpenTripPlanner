@@ -93,7 +93,7 @@ public class OSMFilter {
             // this can actually be overridden
             permission = StreetTraversalPermission.NONE;
             if (entity.isMotorcarExplicitlyAllowed()) {
-                permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
+                permission = permission.add(StreetTraversalPermission.CAR);
             }
             if (entity.isBicycleExplicitlyAllowed()) {
                 permission = permission.add(StreetTraversalPermission.BICYCLE);
@@ -106,9 +106,9 @@ public class OSMFilter {
         }
 
         if (entity.isMotorcarExplicitlyDenied()) {
-            permission = permission.remove(StreetTraversalPermission.ALL_DRIVING);
+            permission = permission.remove(StreetTraversalPermission.CAR);
         } else if (entity.hasTag("motorcar")) {
-            permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
+            permission = permission.add(StreetTraversalPermission.CAR);
         }
 
         if (entity.isBicycleExplicitlyDenied()) {
@@ -198,11 +198,10 @@ public class OSMFilter {
 
         // Check driving direction restrictions.
         if (way.isOneWayForwardDriving() || way.isRoundabout()) {
-            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_DRIVING);
+            permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
         }
         if (way.isOneWayReverseDriving()) {
-            permissionsFront = permissionsFront
-                    .remove(StreetTraversalPermission.BICYCLE_AND_DRIVING);
+            permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
         }
 
         // Check bike direction restrictions.

@@ -22,6 +22,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.*;
@@ -69,6 +70,9 @@ public class GraphBuilder implements Runnable {
     private String _baseGraph = null;
     
     private Graph graph = new Graph();
+
+    /* The router configuration JSON that was discovered during the graph build and will be embedded (if any). */
+    public JsonNode routerConfig;
 
     /** Should the graph be serialized to disk after being created or not? */
     public boolean serializeGraph = true;
@@ -190,8 +194,8 @@ public class GraphBuilder implements Runnable {
         // Find and parse config files first to reveal syntax errors early without waiting for graph build.
         builderConfig = OTPMain.loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
-        // Load the router config JSON to fail fast, but we will actually apply it only when a router starts up
-        OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
+        // Load the router config JSON to fail fast, but we will only apply it later when a router starts up
+        graphBuilder.routerConfig = OTPMain.loadJson(new File(dir, Router.ROUTER_CONFIG_FILENAME));
         LOG.info(ReflectionLibrary.dumpFields(builderParams));
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
@@ -204,7 +208,7 @@ public class GraphBuilder implements Runnable {
                     osmFiles.add(file);
                     break;
                 case DEM:
-                    if (!builderParams.elevation && demFile == null) {
+                    if (!builderParams.fetchElevationUS && demFile == null) {
                         LOG.info("Found DEM file {}", file);
                         demFile = file;
                     } else {
@@ -212,7 +216,7 @@ public class GraphBuilder implements Runnable {
                     }
                     break;
                 case OTHER:
-                    LOG.debug("Skipping file '{}'", file);
+                    LOG.warn("Skipping unrecognized file '{}'", file);
             }
         }
         boolean hasOSM  = builderParams.streets && !osmFiles.isEmpty();
@@ -229,7 +233,7 @@ public class GraphBuilder implements Runnable {
             }
             OpenStreetMapModule osmBuilder = new OpenStreetMapModule(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
-            streetEdgeFactory.useElevationData = builderParams.elevation || (demFile != null);
+            streetEdgeFactory.useElevationData = builderParams.fetchElevationUS || (demFile != null);
             osmBuilder.edgeFactory = streetEdgeFactory;
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
             osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
@@ -245,7 +249,8 @@ public class GraphBuilder implements Runnable {
                 if (builderParams.parentStopLinking) {
                     gtfsBundle.linkStopsToParentStations = true;
                 }
-                gtfsBundle.parentStationTransfers = builderParams.parentStationTransfers;
+                gtfsBundle.parentStationTransfers = builderParams.stationTransfers;
+                gtfsBundle.subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);
@@ -264,7 +269,7 @@ public class GraphBuilder implements Runnable {
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
         }
-        if (builderParams.elevation) {
+        if (builderParams.fetchElevationUS) {
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
@@ -282,9 +287,13 @@ public class GraphBuilder implements Runnable {
         return graphBuilder;
     }
 
-    /** Represents the different types of input files for a graph build. */
+    /**
+     * Represents the different types of files that might be present in a router / graph build directory.
+     * We want to detect even those that are not graph builder inputs so we can effectively warn when unrecognized file
+     * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
+     */
     private static enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, OTHER;
+        GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -299,6 +308,10 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif")) return DEM; // Digital elevation model (elevation raster)
+            if (name.equals("Graph.obj")) return GRAPH;
+            if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
+                return CONFIG;
+            }
             return OTHER;
         }
     }

@@ -13,10 +13,8 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -28,14 +26,13 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.spt.SingleStateShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * Euclidean heuristics are terrible for transit because the maximum transit speed is quite high, especially relative
@@ -59,9 +56,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance(); // TODO make non-pluggable
-
-    /* 
+    /*
      * http://en.wikipedia.org/wiki/Train_routes_in_the_Netherlands
      * http://en.wikipedia.org/wiki/File:Baanvaksnelheden.png 
      */
@@ -220,7 +215,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (weight == Double.POSITIVE_INFINITY) {
             // A non-street vertex that was not yet touched by the reverse heuristic search.
             // Return the maximum of the Euclidean heuristic or the highest weight yet found by the heuristic search.
-            double dist = distanceLibrary.fastDistance(v.getY(), v.getX(), target.getY(), target.getX());
+            double dist = SphericalDistanceLibrary.fastDistance(v.getY(), v.getX(), target.getY(), target.getX());
             double time = dist / MAX_TRANSIT_SPEED;
             return Math.max(maxFound, time);
         }
@@ -275,7 +270,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (fromTarget)
             rr.setArriveBy( ! rr.arriveBy);
         List<State> stopStates = Lists.newArrayList();
-        ShortestPathTree spt = new SingleStateShortestPathTree(rr, new DominanceFunction.MinimumWeight());
+        ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(rr);
         BinHeap<State> pq = new BinHeap<State>();
         Vertex initVertex = fromTarget ? rr.rctx.target : rr.rctx.origin;
         State initState = new State(initVertex, rr);

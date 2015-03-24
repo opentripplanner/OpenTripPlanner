@@ -38,7 +38,6 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.PatternDetail;
@@ -79,7 +78,6 @@ public class IndexAPI {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
-    private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     private static final String MSG_404 = "FOUR ZERO FOUR";
     private static final String MSG_400 = "FOUR HUNDRED";
 
@@ -185,7 +183,7 @@ public class IndexAPI {
            Coordinate coord = new Coordinate(lon, lat);
            for (TransitStop stopVertex : streetIndex.getNearbyTransitStops(
                     new Coordinate(lon, lat), radius)) {
-               double distance = distanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
+               double distance = SphericalDistanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
                    stops.add(new StopShort(stopVertex.getStop(), (int) distance));
                }

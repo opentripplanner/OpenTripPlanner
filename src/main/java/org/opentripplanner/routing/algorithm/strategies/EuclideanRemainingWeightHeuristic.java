@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import com.google.common.collect.Iterables;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
@@ -38,7 +37,6 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     private static final long serialVersionUID = -5172878150967231550L;
     private static Logger LOG = LoggerFactory.getLogger(EuclideanRemainingWeightHeuristic.class);
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     private double lat;
     private double lon;
     private boolean transit;
@@ -83,7 +81,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     @Override
     public double estimateRemainingWeight (State s) {
         Vertex sv = s.getVertex();
-        double euclideanDistance = distanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
+        double euclideanDistance = SphericalDistanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
         if (transit) {
             if (euclideanDistance < requiredWalkDistance) {
                 return walkReluctance * euclideanDistance / maxStreetSpeed;
@@ -132,7 +130,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
             if (backEdge instanceof StreetTransitLink) {
                 Vertex backVertex = state.getBackState().getVertex();
-                distanceToClosestStop = distanceLibrary.fastDistance(
+                distanceToClosestStop = SphericalDistanceLibrary.fastDistance(
                         backVertex.getLat(), backVertex.getLon(), lat, lon);
                 LOG.debug("Found closest stop to search target: {} at {}m",
                         state.getVertex(), (int) distanceToClosestStop);

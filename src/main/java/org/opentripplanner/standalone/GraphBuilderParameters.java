@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class GraphBuilderParameters {
 
+    public static double DEFAULT_SUBWAY_ACCESS_TIME = 2.0; // minutes
+
     /**
      * Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.
      */
@@ -39,7 +41,13 @@ public class GraphBuilderParameters {
     /**
      * Create direct transfers between the constituent stops of each parent station.
      */
-    public final boolean parentStationTransfers;
+    public final boolean stationTransfers;
+
+    /**
+     * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
+     * Perhaps this should be a runtime router parameter rather than a graph build parameter.
+     */
+    public final double subwayAccessTime;
 
     /**
      * Include street input files (OSM/PBF).
@@ -62,10 +70,9 @@ public class GraphBuilderParameters {
     public final boolean matchBusRoutesToStreets;
 
     /**
-     * Download and use elevation data for the graph.
+     * Download US NED elevation data and apply it to the graph.
      */
-    public final boolean elevation;
-
+    public final boolean fetchElevationUS;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -79,12 +86,13 @@ public class GraphBuilderParameters {
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
-        parentStationTransfers = config.path("parentStationTransfers").asBoolean(false);
+        stationTransfers = config.path("parentStationTransfers").asBoolean(false);
+        subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME);
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
         areaVisibility = config.path("areaVisibility").asBoolean(false);
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
-        elevation = config.path("elevation").asBoolean(false);
+        fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
 
     }
 

@@ -2,11 +2,7 @@ package org.opentripplanner.profile;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.index.model.RouteShort;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +10,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * This is a response model class which holds data that will be serialized and returned to the client.
+ * It is not used internally in routing.
+ */
 public class Option {
 
     private static final Logger LOG = LoggerFactory.getLogger(Option.class);

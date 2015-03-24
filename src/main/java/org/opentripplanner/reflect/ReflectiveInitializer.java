@@ -38,6 +38,7 @@ import com.google.common.primitives.Primitives;
  * configuration, and we should be careful to only use it in places where it truly makes code more readable.
  *
  * TODO we should probably also use this for RoutingResource to make the system uniform between JSON and QParams.
+ * TODO make this stateless (a static method) if it's not too slow
  *
  * An instance of the requested class is first instantiated via its 0-argument constructor. Any initialization and
  * defaults should be handled at this point (in the constructor or in field initializer expressions).

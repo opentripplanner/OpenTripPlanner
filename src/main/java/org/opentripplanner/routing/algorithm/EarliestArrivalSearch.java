@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Collection;
-
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -23,9 +21,10 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.spt.SingleStateShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 
 /** 
  * Compute full SPT for earliest arrival problem. 
@@ -57,7 +56,7 @@ public class EarliestArrivalSearch {
         options = options.clone();
         
         // disable any resource limiting, which is algorithmically invalid here
-        options.setMaxTransfers(Integer.MAX_VALUE);
+        options.maxTransfers = Integer.MAX_VALUE;
         options.setMaxWalkDistance(Double.MAX_VALUE);
         if (options.clampInitialWait < 0)
             options.clampInitialWait = (60 * 30);
@@ -68,7 +67,7 @@ public class EarliestArrivalSearch {
             
         // SPT cache does not look at routing request in SPT to perform lookup, 
         // so it's OK to construct with the local cloned one
-        ShortestPathTree spt = new SingleStateShortestPathTree(options, new DominanceFunction.EarliestArrival());
+        ShortestPathTree spt = new DominanceFunction.EarliestArrival().getNewShortestPathTree(options);
         State initialState = new State(options);
         spt.add(initialState);
 

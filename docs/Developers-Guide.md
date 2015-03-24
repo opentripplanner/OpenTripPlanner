@@ -1,5 +1,37 @@
 # Developers Guide
 
+## Working on OTP in an IDE
+
+Most people writing or modifying OTP code use an Integrated Development Environment (IDE). Some of the most popular IDEs for
+Java development are [Eclipse](http://eclipse.org), [IntelliJ IDEA](https://www.jetbrains.com/idea/), and
+[NetBeans](https://netbeans.org). All three of these environments are good for working on OTP,
+and any IDE with Maven build support should also work (ensure that you have the Maven plugins installed and enabled).
+Git integration is a plus since OTP is under Git version control.
+
+IntelliJ IDEA is a commercial product, but its authors give free licenses to open source projects and the OpenTripPlanner
+development community has received such a license. If you want to use IntelliJ just ask us for the license key. It's
+an excellent IDE, and in my experience is quicker and more stable than the competition.
+
+Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP Github
+repository manually (on the command line or using some other Git interface tool), then import the resulting local OTP
+repository into my IDE as a Maven project. The IDE should then take care of fetching all the libraries OTP depends on,
+based on the Maven project description (POM file) in the base of the OTP repository. This step can take a long time because
+it involves downloading a lot of JAR files.
+
+When running your local copy of the OTP source within an IDE, all command line switches and configuration options will
+be identical to the ones used when running the OTP JAR from the command line (as described in the
+[basic introduction](Basic-Usage) and [configuration reference](Configuration). The only difference is that you need to
+manually specify the main class. When you run a JAR from the command line, the JVM automatically knows which class
+contains the entry point into the program (the `main` function), but in IDEs you must create a "run configuration".
+
+Both IntelliJ and Eclipse have "run" menus, from which you can select an option to edit the run configurations.
+You want to create a configuration for a Java Application, specifying the main class
+`org.opentripplanner.standalone.OTPMain`. Unlike on the command line, the arguments to the JVM and to the main class
+you are running are specified separately. In the field for the VM options you'll want to put your maximum memory
+parameter (`-Xmx2G`, or whatever limit you want to place on JVM memory usage). The rest of the parameters to OTP itself
+will go in a different field with a name like "program arguments".
+
+
 ## Contributing to the project
 
 OpenTripPlanner is a community based open source project, and we welcome all who wish to contribute.
@@ -26,22 +58,26 @@ ideally even prior to your development work since this provides a place to carry
 Github will automatically update issues when commits are merged in: if your commit message includes the text
 ` fixes #123 `, it will automatically append your message as a comment on the isse and close it.
 If you simply mention ` #123 ` in your message, your message will be appended to the issue but it will remain open.
-
 Many other expressions exist to close issues via commit messages. See [the Github help page on this topic](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
-### Comments & documentation
+### Code Comments
 
 As a matter of [policy](http://github.com/opentripplanner/OpenTripPlanner/issues/93), all new methods, classes, and 
 fields should include comments explaining what they are for and any other pertinent information. For Java code, 
-the comments should use the [JavaDoc conventions](http://java.sun.com/j2se/javadoc/writingdoccomments). When 
-documenting fields with getters and setters, the comments should go with the getter. It is best to provide comments that
+the comments should use the [JavaDoc conventions](http://java.sun.com/j2se/javadoc/writingdoccomments).
+It is best to provide comments that
 not only explain *what* you did but also *why you did it* while providing some context. Please avoid including trivial
 Javadoc or the empty Javadoc stubs added by IDEs, such as `@param` annotations with no description.
 
-An increasing amount of project documentation is now included directly in the OpenTripPlanner repository, rather than a
-separate wiki. This allows version control to be applied to documentation as well as program source code.
-All pull requests that change how OTP is used or configured should include changes to the documentation alongside code modifications.
+### Documentation
+
+Most documentation should be included directly in the OpenTripPlanner repository rather than the Github wiki.
+This allows version control to be applied to documentation as well as program source code.
+All pull requests that change how OTP is used or configured should include changes to the documentation alongside code
+modifications. Pages that help organize development teams or serve as scratchpads can still go
+[on the wiki](https://github.com/opentripplanner/OpenTripPlanner/wiki), but all documentation that would be of interest
+to people configuring or using OTP belong [in the repo](https://github.com/opentripplanner/OpenTripPlanner/tree/master/docs).
 
 The documentation files are in Markdown format and are in the `/docs` directory under the root of the project. On every
 push to the master branch the documentation will be rebuilt and deployed as static pages to our subdomain of
@@ -83,7 +119,7 @@ A proposal does *not* need to be a formal or lengthy document; it can and should
 what you want to do, ideally with a brief explanation for why it's a good idea. 
 
 Proposals are just messages sent to the list and can be as simple as *"I think we should do X because of Y and Z. 
-Deadline for response is 10/29. Assuming I've heard no blocking votes by then, I'll go ahead."* 
+Deadline for response is 2015-10-29. Assuming I've heard no blocking votes by then, I'll go ahead."*
 Note that you should make sure to include a **deadline** by which you will go ahead and do what you're proposing 
 if you don't hear any blocking responses. In general, you should leave at least 72 hours for people to respond. 
 This is not a hard-and-fast rule and you should use your best judgement in determining how far in the future the 
@@ -147,5 +183,14 @@ As of #206, we follow [Crockford's JavaScript code conventions](http://javascrip
      */
 ```
 
-*Note: There is still a lot of code following other style conventions. We are reformatting as we write new code and refactor.*
+*Note: There is still a lot of code following other style conventions, but please adhere to consistent style when you
+ write new code, and help clean up and reformat code as you refactor.*
+
+
+## Continuous Integration
+
+The OpenTripPlanner project has a [continuous integration (CI) server](http://ci.opentripplanner.org). Any time a change
+is pushed to the main OpenTripPlanner repository on GitHub, this server will compile and test the new code, providing
+feedback on the stability of the build. It is also configured to run a battery of speed tests so that we can track
+improvements due to optimizations and spot drops in performance as an unintended consequence of changes.
 

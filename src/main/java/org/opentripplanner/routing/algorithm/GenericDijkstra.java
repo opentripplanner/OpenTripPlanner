@@ -25,7 +25,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.spt.SingleStateShortestPathTree;
 
 /**
  * Find the shortest path between graph vertices using Dijkstra's algorithm.
@@ -70,7 +69,7 @@ public class GenericDijkstra {
         if (options.rctx != null) {
             target = initialState.getOptions().rctx.target;
         }
-        ShortestPathTree spt = new SingleStateShortestPathTree(options, new DominanceFunction.MinimumWeight());
+        ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(options);
         BinHeap<State> queue = new BinHeap<State>(1000);
 
         spt.add(initialState);

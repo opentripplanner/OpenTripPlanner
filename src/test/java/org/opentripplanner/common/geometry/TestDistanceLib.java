@@ -45,39 +45,38 @@ public class TestDistanceLib extends TestCase {
 
     public void testPointToLineStringFastDistance() {
         // Note: the meridian length of 1 degree of latitude on the sphere is around 111.2 km
-        DistanceLibrary dlib = new SphericalDistanceLibrary();
-        runOneTestPointToLineStringFastDistance(dlib, 0, 0, 45, 0, 44.9, 0, 45.1, 0);
-        runOneTestPointToLineStringFastDistance(dlib, 0, 0, 45, 0, 45, -0.1, 45, 0.1);
+        runOneTestPointToLineStringFastDistance(0, 0, 45, 0, 44.9, 0, 45.1, 0);
+        runOneTestPointToLineStringFastDistance(0, 0, 45, 0, 45, -0.1, 45, 0.1);
 
         // Mid-range lat
-        runOneTestPointToLineStringFastDistance(dlib, 7862, 7863, 45, 0.1, 44.9, 0, 45.1, 0);
-        runOneTestPointToLineStringFastDistance(dlib, 11119, 11120, 45.1, 0.0, 45, -0.1, 45, 0.1);
+        runOneTestPointToLineStringFastDistance(7862, 7863, 45, 0.1, 44.9, 0, 45.1, 0);
+        runOneTestPointToLineStringFastDistance(11119, 11120, 45.1, 0.0, 45, -0.1, 45, 0.1);
         // Equator
-        runOneTestPointToLineStringFastDistance(dlib, 11119, 11120, 0, 0.1, -0.1, 0, 0.1, 0);
-        runOneTestPointToLineStringFastDistance(dlib, 11119, 11120, 0.1, 0.0, 0, -0.1, 0, 0.1);
+        runOneTestPointToLineStringFastDistance(11119, 11120, 0, 0.1, -0.1, 0, 0.1, 0);
+        runOneTestPointToLineStringFastDistance(11119, 11120, 0.1, 0.0, 0, -0.1, 0, 0.1);
 
-        runOneTestPointToLineStringFastDistance(dlib, 0, 0, 45.1, 0.1, 44.9, -0.1, 45.1, 0.1);
-        runOneTestPointToLineStringFastDistance(dlib, 12854, 12855, 44.9, 0.1, 44.9, -0.1, 45.1,
+        runOneTestPointToLineStringFastDistance(0, 0, 45.1, 0.1, 44.9, -0.1, 45.1, 0.1);
+        runOneTestPointToLineStringFastDistance(12854, 12855, 44.9, 0.1, 44.9, -0.1, 45.1,
                 0.1);
 
         // Test corners
-        runOneTestPointToLineStringFastDistance(dlib, 1361, 1362, 44.99, 0.01, 45, -0.1, 45, 0,
+        runOneTestPointToLineStringFastDistance(1361, 1362, 44.99, 0.01, 45, -0.1, 45, 0,
                 45.1, 0);
-        runOneTestPointToLineStringFastDistance(dlib, 1111, 1112, 44.99, -0.05, 45, -0.1, 45, 0,
+        runOneTestPointToLineStringFastDistance(1111, 1112, 44.99, -0.05, 45, -0.1, 45, 0,
                 45.1, 0);
         /*
          * Note: the two following case do not have the exact same distance as we project on point
          * location and their latitude differ a bit.
          */
-        runOneTestPointToLineStringFastDistance(dlib, 786, 787, 45.01, -0.01, 45, -0.1, 45, 0,
+        runOneTestPointToLineStringFastDistance(786, 787, 45.01, -0.01, 45, -0.1, 45, 0,
                 45.1, 0);
-        runOneTestPointToLineStringFastDistance(dlib, 785, 786, 45.05, -0.01, 45, -0.1, 45, 0,
+        runOneTestPointToLineStringFastDistance(785, 786, 45.05, -0.01, 45, -0.1, 45, 0,
                 45.1, 0);
     }
 
-    private void runOneTestPointToLineStringFastDistance(DistanceLibrary dlib, double dMin,
-            double dMax, double lat, double lon, double... latlon) {
-        double dist = dlib.fastDistance(makeCoordinate(lat, lon), makeLineString(latlon));
+    private void runOneTestPointToLineStringFastDistance(
+            double dMin, double dMax, double lat, double lon, double... latlon) {
+        double dist = SphericalDistanceLibrary.fastDistance(makeCoordinate(lat, lon), makeLineString(latlon));
         System.out.println("dist=" + dist + ", interval=[" + dMin + "," + dMax + "]");
         assertTrue(dist >= dMin);
         assertTrue(dist <= dMax);
@@ -85,24 +84,22 @@ public class TestDistanceLib extends TestCase {
 
     public void testLineStringFastLenght() {
         // Note: the meridian length of 1 degree of latitude on the sphere is around 111.2 km
-        DistanceLibrary dlib = new SphericalDistanceLibrary();
         // a ~= 111.2 km
-        double a = runOneTestLineStringFastLength(dlib, 11119, 11120, 45, 0, 45.1, 0);
+        double a = runOneTestLineStringFastLength(11119, 11120, 45, 0, 45.1, 0);
         // b ~= a . cos(45)
-        double b = runOneTestLineStringFastLength(dlib, 7862, 7863, 45, 0, 45, 0.1);
+        double b = runOneTestLineStringFastLength(7862, 7863, 45, 0, 45, 0.1);
         // c^2 ~= a^2 + b^2
-        double c = runOneTestLineStringFastLength(dlib, 13614, 13615, 45, 0, 45.1, 0.1);
+        double c = runOneTestLineStringFastLength(13614, 13615, 45, 0, 45.1, 0.1);
         // d ~= a + b
-        double d = runOneTestLineStringFastLength(dlib, 18975, 18976, 45, 0, 45.1, 0, 45.1, 0.1);
+        double d = runOneTestLineStringFastLength(18975, 18976, 45, 0, 45.1, 0, 45.1, 0.1);
         // fast, but imprecise: error is less than 10 meters for a distance of ~20 kms
         assertTrue(Math.abs(b - a * Math.cos(Math.toRadians(45))) < 1.0);
         assertTrue(Math.abs(c - Math.sqrt(a * a + b * b)) < 10.0);
         assertTrue(Math.abs(d - (a + b)) < 10.0);
     }
 
-    private double runOneTestLineStringFastLength(DistanceLibrary dlib, double dMin,
-            double dMax, double... latlon) {
-        double dist = dlib.fastLength(makeLineString(latlon));
+    private double runOneTestLineStringFastLength(double dMin, double dMax, double... latlon) {
+        double dist = SphericalDistanceLibrary.fastLength(makeLineString(latlon));
         System.out.println("dist=" + dist + ", interval=[" + dMin + "," + dMax + "]");
         assertTrue(dist >= dMin);
         assertTrue(dist <= dMax);

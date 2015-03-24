@@ -20,8 +20,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.opentripplanner.common.geometry.DistanceLibrary;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -63,8 +61,6 @@ public class NetworkLinkerLibrary {
     StreetVertexIndexServiceImpl index;
 
     EdgesForRoute edgesForRoute;
-
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public NetworkLinkerLibrary(Graph graph, Map<Class<?>, Object> extra) {
         this.graph = graph;
@@ -120,10 +116,6 @@ public class NetworkLinkerLibrary {
             }
         });
         return request;
-    }
-
-    public DistanceLibrary getDistanceLibrary() {
-        return distanceLibrary;
     }
 
 }
