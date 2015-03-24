@@ -328,6 +328,8 @@ public class OSMWithTags {
             return TraverseMode.TRAM;
         } else if (isTag("railway", "subway")) {
             return TraverseMode.SUBWAY;
+        } else if(isTag("aerialway", "cable_car") || isTag("aerialway", "gondola")) {
+            return TraverseMode.GONDOLA;
         } else {
             //throw new Exception("Wrong PT type:" + way.getTag("railway"));
             //TODO: some error mode
