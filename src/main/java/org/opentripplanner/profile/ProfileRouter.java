@@ -18,6 +18,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -404,6 +405,7 @@ public class ProfileRouter {
     private Collection<StopAtDistance> findClosestStops(final QualifiedMode qmode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest();
+        rr.setModes(new TraverseModeSet());
         qmode.applyToRoutingRequest(rr, request.transitModes.isTransit());
         rr.from = (new GenericLocation(request.fromLat, request.fromLon));
         // FIXME requires destination to be set, not necessary for analyst
@@ -471,6 +473,7 @@ public class ProfileRouter {
     private void findDirectOption(QualifiedMode qmode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest();
+        rr.setModes(new TraverseModeSet());
         qmode.applyToRoutingRequest(rr, false); // force no transit
         rr.from = (new GenericLocation(request.fromLat, request.fromLon));
         rr.to = new GenericLocation(request.toLat, request.toLon);
