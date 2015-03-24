@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantLock;
 
-import jersey.repackaged.com.google.common.base.Preconditions;
-
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import org.onebusaway.gtfs.model.Agency;
@@ -81,10 +81,17 @@ public class TimetableSnapshotSource {
      * The last committed snapshot that was handed off to a routing thread. This snapshot may be
      * given to more than one routing thread if the maximum snapshot frequency is exceeded.
      */
-    private TimetableSnapshot snapshot = null;
+    private volatile TimetableSnapshot snapshot = null;
 
-    /** The working copy of the timetable resolver. Should not be visible to routing threads. */
+    /**
+     * The working copy of the timetable snapshot. Should not be visible to routing threads.
+     */
     private TimetableSnapshot buffer = new TimetableSnapshot();
+    
+    /**
+     * Lock to indicate that buffer is in use
+     */
+    private final ReentrantLock bufferLock = new ReentrantLock(true);
     
     /**
      * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
@@ -121,10 +128,26 @@ public class TimetableSnapshotSource {
      *         release its reference to the snapshot to release resources.
      */
     public TimetableSnapshot getTimetableSnapshot() {
-        return getTimetableSnapshot(false);
+        TimetableSnapshot snapshotToReturn;
+        
+        // Try to get a lock on the buffer
+        if (bufferLock.tryLock()) {
+            // Make a new snapshot if necessary
+            try {
+                snapshotToReturn = getTimetableSnapshot(false);
+            } finally {
+                bufferLock.unlock();
+            }
+        } else {
+            // No lock could be obtained because there is either a snapshot commit busy or updates
+            // are applied at this moment, just return the current snapshot
+            snapshotToReturn = snapshot;
+        }
+        
+        return snapshotToReturn;
     }
 
-    protected synchronized TimetableSnapshot getTimetableSnapshot(boolean force) {
+    private TimetableSnapshot getTimetableSnapshot(boolean force) {
         long now = System.currentTimeMillis();
         if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
             if (force || buffer.isDirty()) {
@@ -147,9 +170,6 @@ public class TimetableSnapshotSource {
      * However, multi-feed support is not completed and we currently assume there is only one static
      * feed when matching IDs.
      * 
-     * TODO: synchronize method to make sure updates happen atomically. Note that {@link
-     * #getTimetableSnaphot(boolean)} should not block when this method is busy.
-     * 
      * @param graph graph to update (needed for adding/changing stop patterns)
      * @param updates GTFS-RT TripUpdate's that should be applied atomically
      * @param feedId
@@ -159,80 +179,89 @@ public class TimetableSnapshotSource {
             LOG.warn("updates is null");
             return;
         }
+        
+        // Attain lock on buffer
+        bufferLock.lock();
 
-        LOG.debug("message contains {} trip updates", updates.size());
-        int uIndex = 0;
-        for (TripUpdate tripUpdate : updates) {
-            if (!tripUpdate.hasTrip()) {
-                LOG.warn("Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
-                continue;
-            }
-
-            ServiceDate serviceDate = new ServiceDate();
-            TripDescriptor tripDescriptor = tripUpdate.getTrip();
-
-            if (tripDescriptor.hasStartDate()) {
-                try {
-                    serviceDate = ServiceDate.parseString(tripDescriptor.getStartDate());
-                } catch (ParseException e) {
-                    LOG.warn("Failed to parse startDate in gtfs-rt trip update: \n{}", tripUpdate);
+        try {
+            LOG.debug("message contains {} trip updates", updates.size());
+            int uIndex = 0;
+            for (TripUpdate tripUpdate : updates) {
+                if (!tripUpdate.hasTrip()) {
+                    LOG.warn("Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
                     continue;
                 }
-            }
 
-            uIndex += 1;
-            LOG.debug("trip update #{} ({} updates) :",
-                    uIndex, tripUpdate.getStopTimeUpdateCount());
-            LOG.trace("{}", tripUpdate);
+                ServiceDate serviceDate = new ServiceDate();
+                TripDescriptor tripDescriptor = tripUpdate.getTrip();
 
-            boolean applied = false;
-            if (tripDescriptor.hasScheduleRelationship()) {
-                switch(tripDescriptor.getScheduleRelationship()) {
-                    case SCHEDULED:
-                        applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
-                        break;
-                    case ADDED:
-                        applied = validateAndHandleAddedTrip(graph, tripUpdate, feedId, serviceDate);
-                        break;
-                    case UNSCHEDULED:
-                        applied = handleUnscheduledTrip(tripUpdate, feedId, serviceDate);
-                        break;
-                    case CANCELED:
-                        applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
-                        break;
-                    case REPLACEMENT:
-                        applied = handleReplacementTrip(tripUpdate, feedId, serviceDate);
-                        break;
+                if (tripDescriptor.hasStartDate()) {
+                    try {
+                        serviceDate = ServiceDate.parseString(tripDescriptor.getStartDate());
+                    } catch (ParseException e) {
+                        LOG.warn("Failed to parse startDate in gtfs-rt trip update: \n{}", tripUpdate);
+                        continue;
+                    }
                 }
+
+                uIndex += 1;
+                LOG.debug("trip update #{} ({} updates) :",
+                        uIndex, tripUpdate.getStopTimeUpdateCount());
+                LOG.trace("{}", tripUpdate);
+
+                boolean applied = false;
+                if (tripDescriptor.hasScheduleRelationship()) {
+                    switch(tripDescriptor.getScheduleRelationship()) {
+                        case SCHEDULED:
+                            applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
+                            break;
+                        case ADDED:
+                            applied = validateAndHandleAddedTrip(graph, tripUpdate, feedId, serviceDate);
+                            break;
+                        case UNSCHEDULED:
+                            applied = handleUnscheduledTrip(tripUpdate, feedId, serviceDate);
+                            break;
+                        case CANCELED:
+                            applied = handleCanceledTrip(tripUpdate, feedId, serviceDate);
+                            break;
+                        case REPLACEMENT:
+                            applied = handleReplacementTrip(tripUpdate, feedId, serviceDate);
+                            break;
+                    }
+                } else {
+                    // Default
+                    applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
+                }
+
+                if (applied) {
+                    appliedBlockCount++;
+                } else {
+                    LOG.warn("Failed to apply TripUpdate.");
+                    LOG.trace(" Contents: {}", tripUpdate);
+                }
+
+                if (appliedBlockCount % logFrequency == 0) {
+                    LOG.info("Applied {} trip updates.", appliedBlockCount);
+                }
+            }
+            LOG.debug("end of update message");
+
+            // Make a snapshot after each message in anticipation of incoming requests
+            // Purge data if necessary (and force new snapshot if anything was purged)
+            // Make sure that the public (locking) getTimetableSnapshot function is not called.
+            if (purgeExpiredData) {
+                boolean modified = purgeExpiredData();
+                getTimetableSnapshot(modified);
             } else {
-                // Default
-                applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
+                getTimetableSnapshot(false);
             }
-
-            if (applied) {
-                appliedBlockCount++;
-            } else {
-                LOG.warn("Failed to apply TripUpdate.");
-                LOG.trace(" Contents: {}", tripUpdate);
-            }
-
-            if (appliedBlockCount % logFrequency == 0) {
-                LOG.info("Applied {} trip updates.", appliedBlockCount);
-            }
-        }
-        LOG.debug("end of update message");
-
-        // Make a snapshot after each message in anticipation of incoming requests
-        // Purge data if necessary (and force new snapshot if anything was purged)
-        if(purgeExpiredData) {
-            boolean modified = purgeExpiredData();
-            getTimetableSnapshot(modified);
-        } else {
-            getTimetableSnapshot();
+        } finally {
+            // Always release lock
+            bufferLock.unlock();
         }
     }
 
-    protected boolean handleScheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
+    private boolean handleScheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
         // This does not include Agency ID or feed ID, trips are feed-unique and we currently assume a single static feed.
         String tripId = tripDescriptor.getTripId();
@@ -264,7 +293,7 @@ public class TimetableSnapshotSource {
      * @param serviceDate
      * @return true iff successful
      */
-    protected boolean validateAndHandleAddedTrip(final Graph graph, final TripUpdate tripUpdate,
+    private boolean validateAndHandleAddedTrip(final Graph graph, final TripUpdate tripUpdate,
             final String feedId, final ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(graph);
@@ -583,19 +612,19 @@ public class TimetableSnapshotSource {
         return success;
     }
 
-    protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
+    private boolean handleUnscheduledTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         // TODO: Handle unscheduled trip
         LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
-    protected boolean handleReplacementTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
+    private boolean handleReplacementTrip(TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         // TODO: Handle replacement trip
         LOG.warn("Replacement trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
-    protected boolean handleCanceledTrip(TripUpdate tripUpdate, String agencyId,
+    private boolean handleCanceledTrip(TripUpdate tripUpdate, String agencyId,
                                          ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
         String tripId = tripDescriptor.getTripId(); // This does not include Agency ID, trips are feed-unique.
@@ -619,7 +648,7 @@ public class TimetableSnapshotSource {
         return success;
     }
 
-    protected boolean purgeExpiredData() {
+    private boolean purgeExpiredData() {
         ServiceDate today = new ServiceDate();
         ServiceDate previously = today.previous().previous(); // Just to be safe...
 
