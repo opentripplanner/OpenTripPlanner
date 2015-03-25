@@ -322,7 +322,11 @@ public class TransitToStreetNetworkBuilderTest {
                         //assertTrue(String.format("Transit stop %s connected wrongly", ts.getLabel()), foundConnection);
                         //collector.checkThat(sb.toString(), CoreMatchers.equalTo(wantedEdgeLabel));
                         collector.checkThat(sb.toString(), CoreMatchers.describedAs("TransitStop %0 should be connected to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
-                        transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, false, (StreetEdge) e.getToVertex().getOutgoingStreetEdges().get(0)));
+                        if (e.getToVertex().getOutgoingStreetEdges().size() > 0) {
+                            transitConnections.add(new TransitToStreetConnection(wanted_con, (StreetTransitLink) e, false, (StreetEdge) e.getToVertex().getOutgoingStreetEdges().get(0)));
+                        } else {
+                            LOG.warn("To vertex has no outgoing edges");
+                        }
                     } 
                 }
             }
