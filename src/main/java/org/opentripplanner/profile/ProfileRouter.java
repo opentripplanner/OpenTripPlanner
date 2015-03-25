@@ -1,16 +1,19 @@
 package org.opentripplanner.profile;
 
-import com.google.common.collect.*;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
-
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
@@ -29,8 +32,11 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Rather than finding a single optimal route, ProfileRouter aims to find all reasonable ways to go from an origin
@@ -74,7 +80,7 @@ public class ProfileRouter {
     Multimap<StopCluster, Ride> retainedRides = ArrayListMultimap.create(); // the rides arriving at each stop that are worth continuing to explore.
     BinHeap<Ride> queue = new BinHeap<Ride>(); // rides to be explored, prioritized by minumum travel time
     // TODO rename fromStopsByPattern
-    Map<TripPattern, StopAtDistance> fromStops, toStops;
+    Multimap<TripPattern, StopAtDistance> fromStops, toStops;
     TimeWindow window; // filters trips used by time of day and service schedule
 
     /** @return true if the given stop cluster has at least one transfer coming from the given pattern. */
@@ -136,24 +142,38 @@ public class ProfileRouter {
 
         /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
         Map<StopCluster, Ride> initialRides = Maps.newHashMap(); // One ride per stop cluster
-        for (Entry<TripPattern, StopAtDistance> entry : fromStops.entrySet()) {
-            TripPattern pattern = entry.getKey();
-            StopAtDistance sd = entry.getValue();
+        /* This Multimap will contain multiple entries for the same pattern if it can be reached by multiple modes. */
+        for (TripPattern pattern : fromStops.keySet()) {
             if ( ! request.transitModes.contains(pattern.mode)) {
-                continue; // FIXME why are we even storing these patterns?
+                continue; // FIXME do not even store these patterns when performing access/egress searches
             }
-            /* Loop over stop clusters in case stop cluster appears more than once in the same pattern. */
-            for (int i = 0; i < pattern.getStops().size(); ++i) {
-                // FIXME using String identity equality for stop clusters on purpose
-                if (sd.stop == graph.index.stopClusterForStop.get(pattern.getStops().get(i))) {
-                    Ride ride = initialRides.get(sd.stop);
-                    if (ride == null) {
-                        ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
-                        ride.accessTime = sd.etime;
-                        ride.accessDist = 0; // FIXME
-                        initialRides.put(sd.stop, ride);
+            Collection<StopAtDistance> sds = fromStops.get(pattern);
+            for (StopAtDistance sd : sds) {
+                /* Fetch or construct a new Ride beginning at this stop cluster. */
+                Ride ride = initialRides.get(sd.stop);
+                if (ride == null) {
+                    ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
+                    ride.accessStats = new Stats(); // empty stats, times for each access mode will be merged in
+                    ride.accessStats.min = Integer.MAX_VALUE; // higher than any value that will be merged in
+                    ride.accessDist = (int) sd.state.getWalkDistance(); // TODO verify correctness
+                    initialRides.put(sd.stop, ride);
+                }
+                /* Record the access time for this mode in the stats. */
+                ride.accessStats.merge(sd.etime);
+                /* Loop over stop clusters in case stop cluster appears more than once in the pattern. */
+                STOP_INDEX: for (int i = 0; i < pattern.getStops().size(); ++i) {
+                    if (sd.stop == graph.index.stopClusterForStop.get(pattern.getStops().get(i))) {
+                        PatternRide newPatternRide = new PatternRide(pattern, i);
+                        /* Only add the PatternRide once per unique (pattern,stopIndex). */
+                        // TODO this would be a !contains() call if PatternRides had semantic equality
+                        for (PatternRide existingPatternRide : ride.patternRides) {
+                            if (existingPatternRide.pattern == newPatternRide.pattern &&
+                                existingPatternRide.fromIndex == newPatternRide.fromIndex) {
+                                continue STOP_INDEX;
+                            }
+                        }
+                        ride.patternRides.add(newPatternRide);
                     }
-                    ride.patternRides.add(new PatternRide(pattern, i));
                 }
             }
         }
@@ -234,7 +254,7 @@ public class ProfileRouter {
                                 if (r2 == null) {
                                     r2 = new Ride(tr.sc2, r1);
                                     r2.accessDist = tr.distance;
-                                    r2.accessTime = (int) (tr.distance / request.walkSpeed);
+                                    r2.accessStats = new Stats((int)(tr.distance / request.walkSpeed));
                                     xferRides.put(tr.sc2, r2);
                                 }
                                 for (PatternRide pr : r2.patternRides) {
@@ -262,15 +282,18 @@ public class ProfileRouter {
             return null;
         }
         /* Non-analyst: Determine which rides are good ways to reach the destination. */
-        // FIXME determine why there are multiple copies of the same ride then maybe use a list
         Set<Ride> targetRides = Sets.newHashSet();
+        // FIXME there are multiple copies of the same ride because we are iterating over all clusters near dest (hence using a set)
+        // FIXME do not examine every cluster near the destination, only those that are closest on at least one pattern
+        // use a Set<StopCluster>
         for (StopCluster cluster : toStopPaths.keySet()) {
             for (Ride ride : retainedRides.get(cluster)) {
                 PATTERN: for (PatternRide pr : ride.patternRides) {
-                    StopAtDistance clusterForPattern = toStops.get(pr.pattern);
-                    if (clusterForPattern != null && clusterForPattern.stop == cluster) {
-                        targetRides.add(ride);
-                        break PATTERN;
+                    for (StopAtDistance clusterForPattern : toStops.get(pr.pattern)) {
+                        if (clusterForPattern != null && clusterForPattern.stop == cluster) {
+                            targetRides.add(ride);
+                            break PATTERN;
+                        }
                     }
                 }
             }
@@ -279,8 +302,8 @@ public class ProfileRouter {
         /* Non-analyst: Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
         for (Ride ride : targetRides) {
-            /* We alight from all patterns in a ride at the same stop. */
-            int dist = toStops.get(ride.patternRides.get(0).pattern).etime; // TODO time vs dist
+            //
+            // We board / alight from all patterns in a ride at the same stop.
             Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStopCluster());
             Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStopCluster());
             Option option = new Option(ride, accessPaths, egressPaths);
@@ -288,17 +311,6 @@ public class ProfileRouter {
         }
         /* Include the direct (no-transit) biking, driving, and walking options. */
         options.add(new Option(null, directPaths, null));
-/*
-        for (Stop stop : graph.index.stopVertexForStop.keySet()) {
-            TransitStop tstop = graph.index.stopVertexForStop.get(stop);
-            int min = mins[tstop.getIndex()];
-            int max = maxs[tstop.getIndex()];
-            if (min == Integer.MAX_VALUE)
-                LOG.info("{} unreachable", tstop.getName());
-            else
-                LOG.info("{} min {} max {}", tstop.getName(), min, max);
-        }
-*/
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
@@ -341,45 +353,28 @@ public class ProfileRouter {
      * than once in a pattern, we want to consider boarding or alighting from that pattern at every index where the
      * cluster occurs.
      */
-    public Map<TripPattern, StopAtDistance> findClosestPatterns(Multimap<StopCluster, StopAtDistance> stopClusters) {
-        SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closest = new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
+    public Multimap<TripPattern, StopAtDistance> findClosestPatterns(Multimap<StopCluster, StopAtDistance> stopClusters) {
+        SimpleIsochrone.MinMap<T2<TripPattern, QualifiedMode>, StopAtDistance> closest = new SimpleIsochrone.MinMap<>();
         // Iterate over all StopAtDistance for all Stops. The fastest mode will win at each stop.
         for (StopAtDistance stopDist : stopClusters.values()) {
             for (Stop stop : stopDist.stop.children) {
                 for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
-                    closest.putMin(pattern, stopDist);
-                    //LOG.info("trip pattern {}", pattern);
+                    closest.putMin(new T2(pattern, stopDist.qmode), stopDist);
                 }
             }
         }
+        /* Remove the QualifiedModes from the keys. Maybe it would be better to just return the result including them. */
+        Multimap<TripPattern, StopAtDistance> result = ArrayListMultimap.create();
+        for (Entry<T2<TripPattern, QualifiedMode>, StopAtDistance> entry : closest.entrySet()) {
+            result.put(entry.getKey().first, entry.getValue());
+        }
+        // We used to truncate long lists to include a mix of nearby bus and train patterns
+        // but this gives crazy results. Now we just warn on this condition.
         final int MAX_PATTERNS = 1000;
-        // Truncate long lists to include a mix of nearby bus and train patterns, keeping those closest to the origin
-        if (closest.size() > MAX_PATTERNS) {
-            LOG.warn("Truncating excessively long list of patterns. {} patterns, max allowed is {}.", closest.size(), MAX_PATTERNS);
-            // The natural ordering on StopAtDistance is based on distance from the origin
-            Multimap<StopAtDistance, TripPattern> busPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-            Multimap<StopAtDistance, TripPattern> otherPatterns = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-            for (TripPattern pattern : closest.keySet()) {
-                Multimap<StopAtDistance, TripPattern> patterns = (pattern.mode == TraverseMode.BUS) ? busPatterns : otherPatterns;
-                patterns.put(closest.get(pattern), pattern);
-            }
-            closest.clear();
-            Iterator<StopAtDistance> iterBus = busPatterns.keySet().iterator();
-            Iterator<StopAtDistance> iterOther = otherPatterns.keySet().iterator();
-            // Alternately add one bus and one non-bus pattern in order of increasing distance until we reach the max
-            while (closest.size() < MAX_PATTERNS) {
-                StopAtDistance sd;
-                if (iterBus.hasNext()) {
-                    sd = iterBus.next();
-                    for (TripPattern tp : busPatterns.get(sd)) closest.put(tp, sd);
-                }
-                if (iterOther.hasNext()) {
-                    sd = iterOther.next();
-                    for (TripPattern tp: otherPatterns.get(sd)) closest.put(tp, sd);
-                }
-            }
+        if (result.size() > MAX_PATTERNS) {
+            LOG.warn("Excessively long list of patterns. {} patterns, max allowed is {}.", closest.size(), MAX_PATTERNS);
         }
-        return closest;
+        return result;
     }
 
     /**
@@ -427,8 +422,6 @@ public class ProfileRouter {
             rr.carSpeed = request.carSpeed;
             minAccessTime = request.minCarTime;
             maxAccessTime = request.maxCarTime;
-        } else {
-            LOG.warn("No modes matched when setting min/max travel times.");
         }
         long worstElapsedTimeSeconds = maxAccessTime * 60; // convert from minutes to seconds
         if (dest) worstElapsedTimeSeconds *= -1;

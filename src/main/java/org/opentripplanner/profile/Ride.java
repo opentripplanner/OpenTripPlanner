@@ -1,24 +1,20 @@
 package org.opentripplanner.profile;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.regex.Pattern;
 
-import com.google.common.collect.Lists;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 /** 
@@ -43,10 +39,10 @@ public class Ride {
     final StopCluster to;
     final Ride previous;
     final List<PatternRide> patternRides = Lists.newArrayList();
-    Stats rideStats; // filled in only once the ride is complete (has all PatternRides).
-    Stats waitStats; // filled in only once the ride is complete (has all PatternRides).
-    int accessTime;  // minimum time to reach this ride from the previous one, or from the origin point on the first ride
-    int accessDist;  // meters from the previous ride, or from the origin point on the first ride
+    Stats rideStats;   // filled in only once the ride is complete (has all PatternRides).
+    Stats waitStats;   // filled in only once the ride is complete (has all PatternRides).
+    Stats accessStats; // min and max time to reach this ride from the previous one, or from the origin point on the first ride
+    int accessDist;    // meters from the previous ride, or from the origin point on the first ride
 
     public Ride (StopCluster from, Ride previous) {
         this.from = from;
@@ -59,7 +55,7 @@ public class Ride {
         this.from = other.from;
         this.to = to;
         this.previous = other.previous;
-        this.accessTime = other.accessTime;
+        this.accessStats = other.accessStats;
         this.accessDist = other.accessDist;
     }
 
@@ -141,7 +137,7 @@ public class Ride {
         while (ride != null) {
             ret += ride.rideStats.min;
             ret += ride.waitStats.min;
-            ret += ride.accessTime; // minimum access time to first ride, or transfer walking time on subsequent ones.
+            ret += ride.accessStats.min; // access time to first ride, or transfer time on subsequent ones.
             ride = ride.previous;
         }
         return ret;
@@ -154,7 +150,7 @@ public class Ride {
         while (ride != null) {
             ret += ride.rideStats.max;
             ret += ride.waitStats.max;
-            ret += ride.accessTime; // FIXME using fastest access mode when calculating upper bound time... is this OK?
+            ret += ride.accessStats.max; // access time to first ride, or transfer time on subsequent ones.
             ride = ride.previous;
         }
         return ret;
@@ -276,7 +272,9 @@ public class Ride {
         Iterator<Integer> departureIterator = departures.iterator(); 
         int departure = departureIterator.next();
         ARRIVAL : for (int arrival : arrivals) {
-            int boardTime = arrival + accessTime + ProfileRouter.SLACK;
+            // On transfers the access stats should have max=min=avg
+            // We use the min, which would be best if min != max since it should only relax the bounds somewhat.
+            int boardTime = arrival + accessStats.min + ProfileRouter.SLACK;
             while (departure <= boardTime) {
                 if (!departureIterator.hasNext()) break ARRIVAL;
                 departure = departureIterator.next();

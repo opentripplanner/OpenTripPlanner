@@ -1,19 +1,16 @@
 package org.opentripplanner.profile;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import com.google.common.collect.Sets;
-
 import com.beust.jcommander.internal.Lists;
-import org.onebusaway.gtfs.model.AgencyAndId;
+import com.google.common.collect.Sets;
 import org.onebusaway.gtfs.model.Route;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The equivalent of a ride in an API response. Information degenerates to Strings and ints here.
@@ -77,7 +74,7 @@ public class Segment {
         for (PatternRide pr : ride.patternRides) {
             if (pr.pattern.mode != mode) LOG.warn("Segment contains patterns using more than one mode.");
         }
-        walkTime = ride.accessTime;
+        walkTime = ride.accessStats.min; // FIXME this is assuming min=max for transfers, which they do for now...
         walkDistance = ride.accessDist;
         waitStats = ride.waitStats;
         this.routes = RouteShort.list(routes);

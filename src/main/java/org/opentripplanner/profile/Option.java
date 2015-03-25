@@ -36,11 +36,16 @@ public class Option {
         stats.add(access);
         stats.add(egress);
         List<Ride> rides = Lists.newArrayList();
-        for (Ride ride = tail; ride != null; ride = ride.previous) rides.add(ride);
+        // Chase back-pointers to get a reversed sequence of rides
+        for (Ride ride = tail; ride != null; ride = ride.previous) {
+            rides.add(ride);
+        }
         if ( ! rides.isEmpty()) {
             Collections.reverse(rides);
-            rides.get(0).accessTime = 0; // Avoid double-inclusion of the access time for the first leg.
-            rides.get(0).accessDist = 0; // Just to make dist coherent with the accessTime in the result object.
+            // The access times have already been calculated separately, avoid double-inclusion by zeroing them out here
+            rides.get(0).accessStats = new Stats();
+            rides.get(0).accessDist = 0;
+            // Make a transit segment for each ride in order
             transit = Lists.newArrayList();
             for (Ride ride : rides) {
                 Segment segment = new Segment(ride);
@@ -109,6 +114,7 @@ public class Option {
 
     /**
      * Rides or transfers may contain no patterns after applying time window.
+     * Return true if this Option contains any transit rides that contain zero active patterns.
      */
     public boolean hasEmptyRides() {
         for (Segment seg : transit) {
