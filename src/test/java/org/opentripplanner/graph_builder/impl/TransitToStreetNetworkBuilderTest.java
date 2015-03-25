@@ -45,7 +45,6 @@ import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
@@ -188,7 +187,7 @@ public class TransitToStreetNetworkBuilderTest {
             if(!poly.intersects(e.getGeometry())) {
                 continue;
             }
-            Double distance = SphericalDistanceLibrary.getInstance().fastDistance(ts.getCoordinate(), se.getGeometry());
+            Double distance = SphericalDistanceLibrary.fastDistance(ts.getCoordinate(), se.getGeometry());
             System.out.println("  " + distance + ", " + e);
             //Returns true if a path that can be walked/biked and not driven is near
             if ((neighbourType == StreetType.WALK_BIKE && ((se.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)
@@ -249,15 +248,11 @@ public class TransitToStreetNetworkBuilderTest {
         ObjectInputStream ois = new ObjectInputStream(fis);
         List<TransitStopConnToWantedEdge> outList = (List<TransitStopConnToWantedEdge>) ois.readObject();
         Map<String, TransitStopConnToWantedEdge> stop_id_toEdge = new HashMap<>(outList.size());
-        DistanceLibrary distanceLibrary = null;
-        if (transit_stats) {
-            distanceLibrary = SphericalDistanceLibrary.getInstance();
-        }
         for (TransitStopConnToWantedEdge stop_edge_con: outList) {
             if (transit_stats) {
                 String mode = stop_edge_con.getTransitStop().getModes().toString();
                 String street_modes = stop_edge_con.getStreetEdge().getPermission().toString();
-                String dist = Double.toString(distanceLibrary.fastDistance(stop_edge_con.getTransitStop().getCoordinate(), stop_edge_con.getStreetEdge().getGeometry()));
+                String dist = Double.toString(SphericalDistanceLibrary.fastDistance(stop_edge_con.getTransitStop().getCoordinate(), stop_edge_con.getStreetEdge().getGeometry()));
                 String type = stop_edge_con.getStreetType().toString();
                 writer.writeRecord(new String[]{mode, dist, type, street_modes, stop_edge_con.getStopID(), stop_edge_con.getTransitStop().getName()});
             }
