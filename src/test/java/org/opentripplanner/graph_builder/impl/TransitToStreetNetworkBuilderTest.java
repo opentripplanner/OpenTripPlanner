@@ -97,10 +97,12 @@ public class TransitToStreetNetworkBuilderTest {
     }
     
     /**
-     * Creates graph from OSM and GTFS data and runs {@link TransitToTaggedStopsGraphBuilderImpl} and {@link TransitToStreetNetworkGraphBuilderImpl}.
+     * Creates graph from OSM and GTFS data and runs {@link org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule} and {@link org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule}.
      * @param osm_filename filename for OSM (in resource folder of class)
      * @param gtfs_filename filename for GTFS (in resource folder of class)
-     * @param wanted_con_filename filename for saved connections (in resource folder of class)
+     * @param taggedBuilder should {@link org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule} be run
+     * @param normalBuilder should {@link org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule} be run
+     * @return Loaded graph
      * @throws Exception 
      */
     private Graph loadGraph(String osm_filename, String gtfs_filename,
