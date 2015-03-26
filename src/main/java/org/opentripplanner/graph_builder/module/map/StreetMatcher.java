@@ -115,9 +115,6 @@ public class StreetMatcher {
                     continue;
                 }
             }
-            if (initialEdge instanceof StreetEdge) {
-                log.warn("Initial edge is streetEdge. Traverse MOde: {}", traverseMode);
-            }
             Geometry edgeGeometry = initialEdge.getGeometry();
             
             LocationIndexedLine indexedEdge = new LocationIndexedLine(edgeGeometry);
