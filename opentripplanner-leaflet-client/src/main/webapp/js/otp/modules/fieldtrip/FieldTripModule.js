@@ -58,7 +58,6 @@ otp.modules.fieldtrip.FieldTripModule =
 
     activate : function() {
         if(this.activated) return;
-        console.log("activate "+this.id);
         otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
 
         var modeSelector = this.optionsWidget.controls['mode'];
@@ -218,7 +217,7 @@ otp.modules.fieldtrip.FieldTripModule =
         if(this.currentGroupSize > capacity) { // group members remain; plan another trip
             this.currentGroupSize -= capacity;
             itin.groupSize = capacity;
-            console.log("remaining: "+this.currentGroupSize);
+            //console.log("remaining: "+this.currentGroupSize);
             this.itinCapacity = null;
             this.planTrip();
         }
@@ -323,7 +322,7 @@ otp.modules.fieldtrip.FieldTripModule =
 
     checkTripValidity : function(tripId, leg, itin) {
         var capacityInUse = 0;
-        console.log('checkTripValidity ' + tripId + ' from ' + leg.from.stopIndex + ' to ' + leg.to.stopIndex);
+        //console.log('checkTripValidity ' + tripId + ' from ' + leg.from.stopIndex + ' to ' + leg.to.stopIndex);
         for(var i = 0; i < this.tripsInUse.length; i++) {
             var tripInUse  = this.tripsInUse[i];
 
@@ -345,13 +344,10 @@ otp.modules.fieldtrip.FieldTripModule =
         }
 
         var remainingCapacity = itin.getModeCapacity(leg.mode) - capacityInUse;
-        if(remainingCapacity < 10) {
-            console.log('cTV ret false');
-            return false; // consider trip 'full' if < 10 spots remain
-        }
+        if(remainingCapacity < 10) return false; // consider trip 'full' if < 10 spots remain
+
         this.itinCapacity = this.itinCapacity ? Math.min(this.itinCapacity, remainingCapacity) : remainingCapacity;
 
-        console.log('cTV ret true');
         return true;
     },
         
