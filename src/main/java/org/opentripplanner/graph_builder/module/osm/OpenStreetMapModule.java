@@ -1122,8 +1122,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             /*if (customNamer != null) {
                 customNamer.nameWithEdge(way, street);
             }*/
-            backStreet = ptEdgeFactory.createEdge(end, start, backGeometry, name, length, ptype, true, way.getId());
-            backStreet.setLevel(level);
+            //Gondolas are one directional
+            if (ptype != TraverseMode.GONDOLA) {
+                backStreet = ptEdgeFactory.createEdge(end, start, backGeometry, name, length, ptype, true, way.getId());
+                backStreet.setLevel(level);
+            }
 
             if (street != null && backStreet != null) {
                 backStreet.shareData(street);
