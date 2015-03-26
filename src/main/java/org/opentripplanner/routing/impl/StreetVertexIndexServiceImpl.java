@@ -441,7 +441,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     @Override
     public CandidateEdgeBundle getClosestEdges(GenericLocation location,
             TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
-            boolean possibleTransitLinksOnly) {
+            boolean possibleTransitLinksOnly, TransitStop ts) {
         Coordinate coordinate = location.getCoordinate();
         Envelope envelope = new Envelope(coordinate);
 
@@ -511,7 +511,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @Override
     public CandidateEdgeBundle getClosestEdges(GenericLocation location, TraversalRequirements reqs) {
-        return getClosestEdges(location, reqs, null, null, false);
+        return getClosestEdges(location, reqs, null, null, false, null);
     }
 
     /**
@@ -532,7 +532,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // that accept all modes of travel.
         TraversalRequirements reqs = new TraversalRequirements(request);
 
-        return getClosestEdges(location, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
+        return getClosestEdges(location, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly, null);
     }
 
     /**

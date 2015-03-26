@@ -53,11 +53,12 @@ public interface StreetVertexIndexService {
      * @param extraEdges Additional edges to consider, may be null
      * @param preferredEdges Edges which are preferred, may be null
      * @param possibleTransitLinksOnly Only include possible transit links.
+     * @param ts TransitStop if searching for edges closest to TransitStop in linking null otherwise
      * @return
      */
     public CandidateEdgeBundle getClosestEdges(GenericLocation location,
-            TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
-            boolean possibleTransitLinksOnly);
+                                               TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
+                                               boolean possibleTransitLinksOnly, TransitStop ts);
 
     /**
      * Get the closest edges to this location are traversable given these preferences.

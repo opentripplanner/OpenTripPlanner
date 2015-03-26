@@ -95,7 +95,7 @@ public class LinkRequest {
      */
     private Collection<StreetVertex> getNearbyStreetVertices(Vertex v,
             Collection<Edge> nearbyRouteEdges, RoutingRequest options,
-            boolean possibleTransitLinksOnly) {
+            boolean possibleTransitLinksOnly, TransitStop ts) {
         Collection<StreetVertex> existing = linker.splitVertices.get(v);
         if (existing != null)
             return existing;
@@ -111,7 +111,7 @@ public class LinkRequest {
         GenericLocation location = new GenericLocation(coordinate);
         TraversalRequirements reqs = new TraversalRequirements(options);
         CandidateEdgeBundle edges = linker.index.getClosestEdges(location, reqs, null,
-                nearbyRouteEdges, possibleTransitLinksOnly);
+                nearbyRouteEdges, possibleTransitLinksOnly, ts);
         if (edges == null || edges.size() < 1) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
             LOG.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
@@ -359,7 +359,7 @@ public class LinkRequest {
         modes.setMode(TraverseMode.WALK, true);
         RoutingRequest request = new RoutingRequest(modes);
         Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges,
-                request, true);
+                request, true, v);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {
@@ -386,7 +386,7 @@ public class LinkRequest {
             request = new RoutingRequest(modes);
         }
         Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, request,
-                false);
+                false, null);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {
