@@ -12,8 +12,10 @@ public class DefaultPublicTransitEdgeFactory {
 
     public PublicTransitEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
                                         LineString geometry, String name, double length, TraverseMode publicTransitType,
-                                        boolean back) {
+                                        boolean back, long osmID) {
         PublicTransitEdge pte = new PublicTransitEdge(startEndpoint, endEndpoint, geometry, name, length, publicTransitType, back);
+
+        pte.setOsmID(osmID);
         return pte;
     }
 }

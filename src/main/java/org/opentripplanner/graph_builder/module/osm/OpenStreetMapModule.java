@@ -1115,14 +1115,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 LOG.warn("Way {} has unknown railway: {}", way.getId(), way.getTag("railway"));
             }
 
-            street = ptEdgeFactory.createEdge(start, end, geometry, name, length, ptype, false);
+            street = ptEdgeFactory.createEdge(start, end, geometry, name, length, ptype, false, way.getId());
 
             OSMLevel level = osmdb.getLevelForWay(way);
             street.setLevel(level);
             /*if (customNamer != null) {
                 customNamer.nameWithEdge(way, street);
             }*/
-            backStreet = ptEdgeFactory.createEdge(end, start, backGeometry, name, length, ptype, true);
+            backStreet = ptEdgeFactory.createEdge(end, start, backGeometry, name, length, ptype, true, way.getId());
             backStreet.setLevel(level);
 
             if (street != null && backStreet != null) {
