@@ -15,8 +15,6 @@ package org.opentripplanner.updater.stoptime;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.prefs.Preferences;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.graph.Graph;
@@ -150,11 +148,12 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     public void runPolling() {
         // Get update lists from update source
         List<TripUpdate> updates = updateSource.getUpdates();
+        boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
 
         if (updates != null && updates.size() > 0) {
             // Handle trip updates via graph writer runnable
             TripUpdateGraphWriterRunnable runnable =
-                    new TripUpdateGraphWriterRunnable(updates, agencyId);
+                    new TripUpdateGraphWriterRunnable(fullDataset, updates, agencyId);
             updaterManager.execute(runnable);
         }
     }

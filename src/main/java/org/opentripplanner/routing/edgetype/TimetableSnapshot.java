@@ -250,6 +250,19 @@ public class TimetableSnapshot {
     }
 
     /**
+     * Clear all data from snapshot 
+     */
+    public void clear() {
+        if (dirty == null) {
+            throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
+        }
+        
+        // Clear all data from snapshot
+        timetables.clear();
+        lastAddedTripPattern.clear();
+    }
+
+    /**
      * Removes all Timetables which are valid for a ServiceDate on-or-before the one supplied.
      */
     public boolean purgeExpiredData(ServiceDate serviceDate) {

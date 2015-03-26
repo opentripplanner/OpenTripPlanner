@@ -170,10 +170,12 @@ public class TimetableSnapshotSource {
      * feed when matching IDs.
      * 
      * @param graph graph to update (needed for adding/changing stop patterns)
+     * @param fullDataset true iff the list with updates represent all updates that are active right
+     *        now, i.e. all previous updates should be disregarded
      * @param updates GTFS-RT TripUpdate's that should be applied atomically
      * @param feedId
      */
-    public void applyTripUpdates(Graph graph, final List<TripUpdate> updates, final String feedId) {
+    public void applyTripUpdates(Graph graph, boolean fullDataset, final List<TripUpdate> updates, final String feedId) {
         if (updates == null) {
             LOG.warn("updates is null");
             return;
@@ -183,6 +185,11 @@ public class TimetableSnapshotSource {
         bufferLock.lock();
 
         try {
+            if (fullDataset) {
+                // Remove all updates from the buffer
+                buffer.clear();
+            }
+            
             LOG.debug("message contains {} trip updates", updates.size());
             int uIndex = 0;
             for (TripUpdate tripUpdate : updates) {
