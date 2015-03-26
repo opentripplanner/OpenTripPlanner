@@ -34,7 +34,7 @@ import org.opentripplanner.common.geometry.CompactLineString;
  * They are then removed from graph
  * Created by mabu on 18.3.2015.
  */
-public class PublicTransitEdge extends Edge {
+public class PublicTransitEdge extends Edge implements EdgeInfo {
 
     private static Logger LOG = LoggerFactory.getLogger(PublicTransitEdge.class);
 

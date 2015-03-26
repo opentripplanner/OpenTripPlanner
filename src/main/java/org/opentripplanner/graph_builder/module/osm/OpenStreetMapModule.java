@@ -1092,6 +1092,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 customNamer.nameWithEdge(way, street);
             }
 
+            OSMLevel level = osmdb.getLevelForWay(way);
+
+            street.setLevel(level);
+
             return street;
         }
 
