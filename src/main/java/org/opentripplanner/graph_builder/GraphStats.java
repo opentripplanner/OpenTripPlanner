@@ -17,22 +17,20 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import com.google.common.collect.Iterables;
 import org.geotools.referencing.GeodeticCalculator;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.util.GeometryCSVWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +48,6 @@ import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.geotools.math.Statistics;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
 
 public class GraphStats {
 
@@ -79,6 +76,8 @@ public class GraphStats {
 
     private CommandTransitLinkStats commandTransitLinkStats = new CommandTransitLinkStats();
 
+    private CommandVertexStats commandVertexStats = new CommandVertexStats();
+
     private JCommander jc;
     
     private Graph graph;
@@ -96,6 +95,7 @@ public class GraphStats {
         jc.addCommand(commandSpeedStats);
         jc.addCommand(commandPatternStats);
         jc.addCommand(commandTransitLinkStats);
+        jc.addCommand(commandVertexStats);
         
         try {
             jc.parse(args);
@@ -144,6 +144,8 @@ public class GraphStats {
             commandPatternStats.run();
         } else if (command.equals("transitlinkstats")) {
             commandTransitLinkStats.run();
+        } else if (command.equals("vertexstats")) {
+            commandVertexStats.run();
         }
         writer.close();
 
@@ -367,6 +369,42 @@ public class GraphStats {
                 return;
             }
             LOG.info("done.");
+        }
+    }
+
+    //This outputs vertices which have PublicTransitEdges and StreetEdges
+    @Parameters(commandNames = "vertexstats", commandDescription = "Stats about vertex")
+    class CommandVertexStats {
+
+        public void run() {
+            LOG.info("Vertex stats");
+            long both_vertices = 0;
+            long pt_vertices = 0;
+            long st_vertices = 0;
+            GeometryCSVWriter geometryCSVWriter = new GeometryCSVWriter(Arrays.asList("vertex_name", "vertex_label", "geo"), "geo", writer);
+            for (IntersectionVertex vertex: Iterables.filter(graph.getVertices(), IntersectionVertex.class)) {
+                boolean foundPublicTransitEdge = false;
+                boolean foundStreetEdge = false;
+                for (Edge edge: vertex.getOutgoing()) {
+                    if (edge instanceof PublicTransitEdge) {
+                        foundPublicTransitEdge = true;
+                    } else if (edge instanceof StreetEdge) {
+                        foundStreetEdge = true;
+                    }
+                    if (foundPublicTransitEdge && foundStreetEdge) {
+                        break;
+                    }
+                }
+                if (foundPublicTransitEdge && foundStreetEdge) {
+                    both_vertices++;
+                    geometryCSVWriter.add(Arrays.asList(vertex.getName(), vertex.getLabel()), GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate()));
+                } else if (foundPublicTransitEdge) {
+                    pt_vertices++;
+                } else if (foundStreetEdge) {
+                    st_vertices++;
+                }
+            }
+            LOG.info("ST vert: {}, PT vert: {}, both vert: {}", st_vertices, pt_vertices, both_vertices);
         }
     }
 
