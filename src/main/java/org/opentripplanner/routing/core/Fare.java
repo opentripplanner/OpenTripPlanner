@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -22,8 +23,8 @@ import java.util.HashMap;
  */
 public class Fare {
 
-    public static enum FareType {
-        regular, student, senior, tram, special
+    public static enum FareType implements Serializable {
+        regular, student, senior, tram, special, youth
     }
 
     /**

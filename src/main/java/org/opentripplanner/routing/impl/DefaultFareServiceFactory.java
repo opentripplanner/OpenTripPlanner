@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
@@ -22,8 +23,11 @@ import org.onebusaway.gtfs.model.FareRule;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements the default GTFS fare rules as described in
@@ -33,22 +37,52 @@ import org.opentripplanner.routing.services.FareServiceFactory;
  * 
  */
 public class DefaultFareServiceFactory implements FareServiceFactory {
-    protected HashMap<AgencyAndId, FareRuleSet> fareRules = new HashMap<AgencyAndId, FareRuleSet>();
-    HashMap<AgencyAndId, FareAttribute> fareAttributes = new HashMap<AgencyAndId, FareAttribute>();
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
+
+    protected Map<AgencyAndId, FareRuleSet> regularFareRules = new HashMap<AgencyAndId, FareRuleSet>();
 
     public FareService makeFareService() {
-        return new DefaultFareServiceImpl(fareRules, fareAttributes);
+        DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
+        fareService.addFareRules(FareType.regular, regularFareRules.values());
+        return fareService;
     }
 
-    private void readFareRules(GtfsRelationalDao dao) {
-        Collection<FareRule> rules = dao.getAllFareRules();
-        for (FareRule rule : rules) {
+    @Override
+    public void setDao(GtfsRelationalDao dao) {
+        fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), regularFareRules);
+    }
+
+    protected void fillFareRules(String agencyId, Collection<FareAttribute> fareAttributes,
+            Collection<FareRule> fareRules, Map<AgencyAndId, FareRuleSet> fareRuleSet) {
+        /*
+         * Create an empty FareRuleSet for each FareAttribute, as some FareAttribute may have no
+         * rules attached to them.
+         */
+        for (FareAttribute fare : fareAttributes) {
+            AgencyAndId id = fare.getId();
+            FareRuleSet fareRule = fareRuleSet.get(id);
+            if (fareRule == null) {
+                fareRule = new FareRuleSet(fare);
+                fareRuleSet.put(id, fareRule);
+                if (agencyId != null) {
+                    // TODO With the new GTFS lib, use fareAttribute.agency_id directly
+                    fareRule.setAgency(agencyId);
+                }
+            }
+        }
+
+        /*
+         * For each fare rule, add it to the FareRuleSet of the fare.
+         */
+        for (FareRule rule : fareRules) {
             FareAttribute fare = rule.getFare();
             AgencyAndId id = fare.getId();
-            FareRuleSet fareRule = fareRules.get(id);
+            FareRuleSet fareRule = fareRuleSet.get(id);
             if (fareRule == null) {
-                fareRule = new FareRuleSet();
-                fareRules.put(id, fareRule);
+                // Should never happen by design
+                LOG.error("Inexistant fare ID in fare rule: " + id);
+                continue;
             }
             String contains = rule.getContainsId();
             if (contains != null) {
@@ -65,16 +99,5 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
                 fareRule.addRoute(routeId);
             }
         }
-    }
-
-    @Override
-    public void setDao(GtfsRelationalDao dao) {
-
-        readFareRules(dao);
-        Collection<FareAttribute> fA = dao.getAllFareAttributes();
-        for (FareAttribute fare : fA) {
-            fareAttributes.put(fare.getId(), fare);
-        }
-
     }
 }
