@@ -196,7 +196,7 @@ public class FieldTrip extends Application {
                         if(!tripInUse.groupItinerary.fieldTrip.request.travelDate.equals(ftRequest.travelDate)) continue;
                             
                         // do the stop ranges overlap?
-                        if(gtrip.fromStopIndex > tripInUse.toStopIndex || gtrip.toStopIndex < tripInUse.fromStopIndex) continue;
+                        if(gtrip.fromStopIndex >= tripInUse.toStopIndex || gtrip.toStopIndex <= tripInUse.fromStopIndex) continue;
                         
                         capacityInUse += tripInUse.groupItinerary.passengers;
                     }
