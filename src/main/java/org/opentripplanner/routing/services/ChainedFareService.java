@@ -13,6 +13,10 @@
 
 package org.opentripplanner.routing.services;
 
+/*
+ * TODO Remove this interface.
+ */
+@Deprecated
 public interface ChainedFareService extends FareService {
     void setNextService(FareService service);
 }

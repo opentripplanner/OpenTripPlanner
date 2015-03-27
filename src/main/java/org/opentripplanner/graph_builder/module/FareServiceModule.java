@@ -21,9 +21,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareService;
 
 /**
- * Builds a street graph from OpenStreetMap data.
- * 
+ * TODO. Remove this class.
  */
+@Deprecated
 public class FareServiceModule implements GraphBuilderModule {
 
     private ChainedFareService service;
