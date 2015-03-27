@@ -43,7 +43,6 @@ import java.util.Map.Entry;
  * they are released for garbage collection.
  */
 public class ProfileRouter {
-
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
 
     /* Search configuration constants */
@@ -59,6 +58,9 @@ public class ProfileRouter {
         this.graph = graph;
         this.request = request;
     }
+    
+    // keep track of state - has routing been completed
+    public boolean completed = false;
 
     /* Search state */
     Multimap<StopCluster, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop cluster
@@ -265,6 +267,7 @@ public class ProfileRouter {
         LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
         if (request.analyst) {
             makeSurfaces();
+            this.completed = true;
             return null;
         }
         /* Non-analyst: Determine which rides are good ways to reach the destination. */
@@ -305,6 +308,7 @@ public class ProfileRouter {
                 LOG.info("{} min {} max {}", tstop.getName(), min, max);
         }
 */
+        this.completed = true;
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 

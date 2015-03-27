@@ -38,6 +38,9 @@ public class ProfileRequest implements Serializable, Cloneable {
     public QualifiedModeSet accessModes, egressModes, directModes;
     public TraverseModeSet transitModes;
     public boolean analyst = false; // if true, propagate travel times out to street network
+    
+    /** analyst mode: the strategy the user uses in choosing which vehicles to board */
+    public ProfileChoiceStrategy choiceStrategy;
 
     /*
       This parameter compensates for the fact that GTFS does not contain information about schedule deviation (lateness).
