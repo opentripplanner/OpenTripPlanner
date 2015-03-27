@@ -1,7 +1,6 @@
 package org.opentripplanner.api.parameter;
 
-import com.beust.jcommander.internal.Sets;
-
+import com.google.common.collect.Sets;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 
@@ -14,7 +13,7 @@ public class QualifiedMode implements Serializable {
     
     public final TraverseMode mode;
     public final Set<Qualifier> qualifiers = Sets.newHashSet();
-    
+
     public QualifiedMode(String qMode) {
         String[] elements = qMode.split("_");
         mode = TraverseMode.valueOf(elements[0].trim());
@@ -61,7 +60,21 @@ public class QualifiedMode implements Serializable {
             req.modes.setWalk(true); // need to walk after dropping the car off
         }
     }
-    
+
+    @Override
+    public int hashCode() {
+        return mode.hashCode() * qualifiers.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof QualifiedMode) {
+            QualifiedMode qmOther = (QualifiedMode) other;
+            return qmOther.mode.equals(this.mode) && qmOther.qualifiers.equals(this.qualifiers);
+        }
+        return false;
+    }
+
 }
 
 enum Qualifier {
