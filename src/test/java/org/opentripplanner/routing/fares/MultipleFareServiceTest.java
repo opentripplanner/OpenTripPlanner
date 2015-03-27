@@ -55,6 +55,10 @@ public class MultipleFareServiceTest extends TestCase {
         fare2.addFare(FareType.student, new WrappedCurrency("EUR"), 120);
         FareService fs2 = new SimpleFareService(fare2);
 
+        /*
+         * Note: this fare is not very representative, as you should probably always compute a
+         * "regular" fare in case you want to add bike and transit fares.
+         */
         Fare fare3 = new Fare();
         fare3.addFare(FareType.student, new WrappedCurrency("EUR"), 80);
         FareService fs3 = new SimpleFareService(fare3);
@@ -67,6 +71,11 @@ public class MultipleFareServiceTest extends TestCase {
         fare = mfs.getCost(null);
         assertEquals(100, fare.getFare(FareType.regular).getCents());
         assertEquals(null, fare.getFare(FareType.student));
+
+        mfs = new AddingMultipleFareService(Arrays.asList(fs2));
+        fare = mfs.getCost(null);
+        assertEquals(140, fare.getFare(FareType.regular).getCents());
+        assertEquals(120, fare.getFare(FareType.student).getCents());
 
         mfs = new AddingMultipleFareService(Arrays.asList(fs1, fs2));
         fare = mfs.getCost(null);
@@ -83,5 +92,14 @@ public class MultipleFareServiceTest extends TestCase {
         assertEquals(100, fare.getFare(FareType.regular).getCents());
         assertEquals(180, fare.getFare(FareType.student).getCents());
 
+        mfs = new AddingMultipleFareService(Arrays.asList(fs3, fs1));
+        fare = mfs.getCost(null);
+        assertEquals(100, fare.getFare(FareType.regular).getCents());
+        assertEquals(180, fare.getFare(FareType.student).getCents());
+
+        mfs = new AddingMultipleFareService(Arrays.asList(fs1, fs2, fs3));
+        fare = mfs.getCost(null);
+        assertEquals(240, fare.getFare(FareType.regular).getCents());
+        assertEquals(300, fare.getFare(FareType.student).getCents());
     }
 }
