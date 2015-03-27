@@ -17,6 +17,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -399,6 +400,7 @@ public class ProfileRouter {
      */
     private Collection<StopAtDistance> findClosestStops(final QualifiedMode qmode, boolean dest) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
+        // TODO make a function that builds normal routing requests from profile requests
         RoutingRequest rr = new RoutingRequest(new TraverseModeSet());
         qmode.applyToRoutingRequest(rr, request.transitModes.isTransit());
         rr.from = (new GenericLocation(request.fromLat, request.fromLon));
@@ -418,6 +420,8 @@ public class ProfileRouter {
             rr.bikeSpeed = request.bikeSpeed;
             minAccessTime = request.minBikeTime;
             maxAccessTime = request.maxBikeTime;
+            rr.optimize = OptimizeType.TRIANGLE;
+            rr.setTriangleNormalized(request.bikeSafe, request.bikeSlope, request.bikeTime);
         } else if (qmode.mode == TraverseMode.CAR) {
             rr.carSpeed = request.carSpeed;
             minAccessTime = request.minCarTime;
@@ -465,7 +469,12 @@ public class ProfileRouter {
     private void findDirectOption(QualifiedMode qmode) {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         RoutingRequest rr = new RoutingRequest(new TraverseModeSet());
-        qmode.applyToRoutingRequest(rr, false); // force no transit
+        qmode.applyToRoutingRequest(rr, false); // false because we never use transit in direct options
+        if (qmode.mode == TraverseMode.BICYCLE) {
+            // TRIANGLE should only affect bicycle searches, but we wrap this in a conditional just to be clear.
+            rr.optimize = OptimizeType.TRIANGLE;
+            rr.setTriangleNormalized(request.bikeSafe, request.bikeSlope, request.bikeTime);
+        }
         rr.from = (new GenericLocation(request.fromLat, request.fromLon));
         rr.to = new GenericLocation(request.toLat, request.toLon);
         rr.setArriveBy(false);

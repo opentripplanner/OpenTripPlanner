@@ -1130,6 +1130,21 @@ public class RoutingRequest implements Cloneable, Serializable {
         return 40; // TODO find accurate max speeds
     }
 
+    /**
+     * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness, and speed.
+     * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
+     * This setter function accepts any three numbers and will normalize them to add up to 1.
+     */
+    public void setTriangleNormalized (double safe, double slope, double time) {
+        double total = safe + slope + time;
+        safe /= total;
+        slope /= total;
+        time /= total;
+        this.triangleSafetyFactor = safe;
+        this.triangleSlopeFactor = slope;
+        this.triangleTimeFactor = time;
+    }
+
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
     public ShortestPathTree getNewShortestPathTree() {
         return this.dominanceFunction.getNewShortestPathTree(this);
