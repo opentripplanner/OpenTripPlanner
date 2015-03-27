@@ -29,6 +29,8 @@ import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * Implements the default GTFS fare rules as described in
  * http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b
@@ -99,5 +101,38 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
                 fareRule.addRoute(routeId);
             }
         }
+    }
+
+    public void configure(JsonNode config) {
+        // No configuration for the moment
+    }
+
+    /**
+     * Build a specific FareServiceFactory given the "type" node of the config, or fallback to the
+     * default if none specified.
+     */
+    public static FareServiceFactory fromConfig(JsonNode config) {
+        String type = config == null ? null : config.path("type").asText(null);
+        if (type == null)
+            type = "default";
+        FareServiceFactory retval;
+        switch (type) {
+        case "default":
+            retval = new DefaultFareServiceFactory();
+            break;
+        case "san-francisco":
+            retval = new SFBayFareServiceFactory();
+            break;
+        case "new-york":
+            retval = new NycFareServiceFactory();
+            break;
+        case "seattle":
+            retval = new SeattleFareServiceFactory();
+            break;
+        default:
+            throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));
+        }
+        retval.configure(config);
+        return retval;
     }
 }

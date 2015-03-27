@@ -29,6 +29,8 @@ import org.opentripplanner.routing.services.FareService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
 
     @SuppressWarnings("unused")
@@ -201,5 +203,10 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
             super.fillFareRules(kv.getKey(), kv.getValue(), fareRulesPerAgency.get(kv.getKey()),
                     regularFareRules);
         }
+    }
+
+    @Override
+    public void configure(JsonNode config) {
+        // No config for the moment
     }
 }
