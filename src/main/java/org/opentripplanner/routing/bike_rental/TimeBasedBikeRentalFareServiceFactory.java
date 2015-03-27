@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
@@ -34,8 +33,6 @@ public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory
     private static Logger log = LoggerFactory
             .getLogger(TimeBasedBikeRentalFareServiceFactory.class);
 
-    private FareServiceFactory nextFactory;
-
     // Each entry is <max time, cents at that time>; the list is sorted in
     // ascending time order
     private List<P2<Integer>> pricingBySecond;
@@ -44,21 +41,16 @@ public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory
 
     @Override
     public FareService makeFareService() {
-        return new TimeBasedBikeRentalFareService(nextFactory.makeFareService(), currency,
-                pricingBySecond);
+        return new TimeBasedBikeRentalFareService(currency, pricingBySecond);
     }
 
     @Override
     public void processGtfs(GtfsRelationalDao dao) {
-        nextFactory.processGtfs(dao);
+        // Nothing to do
     }
 
     @Override
     public void configure(JsonNode config) {
-
-        // Next fare service
-        // TODO Extract to dedicated composite class
-        nextFactory = DefaultFareServiceFactory.fromConfig(config.path("next"));
 
         // Currency
         String currencyStr = config.path("currency").asText(null);

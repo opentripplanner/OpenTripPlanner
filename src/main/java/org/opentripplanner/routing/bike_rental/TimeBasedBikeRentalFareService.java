@@ -34,21 +34,13 @@ public class TimeBasedBikeRentalFareService implements FareService, Serializable
 
     private static Logger log = LoggerFactory.getLogger(TimeBasedBikeRentalFareService.class);
 
-    /*
-     * TODO Since there is no interaction between the two fares services, extract a generic "adding"
-     * chained fare service class, accepting a list of sub-fare services, adding each fare in turn.
-     */
-    private FareService next;
-
     // Each entry is <max time, cents at that time>; the list is sorted in
     // ascending time order
     private List<P2<Integer>> pricing_by_second;
 
     private Currency currency;
 
-    protected TimeBasedBikeRentalFareService(FareService next, Currency currency,
-            List<P2<Integer>> pricingBySecond) {
-        this.next = next;
+    protected TimeBasedBikeRentalFareService(Currency currency, List<P2<Integer>> pricingBySecond) {
         this.currency = currency;
         this.pricing_by_second = pricingBySecond;
     }
@@ -84,22 +76,8 @@ public class TimeBasedBikeRentalFareService implements FareService, Serializable
             }
         }
 
-        if (next == null) {
-            Fare fare = new Fare();
-            fare.addFare(FareType.regular, new WrappedCurrency(currency), cost);
-            return fare;
-        }
-        if (cost == 0) {
-            return next.getCost(path);
-        }
-
-        Fare fare = next.getCost(path);
-        if (fare == null) {
-            fare = new Fare();
-            fare.addFare(FareType.regular, new WrappedCurrency(currency), cost);
-            return fare;
-        }
-        fare.addCost(cost);
+        Fare fare = new Fare();
+        fare.addFare(FareType.regular, new WrappedCurrency(currency), cost);
         return fare;
     }
 }
