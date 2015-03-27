@@ -157,7 +157,7 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
     }
 
     @Override
-    public void setDao(GtfsRelationalDao dao) {
+    public void processGtfs(GtfsRelationalDao dao) {
 
         /*
          * Sort all fares based on their agency. TODO With the new GTFS library, this code may be

@@ -26,7 +26,7 @@ public class NycFareServiceFactory implements FareServiceFactory {
     }
 
     @Override
-    public void setDao(GtfsRelationalDao dao) {
+    public void processGtfs(GtfsRelationalDao dao) {
     }
 
     @Override

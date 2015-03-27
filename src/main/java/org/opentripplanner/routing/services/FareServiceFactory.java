@@ -21,7 +21,7 @@ public interface FareServiceFactory {
 
     public FareService makeFareService();
 
-    public void setDao(GtfsRelationalDao dao);
+    public void processGtfs(GtfsRelationalDao dao);
 
     public void configure(JsonNode config);
 }

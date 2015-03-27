@@ -51,7 +51,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     }
 
     @Override
-    public void setDao(GtfsRelationalDao dao) {
+    public void processGtfs(GtfsRelationalDao dao) {
         fillFareRules(null, dao.getAllFareAttributes(), dao.getAllFareRules(), regularFareRules);
     }
 
