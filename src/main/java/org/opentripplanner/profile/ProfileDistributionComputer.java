@@ -195,9 +195,6 @@ public class ProfileDistributionComputer {
             d.offset += egressTimes.get(ride.to);
             
             distributions.put(ride, d);
-            
-            // sanity check
-            assert (Integer.MAX_VALUE - d.sum() < 1000);
         }
         
         // at this point we no longer care about the rides
@@ -218,42 +215,8 @@ public class ProfileDistributionComputer {
         if (options.size() == 1)
             return options.iterator().next();
         
-        Distribution[] cumulative = new Distribution[options.size()];
-        Distribution[] dist = new Distribution[options.size()];
-        
-        int didx = 0;
-        for (Distribution d : options) {
-            dist[didx] = d;
-            cumulative[didx] = d.cumulative();
-            didx++;
-        }
-        
-        // the distribution at the destination
-        Distribution dest = new Distribution(0);
-        
-        // figure out the probability of arriving on each vehicle
-        for (int i = 0; i < cumulative.length; i++) {
-            // calculate the probability that you would have arrived on any other vehicle
-            int j = (i != 0 ? 0 : 1);
-            Distribution otherVehicleArrived = cumulative[j];
-            j++;
-            
-            for (; j < cumulative.length; j++) {
-                if (j == i)
-                    continue;
-                
-                // FIXME this uses the formula for or for uncorrelated events, but what if the rides share an upstream ride?
-                otherVehicleArrived = otherVehicleArrived.or(cumulative[j]);
-            }
-            
-            // this is now no other vehicle arrived
-            otherVehicleArrived.complementInPlace();
-            
-            Distribution userArrivedOnThisVehicle = dist[i].and(otherVehicleArrived);
-            dest = dest.orMutuallyExclusive(userArrivedOnThisVehicle);
-        }
-        
-        return dest;
+        // the minimum elapsed time is the optimal one
+        return Distribution.min(options);
     }
     
     /**
@@ -351,13 +314,7 @@ public class ProfileDistributionComputer {
         
         long now = System.currentTimeMillis();
         DistributionResultSet drs = pdc.computeResults(ps);
-        System.out.println("Computing distributions took " + (now / 1000) + " seconds");
-        
-        // we want cumulative distributions for image rendering
-        for (int i = 0; i < drs.distributions.length; i++) {
-            if (drs.distributions[i] != null)
-                drs.distributions[i] = drs.distributions[i].cumulative();
-        }
+        System.out.println("Computing distributions took " + (System.currentTimeMillis() - now) / 1000 + " seconds");
         
         // calculate pointset bounds
         Envelope env = new Envelope();
@@ -382,7 +339,7 @@ public class ProfileDistributionComputer {
                 Polygon geom = (Polygon) pf.getGeom();
                 
                 // compute the color
-                float blue = ((float) drs.distributions[i].get(minute * 120)) / ((float)Integer.MAX_VALUE);
+                float blue = (float) (drs.distributions[i].get(minute * 120));
                 Color c = new Color(1 - blue, 1 - blue, 1f, 1f);
                 gr.setColor(c);
                 
