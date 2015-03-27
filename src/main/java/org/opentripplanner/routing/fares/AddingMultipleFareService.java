@@ -45,9 +45,11 @@ public class AddingMultipleFareService implements FareService, Serializable {
             }
             if (fare == null) {
                 // Pick first defined fare
-                fare = subFare;
+                fare = new Fare(subFare);
             } else {
                 // Merge subFare with existing fare
+                // Must use a temporary as we need to keep fare clean during the loop on FareType
+                Fare newFare = new Fare(fare);
                 for (FareType fareType : FareType.values()) {
                     Money cost = fare.getFare(fareType);
                     Money subCost = subFare.getFare(fareType);
@@ -66,20 +68,21 @@ public class AddingMultipleFareService implements FareService, Serializable {
                         subCost = subFare.getFare(FareType.regular);
                     } else if (cost == null && subCost != null) {
                         /* Same, but the other way around. */
-                        cost = subFare.getFare(FareType.regular);
+                        cost = fare.getFare(FareType.regular);
                     }
 
                     if (cost != null && subCost != null) {
                         // Add sub cost to cost
-                        fare.addFare(fareType, cost.getCurrency(),
+                        newFare.addFare(fareType, cost.getCurrency(),
                                 cost.getCents() + subCost.getCents());
                     } else if (cost == null && subCost != null) {
                         // Add new cost
                         // Note: this should not happen often: only if a fare
                         // did not compute a "regular" fare.
-                        fare.addFare(fareType, subCost.getCurrency(), subCost.getCents());
+                        newFare.addFare(fareType, subCost.getCurrency(), subCost.getCents());
                     }
                 }
+                fare = newFare;
             }
         }
 
