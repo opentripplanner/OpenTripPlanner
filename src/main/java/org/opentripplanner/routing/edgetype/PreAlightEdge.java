@@ -111,7 +111,7 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.LEG_SWITCH;
+        return TraverseMode.LEGSWITCH;
     }
 
     public State optimisticTraverse(State s0) {

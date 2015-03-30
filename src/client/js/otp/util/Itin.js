@@ -190,7 +190,7 @@ otp.util.Itin = {
         'TRAM' : _tr('Light Rail'),
         //TRANSLATORS: Used for street-level cable cars where the cable runs
         //beneath the car.
-        'CABLE_CAR': _tr('Cable Car'),
+        'CABLECAR': _tr('Cable Car'),
         //TRANSLATORS: Any rail system designed for steep inclines.
         'FUNICULAR': _tr('Funicular'),
         //TRANSLATORS: Gondola, Suspended cable car. Typically used for aerial
