@@ -14,6 +14,7 @@
 package org.opentripplanner.updater.stoptime;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -281,6 +282,155 @@ public class TimetableSnapshotSourceTest {
         
         assertTrue("Added trip should be found in time table for service date", forToday.getTripIndex(addedTripId) > -1);
         assertEquals("Added trip should not be found in scheduled time table", -1, schedule.getTripIndex(addedTripId));
+    }
+    
+    @Test
+    public void testHandleModifiedTrip() throws ParseException {
+        // TODO
+        
+        // GIVEN
+        
+        // Get service date of today because old dates will be purged after applying updates
+        ServiceDate serviceDate = new ServiceDate(Calendar.getInstance());
+        
+        String modifiedTripId = "10.1";
+        String modifiedTripAgency = "agency";
+        
+        TripUpdate tripUpdate;
+        {
+            TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+            
+            tripDescriptorBuilder.setTripId(modifiedTripId);
+            tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.MODIFIED);
+            tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
+            
+            Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
+            long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
+            
+            TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+            
+            tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+            
+            { // Stop O
+                StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+                stopTimeUpdateBuilder.setStopId("O");
+                stopTimeUpdateBuilder.setStopSequence(10);
+                
+                { // Arrival
+                    StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+                    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (30 * 60));
+                    arrivalBuilder.setDelay(0);
+                }
+                
+                { // Departure
+                    StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+                    departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (30 * 60));
+                    departureBuilder.setDelay(0);
+                }
+            }
+            
+            { // Stop C
+                StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.ADDED);
+                stopTimeUpdateBuilder.setStopId("C");
+                stopTimeUpdateBuilder.setStopSequence(30);
+                
+                { // Arrival
+                    StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+                    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (40 * 60));
+                    arrivalBuilder.setDelay(0);
+                }
+                
+                { // Departure
+                    StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+                    departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (45 * 60));
+                    departureBuilder.setDelay(0);
+                }
+            }
+            
+            { // Stop D
+                StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
+                stopTimeUpdateBuilder.setStopId("D");
+                stopTimeUpdateBuilder.setStopSequence(40);
+                
+                { // Arrival
+                    StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+                    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (50 * 60));
+                    arrivalBuilder.setDelay(0);
+                }
+                
+                { // Departure
+                    StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+                    departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (51 * 60));
+                    departureBuilder.setDelay(0);
+                }
+            }
+            
+            { // Stop P
+                StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+                stopTimeUpdateBuilder.setStopId("P");
+                stopTimeUpdateBuilder.setStopSequence(50);
+                
+                { // Arrival
+                    StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+                    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (55 * 60));
+                    arrivalBuilder.setDelay(0);
+                }
+                
+                { // Departure
+                    StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+                    departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (55 * 60));
+                    departureBuilder.setDelay(0);
+                }
+            }
+            
+            tripUpdate = tripUpdateBuilder.build();
+        }
+        
+        // WHEN
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), modifiedTripAgency);
+        
+        // THEN
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+
+        // Original trip pattern 
+        {
+            AgencyAndId tripId = new AgencyAndId(modifiedTripAgency, modifiedTripId);
+            Trip trip = graph.index.tripForId.get(tripId);
+            TripPattern originalTripPattern = graph.index.patternForTrip.get(trip);
+            
+            Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, serviceDate);
+            Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
+            
+            assertNotSame(originalTimetableForToday, originalTimetableScheduled);
+            
+            int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(modifiedTripId);
+            assertTrue("Original trip should be found in scheduled time table", originalTripIndexScheduled > -1);
+            TripTimes originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(originalTripIndexScheduled);
+            assertFalse("Original trip times should not be canceled in scheduled time table", originalTripTimesScheduled.isCanceled());
+
+            int originalTripIndexForToday = originalTimetableForToday.getTripIndex(modifiedTripId);
+            assertTrue("Original trip should be found in time table for service date", originalTripIndexForToday > -1);
+            TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(originalTripIndexForToday);
+            assertTrue("Original trip times should be canceled in time table for service date", originalTripTimesForToday.isCanceled());
+        }
+        
+        // New trip pattern 
+        {
+            TripPattern newTripPattern = snapshot.getLastAddedTripPattern(modifiedTripId, serviceDate);
+            assertNotNull("New trip pattern should be found", newTripPattern);
+            
+            Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
+            Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
+            
+            assertNotSame(newTimetableForToday, newTimetableScheduled);
+            
+            assertTrue("New trip should be found in time table for service date", newTimetableForToday.getTripIndex(modifiedTripId) > -1);
+            assertEquals("New trip should not be found in scheduled time table", -1, newTimetableScheduled.getTripIndex(modifiedTripId));
+        }
     }
     
     @Test

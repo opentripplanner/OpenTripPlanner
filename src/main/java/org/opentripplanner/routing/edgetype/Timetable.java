@@ -151,6 +151,7 @@ public class Timetable implements Serializable {
         // Hoping JVM JIT will distribute the loop over the if clauses as needed.
         // We could invert this and skip some service days based on schedule overlap as in RRRR.
         for (TripTimes tt : tripTimes) {
+            if (tt.isCanceled()) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
@@ -176,6 +177,7 @@ public class Timetable implements Serializable {
         FrequencyEntry bestFreq = null;
         for (FrequencyEntry freq : frequencyEntries) {
             TripTimes tt = freq.tripTimes;
+            if (tt.isCanceled()) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
