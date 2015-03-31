@@ -23,8 +23,8 @@ import org.onebusaway.gtfs.model.FareRule;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.fares.MultipleFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -110,19 +110,62 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     }
 
     /**
-     * Build a specific FareServiceFactory given the "type" node of the config, or fallback to the
-     * default if none specified.
+     * Build a specific FareServiceFactory given the config node, or fallback to the default if none
+     * specified.
+     * 
+     * Accept different formats. Examples:
+     * 
+     * <pre>
+     * { fares : "seattle" }
+     * --------------------------
+     * { fares : {} } // Fallback to default
+     * --------------------------
+     * { fares : {
+     *       type : "foobar",
+     *       param1 : 42
+     * } }
+     * --------------------------
+     * { fares : {
+     *       combinationStrategy : "additive",
+     *       fares : [
+     *           "seattle",
+     *           { type : "foobar", ... }
+     *       ]
+     * } }
+     * </pre>
      */
     public static FareServiceFactory fromConfig(JsonNode config) {
-        String type = config == null ? null : config.path("type").asText(null);
+        String type = null;
+        if (config == null) {
+            /* Empty block, fallback to default */
+            type = null;
+        } else if (config.isTextual()) {
+            /* Simplest form: { fares : "seattle" } */
+            type = config.asText();
+        } else if (config.has("combinationStrategy")) {
+            /* Composite */
+            String combinationStrategy = config.path("combinationStrategy").asText();
+            switch (combinationStrategy) {
+            case "additive":
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown fare combinationStrategy: "
+                        + combinationStrategy);
+            }
+            type = "composite:" + combinationStrategy;
+        } else if (config.has("type")) {
+            /* Fare with a type: { fares : { type : "foobar", param1 : 42 } } */
+            type = config.path("type").asText(null);
+        }
         if (type == null)
             type = "default";
+
         FareServiceFactory retval;
         switch (type) {
         case "default":
             retval = new DefaultFareServiceFactory();
             break;
-        case "adding-multiple":
+        case "composite:additive":
             retval = new MultipleFareServiceFactory.AddingMultipleFareServiceFactory();
             break;
         case "bike-rental-time-based":
