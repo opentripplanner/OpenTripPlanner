@@ -216,6 +216,9 @@ public class TimetableSnapshotSource {
                         LOG.warn("Failed to parse start date in gtfs-rt trip update: \n{}", tripUpdate);
                         continue;
                     }
+                } else {
+                    // TODO: figure out the correct service date. For the special case that a trip
+                    // starts for example at 25:00, yesterday would probably be a better guess.
                 }
 
                 uIndex += 1;
@@ -414,6 +417,11 @@ public class TimetableSnapshotSource {
         for (int index = 0; index < stopTimeUpdates.size(); ++index) {
             StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
             
+            // Determine whether stop is skipped
+            boolean skippedStop = stopTimeUpdate.hasScheduleRelationship() &&
+                    stopTimeUpdate.getScheduleRelationship().equals(
+                            StopTimeUpdate.ScheduleRelationship.SKIPPED);
+            
             // Check stop sequence
             if (stopTimeUpdate.hasStopSequence()) {
                 Integer stopSequence = stopTimeUpdate.getStopSequence();
@@ -442,6 +450,9 @@ public class TimetableSnapshotSource {
                 if (stop != null) {
                     // Remember stop
                     stops.add(stop);
+                } else if (skippedStop) {
+                    // Set a null value for a skipped stop
+                    stops.add(null);
                 } else {
                     LOG.warn("Graph doesn't contain stop id \"{}\" of trip update, skipping.",
                             stopTimeUpdate.getStopId());
@@ -452,39 +463,42 @@ public class TimetableSnapshotSource {
                 return null;
             }
             
-            // Check arrival time
-            if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
-                // Check for increasing time
-                Long time = stopTimeUpdate.getArrival().getTime();
-                if (previousTime != null && previousTime > time) {
-                    LOG.warn("Trip update contains decreasing times, skipping.");
-                    return null;
+            // Only check arrival and departure times for non-skipped stops
+            if (!skippedStop) {
+                // Check arrival time
+                if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
+                    // Check for increasing time
+                    Long time = stopTimeUpdate.getArrival().getTime();
+                    if (previousTime != null && previousTime > time) {
+                        LOG.warn("Trip update contains decreasing times, skipping.");
+                        return null;
+                    }
+                    previousTime = time;
+                } else {
+                    // Only first stop is allowed to miss arrival time
+                    // TODO: should we support only requiring an arrival time on the last stop and interpolate? 
+                    if (index > 0) {
+                        LOG.warn("Trip update misses arrival time, skipping.");
+                        return null;
+                    }
                 }
-                previousTime = time;
-            } else {
-                // Only first stop is allowed to miss arrival time
-                // TODO: should we support only requiring an arrival time on the last stop and interpolate? 
-                if (index > 0) {
-                    LOG.warn("Trip update misses arrival time, skipping.");
-                    return null;
-                }
-            }
-            
-            // Check departure time
-            if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
-                // Check for increasing time
-                Long time = stopTimeUpdate.getDeparture().getTime();
-                if (previousTime != null && previousTime > time) {
-                    LOG.warn("Trip update contains decreasing times, skipping.");
-                    return null;
-                }
-                previousTime = time;
-            } else {
-                // Only last stop is allowed to miss departure time
-                // TODO: should we support only requiring a departure time on the first stop and interpolate? 
-                if (index < stopTimeUpdates.size() - 1) {
-                    LOG.warn("Trip update misses departure time, skipping.");
-                    return null;
+                
+                // Check departure time
+                if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
+                    // Check for increasing time
+                    Long time = stopTimeUpdate.getDeparture().getTime();
+                    if (previousTime != null && previousTime > time) {
+                        LOG.warn("Trip update contains decreasing times, skipping.");
+                        return null;
+                    }
+                    previousTime = time;
+                } else {
+                    // Only last stop is allowed to miss departure time
+                    // TODO: should we support only requiring a departure time on the first stop and interpolate? 
+                    if (index < stopTimeUpdates.size() - 1) {
+                        LOG.warn("Trip update misses departure time, skipping.");
+                        return null;
+                    }
                 }
             }
         }
@@ -587,9 +601,13 @@ public class TimetableSnapshotSource {
             StopTimeUpdate stopTimeUpdate = tripUpdate.getStopTimeUpdate(index);
             Stop stop = stops.get(index);
             
+            // Determine whether stop is skipped
+            boolean skippedStop = stopTimeUpdate.hasScheduleRelationship() &&
+                    stopTimeUpdate.getScheduleRelationship().equals(
+                            StopTimeUpdate.ScheduleRelationship.SKIPPED);
+            
             // Only create stop time for non-skipped stops
-            if (!(stopTimeUpdate.hasScheduleRelationship() && stopTimeUpdate.getScheduleRelationship().equals(
-                    StopTimeUpdate.ScheduleRelationship.SKIPPED))) {
+            if (!skippedStop) {
                 // Create stop time
                 StopTime stopTime = new StopTime();
                 stopTime.setTrip(trip);
@@ -644,11 +662,13 @@ public class TimetableSnapshotSource {
         // Get cached trip pattern or create one if it doesn't exist yet
         TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
         
-        // Add service code to bitset of pattern (using copy on write)
+        // Add service code to bitset of pattern if needed (using copy on write)
         int serviceCode = graph.serviceCodes.get(trip.getServiceId());
-        BitSet services = (BitSet) pattern.getServices().clone();
-        services.set(serviceCode);
-        pattern.setServices(services);
+        if (!pattern.getServices().get(serviceCode)) {
+            BitSet services = (BitSet) pattern.getServices().clone();
+            services.set(serviceCode);
+            pattern.setServices(services);
+        }
         
         // Create new trip times
         TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
