@@ -53,7 +53,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * Represents a group of trips that all call at the same sequence of stops. For each stop, there
+ * Represents a group of trips on a route that all call at the same sequence of stops. For each stop, there
  * is a list of departure times, running times, arrival times, dwell times, and wheelchair
  * accessibility information (one of each of these per trip per stop).
  * Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a later trip.
@@ -76,15 +76,12 @@ public class TripPattern implements Serializable {
     public static final int FLAG_BIKES_ALLOWED = 32;
 
     /**
-     * The GTFS Route of all trips in this pattern. GTFS technically allows the same pattern to appear in more
-     * than one route, but we make the assumption that all trips with the same pattern belong to the
-     * same Route.
-     * TODO: consider the case where there is a replacement bus that makes the same stops as a train. We may need to split out multiple patterns for multiple routes.
+     * The GTFS Route of all trips in this pattern.
      */
     public final Route route;
 
     /**
-     * As for the route field, this depends on there being a single GFTFS route per journey pattern. That is not always true.
+     * The traverse mode for all trips in this pattern.
      */
     public final TraverseMode mode;
 

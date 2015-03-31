@@ -81,6 +81,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.HashMultimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -285,7 +286,7 @@ public class GTFSPatternHopFactory {
     
     private FareServiceFactory fareServiceFactory;
 
-    private Map<StopPattern, TripPattern> tripPatterns = Maps.newHashMap();
+    private Multimap<StopPattern, TripPattern> tripPatterns = HashMultimap.create();
 
     private GtfsStopContext context = new GtfsStopContext();
 
@@ -345,7 +346,7 @@ public class GTFSPatternHopFactory {
         /* The hops don't actually exist when we build their geometries, but we have to build their geometries
          * below, before we throw away the modified stopTimes, saving only the tripTimes (which don't have enough
          * information to build a geometry). So we keep them here.
-         * 
+         *
          *  A trip pattern actually does not have a single geometry, but one per hop, so we store an array.
          *  FIXME _why_ doesn't it have a single geometry?
          */
@@ -380,11 +381,7 @@ public class GTFSPatternHopFactory {
 
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
             StopPattern stopPattern = new StopPattern(stopTimes);
-            TripPattern tripPattern = tripPatterns.get(stopPattern);
-            if (tripPattern == null) {
-                tripPattern = new TripPattern(trip.getRoute(), stopPattern);
-                tripPatterns.put(stopPattern, tripPattern);
-            }
+            TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute());
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
             TripTimes tripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
@@ -469,6 +466,18 @@ public class GTFSPatternHopFactory {
         clearCachedData(); // eh?
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
+    }
+
+    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route) {
+        for(TripPattern tripPattern : tripPatterns.get(stopPattern)) {
+            if(tripPattern.route.equals(route)) {
+                return tripPattern;
+            }
+        }
+
+        TripPattern tripPattern = new TripPattern(route, stopPattern);
+        tripPatterns.put(stopPattern, tripPattern);
+        return tripPattern;
     }
 
     /**
