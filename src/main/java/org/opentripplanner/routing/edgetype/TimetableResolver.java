@@ -18,16 +18,18 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.common.base.Preconditions;
 
 // this is only currently in edgetype because that's where Trippattern is.
 // move these classes elsewhere.
@@ -50,6 +52,47 @@ public class TimetableResolver {
             return t1.serviceDate.compareTo(t2.serviceDate);
         }
     }
+    
+    /**
+     * Class to use as key in HashMap containing trip id and service date
+     */
+    protected class TripIdAndServiceDate {
+        private final String tripId;
+        private final ServiceDate serviceDate;
+        
+        public TripIdAndServiceDate(final String tripId, final ServiceDate serviceDate) {
+            this.tripId = tripId;
+            this.serviceDate = serviceDate;
+        }
+        
+        public String getTripId() {
+            return tripId;
+        }
+
+        public ServiceDate getServiceDate() {
+            return serviceDate;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(tripId, serviceDate);
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            TripIdAndServiceDate other = (TripIdAndServiceDate) obj;
+            boolean result = Objects.equals(this.tripId, other.tripId) &&
+                    Objects.equals(this.serviceDate, other.serviceDate);
+            return result;
+        }
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(TimetableResolver.class);
 
@@ -59,6 +102,18 @@ public class TimetableResolver {
     // FIXME: this could be made into a flat hashtable with compound keys.
     private HashMap<TripPattern, SortedSet<Timetable>> timetables =
             new HashMap<TripPattern, SortedSet<Timetable>>();
+    
+    /**
+     * <p>
+     * Map containing the last <b>added</b> trip pattern given a trip id (without agency) and a
+     * service date as a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)}
+     * with trip times of a trip that didn't exist yet in the trip pattern.
+     * </p>
+     * <p>
+     * This is a HashMap and not a Map so the clone function is available.
+     * </p>
+     */
+    private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
 
     /** A set of all timetables which have been modified and are waiting to be indexed. */
     private Set<Timetable> dirty = new HashSet<Timetable>();
@@ -81,12 +136,36 @@ public class TimetableResolver {
 
         return pattern.scheduledTimetable;
     }
+    
+    /**
+     * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as
+     * a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)} with trip times of
+     * a trip that didn't exist yet in the trip pattern.
+     * 
+     * @param tripId trip id (without agency)
+     * @param serviceDate service date
+     * @return last added trip pattern; null if trip never was added to a trip pattern
+     */
+    public TripPattern getLastAddedTripPattern(String tripId, ServiceDate serviceDate) {
+        TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
+        TripPattern pattern = lastAddedTripPattern.get(tripIdAndServiceDate);
+        return pattern;
+    }
 
     /**
+     * Update the trip times of one trip in a timetable of a trip pattern. If the trip of the trip
+     * times does not exist yet in the timetable, add it.
+     * 
+     * @param pattern trip pattern
+     * @param updatedTripTimes updated trip times
+     * @param serviceDate service day for which this update is valid
      * @return whether or not the update was actually applied
      */
-    public boolean update(TripPattern pattern, TripUpdate tripUpdate, String agencyId,
-            TimeZone timeZone, ServiceDate serviceDate) {
+    public boolean update(TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
+        // Preconditions
+        Preconditions.checkNotNull(pattern);
+        Preconditions.checkNotNull(serviceDate);
+        
         // synchronization prevents commits/snapshots while update is in progress
         synchronized(this) {
             if (dirty == null)
@@ -112,8 +191,25 @@ public class TimetableResolver {
                 timetables.put(pattern, sortedTimetables);
                 dirty.add(tt);
             }
+            
             // Assume all trips in a pattern are from the same feed, which should be the case.
-            return tt.update(tripUpdate, timeZone, serviceDate);
+            // Find trip index
+            int tripIndex = tt.getTripIndex(updatedTripTimes.trip.getId());
+            if (tripIndex == -1) {
+                // Trip not found, add it
+                tt.addTripTimes(updatedTripTimes);
+                // Remember this pattern for the added trip id and service date
+                String tripId = updatedTripTimes.trip.getId().getId();
+                TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
+                lastAddedTripPattern.put(tripIdAndServiceDate, pattern);
+            } else {
+                // Set updated trip times of trip
+                tt.setTripTimes(tripIndex, updatedTripTimes);
+            }
+            
+            // The time tables are finished during the commit
+            
+            return true;
         }
     }
 
@@ -143,8 +239,9 @@ public class TimetableResolver {
             for (Timetable tt : dirty) {
                 tt.finish(); // summarize, index, etc. the new timetables
             }
-            ret.timetables =
-                    (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
+            ret.timetables = (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
+            ret.lastAddedTripPattern = (HashMap<TripIdAndServiceDate, TripPattern>)
+                    this.lastAddedTripPattern.clone();
             this.dirty.clear();
         }
         ret.dirty = null; // mark the snapshot as henceforth immutable
@@ -178,6 +275,16 @@ public class TimetableResolver {
                     it.remove();
                 } else {
                     timetables.put(pattern, toKeepTimetables);
+                }
+            }
+            
+            // Also remove last added trip pattern for days that are purged
+            for (Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator = lastAddedTripPattern
+                    .entrySet().iterator(); iterator.hasNext();) {
+                TripIdAndServiceDate tripIdAndServiceDate = iterator.next().getKey();
+                if (serviceDate.compareTo(tripIdAndServiceDate.getServiceDate()) >= 0) {
+                    iterator.remove();
+                    modified = true;
                 }
             }
 

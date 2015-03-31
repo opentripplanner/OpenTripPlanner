@@ -21,6 +21,7 @@ import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
@@ -29,21 +30,26 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     /**
      * The list with updates to apply to the graph
      */
-    private List<TripUpdate> updates;
+    private final List<TripUpdate> updates;
 
-    private String feedId;
+    private final String feedId;
 
-    public TripUpdateGraphWriterRunnable(List<TripUpdate> updates, String feedId) {
-		this.updates = updates;
-		this.feedId = feedId;
-	}
+    public TripUpdateGraphWriterRunnable(final List<TripUpdate> updates, final String feedId) {
+        // Preconditions
+        Preconditions.checkNotNull(updates);
+        Preconditions.checkNotNull(feedId);
+        
+        // Set fields
+        this.updates = updates;
+        this.feedId = feedId;
+    }
 
-	@Override
+    @Override
     public void run(Graph graph) {
         // Apply updates to graph using realtime snapshot source
         TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
         if (snapshotSource != null) {
-            snapshotSource.applyTripUpdates(updates, feedId);
+            snapshotSource.applyTripUpdates(graph, updates, feedId);
         } else {
             LOG.error("Could not find realtime data snapshot source in graph."
                     + " The following updates are not applied: {}", updates);

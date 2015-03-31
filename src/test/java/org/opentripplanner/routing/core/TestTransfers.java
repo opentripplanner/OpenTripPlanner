@@ -49,6 +49,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.TestUtils;
@@ -212,7 +213,11 @@ public class TestTransfers extends TestCase {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
+        TripTimes updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        assertNotNull(updatedTripTimes);
+        int tripIndex = timetable.getTripIndex(tripId);
+        assertTrue(tripIndex != -1);
+        timetable.setTripTimes(tripIndex, updatedTripTimes);
     }
 
     public void testStopToStopTransfer() throws Exception {
@@ -364,9 +369,7 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency:U");
-        @SuppressWarnings("deprecation")
         Vertex destination = graph.getVertex("agency:J");
 
         // Set options like time and routing context
