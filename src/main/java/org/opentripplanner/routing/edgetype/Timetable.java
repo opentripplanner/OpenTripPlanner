@@ -151,6 +151,7 @@ public class Timetable implements Serializable {
         // Hoping JVM JIT will distribute the loop over the if clauses as needed.
         // We could invert this and skip some service days based on schedule overlap as in RRRR.
         for (TripTimes tt : tripTimes) {
+            if (tt.isCanceled()) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
@@ -176,6 +177,7 @@ public class Timetable implements Serializable {
         FrequencyEntry bestFreq = null;
         for (FrequencyEntry freq : frequencyEntries) {
             TripTimes tt = freq.tripTimes;
+            if (tt.isCanceled()) continue;
             if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue; // TODO merge into call on next line
             if ( ! tt.tripAcceptable(s0, stopIndex)) continue;
             int adjustedTime = adjustTimeForTransfer(s0, currentStop, tt.trip, boarding, serviceDay, time);
@@ -332,19 +334,20 @@ public class Timetable implements Serializable {
     }
 
     /**
-     * Apply the TripUpdate to the appropriate TripTimes from this Timetable.
-     * The existing TripTimes must not be modified directly because they may be shared with
-     * the underlying scheduledTimetable, or other updated Timetables.
-     * The StoptimeUpdater performs the protective copying of this Timetable. It is not done in
-     * this update method to avoid repeatedly cloning the same Timetable when several updates
-     * are applied to it at once.
-     * We assume here that all trips in a timetable are from the same feed, which should always be the case.
+     * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
+     * must not be modified directly because they may be shared with the underlying
+     * scheduledTimetable, or other updated Timetables. The {@link TimetableSnapshot} performs the
+     * protective copying of this Timetable. It is not done in this update method to avoid
+     * repeatedly cloning the same Timetable when several updates are applied to it at once. We
+     * assume here that all trips in a timetable are from the same feed, which should always be the
+     * case.
      *
      * @param tripUpdate GTFS-RT trip update
      * @param timeZone time zone of trip update
      * @param updateServiceDate service date of trip update
-     * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip with the id
-     *         specified in the trip descriptor of the TripUpdate; null if something went wrong
+     * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
+     *         with the id specified in the trip descriptor of the TripUpdate; null if something
+     *         went wrong
      */
     public TripTimes createUpdatedTripTimes(TripUpdate tripUpdate, TimeZone timeZone, ServiceDate updateServiceDate) {
         if (tripUpdate == null) {
@@ -371,7 +374,7 @@ public class Timetable implements Serializable {
             LOG.info("tripId {} not found in pattern.", tripId);
             return null;
         } else {
-            LOG.trace("tripId {} found at index {} in scheduled timetable.", tripId, tripIndex);
+            LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
         }
 
         TripTimes newTimes = new TripTimes(getTripTimes(tripIndex));
@@ -406,8 +409,7 @@ public class Timetable implements Serializable {
                             update.hasScheduleRelationship() ? update.getScheduleRelationship()
                             : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
                     if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
-                        // TODO: Handle partial trip cancellations
-                        LOG.warn("Partially canceled trips are currently unsupported." +
+                        LOG.warn("Partially canceled trips are unsupported by this method." +
                                 " Skipping TripUpdate.");
                         return null;
                     } else if (scheduleRelationship ==

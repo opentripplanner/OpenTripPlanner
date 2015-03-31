@@ -40,7 +40,7 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
@@ -99,13 +99,13 @@ class Context {
         // Add simple transfer to make transfer possible between U-V and I-J
         createSimpleTransfer("agency:V", "agency:I", 100);
 
-        // Create dummy TimetableResolver
-        TimetableResolver resolver = new TimetableResolver();
+        // Create dummy TimetableSnapshot
+        TimetableSnapshot snapshot = new TimetableSnapshot();
 
-        // Mock TimetableSnapshotSource to return dummy TimetableResolver
+        // Mock TimetableSnapshotSource to return dummy TimetableSnapshot
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
 
-        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
+        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(snapshot);
 
         graph.timetableSnapshotSource = (timetableSnapshotSource);
     }
@@ -185,7 +185,7 @@ public class TestTransfers extends TestCase {
     private void applyUpdateToTripPattern(TripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
-        TimetableResolver snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
+        TimetableSnapshot snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         Timetable timetable = snapshot.resolve(pattern, serviceDate);
         TimeZone timeZone = new SimpleTimeZone(-7, "PST");
         long today = serviceDate.getAsDate(timeZone).getTime() / 1000;

@@ -14,6 +14,7 @@
 package org.opentripplanner.updater.stoptime;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
@@ -39,7 +40,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -57,6 +58,7 @@ public class TimetableSnapshotSourceTest {
 
     private static byte cancellation[];
     private static Graph graph = new Graph();
+    private static boolean fullDataset = false;
     private static GtfsContext context;
     private static ServiceDate serviceDate = new ServiceDate();
 
@@ -91,19 +93,19 @@ public class TimetableSnapshotSourceTest {
 
     @Test
     public void testGetSnapshot() throws InvalidProtocolBufferException {
-        updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
 
-        TimetableResolver resolver = updater.getTimetableSnapshot();
-        assertNotNull(resolver);
-        assertSame(resolver, updater.getTimetableSnapshot());
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        assertNotNull(snapshot);
+        assertSame(snapshot, updater.getTimetableSnapshot());
 
-        updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
-        assertSame(resolver, updater.getTimetableSnapshot());
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        assertSame(snapshot, updater.getTimetableSnapshot());
 
         updater.maxSnapshotFrequency = (-1);
-        TimetableResolver newResolver = updater.getTimetableSnapshot();
-        assertNotNull(newResolver);
-        assertNotSame(resolver, newResolver);
+        TimetableSnapshot newSnapshot = updater.getTimetableSnapshot();
+        assertNotNull(newSnapshot);
+        assertNotSame(snapshot, newSnapshot);
     }
 
     @Test
@@ -115,11 +117,11 @@ public class TimetableSnapshotSourceTest {
         int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
         int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
-        updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
 
-        TimetableResolver resolver = updater.getTimetableSnapshot();
-        Timetable forToday = resolver.resolve(pattern, serviceDate);
-        Timetable schedule = resolver.resolve(pattern, null);
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        Timetable forToday = snapshot.resolve(pattern, serviceDate);
+        Timetable schedule = snapshot.resolve(pattern, null);
         assertNotSame(forToday, schedule);
         assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
         assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
@@ -164,11 +166,11 @@ public class TimetableSnapshotSourceTest {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(graph, Arrays.asList(tripUpdate), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), "agency");
 
-        TimetableResolver resolver = updater.getTimetableSnapshot();
-        Timetable forToday = resolver.resolve(pattern, serviceDate);
-        Timetable schedule = resolver.resolve(pattern, null);
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        Timetable forToday = snapshot.resolve(pattern, serviceDate);
+        Timetable schedule = snapshot.resolve(pattern, null);
         assertNotSame(forToday, schedule);
         assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
         assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
@@ -261,7 +263,7 @@ public class TimetableSnapshotSourceTest {
         }
         
         // WHEN
-        updater.applyTripUpdates(graph, Arrays.asList(tripUpdate), "agency");
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), "agency");
         
         // THEN
         // Find new pattern in graph starting from stop A
@@ -272,14 +274,163 @@ public class TimetableSnapshotSourceTest {
         TripPattern tripPattern = ((TransitBoardAlight) outgoingEdges.get(outgoingEdges.size() - 1)).getPattern();
         assertNotNull("Added trip pattern should be found", tripPattern);
         
-        TimetableResolver resolver = updater.getTimetableSnapshot();
-        Timetable forToday = resolver.resolve(tripPattern, serviceDate);
-        Timetable schedule = resolver.resolve(tripPattern, null);
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        Timetable forToday = snapshot.resolve(tripPattern, serviceDate);
+        Timetable schedule = snapshot.resolve(tripPattern, null);
         
         assertNotSame(forToday, schedule);
         
         assertTrue("Added trip should be found in time table for service date", forToday.getTripIndex(addedTripId) > -1);
         assertEquals("Added trip should not be found in scheduled time table", -1, schedule.getTripIndex(addedTripId));
+    }
+    
+    @Test
+    public void testHandleModifiedTrip() throws ParseException {
+        // TODO
+        
+        // GIVEN
+        
+        // Get service date of today because old dates will be purged after applying updates
+        ServiceDate serviceDate = new ServiceDate(Calendar.getInstance());
+        
+        String modifiedTripId = "10.1";
+        String modifiedTripAgency = "agency";
+        
+        TripUpdate tripUpdate;
+        {
+            TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+            
+            tripDescriptorBuilder.setTripId(modifiedTripId);
+            tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.MODIFIED);
+            tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
+            
+            Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
+            long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
+            
+            TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+            
+            tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+            
+            { // Stop O
+                StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+                stopTimeUpdateBuilder.setStopId("O");
+                stopTimeUpdateBuilder.setStopSequence(10);
+                
+                { // Arrival
+                    StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+                    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (30 * 60));
+                    arrivalBuilder.setDelay(0);
+                }
+                
+                { // Departure
+                    StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+                    departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (30 * 60));
+                    departureBuilder.setDelay(0);
+                }
+            }
+            
+            { // Stop C
+                StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.ADDED);
+                stopTimeUpdateBuilder.setStopId("C");
+                stopTimeUpdateBuilder.setStopSequence(30);
+                
+                { // Arrival
+                    StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+                    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (40 * 60));
+                    arrivalBuilder.setDelay(0);
+                }
+                
+                { // Departure
+                    StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+                    departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (45 * 60));
+                    departureBuilder.setDelay(0);
+                }
+            }
+            
+            { // Stop D
+                StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
+                stopTimeUpdateBuilder.setStopId("D");
+                stopTimeUpdateBuilder.setStopSequence(40);
+                
+                { // Arrival
+                    StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+                    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (50 * 60));
+                    arrivalBuilder.setDelay(0);
+                }
+                
+                { // Departure
+                    StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+                    departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (51 * 60));
+                    departureBuilder.setDelay(0);
+                }
+            }
+            
+            { // Stop P
+                StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+                stopTimeUpdateBuilder.setStopId("P");
+                stopTimeUpdateBuilder.setStopSequence(50);
+                
+                { // Arrival
+                    StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+                    arrivalBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (55 * 60));
+                    arrivalBuilder.setDelay(0);
+                }
+                
+                { // Departure
+                    StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+                    departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (55 * 60));
+                    departureBuilder.setDelay(0);
+                }
+            }
+            
+            tripUpdate = tripUpdateBuilder.build();
+        }
+        
+        // WHEN
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), modifiedTripAgency);
+        
+        // THEN
+        TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+
+        // Original trip pattern 
+        {
+            AgencyAndId tripId = new AgencyAndId(modifiedTripAgency, modifiedTripId);
+            Trip trip = graph.index.tripForId.get(tripId);
+            TripPattern originalTripPattern = graph.index.patternForTrip.get(trip);
+            
+            Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, serviceDate);
+            Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
+            
+            assertNotSame(originalTimetableForToday, originalTimetableScheduled);
+            
+            int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(modifiedTripId);
+            assertTrue("Original trip should be found in scheduled time table", originalTripIndexScheduled > -1);
+            TripTimes originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(originalTripIndexScheduled);
+            assertFalse("Original trip times should not be canceled in scheduled time table", originalTripTimesScheduled.isCanceled());
+
+            int originalTripIndexForToday = originalTimetableForToday.getTripIndex(modifiedTripId);
+            assertTrue("Original trip should be found in time table for service date", originalTripIndexForToday > -1);
+            TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(originalTripIndexForToday);
+            assertTrue("Original trip times should be canceled in time table for service date", originalTripTimesForToday.isCanceled());
+        }
+        
+        // New trip pattern 
+        {
+            TripPattern newTripPattern = snapshot.getLastAddedTripPattern(modifiedTripId, serviceDate);
+            assertNotNull("New trip pattern should be found", newTripPattern);
+            
+            Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
+            Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
+            
+            assertNotSame(newTimetableForToday, newTimetableScheduled);
+            
+            assertTrue("New trip should be found in time table for service date", newTimetableForToday.getTripIndex(modifiedTripId) > -1);
+            assertEquals("New trip should not be found in scheduled time table", -1, newTimetableScheduled.getTripIndex(modifiedTripId));
+        }
     }
     
     @Test
@@ -292,8 +443,8 @@ public class TimetableSnapshotSourceTest {
         updater.maxSnapshotFrequency = (0);
         updater.purgeExpiredData = (false);
 
-        updater.applyTripUpdates(graph, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
-        TimetableResolver resolverA = updater.getTimetableSnapshot();
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), "agency");
+        TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
         updater.purgeExpiredData = (true);
 
@@ -309,15 +460,15 @@ public class TimetableSnapshotSourceTest {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(graph, Arrays.asList(tripUpdate), "agency");
-        TimetableResolver resolverB = updater.getTimetableSnapshot();
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), "agency");
+        TimetableSnapshot snapshotB = updater.getTimetableSnapshot();
 
-        assertNotSame(resolverA, resolverB);
+        assertNotSame(snapshotA, snapshotB);
 
-        assertSame   (resolverA.resolve(pattern, null ), resolverB.resolve(pattern, null ));
-        assertSame   (resolverA.resolve(pattern, serviceDate),
-                resolverB.resolve(pattern, serviceDate));
-        assertNotSame(resolverA.resolve(pattern, null ), resolverA.resolve(pattern, serviceDate));
-        assertSame   (resolverB.resolve(pattern, null ), resolverB.resolve(pattern, previously));
+        assertSame   (snapshotA.resolve(pattern, null ), snapshotB.resolve(pattern, null ));
+        assertSame   (snapshotA.resolve(pattern, serviceDate),
+                snapshotB.resolve(pattern, serviceDate));
+        assertNotSame(snapshotA.resolve(pattern, null ), snapshotA.resolve(pattern, serviceDate));
+        assertSame   (snapshotB.resolve(pattern, null ), snapshotB.resolve(pattern, previously));
     }
 }

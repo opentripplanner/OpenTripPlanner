@@ -16,9 +16,8 @@ package org.opentripplanner.updater.stoptime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.prefs.Preferences;
-
 import com.fasterxml.jackson.databind.JsonNode;
+
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -28,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
@@ -173,10 +173,21 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
             FeedMessage feedMessage = null;
             List<FeedEntity> feedEntityList = null;
             List<TripUpdate> updates = null;
+            boolean fullDataset = true;
             try {
-                // Decode message into List of TripUpdates
+                // Decode message
                 feedMessage = FeedMessage.PARSER.parseFrom(message);
                 feedEntityList = feedMessage.getEntityList();
+                
+                // Change fullDataset value if this is an incremental update
+                if (feedMessage.hasHeader()
+                        && feedMessage.getHeader().hasIncrementality()
+                        && feedMessage.getHeader().getIncrementality()
+                                .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)) {
+                    fullDataset = false;
+                }
+                
+                // Create List of TripUpdates
                 updates = new ArrayList<TripUpdate>(feedEntityList.size());
                 for (FeedEntity feedEntity : feedEntityList) {
                     if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
@@ -187,7 +198,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
             if (updates != null && updates.size() > 0) {
                 // Handle trip updates via graph writer runnable
-                TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates, feedId);
+                TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
+                        fullDataset, updates, feedId);
                 updaterManager.execute(runnable);
             }
         }

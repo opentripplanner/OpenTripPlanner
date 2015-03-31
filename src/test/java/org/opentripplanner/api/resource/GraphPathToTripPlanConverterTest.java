@@ -623,13 +623,13 @@ public class GraphPathToTripPlanConverterTest {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        // Create dummy TimetableResolver
-        TimetableResolver resolver = new TimetableResolver();
+        // Create dummy TimetableSnapshot
+        TimetableSnapshot snapshot = new TimetableSnapshot();
         
-        // Mock TimetableSnapshotSource to return dummy TimetableResolver
+        // Mock TimetableSnapshotSource to return dummy TimetableSnapshot
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
 
-        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
+        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(snapshot);
 
         TripTimes updatedTripTimes = thirdTripPattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
                 timeZone, serviceDate);

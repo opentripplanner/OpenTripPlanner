@@ -29,7 +29,7 @@ import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -327,9 +327,9 @@ public class GraphIndex {
 
         long now = System.currentTimeMillis()/1000;
         List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableResolver timetableResolver = null;
+        TimetableSnapshot snapshot = null;
         if (graph.timetableSnapshotSource != null) {
-            timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         }
         ServiceDate[] serviceDates = {new ServiceDate().previous(), new ServiceDate(), new ServiceDate().next()};
 
@@ -349,8 +349,8 @@ public class GraphIndex {
             for (ServiceDate serviceDate : serviceDates) {
                 ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
                 Timetable tt;
-                if (timetableResolver != null){
-                    tt = timetableResolver.resolve(pattern, serviceDate);
+                if (snapshot != null){
+                    tt = snapshot.resolve(pattern, serviceDate);
                 } else {
                     tt = pattern.scheduledTimetable;
                 }
@@ -409,16 +409,16 @@ public class GraphIndex {
      */
     public List<StopTimesInPattern> getStopTimesForStop(Stop stop, ServiceDate serviceDate) {
         List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableResolver timetableResolver = null;
+        TimetableSnapshot snapshot = null;
         if (graph.timetableSnapshotSource != null) {
-            timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         }
         Collection<TripPattern> patterns = patternsForStop.get(stop);
         for (TripPattern pattern : patterns) {
             StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
             Timetable tt;
-            if (timetableResolver != null){
-                tt = timetableResolver.resolve(pattern, serviceDate);
+            if (snapshot != null){
+                tt = snapshot.resolve(pattern, serviceDate);
             } else {
                 tt = pattern.scheduledTimetable;
             }
