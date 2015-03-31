@@ -66,7 +66,7 @@ public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory
         pricingBySecond = new ArrayList<>();
         for (Iterator<Map.Entry<String, JsonNode>> i = config.path("prices").fields(); i.hasNext();) {
             Map.Entry<String, JsonNode> kv = i.next();
-            int maxTimeSec = hmsToSeconds(kv.getKey());
+            int maxTimeSec = hmToMinutes(kv.getKey()) * 60;
             int priceCent = (int) Math.round(kv.getValue().asDouble() * 100);
             pricingBySecond.add(new P2<>(maxTimeSec, priceCent));
         }
@@ -98,14 +98,16 @@ public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory
         }
     }
 
-    private int hmsToSeconds(String hmsStr) {
-        String[] hms = hmsStr.split(":");
-        int seconds = 0;
-        for (String field : hms) {
-            seconds *= 60;
+    private int hmToMinutes(String hmStr) {
+        String[] hm = hmStr.split(":");
+        if (hm.length > 2)
+            throw new IllegalArgumentException("Invalid time: '" + hmStr + "'. Must be either 'hh:mm' or 'mm'.");
+        int minutes = 0;
+        for (String field : hm) {
+            minutes *= 60;
             int fieldValue = Integer.parseInt(field);
-            seconds += fieldValue;
+            minutes += fieldValue;
         }
-        return seconds;
+        return minutes;
     }
 }
