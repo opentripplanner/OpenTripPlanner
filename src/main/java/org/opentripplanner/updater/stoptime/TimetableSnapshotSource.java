@@ -829,15 +829,14 @@ public class TimetableSnapshotSource {
         if (tripUpdate.getTrip().hasTripId()) {
             // Try to cancel scheduled trip
             String tripId = tripUpdate.getTrip().getTripId();
-            success = cancelScheduledTrip(tripId, serviceDate);
+            boolean cancelScheduledSuccess = cancelScheduledTrip(tripId, serviceDate); 
             
-            // If not successful, try to cancel previously added trip
-            if (!success) {
-                // Try to cancel previously added trip
-                success = cancelPreviouslyAddedTrip(tripId, serviceDate);
-            }
+            // Try to cancel previously added trip
+            boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(tripId, serviceDate);
             
-            if (!success) {
+            if (cancelScheduledSuccess || cancelPreviouslyAddedSuccess) {
+                success = true;
+            } else {
                 LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
             }
         } else {
