@@ -5,8 +5,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -33,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -55,8 +58,9 @@ public class ProfileRouter {
 
     /* Search configuration constants */
     public static final int SLACK = 60; // in seconds, time required to catch a transit vehicle
-    private static final int TIMEOUT = 10; // in seconds, maximum computation time
+    private static final int TIMEOUT = 600; // in seconds, maximum computation time
     public static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
+    public static final int MAX_UPPER_BOUND = 3 * 60 * 60;
     private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
 
     public final Graph graph;
@@ -188,7 +192,8 @@ public class ProfileRouter {
             // retainedRides must contain the key of this stop cluster, because it either contains this ride
             // or another ride that dominated this ride
             // note that domination is only done once rides are finished
-            if (!retainedRides.get(ride.from).contains(ride) && !ride.equals(initialRides.get(ride.from)))
+            // We check both this ride and the previous because previous will be in the queue if the ride is unfinished
+            if (!retainedRides.get(ride.from).contains(ride.previous) && !retainedRides.get(ride.from).contains(ride) && !ride.equals(initialRides.get(ride.from)))
                 continue;
             
             //LOG.info("dequeued ride {}", ride);
@@ -233,7 +238,7 @@ public class ProfileRouter {
                     // It might make more sense to keep bags of arrival times per ride+stop.
                     continue;
                 }
-                if ( ! addIfNondominated(r1)) continue; // abandon this ride if it is dominated by some existing ride at the same location
+                if (!nondominated(r1, false)) continue; // abandon this ride if it is dominated by some existing ride at the same location
                 // We have a new, nondominated, completed ride.
 
                 /* Find transfers out of this new ride. */
@@ -279,7 +284,7 @@ public class ProfileRouter {
             /* Enqueue new incomplete Rides with non-excessive durations. */
             for (Ride r : xferRides.values()) {
                 // ride is unfinished, use previous ride's time as key
-                if (addIfNondominated(r)) queue.insert(r, r.previous.durationLowerBound());
+                if (nondominated(r, true)) queue.insert(r, r.previous.durationLowerBound());
             }
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
         }
@@ -321,14 +326,15 @@ public class ProfileRouter {
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
-    /** Check whether a new ride has too long a duration relative to existing rides at the same location or global time limit. */
-    public boolean addIfNondominated(Ride newRide) {
+    /** Check whether a new ride has too long a duration relative to existing rides at the same location or global time limit. If the boolean argument is true,
+     * the ride will be added to retainedRides */
+    public boolean nondominated(Ride newRide, boolean add) {
         StopCluster cluster = newRide.to;
         if (cluster == null) { // if ride is unfinished, calculate time to its from-cluster based on previous ride
             cluster = newRide.from;
             newRide = newRide.previous;
         }
-        if (newRide.durationLowerBound() > MAX_DURATION) return false;
+        if (newRide.durationLowerBound() > MAX_DURATION || newRide.durationUpperBound() > MAX_UPPER_BOUND) return false;
         // Check whether any existing rides at the same location (stop cluster) dominate the new one.
         for (Iterator<Ride> it = retainedRides.get(cluster).iterator(); it.hasNext();) {
             Ride oldRide = it.next();
@@ -347,13 +353,16 @@ public class ProfileRouter {
                 return false;
             }
             
-            if (oldRide.durationLowerBound() > newRide.durationUpperBound() + request.suboptimalMinutes) {
+            if (add && oldRide.durationLowerBound() > newRide.durationUpperBound() + request.suboptimalMinutes) {
                 // old ride is dominated by new ride, remove it
                 // TODO: remove propagation from old ride at this location? Or do we want to do this?
                 it.remove();
             }
         }
-        retainedRides.put(cluster, newRide);
+        
+        if (add)
+            retainedRides.put(cluster, newRide);
+        
         return true; // No existing ride is strictly better than the new ride.
     }
 
