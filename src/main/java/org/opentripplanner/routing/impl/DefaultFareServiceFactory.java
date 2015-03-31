@@ -111,7 +111,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     /**
      * Build a specific FareServiceFactory given the config node, or fallback to the default if none
-     * specified.
+     * specified and the lenient mode is activated.
      * 
      * Accept different formats. Examples:
      * 
@@ -133,8 +133,11 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
      *       ]
      * } }
      * </pre>
+     * 
+     * @param fallbackToDefault True to return a default fare in case nothing is found / specified,
+     *        false to return null if nothing can be found.
      */
-    public static FareServiceFactory fromConfig(JsonNode config) {
+    public static FareServiceFactory fromConfig(JsonNode config, boolean fallbackToDefault) {
         String type = null;
         if (config == null) {
             /* Empty block, fallback to default */
@@ -157,8 +160,13 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             /* Fare with a type: { fares : { type : "foobar", param1 : 42 } } */
             type = config.path("type").asText(null);
         }
-        if (type == null)
-            type = "default";
+
+        if (type == null) {
+            if (fallbackToDefault)
+                type = "default";
+            else
+                return null;
+        }
 
         FareServiceFactory retval;
         switch (type) {

@@ -47,7 +47,7 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
     public void configure(JsonNode config) {
         subFactories = new ArrayList<>();
         for (JsonNode pConfig : config.path("fares")) {
-            subFactories.add(DefaultFareServiceFactory.fromConfig(pConfig));
+            subFactories.add(DefaultFareServiceFactory.fromConfig(pConfig, true));
         }
     }
 
