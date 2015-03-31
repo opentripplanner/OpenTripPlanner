@@ -24,6 +24,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ import com.google.transit.realtime.GtfsRealtime.EntitySelector;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TimeRange;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.
@@ -49,6 +51,9 @@ public class AlertsUpdateHandler {
 
     /** How long before the posted start of an event it should be displayed to users */
     private long earlyStart;
+
+    /** Set only if we should attempt to match the trip_id from other data in TripDescriptor */
+    private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public void update(FeedMessage message) {
         alertPatchService.expire(patchIds);
@@ -89,6 +94,11 @@ public class AlertsUpdateHandler {
             periods.add(new TimePeriod(0, Long.MAX_VALUE));
         }
         for (EntitySelector informed : alert.getInformedEntityList()) {
+            if (fuzzyTripMatcher != null && informed.hasTrip()) {
+                String agency = informed.hasAgencyId() ? informed.getAgencyId() : defaultAgencyId;
+                TripDescriptor trip = fuzzyTripMatcher.match(agency, informed.getTrip());
+                informed = informed.toBuilder().setTrip(trip).build();
+            }
             String patchId = createId(id, informed);
 
             String routeId = null;
@@ -194,5 +204,9 @@ public class AlertsUpdateHandler {
 
     public void setEarlyStart(long earlyStart) {
         this.earlyStart = earlyStart;
+    }
+
+    public void setFuzzyTripMatcher(GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
+        this.fuzzyTripMatcher = fuzzyTripMatcher;
     }
 }

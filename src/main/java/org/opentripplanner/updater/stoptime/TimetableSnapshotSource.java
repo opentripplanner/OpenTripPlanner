@@ -25,6 +25,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,8 @@ public class TimetableSnapshotSource {
     private final TimeZone timeZone;
 
     private GraphIndex graphIndex;
+
+    public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public TimetableSnapshotSource(Graph graph) {
         timeZone = graph.getTimeZone();
@@ -115,6 +118,11 @@ public class TimetableSnapshotSource {
         LOG.debug("message contains {} trip updates", updates.size());
         int uIndex = 0;
         for (TripUpdate tripUpdate : updates) {
+            if (fuzzyTripMatcher != null && tripUpdate.hasTrip()) {
+                TripDescriptor trip = fuzzyTripMatcher.match(feedId, tripUpdate.getTrip());
+                tripUpdate = tripUpdate.toBuilder().setTrip(trip).build();
+            }
+
             if (!tripUpdate.hasTrip()) {
                 LOG.warn("Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
                 continue;
