@@ -19,13 +19,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 public abstract class MultipleFareServiceFactory implements FareServiceFactory {
+
+    private static Logger log = LoggerFactory
+            .getLogger(MultipleFareServiceFactory.class);
 
     private List<FareServiceFactory> subFactories;
 
@@ -81,6 +87,10 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
         if (subFactories.isEmpty())
             throw new IllegalArgumentException(
                     "Empty fare composite. Please specify either a 'fares' array or a list of 'fareXxx' properties");
+        if (subFactories.size() == 1) {
+            // Legal, but suspicious.
+            log.warn("Fare composite has only ONE fare to combine. This is allowed, but useless. Did you forgot to define a second fare to combine?");
+        }
     }
 
     public static class AddingMultipleFareServiceFactory extends MultipleFareServiceFactory {
