@@ -60,7 +60,6 @@ public class ProfileRouter {
     public static final int SLACK = 60; // in seconds, time required to catch a transit vehicle
     private static final int TIMEOUT = 600; // in seconds, maximum computation time
     public static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
-    public static final int MAX_UPPER_BOUND = 3 * 60 * 60;
     private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
 
     public final Graph graph;
@@ -238,7 +237,7 @@ public class ProfileRouter {
                     // It might make more sense to keep bags of arrival times per ride+stop.
                     continue;
                 }
-                if (!nondominated(r1, false)) continue; // abandon this ride if it is dominated by some existing ride at the same location
+                if (!nondominated(r1, true)) continue; // abandon this ride if it is dominated by some existing ride at the same location
                 // We have a new, nondominated, completed ride.
 
                 /* Find transfers out of this new ride. */
@@ -284,7 +283,7 @@ public class ProfileRouter {
             /* Enqueue new incomplete Rides with non-excessive durations. */
             for (Ride r : xferRides.values()) {
                 // ride is unfinished, use previous ride's time as key
-                if (nondominated(r, true)) queue.insert(r, r.previous.durationLowerBound());
+                if (nondominated(r, false)) queue.insert(r, r.previous.durationLowerBound());
             }
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
         }
@@ -334,7 +333,7 @@ public class ProfileRouter {
             cluster = newRide.from;
             newRide = newRide.previous;
         }
-        if (newRide.durationLowerBound() > MAX_DURATION || newRide.durationUpperBound() > MAX_UPPER_BOUND) return false;
+        if (newRide.durationLowerBound() > MAX_DURATION) return false;
         // Check whether any existing rides at the same location (stop cluster) dominate the new one.
         for (Iterator<Ride> it = retainedRides.get(cluster).iterator(); it.hasNext();) {
             Ride oldRide = it.next();
