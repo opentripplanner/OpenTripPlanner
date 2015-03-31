@@ -78,6 +78,9 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
                     subFactories.add(fareFactory);
             }
         }
+        if (subFactories.isEmpty())
+            throw new IllegalArgumentException(
+                    "Empty fare composite. Please specify either a 'fares' array or a list of 'fareXxx' properties");
     }
 
     public static class AddingMultipleFareServiceFactory extends MultipleFareServiceFactory {
