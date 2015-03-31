@@ -14,7 +14,6 @@
 package org.opentripplanner.updater.alerts;
 
 import java.io.InputStream;
-import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -53,6 +53,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private String defaultAgencyId;
 
+    private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+
     private AlertPatchService alertPatchService;
 
     private long earlyStart;
@@ -76,6 +78,9 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.url = url;
         this.earlyStart = config.path("earlyStartSec").asInt(0);
         this.defaultAgencyId = config.path("defaultAgencyId").asText();
+        if (config.path("fuzzyTripMatching").asBoolean(false)) {
+            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
+        }
         LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec, url);
     }
 
@@ -87,6 +92,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         updateHandler.setEarlyStart(earlyStart);
         updateHandler.setDefaultAgencyId(defaultAgencyId);
         updateHandler.setAlertPatchService(alertPatchService);
+        updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
     }
 
     @Override
