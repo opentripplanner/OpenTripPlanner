@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Currency;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.model.P2;
@@ -62,9 +64,10 @@ public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory
 
         // List of {time, price_cents}
         pricingBySecond = new ArrayList<>();
-        for (JsonNode pConfig : config.path("prices")) {
-            int maxTimeSec = hmsToSeconds(pConfig.get("maxTime").asText());
-            int priceCent = pConfig.get("priceCents").asInt();
+        for (Iterator<Map.Entry<String, JsonNode>> i = config.path("prices").fields(); i.hasNext();) {
+            Map.Entry<String, JsonNode> kv = i.next();
+            int maxTimeSec = hmsToSeconds(kv.getKey());
+            int priceCent = (int) Math.round(kv.getValue().asDouble() * 100);
             pricingBySecond.add(new P2<>(maxTimeSec, priceCent));
         }
         if (pricingBySecond.isEmpty())
