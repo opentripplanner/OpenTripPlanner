@@ -133,11 +133,8 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
      *       ]
      * } }
      * </pre>
-     * 
-     * @param fallbackToDefault True to return a default fare in case nothing is found / specified,
-     *        false to return null if nothing can be found.
      */
-    public static FareServiceFactory fromConfig(JsonNode config, boolean fallbackToDefault) {
+    public static FareServiceFactory fromConfig(JsonNode config) {
         String type = null;
         if (config == null) {
             /* Empty block, fallback to default */
@@ -162,10 +159,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
         }
 
         if (type == null) {
-            if (fallbackToDefault)
-                type = "default";
-            else
-                return null;
+            type = "default";
         }
 
         FareServiceFactory retval;

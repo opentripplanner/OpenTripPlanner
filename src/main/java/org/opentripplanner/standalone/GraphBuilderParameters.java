@@ -100,7 +100,7 @@ public class GraphBuilderParameters {
         areaVisibility = config.path("areaVisibility").asBoolean(false);
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
-        fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"), true);
+        fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
     }
 
 }

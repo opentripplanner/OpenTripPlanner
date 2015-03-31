@@ -14,7 +14,9 @@
 package org.opentripplanner.routing.fares;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
@@ -43,11 +45,38 @@ public abstract class MultipleFareServiceFactory implements FareServiceFactory {
             subFactory.processGtfs(dao);
     }
 
+    /**
+     * Accept several ways to define fares to compose. Examples:
+     * 
+     * <pre>
+     * { combinationStrategy : "additive",
+     *   // An array of 'fares'
+     *   fares : [ "seattle", { ... } ]
+     * }
+     * --------------------------
+     * { combinationStrategy : "additive",
+     *   // All properties starting with 'fare'
+     *   fare1 : "seattle",
+     *   fare2 : { type: "bike-rental-time-based",
+     *             prices : { ... }
+     * } }
+     * </pre>
+     */
     @Override
     public void configure(JsonNode config) {
         subFactories = new ArrayList<>();
         for (JsonNode pConfig : config.path("fares")) {
-            subFactories.add(DefaultFareServiceFactory.fromConfig(pConfig, true));
+            subFactories.add(DefaultFareServiceFactory.fromConfig(pConfig));
+        }
+        for (Iterator<Map.Entry<String, JsonNode>> i = config.fields(); i.hasNext();) {
+            Map.Entry<String, JsonNode> kv = i.next();
+            String key = kv.getKey();
+            if (key.startsWith("fare") && !key.equals("fares")) {
+                JsonNode node = kv.getValue();
+                FareServiceFactory fareFactory = DefaultFareServiceFactory.fromConfig(node);
+                if (fareFactory != null)
+                    subFactories.add(fareFactory);
+            }
         }
     }
 
