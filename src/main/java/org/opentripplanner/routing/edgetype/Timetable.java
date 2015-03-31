@@ -158,7 +158,9 @@ public class Timetable implements Serializable {
             if (adjustedTime == -1) continue;
             if (boarding) {
                 int depTime = tt.getDepartureTime(stopIndex);
-                if (depTime < 0) continue;
+                if (depTime < 0) continue; // negative values were previously used for canceled trips/passed stops/skipped stops, but
+                                           // now its not sure if this check should be still in place because there is a boolean field
+                                           // for canceled trips
                 if (depTime >= adjustedTime && depTime < bestTime) {
                     bestTrip = tt;
                     bestTime = depTime;
@@ -185,7 +187,7 @@ public class Timetable implements Serializable {
             LOG.debug("  running freq {}", freq);
             if (boarding) {
                 int depTime = freq.nextDepartureTime(stopIndex, adjustedTime); // min transfer time included in search
-                if (depTime < 0) continue;
+                if (depTime < 0) continue; 
                 if (depTime >= adjustedTime && depTime < bestTime) {
                     bestFreq = freq;
                     bestTime = depTime;
