@@ -84,7 +84,9 @@ public class TimetableSnapshotSource {
     private volatile TimetableSnapshot snapshot = null;
 
     /**
-     * The working copy of the timetable snapshot. Should not be visible to routing threads.
+     * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
+     * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
+     * might modify this buffer will correctly acquire the lock.
      */
     private TimetableSnapshot buffer = new TimetableSnapshot();
     
