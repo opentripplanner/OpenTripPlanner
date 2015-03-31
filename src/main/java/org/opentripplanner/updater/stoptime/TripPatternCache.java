@@ -16,6 +16,7 @@ package org.opentripplanner.updater.stoptime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -25,6 +26,8 @@ import org.opentripplanner.routing.graph.Graph;
  * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
  */
 public class TripPatternCache {
+    
+    private int counter = 0;
 
     private final Map<StopPattern, TripPattern> cache = new HashMap<>();
     
@@ -45,6 +48,10 @@ public class TripPatternCache {
         // Create TripPattern if it doesn't exist yet
         if (tripPattern == null) {
             tripPattern = new TripPattern(route, stopPattern);
+            
+            // Generate unique code for trip pattern
+            tripPattern.code = generateUniqueTripPatternCode(tripPattern);
+            
             // Create an empty bitset for service codes (because the new pattern does not contain any trips)
             tripPattern.setServiceCodes(graph.serviceCodes);
             
@@ -62,6 +69,26 @@ public class TripPatternCache {
         }
         
         return tripPattern;
+    }
+
+    /**
+     * Generate unique trip pattern code for real-time added trip pattern. This function roughly
+     * follows the format of {@link TripPattern#generateUniqueIds(java.util.Collection)}.
+     * 
+     * @param tripPattern trip pattern to generate code for
+     * @return unique trip pattern code
+     */
+    private String generateUniqueTripPatternCode(TripPattern tripPattern) {
+        AgencyAndId routeId = tripPattern.route.getId();
+        String direction = tripPattern.directionId != -1 ? String.valueOf(tripPattern.directionId) : "";
+        if (counter == Integer.MAX_VALUE) {
+            counter = 0;
+        } else {
+            counter++;
+        }
+        // OBA library uses underscore as separator, we're moving toward colon.
+        String code = String.format("%s:%s:%s:rt#%d", routeId.getAgencyId(), routeId.getId(), direction, counter);
+        return code;
     }
 
 }
