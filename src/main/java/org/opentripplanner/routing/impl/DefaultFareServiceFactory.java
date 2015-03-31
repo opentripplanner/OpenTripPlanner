@@ -111,7 +111,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     /**
      * Build a specific FareServiceFactory given the config node, or fallback to the default if none
-     * specified and the lenient mode is activated.
+     * specified.
      * 
      * Accept different formats. Examples:
      * 
