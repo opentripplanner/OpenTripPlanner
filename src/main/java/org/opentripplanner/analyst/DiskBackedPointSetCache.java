@@ -1,16 +1,13 @@
 package org.opentripplanner.analyst;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.GraphService;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 
 public class DiskBackedPointSetCache extends PointSetCache {
 	
@@ -26,16 +23,19 @@ public class DiskBackedPointSetCache extends PointSetCache {
                 LOG.error("'{}' is not a readable directory.", pointSetPath);
                 return null;
             }
-    		
     		for (File file : pointSetPath.listFiles()) {
                 if(file.getName().toLowerCase().startsWith(pointSetId.toLowerCase())) {
-                	
+					LOG.info("Attempting to load pointset from '{}'.", file);
                 	PointSet pointSet = this.loadFromFile(file);
-                	
-                	if(pointSet != null)
+                	if(pointSet == null) {
+						LOG.error("Pointset loading function returned null.");
+						return null;
+					} else {
                 		return pointSet;
+					}
                 }
             }
+			LOG.error("No file was found with the given pointset name.");
 			return null;
 		}
 		
@@ -55,9 +55,9 @@ public class DiskBackedPointSetCache extends PointSetCache {
 	                return pset;
 	                
 	            } catch (IOException ioex) {
-	                LOG.warn("Exception while loading pointset: {}", ioex);
+	                LOG.warn("Exception while loading pointset.");
+					ioex.printStackTrace();
 	            }
-	            
 	        } else if (name.endsWith(".json")) {
 	            String baseName = name.substring(0, name.length() - 5);
 	            LOG.info("loading '{}' with ID '{}'", pointSetData, baseName);
@@ -70,7 +70,7 @@ public class DiskBackedPointSetCache extends PointSetCache {
 			return null;
 		}
 	}
-	
+
 	public DiskBackedPointSetCache(Integer maxCacheSize, File pointSetPath) {
 		super();
 		

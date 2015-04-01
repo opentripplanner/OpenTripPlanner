@@ -1,18 +1,15 @@
 package org.opentripplanner.analyst;
 
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Maps;
-
-import org.opentripplanner.analyst.request.SampleFactory;
-import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * This is a loadingCache, so it will attempt to load pointsets only when they are requested.
+ * Therefore loading errors will only surface when pointsets are first used.
+ */
 public abstract class PointSetCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(PointSetCache.class);

@@ -273,6 +273,7 @@ public class PointSet implements Serializable {
 
     /**
      * Examines a JSON stream to see if it matches the expected OTPA format.
+     * TODO improve the level of detail of validation. Many files pass the validation and then crash the load function.
      * 
      * @return the number of features in the collection if it's valid, or -1 if
      *         it doesn't fit the OTPA format.
@@ -381,6 +382,7 @@ public class PointSet implements Serializable {
             }
         } catch (Exception ex) {
             LOG.error("GeoJSON parsing failure: {}", ex.toString());
+            ex.printStackTrace();
             return null;
         }
         return ret;
@@ -493,11 +495,8 @@ public class PointSet implements Serializable {
         for (Entry<String,Integer> ad : feat.getProperties().entrySet()) {
             String propId = ad.getKey();
             Integer propVal = ad.getValue();
-
             this.getOrCreatePropertyForId(propId);
             this.properties.get(propId)[index] = propVal;
-
-
         }
     }
 
