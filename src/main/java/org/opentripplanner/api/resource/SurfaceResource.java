@@ -7,6 +7,7 @@ import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.PointSet;
+import org.opentripplanner.analyst.ResultSetWithTimes;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.core.IsochroneData;
@@ -123,7 +124,7 @@ public class SurfaceResource extends RoutingResource {
         Router router = otpServer.getRouter(surf.routerId);
         // TODO cache this sampleset
         SampleSet samples = pset.getSampleSet(router.graph);
-        final ResultSet indicator = new ResultSet(samples, surf);
+        final ResultSet indicator = detail ? new ResultSetWithTimes(samples, surf) : new ResultSet(samples, surf);
         if (indicator == null) return badServer("Could not compute indicator as requested.");
 
         return Response.ok().entity(new StreamingOutput() {
