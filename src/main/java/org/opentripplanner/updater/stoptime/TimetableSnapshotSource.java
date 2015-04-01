@@ -194,7 +194,7 @@ public class TimetableSnapshotSource {
                 // Remove all updates from the buffer
                 buffer.clear();
             }
-                
+
             LOG.debug("message contains {} trip updates", updates.size());
             int uIndex = 0;
             for (TripUpdate tripUpdate : updates) {
@@ -220,7 +220,7 @@ public class TimetableSnapshotSource {
                     }
                 } else {
                     // TODO: figure out the correct service date. For the special case that a trip
-                    // starts for example at 25:00, yesterday would probably be a better guess.
+                    // starts for example at 40:00, yesterday would probably be a better guess.
                 }
 
                 uIndex += 1;
