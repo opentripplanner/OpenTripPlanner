@@ -676,6 +676,7 @@ public class TimetableSnapshotSource {
         TripTimes newTripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
         
         // Update all times to mark trip times as realtime
+        // TODO: should we incorporate the delay field if present?
         for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
             newTripTimes.updateArrivalTime(stopIndex, newTripTimes.getScheduledArrivalTime(stopIndex));
             newTripTimes.updateDepartureTime(stopIndex, newTripTimes.getScheduledDepartureTime(stopIndex));
