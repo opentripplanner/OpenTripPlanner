@@ -556,11 +556,6 @@ public class PointSet implements Serializable {
     /**
      * Gets the Category object for the given ID, creating it if it doesn't
      * exist.
-     * 
-     * @param id
-     *            the id for the category alone, not the fully-specified
-     *            category:property.
-     * @return a Category with the given ID.
      */
     public PropertyMetadata getOrCreatePropertyForId(String id) {
         PropertyMetadata property = propMetadata.get(id);
@@ -622,9 +617,6 @@ public class PointSet implements Serializable {
             if (description != null)
                 jgen.writeStringField("description", description);
 
-            // writes schema as a flat namespace with cat_id and
-            // cat_id:prop_id interleaved
-
             jgen.writeObjectFieldStart("schema");
             {
 
@@ -634,6 +626,7 @@ public class PointSet implements Serializable {
                     {
                         if (cat.label != null)
                             jgen.writeStringField("label", cat.label);
+                        // TODO do we need this? there are only categories now, and they really shouldn't be called categories
                         jgen.writeStringField("type", "Category");
 
                         if (cat.style != null && cat.style.attributes != null) {
@@ -651,10 +644,6 @@ public class PointSet implements Serializable {
 
                     }
                     jgen.writeEndObject();
-
-                    // two-level hierarchy for now... could be extended
-                    // to recursively map
-                    // categories,sub-categories,attributes
                 }
 
             }
