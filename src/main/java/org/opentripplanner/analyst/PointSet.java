@@ -580,8 +580,7 @@ public class PointSet implements Serializable {
      */
     public void writeJson(OutputStream out, Boolean forcePoints) {
         try {
-            JsonFactory jsonFactory = new JsonFactory(); // ObjectMapper.getJsonFactory()
-            // is better
+            JsonFactory jsonFactory = new JsonFactory(); // ObjectMapper.getJsonFactory() is better
             JsonGenerator jgen = jsonFactory.createGenerator(out);
             jgen.setCodec(new ObjectMapper());
             jgen.writeStartObject();
@@ -619,33 +618,23 @@ public class PointSet implements Serializable {
 
             jgen.writeObjectFieldStart("schema");
             {
-
                 for (PropertyMetadata cat : this.propMetadata.values()) {
-
                     jgen.writeObjectFieldStart(cat.id);
                     {
                         if (cat.label != null)
                             jgen.writeStringField("label", cat.label);
-                        // TODO do we need this? there are only categories now, and they really shouldn't be called categories
-                        jgen.writeStringField("type", "Category");
-
                         if (cat.style != null && cat.style.attributes != null) {
-
                             jgen.writeObjectFieldStart("style");
                             {
-
                                 for (String styleKey : cat.style.attributes.keySet()) {
                                     jgen.writeStringField(styleKey, cat.style.attributes.get(styleKey));
                                 }
                             }
                             jgen.writeEndObject();
-
                         }
-
                     }
                     jgen.writeEndObject();
                 }
-
             }
             jgen.writeEndObject();
         }
