@@ -104,9 +104,9 @@ public class AnalystProfileRouterPrototype {
         LOG.info("From patterns/stops: {}", fromStops);
 
         /* Initialize time range tracker to begin the search. */
-        Multimap<Stop, TimeRange> times = HashMultimap.create();
+        TimeRange.Tracker times = new TimeRange.Tracker();
         for (Stop stop : fromStops.keySet()) {
-            times.put(stop, new TimeRange(fromStops.get(stop)));
+            times.set(stop, fromStops.get(stop));
         }
 
         Set<Stop> stopsUpdated = fromStops.keySet();
@@ -131,7 +131,7 @@ public class AnalystProfileRouterPrototype {
                 int headway = freq.headway;
                 for (int sidx = 0; sidx < stops.size(); sidx++) {
                     Stop stop = stops.get(sidx);
-                    Collection<TimeRange> ranges = times.get(stop);
+                    TimeRange existingRange = times.get(stop);
                     TimeRange reBoardRange = (existingRange != null) ? existingRange.wait(headway) : null;
                     if (rangeBeingPropagated == null) {
                         // We do not yet have a range worth propagating
