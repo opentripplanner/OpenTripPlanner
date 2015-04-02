@@ -28,7 +28,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.standalone.OTPMain;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
