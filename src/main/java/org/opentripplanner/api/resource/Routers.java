@@ -170,8 +170,6 @@ public class Routers {
      * @param preEvict before reloading each graph, evict the existing graph. This will prevent 
      * memory usage from increasing during the reload, but routing will be unavailable on this 
      * routerId for the duration of the operation.
-     *
-     *                FIXME @param upload read the graph from the PUT data stream instead of from disk.
      */
     @RolesAllowed({ "ROUTERS" })
     @PUT @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
