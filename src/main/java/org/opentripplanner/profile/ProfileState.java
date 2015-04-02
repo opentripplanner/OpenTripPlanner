@@ -1,6 +1,7 @@
 package org.opentripplanner.profile;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 import jersey.repackaged.com.google.common.collect.Lists;
@@ -16,7 +17,7 @@ public class ProfileState implements Cloneable {
     public Type accessType;
     
     /** the trip patterns used to access this stop */
-    public Collection<TripPattern> patterns = Lists.newArrayList();
+    public TripPattern[] patterns;
     
     /** the location of this state */
     public TransitStop stop;
@@ -54,10 +55,6 @@ public class ProfileState implements Cloneable {
         return propagate(delta, delta);
     }
     
-    public void clearPatterns () {
-        this.patterns = Lists.newArrayList();
-    }
-    
     /** two ways to create a profile state: the initial state, reached via an on-street mode, and subsequent states reached via transit */
     public static enum Type {
         STREET, TRANSIT, TRANSFER;
@@ -68,6 +65,46 @@ public class ProfileState implements Cloneable {
         this.lowerBound = Math.min(this.lowerBound, other.lowerBound);
         // the upper bound of a common trunk is the _minimum_ upper bound of all its constituents
         this.upperBound = Math.min(this.upperBound, other.upperBound);
-        this.patterns.addAll(other.patterns);
+        this.patterns = new TripPattern[this.patterns.length + other.patterns.length];
+        
+    }
+
+    public boolean containsPattern(TripPattern pattern) {
+        if (patterns == null)
+            return false;
+        
+        for (TripPattern tp : patterns) {
+            if (tp == pattern)
+                return true;
+        }
+        
+        return false;
+    }
+    
+    
+    /** merge all the profile states into a new ProfileState. Assumes that each state consists of a single pattern unique among the states. */
+    public static ProfileState merge (Collection<ProfileState> states, boolean retainPatterns) {
+        ProfileState ret = new ProfileState();
+        ret.lowerBound = ret.upperBound = Integer.MAX_VALUE;
+        
+        if (retainPatterns)
+            ret.patterns = new TripPattern[states.size()];
+        
+        {
+            int i = 0;
+            for (Iterator<ProfileState> it = states.iterator(); it.hasNext(); i++) {
+                ProfileState state = it.next();
+                if (state.lowerBound < ret.lowerBound) ret.lowerBound = state.lowerBound;
+                
+                // Yes, we want the _minimum_ upper bound: you will never take a journey that is longer than the minimum
+                // upper bound, in either the perfect information case or the min-upper-bound case.
+                if (state.upperBound < ret.upperBound) ret.upperBound = state.upperBound;
+                
+                if (retainPatterns)
+                    ret.patterns[i] = state.patterns[0];
+            }
+        }
+        
+        return ret;
     }
 }
