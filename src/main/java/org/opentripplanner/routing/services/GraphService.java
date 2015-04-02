@@ -134,27 +134,41 @@ public class GraphService {
     }
 
     /**
-     * Reload all registered graphs from wherever they came from.
-     * 
-     * @param preEvict When true, release the existing graph (if any) before loading. This will
-     *        halve the amount of memory needed for the operation, but routing will be unavailable
-     *        for that graph during the load process
-     * @return whether the operation completed successfully
+     * Reload all registered graphs from wherever they came from. See reloadGraph().
+     * @return whether the operation completed successfully (all reloads are successful).
      */
     public boolean reloadGraphs(boolean preEvict) {
         boolean allSucceeded = true;
         synchronized (graphSources) {
             Collection<String> routerIds = getRouterIds();
             for (String routerId : routerIds) {
-                GraphSource graphSource = graphSources.get(routerId);
-                boolean success = graphSource.reload(true, preEvict);
-                if (!success) {
-                    evictRouter(routerId);
-                }
-                allSucceeded &= success;
+                allSucceeded &= reloadGraph(routerId, preEvict);
             }
         }
         return allSucceeded;
+    }
+
+    /**
+     * Reload a registered graph. If the reload fails, evict (remove) the graph.
+     * 
+     * @param routerId ID of the router
+     * @param preEvict When true, release the existing graph (if any) before loading. This will
+     *        halve the amount of memory needed for the operation, but routing will be unavailable
+     *        for that graph during the load process
+     * @return True if the reload is successful, false otherwise.
+     */
+    public boolean reloadGraph(String routerId, boolean preEvict) {
+        synchronized (graphSources) {
+            GraphSource graphSource = graphSources.get(routerId);
+            if (graphSource == null) {
+                return false;
+            }
+            boolean success = graphSource.reload(true, preEvict);
+            if (!success) {
+                evictRouter(routerId);
+            }
+            return success;
+        }
     }
 
     /** @return a collection of all valid router IDs for this server */
