@@ -5,6 +5,7 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -65,6 +66,8 @@ public class RoundBasedProfileRouter {
     public final int MAX_ROUNDS = 3;
     
     public static final int CUTOFF_SECONDS = 90 * 60;
+    
+    public static final boolean RETAIN_PATTERNS = false;
     
     private static final Logger LOG = LoggerFactory.getLogger(RoundBasedProfileRouter.class);
     
@@ -158,7 +161,7 @@ public class RoundBasedProfileRouter {
                         @Override
                         public boolean apply(ProfileState input) {
                             // don't reboard same pattern, and don't board patterns that are better boarded elsewhere
-                            return !input.patterns.contains(pattern) &&
+                            return !input.containsPattern(pattern) &&
                                     (input.targetPatterns == null || input.targetPatterns.contains(pattern));
                         }
                         
@@ -214,6 +217,11 @@ public class RoundBasedProfileRouter {
                             if (t > maxRideTime) maxRideTime = t;
                         }
                         
+                        if (minWaitTime == Integer.MAX_VALUE || maxWaitTime == Integer.MIN_VALUE ||
+                                minRideTime == Integer.MAX_VALUE || maxRideTime == Integer.MIN_VALUE)
+                            // no trips in window that arrive at stop
+                            continue DESTSTOPS;
+                        
                         // note: unnecessary variance in the scheduled case. It is entirely possible that the max wait and the max ride time
                         // cannot occur simultaneously.
                         
@@ -223,8 +231,7 @@ public class RoundBasedProfileRouter {
                             ProfileState ps2 = ps.propagate(minWaitTime + minRideTime, maxWaitTime + maxRideTime);
                             ps2.stop = pattern.stopVertices[j];
                             ps2.accessType = Type.TRANSIT;
-                            ps2.clearPatterns();
-                            ps2.patterns.add(pattern);
+                            ps2.patterns = new TripPattern[] { pattern };
                             touchedStops.put(ps2.stop, ps2);
                         }
                     }
@@ -241,18 +248,29 @@ public class RoundBasedProfileRouter {
                 if (pss.isEmpty())
                     continue;
                 
-                // merge states that have come from the same place
-                Map<ProfileState, ProfileState> foundStates = Maps.newHashMap();
+                if (!RETAIN_PATTERNS) {
+                    ProfileState st = ProfileState.merge(pss, false);
+                    pss.clear();
+                    pss.add(st);
+                    continue;
+                }
+                
+                // find states that have come from the same place
+                Multimap<ProfileState, ProfileState> foundStates = ArrayListMultimap.create();
                 
                 for (Iterator<ProfileState> it = pss.iterator(); it.hasNext();) {
                     ProfileState ps = it.next();
-                    
-                    if (foundStates.containsKey(ps.previous)) {
-                        it.remove();
-                        foundStates.get(ps.previous).mergeIn(ps);
-                    }
+                    foundStates.put(ps.previous, ps);
+                }
+                
+                pss.clear();
+                
+                // merge them now
+                for (Collection<ProfileState> states : foundStates.asMap().values()) {                   
+                    if (states.size() == 1)
+                        pss.addAll(states);
                     else
-                        foundStates.put(ps.previous, ps);
+                        pss.add(ProfileState.merge(states, true));
                 }
             }
             
