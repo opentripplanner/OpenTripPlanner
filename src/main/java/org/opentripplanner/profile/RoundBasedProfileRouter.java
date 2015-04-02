@@ -153,7 +153,7 @@ public class RoundBasedProfileRouter {
                         continue STOPS;
                     
                     // only propagate nondominated states
-                    Collection<ProfileState> statesToPropagate = nondominated(previousStops.get(pattern.stopVertices[i]));
+                    Collection<ProfileState> statesToPropagate = nondominated(previousStops.get(pattern.stopVertices[i]), pattern.stopVertices[i]);
                     
                     // don't 
                     statesToPropagate = Collections2.filter(statesToPropagate, new Predicate<ProfileState> () {
@@ -243,7 +243,7 @@ public class RoundBasedProfileRouter {
             
             Set<TransitStop> touchedStopVertices = new HashSet<TransitStop>(touchedStops.keySet());
             for (TransitStop tstop : touchedStopVertices) {
-                Collection<ProfileState> pss = nondominated(touchedStops.get(tstop));
+                Collection<ProfileState> pss = nondominated(touchedStops.get(tstop), tstop);
                 
                 if (pss.isEmpty())
                     continue;
@@ -302,7 +302,7 @@ public class RoundBasedProfileRouter {
                 }
                 
                 // only transfer from nondominated states. only transfer to each pattern once
-                Collection<ProfileState> statesAtStop = nondominated(touchedStops.get(tstop));
+                Collection<ProfileState> statesAtStop = nondominated(touchedStops.get(tstop), tstop);
                 
                 minBoardTime = new TObjectIntHashMap<TripPattern>(1000, .75f, Integer.MAX_VALUE);
                 Map<TripPattern, ProfileState> optimalBoardState = Maps.newHashMap();
@@ -352,12 +352,19 @@ public class RoundBasedProfileRouter {
     }
     
     /** from a collection of profile states at a transit stop, return a collection of all the nondominated states */
-    public Collection<ProfileState> nondominated(Collection<ProfileState> original) {
+    public Collection<ProfileState> nondominated(Collection<ProfileState> original, TransitStop tstop) {
         // find the min upper bound
         int minUpperBound = Integer.MAX_VALUE;
         
         // TODO optimization: retain min upper bound as states are added.
         for (ProfileState ps : original) {
+            if (ps.upperBound < minUpperBound)
+                minUpperBound = ps.upperBound;
+        }
+        
+        // we also check against states that were found in previous rounds and have already been propagated;
+        // no reason to propagate again.
+        for (ProfileState ps : retainedStates.get(tstop)) {
             if (ps.upperBound < minUpperBound)
                 minUpperBound = ps.upperBound;
         }
@@ -417,7 +424,8 @@ public class RoundBasedProfileRouter {
         TimeSurface maxSurface = new TimeSurface(this);
         // Grab a cached map of distances to street intersections from each transit stop
         StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
-        // Iterate over all nondominated rides at all clusters
+        // Iterate over all rides at all clusters
+        // Note that some may be dominated, but it doesn't matter
         for (Entry<TransitStop, ProfileState> entry : retainedStates.entries()) {
             ProfileState ps = entry.getValue();
             int lb0 = ps.lowerBound;
