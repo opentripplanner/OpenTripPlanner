@@ -64,9 +64,7 @@ public class ProfileState implements Cloneable {
     public void mergeIn(ProfileState other) {
         this.lowerBound = Math.min(this.lowerBound, other.lowerBound);
         // the upper bound of a common trunk is the _minimum_ upper bound of all its constituents
-        this.upperBound = Math.min(this.upperBound, other.upperBound);
-        this.patterns = new TripPattern[this.patterns.length + other.patterns.length];
-        
+        this.upperBound = Math.min(this.upperBound, other.upperBound);        
     }
 
     public boolean containsPattern(TripPattern pattern) {
