@@ -137,12 +137,12 @@ public class GraphService {
      * Reload all registered graphs from wherever they came from. See reloadGraph().
      * @return whether the operation completed successfully (all reloads are successful).
      */
-    public boolean reloadGraphs(boolean preEvict) {
+    public boolean reloadGraphs(boolean preEvict, boolean force) {
         boolean allSucceeded = true;
         synchronized (graphSources) {
             Collection<String> routerIds = getRouterIds();
             for (String routerId : routerIds) {
-                allSucceeded &= reloadGraph(routerId, preEvict);
+                allSucceeded &= reloadGraph(routerId, preEvict, force);
             }
         }
         return allSucceeded;
@@ -155,15 +155,17 @@ public class GraphService {
      * @param preEvict When true, release the existing graph (if any) before loading. This will
      *        halve the amount of memory needed for the operation, but routing will be unavailable
      *        for that graph during the load process
+     * @param force When true, force a reload. If false, only check if the source has been modified,
+     *        and reload if so.
      * @return True if the reload is successful, false otherwise.
      */
-    public boolean reloadGraph(String routerId, boolean preEvict) {
+    public boolean reloadGraph(String routerId, boolean preEvict, boolean force) {
         synchronized (graphSources) {
             GraphSource graphSource = graphSources.get(routerId);
             if (graphSource == null) {
                 return false;
             }
-            boolean success = graphSource.reload(true, preEvict);
+            boolean success = graphSource.reload(force, preEvict);
             if (!success) {
                 evictRouter(routerId);
             }

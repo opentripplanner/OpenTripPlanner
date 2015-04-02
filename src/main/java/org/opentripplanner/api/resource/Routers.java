@@ -159,9 +159,10 @@ public class Routers {
      */
     @RolesAllowed({ "ROUTERS" })
     @PUT @Produces({ MediaType.APPLICATION_JSON })
-    public Response reloadGraphs(@QueryParam("path") String path, 
-            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        otpServer.getGraphService().reloadGraphs(preEvict);
+    public Response reloadGraphs(@QueryParam("path") String path,
+            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict,
+            @QueryParam("force") @DefaultValue("true") boolean force) {
+        otpServer.getGraphService().reloadGraphs(preEvict, force);
         return Response.status(Status.OK).build();
     }
 
@@ -178,7 +179,7 @@ public class Routers {
         LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
         GraphService graphService = otpServer.getGraphService();
         if (graphService.getRouterIds().contains(routerId)) {
-            boolean success = graphService.reloadGraph(routerId, preEvict);
+            boolean success = graphService.reloadGraph(routerId, preEvict, false);
             if (success)
                 return Response.status(201).entity("graph already registered, reloaded.\n").build();
             else
