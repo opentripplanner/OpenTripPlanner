@@ -180,8 +180,11 @@ public class Routers {
         LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
         GraphService graphService = otpServer.getGraphService();
         if (graphService.getRouterIds().contains(routerId)) {
-            graphService.reloadGraph(routerId, preEvict);
-            return Response.status(201).entity("graph already registered, reloaded.\n").build();
+            boolean success = graphService.reloadGraph(routerId, preEvict);
+            if (success)
+                return Response.status(201).entity("graph already registered, reloaded.\n").build();
+            else
+                return Response.status(404).entity("graph already registered, but reload failed.\n").build();
         } else {
             boolean success = graphService.registerGraph(routerId, graphService
                     .getGraphSourceFactory().createGraphSource(routerId));
