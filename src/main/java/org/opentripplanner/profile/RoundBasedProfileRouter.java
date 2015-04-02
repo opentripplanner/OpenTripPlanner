@@ -227,52 +227,46 @@ public class RoundBasedProfileRouter {
                             ProfileState ps2 = ps.propagate(minWaitTime + minRideTime, maxWaitTime + maxRideTime);
                             ps2.stop = pattern.stopVertices[j];
                             ps2.accessType = Type.TRANSIT;
-                            
-                            if (RETAIN_PATTERNS) {
-                                ps2.patterns = new TripPattern[] { pattern };
-                            }
-                            else {
-                                // TODO: don't create an iterator here. Perhaps use a single map for non-retain-patterns mode?
-                                if (touchedStops.containsKey(pattern.stopVertices[j])) {
-                                    touchedStops.get(ps2.stop).iterator().next().mergeIn(ps2);
-                                }
-                                else {
-                                    touchedStops.put(ps2.stop, ps2);
-                                }
-                            }
+                            ps2.patterns = new TripPattern[] { pattern };
+                            touchedStops.put(ps2.stop, ps2);
                         }
                     }
                 }
             }
             
             // merge single path common trunks right here, to avoid propagating too many bounds
-            if (RETAIN_PATTERNS) {
-                LOG.info("Round completed, merging similar states");
+            LOG.info("Round completed, merging similar states");
+            
+            Set<TransitStop> touchedStopVertices = new HashSet<TransitStop>(touchedStops.keySet());
+            for (TransitStop tstop : touchedStopVertices) {
+                Collection<ProfileState> pss = nondominated(touchedStops.get(tstop), tstop);
                 
-                Set<TransitStop> touchedStopVertices = new HashSet<TransitStop>(touchedStops.keySet());
-                for (TransitStop tstop : touchedStopVertices) {
-                    Collection<ProfileState> pss = nondominated(touchedStops.get(tstop), tstop);
-                    
-                    if (pss.isEmpty())
-                        continue;
-                    
-                    // find states that have come from the same place
-                    Multimap<ProfileState, ProfileState> foundStates = ArrayListMultimap.create();
-                    
-                    for (Iterator<ProfileState> it = pss.iterator(); it.hasNext();) {
-                        ProfileState ps = it.next();
-                        foundStates.put(ps.previous, ps);
-                    }
-                    
+                if (pss.isEmpty())
+                    continue;
+                
+                if (!RETAIN_PATTERNS) {
+                    ProfileState st = ProfileState.merge(pss, false);
                     pss.clear();
-                    
-                    // merge them now
-                    for (Collection<ProfileState> states : foundStates.asMap().values()) {                   
-                        if (states.size() == 1)
-                            pss.addAll(states);
-                        else
-                            pss.add(ProfileState.merge(states, true));
-                    }
+                    pss.add(st);
+                    continue;
+                }
+                
+                // find states that have come from the same place
+                Multimap<ProfileState, ProfileState> foundStates = ArrayListMultimap.create();
+                
+                for (Iterator<ProfileState> it = pss.iterator(); it.hasNext();) {
+                    ProfileState ps = it.next();
+                    foundStates.put(ps.previous, ps);
+                }
+                
+                pss.clear();
+                
+                // merge them now
+                for (Collection<ProfileState> states : foundStates.asMap().values()) {                   
+                    if (states.size() == 1)
+                        pss.addAll(states);
+                    else
+                        pss.add(ProfileState.merge(states, true));
                 }
             }
             
