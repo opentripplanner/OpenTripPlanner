@@ -53,7 +53,13 @@ public class TimeSurface implements Serializable {
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
     public String description;
 
+    /** Create a time surface with a sample grid */
     public TimeSurface(ShortestPathTree spt) {
+        this(spt, true);
+    }
+    
+    /** Create a time surface, optionally making a sample grid */
+    public TimeSurface(ShortestPathTree spt, boolean makeSampleGrid) {
 
         params = spt.getOptions().parameters;
 
@@ -83,7 +89,9 @@ public class TimeSurface implements Serializable {
         this.dateTime = spt.getOptions().dateTime;
         long t1 = System.currentTimeMillis();
         LOG.info("Made TimeSurface from SPT in {} msec.", (int) (t1 - t0));
-        makeSampleGrid(spt);
+        
+        if (makeSampleGrid)
+            makeSampleGrid(spt);
     }
 
     /** Make a max or min timesurface from propagated times in a ProfileRouter. */

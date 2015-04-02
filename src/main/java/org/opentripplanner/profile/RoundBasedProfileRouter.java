@@ -368,6 +368,8 @@ public class RoundBasedProfileRouter {
         LOG.info("Finished profile routing in {} seconds", (System.currentTimeMillis() - searchBeginTime) / 1000);
         
         makeSurfaces();
+        
+        LOG.info("Finished analyst request in {} seconds total", (System.currentTimeMillis() - searchBeginTime) / 1000);
     }
     
     public void mergeStates(Multimap<TransitStop, ProfileState> touchedStops) {
@@ -494,56 +496,59 @@ public class RoundBasedProfileRouter {
     /** analyst mode: propagate to street network */
     private void makeSurfaces() {
         LOG.info("Propagating from transit stops to the street network...");
-        // A map to store the travel time to each vertex
-        TimeSurface minSurface = new TimeSurface(this);
-        TimeSurface avgSurface = new TimeSurface(this);
-        TimeSurface maxSurface = new TimeSurface(this);
-        // Grab a cached map of distances to street intersections from each transit stop
-        StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
+        List<State> lower = Lists.newArrayList();
+        List<State> upper = Lists.newArrayList();
+        List<State> avg = Lists.newArrayList();
+        
+        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        rr.batch = (true);
+        rr.from = new GenericLocation(request.fromLat, request.fromLon);
+        rr.setRoutingContext(graph);
+        rr.longDistance = true;
+        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+        rr.setNumItineraries(1);
+       
+        long startTime = rr.dateTime / 1000;
+        
+        // TODO: insert the origin into each of these lists so that we get direct modes as well
+        
         // Iterate over all rides at all clusters
         // Note that some may be dominated, but it doesn't matter
-        for (Entry<TransitStop, ProfileState> entry : retainedStates.entries()) {
-            ProfileState ps = entry.getValue();
-            int lb0 = ps.lowerBound;
-            int ub0 = ps.upperBound;
-
-            TransitStop tstop = entry.getKey();
-            // Iterate over street intersections in the vicinity of this particular transit stop.
-            // Shift the time range at this transit stop, merging it into that for all reachable street intersections.
-            TObjectIntMap<Vertex> distanceToVertex = stopTreeCache.getDistancesForStop(tstop);
-            for (TObjectIntIterator<Vertex> iter = distanceToVertex.iterator(); iter.hasNext(); ) {
-                iter.advance();
-                Vertex vertex = iter.key();
-                // distance in meters over walkspeed in meters per second --> seconds
-                int egressWalkTimeSeconds = (int) (iter.value() / request.walkSpeed);
-                if (egressWalkTimeSeconds > request.maxWalkTime * 60) {
-                    continue;
-                }
-                int propagated_min = lb0 + egressWalkTimeSeconds;
-                int propagated_max = ub0 + egressWalkTimeSeconds;
-                int propagated_avg = (int)(((long) propagated_min + propagated_max) / 2); // FIXME HACK
-                int existing_min = minSurface.times.get(vertex);
-                int existing_max = maxSurface.times.get(vertex);
-                int existing_avg = avgSurface.times.get(vertex);
-                // FIXME this is taking the least lower bound and the least upper bound
-                // which is not necessarily wrong but it's a crude way to perform the combination
-                if (existing_min == TimeSurface.UNREACHABLE || existing_min > propagated_min) {
-                    minSurface.times.put(vertex, propagated_min);
-                }
-                if (existing_max == TimeSurface.UNREACHABLE || existing_max > propagated_max) {
-                    maxSurface.times.put(vertex, propagated_max);
-                }
-                if (existing_avg == TimeSurface.UNREACHABLE || existing_avg > propagated_avg) {
-                    avgSurface.times.put(vertex, propagated_avg);
-                }
+        // Multi-origin Dijkstra search; preinitialize the queue with states at each transit stop
+        for (Collection<ProfileState> pss : retainedStates.asMap().values()) {
+            TransitStop tstop = null;
+            int lowerBound = Integer.MAX_VALUE;
+            int upperBound = Integer.MAX_VALUE;
+            
+            for (ProfileState ps : pss) {
+                if (tstop == null) tstop = ps.stop;
+                if (ps.lowerBound < lowerBound) lowerBound = ps.lowerBound;
+                if (ps.upperBound < upperBound) upperBound = ps.upperBound;
             }
+            
+            if (lowerBound == Integer.MAX_VALUE || upperBound == Integer.MAX_VALUE)
+                throw new IllegalStateException("Invalid bound!");
+               
+            lower.add(new State(tstop, null, lowerBound + startTime, startTime, rr));
+            upper.add(new State(tstop, null, upperBound + startTime, startTime, rr));
+            
+            // TODO extremely incorrect hack!
+            avg.add(new State(tstop, null, (upperBound + lowerBound) / 2 + startTime, startTime, rr));
         }
+        
+        // create timesurfaces
+        timeSurfaceRangeSet = new TimeSurface.RangeSet();
+
+        AStar astar = new AStar();
+        timeSurfaceRangeSet.min = new TimeSurface(astar.getShortestPathTree(rr, 20, null, lower), false);
+        astar = new AStar();
+        timeSurfaceRangeSet.max = new TimeSurface(astar.getShortestPathTree(rr, 20, null, upper), false);
+        astar = new AStar();
+        timeSurfaceRangeSet.avg = new TimeSurface(astar.getShortestPathTree(rr, 20, null, avg), false);
+        
         LOG.info("Done with propagation.");
         /* Store the results in a field in the router object. */
-        timeSurfaceRangeSet = new TimeSurface.RangeSet();
-        timeSurfaceRangeSet.min = minSurface;
-        timeSurfaceRangeSet.max = maxSurface;
-        timeSurfaceRangeSet.avg = avgSurface;
+
     }
     
     public void cleanup () {

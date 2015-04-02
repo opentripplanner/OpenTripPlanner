@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Keeps travel distances from all transit stops in a particular Graph to their nearby street nodes.
@@ -33,8 +35,40 @@ public class StopTreeCache {
 
     public StopTreeCache (Graph graph, int timeCutoffMinutes) {
         this.timeCutoffMinutes = timeCutoffMinutes;
+        
+        ForkJoinPool pool = new ForkJoinPool();
+        
         LOG.info("Caching distances to nearby street intersections from each transit stop...");
+        long startTime = System.currentTimeMillis();
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
+            pool.execute(new ComputeDistancesForStop(tstop, graph));
+        }
+        
+        pool.shutdown();
+        try {
+            pool.awaitTermination(5, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        
+        LOG.info("Done caching distances to nearby street intersections from each transit stop.");
+    }
+
+    public TObjectIntMap<Vertex> getDistancesForStop(TransitStop tstop) {
+        return distancesForStop.get(tstop);
+    }
+    
+    private class ComputeDistancesForStop implements Runnable {
+        private TransitStop tstop;
+        private Graph graph;
+        
+        public ComputeDistancesForStop(TransitStop tstop, Graph graph) {
+            this.tstop = tstop;
+            this.graph = graph;
+        }
+        
+        @Override
+        public void run() {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = (true);
             rr.setRoutingContext(graph, tstop, tstop);
@@ -50,13 +84,13 @@ public class StopTreeCache {
             for (State state : spt.getAllStates()) {
                 distanceToVertex.put(state.getVertex(), (int)state.walkDistance);
             }
-            distancesForStop.put(tstop, distanceToVertex);
-            rr.cleanup();
+            
+            synchronized (distancesForStop) {
+                distancesForStop.put(tstop, distanceToVertex);
+            }
+            
+            rr.cleanup();            
         }
-        LOG.info("Done caching distances to nearby street intersections from each transit stop.");
-    }
-
-    public TObjectIntMap<Vertex> getDistancesForStop(TransitStop tstop) {
-        return distancesForStop.get(tstop);
+        
     }
 }
