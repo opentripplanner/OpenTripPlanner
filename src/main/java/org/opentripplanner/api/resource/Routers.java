@@ -175,23 +175,16 @@ public class Routers {
      */
     @RolesAllowed({ "ROUTERS" })
     @PUT @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
-    public Response putGraphId(
-            @PathParam("routerId") String routerId, 
+    public Response putGraphId(@PathParam("routerId") String routerId,
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
         LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
-        try {
-            otpServer.getGraphService().getRouter(routerId);
-            return Response.status(404).entity("graph already registered.\n").build();
-        } catch (GraphNotFoundException e) {
-            if (preEvict) {
-                LOG.debug("Pre-evicting graph '{}'", routerId);
-                otpServer.getGraphService().evictRouter(routerId);
-            }
-            boolean success = otpServer.getGraphService()
-                    .registerGraph(
-                            routerId,
-                            otpServer.getGraphService().getGraphSourceFactory()
-                                    .createGraphSource(routerId));
+        GraphService graphService = otpServer.getGraphService();
+        if (graphService.getRouterIds().contains(routerId)) {
+            graphService.reloadGraph(routerId, preEvict);
+            return Response.status(201).entity("graph already registered, reloaded.\n").build();
+        } else {
+            boolean success = graphService.registerGraph(routerId, graphService
+                    .getGraphSourceFactory().createGraphSource(routerId));
             if (success)
                 return Response.status(201).entity("graph registered.\n").build();
             else
