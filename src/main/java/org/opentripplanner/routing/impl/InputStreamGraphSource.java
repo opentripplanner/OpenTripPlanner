@@ -124,6 +124,7 @@ public class InputStreamGraphSource implements GraphSource {
             if (preEvict) {
                 synchronized (preEvictMutex) {
                     if (router != null) {
+                        LOG.info("Reloading '{}': pre-evicting router", routerId);
                         router.shutdown();
                     }
                     /*
@@ -139,6 +140,7 @@ public class InputStreamGraphSource implements GraphSource {
                 if (newRouter != null) {
                     // Load OK
                     if (router != null) {
+                        LOG.info("Reloading '{}': post-evicting router", routerId);
                         router.shutdown();
                     }
                     router = newRouter; // Assignment in java is atomic
