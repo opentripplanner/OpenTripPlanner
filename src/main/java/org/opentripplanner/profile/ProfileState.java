@@ -60,13 +60,13 @@ public class ProfileState implements Cloneable {
         STREET, TRANSIT, TRANSFER;
     }
 
-    /** Merge the other profile state into this one, in place */
-    public void mergeIn(ProfileState other) {
+    /** Merge the other profile state into this one, in place. Does not preserve patterns. */
+    public void mergeIn (ProfileState other) {
         this.lowerBound = Math.min(this.lowerBound, other.lowerBound);
         // the upper bound of a common trunk is the _minimum_ upper bound of all its constituents
         this.upperBound = Math.min(this.upperBound, other.upperBound);
-        this.patterns = new TripPattern[this.patterns.length + other.patterns.length];
-        
+        this.patterns = null;
+        this.previous = null;
     }
 
     public boolean containsPattern(TripPattern pattern) {
