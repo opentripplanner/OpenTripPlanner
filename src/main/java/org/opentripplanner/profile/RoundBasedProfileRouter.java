@@ -148,10 +148,6 @@ public class RoundBasedProfileRouter {
                     if (!previousStops.containsKey(pattern.stopVertices[i]))
                         continue STOPS;
                     
-                    // optimization: don't board the same patterns many times at the origin
-                    if (round == 0 && optimalBoardingLocation.get(pattern) != pattern.stopVertices[i])
-                        continue STOPS;
-                    
                     // only propagate nondominated states
                     Collection<ProfileState> statesToPropagate = nondominated(previousStops.get(pattern.stopVertices[i]), pattern.stopVertices[i]);
                     
@@ -418,7 +414,29 @@ public class RoundBasedProfileRouter {
             }
         }
         
-        return stops;       
+        Map<TripPattern, ProfileState> optimalBoardingLocation = Maps.newHashMap();
+        TObjectIntMap<TripPattern> minBoardTime = new TObjectIntHashMap<TripPattern>(100, 0.75f, Integer.MAX_VALUE);
+        
+        // Only board patterns at the closest possible stop
+        for (ProfileState ps : stops.values()) {
+            for (TripPattern pattern : graph.index.patternsForStop.get(ps.stop.getStop())) {
+                if (ps.lowerBound < minBoardTime.get(pattern))
+                    optimalBoardingLocation.put(pattern, ps);
+            }
+            
+            ps.targetPatterns = Sets.newHashSet();
+        }
+        
+        for (Entry<TripPattern, ProfileState> e : optimalBoardingLocation.entrySet()) {
+            e.getValue().targetPatterns.add(e.getKey());
+        }
+        
+        for (Iterator<ProfileState> it = stops.values().iterator(); it.hasNext();) {
+            if (it.next().targetPatterns.isEmpty())
+                it.remove();
+        }
+        
+        return stops;
     }
     
     /** analyst mode: propagate to street network */
