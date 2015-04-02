@@ -102,7 +102,7 @@ public class RoundBasedProfileRouter {
         Multimap<TransitStop, ProfileState> touchedStops = findInitialStops(false);
         
         LOG.info("Found {} initial stops", touchedStops.size());
-        
+       
         // note: we do not add the found stops to retainedStates, because, if you are making a zero-transfer trip,
         // we don't want to generate trips that are artificially forced to go past a transit stop.
         ROUNDS: for (int round = 0; round < MAX_ROUNDS; round++) {
@@ -234,41 +234,9 @@ public class RoundBasedProfileRouter {
                 }
             }
             
-            // merge single path common trunks right here, to avoid propagating too many bounds
+            // merge states that came from the same stop. when retain_patterns = false, merge all states at each stop.
             LOG.info("Round completed, merging similar states");
-            
-            Set<TransitStop> touchedStopVertices = new HashSet<TransitStop>(touchedStops.keySet());
-            for (TransitStop tstop : touchedStopVertices) {
-                Collection<ProfileState> pss = nondominated(touchedStops.get(tstop), tstop);
-                
-                if (pss.isEmpty())
-                    continue;
-                
-                if (!RETAIN_PATTERNS) {
-                    ProfileState st = ProfileState.merge(pss, false);
-                    pss.clear();
-                    pss.add(st);
-                    continue;
-                }
-                
-                // find states that have come from the same place
-                Multimap<ProfileState, ProfileState> foundStates = ArrayListMultimap.create();
-                
-                for (Iterator<ProfileState> it = pss.iterator(); it.hasNext();) {
-                    ProfileState ps = it.next();
-                    foundStates.put(ps.previous, ps);
-                }
-                
-                pss.clear();
-                
-                // merge them now
-                for (Collection<ProfileState> states : foundStates.asMap().values()) {                   
-                    if (states.size() == 1)
-                        pss.addAll(states);
-                    else
-                        pss.add(ProfileState.merge(states, true));
-                }
-            }
+            mergeStates(touchedStops);
             
             // retain the states found here. we do this before finding transfers because you wouldn't transfer and then
             // not board a vehicle, so states immediately after a transfer are not final.
@@ -305,6 +273,9 @@ public class RoundBasedProfileRouter {
                 
                 List<ProfileState> xferStates = Lists.newArrayList();
                 
+                // make a hashset of the patterns that stop here, because we don't want to transfer to them at another stop
+                HashSet<TripPattern> patternsAtSource = new HashSet<TripPattern>(graph.index.patternsForStop.get(tstop.getStop()));
+                
                 for (ProfileState ps : statesAtStop) {
                     for (Tuple2<TransitStop, Integer> atime : accessTimes) {
                         ProfileState ps2 = ps.propagate(atime.b);
@@ -312,8 +283,12 @@ public class RoundBasedProfileRouter {
                         ps2.stop = atime.a;
                         // note that we do not reset pattern, as we still don't want to transfer from a pattern to itself.
                         // (TODO: is this true? loop routes?)
-
-                        for (TripPattern patt : graph.index.patternsForStop.get(tstop.getStop())) {
+                        
+                        for (TripPattern patt : graph.index.patternsForStop.get(atime.a.getStop())) {
+                            // don't transfer to patterns that we can board at this stop.
+                            if (patternsAtSource.contains(patt))
+                                continue;
+                            
                             if (atime.b < minBoardTime.get(patt)) {
                                 minBoardTime.put(patt, atime.b);
                                 optimalBoardState.put(patt, ps2);
@@ -339,12 +314,54 @@ public class RoundBasedProfileRouter {
                 }
             }
             
+            // merge single path common trunks again here, to avoid propagating too many bounds
+            // when retain_patterns = false, we want a single state at each transit stop. Thus we must merge them again after transferring.
+            if (!RETAIN_PATTERNS) {
+                LOG.info("Merging transfer states into direct states");
+                mergeStates(touchedStops);
+            }
+            
             LOG.info("Finished round {} in {} seconds", round, (System.currentTimeMillis() - roundStart) / 1000);
         }
         
         LOG.info("Finished profile routing in {} seconds", (System.currentTimeMillis() - searchBeginTime) / 1000);
         
         makeSurfaces();
+    }
+    
+    public void mergeStates(Multimap<TransitStop, ProfileState> touchedStops) {
+        Set<TransitStop> touchedStopVertices = new HashSet<TransitStop>(touchedStops.keySet());
+        for (TransitStop tstop : touchedStopVertices) {
+            Collection<ProfileState> pss = nondominated(touchedStops.get(tstop), tstop);
+            
+            if (pss.isEmpty())
+                continue;
+            
+            if (!RETAIN_PATTERNS) {
+                ProfileState st = ProfileState.merge(pss, false);
+                pss.clear();
+                pss.add(st);
+                continue;
+            }
+            
+            // find states that have come from the same place
+            Multimap<ProfileState, ProfileState> foundStates = ArrayListMultimap.create();
+            
+            for (Iterator<ProfileState> it = pss.iterator(); it.hasNext();) {
+                ProfileState ps = it.next();
+                foundStates.put(ps.previous, ps);
+            }
+            
+            pss.clear();
+            
+            // merge them now
+            for (Collection<ProfileState> states : foundStates.asMap().values()) {                   
+                if (states.size() == 1)
+                    pss.addAll(states);
+                else
+                    pss.add(ProfileState.merge(states, true));
+            }
+        }
     }
     
     /** from a collection of profile states at a transit stop, return a collection of all the nondominated states */
