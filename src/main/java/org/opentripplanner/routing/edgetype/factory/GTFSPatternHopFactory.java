@@ -81,6 +81,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.HashMultimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -285,7 +286,7 @@ public class GTFSPatternHopFactory {
     
     private FareServiceFactory fareServiceFactory;
 
-    private Map<StopPattern, TripPattern> tripPatterns = Maps.newHashMap();
+    private Multimap<StopPattern, TripPattern> tripPatterns = HashMultimap.create();
 
     private GtfsStopContext context = new GtfsStopContext();
 
@@ -308,7 +309,7 @@ public class GTFSPatternHopFactory {
         if (fareServiceFactory == null) {
             fareServiceFactory = new DefaultFareServiceFactory();
         }
-        fareServiceFactory.setDao(_dao);
+        fareServiceFactory.processGtfs(_dao);
         
         // TODO: Why are we loading stops? The Javadoc above says this method assumes stops are aleady loaded.
         loadStops(graph);
@@ -345,7 +346,7 @@ public class GTFSPatternHopFactory {
         /* The hops don't actually exist when we build their geometries, but we have to build their geometries
          * below, before we throw away the modified stopTimes, saving only the tripTimes (which don't have enough
          * information to build a geometry). So we keep them here.
-         * 
+         *
          *  A trip pattern actually does not have a single geometry, but one per hop, so we store an array.
          *  FIXME _why_ doesn't it have a single geometry?
          */
@@ -378,13 +379,18 @@ public class GTFSPatternHopFactory {
                 continue TRIP;
             }
 
+            /* Try to get the direction id for the trip, set to -1 if not found */
+            int directionId;
+            try {
+                directionId = Integer.parseInt(trip.getDirectionId());
+            } catch (NumberFormatException e) {
+                LOG.debug("Trip {} does not have direction id, defaults to -1");
+                directionId = -1;
+            }
+
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
             StopPattern stopPattern = new StopPattern(stopTimes);
-            TripPattern tripPattern = tripPatterns.get(stopPattern);
-            if (tripPattern == null) {
-                tripPattern = new TripPattern(trip.getRoute(), stopPattern);
-                tripPatterns.put(stopPattern, tripPattern);
-            }
+            TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
             TripTimes tripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
@@ -429,7 +435,7 @@ public class GTFSPatternHopFactory {
 
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns.values()) {
-            tripPattern.makePatternVerticesAndEdges(graph, context);
+            tripPattern.makePatternVerticesAndEdges(graph, context.stationStopNodes);
             // Add the geometries to the hop edges.
             LineString[] geom = geometriesByTripPattern.get(tripPattern);
             if (geom != null) {
@@ -469,6 +475,19 @@ public class GTFSPatternHopFactory {
         clearCachedData(); // eh?
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
+    }
+
+    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, int directionId) {
+        for(TripPattern tripPattern : tripPatterns.get(stopPattern)) {
+            if(tripPattern.route.equals(route) && tripPattern.directionId == directionId) {
+                return tripPattern;
+            }
+        }
+
+        TripPattern tripPattern = new TripPattern(route, stopPattern);
+        tripPattern.directionId = directionId;
+        tripPatterns.put(stopPattern, tripPattern);
+        return tripPattern;
     }
 
     /**

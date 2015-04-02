@@ -24,6 +24,12 @@ public interface TripUpdateSource {
      *         or null if an exception occurred while processing the message
      */
     public List<TripUpdate> getUpdates();
+    
+    /**
+     * @return true iff the last list with updates represent all updates that are active right
+     *        now, i.e. all previous updates should be disregarded
+     */
+    public boolean getFullDatasetValueOfLastUpdates();
 
     public String getAgencyId();
 }

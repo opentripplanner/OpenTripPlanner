@@ -27,7 +27,7 @@ import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -93,8 +93,8 @@ public class RoutingContext implements Cloneable {
 
     public final TransferTable transferTable;
 
-    /** The timetableSnapshot is a {@link TimetableResolver} for looking up real-time updates. */
-    public final TimetableResolver timetableSnapshot;
+    /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
+    public final TimetableSnapshot timetableSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the

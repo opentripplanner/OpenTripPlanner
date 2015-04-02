@@ -13,10 +13,12 @@
 
 package org.opentripplanner.standalone;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -31,12 +33,9 @@ import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
  * This is the main entry point to OpenTripPlanner. It allows both building graphs and starting up an OTP server
@@ -63,20 +62,19 @@ public class OTPMain {
         CommandLineParameters params = new CommandLineParameters();
         try {
             JCommander jc = new JCommander(params, args);
+            if (params.version) {
+                System.out.println(MavenVersion.VERSION.getLongVersionString());
+                System.exit(0);
+            }
             if (params.help) {
+                System.out.println(MavenVersion.VERSION.getShortVersionString());
                 jc.setProgramName("java -Xmx[several]G -jar otp.jar");
                 jc.usage();
                 System.exit(0);
             }
-
-            if (params.version) {
-                MavenVersion version = MavenVersion.VERSION;
-                System.out.println(version.getVersion());
-                System.exit(0);
-            }
-
             params.infer();
         } catch (ParameterException pex) {
+            System.out.println(MavenVersion.VERSION.getShortVersionString());
             LOG.error("Parameter error: {}", pex.getMessage());
             System.exit(1);
         }

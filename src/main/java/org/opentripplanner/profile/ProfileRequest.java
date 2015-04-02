@@ -39,6 +39,12 @@ public class ProfileRequest implements Serializable, Cloneable {
     public TraverseModeSet transitModes;
     public boolean analyst = false; // if true, propagate travel times out to street network
 
+    /* The relative importance of different factors when biking */
+    public int bikeSafe;
+    public int bikeSlope;
+    public int bikeTime;
+    // FIXME change "safe" to "danger" to consistently refer to the things being minimized
+
     /*
       This parameter compensates for the fact that GTFS does not contain information about schedule deviation (lateness).
       The min-max travel time range for some trains is zero, since the trips are reported to always have the same

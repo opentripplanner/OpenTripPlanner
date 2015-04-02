@@ -98,7 +98,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
-    public OptimizeType optimize = OptimizeType.QUICK; // TODO this should be completely removed and done only with individual cost parameters
+    public OptimizeType optimize = OptimizeType.QUICK;
+    // TODO this should be completely removed and done only with individual cost parameters
+    // Also: apparently OptimizeType only affects BICYCLE mode traversal of street segments.
+    // If this is the case it should be very well documented and carried over into the Enum name.
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
@@ -1125,6 +1128,21 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         // Considering that buses can travel on highways, return the same max speed for all other transit.
         return 40; // TODO find accurate max speeds
+    }
+
+    /**
+     * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness, and speed.
+     * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
+     * This setter function accepts any three numbers and will normalize them to add up to 1.
+     */
+    public void setTriangleNormalized (double safe, double slope, double time) {
+        double total = safe + slope + time;
+        safe /= total;
+        slope /= total;
+        time /= total;
+        this.triangleSafetyFactor = safe;
+        this.triangleSlopeFactor = slope;
+        this.triangleTimeFactor = time;
     }
 
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */

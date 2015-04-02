@@ -88,6 +88,7 @@ public abstract class GtfsTest extends TestCase {
         alertsUpdateHandler.setDefaultAgencyId("MMRI");
 
         try {
+            final boolean fullDataset = false;
             InputStream inputStream = new FileInputStream(gtfsRealTime);
             FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
             List<FeedEntity> feedEntityList = feedMessage.getEntityList();
@@ -95,7 +96,7 @@ public abstract class GtfsTest extends TestCase {
             for (FeedEntity feedEntity : feedEntityList) {
                 updates.add(feedEntity.getTripUpdate());
             }
-            timetableSnapshotSource.applyTripUpdates(updates, agencyId);
+            timetableSnapshotSource.applyTripUpdates(graph, fullDataset, updates, agencyId);
             alertsUpdateHandler.update(feedMessage);
         } catch (Exception exception) {}
     }

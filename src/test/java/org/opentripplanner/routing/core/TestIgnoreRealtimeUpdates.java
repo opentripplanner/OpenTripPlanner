@@ -15,7 +15,7 @@ package org.opentripplanner.routing.core;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -49,12 +49,12 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         Vertex from = new TransitStop(graph, stop1);
         Vertex to = new TransitStop(graph, stop2);
         
-        // Create dummy TimetableResolver
-        TimetableResolver resolver = new TimetableResolver();
+        // Create dummy TimetableSnapshot
+        TimetableSnapshot snapshot = new TimetableSnapshot();
         
-        // Mock TimetableSnapshotSource to return dummy TimetableResolver
+        // Mock TimetableSnapshotSource to return dummy TimetableSnapshot
         TimetableSnapshotSource source = mock(TimetableSnapshotSource.class);
-        when(source.getTimetableSnapshot()).thenReturn(resolver);
+        when(source.getTimetableSnapshot()).thenReturn(snapshot);
         graph.timetableSnapshotSource = (source);
         
         // Create routing context
