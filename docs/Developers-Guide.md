@@ -49,7 +49,7 @@ There are several ways to get involved:
 
 ### Issues and commits
 
-All commits should reference a specific issue number (this was formally decided decided in issue #175).
+All commits should reference a specific issue number (this was formally decided in issue #175).
 For example, `Simplify module X configuration #9999`.
 If no ticket exists for the feature or bug your code implements or fixes,
 you should [create a new ticket](http://github.com/openplans/OpenTripPlanner/issues/new) prior to checking in, or
