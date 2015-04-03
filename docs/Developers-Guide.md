@@ -12,7 +12,7 @@ IntelliJ IDEA is a commercial product, but its authors give free licenses to ope
 development community has received such a license. If you want to use IntelliJ just ask us for the license key. It's
 an excellent IDE, and in my experience is quicker and more stable than the competition.
 
-Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP Github
+Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP GitHub
 repository manually (on the command line or using some other Git interface tool), then import the resulting local OTP
 repository into my IDE as a Maven project. The IDE should then take care of fetching all the libraries OTP depends on,
 based on the Maven project description (POM file) in the base of the OTP repository. This step can take a long time because
@@ -55,10 +55,10 @@ If no ticket exists for the feature or bug your code implements or fixes,
 you should [create a new ticket](http://github.com/openplans/OpenTripPlanner/issues/new) prior to checking in, or
 ideally even prior to your development work since this provides a place to carry out implementation discussions (in the comments).
 
-Github will automatically update issues when commits are merged in: if your commit message includes the text
+GitHub will automatically update issues when commits are merged in: if your commit message includes the text
 ` fixes #123 `, it will automatically append your message as a comment on the isse and close it.
 If you simply mention ` #123 ` in your message, your message will be appended to the issue but it will remain open.
-Many other expressions exist to close issues via commit messages. See [the Github help page on this topic](https://help.github.com/articles/closing-issues-via-commit-messages/).
+Many other expressions exist to close issues via commit messages. See [the GitHub help page on this topic](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
 ### Code Comments
@@ -72,7 +72,7 @@ Javadoc or the empty Javadoc stubs added by IDEs, such as `@param` annotations w
 
 ### Documentation
 
-Most documentation should be included directly in the OpenTripPlanner repository rather than the Github wiki.
+Most documentation should be included directly in the OpenTripPlanner repository rather than the GitHub wiki.
 This allows version control to be applied to documentation as well as program source code.
 All pull requests that change how OTP is used or configured should include changes to the documentation alongside code
 modifications. Pages that help organize development teams or serve as scratchpads can still go
