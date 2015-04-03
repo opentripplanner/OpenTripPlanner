@@ -5,13 +5,13 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 /**
- * A stop associated with its elapsed time from a search location and the path for reaching it.
+ * A stop cluster associated with its elapsed time from a search location and the path for reaching it.
  * Used in profile routing.
  * TODO rename this StopPath or something.
  */
 public class StopAtDistance implements Comparable<StopAtDistance> {
 
-    public StopCluster stop; // TODO rename to stopCluster, use StopCluster objects not strings?
+    public StopCluster stopCluster; // TODO rename to stopCluster, use StopCluster objects not strings?
     public QualifiedMode qmode;
     public int etime;
     public State state;
@@ -28,7 +28,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
         this.qmode = qmode;
         if (state.getVertex() instanceof TransitStop) {
             TransitStop tstop = (TransitStop) state.getVertex();
-            stop = state.getOptions().rctx.graph.index.stopClusterForStop.get(tstop.getStop());
+            stopCluster = state.getOptions().rctx.graph.index.stopClusterForStop.get(tstop.getStop());
         }
     }
 
@@ -38,7 +38,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     }
 
     public String toString() {
-        return String.format("stop cluster %s via mode %s at %d min", stop, qmode, etime / 60);
+        return String.format("stop cluster %s via mode %s at %d min", stopCluster.id, qmode, etime / 60);
     }
 
 }

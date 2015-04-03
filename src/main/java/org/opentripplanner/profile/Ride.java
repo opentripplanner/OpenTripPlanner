@@ -68,7 +68,8 @@ public class Ride {
         return String.format("Ride from %s to %s (%d patterns on routes %s)", from, to, patternRides.size(), getRoutes());
     }
 
-    public void dump() {
+    /** Output this entire chain of rides. */
+    public void dumpRideChain() {
         List<Ride> rides = Lists.newLinkedList();
         Ride ride = this;
         while (ride != null) {

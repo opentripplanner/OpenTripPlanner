@@ -92,6 +92,15 @@ public class ProfileRouter {
         return false;
     }
 
+    public void printStopsForPatterns(String prefix, Multimap<TripPattern, StopAtDistance> stopClustersByPattern) {
+        for (TripPattern tp : stopClustersByPattern.keySet()) {
+            LOG.info("{} {}", prefix, tp.code);
+            for (StopAtDistance sd : stopClustersByPattern.get(tp)) {
+                LOG.info("    {}", sd);
+            }
+        }
+    }
+
     /* Maybe don't even try to accumulate stats and weights on the fly, just enumerate options. */
     /* TODO Or actually use a priority queue based on the min time. */
 
@@ -138,8 +147,8 @@ public class ProfileRouter {
             }
         }
         LOG.info("Done finding access/egress paths.");
-        LOG.info("From patterns/stops: {}", fromStops);
-        LOG.info("To patterns/stops: {}", toStops);
+        printStopsForPatterns("from", fromStops);
+        printStopsForPatterns("to", toStops);
 
         /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
         Map<StopCluster, Ride> initialRides = Maps.newHashMap(); // One ride per stop cluster
@@ -151,19 +160,19 @@ public class ProfileRouter {
             Collection<StopAtDistance> sds = fromStops.get(pattern);
             for (StopAtDistance sd : sds) {
                 /* Fetch or construct a new Ride beginning at this stop cluster. */
-                Ride ride = initialRides.get(sd.stop);
+                Ride ride = initialRides.get(sd.stopCluster);
                 if (ride == null) {
-                    ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
+                    ride = new Ride(sd.stopCluster, null); // null previous ride because this is the first ride
                     ride.accessStats = new Stats(); // empty stats, times for each access mode will be merged in
                     ride.accessStats.min = Integer.MAX_VALUE; // higher than any value that will be merged in
-                    ride.accessDist = (int) sd.state.getWalkDistance(); // TODO verify correctness
-                    initialRides.put(sd.stop, ride);
+                    ride.accessDist = (int) sd.state.getWalkDistance(); // TODO verify correctness and uses
+                    initialRides.put(sd.stopCluster, ride);
                 }
                 /* Record the access time for this mode in the stats. */
                 ride.accessStats.merge(sd.etime);
                 /* Loop over stop clusters in case stop cluster appears more than once in the pattern. */
                 STOP_INDEX: for (int i = 0; i < pattern.getStops().size(); ++i) {
-                    if (sd.stop == graph.index.stopClusterForStop.get(pattern.getStops().get(i))) {
+                    if (sd.stopCluster == graph.index.stopClusterForStop.get(pattern.getStops().get(i))) {
                         PatternRide newPatternRide = new PatternRide(pattern, i);
                         /* Only add the PatternRide once per unique (pattern,stopIndex). */
                         // TODO this would be a !contains() call if PatternRides had semantic equality
@@ -178,22 +187,29 @@ public class ProfileRouter {
                 }
             }
         }
+        LOG.info("Created these initial rides:");
         for (Ride ride : initialRides.values()) {
+            LOG.info("{}", ride.toString());
+            LOG.info("    {}", ride.accessStats);
+            for (PatternRide pr : ride.patternRides) {
+                LOG.info("    {} {}", pr.pattern.route, pr);
+            }
             queue.insert(ride, 0);
         }
         /* Explore incomplete rides as long as there are any in the queue. */
         while ( ! queue.empty()) {
             /* Get the minimum-time unfinished ride off the queue. */
             Ride ride = queue.extract_min();
+            /* Skip this ride if it has been dominated since it was enqueued. */
+            if ( ! retainedRides.get(ride.from).contains(ride)) continue;
             //LOG.info("dequeued ride {}", ride);
             //ride.dump();
             // maybe when ride is complete, then find transfers here, but that makes for more queue operations.
             if (ride.to != null) throw new AssertionError("Ride should be unfinished.");
-            /* Track finished rides by their destination stop, so we can add PatternRides to them. */
+            /* Track finished Rides by their destination StopCluster, so we can add PatternRides to them. */
             Map<StopCluster, Ride> rides = Maps.newHashMap();
             /* Complete partial PatternRides (with only a pattern and a beginning stop) which were enqueued in this
-             * partial ride. This is done by scanning through the Pattern, creating rides to all downstream stops that
-             * are near the destination or have relevant transfers. */
+             * partial ride. This is done by scanning through the Pattern, creating rides to all downstream stops. */
             PR: for (PatternRide pr : ride.patternRides) {
                 // LOG.info(" {}", pr);
                 List<Stop> stops = pr.pattern.getStops();
@@ -218,7 +234,8 @@ public class ProfileRouter {
                 }
             }
             /* Build new downstream Rides by transferring from patterns in current Rides. */
-            Map<StopCluster, Ride> xferRides = Maps.newHashMap(); // A map of incomplete rides after transfers, one for each stop.
+            // Create a map of incomplete rides (start but no end point) after transfers, one for each stop.
+            Map<StopCluster, Ride> xferRides = Maps.newHashMap();
             for (Ride r1 : rides.values()) {
                 r1.calcStats(window, request.walkSpeed);
                 if (r1.waitStats == null) {
@@ -227,10 +244,9 @@ public class ProfileRouter {
                     // It might make more sense to keep bags of arrival times per ride+stop.
                     continue;
                 }
-                if ( ! addIfNondominated(r1)) continue; // abandon this ride if it is dominated by some existing ride at the same location
-                // We have a new, nondominated, completed ride.
-
-                /* Find transfers out of this new ride. */
+                /* Abandon this ride if it is dominated by some existing ride at the same location. */
+                if ( ! addIfNondominated(r1)) continue;
+                /* We have a new, nondominated, completed ride. Find transfers out of this new ride. */
                 // Do not transfer too many times. Check after calculating stats since stats are needed in any case.
                 int nRides = r1.pathLength();
                 if (nRides >= MAX_RIDES) continue;
@@ -272,7 +288,7 @@ public class ProfileRouter {
             }
             /* Enqueue new incomplete Rides with non-excessive durations. */
             for (Ride r : xferRides.values()) {
-                // ride is unfinished, use previous ride's time as key
+                // This ride is unfinished, use the previous ride's travel time lower bound as the priority queue key.
                 if (addIfNondominated(r)) queue.insert(r, r.previous.durationLowerBound());
             }
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
@@ -291,7 +307,7 @@ public class ProfileRouter {
             for (Ride ride : retainedRides.get(cluster)) {
                 PATTERN: for (PatternRide pr : ride.patternRides) {
                     for (StopAtDistance clusterForPattern : toStops.get(pr.pattern)) {
-                        if (clusterForPattern != null && clusterForPattern.stop == cluster) {
+                        if (clusterForPattern != null && clusterForPattern.stopCluster == cluster) {
                             targetRides.add(ride);
                             break PATTERN;
                         }
@@ -303,8 +319,7 @@ public class ProfileRouter {
         /* Non-analyst: Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
         for (Ride ride : targetRides) {
-            //
-            // We board / alight from all patterns in a ride at the same stop.
+            // All PatternRides in a Ride end at the same stop.
             Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStopCluster());
             Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStopCluster());
             Option option = new Option(ride, accessPaths, egressPaths);
@@ -358,7 +373,7 @@ public class ProfileRouter {
         SimpleIsochrone.MinMap<T2<TripPattern, QualifiedMode>, StopAtDistance> closest = new SimpleIsochrone.MinMap<>();
         // Iterate over all StopAtDistance for all Stops. The fastest mode will win at each stop.
         for (StopAtDistance stopDist : stopClusters.values()) {
-            for (Stop stop : stopDist.stop.children) {
+            for (Stop stop : stopDist.stopCluster.children) {
                 for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
                     closest.putMin(new T2(pattern, stopDist.qmode), stopDist);
                 }
@@ -388,7 +403,7 @@ public class ProfileRouter {
         for (QualifiedMode qmode : qModes.qModes) {
             LOG.info("{} mode {}", dest ? "egress" : "access", qmode);
             for (StopAtDistance sd : findClosestStops(qmode, dest)) {
-                pathsByStop.put(sd.stop, sd);
+                pathsByStop.put(sd.stopCluster, sd);
             }
         }
         return pathsByStop;
@@ -458,9 +473,9 @@ public class ProfileRouter {
             if (vertex instanceof TransitStop) {
                 StopAtDistance sd = new StopAtDistance(state, qmode);
                 if (qmode.mode == TraverseMode.CAR && sd.etime < minTravelTimeSeconds) return;
-                if (stopClustersFound.containsKey(sd.stop)) return; // record only the closest stop in each cluster
+                if (stopClustersFound.containsKey(sd.stopCluster)) return; // record only the closest stop in each cluster
                 LOG.debug("found stop cluster: {}", sd);
-                stopClustersFound.put(sd.stop, sd);
+                stopClustersFound.put(sd.stopCluster, sd);
             }
         }
     }
