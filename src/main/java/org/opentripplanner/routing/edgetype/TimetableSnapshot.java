@@ -95,7 +95,7 @@ public class TimetableSnapshot {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
-
+    
     // Use HashMap not Map so we can clone.
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
     // The SortedSet members are copy-on-write
@@ -114,12 +114,24 @@ public class TimetableSnapshot {
      * </p>
      */
     private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
+    
+    /**
+     * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it shouldn't
+     * be possible to change it to false anymore.
+     */
+    private boolean readOnly = false;
 
+    /**
+     * Boolean value indicating that this timetable snapshot contains changes compared to the state
+     * of the last commit if true.
+     */
+    private boolean dirty = false;
+    
     /**
      * A set of all timetables which have been modified and are waiting to be indexed. When
      * <code>dirty</code> is <code>null</code>, it indicates that the snapshot is read-only.
      */
-    private Set<Timetable> dirty = new HashSet<Timetable>();
+    private Set<Timetable> dirtyTimetables = new HashSet<Timetable>();
 
     /**
      * Returns an updated timetable for the specified pattern if one is available in this snapshot,
@@ -169,14 +181,14 @@ public class TimetableSnapshot {
         Preconditions.checkNotNull(pattern);
         Preconditions.checkNotNull(serviceDate);
         
-        if (dirty == null) {
+        if (readOnly) {
             throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
         }
         
         Timetable tt = resolve(pattern, serviceDate);
         // we need to perform the copy of Timetable here rather than in Timetable.update()
         // to avoid repeatedly copying in case several updates are applied to the same timetable
-        if ( ! dirty.contains(tt)) {
+        if ( ! dirtyTimetables.contains(tt)) {
             Timetable old = tt;
             tt = new Timetable(tt, serviceDate);
             SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
@@ -192,7 +204,8 @@ public class TimetableSnapshot {
                 sortedTimetables.remove(old);
             sortedTimetables.add(tt);
             timetables.put(pattern, sortedTimetables);
-            dirty.add(tt);
+            dirtyTimetables.add(tt);
+            dirty = true;
         }
         
         // Assume all trips in a pattern are from the same feed, which should be the case.
@@ -231,30 +244,36 @@ public class TimetableSnapshot {
 
     @SuppressWarnings("unchecked")
     public TimetableSnapshot commit(boolean force) {
-        if (dirty == null) {
+        if (readOnly) {
             throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
         }
         
         TimetableSnapshot ret = new TimetableSnapshot();
         if (!force && !this.isDirty()) return null;
-        for (Timetable tt : dirty) {
+        for (Timetable tt : dirtyTimetables) {
             tt.finish(); // summarize, index, etc. the new timetables
         }
         ret.timetables = (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
         ret.lastAddedTripPattern = (HashMap<TripIdAndServiceDate, TripPattern>)
                 this.lastAddedTripPattern.clone();
-        this.dirty.clear();
+        this.dirtyTimetables.clear();
+        this.dirty = false;
 
-        ret.dirty = null; // mark the snapshot as henceforth immutable
+        ret.readOnly = true; // mark the snapshot as henceforth immutable
         return ret;
     }
 
     /**
-     * Clear all data from snapshot 
+     * Clear all data of snapshot 
      */
     public void clear() {
-        if (dirty == null) {
+        if (readOnly) {
             throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
+        }
+        
+        // If this snapshot is not empty, it will be dirty after the clear action 
+        if (!timetables.isEmpty() || !lastAddedTripPattern.isEmpty()) {
+            dirty = true;
         }
         
         // Clear all data from snapshot
@@ -266,7 +285,7 @@ public class TimetableSnapshot {
      * Removes all Timetables which are valid for a ServiceDate on-or-before the one supplied.
      */
     public boolean purgeExpiredData(ServiceDate serviceDate) {
-        if (dirty == null) {
+        if (readOnly) {
             throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
         }
 
@@ -305,12 +324,12 @@ public class TimetableSnapshot {
     }
 
     public boolean isDirty() {
-        if (dirty == null) return false;
-        return dirty.size() > 0;
+        if (readOnly) return false;
+        return dirty;
     }
 
     public String toString() {
-        String d = dirty == null ? "committed" : String.format("%d dirty", dirty.size());
+        String d = readOnly ? "committed" : String.format("%d dirty", dirtyTimetables.size());
         return String.format("Timetable snapshot: %d timetables (%s)", timetables.size(), d);
     }
 }
