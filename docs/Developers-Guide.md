@@ -20,7 +20,7 @@ it involves downloading a lot of JAR files.
 
 When running your local copy of the OTP source within an IDE, all command line switches and configuration options will
 be identical to the ones used when running the OTP JAR from the command line (as described in the
-[basic introduction](Basic-Usage) and [configuration reference](Configuration). The only difference is that you need to
+[basic introduction](Basic-Usage) and [configuration reference](Configuration)). The only difference is that you need to
 manually specify the main class. When you run a JAR from the command line, the JVM automatically knows which class
 contains the entry point into the program (the `main` function), but in IDEs you must create a "run configuration".
 
