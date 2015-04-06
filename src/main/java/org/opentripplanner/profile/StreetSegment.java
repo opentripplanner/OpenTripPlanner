@@ -34,8 +34,6 @@ public class StreetSegment {
     @JsonSerialize(using = ToStringSerializer.class) // as a string (e.g. "BICYCLE_RENT" instead of a nested object)
     public QualifiedMode mode;
     public int time;
-    public EncodedPolylineBean geometry;
-    public List<WalkStep> walkSteps = Lists.newArrayList();
     public List<StreetEdgeInfo> streetEdges = Lists.newArrayList();
 
     /**
@@ -56,11 +54,8 @@ public class StreetSegment {
                 }
             }
         }
-        Geometry geom = GeometryUtils.getGeometryFactory().createLineString(coordinates);
-        this.geometry = PolylineEncoder.createEncodings(geom);
         Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false);
         for (Leg leg : itin.legs) {
-            walkSteps.addAll(leg.walkSteps);
             // populate the streetEdges array
             for(WalkStep walkStep : leg.walkSteps) {
                 int i = 0;
