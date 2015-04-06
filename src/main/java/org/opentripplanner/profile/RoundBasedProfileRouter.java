@@ -488,6 +488,8 @@ public class RoundBasedProfileRouter {
             ps.targetPatterns = Sets.newHashSet();
         }
         
+        LOG.info("Found {} reachable stops, filtering to only board at closest stops", stops.size());
+        
         for (Entry<TripPattern, ProfileState> e : optimalBoardingLocation.entrySet()) {
             e.getValue().targetPatterns.add(e.getKey());
         }
@@ -496,6 +498,8 @@ public class RoundBasedProfileRouter {
             if (it.next().targetPatterns.isEmpty())
                 it.remove();
         }
+        
+        rr.cleanup();
         
         return stops;
     }
@@ -517,7 +521,7 @@ public class RoundBasedProfileRouter {
        
         long startTime = rr.dateTime / 1000;
         
-        // TODO: insert the origin into each of these lists so that we get direct modes as well
+        State origin = new State(rr);
         
         // Iterate over all rides at all clusters
         // Note that some may be dominated, but it doesn't matter
@@ -543,6 +547,11 @@ public class RoundBasedProfileRouter {
             avg.add(new State(tstop, null, (upperBound + lowerBound) / 2 + startTime, startTime, rr));
         }
         
+        // get direct trips as well
+        lower.add(origin);
+        upper.add(origin);
+        avg.add(origin);
+        
         // create timesurfaces
         timeSurfaceRangeSet = new TimeSurface.RangeSet();
 
@@ -552,6 +561,8 @@ public class RoundBasedProfileRouter {
         timeSurfaceRangeSet.max = new TimeSurface(astar.getShortestPathTree(rr, 20, null, upper), false);
         astar = new AStar();
         timeSurfaceRangeSet.avg = new TimeSurface(astar.getShortestPathTree(rr, 20, null, avg), false);
+        
+        rr.cleanup();
         
         LOG.info("Done with propagation.");
         /* Store the results in a field in the router object. */
