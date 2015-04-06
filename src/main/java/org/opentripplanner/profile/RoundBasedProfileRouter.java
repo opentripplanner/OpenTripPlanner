@@ -99,6 +99,8 @@ public class RoundBasedProfileRouter {
         // TODO consider that some stops may be closer by one mode than another
         // and that some stops may be accessible by one mode but not another
         
+        // We have two declarations here because there are two modes. In standard mode, we retain multiple states
+        // at each stop. In non-retain-patterns mode, we retain but a single state at each stop after each round.
         Multimap<TransitStop, ProfileState> touchedStops;
         Map<TransitStop, ProfileState> singleTouchedStops;
         
@@ -188,7 +190,7 @@ public class RoundBasedProfileRouter {
                     }
                     
                     DESTSTOPS: for (int j = i + 1; j < pattern.stopVertices.length; j++) {
-                        // how long does it take to ride this trip from i to j
+                        // how long does it take to ride this trip from i to j?
                         int minRideTime = Integer.MAX_VALUE;
                         int maxRideTime = Integer.MIN_VALUE;
                         
@@ -220,6 +222,12 @@ public class RoundBasedProfileRouter {
                                 minRideTime == Integer.MAX_VALUE || maxRideTime == Integer.MIN_VALUE)
                             // no trips in window that arrive at stop
                             continue DESTSTOPS;
+                        
+                        if (minRideTime < 0 || maxRideTime < 0) {
+                            LOG.error("Pattern {} travels backwards in time between stop {} and {}",
+                                    pattern, pattern.stopVertices[i].getStop(), pattern.stopVertices[j].getStop());
+                            continue DESTSTOPS;
+                        }
                         
                         // note: unnecessary variance in the scheduled case. It is entirely possible that the max wait and the max ride time
                         // cannot occur simultaneously.
