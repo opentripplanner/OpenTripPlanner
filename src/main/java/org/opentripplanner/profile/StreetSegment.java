@@ -77,10 +77,10 @@ public class StreetSegment {
                         edgeInfo.stayOn = walkStep.stayOn;
                         edgeInfo.area = walkStep.area;
                         edgeInfo.bogusName = walkStep.bogusName;
-                        edgeInfo.bikeRentalOnStation = walkStep.bikeRentalOnStation;
+                        edgeInfo.bikeRentalOffStation = walkStep.bikeRentalOffStation;
                     }
                     if(i == walkStep.edges.size() - 1) {
-                        edgeInfo.bikeRentalOffStation = walkStep.bikeRentalOffStation;
+                        edgeInfo.bikeRentalOnStation = walkStep.bikeRentalOnStation;
                     }
                     streetEdges.add(edgeInfo);
                     i++;

@@ -361,38 +361,6 @@ public abstract class GraphPathToTripPlanConverter {
                 walkSteps.get(0).newMode = legMode;
                 lastMode = legMode;
             }
-            // TODO shouldn't this bike station logic be done in generateWalkSteps?
-            if(!walkSteps.isEmpty()) {
-                // check if leg starts with a bike station
-                Edge firstEdge = legsStates[i][0].backEdge;
-                if(firstEdge != null && onVertex == null) {
-                    if(firstEdge.getFromVertex() instanceof BikeRentalStationVertex) {
-                        onVertex = (BikeRentalStationVertex) firstEdge.getFromVertex();
-                    }
-                    else if(firstEdge.getToVertex() instanceof BikeRentalStationVertex) {
-                        onVertex = (BikeRentalStationVertex) firstEdge.getToVertex();                        
-                    }
-
-                    if(onVertex != null) {
-                        walkSteps.get(0).bikeRentalOnStation = new BikeRentalStationInfo(onVertex);
-                    }
-                }
-                
-                // check if leg ends with a bike station
-                Edge lastEdge = legsStates[i][legsStates[i].length - 1].backEdge;
-                if(lastEdge != null && onVertex != null && offVertex == null) {
-                    if(lastEdge.getFromVertex() instanceof BikeRentalStationVertex) {
-                        offVertex = (BikeRentalStationVertex) lastEdge.getFromVertex();
-                    }
-                    else if(lastEdge.getToVertex() instanceof BikeRentalStationVertex) {
-                        offVertex = (BikeRentalStationVertex) lastEdge.getToVertex();
-                    }
-
-                    if(offVertex != null) {
-                        walkSteps.get(walkSteps.size()-1).bikeRentalOffStation = new BikeRentalStationInfo(offVertex);
-                    }
-                }
-            }
 
             legs.get(i).walkSteps = walkSteps;
 
@@ -721,10 +689,16 @@ public abstract class GraphPathToTripPlanConverter {
         int roundaboutExit = 0; // track whether we are in a roundabout, and if so the exit number
         String roundaboutPreviousStreet = null;
 
+        State onBikeRentalState = null, offBikeRentalState = null;
+
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];
             State forwardState = states[i + 1];
             Edge edge = forwardState.getBackEdge();
+
+            if(edge instanceof RentABikeOnEdge) onBikeRentalState = forwardState;
+            if(edge instanceof RentABikeOffEdge) offBikeRentalState = forwardState;
+
             boolean createdNewStep = false, disableZagRemovalForThisStep = false;
             if (edge instanceof FreeEdge) {
                 continue;
@@ -986,6 +960,19 @@ public abstract class GraphPathToTripPlanConverter {
 
             step.edges.add(edge);
         }
+
+        // add bike rental information if applicable
+        if(onBikeRentalState != null) {
+            if(steps.isEmpty()) steps.add(createWalkStep(graph, onBikeRentalState));
+            steps.get(steps.size()-1).bikeRentalOnStation = 
+                    new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
+        }
+        if(offBikeRentalState != null) {
+            if(steps.isEmpty()) steps.add(createWalkStep(graph, offBikeRentalState));
+            steps.get(0).bikeRentalOffStation = 
+                    new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
+        }
+
         return steps;
     }
 
