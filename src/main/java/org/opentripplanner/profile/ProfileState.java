@@ -45,6 +45,8 @@ public class ProfileState implements Cloneable {
         ret.lowerBound += deltaMin;
         ret.upperBound += deltaMax;
         
+        this.targetPatterns = null;
+        
         return ret;
     }
     
