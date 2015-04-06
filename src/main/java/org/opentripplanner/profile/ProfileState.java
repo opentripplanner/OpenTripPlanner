@@ -62,6 +62,9 @@ public class ProfileState implements Cloneable {
 
     /** Merge the other profile state into this one, in place */
     public void mergeIn(ProfileState other) {
+        if (this.lowerBound < 0 || other.lowerBound < 0 || this.upperBound < 0 || other.upperBound < 0)
+            throw new IllegalStateException("Invalid bound");
+        
         this.lowerBound = Math.min(this.lowerBound, other.lowerBound);
         // the upper bound of a common trunk is the _minimum_ upper bound of all its constituents
         this.upperBound = Math.min(this.upperBound, other.upperBound);        
