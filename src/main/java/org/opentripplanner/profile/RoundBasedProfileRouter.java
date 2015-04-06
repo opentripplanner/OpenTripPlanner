@@ -65,7 +65,7 @@ public class RoundBasedProfileRouter {
     /** the maximum number of rounds. this is the same as the maximum number of boarding */
     public final int MAX_ROUNDS = 3;
     
-    public static final int CUTOFF_SECONDS = 90 * 60;
+    public static final int CUTOFF_SECONDS = 180 * 60;
     
     public static final boolean RETAIN_PATTERNS = false;
     
@@ -99,45 +99,27 @@ public class RoundBasedProfileRouter {
         // TODO consider that some stops may be closer by one mode than another
         // and that some stops may be accessible by one mode but not another
         
-        // We have two declarations here because there are two modes. In standard mode, we retain multiple states
-        // at each stop. In non-retain-patterns mode, we retain but a single state at each stop after each round.
-        Multimap<TransitStop, ProfileState> touchedStops;
-        Map<TransitStop, ProfileState> singleTouchedStops;
+        ProfileStateStore store = RETAIN_PATTERNS ? new MultiProfileStateStore() : new SingleProfileStateStore();
         
-        if (RETAIN_PATTERNS) {
-            touchedStops = ArrayListMultimap.create();
-            for (Entry<TransitStop, ProfileState> e : findInitialStops(false).entrySet()) {
-                touchedStops.put(e.getKey(), e.getValue());
-            }
-        } else {
-            singleTouchedStops = findInitialStops(false);
+        for (ProfileState ps : findInitialStops(false)) {
+            store.put(ps);
         }
         
-        LOG.info("Found {} initial stops", RETAIN_PATTERNS ? touchedStops.size() : singleTouchedStops.size());
+        LOG.info("Found {} initial stops", store.size());
        
         // note: we do not add the found stops to retainedStates, because, if you are making a zero-transfer trip,
         // we don't want to generate trips that are artificially forced to go past a transit stop.
         ROUNDS: for (int round = 0; round < MAX_ROUNDS; round++) {
             long roundStart = System.currentTimeMillis();
-            LOG.info("Begin round {}; {} stops to explore", round, RETAIN_PATTERNS ? touchedStops.size() : singleTouchedStops.size());
+            LOG.info("Begin round {}; {} stops to explore", round, store.size());
             
-            Multimap<TransitStop, ProfileState> previousStops;
-            Map<TransitStop, ProfileState> singlePreviousStops;
-            
-            if (RETAIN_PATTERNS) {
-                previousStops = touchedStops;
-                touchedStops = ArrayListMultimap.create();
-            }
-            else {
-                singlePreviousStops = singleTouchedStops;
-                singleTouchedStops = Maps.newHashMap();
-            }
-                
+            ProfileStateStore previousStore = store;
+            store = RETAIN_PATTERNS ? new MultiProfileStateStore((MultiProfileStateStore) store) : new SingleProfileStateStore((SingleProfileStateStore) store);
         
             Set<TripPattern> patternsToExplore = Sets.newHashSet();
             
             // explore all of the patterns at the stops visited on the previous round
-            for (TransitStop tstop : (RETAIN_PATTERNS ? previousStops.keySet() : singlePreviousStops.keySet())) {
+            for (TransitStop tstop : previousStore.keys()) {
                 Collection<TripPattern> patterns = graph.index.patternsForStop.get(tstop.getStop());
                 patternsToExplore.addAll(patterns);
             }
@@ -147,29 +129,27 @@ public class RoundBasedProfileRouter {
             // propagate all of the bounds down each pattern
             PATTERNS: for (final TripPattern pattern : patternsToExplore) {
                 STOPS: for (int i = 0; i < pattern.stopVertices.length; i++) {
-                    if (!(RETAIN_PATTERNS ? previousStops.containsKey(pattern.stopVertices[i]) : singlePreviousStops.containsKey(pattern.stopVertices[i])))
+                    if (!previousStore.containsKey(pattern.stopVertices[i]))
                         continue STOPS;
                     
                     Collection<ProfileState> statesToPropagate;                    
-                    if (RETAIN_PATTERNS) {
-                        // only propagate nondominated states
-                        statesToPropagate = nondominated(previousStops.get(pattern.stopVertices[i]), pattern.stopVertices[i]);
+                    // only propagate nondominated states
+                    statesToPropagate = previousStore.get(pattern.stopVertices[i]);
+                    
+                    // don't propagate states that use the same pattern
+                    statesToPropagate = Collections2.filter(statesToPropagate, new Predicate<ProfileState> () {
+
+                        @Override
+                        public boolean apply(ProfileState input) {
+                            // don't reboard same pattern, and don't board patterns that are better boarded elsewhere
+                            return !input.containsPattern(pattern) &&
+                                    (input.targetPatterns == null || input.targetPatterns.contains(pattern));
+                        }
                         
-                        // don't propagate states that use the same pattern
-                        statesToPropagate = Collections2.filter(statesToPropagate, new Predicate<ProfileState> () {
-    
-                            @Override
-                            public boolean apply(ProfileState input) {
-                                // don't reboard same pattern, and don't board patterns that are better boarded elsewhere
-                                return !input.containsPattern(pattern) &&
-                                        (input.targetPatterns == null || input.targetPatterns.contains(pattern));
-                            }
-                            
-                        });
-                        
-                        if (statesToPropagate.isEmpty())
-                            continue STOPS;
-                    }
+                    });
+                    
+                    if (statesToPropagate.isEmpty())
+                        continue STOPS;         
                     
                     int minWaitTime = Integer.MAX_VALUE;
                     int maxWaitTime = Integer.MIN_VALUE;
@@ -234,24 +214,19 @@ public class RoundBasedProfileRouter {
                         
                         // propagate every profile state that we picked up at stop i to stop j
                         // we've already checked to ensure we're not reboarding the same pattern
-                        if (RETAIN_PATTERNS) {
-                            for (ProfileState ps : statesToPropagate) {
-                                ProfileState ps2 = ps.propagate(minWaitTime + minRideTime, maxWaitTime + maxRideTime);
-                                ps2.stop = pattern.stopVertices[j];
-                                ps2.accessType = Type.TRANSIT;
-                                ps2.patterns = new TripPattern[] { pattern };
-                                touchedStops.put(ps2.stop, ps2);
-                            }
-                        }
-                        else {
-                            ProfileState ps = singlePreviousStops.get(pattern.stopVertices[i]);
+                        for (ProfileState ps : statesToPropagate) {
                             ProfileState ps2 = ps.propagate(minWaitTime + minRideTime, maxWaitTime + maxRideTime);
+                            
+                            if (ps2.upperBound > CUTOFF_SECONDS)
+                                continue;
+                            
                             ps2.stop = pattern.stopVertices[j];
                             ps2.accessType = Type.TRANSIT;
-                            if (!singleTouchedStops.containsKey(ps2.stop))
-                                singleTouchedStops.put(ps2.stop, ps2);
-                            else
-                                singleTouchedStops.get(ps2.stop).mergeIn(ps2);
+                            
+                            if (RETAIN_PATTERNS)
+                                ps2.patterns = new TripPattern[] { pattern };
+                            
+                            store.put(ps2);  
                         }
                     }
                 }
@@ -260,19 +235,11 @@ public class RoundBasedProfileRouter {
             // merge states that came from the same stop. when retain_patterns = false, merge all states at each stop.
             if (RETAIN_PATTERNS) {
                 LOG.info("Round completed, merging similar states");
-                mergeStates(touchedStops);
-                
-                // retain the states found here. we do this before finding transfers because you wouldn't transfer and then
-                // not board a vehicle, so states immediately after a transfer are not final.
-                for (Entry<TransitStop, ProfileState> e : touchedStops.entries()) {
-                    retainedStates.put(e.getKey(), e.getValue());
-                }
+                ((MultiProfileStateStore) store).mergeStates();
             }
             
-            else {
-                for (Entry<TransitStop, ProfileState> e : singleTouchedStops.entrySet()) {
-                    retainedStates.put(e.getKey(), e.getValue());
-                }
+            for (ProfileState ps : store.getAll()) {
+                retainedStates.put(ps.stop, ps);
             }
             
             if (round == MAX_ROUNDS - 1) {
@@ -285,7 +252,7 @@ public class RoundBasedProfileRouter {
             if (RETAIN_PATTERNS) {
                
                 // avoid concurrent modification
-                Set<TransitStop> touchedStopKeys = new HashSet<TransitStop>(touchedStops.keySet());
+                Set<TransitStop> touchedStopKeys = new HashSet<TransitStop>(store.keys());
                 for (TransitStop tstop : touchedStopKeys) {
                     List<Tuple2<TransitStop, Integer>> accessTimes = Lists.newArrayList();
                     
@@ -299,7 +266,7 @@ public class RoundBasedProfileRouter {
                     }
                     
                     // only transfer from nondominated states. only transfer to each pattern once
-                    Collection<ProfileState> statesAtStop = nondominated(touchedStops.get(tstop), tstop);
+                    Collection<ProfileState> statesAtStop = store.get(tstop);
                     
                     TObjectIntHashMap<TripPattern> minBoardTime = new TObjectIntHashMap<TripPattern>(1000, .75f, Integer.MAX_VALUE);
                     Map<TripPattern, ProfileState> optimalBoardState = Maps.newHashMap();
@@ -343,27 +310,25 @@ public class RoundBasedProfileRouter {
                     
                     for (ProfileState ps : xferStates) {
                         if (ps.targetPatterns != null && !ps.targetPatterns.isEmpty()) {
-                            touchedStops.put(ps.stop, ps);
+                            store.put(ps);
                         }
                     }
                 }
             }
             else {
                 // avoid concurrent modification
-                Set<TransitStop> touchedStopKeys = new HashSet<TransitStop>(singleTouchedStops.keySet());
+                Set<TransitStop> touchedStopKeys = new HashSet<TransitStop>(store.keys());
                 for (TransitStop tstop : touchedStopKeys) {
                     // find transfers for the stop
-                    ProfileState ps = singleTouchedStops.get(tstop);
+                    // clooge: SingleStore returns a list
+                    ProfileState ps = ((List<ProfileState>) store.get(tstop)).get(0);
                     for (Edge e : tstop.getOutgoing()) {
                         if (e instanceof SimpleTransfer) {
                             SimpleTransfer t = (SimpleTransfer) e;
                             int time = (int) (t.getDistance() / request.walkSpeed);
                             ProfileState ps2 = ps.propagate(time);
                             ps2.stop = (TransitStop) t.getToVertex();
-                            if (singleTouchedStops.containsKey(ps2.stop))
-                                singleTouchedStops.get(ps2.stop).mergeIn(ps2);
-                            else
-                                singleTouchedStops.put(ps2.stop, ps2);
+                            store.put(ps2);
                         }
                     }
                 }
@@ -377,41 +342,6 @@ public class RoundBasedProfileRouter {
         makeSurfaces();
         
         LOG.info("Finished analyst request in {} seconds total", (System.currentTimeMillis() - searchBeginTime) / 1000);
-    }
-    
-    public void mergeStates(Multimap<TransitStop, ProfileState> touchedStops) {
-        Set<TransitStop> touchedStopVertices = new HashSet<TransitStop>(touchedStops.keySet());
-        for (TransitStop tstop : touchedStopVertices) {
-            Collection<ProfileState> pss = nondominated(touchedStops.get(tstop), tstop);
-            
-            if (pss.isEmpty())
-                continue;
-            
-            if (!RETAIN_PATTERNS) {
-                ProfileState st = ProfileState.merge(pss, false);
-                pss.clear();
-                pss.add(st);
-                continue;
-            }
-            
-            // find states that have come from the same place
-            Multimap<ProfileState, ProfileState> foundStates = ArrayListMultimap.create();
-            
-            for (Iterator<ProfileState> it = pss.iterator(); it.hasNext();) {
-                ProfileState ps = it.next();
-                foundStates.put(ps.previous, ps);
-            }
-            
-            pss.clear();
-            
-            // merge them now
-            for (Collection<ProfileState> states : foundStates.asMap().values()) {                   
-                if (states.size() == 1)
-                    pss.addAll(states);
-                else
-                    pss.add(ProfileState.merge(states, true));
-            }
-        }
     }
     
     /** from a collection of profile states at a transit stop, return a collection of all the nondominated states */
@@ -442,12 +372,12 @@ public class RoundBasedProfileRouter {
     }
     
     /** find the boarding stops */
-    private Map<TransitStop, ProfileState> findInitialStops(boolean dest) {
+    private Collection<ProfileState> findInitialStops(boolean dest) {
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
         QualifiedModeSet modes = dest ? request.accessModes : request.egressModes;
         
-        Map<TransitStop, ProfileState> stops = Maps.newHashMap();
+        List<ProfileState> stops = Lists.newArrayList();
         
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.dominanceFunction = new DominanceFunction.EarliestArrival();
@@ -471,7 +401,7 @@ public class RoundBasedProfileRouter {
                 ps.lowerBound = ps.upperBound = (int) s.getElapsedTimeSeconds();
                 ps.stop = tstop;
                 ps.accessType = Type.STREET;
-                stops.put(tstop, ps);
+                stops.add(ps);
             }
         }
         
@@ -479,7 +409,7 @@ public class RoundBasedProfileRouter {
         TObjectIntMap<TripPattern> minBoardTime = new TObjectIntHashMap<TripPattern>(100, 0.75f, Integer.MAX_VALUE);
         
         // Only board patterns at the closest possible stop
-        for (ProfileState ps : stops.values()) {
+        for (ProfileState ps : stops) {
             for (TripPattern pattern : graph.index.patternsForStop.get(ps.stop.getStop())) {
                 if (ps.lowerBound < minBoardTime.get(pattern))
                     optimalBoardingLocation.put(pattern, ps);
@@ -494,7 +424,7 @@ public class RoundBasedProfileRouter {
             e.getValue().targetPatterns.add(e.getKey());
         }
         
-        for (Iterator<ProfileState> it = stops.values().iterator(); it.hasNext();) {
+        for (Iterator<ProfileState> it = stops.iterator(); it.hasNext();) {
             if (it.next().targetPatterns.isEmpty())
                 it.remove();
         }
@@ -518,8 +448,9 @@ public class RoundBasedProfileRouter {
         rr.longDistance = true;
         rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         rr.setNumItineraries(1);
+        rr.worstTime = rr.dateTime + CUTOFF_SECONDS;
        
-        long startTime = rr.dateTime / 1000;
+        long startTime = rr.dateTime;
         
         State origin = new State(rr);
         
