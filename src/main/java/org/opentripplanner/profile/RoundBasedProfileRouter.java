@@ -248,7 +248,6 @@ public class RoundBasedProfileRouter {
                             ProfileState ps2 = ps.propagate(minWaitTime + minRideTime, maxWaitTime + maxRideTime);
                             ps2.stop = pattern.stopVertices[j];
                             ps2.accessType = Type.TRANSIT;
-                            ps2.patterns = new TripPattern[] { pattern };
                             if (!singleTouchedStops.containsKey(ps2.stop))
                                 singleTouchedStops.put(ps2.stop, ps2);
                             else
