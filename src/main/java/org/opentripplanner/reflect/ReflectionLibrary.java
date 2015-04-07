@@ -7,7 +7,7 @@ public class ReflectionLibrary {
     /** Concatenate all fields and values of a Java object. */
     public static String dumpFields (Object object) {
         StringBuilder sb = new StringBuilder();
-        Class clazz = object.getClass();
+        Class<?> clazz = object.getClass();
         sb.append("Summarizing ");
         sb.append(clazz.getSimpleName());
         sb.append('\n');
