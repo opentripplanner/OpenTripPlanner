@@ -15,7 +15,8 @@ public class ReflectionLibrary {
             sb.append(field.getName());
             sb.append(" = ");
             try {
-                String value = field.get(object).toString();
+                Object fieldValue = field.get(object);
+                String value = fieldValue == null ? "null" : fieldValue.toString();
                 sb.append(value);
             } catch (IllegalAccessException ex) {
                 sb.append("(non-public)");
