@@ -101,6 +101,14 @@ public class ProfileRouter {
         }
     }
 
+    private static void logRide(Ride ride) {
+        LOG.info("{}", ride.toString());
+        LOG.info("    {}", ride.accessStats);
+        for (PatternRide pr : ride.patternRides) {
+            LOG.info("    {} {}", pr.pattern.route, pr);
+        }
+    }
+
     /* Maybe don't even try to accumulate stats and weights on the fly, just enumerate options. */
     /* TODO Or actually use a priority queue based on the min time. */
 
@@ -147,8 +155,8 @@ public class ProfileRouter {
             }
         }
         LOG.info("Done finding access/egress paths.");
-        printStopsForPatterns("from", fromStops);
-        printStopsForPatterns("to", toStops);
+        //printStopsForPatterns("from", fromStops);
+        //printStopsForPatterns("to", toStops);
 
         /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
         Map<StopCluster, Ride> initialRides = Maps.newHashMap(); // One ride per stop cluster
@@ -187,13 +195,8 @@ public class ProfileRouter {
                 }
             }
         }
-        LOG.info("Created these initial rides:");
         for (Ride ride : initialRides.values()) {
-            LOG.info("{}", ride.toString());
-            LOG.info("    {}", ride.accessStats);
-            for (PatternRide pr : ride.patternRides) {
-                LOG.info("    {} {}", pr.pattern.route, pr);
-            }
+            // logRide(ride);
             queue.insert(ride, 0);
         }
         /* Explore incomplete rides as long as there are any in the queue. */
@@ -201,10 +204,8 @@ public class ProfileRouter {
             /* Get the minimum-time unfinished ride off the queue. */
             Ride ride = queue.extract_min();
             /* Skip this ride if it has been dominated since it was enqueued. */
-            if ( ! retainedRides.get(ride.from).contains(ride)) continue;
-            //LOG.info("dequeued ride {}", ride);
-            //ride.dump();
-            // maybe when ride is complete, then find transfers here, but that makes for more queue operations.
+            if (dominated(ride, ride.from)) continue;
+            // Maybe when ride is complete, then find transfers here, but that makes for more queue operations.
             if (ride.to != null) throw new AssertionError("Ride should be unfinished.");
             /* Track finished Rides by their destination StopCluster, so we can add PatternRides to them. */
             Map<StopCluster, Ride> rides = Maps.newHashMap();
@@ -244,10 +245,10 @@ public class ProfileRouter {
                     // It might make more sense to keep bags of arrival times per ride+stop.
                     continue;
                 }
-                /* Abandon this ride if it is dominated by some existing ride at the same location. */
-                if ( ! addIfNondominated(r1)) continue;
-                /* We have a new, nondominated, completed ride. Find transfers out of this new ride. */
-                // Do not transfer too many times. Check after calculating stats since stats are needed in any case.
+                /* Retain this ride if it is not dominated by some existing ride at the same location. */
+                if (dominated(r1, r1.to)) continue;
+                retainedRides.put(r1.to, r1);
+                /* We have a new, non-dominated, completed ride. Find transfers out of this new ride, respecting the transfer limit. */
                 int nRides = r1.pathLength();
                 if (nRides >= MAX_RIDES) continue;
                 boolean penultimateRide = (nRides == MAX_RIDES - 1);
@@ -286,10 +287,13 @@ public class ProfileRouter {
                     }
                 }
             }
-            /* Enqueue new incomplete Rides with non-excessive durations. */
+            /* Enqueue new incomplete Rides resulting from transfers if they are not dominated at their from-cluster. */
             for (Ride r : xferRides.values()) {
-                // This ride is unfinished, use the previous ride's travel time lower bound as the priority queue key.
-                if (addIfNondominated(r)) queue.insert(r, r.previous.durationLowerBound());
+                if ( ! dominated(r, r.from)) {
+                    // This ride is unfinished, use the previous ride's travel time lower bound as the p-queue key.
+                    // Note that we are not adding these transfer results to the retained rides, just enqueuing them.
+                    queue.insert(r, r.durationLowerBound());
+                }
             }
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
         }
@@ -330,32 +334,58 @@ public class ProfileRouter {
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
-    /** Check whether a new ride has too long a duration relative to existing rides at the same location or global time limit. */
-    public boolean addIfNondominated(Ride newRide) {
-        StopCluster cluster = newRide.to;
-        if (cluster == null) { // if ride is unfinished, calculate time to its from-cluster based on previous ride
-            cluster = newRide.from;
-            newRide = newRide.previous;
+    /** Returns whether r1's access modes are a non-strict superset of r2's. */
+    public boolean accessModeSuperset(Ride r1, Ride r2) {
+        StopCluster sc1 = r1.getAccessStopCluster();
+        StopCluster sc2 = r2.getAccessStopCluster();
+        Collection<StopAtDistance> sds1 = fromStopPaths.get(sc1);
+        Collection<StopAtDistance> sds2 = fromStopPaths.get(sc2);
+        RIDE2 : for (StopAtDistance sd2 : sds2) {
+            for (StopAtDistance sd1 : sds1) {
+                if (sd1.qmode.equals(sd2.qmode)) {
+                    continue RIDE2;
+                }
+                return false;
+            }
         }
-        if (newRide.durationLowerBound() > MAX_DURATION) return false;
+        return true;
+    }
+
+    /** Returns whether r1's access modes are a non-strict superset of r2's. */
+    public boolean accessModesEqual(Ride r1, Ride r2) {
+        StopCluster sc1 = r1.getAccessStopCluster();
+        StopCluster sc2 = r2.getAccessStopCluster();
+        Collection<StopAtDistance> sds1 = fromStopPaths.get(sc1);
+        Collection<StopAtDistance> sds2 = fromStopPaths.get(sc2);
+        return sds1.equals(sds2);
+    }
+
+    /**
+     * Check whether a new ride has too long a duration relative to existing rides at the given location,
+     * or relative to the global travel time limit.
+     */
+    public boolean dominated (Ride ride, StopCluster atCluster) {
+        int dlb = ride.durationLowerBound(); // this call is sort-of-expensive, it chases pointers
+        int dub = ride.durationUpperBound();
+        if (dlb > MAX_DURATION) return true;
         // Check whether any existing rides at the same location (stop cluster) dominate the new one.
-        for (Ride oldRide : retainedRides.get(cluster)) {
-            if (oldRide.to == null) oldRide = oldRide.previous; // rides may be unfinished
-            // New rides must be strictly better (min and max) than any existing one with less transfers.
-            // This avoids alternatives formed by simply inserting extra unnecessary rides.
-            if (oldRide.pathLength() < newRide.pathLength() &&
-                oldRide.durationLowerBound() < newRide.durationLowerBound() &&
-                oldRide.durationUpperBound() < newRide.durationUpperBound()) {
-                return false;
+        for (Ride oldRide : retainedRides.get(atCluster)) {
+            if (oldRide.to == null) throw new AssertionError("no retained rides should be unfinished");
+            // Certain pairs of options should not be presented as alternatives to one another.
+            // They are in direct competition with one another and strict dominance applies.
+            if (oldRide.pathLength() < ride.pathLength() &&
+                oldRide.durationLowerBound() < dlb &&
+                oldRide.durationUpperBound() < dub &&
+                accessModeSuperset(oldRide, ride)) {
+                return true;
             }
-            // State is not strictly dominated. Perhaps it has the same number of transfers.
-            // In this case we want to keep it as long as it's sometimes better than all the others (time ranges overlap).
-            if (newRide.durationLowerBound() > oldRide.durationUpperBound() + request.suboptimalMinutes) {
-                return false;
+            // Strict dominance does not apply.
+            // Check whether time ranges overlap, considering the tolerance for suboptimality.
+            if (dlb > oldRide.durationUpperBound() + request.suboptimalMinutes) {
+                return true;
             }
         }
-        retainedRides.put(cluster, newRide);
-        return true; // No existing ride is strictly better than the new ride.
+        return false; // No existing ride is considered sufficiently better than the new ride to eject it.
     }
 
     /**

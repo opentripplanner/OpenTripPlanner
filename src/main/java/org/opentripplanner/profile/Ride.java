@@ -135,6 +135,10 @@ public class Ride {
     public int durationLowerBound() {
         int ret = 0;
         Ride ride = this;
+        // If this is an "unfinished ride" that just came off the queue, then its stats will all be null.
+        if (ride.to == null) {
+            ride = ride.previous;
+        }
         while (ride != null) {
             ret += ride.rideStats.min;
             ret += ride.waitStats.min;
@@ -148,6 +152,12 @@ public class Ride {
     public int durationUpperBound() {
         int ret = 0;
         Ride ride = this;
+        // If this is an "unfinished ride" that just came off the queue, then its stats will all be null.
+        // FIXME this is not really an upper bound, because it does not include transfer time!
+        // Perhaps change the reasoning at the call site where ride is an unfinished ride.
+        if (ride.to == null) {
+            ride = ride.previous;
+        }
         while (ride != null) {
             ret += ride.rideStats.max;
             ret += ride.waitStats.max;
@@ -295,7 +305,6 @@ public class Ride {
         }
         return ride.from;
     }
-
 
     /** @return the stop from which the rider will walk to the final destination, assuming this is the final Ride in a chain. */
     public StopCluster getEgressStopCluster() {

@@ -58,7 +58,7 @@ public class ProfileResource {
             @QueryParam("maxBikeTime")  @DefaultValue("20")    int maxBikeTime,
             @QueryParam("minCarTime")   @DefaultValue("1")     int minCarTime,
             @QueryParam("minBikeTime")  @DefaultValue("1")     int minBikeTime,
-            @QueryParam("orderBy")      @DefaultValue("AVG")   Option.SortOrder orderBy,
+            @QueryParam("orderBy")      @DefaultValue("MIN")   Option.SortOrder orderBy,
             @QueryParam("limit")        @DefaultValue("10")    int limit,       // max options to return PER ACCESS MODE
             @QueryParam("suboptimal")   @DefaultValue("5")     int suboptimalMinutes,
             @QueryParam("bikeSafe")     @DefaultValue("1")     int bikeSafe,
