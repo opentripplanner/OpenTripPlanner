@@ -24,14 +24,13 @@ public class MultiProfileStateStore implements ProfileStateStore {
         if (ps.lowerBound < minUpperBounds.get(ps.stop)) {
             states.put(ps.stop, ps);
             
-            // TODO: we're using strictly-less-than here, and geq below, which means that bounds that douch but do not overlap
-            // get dropped. This is probably what we want.
             if (ps.upperBound < minUpperBounds.get(ps.stop)) {
                 minUpperBounds.put(ps.stop, ps.upperBound);
                 
                 // kick out old states
                 for (Iterator<ProfileState> it = states.get(ps.stop).iterator(); it.hasNext();) {
-                    if (it.next().lowerBound >= ps.upperBound) {
+                    // need to use strictly-greater-than here, so states with no variation don't dominate themselves.
+                    if (it.next().lowerBound > ps.upperBound) {
                         it.remove();
                     }
                 }
@@ -51,7 +50,6 @@ public class MultiProfileStateStore implements ProfileStateStore {
 
     @Override
     public Collection<ProfileState> getAll() {
-        // TODO Auto-generated method stub
         return states.values();
     }
     
