@@ -31,6 +31,8 @@ public class SingleProfileStateStore implements ProfileStateStore {
         if (ps.lowerBound >= minUpperBounds.get(ps.stop))
             return false;
         
+        ps.previous = null;
+        
         if (ps.upperBound < minUpperBounds.get(ps.stop))
             minUpperBounds.put(ps.stop, ps.upperBound);
         
