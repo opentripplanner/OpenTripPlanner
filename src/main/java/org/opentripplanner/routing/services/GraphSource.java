@@ -65,7 +65,8 @@ public interface GraphSource {
      * @param preEvict True to evict the old version *before* loading the new one. In that case the
      *        implementation have to take care of making the getGraph() call wait while the new
      *        graph is being loaded and not return null.
-     * @return False if a new graph has not been reloaded and this graph must be evicted.
+     * @return False if a new graph has not been reloaded and we could not keep the previous one: it
+     *         should be evicted.
      */
     public boolean reload(boolean force, boolean preEvict);
 

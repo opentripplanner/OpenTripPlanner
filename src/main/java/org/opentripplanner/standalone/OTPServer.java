@@ -8,8 +8,6 @@ import org.opentripplanner.analyst.DiskBackedPointSetCache;
 import org.opentripplanner.analyst.PointSetCache;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.impl.GraphScanner;
-import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.scripting.impl.ScriptingService;
 import org.slf4j.Logger;
