@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone;
 
+import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
@@ -81,6 +82,12 @@ public class GraphBuilderParameters {
      * A specific fares service to use.
      */
     public final FareServiceFactory fareServiceFactory;
+
+    /**
+     * A custom OSM namer to use.
+     */
+    public final CustomNamer customNamer;
+
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
@@ -101,6 +108,7 @@ public class GraphBuilderParameters {
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
+        customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
     }
 
 }
