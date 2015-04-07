@@ -962,13 +962,11 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         // add bike rental information if applicable
-        if(onBikeRentalState != null) {
-            if(steps.isEmpty()) steps.add(createWalkStep(graph, onBikeRentalState));
+        if(onBikeRentalState != null && !steps.isEmpty()) {
             steps.get(steps.size()-1).bikeRentalOnStation = 
                     new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
         }
-        if(offBikeRentalState != null) {
-            if(steps.isEmpty()) steps.add(createWalkStep(graph, offBikeRentalState));
+        if(offBikeRentalState != null && !steps.isEmpty()) {
             steps.get(0).bikeRentalOffStation = 
                     new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
         }
