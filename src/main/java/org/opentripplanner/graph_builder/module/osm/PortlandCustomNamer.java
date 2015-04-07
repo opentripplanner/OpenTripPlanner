@@ -15,7 +15,9 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.HashSet;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
+
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -137,6 +139,11 @@ public class PortlandCustomNamer implements CustomNamer {
         for (StreetEdge e : nameByDestination) {
             nameAccordingToDestination(graph, e, 15);
         }
+    }
+
+    @Override
+    public void configure(JsonNode config) {
+        // No configuration needed.
     }
 
     private String nameAccordingToDestination(Graph graph, StreetEdge e, int maxDepth) {
