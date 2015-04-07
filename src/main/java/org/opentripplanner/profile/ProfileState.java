@@ -97,6 +97,9 @@ public class ProfileState implements Cloneable {
             int i = 0;
             for (Iterator<ProfileState> it = states.iterator(); it.hasNext(); i++) {
                 ProfileState state = it.next();
+                
+                if (ret.stop == null) ret.stop = state.stop;
+                
                 if (state.lowerBound < ret.lowerBound) ret.lowerBound = state.lowerBound;
                 
                 // Yes, we want the _minimum_ upper bound: you will never take a journey that is longer than the minimum
