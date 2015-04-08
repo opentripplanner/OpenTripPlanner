@@ -37,6 +37,7 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -51,6 +52,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.StationStopEdge;
@@ -413,8 +415,13 @@ public class GTFSPatternHopFactory {
             if (!geometriesByTripPattern.containsKey(tripPattern) && 
                     trip.getShapeId() != null && trip.getShapeId().getId() != null &&
                     !trip.getShapeId().getId().equals("")) {
-                // save the geometry to later be applied to the hops
-                geometriesByTripPattern.put(tripPattern,  createGeometry(graph, trip, stopTimes));
+                int numberOfAnnotations = graph.getBuilderAnnotations().size();
+                LineString[] lineStrings = createGeometry(graph, trip, stopTimes);
+                //different number of annotations means that some geometries were created as crow flies and ara unusable
+                if (numberOfAnnotations == graph.getBuilderAnnotations().size()) {
+                    // save the geometry to later be applied to the hops
+                    geometriesByTripPattern.put(tripPattern, lineStrings);
+                }
             }
 
 
@@ -447,11 +454,34 @@ public class GTFSPatternHopFactory {
 
             /* Iterate over all stops in this pattern recording mode information. */
             TraverseMode mode = GtfsLibrary.getTraverseMode(tripPattern.route);
+            int vertex_idx = 0;
+            List<PatternHop> patternHops = null;
+            if (this.useGTFSShapesForLinker) {
+                patternHops = tripPattern.getPatternHops();
+            }
             for (TransitStop tstop : tripPattern.stopVertices) {
                 tstop.addMode(mode);
                 if (mode == TraverseMode.SUBWAY) {
                     tstop.setStreetToStopTime(subwayAccessTime);
                 }
+
+                //should skip generated geometries
+                if (geom != null && this.useGTFSShapesForLinker) {
+                    if (vertex_idx < patternHops.size()) {
+                        PatternHop cur_hop = patternHops.get(vertex_idx);
+                        if (cur_hop != null) {
+                            LineString geo = cur_hop.getGeometry();
+                            LineString geo_prev = null;
+                            //adds one segment of previous hop
+                            //FIXME: enable adding last segment to geometry
+                            /*if (vertex_idx > 0) {
+                                geo_prev = patternHops.get(vertex_idx - 1).getGeometry();
+                            }*/
+                            tstop.addGeometry(getPartLineString(geo, geo_prev), mode);
+                        }
+                    }
+                }
+                vertex_idx++;
             }
 
         }
@@ -473,6 +503,26 @@ public class GTFSPatternHopFactory {
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
     }
 
+    private LineString getPartLineString(LineString line, LineString prev_line) {
+        int maxLine = 4;
+        if (line.getNumPoints() <= maxLine && prev_line == null) {
+            return line;
+        } else {
+            //returns last 2 vertices of last line and 2 from current
+            CoordinateArrayListSequence coordinateSequence = new CoordinateArrayListSequence();
+            int i = 0;
+            if (prev_line != null && prev_line.getNumPoints() > 2) {
+                i = 2;
+                coordinateSequence.add(prev_line.getCoordinateN(prev_line.getNumPoints()-3));
+                coordinateSequence.add(prev_line.getCoordinateN(prev_line.getNumPoints()-2));
+            }
+            maxLine = Math.min(maxLine, line.getNumPoints());
+            for(; i < maxLine; i++) {
+                coordinateSequence.add(line.getCoordinateN(i));
+            }
+            return GeometryUtils.getGeometryFactory().createLineString(coordinateSequence);
+        }
+    }
     /**
      * Identify interlined trips (where a physical vehicle continues on to another logical trip)
      * and update the TripPatterns accordingly. This must be called after all the pattern edges and vertices

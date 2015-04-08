@@ -13,7 +13,14 @@
 */
 package org.opentripplanner.routing.vertextype;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.vividsolutions.jts.geom.LineString;
+import gnu.trove.set.TShortSet;
+import gnu.trove.set.hash.TShortHashSet;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -29,6 +36,8 @@ public class TransitStop extends TransitStationStop {
     // Do we actually need a set of modes for each stop?
     // It's nice to have for the index web API but can be generated on demand.
     private TraverseModeSet modes = new TraverseModeSet();
+
+    private TShortSet levels;
 
     private static final long serialVersionUID = 1L;
 
@@ -51,10 +60,14 @@ public class TransitStop extends TransitStationStop {
     public TransitStopArrive arriveVertex;
     public TransitStopDepart departVertex;
 
+    public transient Set<T2<LineString, TraverseMode>> geometries;
+
     public TransitStop(Graph graph, Stop stop) {
         super(graph, stop);
         this.wheelchairEntrance = stop.getWheelchairBoarding() != 2;
         isEntrance = stop.getLocationType() == 2;
+        geometries = new HashSet<>(5);
+        levels = new TShortHashSet(4);
     }
 
     public boolean hasWheelchairEntrance() {
@@ -93,5 +106,25 @@ public class TransitStop extends TransitStationStop {
     
     public boolean isStreetLinkable() {
         return isEntrance() || !hasEntrances();
+    }
+
+    public void addGeometry(LineString geometry, TraverseMode mode) {
+        this.geometries.add(new T2<>(geometry, mode));
+    }
+
+    public void addLevel(int floorLevel) {
+        levels.add((short) floorLevel);
+    }
+
+    public TShortSet getLevels() {
+        return levels;
+    }
+
+    public short getLevel() {
+        if (levels.isEmpty()) {
+            return 0;
+        } else {
+            return levels.iterator().next();
+        }
     }
 }
