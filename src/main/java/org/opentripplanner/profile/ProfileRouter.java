@@ -243,10 +243,11 @@ public class ProfileRouter {
             for (Ride r1 : rides.values()) {
                 r1.calcStats(window, request.walkSpeed);
                 if (r1.waitStats == null) {
-                    // This is a sign of a questionable algorithm: we're only seeing if it was possible
-                    // to board these trips after the fact, and removing the ride late.
-                    // It might make more sense to keep bags of arrival times per ride+stop.
+                    // WaitStats can be null if it was not possible to board these trips in the time window.
+                    // This is a sign of a questionable algorithm, since we eliminate the ride rather late.
                     continue;
+                } else {
+                    r1.recomputeBounds();
                 }
                 /* Retain this ride if it is not dominated by some existing ride at the same location. */
                 if (dominated(r1, r1.to)) continue;
@@ -276,6 +277,7 @@ public class ProfileRouter {
                                     r2 = new Ride(tr.sc2, r1);
                                     r2.accessDist = tr.distance;
                                     r2.accessStats = new Stats((int)(tr.distance / request.walkSpeed));
+                                    r2.recomputeBounds();
                                     xferRides.put(tr.sc2, r2);
                                 }
                                 for (PatternRide pr : r2.patternRides) {

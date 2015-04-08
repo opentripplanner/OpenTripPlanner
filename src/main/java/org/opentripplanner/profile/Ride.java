@@ -53,7 +53,6 @@ public class Ride {
         this.from = from;
         this.to = null; // this is a "partial ride" waiting to be completed.
         this.previous = previous;
-        recomputeBounds();
     }
 
     /** Construct a partial copy with no PatternRides or Stats and the given arrival StopCluster. */
@@ -139,28 +138,31 @@ public class Ride {
     }
 
     /**
-     * Calculate upper and lower bounds on the duration of this option, as well as path length.
+     * Calculate length and upper and lower bounds on duration for the chain of rides ending with this one.
      * This should be called whenever the ride/wait/access stats for the ride are updated.
+     * We can't call it in the constructor or update methods because access stats are set after construction,
+     * and wait stats are sometimes null.
      */
-    private void recomputeBounds() {
+    public void recomputeBounds() {
         dlb = 0;
         dub = 0;
         pathLength = 0;
         Ride ride = this;
-        // If this is an "unfinished ride" that just came off the queue, then its stats will all be null.
-        // FIXME this is not really an upper bound, because it does not include transfer time!
-        // Perhaps change the reasoning at the call site where ride is an unfinished ride.
         if (ride.to == null) {
+            // This is an unfinished ride that just came off the queue.
+            // It is the result of a transfer. It has access time, but not wait or ride time yet.
+            dlb += ride.accessStats.min;
+            dub += ride.accessStats.max;
             ride = ride.previous;
         }
         while (ride != null) {
             pathLength += 1;
             dlb += ride.rideStats.min;
             dlb += ride.waitStats.min;
-            dlb += ride.accessStats.min; // access time to first ride, or transfer time on subsequent ones.
+            dlb += ride.accessStats.min;
             dub += ride.rideStats.max;
             dub += ride.waitStats.max;
-            dub += ride.accessStats.max; // access time to first ride, or transfer time on subsequent ones.
+            dub += ride.accessStats.max;
             ride = ride.previous;
         }
     }
@@ -190,11 +192,6 @@ public class Ride {
                 // There is a previous ride, so account for arrival and departure times before and after the transfer.
                 waitStats = calcStatsForTransfer(window, walkSpeed);
             }
-        }
-        // WaitStats may be null if there were no active rides during the time window.
-        // In that case this Ride is destined to be trashed.
-        if (waitStats != null) {
-            recomputeBounds();
         }
     }
 
