@@ -1,12 +1,16 @@
 package org.opentripplanner.profile;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedMode;
@@ -34,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -346,15 +351,21 @@ public class ProfileRouter {
         StopCluster sc2 = r2.getAccessStopCluster();
         Collection<StopAtDistance> sds1 = fromStopPaths.get(sc1);
         Collection<StopAtDistance> sds2 = fromStopPaths.get(sc2);
-        RIDE2 : for (StopAtDistance sd2 : sds2) {
-            for (StopAtDistance sd1 : sds1) {
-                if (sd1.qmode.equals(sd2.qmode)) {
-                    continue RIDE2;
-                }
-                return false;
+        Set<QualifiedMode> qm1 = new HashSet<QualifiedMode>(Collections2.transform(sds1, new Function<StopAtDistance, QualifiedMode> () {
+            @Override
+            public QualifiedMode apply(StopAtDistance input) {
+                return input.qmode;
             }
-        }
-        return true;
+        }));
+        
+        Set<QualifiedMode> qm2 = new HashSet<QualifiedMode>(Collections2.transform(sds2, new Function<StopAtDistance, QualifiedMode> () {
+            @Override
+            public QualifiedMode apply(StopAtDistance input) {
+                return input.qmode;
+            }
+        }));
+        
+        return qm1.containsAll(qm2);
     }
 
     /** Returns whether r1's access modes are a non-strict superset of r2's. */
@@ -383,6 +394,7 @@ public class ProfileRouter {
                 accessModeSuperset(oldRide, ride)) {
                 return true;
             }
+            
             // Strict dominance does not apply.
             // Check whether time ranges overlap, considering the tolerance for suboptimality.
             if (ride.dlb > oldRide.dub + request.suboptimalMinutes) {
