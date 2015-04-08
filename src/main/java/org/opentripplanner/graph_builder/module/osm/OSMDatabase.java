@@ -248,9 +248,9 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             } else {
                 name = way.toString() + name;
             }
-            if (way.hasTag("railway")) {
+            /*if (way.hasTag("railway")) {
                 LOG.info("Skipped railway: {} ({})", name, way.getTag("railway"));
-            }
+            }*/
             return;
         }
         /* An area can be specified as such, or be one by default as an amenity */
