@@ -305,18 +305,18 @@ connect to a network resource is the `url` field.
 
 ## Fares configuration
 
-By default OTP will compute fares based on the GTFS specifications, if some fare data is available in some GTFS input.
-For more complex scenario, or to handle bike-rental fares, it is necessary to configure it,
-by defining the `fares` section in `router-config.json`. You can combine differents fares
-(for example transit and bike-rental) by defining a `combinationStrategy` parameter,
-and a list of sub-fares to combine (all fields starting by `fare` are considered as sub-fares).
+By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.
+For more complex scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
+`fares` section in `build-config.json`. You can combine different fares (for example transit and bike-rental)
+by defining a `combinationStrategy` parameter, and a list of sub-fares to combine (all fields starting with `fare`
+are considered to be sub-fares).
 
 ```JSON
-// router-config.json
+// build-config.json
 {
   // Select the custom fare "seattle"
   fares: "seattle"
-  // OR
+  // OR this alternative form that could allow additional configuration
   fares: {
 	type: "seattle"
   }
@@ -324,7 +324,7 @@ and a list of sub-fares to combine (all fields starting by `fare` are considered
 ```
 
 ```JSON
-// router-config.json
+// build-config.json
 {
   fares: {
     // Combine two fares by simply adding them
@@ -362,11 +362,11 @@ The current list of `combinationStrategy` is:
 
 ## Custom OSM naming
 
-You can define a custom OSM naming scheme by defining `osmNaming` in `router-config.json`,
+You can define a custom OSM naming scheme by defining `osmNaming` in `build-config.json`,
 such as:
 
 ```JSON
-// router-config.json
+// build-config.json
 {
   osmNaming: "portland"
 }
