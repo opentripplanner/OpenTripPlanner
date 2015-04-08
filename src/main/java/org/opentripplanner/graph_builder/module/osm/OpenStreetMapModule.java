@@ -1126,8 +1126,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             /*if (customNamer != null) {
                 customNamer.nameWithEdge(way, street);
             }*/
-            //Gondolas are one directional
-            if (ptype != TraverseMode.GONDOLA) {
+            //Gondolas and one way streets are one directional
+	    //TODO: correct oneway handling
+            if (ptype != TraverseMode.GONDOLA || !way.isTag("oneway", "yes")) {
                 backStreet = ptEdgeFactory.createEdge(end, start, backGeometry, name, length, ptype, true, way.getId());
                 backStreet.setLevel(level);
             }
