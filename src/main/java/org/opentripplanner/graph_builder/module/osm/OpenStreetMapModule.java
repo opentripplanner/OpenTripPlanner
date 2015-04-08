@@ -652,7 +652,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             elevationData.put(endEndpoint, elevation);
                         }
                     }
-                    if (way.isPublicTransport()) {
+                    if (way.isPublicTransport() && !OSMFilter.isWayRoutable(way)) {
                         P2<PublicTransitEdge> streets = getEdgesForPT(startEndpoint, endEndpoint,
                                 way, i, osmStartNode.getId(), osmEndNode.getId(), geometry);
 

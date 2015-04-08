@@ -318,10 +318,12 @@ public class OSMWithTags {
      * - railway=rail = rail
      * - railway=tram/light_rail = tram
      * - railway=subway = subway
+     * - access=no && bus=designated
      *
      * Used in {@link #isPublicTransport()}
      */
     public TraverseMode getPublicTransitType() {
+        //return TraverseMode.LEG_SWITCH;
         if (isTag("railway", "rail")) {
             return TraverseMode.RAIL;
         } else if (isTag("railway", "tram") || isTag("railway", "light_rail")) {
@@ -330,6 +332,8 @@ public class OSMWithTags {
             return TraverseMode.SUBWAY;
         } else if(isTag("aerialway", "cable_car") || isTag("aerialway", "gondola")) {
             return TraverseMode.GONDOLA;
+        } else if(isTag("access", "no") && isTag("bus", "designated")) {
+            return TraverseMode.BUS;
         } else {
             //throw new Exception("Wrong PT type:" + way.getTag("railway"));
             //TODO: some error mode
