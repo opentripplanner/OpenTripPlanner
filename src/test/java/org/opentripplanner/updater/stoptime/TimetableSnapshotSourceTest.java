@@ -206,7 +206,6 @@ public class TimetableSnapshotSourceTest {
                 StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
                 stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
                 stopTimeUpdateBuilder.setStopId("A");
-                stopTimeUpdateBuilder.setStopSequence(10);
                 
                 { // Arrival
                     StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
@@ -225,7 +224,6 @@ public class TimetableSnapshotSourceTest {
                 StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
                 stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
                 stopTimeUpdateBuilder.setStopId("C");
-                stopTimeUpdateBuilder.setStopSequence(30);
                 
                 { // Arrival
                     StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
@@ -244,7 +242,6 @@ public class TimetableSnapshotSourceTest {
                 StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
                 stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
                 stopTimeUpdateBuilder.setStopId("E");
-                stopTimeUpdateBuilder.setStopSequence(50);
                 
                 { // Arrival
                     StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
@@ -332,7 +329,7 @@ public class TimetableSnapshotSourceTest {
             
             { // Stop C
                 StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
-                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.ADDED);
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
                 stopTimeUpdateBuilder.setStopId("C");
                 stopTimeUpdateBuilder.setStopSequence(30);
                 
@@ -466,8 +463,7 @@ public class TimetableSnapshotSourceTest {
         assertNotSame(snapshotA, snapshotB);
 
         assertSame   (snapshotA.resolve(pattern, null ), snapshotB.resolve(pattern, null ));
-        assertSame   (snapshotA.resolve(pattern, serviceDate),
-                snapshotB.resolve(pattern, serviceDate));
+        assertSame   (snapshotA.resolve(pattern, serviceDate), snapshotB.resolve(pattern, serviceDate));
         assertNotSame(snapshotA.resolve(pattern, null ), snapshotA.resolve(pattern, serviceDate));
         assertSame   (snapshotB.resolve(pattern, null ), snapshotB.resolve(pattern, previously));
     }

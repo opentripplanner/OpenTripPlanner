@@ -7,9 +7,8 @@ package com.google.transit.realtime;
 /**
  * <p>
  * Protocol buffer generated class to read GTFS-RT feeds. This class is generated from the
- * gtfs-realtime.proto file contained in the attachment of
- * <a href="https://groups.google.com/d/msg/gtfs-realtime/npG8Z0Iqt4k/rG3P9PHOSeUJ">
- * this post</a> on the GTFS-RT mailinglist.
+ * gtfs-realtime.proto file that can be found at <a href="http://gtfs.ovapi.nl/new/gtfs-realtime.proto">
+ * http://gtfs.ovapi.nl/new/gtfs-realtime.proto</a>.
  * </p>
  * <p>
  * Compared to the
@@ -17,9 +16,7 @@ package com.google.transit.realtime;
  * standard gtfs-realtime.proto file</a> the following things are added:
  * </p>
  * <ul>
- * <li>Enum value TripDescriptor.ScheduleRelationship.MODIFIED</li>
- * <li>Enum value StopTimeUpdate.ScheduleRelationship.ADDED</li>
- * <li>Optional field VehiclePosition.ovapi_vehicle_position</li>
+ * <li>Enum value TripDescriptor.ScheduleRelationship.MODIFIED = 5</li>
  * </ul>
  * <p>
  * Version 2.5.0 of protoc.exe has been used to generate this file.
@@ -4926,15 +4923,6 @@ public final class GtfsRealtime {
          * </pre>
          */
         NO_DATA(2, 2),
-        /**
-         * <code>ADDED = 3;</code>
-         *
-         * <pre>
-         * The extra stop call was introduced into the realtime schedule. This
-         * assertion might change the stop sequence from the published schedule.
-         * </pre>
-         */
-        ADDED(3, 3),
         ;
 
         /**
@@ -4970,15 +4958,6 @@ public final class GtfsRealtime {
          * </pre>
          */
         public static final int NO_DATA_VALUE = 2;
-        /**
-         * <code>ADDED = 3;</code>
-         *
-         * <pre>
-         * The extra stop call was introduced into the realtime schedule. This
-         * assertion might change the stop sequence from the published schedule.
-         * </pre>
-         */
-        public static final int ADDED_VALUE = 3;
 
 
         public final int getNumber() { return value; }
@@ -4988,7 +4967,6 @@ public final class GtfsRealtime {
             case 0: return SCHEDULED;
             case 1: return SKIPPED;
             case 2: return NO_DATA;
-            case 3: return ADDED;
             default: return null;
           }
         }
@@ -8055,20 +8033,6 @@ public final class GtfsRealtime {
      * <code>optional .transit_realtime.VehiclePosition.OccupancyStatus occupancy_status = 9;</code>
      */
     com.google.transit.realtime.GtfsRealtime.VehiclePosition.OccupancyStatus getOccupancyStatus();
-
-    // optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;
-    /**
-     * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-     */
-    boolean hasOvapiVehiclePosition();
-    /**
-     * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-     */
-    com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition getOvapiVehiclePosition();
-    /**
-     * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-     */
-    com.google.transit.realtime.GtfsRealtime.OVapiVehiclePositionOrBuilder getOvapiVehiclePositionOrBuilder();
   }
   /**
    * Protobuf type {@code transit_realtime.VehiclePosition}
@@ -8210,19 +8174,6 @@ public final class GtfsRealtime {
                 bitField0_ |= 0x00000100;
                 occupancyStatus_ = value;
               }
-              break;
-            }
-            case 8026: {
-              com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000200) == 0x00000200)) {
-                subBuilder = ovapiVehiclePosition_.toBuilder();
-              }
-              ovapiVehiclePosition_ = input.readMessage(com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(ovapiVehiclePosition_);
-                ovapiVehiclePosition_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000200;
               break;
             }
           }
@@ -8990,28 +8941,6 @@ public final class GtfsRealtime {
       return occupancyStatus_;
     }
 
-    // optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;
-    public static final int OVAPI_VEHICLE_POSITION_FIELD_NUMBER = 1003;
-    private com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition ovapiVehiclePosition_;
-    /**
-     * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-     */
-    public boolean hasOvapiVehiclePosition() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
-    }
-    /**
-     * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-     */
-    public com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition getOvapiVehiclePosition() {
-      return ovapiVehiclePosition_;
-    }
-    /**
-     * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-     */
-    public com.google.transit.realtime.GtfsRealtime.OVapiVehiclePositionOrBuilder getOvapiVehiclePositionOrBuilder() {
-      return ovapiVehiclePosition_;
-    }
-
     private void initFields() {
       trip_ = com.google.transit.realtime.GtfsRealtime.TripDescriptor.getDefaultInstance();
       vehicle_ = com.google.transit.realtime.GtfsRealtime.VehicleDescriptor.getDefaultInstance();
@@ -9022,7 +8951,6 @@ public final class GtfsRealtime {
       timestamp_ = 0L;
       congestionLevel_ = com.google.transit.realtime.GtfsRealtime.VehiclePosition.CongestionLevel.UNKNOWN_CONGESTION_LEVEL;
       occupancyStatus_ = com.google.transit.realtime.GtfsRealtime.VehiclePosition.OccupancyStatus.EMPTY;
-      ovapiVehiclePosition_ = com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -9088,9 +9016,6 @@ public final class GtfsRealtime {
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeEnum(9, occupancyStatus_.getNumber());
       }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeMessage(1003, ovapiVehiclePosition_);
-      }
       extensionWriter.writeUntil(2000, output);
       getUnknownFields().writeTo(output);
     }
@@ -9136,10 +9061,6 @@ public final class GtfsRealtime {
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(9, occupancyStatus_.getNumber());
-      }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1003, ovapiVehiclePosition_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -9257,7 +9178,6 @@ public final class GtfsRealtime {
           getTripFieldBuilder();
           getVehicleFieldBuilder();
           getPositionFieldBuilder();
-          getOvapiVehiclePositionFieldBuilder();
         }
       }
       private static Builder create() {
@@ -9296,12 +9216,6 @@ public final class GtfsRealtime {
         bitField0_ = (bitField0_ & ~0x00000080);
         occupancyStatus_ = com.google.transit.realtime.GtfsRealtime.VehiclePosition.OccupancyStatus.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000100);
-        if (ovapiVehiclePositionBuilder_ == null) {
-          ovapiVehiclePosition_ = com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.getDefaultInstance();
-        } else {
-          ovapiVehiclePositionBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
 
@@ -9378,14 +9292,6 @@ public final class GtfsRealtime {
           to_bitField0_ |= 0x00000100;
         }
         result.occupancyStatus_ = occupancyStatus_;
-        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
-          to_bitField0_ |= 0x00000200;
-        }
-        if (ovapiVehiclePositionBuilder_ == null) {
-          result.ovapiVehiclePosition_ = ovapiVehiclePosition_;
-        } else {
-          result.ovapiVehiclePosition_ = ovapiVehiclePositionBuilder_.build();
-        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -9430,9 +9336,6 @@ public final class GtfsRealtime {
         }
         if (other.hasOccupancyStatus()) {
           setOccupancyStatus(other.getOccupancyStatus());
-        }
-        if (other.hasOvapiVehiclePosition()) {
-          mergeOvapiVehiclePosition(other.getOvapiVehiclePosition());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -10307,123 +10210,6 @@ public final class GtfsRealtime {
         return this;
       }
 
-      // optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;
-      private com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition ovapiVehiclePosition_ = com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition, com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.Builder, com.google.transit.realtime.GtfsRealtime.OVapiVehiclePositionOrBuilder> ovapiVehiclePositionBuilder_;
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      public boolean hasOvapiVehiclePosition() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
-      }
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      public com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition getOvapiVehiclePosition() {
-        if (ovapiVehiclePositionBuilder_ == null) {
-          return ovapiVehiclePosition_;
-        } else {
-          return ovapiVehiclePositionBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      public Builder setOvapiVehiclePosition(com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition value) {
-        if (ovapiVehiclePositionBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ovapiVehiclePosition_ = value;
-          onChanged();
-        } else {
-          ovapiVehiclePositionBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000200;
-        return this;
-      }
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      public Builder setOvapiVehiclePosition(
-          com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.Builder builderForValue) {
-        if (ovapiVehiclePositionBuilder_ == null) {
-          ovapiVehiclePosition_ = builderForValue.build();
-          onChanged();
-        } else {
-          ovapiVehiclePositionBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000200;
-        return this;
-      }
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      public Builder mergeOvapiVehiclePosition(com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition value) {
-        if (ovapiVehiclePositionBuilder_ == null) {
-          if (((bitField0_ & 0x00000200) == 0x00000200) &&
-              ovapiVehiclePosition_ != com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.getDefaultInstance()) {
-            ovapiVehiclePosition_ =
-              com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.newBuilder(ovapiVehiclePosition_).mergeFrom(value).buildPartial();
-          } else {
-            ovapiVehiclePosition_ = value;
-          }
-          onChanged();
-        } else {
-          ovapiVehiclePositionBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000200;
-        return this;
-      }
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      public Builder clearOvapiVehiclePosition() {
-        if (ovapiVehiclePositionBuilder_ == null) {
-          ovapiVehiclePosition_ = com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.getDefaultInstance();
-          onChanged();
-        } else {
-          ovapiVehiclePositionBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000200);
-        return this;
-      }
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      public com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.Builder getOvapiVehiclePositionBuilder() {
-        bitField0_ |= 0x00000200;
-        onChanged();
-        return getOvapiVehiclePositionFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      public com.google.transit.realtime.GtfsRealtime.OVapiVehiclePositionOrBuilder getOvapiVehiclePositionOrBuilder() {
-        if (ovapiVehiclePositionBuilder_ != null) {
-          return ovapiVehiclePositionBuilder_.getMessageOrBuilder();
-        } else {
-          return ovapiVehiclePosition_;
-        }
-      }
-      /**
-       * <code>optional .transit_realtime.OVapiVehiclePosition ovapi_vehicle_position = 1003;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition, com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.Builder, com.google.transit.realtime.GtfsRealtime.OVapiVehiclePositionOrBuilder> 
-          getOvapiVehiclePositionFieldBuilder() {
-        if (ovapiVehiclePositionBuilder_ == null) {
-          ovapiVehiclePositionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition, com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.Builder, com.google.transit.realtime.GtfsRealtime.OVapiVehiclePositionOrBuilder>(
-                  ovapiVehiclePosition_,
-                  getParentForChildren(),
-                  isClean());
-          ovapiVehiclePosition_ = null;
-        }
-        return ovapiVehiclePositionBuilder_;
-      }
-
       // @@protoc_insertion_point(builder_scope:transit_realtime.VehiclePosition)
     }
 
@@ -10433,450 +10219,6 @@ public final class GtfsRealtime {
     }
 
     // @@protoc_insertion_point(class_scope:transit_realtime.VehiclePosition)
-  }
-
-  public interface OVapiVehiclePositionOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
-
-    // optional int32 delay = 1;
-    /**
-     * <code>optional int32 delay = 1;</code>
-     *
-     * <pre>
-     * Estimated arrival-delay at the next stop (in seconds) can be positive (meaning that the vehicle is late) or
-     * negative (meaning that the vehicle is ahead of schedule). Delay of 0
-     * means that the vehicle is exactly on time.
-     * </pre>
-     */
-    boolean hasDelay();
-    /**
-     * <code>optional int32 delay = 1;</code>
-     *
-     * <pre>
-     * Estimated arrival-delay at the next stop (in seconds) can be positive (meaning that the vehicle is late) or
-     * negative (meaning that the vehicle is ahead of schedule). Delay of 0
-     * means that the vehicle is exactly on time.
-     * </pre>
-     */
-    int getDelay();
-  }
-  /**
-   * Protobuf type {@code transit_realtime.OVapiVehiclePosition}
-   */
-  public static final class OVapiVehiclePosition extends
-      com.google.protobuf.GeneratedMessage
-      implements OVapiVehiclePositionOrBuilder {
-    // Use OVapiVehiclePosition.newBuilder() to construct.
-    private OVapiVehiclePosition(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private OVapiVehiclePosition(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final OVapiVehiclePosition defaultInstance;
-    public static OVapiVehiclePosition getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public OVapiVehiclePosition getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private OVapiVehiclePosition(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              delay_ = input.readInt32();
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_OVapiVehiclePosition_descriptor;
-    }
-
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_OVapiVehiclePosition_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.class, com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<OVapiVehiclePosition> PARSER =
-        new com.google.protobuf.AbstractParser<OVapiVehiclePosition>() {
-      public OVapiVehiclePosition parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new OVapiVehiclePosition(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<OVapiVehiclePosition> getParserForType() {
-      return PARSER;
-    }
-
-    private int bitField0_;
-    // optional int32 delay = 1;
-    public static final int DELAY_FIELD_NUMBER = 1;
-    private int delay_;
-    /**
-     * <code>optional int32 delay = 1;</code>
-     *
-     * <pre>
-     * Estimated arrival-delay at the next stop (in seconds) can be positive (meaning that the vehicle is late) or
-     * negative (meaning that the vehicle is ahead of schedule). Delay of 0
-     * means that the vehicle is exactly on time.
-     * </pre>
-     */
-    public boolean hasDelay() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>optional int32 delay = 1;</code>
-     *
-     * <pre>
-     * Estimated arrival-delay at the next stop (in seconds) can be positive (meaning that the vehicle is late) or
-     * negative (meaning that the vehicle is ahead of schedule). Delay of 0
-     * means that the vehicle is exactly on time.
-     * </pre>
-     */
-    public int getDelay() {
-      return delay_;
-    }
-
-    private void initFields() {
-      delay_ = 0;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, delay_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, delay_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code transit_realtime.OVapiVehiclePosition}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements com.google.transit.realtime.GtfsRealtime.OVapiVehiclePositionOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_OVapiVehiclePosition_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_OVapiVehiclePosition_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.class, com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.Builder.class);
-      }
-
-      // Construct using com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-
-      public Builder clear() {
-        super.clear();
-        delay_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return com.google.transit.realtime.GtfsRealtime.internal_static_transit_realtime_OVapiVehiclePosition_descriptor;
-      }
-
-      public com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition getDefaultInstanceForType() {
-        return com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.getDefaultInstance();
-      }
-
-      public com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition build() {
-        com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      public com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition buildPartial() {
-        com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition result = new com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.delay_ = delay_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition) {
-          return mergeFrom((com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition other) {
-        if (other == com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition.getDefaultInstance()) return this;
-        if (other.hasDelay()) {
-          setDelay(other.getDelay());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (com.google.transit.realtime.GtfsRealtime.OVapiVehiclePosition) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
-
-      // optional int32 delay = 1;
-      private int delay_ ;
-      /**
-       * <code>optional int32 delay = 1;</code>
-       *
-       * <pre>
-       * Estimated arrival-delay at the next stop (in seconds) can be positive (meaning that the vehicle is late) or
-       * negative (meaning that the vehicle is ahead of schedule). Delay of 0
-       * means that the vehicle is exactly on time.
-       * </pre>
-       */
-      public boolean hasDelay() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>optional int32 delay = 1;</code>
-       *
-       * <pre>
-       * Estimated arrival-delay at the next stop (in seconds) can be positive (meaning that the vehicle is late) or
-       * negative (meaning that the vehicle is ahead of schedule). Delay of 0
-       * means that the vehicle is exactly on time.
-       * </pre>
-       */
-      public int getDelay() {
-        return delay_;
-      }
-      /**
-       * <code>optional int32 delay = 1;</code>
-       *
-       * <pre>
-       * Estimated arrival-delay at the next stop (in seconds) can be positive (meaning that the vehicle is late) or
-       * negative (meaning that the vehicle is ahead of schedule). Delay of 0
-       * means that the vehicle is exactly on time.
-       * </pre>
-       */
-      public Builder setDelay(int value) {
-        bitField0_ |= 0x00000001;
-        delay_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional int32 delay = 1;</code>
-       *
-       * <pre>
-       * Estimated arrival-delay at the next stop (in seconds) can be positive (meaning that the vehicle is late) or
-       * negative (meaning that the vehicle is ahead of schedule). Delay of 0
-       * means that the vehicle is exactly on time.
-       * </pre>
-       */
-      public Builder clearDelay() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        delay_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:transit_realtime.OVapiVehiclePosition)
-    }
-
-    static {
-      defaultInstance = new OVapiVehiclePosition(true);
-      defaultInstance.initFields();
-    }
-
-    // @@protoc_insertion_point(class_scope:transit_realtime.OVapiVehiclePosition)
   }
 
   public interface AlertOrBuilder extends
@@ -15552,13 +14894,13 @@ public final class GtfsRealtime {
        */
       CANCELED(3, 3),
       /**
-       * <code>MODIFIED = 4;</code>
+       * <code>MODIFIED = 5;</code>
        *
        * <pre>
-       * A trip that calls at different stops previously published in the schedule.
+       * Trip that is no longer running in accordance with its GTFS schedule and replaces it.
        * </pre>
        */
-      MODIFIED(4, 4),
+      MODIFIED(4, 5),
       ;
 
       /**
@@ -15598,13 +14940,13 @@ public final class GtfsRealtime {
        */
       public static final int CANCELED_VALUE = 3;
       /**
-       * <code>MODIFIED = 4;</code>
+       * <code>MODIFIED = 5;</code>
        *
        * <pre>
-       * A trip that calls at different stops previously published in the schedule.
+       * Trip that is no longer running in accordance with its GTFS schedule and replaces it.
        * </pre>
        */
-      public static final int MODIFIED_VALUE = 4;
+      public static final int MODIFIED_VALUE = 5;
 
 
       public final int getNumber() { return value; }
@@ -15615,7 +14957,7 @@ public final class GtfsRealtime {
           case 1: return ADDED;
           case 2: return UNSCHEDULED;
           case 3: return CANCELED;
-          case 4: return MODIFIED;
+          case 5: return MODIFIED;
           default: return null;
         }
       }
@@ -20852,11 +20194,6 @@ public final class GtfsRealtime {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_transit_realtime_VehiclePosition_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_transit_realtime_OVapiVehiclePosition_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_transit_realtime_OVapiVehiclePosition_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_transit_realtime_Alert_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -20919,91 +20256,88 @@ public final class GtfsRealtime {
       "\034.transit_realtime.TripUpdate\0222\n\007vehicle" +
       "\030\004 \001(\0132!.transit_realtime.VehiclePositio" +
       "n\022&\n\005alert\030\005 \001(\0132\027.transit_realtime.Aler" +
-      "t*\006\010\350\007\020\320\017\"\245\005\n\nTripUpdate\022.\n\004trip\030\001 \002(\0132 " +
+      "t*\006\010\350\007\020\320\017\"\232\005\n\nTripUpdate\022.\n\004trip\030\001 \002(\0132 " +
       ".transit_realtime.TripDescriptor\0224\n\007vehi" +
       "cle\030\003 \001(\0132#.transit_realtime.VehicleDesc" +
       "riptor\022E\n\020stop_time_update\030\002 \003(\0132+.trans" +
       "it_realtime.TripUpdate.StopTimeUpdate\022\021\n" +
       "\ttimestamp\030\004 \001(\004\022\r\n\005delay\030\005 \001(\005\032I\n\rStopT",
       "imeEvent\022\r\n\005delay\030\001 \001(\005\022\014\n\004time\030\002 \001(\003\022\023\n" +
-      "\013uncertainty\030\003 \001(\005*\006\010\350\007\020\320\017\032\364\002\n\016StopTimeU" +
+      "\013uncertainty\030\003 \001(\005*\006\010\350\007\020\320\017\032\351\002\n\016StopTimeU" +
       "pdate\022\025\n\rstop_sequence\030\001 \001(\r\022\017\n\007stop_id\030" +
       "\004 \001(\t\022;\n\007arrival\030\002 \001(\0132*.transit_realtim" +
       "e.TripUpdate.StopTimeEvent\022=\n\tdeparture\030" +
       "\003 \001(\0132*.transit_realtime.TripUpdate.Stop" +
       "TimeEvent\022j\n\025schedule_relationship\030\005 \001(\016" +
       "2@.transit_realtime.TripUpdate.StopTimeU" +
-      "pdate.ScheduleRelationship:\tSCHEDULED\"J\n" +
+      "pdate.ScheduleRelationship:\tSCHEDULED\"?\n" +
       "\024ScheduleRelationship\022\r\n\tSCHEDULED\020\000\022\013\n\007",
-      "SKIPPED\020\001\022\013\n\007NO_DATA\020\002\022\t\n\005ADDED\020\003*\006\010\350\007\020\320" +
-      "\017*\006\010\350\007\020\320\017\"\251\007\n\017VehiclePosition\022.\n\004trip\030\001 " +
-      "\001(\0132 .transit_realtime.TripDescriptor\0224\n" +
-      "\007vehicle\030\010 \001(\0132#.transit_realtime.Vehicl" +
-      "eDescriptor\022,\n\010position\030\002 \001(\0132\032.transit_" +
-      "realtime.Position\022\035\n\025current_stop_sequen" +
-      "ce\030\003 \001(\r\022\017\n\007stop_id\030\007 \001(\t\022Z\n\016current_sta" +
-      "tus\030\004 \001(\01623.transit_realtime.VehiclePosi" +
-      "tion.VehicleStopStatus:\rIN_TRANSIT_TO\022\021\n" +
-      "\ttimestamp\030\005 \001(\004\022K\n\020congestion_level\030\006 \001",
-      "(\01621.transit_realtime.VehiclePosition.Co" +
-      "ngestionLevel\022K\n\020occupancy_status\030\t \001(\0162" +
-      "1.transit_realtime.VehiclePosition.Occup" +
-      "ancyStatus\022G\n\026ovapi_vehicle_position\030\353\007 " +
-      "\001(\0132&.transit_realtime.OVapiVehiclePosit" +
-      "ion\"G\n\021VehicleStopStatus\022\017\n\013INCOMING_AT\020" +
-      "\000\022\016\n\nSTOPPED_AT\020\001\022\021\n\rIN_TRANSIT_TO\020\002\"}\n\017" +
-      "CongestionLevel\022\034\n\030UNKNOWN_CONGESTION_LE" +
-      "VEL\020\000\022\024\n\020RUNNING_SMOOTHLY\020\001\022\017\n\013STOP_AND_" +
-      "GO\020\002\022\016\n\nCONGESTION\020\003\022\025\n\021SEVERE_CONGESTIO",
-      "N\020\004\"\257\001\n\017OccupancyStatus\022\t\n\005EMPTY\020\000\022\030\n\024MA" +
-      "NY_SEATS_AVAILABLE\020\001\022\027\n\023FEW_SEATS_AVAILA" +
-      "BLE\020\002\022\026\n\022STANDING_ROOM_ONLY\020\003\022\036\n\032CRUSHED" +
-      "_STANDING_ROOM_ONLY\020\004\022\010\n\004FULL\020\005\022\034\n\030NOT_A" +
-      "CCEPTING_PASSENGERS\020\006*\006\010\354\007\020\320\017\"%\n\024OVapiVe" +
-      "hiclePosition\022\r\n\005delay\030\001 \001(\005\"\266\006\n\005Alert\0222" +
-      "\n\ractive_period\030\001 \003(\0132\033.transit_realtime" +
-      ".TimeRange\0229\n\017informed_entity\030\005 \003(\0132 .tr" +
-      "ansit_realtime.EntitySelector\022;\n\005cause\030\006" +
-      " \001(\0162\035.transit_realtime.Alert.Cause:\rUNK",
-      "NOWN_CAUSE\022>\n\006effect\030\007 \001(\0162\036.transit_rea" +
-      "ltime.Alert.Effect:\016UNKNOWN_EFFECT\022/\n\003ur" +
-      "l\030\010 \001(\0132\".transit_realtime.TranslatedStr" +
-      "ing\0227\n\013header_text\030\n \001(\0132\".transit_realt" +
-      "ime.TranslatedString\022<\n\020description_text" +
-      "\030\013 \001(\0132\".transit_realtime.TranslatedStri" +
-      "ng\"\330\001\n\005Cause\022\021\n\rUNKNOWN_CAUSE\020\001\022\017\n\013OTHER" +
-      "_CAUSE\020\002\022\025\n\021TECHNICAL_PROBLEM\020\003\022\n\n\006STRIK" +
-      "E\020\004\022\021\n\rDEMONSTRATION\020\005\022\014\n\010ACCIDENT\020\006\022\013\n\007" +
-      "HOLIDAY\020\007\022\013\n\007WEATHER\020\010\022\017\n\013MAINTENANCE\020\t\022",
-      "\020\n\014CONSTRUCTION\020\n\022\023\n\017POLICE_ACTIVITY\020\013\022\025" +
-      "\n\021MEDICAL_EMERGENCY\020\014\"\265\001\n\006Effect\022\016\n\nNO_S" +
-      "ERVICE\020\001\022\023\n\017REDUCED_SERVICE\020\002\022\026\n\022SIGNIFI" +
-      "CANT_DELAYS\020\003\022\n\n\006DETOUR\020\004\022\026\n\022ADDITIONAL_" +
-      "SERVICE\020\005\022\024\n\020MODIFIED_SERVICE\020\006\022\020\n\014OTHER" +
-      "_EFFECT\020\007\022\022\n\016UNKNOWN_EFFECT\020\010\022\016\n\nSTOP_MO" +
-      "VED\020\t*\006\010\350\007\020\320\017\"/\n\tTimeRange\022\r\n\005start\030\001 \001(" +
-      "\004\022\013\n\003end\030\002 \001(\004*\006\010\350\007\020\320\017\"i\n\010Position\022\020\n\010la" +
-      "titude\030\001 \002(\002\022\021\n\tlongitude\030\002 \002(\002\022\017\n\007beari" +
-      "ng\030\003 \001(\002\022\020\n\010odometer\030\004 \001(\001\022\r\n\005speed\030\005 \001(",
-      "\002*\006\010\350\007\020\320\017\"\256\002\n\016TripDescriptor\022\017\n\007trip_id\030" +
-      "\001 \001(\t\022\020\n\010route_id\030\005 \001(\t\022\024\n\014direction_id\030" +
-      "\006 \001(\r\022\022\n\nstart_time\030\002 \001(\t\022\022\n\nstart_date\030" +
-      "\003 \001(\t\022T\n\025schedule_relationship\030\004 \001(\01625.t" +
-      "ransit_realtime.TripDescriptor.ScheduleR" +
-      "elationship\"]\n\024ScheduleRelationship\022\r\n\tS" +
-      "CHEDULED\020\000\022\t\n\005ADDED\020\001\022\017\n\013UNSCHEDULED\020\002\022\014" +
-      "\n\010CANCELED\020\003\022\014\n\010MODIFIED\020\004*\006\010\350\007\020\320\017\"M\n\021Ve" +
-      "hicleDescriptor\022\n\n\002id\030\001 \001(\t\022\r\n\005label\030\002 \001" +
-      "(\t\022\025\n\rlicense_plate\030\003 \001(\t*\006\010\350\007\020\320\017\"\222\001\n\016En",
-      "titySelector\022\021\n\tagency_id\030\001 \001(\t\022\020\n\010route" +
-      "_id\030\002 \001(\t\022\022\n\nroute_type\030\003 \001(\005\022.\n\004trip\030\004 " +
-      "\001(\0132 .transit_realtime.TripDescriptor\022\017\n" +
-      "\007stop_id\030\005 \001(\t*\006\010\350\007\020\320\017\"\226\001\n\020TranslatedStr" +
-      "ing\022C\n\013translation\030\001 \003(\0132..transit_realt" +
-      "ime.TranslatedString.Translation\0325\n\013Tran" +
-      "slation\022\014\n\004text\030\001 \002(\t\022\020\n\010language\030\002 \001(\t*" +
-      "\006\010\350\007\020\320\017*\006\010\350\007\020\320\017B\035\n\033com.google.transit.re" +
-      "altime"
+      "SKIPPED\020\001\022\013\n\007NO_DATA\020\002*\006\010\350\007\020\320\017*\006\010\350\007\020\320\017\"\340" +
+      "\006\n\017VehiclePosition\022.\n\004trip\030\001 \001(\0132 .trans" +
+      "it_realtime.TripDescriptor\0224\n\007vehicle\030\010 " +
+      "\001(\0132#.transit_realtime.VehicleDescriptor" +
+      "\022,\n\010position\030\002 \001(\0132\032.transit_realtime.Po" +
+      "sition\022\035\n\025current_stop_sequence\030\003 \001(\r\022\017\n" +
+      "\007stop_id\030\007 \001(\t\022Z\n\016current_status\030\004 \001(\01623" +
+      ".transit_realtime.VehiclePosition.Vehicl" +
+      "eStopStatus:\rIN_TRANSIT_TO\022\021\n\ttimestamp\030" +
+      "\005 \001(\004\022K\n\020congestion_level\030\006 \001(\01621.transi",
+      "t_realtime.VehiclePosition.CongestionLev" +
+      "el\022K\n\020occupancy_status\030\t \001(\01621.transit_r" +
+      "ealtime.VehiclePosition.OccupancyStatus\"" +
+      "G\n\021VehicleStopStatus\022\017\n\013INCOMING_AT\020\000\022\016\n" +
+      "\nSTOPPED_AT\020\001\022\021\n\rIN_TRANSIT_TO\020\002\"}\n\017Cong" +
+      "estionLevel\022\034\n\030UNKNOWN_CONGESTION_LEVEL\020" +
+      "\000\022\024\n\020RUNNING_SMOOTHLY\020\001\022\017\n\013STOP_AND_GO\020\002" +
+      "\022\016\n\nCONGESTION\020\003\022\025\n\021SEVERE_CONGESTION\020\004\"" +
+      "\257\001\n\017OccupancyStatus\022\t\n\005EMPTY\020\000\022\030\n\024MANY_S" +
+      "EATS_AVAILABLE\020\001\022\027\n\023FEW_SEATS_AVAILABLE\020",
+      "\002\022\026\n\022STANDING_ROOM_ONLY\020\003\022\036\n\032CRUSHED_STA" +
+      "NDING_ROOM_ONLY\020\004\022\010\n\004FULL\020\005\022\034\n\030NOT_ACCEP" +
+      "TING_PASSENGERS\020\006*\006\010\350\007\020\320\017\"\266\006\n\005Alert\0222\n\ra" +
+      "ctive_period\030\001 \003(\0132\033.transit_realtime.Ti" +
+      "meRange\0229\n\017informed_entity\030\005 \003(\0132 .trans" +
+      "it_realtime.EntitySelector\022;\n\005cause\030\006 \001(" +
+      "\0162\035.transit_realtime.Alert.Cause:\rUNKNOW" +
+      "N_CAUSE\022>\n\006effect\030\007 \001(\0162\036.transit_realti" +
+      "me.Alert.Effect:\016UNKNOWN_EFFECT\022/\n\003url\030\010" +
+      " \001(\0132\".transit_realtime.TranslatedString",
+      "\0227\n\013header_text\030\n \001(\0132\".transit_realtime" +
+      ".TranslatedString\022<\n\020description_text\030\013 " +
+      "\001(\0132\".transit_realtime.TranslatedString\"" +
+      "\330\001\n\005Cause\022\021\n\rUNKNOWN_CAUSE\020\001\022\017\n\013OTHER_CA" +
+      "USE\020\002\022\025\n\021TECHNICAL_PROBLEM\020\003\022\n\n\006STRIKE\020\004" +
+      "\022\021\n\rDEMONSTRATION\020\005\022\014\n\010ACCIDENT\020\006\022\013\n\007HOL" +
+      "IDAY\020\007\022\013\n\007WEATHER\020\010\022\017\n\013MAINTENANCE\020\t\022\020\n\014" +
+      "CONSTRUCTION\020\n\022\023\n\017POLICE_ACTIVITY\020\013\022\025\n\021M" +
+      "EDICAL_EMERGENCY\020\014\"\265\001\n\006Effect\022\016\n\nNO_SERV" +
+      "ICE\020\001\022\023\n\017REDUCED_SERVICE\020\002\022\026\n\022SIGNIFICAN",
+      "T_DELAYS\020\003\022\n\n\006DETOUR\020\004\022\026\n\022ADDITIONAL_SER" +
+      "VICE\020\005\022\024\n\020MODIFIED_SERVICE\020\006\022\020\n\014OTHER_EF" +
+      "FECT\020\007\022\022\n\016UNKNOWN_EFFECT\020\010\022\016\n\nSTOP_MOVED" +
+      "\020\t*\006\010\350\007\020\320\017\"/\n\tTimeRange\022\r\n\005start\030\001 \001(\004\022\013" +
+      "\n\003end\030\002 \001(\004*\006\010\350\007\020\320\017\"i\n\010Position\022\020\n\010latit" +
+      "ude\030\001 \002(\002\022\021\n\tlongitude\030\002 \002(\002\022\017\n\007bearing\030" +
+      "\003 \001(\002\022\020\n\010odometer\030\004 \001(\001\022\r\n\005speed\030\005 \001(\002*\006" +
+      "\010\350\007\020\320\017\"\256\002\n\016TripDescriptor\022\017\n\007trip_id\030\001 \001" +
+      "(\t\022\020\n\010route_id\030\005 \001(\t\022\024\n\014direction_id\030\006 \001" +
+      "(\r\022\022\n\nstart_time\030\002 \001(\t\022\022\n\nstart_date\030\003 \001",
+      "(\t\022T\n\025schedule_relationship\030\004 \001(\01625.tran" +
+      "sit_realtime.TripDescriptor.ScheduleRela" +
+      "tionship\"]\n\024ScheduleRelationship\022\r\n\tSCHE" +
+      "DULED\020\000\022\t\n\005ADDED\020\001\022\017\n\013UNSCHEDULED\020\002\022\014\n\010C" +
+      "ANCELED\020\003\022\014\n\010MODIFIED\020\005*\006\010\350\007\020\320\017\"M\n\021Vehic" +
+      "leDescriptor\022\n\n\002id\030\001 \001(\t\022\r\n\005label\030\002 \001(\t\022" +
+      "\025\n\rlicense_plate\030\003 \001(\t*\006\010\350\007\020\320\017\"\222\001\n\016Entit" +
+      "ySelector\022\021\n\tagency_id\030\001 \001(\t\022\020\n\010route_id" +
+      "\030\002 \001(\t\022\022\n\nroute_type\030\003 \001(\005\022.\n\004trip\030\004 \001(\013" +
+      "2 .transit_realtime.TripDescriptor\022\017\n\007st",
+      "op_id\030\005 \001(\t*\006\010\350\007\020\320\017\"\226\001\n\020TranslatedString" +
+      "\022C\n\013translation\030\001 \003(\0132..transit_realtime" +
+      ".TranslatedString.Translation\0325\n\013Transla" +
+      "tion\022\014\n\004text\030\001 \002(\t\022\020\n\010language\030\002 \001(\t*\006\010\350" +
+      "\007\020\320\017*\006\010\350\007\020\320\017B\035\n\033com.google.transit.realt" +
+      "ime"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -21051,51 +20385,45 @@ public final class GtfsRealtime {
           internal_static_transit_realtime_VehiclePosition_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_transit_realtime_VehiclePosition_descriptor,
-              new java.lang.String[] { "Trip", "Vehicle", "Position", "CurrentStopSequence", "StopId", "CurrentStatus", "Timestamp", "CongestionLevel", "OccupancyStatus", "OvapiVehiclePosition", });
-          internal_static_transit_realtime_OVapiVehiclePosition_descriptor =
-            getDescriptor().getMessageTypes().get(5);
-          internal_static_transit_realtime_OVapiVehiclePosition_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_transit_realtime_OVapiVehiclePosition_descriptor,
-              new java.lang.String[] { "Delay", });
+              new java.lang.String[] { "Trip", "Vehicle", "Position", "CurrentStopSequence", "StopId", "CurrentStatus", "Timestamp", "CongestionLevel", "OccupancyStatus", });
           internal_static_transit_realtime_Alert_descriptor =
-            getDescriptor().getMessageTypes().get(6);
+            getDescriptor().getMessageTypes().get(5);
           internal_static_transit_realtime_Alert_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_transit_realtime_Alert_descriptor,
               new java.lang.String[] { "ActivePeriod", "InformedEntity", "Cause", "Effect", "Url", "HeaderText", "DescriptionText", });
           internal_static_transit_realtime_TimeRange_descriptor =
-            getDescriptor().getMessageTypes().get(7);
+            getDescriptor().getMessageTypes().get(6);
           internal_static_transit_realtime_TimeRange_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_transit_realtime_TimeRange_descriptor,
               new java.lang.String[] { "Start", "End", });
           internal_static_transit_realtime_Position_descriptor =
-            getDescriptor().getMessageTypes().get(8);
+            getDescriptor().getMessageTypes().get(7);
           internal_static_transit_realtime_Position_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_transit_realtime_Position_descriptor,
               new java.lang.String[] { "Latitude", "Longitude", "Bearing", "Odometer", "Speed", });
           internal_static_transit_realtime_TripDescriptor_descriptor =
-            getDescriptor().getMessageTypes().get(9);
+            getDescriptor().getMessageTypes().get(8);
           internal_static_transit_realtime_TripDescriptor_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_transit_realtime_TripDescriptor_descriptor,
               new java.lang.String[] { "TripId", "RouteId", "DirectionId", "StartTime", "StartDate", "ScheduleRelationship", });
           internal_static_transit_realtime_VehicleDescriptor_descriptor =
-            getDescriptor().getMessageTypes().get(10);
+            getDescriptor().getMessageTypes().get(9);
           internal_static_transit_realtime_VehicleDescriptor_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_transit_realtime_VehicleDescriptor_descriptor,
               new java.lang.String[] { "Id", "Label", "LicensePlate", });
           internal_static_transit_realtime_EntitySelector_descriptor =
-            getDescriptor().getMessageTypes().get(11);
+            getDescriptor().getMessageTypes().get(10);
           internal_static_transit_realtime_EntitySelector_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_transit_realtime_EntitySelector_descriptor,
               new java.lang.String[] { "AgencyId", "RouteId", "RouteType", "Trip", "StopId", });
           internal_static_transit_realtime_TranslatedString_descriptor =
-            getDescriptor().getMessageTypes().get(12);
+            getDescriptor().getMessageTypes().get(11);
           internal_static_transit_realtime_TranslatedString_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_transit_realtime_TranslatedString_descriptor,
