@@ -332,7 +332,7 @@ public class TimetableSnapshotSourceTest {
             
             { // Stop C
                 StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
-                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.ADDED);
+                stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
                 stopTimeUpdateBuilder.setStopId("C");
                 stopTimeUpdateBuilder.setStopSequence(30);
                 

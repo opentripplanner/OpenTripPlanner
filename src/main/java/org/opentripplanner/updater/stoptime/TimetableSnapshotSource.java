@@ -301,8 +301,10 @@ public class TimetableSnapshotSource {
                 if (stopTimeUpdate.hasScheduleRelationship()) {
                     StopTimeUpdate.ScheduleRelationship stopScheduleRelationship = stopTimeUpdate
                             .getScheduleRelationship();
-                    if (stopScheduleRelationship.equals(StopTimeUpdate.ScheduleRelationship.ADDED) ||
-                            stopScheduleRelationship.equals(StopTimeUpdate.ScheduleRelationship.SKIPPED)) {
+                    if (stopScheduleRelationship.equals(StopTimeUpdate.ScheduleRelationship.SKIPPED)
+                            // TODO: uncomment next line when StopTimeUpdate.ScheduleRelationship.ADDED exists
+//                            || stopScheduleRelationship.equals(StopTimeUpdate.ScheduleRelationship.ADDED)
+                            ) {
                         hasModifiedStops = true;
                     }
                 }
