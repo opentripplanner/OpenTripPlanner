@@ -117,6 +117,7 @@ public class GtfsModule implements GraphBuilderModule {
                 hf.setStopContext(stopContext);
                 hf.setFareServiceFactory(_fareServiceFactory);
                 hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
+                hf.setUseGTFSShapesForLinker(gtfsBundle.useGTFSShapeInLinker);
 
                 loadBundle(gtfsBundle, graph, dao);
 

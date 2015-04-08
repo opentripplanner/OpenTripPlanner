@@ -293,6 +293,8 @@ public class GTFSPatternHopFactory {
 
     private double maxStopToShapeSnapDistance = 150;
 
+    private boolean useGTFSShapesForLinker = false;
+
     public GTFSPatternHopFactory(GtfsContext context) {
         this._dao = context.getDao();
         this._calendarService = context.getCalendarService();
@@ -1417,4 +1419,7 @@ public class GTFSPatternHopFactory {
         this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 
+    public void setUseGTFSShapesForLinker(boolean useGTFSShapesForLinker) {
+        this.useGTFSShapesForLinker = useGTFSShapesForLinker;
+    }
 }

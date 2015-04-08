@@ -57,6 +57,8 @@ public class GtfsBundle {
      */
     public boolean linkStopsToParentStations = false;
 
+    public boolean  useGTFSShapeInLinker = false;
+
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
 
     public int subwayAccessTime;
