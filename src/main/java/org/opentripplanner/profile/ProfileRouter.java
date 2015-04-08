@@ -300,7 +300,8 @@ public class ProfileRouter {
                     queue.insert(r, r.dlb);
                 }
             }
-            if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
+            if (System.currentTimeMillis() > abortTime)
+                throw new RuntimeException("TIMEOUT");
         }
         LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
         if (request.analyst) {
@@ -459,7 +460,7 @@ public class ProfileRouter {
         // Set batch after context, so both origin and dest vertices will be found.
         rr.batch = (true);
         rr.walkSpeed = request.walkSpeed;
-        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+        rr.dominanceFunction = new DominanceFunction.MinimumWeight();
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
         int minAccessTime = 0;
@@ -525,7 +526,7 @@ public class ProfileRouter {
         rr.to = new GenericLocation(request.toLat, request.toLon);
         rr.setArriveBy(false);
         rr.setRoutingContext(graph);
-        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+        rr.dominanceFunction = new DominanceFunction.MinimumWeight();
         // This is not a batch search, it is a point-to-point search with goal direction.
         // Impose a max time to protect against very slow searches.
         int worstElapsedTime = request.streetTime * 60;
