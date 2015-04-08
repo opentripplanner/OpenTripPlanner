@@ -63,6 +63,9 @@ public class ProfileRouter {
     public final Graph graph;
     public final ProfileRequest request;
 
+    /** Fake stop cluster to allow applying domination logic at the final destination. */
+    private final StopCluster DESTINATION = new StopCluster("destination", "destination");
+
     public ProfileRouter(Graph graph, ProfileRequest request) {
         this.graph = graph;
         this.request = request;
@@ -292,7 +295,7 @@ public class ProfileRouter {
                 if ( ! dominated(r, r.from)) {
                     // This ride is unfinished, use the previous ride's travel time lower bound as the p-queue key.
                     // Note that we are not adding these transfer results to the retained rides, just enqueuing them.
-                    queue.insert(r, r.durationLowerBound());
+                    queue.insert(r, r.dlb);
                 }
             }
             if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
@@ -365,23 +368,21 @@ public class ProfileRouter {
      * or relative to the global travel time limit.
      */
     public boolean dominated (Ride ride, StopCluster atCluster) {
-        int dlb = ride.durationLowerBound(); // this call is sort-of-expensive, it chases pointers
-        int dub = ride.durationUpperBound();
-        if (dlb > MAX_DURATION) return true;
+        if (ride.dlb > MAX_DURATION) return true;
         // Check whether any existing rides at the same location (stop cluster) dominate the new one.
         for (Ride oldRide : retainedRides.get(atCluster)) {
             if (oldRide.to == null) throw new AssertionError("no retained rides should be unfinished");
             // Certain pairs of options should not be presented as alternatives to one another.
             // They are in direct competition with one another and strict dominance applies.
             if (oldRide.pathLength() < ride.pathLength() &&
-                oldRide.durationLowerBound() < dlb &&
-                oldRide.durationUpperBound() < dub &&
+                oldRide.dlb < ride.dlb &&
+                oldRide.dub < ride.dub &&
                 accessModeSuperset(oldRide, ride)) {
                 return true;
             }
             // Strict dominance does not apply.
             // Check whether time ranges overlap, considering the tolerance for suboptimality.
-            if (dlb > oldRide.durationUpperBound() + request.suboptimalMinutes) {
+            if (ride.dlb > oldRide.dub + request.suboptimalMinutes) {
                 return true;
             }
         }
@@ -475,8 +476,6 @@ public class ProfileRouter {
         long worstElapsedTimeSeconds = maxAccessTime * 60; // convert from minutes to seconds
         if (dest) worstElapsedTimeSeconds *= -1;
         rr.worstTime = (rr.dateTime + worstElapsedTimeSeconds);
-        // Note that the (forward) search is intentionally unlimited so it will reach the destination
-        // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         AStar astar = new AStar();
         rr.setNumItineraries(1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(qmode, minAccessTime * 60);
@@ -582,8 +581,6 @@ public class ProfileRouter {
         for (Entry<StopCluster, Ride> entry : retainedRides.entries()) {
             StopCluster cluster = entry.getKey();
             Ride ride = entry.getValue();
-            int lb0 = ride.durationLowerBound();
-            int ub0 = ride.durationUpperBound();
             for (Stop stop : cluster.children) {
                 TransitStop tstop = graph.index.stopVertexForStop.get(stop);
                 // Iterate over street intersections in the vicinity of this particular transit stop.
@@ -597,8 +594,8 @@ public class ProfileRouter {
                     if (egressWalkTimeSeconds > request.maxWalkTime * 60) {
                         continue;
                     }
-                    int propagated_min = lb0 + egressWalkTimeSeconds;
-                    int propagated_max = ub0 + egressWalkTimeSeconds;
+                    int propagated_min = ride.dlb + egressWalkTimeSeconds;
+                    int propagated_max = ride.dub + egressWalkTimeSeconds;
                     int propagated_avg = (int)(((long) propagated_min + propagated_max) / 2); // FIXME HACK
                     int existing_min = minSurface.times.get(vertex);
                     int existing_max = maxSurface.times.get(vertex);

@@ -44,10 +44,16 @@ public class Ride {
     Stats accessStats; // min and max time to reach this ride from the previous one, or from the origin point on the first ride
     int accessDist;    // meters from the previous ride, or from the origin point on the first ride
 
+    int dlb = 0;
+    int dub = Integer.MAX_VALUE;
+    int pathLength = 0;
+
+    /** Construct a partial ride (resulting from a transfer, waiting to be completed). */
     public Ride (StopCluster from, Ride previous) {
         this.from = from;
         this.to = null; // this is a "partial ride" waiting to be completed.
         this.previous = previous;
+        recomputeBounds();
     }
 
     /** Construct a partial copy with no PatternRides or Stats and the given arrival StopCluster. */
@@ -57,6 +63,7 @@ public class Ride {
         this.previous = other.previous;
         this.accessStats = other.accessStats;
         this.accessDist = other.accessDist;
+        // Bounds will be recomputed when stats are computed.
     }
 
     /** Extend this incomplete ride to the given stop, creating a container for PatternRides. */
@@ -131,26 +138,14 @@ public class Ride {
         return false;
     }
 
-    /** Return a lower bound on the duration of this option. */
-    public int durationLowerBound() {
-        int ret = 0;
-        Ride ride = this;
-        // If this is an "unfinished ride" that just came off the queue, then its stats will all be null.
-        if (ride.to == null) {
-            ride = ride.previous;
-        }
-        while (ride != null) {
-            ret += ride.rideStats.min;
-            ret += ride.waitStats.min;
-            ret += ride.accessStats.min; // access time to first ride, or transfer time on subsequent ones.
-            ride = ride.previous;
-        }
-        return ret;
-    }
-
-    /** Return an upper bound on the duration of this option. */
-    public int durationUpperBound() {
-        int ret = 0;
+    /**
+     * Calculate upper and lower bounds on the duration of this option, as well as path length.
+     * This should be called whenever the ride/wait/access stats for the ride are updated.
+     */
+    private void recomputeBounds() {
+        dlb = 0;
+        dub = 0;
+        pathLength = 0;
         Ride ride = this;
         // If this is an "unfinished ride" that just came off the queue, then its stats will all be null.
         // FIXME this is not really an upper bound, because it does not include transfer time!
@@ -159,12 +154,15 @@ public class Ride {
             ride = ride.previous;
         }
         while (ride != null) {
-            ret += ride.rideStats.max;
-            ret += ride.waitStats.max;
-            ret += ride.accessStats.max; // access time to first ride, or transfer time on subsequent ones.
+            pathLength += 1;
+            dlb += ride.rideStats.min;
+            dlb += ride.waitStats.min;
+            dlb += ride.accessStats.min; // access time to first ride, or transfer time on subsequent ones.
+            dub += ride.rideStats.max;
+            dub += ride.waitStats.max;
+            dub += ride.accessStats.max; // access time to first ride, or transfer time on subsequent ones.
             ride = ride.previous;
         }
-        return ret;
     }
 
     /**
@@ -192,6 +190,11 @@ public class Ride {
                 // There is a previous ride, so account for arrival and departure times before and after the transfer.
                 waitStats = calcStatsForTransfer(window, walkSpeed);
             }
+        }
+        // WaitStats may be null if there were no active rides during the time window.
+        // In that case this Ride is destined to be trashed.
+        if (waitStats != null) {
+            recomputeBounds();
         }
     }
 
