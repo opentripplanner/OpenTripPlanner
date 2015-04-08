@@ -253,7 +253,7 @@ public class ProfileRouter {
                 if (dominated(r1, r1.to)) continue;
                 retainedRides.put(r1.to, r1);
                 /* We have a new, non-dominated, completed ride. Find transfers out of this new ride, respecting the transfer limit. */
-                int nRides = r1.pathLength();
+                int nRides = r1.pathLength;
                 if (nRides >= MAX_RIDES) continue;
                 boolean penultimateRide = (nRides == MAX_RIDES - 1);
                 // Invariant: r1.to should be the same as r1's key in rides
@@ -377,7 +377,7 @@ public class ProfileRouter {
             if (oldRide.to == null) throw new AssertionError("no retained rides should be unfinished");
             // Certain pairs of options should not be presented as alternatives to one another.
             // They are in direct competition with one another and strict dominance applies.
-            if (oldRide.pathLength() < ride.pathLength() &&
+            if (oldRide.pathLength < ride.pathLength &&
                 oldRide.dlb < ride.dlb &&
                 oldRide.dub < ride.dub &&
                 accessModeSuperset(oldRide, ride)) {

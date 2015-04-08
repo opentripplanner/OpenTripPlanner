@@ -105,16 +105,6 @@ public class Ride {
         return false;
     }
 
-    public int pathLength() {
-        int length = 0;
-        Ride ride = this;
-        while (ride != null) {
-            length += 1;
-            ride = ride.previous;
-        }
-        return length;
-    }
-
     public boolean pathContainsRoute(Route route) {
         // Linear search, could use sets if this proves to be time consuming
         Ride ride = this;
