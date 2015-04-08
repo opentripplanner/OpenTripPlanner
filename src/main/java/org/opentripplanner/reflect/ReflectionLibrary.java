@@ -7,7 +7,7 @@ public class ReflectionLibrary {
     /** Concatenate all fields and values of a Java object. */
     public static String dumpFields (Object object) {
         StringBuilder sb = new StringBuilder();
-        Class clazz = object.getClass();
+        Class<?> clazz = object.getClass();
         sb.append("Summarizing ");
         sb.append(clazz.getSimpleName());
         sb.append('\n');
@@ -15,7 +15,8 @@ public class ReflectionLibrary {
             sb.append(field.getName());
             sb.append(" = ");
             try {
-                String value = field.get(object).toString();
+                Object fieldValue = field.get(object);
+                String value = fieldValue == null ? "null" : fieldValue.toString();
                 sb.append(value);
             } catch (IllegalAccessException ex) {
                 sb.append("(non-public)");
