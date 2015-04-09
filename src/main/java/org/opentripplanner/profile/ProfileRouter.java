@@ -56,7 +56,7 @@ public class ProfileRouter {
 
     /* Search configuration constants */
     public static final int SLACK = 60; // in seconds, time required to catch a transit vehicle
-    private static final int TIMEOUT = 10; // in seconds, maximum computation time
+    private static final int TIMEOUT = 20; // in seconds, maximum computation time
     public static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
     private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
 
