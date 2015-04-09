@@ -4,12 +4,17 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -192,9 +197,9 @@ public class Ride {
      * @return a list of sorted departure or arrival times within the window.
      * FIXME this is a hot spot in execution, about 50 percent of runtime.
      */
-    public List<Integer> getSortedStoptimes (TimeWindow window, boolean arrivals) {
+    public TIntList getSortedStoptimes (TimeWindow window, boolean arrivals) {
         // Using Lists because we don't know the length in advance
-        List<Integer> times = Lists.newArrayList();
+        TIntList times = new TIntArrayList();
         // TODO include exact-times frequency trips along with non-frequency trips
         // non-exact (headway-based) frequency trips will be handled elsewhere since they don't have specific boarding times.
         for (PatternRide patternRide : patternRides) {
@@ -206,7 +211,7 @@ public class Ride {
                 }
             }
         }
-        Collections.sort(times);
+        times.sort();
         return times;
     }
 
@@ -243,11 +248,12 @@ public class Ride {
     public Stats calcStatsForBoarding(TimeWindow window) {
         Stats stats = new Stats ();
         stats.min = 0; // You can always arrive just before a train departs.
-        List<Integer> departures = getSortedStoptimes(window, false);
+        TIntList departures = getSortedStoptimes(window, false);
         int last = window.from;
         double avgAccumulated = 0.0;
         /* All departures in the list are known to be running and within the window. */
-        for (int dep : departures) {
+        for (TIntIterator it = departures.iterator(); it.hasNext();) {
+            int dep = it.next();
             int maxWait = dep - last;
             if (maxWait > stats.max) stats.max = maxWait;
             /* Weight the average of each interval by the number of seconds it contains. */
@@ -268,12 +274,13 @@ public class Ride {
      * calculated from full sets of patterns, which are not known until a round is over.
      */
     public Stats calcStatsForTransfer (TimeWindow window, double walkSpeed) {
-        List<Integer> arrivals = previous.getSortedStoptimes(window, true);
-        List<Integer> departures = this.getSortedStoptimes(window, false);
+        TIntList arrivals = previous.getSortedStoptimes(window, true);
+        TIntList departures = this.getSortedStoptimes(window, false);
         List<Integer> waits = Lists.newArrayList();
-        Iterator<Integer> departureIterator = departures.iterator(); 
+        TIntIterator departureIterator = departures.iterator();
         int departure = departureIterator.next();
-        ARRIVAL : for (int arrival : arrivals) {
+        ARRIVAL : for (TIntIterator arrivalsIterator = arrivals.iterator(); arrivalsIterator.hasNext();) {
+            int arrival = arrivalsIterator.next();
             // On transfers the access stats should have max=min=avg
             // We use the min, which would be best if min != max since it should only relax the bounds somewhat.
             int boardTime = arrival + accessStats.min + ProfileRouter.SLACK;
