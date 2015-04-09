@@ -49,6 +49,7 @@ public class Ride {
     int pathLength = 0;
 
     /** Construct a partial ride (resulting from a transfer, waiting to be completed). */
+    // TODO add additional parameter for access stats, then recalc bounds in the constructor.
     public Ride (StopCluster from, Ride previous) {
         this.from = from;
         this.to = null; // this is a "partial ride" waiting to be completed.

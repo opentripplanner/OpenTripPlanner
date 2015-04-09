@@ -63,9 +63,6 @@ public class ProfileRouter {
     public final Graph graph;
     public final ProfileRequest request;
 
-    /** Fake stop cluster to allow applying domination logic at the final destination. */
-    private final StopCluster DESTINATION = new StopCluster("destination", "destination");
-
     public ProfileRouter(Graph graph, ProfileRequest request) {
         this.graph = graph;
         this.request = request;
@@ -309,27 +306,35 @@ public class ProfileRouter {
             makeSurfaces();
             return null;
         }
-        /* Non-analyst: Determine which rides are good ways to reach the destination. */
-        Set<Ride> targetRides = Sets.newHashSet();
-        // FIXME there are multiple copies of the same ride because we are iterating over all clusters near dest (hence using a set)
-        // FIXME do not examine every cluster near the destination, only those that are closest on at least one pattern
-        // use a Set<StopCluster>
+
+        /* In non-analyst (point-to-point) mode, determine which rides are good ways to reach the destination. */
+        /* A fake stop cluster to allow applying generic domination logic at the final destination. */
+        final StopCluster DESTINATION = new StopCluster("The Destination", "The Destination");
         for (StopCluster cluster : toStopPaths.keySet()) {
+            // TODO shared logic for making access/egress stats
+            Stats egressStats = new Stats();
+            egressStats.min = Integer.MAX_VALUE;
+            for (StopAtDistance sd : toStopPaths.get(cluster)) {
+                egressStats.merge(sd.etime);
+            }
             for (Ride ride : retainedRides.get(cluster)) {
-                PATTERN: for (PatternRide pr : ride.patternRides) {
-                    for (StopAtDistance clusterForPattern : toStops.get(pr.pattern)) {
-                        if (clusterForPattern != null && clusterForPattern.stopCluster == cluster) {
-                            targetRides.add(ride);
-                            break PATTERN;
-                        }
-                    }
+                // Construct a new unfinished ride, representing "transferring" from the final stop to the destination
+                Ride rideAtDestination = new Ride(DESTINATION, ride);
+                rideAtDestination.accessStats = egressStats;
+                rideAtDestination.recomputeBounds();
+                if ( ! dominated(rideAtDestination, DESTINATION)) {
+                    retainedRides.put(DESTINATION, rideAtDestination);
                 }
             }
         }
-        LOG.info("{} nondominated rides stop near the destination.", targetRides.size());
+        LOG.info("{} nondominated rides reach the destination.", retainedRides.get(DESTINATION).size());
+
         /* Non-analyst: Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
-        for (Ride ride : targetRides) {
+        for (Ride ride : retainedRides.get(DESTINATION)) {
+            // slice off the final unfinished ride that only contains the egress stats
+            // TODO actually use this ride in preparing the response
+            ride = ride.previous;
             // All PatternRides in a Ride end at the same stop.
             Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStopCluster());
             Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStopCluster());
@@ -361,7 +366,7 @@ public class ProfileRouter {
         // Check whether any existing rides at the same location (stop cluster) dominate the new one.
         Set<QualifiedMode> newRideAccessModes = accessModesForRide(newRide);
         for (Ride oldRide : retainedRides.get(atCluster)) {
-            if (oldRide.to == null) throw new AssertionError("no retained rides should be unfinished");
+            // All retained rides should be finished (to != null), except those at DESTINATION.
             // Certain pairs of options should not be presented as alternatives to one another.
             // They are in direct competition with one another and strict dominance applies.
             if (oldRide.pathLength < newRide.pathLength &&
