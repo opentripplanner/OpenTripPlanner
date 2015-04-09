@@ -147,6 +147,9 @@ public class ProfileResource {
             try {
                 ProfileResponse response = router.route();
                 return Response.status(Status.OK).entity(response).build();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                return Response.status(Status.INTERNAL_SERVER_ERROR).entity(throwable.toString()).build();
             } finally {
                 router.cleanup(); // destroy routing contexts even when an exception happens
             }
