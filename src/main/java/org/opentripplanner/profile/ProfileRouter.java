@@ -357,15 +357,6 @@ public class ProfileRouter {
         return true;
     }
 
-    /** Returns whether r1's access modes are a non-strict superset of r2's. */
-    public boolean accessModesEqual(Ride r1, Ride r2) {
-        StopCluster sc1 = r1.getAccessStopCluster();
-        StopCluster sc2 = r2.getAccessStopCluster();
-        Collection<StopAtDistance> sds1 = fromStopPaths.get(sc1);
-        Collection<StopAtDistance> sds2 = fromStopPaths.get(sc2);
-        return sds1.equals(sds2);
-    }
-
     /**
      * Check whether a new ride has too long a duration relative to existing rides at the given location,
      * or relative to the global travel time limit.
