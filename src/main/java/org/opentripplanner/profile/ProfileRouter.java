@@ -341,43 +341,38 @@ public class ProfileRouter {
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
-    /** Returns whether r1's access modes are a non-strict superset of r2's. */
-    public boolean accessModeSuperset(Ride r1, Ride r2) {
-        StopCluster sc1 = r1.getAccessStopCluster();
-        StopCluster sc2 = r2.getAccessStopCluster();
-        Collection<StopAtDistance> sds1 = fromStopPaths.get(sc1);
-        Collection<StopAtDistance> sds2 = fromStopPaths.get(sc2);
-        RIDE2 : for (StopAtDistance sd2 : sds2) {
-            for (StopAtDistance sd1 : sds1) {
-                if (sd1.qmode.equals(sd2.qmode)) {
-                    continue RIDE2;
-                }
-                return false;
-            }
+    /** @return the set of qualified modes used to access the chain of rides ending with the given ride. */
+    private Set<QualifiedMode> accessModesForRide(Ride ride) {
+        Collection<StopAtDistance> sds = fromStopPaths.get(ride.getAccessStopCluster());
+        Set<QualifiedMode> qmodes = Sets.newHashSetWithExpectedSize(sds.size());
+        for (StopAtDistance sd : sds) {
+            qmodes.add(sd.qmode);
         }
-        return true;
+        return qmodes;
     }
 
     /**
      * Check whether a new ride has too long a duration relative to existing rides at the given location,
      * or relative to the global travel time limit.
+     * TODO auto-detect unfinished rides via to==null
      */
-    public boolean dominated (Ride ride, StopCluster atCluster) {
-        if (ride.dlb > MAX_DURATION) return true;
+    public boolean dominated (Ride newRide, StopCluster atCluster) {
+        if (newRide.dlb > MAX_DURATION) return true;
         // Check whether any existing rides at the same location (stop cluster) dominate the new one.
+        Set<QualifiedMode> newRideAccessModes = accessModesForRide(newRide);
         for (Ride oldRide : retainedRides.get(atCluster)) {
             if (oldRide.to == null) throw new AssertionError("no retained rides should be unfinished");
             // Certain pairs of options should not be presented as alternatives to one another.
             // They are in direct competition with one another and strict dominance applies.
-            if (oldRide.pathLength < ride.pathLength &&
-                oldRide.dlb < ride.dlb &&
-                oldRide.dub < ride.dub &&
-                accessModeSuperset(oldRide, ride)) {
+            if (oldRide.pathLength < newRide.pathLength &&
+                oldRide.dlb < newRide.dlb &&
+                oldRide.dub < newRide.dub &&
+                accessModesForRide(oldRide).containsAll(newRideAccessModes)) {
                 return true;
             }
             // Strict dominance does not apply.
             // Check whether time ranges overlap, considering the tolerance for suboptimality.
-            if (ride.dlb > oldRide.dub + request.suboptimalMinutes * 60) {
+            if (newRide.dlb > oldRide.dub + request.suboptimalMinutes * 60) {
                 return true;
             }
         }
