@@ -13,14 +13,10 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
+import jj2000.j2k.NotImplementedError;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -32,9 +28,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.Context;
-
-import jj2000.j2k.NotImplementedError;
+import java.util.*;
 
 public class RetryingPathServiceImpl implements PathService {
 
@@ -85,6 +79,10 @@ public class RetryingPathServiceImpl implements PathService {
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
+        return getPaths(options, null, null, true);
+    }
+    
+    public List<GraphPath> getPaths(RoutingRequest options, ShortestPathTree spt, Vertex dst, boolean optimize) {
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
@@ -127,15 +125,18 @@ public class RetryingPathServiceImpl implements PathService {
             long subsearchBeginTime = System.currentTimeMillis();
             
             LOG.debug("BEGIN SUBSEARCH");
-            ShortestPathTree spt = sptService.getShortestPathTree(currOptions, timeout);
+            if (spt == null) {
+                spt = sptService.getShortestPathTree(currOptions, timeout);
+            }
             if (spt == null) {
                 // Serious failure, no paths provided. This could be signaled with an exception.
                 LOG.warn("Aborting search. {} paths found, elapsed time {} sec", 
                         paths.size(), (System.currentTimeMillis() - searchBeginTime) / 1000.0);
                 break;
             }
-            List<GraphPath> somePaths = spt.getPaths(); // somePaths may be empty, but is never null.
-            LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
+            Vertex target = dst == null ? currOptions.getRoutingContext().target : dst;
+            List<GraphPath> somePaths = spt.getPaths(target, optimize); // somePaths may be empty, but is never null.
+            LOG.debug("END SUBSEARCH ({} msec of {} msec total)",
                     System.currentTimeMillis() - subsearchBeginTime,
                     System.currentTimeMillis() - searchBeginTime);
             LOG.debug("SPT provides {} paths to target.", somePaths.size());
@@ -208,7 +209,7 @@ public class RetryingPathServiceImpl implements PathService {
         Collections.sort(paths, new PathComparator(options.arriveBy));
         return paths;
     }
-
+    
     public GraphService getGraphService() {
         return graphService;
     }
