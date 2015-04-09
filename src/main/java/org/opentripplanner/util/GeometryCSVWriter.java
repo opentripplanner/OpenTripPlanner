@@ -44,6 +44,8 @@ public class GeometryCSVWriter {
     /* Two dimensional WKT serializer   */
     private static final WKTWriter wktWriter = new WKTWriter(2);
 
+    private boolean writeToFile = true;
+
     private List<String> csvColumns;
     private Integer geoFieldIndex;
     private CsvWriter csvWriter;
@@ -53,7 +55,7 @@ public class GeometryCSVWriter {
     /**
      * Finds geo field index and writes header into CSV file
      *
-     * With help of {@link #constructor(java.util.List, String, String)}
+     * With help of {@link #constructor(java.util.List, String, String, boolean)}
      *
      * @param csvColumns Name of csv columns together with geo field name
      * @param geo_field Name of geo field
@@ -61,20 +63,34 @@ public class GeometryCSVWriter {
      */
     public GeometryCSVWriter(List<String> csvColumns, String geo_field, CsvWriter csvWriter) {
         this.csvWriter = csvWriter;
-        constructor(csvColumns, geo_field, null);
+        constructor(csvColumns, geo_field, null, true);
     }
 
     /**
      * Finds geo field index and writes header into CSV file
      *
-     * With help of {@link #constructor(java.util.List, String, String)}
+     * With help of {@link #constructor(java.util.List, String, String, boolean)}
      *
      * @param csvColumns Name of csv columns together with geo field name
      * @param geo_field Name of geo field
      * @param file Path to csv file where this will be saved
      */
     public GeometryCSVWriter(List<String> csvColumns, String geo_field, String file) {
-        constructor(csvColumns, geo_field, file);
+        constructor(csvColumns, geo_field, file, true);
+    }
+
+    /**
+     * Finds geo field index and writes header into CSV file
+     *
+     * With help of {@link #constructor(java.util.List, String, String, boolean)}
+     *
+     * @param csvColumns Name of csv columns together with geo field name
+     * @param geo_field Name of geo field
+     * @param file Path to csv file where this will be saved
+     * @param writeToFile If false nothing is written and files aren't created
+     */
+    public GeometryCSVWriter(List<String> csvColumns, String geo_field, String file, boolean writeToFile) {
+        constructor(csvColumns, geo_field, file, writeToFile);
     }
 
     /**
@@ -86,7 +102,11 @@ public class GeometryCSVWriter {
      * @param geo_field_name Name of geo field
      * @param file Path to csv file where this will be saved
      */
-    private void constructor(List<String> csvColumns, String geo_field_name, String file) {
+    private void constructor(List<String> csvColumns, String geo_field_name, String file, boolean writeToFile) {
+        if (!writeToFile) {
+            this.writeToFile = writeToFile;
+            return;
+        }
         int index = 0;
         for (String key : csvColumns) {
             if (key.equals(geo_field_name)) {
@@ -113,7 +133,7 @@ public class GeometryCSVWriter {
     /**
      * Finds geo field index and writes header into writer
      *
-     * With help of {@link #constructor(java.util.List, String, String)}
+     * With help of {@link #constructor(List, String, String, boolean)}
      *
      * @param csvColumns Name of csv columns together with geo field name
      * @param geo_field Name of geo field
@@ -123,7 +143,7 @@ public class GeometryCSVWriter {
     @VisibleForTesting
     public GeometryCSVWriter(List<String> csvColumns, String geo_field, Writer test_writer) {
         this.testWriter = test_writer;
-        constructor(csvColumns, geo_field, "");
+        constructor(csvColumns, geo_field, "", true);
     }
 
     /**
@@ -137,6 +157,9 @@ public class GeometryCSVWriter {
      * @param geo Geometry data
      */
     public void add(List<String> values, Geometry geo) {
+        if (!this.writeToFile) {
+            return;
+        }
         String geometry = wktWriter.write(geo);
         String[] csv_values = new String[csvColumns.size()];
         for (int cur_index = 0; cur_index < geoFieldIndex; cur_index++) {
@@ -220,6 +243,9 @@ public class GeometryCSVWriter {
      * Closes writer
      */
     public void close() {
+        if (!this.writeToFile) {
+            return;
+        }
         csvWriter.close();
     }
 }
