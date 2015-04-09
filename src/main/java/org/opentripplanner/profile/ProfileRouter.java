@@ -385,7 +385,7 @@ public class ProfileRouter {
             }
             // Strict dominance does not apply.
             // Check whether time ranges overlap, considering the tolerance for suboptimality.
-            if (ride.dlb > oldRide.dub + request.suboptimalMinutes) {
+            if (ride.dlb > oldRide.dub + request.suboptimalMinutes * 60) {
                 return true;
             }
         }
