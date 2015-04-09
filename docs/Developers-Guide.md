@@ -123,7 +123,7 @@ Deadline for response is 2015-10-29. Assuming I've heard no blocking votes by th
 Note that you should make sure to include a **deadline** by which you will go ahead and do what you're proposing 
 if you don't hear any blocking responses. In general, you should leave at least 72 hours for people to respond. 
 This is not a hard-and-fast rule and you should use your best judgement in determining how far in the future the 
-deadline should be depending on the magnitude of the proposal and how much it will effect the overall project and the 
+deadline should be depending on the magnitude of the proposal and how much it will affect the overall project and the 
 rest of the community.
 
 Of course you may always fork the [OTP repo on GitHub](https://github.com/opentripplanner/OpenTripPlanner/) 
