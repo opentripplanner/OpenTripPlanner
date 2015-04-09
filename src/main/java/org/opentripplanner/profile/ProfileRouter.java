@@ -207,6 +207,7 @@ public class ProfileRouter {
             /* Get the minimum-time unfinished ride off the queue. */
             Ride ride = queue.extract_min();
             /* Skip this ride if it has been dominated since it was enqueued. */
+            // TODO should we check whether ride.previous != null (it is an initial ride)?
             if (dominated(ride, ride.from)) continue;
             // Maybe when ride is complete, then find transfers here, but that makes for more queue operations.
             if (ride.to != null) throw new AssertionError("Ride should be unfinished.");
