@@ -1,8 +1,12 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import jersey.repackaged.com.google.common.collect.Sets;
 
 import com.google.common.collect.Lists;
 
@@ -10,11 +14,15 @@ import flexjson.PathExpression;
 
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -26,6 +34,8 @@ public class Raptor {
     public RoutingRequest options;
     
     private static final Logger LOG = LoggerFactory.getLogger(Raptor.class);
+    
+    private HashSet<TripPattern> markedPatterns = Sets.newHashSet();
         
     /** Initialize a RAPTOR router from states at transit stops */
     public Raptor(Collection<State> states, RoutingRequest options) {
@@ -35,6 +45,7 @@ public class Raptor {
         
         for (State state : states) {
             store.put(state);
+            markedPatterns.addAll(options.rctx.graph.index.patternsForStop.get(((TransitStop) state.getVertex()).getStop()));
         }
     }
     
@@ -55,8 +66,9 @@ public class Raptor {
     public void run () {
         // slightly hacky, but proceed here so that prev is fixed and we can modify current.
         store.proceed();
-        for (int round = 0; round < options.maxTransfers; round++) {
-            if (!doRound()) break;
+        for (int round = 0; round <= options.maxTransfers; round++) {
+            if (!doRound())
+            	break;
         }
     }
     
@@ -64,12 +76,17 @@ public class Raptor {
      * perform one round of a RAPTOR search.
      * @return whether this round relaxed any bounds.
      */
-    public boolean doRound () {
+    private boolean doRound () {
     	//LOG.info("Begin RAPTOR round");
         // TODO: mark routes
         // TODO: filter to routes that are running
         // TODO: implement the rest of the optimizations in the paper, in particular not going past the destination
-        PATTERNS: for (TripPattern tp : options.rctx.graph.index.patternForId.values()) {
+    	Set<TripPattern> oldMarkedPatterns = markedPatterns;
+    	markedPatterns = Sets.newHashSet();
+    	
+    	LOG.info("Exploring {} patterns", oldMarkedPatterns.size());
+    	
+        PATTERNS: for (TripPattern tp : oldMarkedPatterns) {
             STOPS: for (int i = 0; i < tp.stopVertices.length; i++) {
                 State s = store.getPrev(tp.stopVertices[i]);
                 if (s == null)
@@ -83,8 +100,8 @@ public class Raptor {
         store.proceed();
         findTransfers();
         
-        // TODO check if it changed
-        return true;
+        // check if it changed
+        return !markedPatterns.isEmpty();
     }
     
     /** Find all the transfers from the last round to this round */
@@ -97,8 +114,11 @@ public class Raptor {
                 if (e instanceof SimpleTransfer) {
                     State s1 = e.traverse(s0);
                     
-                    if (s1 != null)
-                        store.put(s1);
+                    if (s1 != null) {
+                        if (store.put(s1)) {
+                            markedPatterns.addAll(options.rctx.graph.index.patternsForStop.get(((TransitStop) s1.getVertex()).getStop()));	
+                        }
+                    }
                 }
             }
         }
@@ -114,6 +134,7 @@ public class Raptor {
             if (e instanceof PreBoardEdge) {
                 DEPART_OUTGOING: for (Edge e2 : e.getToVertex().getOutgoing()) {
                     // TODO: handle StopIndex
+                	// (this is not giving incorrect results, but we explore loop routes twice)
                     if (e2 instanceof TransitBoardAlight && ((TransitBoardAlight) e2).getPattern() == tripPattern) {
                         pbe = (PreBoardEdge) e;
                         tbe = (TransitBoardAlight) e2;
@@ -143,14 +164,16 @@ public class Raptor {
         
         while (!states.isEmpty()) {
             State s0 = states.remove(states.size() - 1);
-            for (Edge e : s0.getVertex().getOutgoing()) {
+            for (Edge e : s0.getVertex().getOutgoing()) {            	
                 State s1 = e.traverse(s0);
                 
                 if (s1 == null)
                     continue;
                 
                 if (s1.getVertex() instanceof TransitStop) {
-                    store.put(s1);
+                    if (store.put(s1)) {
+                        markedPatterns.addAll(options.rctx.graph.index.patternsForStop.get(((TransitStop) s1.getVertex()).getStop()));
+                    };
                 }
                 else {
                     states.add(s1);
@@ -165,36 +188,52 @@ public class Raptor {
     }
     
     private void findInitialStops () {
-    	RoutingRequest rr = options.clone();
-    	rr.modes = rr.modes.clone();
-    	rr.modes.setTransit(false);
-    	rr.worstTime = rr.dateTime + (long) (rr.maxWalkDistance / rr.walkSpeed);
-    	rr.batch = true;
+    	TraverseModeSet oldModes = options.modes;
+    	long oldWorstTime = options.worstTime;
+    	boolean oldBatch = options.batch;
+    	options.modes = options.modes.clone();
+    	options.modes.setTransit(false);
+    	options.worstTime = options.dateTime + (long) (options.maxWalkDistance / options.walkSpeed);
+    	options.batch = true;
     	
     	// routing context already set
     	
     	AStar astar = new AStar();    	
-    	ShortestPathTree spt = astar.getShortestPathTree(rr);
+    	ShortestPathTree spt = astar.getShortestPathTree(options);
     	
-    	for (TransitStop tstop : rr.rctx.graph.index.stopVertexForStop.values()) {
+    	for (TransitStop tstop : options.rctx.graph.index.stopVertexForStop.values()) {
     		State s = spt.getState(tstop);
-    		if (s != null)
-    			store.put(s);
+    		if (s != null) {
+    			if (store.put(s))
+    	            markedPatterns.addAll(options.rctx.graph.index.patternsForStop.get(((TransitStop) s.getVertex()).getStop()));
+    			
+    		}
     	}
+    	
+    	options.modes = oldModes;
+    	options.batch = oldBatch;
+    	options.worstTime = oldWorstTime;
     }
     
     private ShortestPathTree finishSearch () {
     	Collection<State> states = Lists.newArrayList();
-    	
+    	    	
     	for (Iterator<State> it = store.currentIterator(); it.hasNext();) {
-    		states.add(it.next());
-    	}
+    		State s = it.next();
+    		states.add(s);
+     	}
+    	
+    	TraverseModeSet oldModes = options.modes;
+    	options.modes.clone();
+    	options.modes.setTransit(false);
     	
     	// add the origin as well
     	states.add(new State(options));
     	
     	AStar astar = new AStar();
     	// TODO this is not efficient
-    	return astar.getShortestPathTree(options, 10, null, states);
+    	ShortestPathTree spt = astar.getShortestPathTree(options, 10, null, states);
+    	options.modes = oldModes;
+    	return spt;
     }
 }
