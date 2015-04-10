@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import flexjson.PathExpression;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -13,6 +15,7 @@ import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,20 @@ public class Raptor {
         for (State state : states) {
             store.put(state);
         }
+    }
+    
+    /** Initialize a RAPTOR router with only a routing request */
+    public Raptor(RoutingRequest options) {
+    	this.options = options;
+    	this.store = new StatePreservingRaptorStateStore();
+    	
+    	findInitialStops();
+    }
+    
+    /** Get a state at the destination, for a point-to-point search */
+    public ShortestPathTree getShortestPathTree () {
+    	run();
+    	return finishSearch();
     }
     
     public void run () {
@@ -145,5 +162,39 @@ public class Raptor {
     /** Get an iterator over all the nondominated target states of this RAPTOR search */
     public Iterator<State> iterator () {
         return store.currentIterator();
+    }
+    
+    private void findInitialStops () {
+    	RoutingRequest rr = options.clone();
+    	rr.modes = rr.modes.clone();
+    	rr.modes.setTransit(false);
+    	rr.worstTime = rr.dateTime + (long) (rr.maxWalkDistance / rr.walkSpeed);
+    	rr.batch = true;
+    	
+    	// routing context already set
+    	
+    	AStar astar = new AStar();    	
+    	ShortestPathTree spt = astar.getShortestPathTree(rr);
+    	
+    	for (TransitStop tstop : rr.rctx.graph.index.stopVertexForStop.values()) {
+    		State s = spt.getState(tstop);
+    		if (s != null)
+    			store.put(s);
+    	}
+    }
+    
+    private ShortestPathTree finishSearch () {
+    	Collection<State> states = Lists.newArrayList();
+    	
+    	for (Iterator<State> it = store.currentIterator(); it.hasNext();) {
+    		states.add(it.next());
+    	}
+    	
+    	// add the origin as well
+    	states.add(new State(options));
+    	
+    	AStar astar = new AStar();
+    	// TODO this is not efficient
+    	return astar.getShortestPathTree(options, 10, null, states);
     }
 }

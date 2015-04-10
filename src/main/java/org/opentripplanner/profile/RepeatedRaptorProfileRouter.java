@@ -81,7 +81,13 @@ public class RepeatedRaptorProfileRouter {
         
         // loop backwards with intention of eventually implementing dynamic programming/rRAPTOR based approach
         int i = 1;
-        for (int startTime = request.toTime; startTime >= request.fromTime; startTime -= 60) {
+        
+        // We assume the times are aligned to minutes, and we don't do a depart-after search starting
+        // at the end of the window.
+        for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
+        	
+        	if (++i % 30 == 0)
+        		LOG.info("Completed {} RAPTOR searches", i);
             
         	//LOG.info("Filtering RAPTOR states");
         	            
