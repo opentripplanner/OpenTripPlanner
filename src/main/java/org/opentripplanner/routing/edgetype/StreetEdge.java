@@ -723,6 +723,10 @@ public class StreetEdge extends Edge implements Cloneable, EdgeInfo {
 
     @Override
     public TraverseMode getPublicTransitType() {
-        return TraverseMode.BUS;
+        if (canTraverse(new TraverseModeSet("CAR"))) {
+            return TraverseMode.BUS;
+        } else {
+            return TraverseMode.LEG_SWITCH;
+        }
     }
 }
