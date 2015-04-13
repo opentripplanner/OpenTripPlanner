@@ -143,7 +143,7 @@ public class LinkRequest {
      * Split edges are not added to the graph immediately, so that they can be re-split later if another stop
      * is located near the same bundle of original edges.
      */
-    private Collection<StreetVertex> getSplitterVertices(String label, Collection<StreetEdge> edges, Coordinate coordinate) {
+    public Collection<StreetVertex> getSplitterVertices(String label, Collection<StreetEdge> edges, Coordinate coordinate) {
 
         // It is assumed that we are splitting at least one edge.
         if (edges.size() < 1) {

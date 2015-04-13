@@ -28,6 +28,30 @@ public class DirectionUtils {
     }
 
     /**
+     * Returns the approximate azimuth for Linestring from start coordinate to end coordinate
+     * in radians clockwise from North, in the range (-PI° to +PI°). The computation is exact
+     * for small delta between A and B.
+     */
+    public static double getAzimuthRad(LineString line) {
+        return DirectionUtils
+            .getAzimuthRad(line.getCoordinateN(0), line.getCoordinateN(line.getNumPoints() - 1));
+    }
+
+    /**
+     * Returns the approximate azimuth from coordinate A to B in radians clockwise from North,
+     * in the range (-PI° to +PI°). The computation is exact for small delta between A and B.
+     */
+    public static synchronized double getAzimuthRad(Coordinate a, Coordinate b) {
+        double cosLat = FastMath.cos(FastMath.toRadians((a.y + b.y) / 2.0));
+        double dY = (b.y - a.y); // in degrees, we do not care about the units
+        double dX = (b.x - a.x) * cosLat; // same
+        if (Math.abs(dX) < 1e-10 && Math.abs(dY) < 1e-10)
+            return Math.PI;
+        double az = FastMath.atan2(dX, dY);
+        return az;
+    }
+
+    /**
      * Returns the approximate azimuth from coordinate A to B in decimal degrees clockwise from North,
      * in the range (-180° to +180°). The computation is exact for small delta between A and B.
      */

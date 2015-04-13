@@ -71,6 +71,11 @@ public class StreetMatcher {
         index.build();
     }
 
+    public StreetMatcher(Graph graph, STRtree index) {
+        this.graph = graph;
+        this.index = index;
+    }
+
     @SuppressWarnings("unchecked")
     public List<Edge> match(Geometry routeGeometry, TraverseMode traverseMode) {
         

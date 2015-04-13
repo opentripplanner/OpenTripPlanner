@@ -58,7 +58,7 @@ public class NetworkLinkerLibrary {
 
     Graph graph;
 
-    StreetVertexIndexServiceImpl index;
+    public StreetVertexIndexServiceImpl index;
 
     EdgesForRoute edgesForRoute;
 
@@ -118,4 +118,11 @@ public class NetworkLinkerLibrary {
         return request;
     }
 
+    public HashMap<HashSet<StreetEdge>, LinkedList<P2<StreetEdge>>> getReplacements() {
+        return replacements;
+    }
+
+    public HashMap<Vertex, Collection<StreetVertex>> getSplitVertices() {
+        return splitVertices;
+    }
 }
