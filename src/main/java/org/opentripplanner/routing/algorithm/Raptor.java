@@ -27,6 +27,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimeSubset;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -154,8 +155,74 @@ public class Raptor {
     
     /** Propagate a state down a trip pattern */
     public void propagate (int time, TripPattern tripPattern, int stopIndex) {
-    	// TODO: frequency trips
     	
+    	if (!propagateFrequencies(time, tripPattern, stopIndex))
+    		propagateSchedules(time, tripPattern, stopIndex);
+    }
+    
+    public boolean propagateFrequencies (int time, TripPattern tripPattern, int stopIndex) {    	
+    	// first check for frequency trips
+    	boolean foundFrequencyEntry = false;
+    	
+    	int bestFreqBoardTime = Integer.MAX_VALUE;
+    	FrequencyEntry bestFreq = null;
+    	
+    	for (FrequencyEntry freq : tripPattern.scheduledTimetable.frequencyEntries) {
+    		// TODO FIXME !!!: CHECK DATE
+    		
+    		// we set this here rather than below the time check, because in Analyst we run
+    		// RAPTOR many times and we don't want the same patterns switching back and forth
+    		// from frequency to scheduled. (or do we?)
+    		foundFrequencyEntry = true;
+    		
+    		// the first stop on the trip must occur between start_time and end_time,
+    		// so offset start_time and end_time the appropriate amount to see if it applies.
+    		int offsetSecs = freq.tripTimes.getScheduledDepartureTime(stopIndex);
+    		
+    		// there are no more trips on this frequency entry
+    		if (freq.endTime + offsetSecs < time)
+    			continue;
+    		
+    		int boardTime = time + freq.headway;
+    		
+    		// we have to wait until the service starts running
+    		// note that we still figure in the wait; unless we are using exact times there
+    		// is no guarantee that first trip left at exactly the start time of the frequency entry,
+    		// only within headway_seconds.
+    		if (freq.startTime + offsetSecs > time) {
+    			boardTime += freq.startTime + offsetSecs - time;
+    		}
+    		
+    		if (boardTime < bestFreqBoardTime) {
+    			bestFreqBoardTime = boardTime;
+    			bestFreq = freq;
+    		}
+    	}
+    	
+    	if (bestFreq == null)
+    		return foundFrequencyEntry;
+    	
+    	int boardOffset = bestFreq.tripTimes.getScheduledDepartureTime(stopIndex);
+    	
+    	for (int reachedIdx = stopIndex + 1; reachedIdx < bestFreq.tripTimes.getNumStops(); reachedIdx++) {
+    		TransitStop v = tripPattern.stopVertices[reachedIdx];
+    		// board time already includes headway, if we are computing the worst-case
+    		int arrTime = bestFreqBoardTime + bestFreq.tripTimes.getScheduledArrivalTime(reachedIdx) - boardOffset;
+    		
+    		if (store.put(v, arrTime)) {
+    			for (TripPattern tp : options.rctx.graph.index.patternsForStop.get(v.getStop())) {
+    				if (tp != tripPattern)
+    					markedPatterns.add(tp);
+    			}
+    			
+    			markedStops.add(v);
+    		}
+    	}
+    	
+    	return foundFrequencyEntry;
+    }
+    	
+    public void propagateSchedules(int time, TripPattern tripPattern, int stopIndex) {
     	TripTimeSubset tts = times.get(tripPattern);
     	
     	if (tts == null)
