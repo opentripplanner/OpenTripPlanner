@@ -32,7 +32,12 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
 
     @Override
     public void proceed() {
-        matrix[current + 1].putAll(matrix[current]);
+    	for (TObjectIntIterator<TransitStop> it = currentIterator(); it.hasNext();) {
+    		it.advance();
+    		
+    		if (it.value() < matrix[current + 1].get(it.key()))
+    			matrix[current + 1].put(it.key(), it.value());
+    	}
         current++;
     }
 
