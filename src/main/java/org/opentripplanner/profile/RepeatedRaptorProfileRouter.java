@@ -92,11 +92,18 @@ public class RepeatedRaptorProfileRouter {
         // loop backwards with intention of eventually implementing dynamic programming/rRAPTOR based approach
         int i = 1;
         
+        // + 2 is because we have one additional round because there is one more ride than transfer
+        // (fencepost problem) and one additional round for the initial walk.
+    	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 3);
+        
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
         for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
-        	RaptorStateStore rss = new PathDiscardingRaptorStateStore();
+        	// note that we do not have to change any times (except the times at the access stops)
+        	// because this stores clock times not elapsed times.
+        	rss.restart();
         	
+        	// add the initial stops, or move back the times at them if not on the first search
         	for (State state : states) {
         		rss.put((TransitStop) state.getVertex(), (int) (state.getElapsedTimeSeconds() + startTime));
         	}

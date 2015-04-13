@@ -40,6 +40,7 @@ public class Raptor {
     private static final Logger LOG = LoggerFactory.getLogger(Raptor.class);
     
     private HashSet<TripPattern> markedPatterns = Sets.newHashSet();
+    private HashSet<TransitStop> markedStops;
     
     private Map<TripPattern, TripTimeSubset> times;
         
@@ -111,6 +112,7 @@ public class Raptor {
         // TODO: implement the rest of the optimizations in the paper, in particular not going past the destination
     	Set<TripPattern> oldMarkedPatterns = markedPatterns;
     	markedPatterns = Sets.newHashSet();
+    	markedStops = Sets.newHashSet();
     	
     	//LOG.info("Exploring {} patterns", oldMarkedPatterns.size());
     	
@@ -135,14 +137,12 @@ public class Raptor {
     /** Find all the transfers from the last round to this round */
     public void findTransfers () {
         // TODO: don't transfer from things that were not updated this round
-        for (TObjectIntIterator<TransitStop> stateIt = store.prevIterator(); stateIt.hasNext();) {
-        	stateIt.advance();
-        	            
-            for (Edge e : stateIt.key().getOutgoing()) {
+        for (TransitStop tstop : markedStops) {        	            
+            for (Edge e : tstop.getOutgoing()) {
                 if (e instanceof SimpleTransfer) {
                 	TransitStop to = (TransitStop) e.getToVertex();
                 	
-                    if (store.put(to, (int) (stateIt.value() + e.getDistance() / options.walkSpeed))) {
+                    if (store.put(to, (int) (store.getPrev(tstop) + e.getDistance() / options.walkSpeed))) {
                         markedPatterns.addAll(options.rctx.graph.index.patternsForStop.get(to.getStop()));	
                     }
                 }
@@ -174,6 +174,8 @@ public class Raptor {
     				if (tp != tripPattern)
     					markedPatterns.add(tp);
     			}
+    			
+    			markedStops.add(v);
     		}
     	}
     }

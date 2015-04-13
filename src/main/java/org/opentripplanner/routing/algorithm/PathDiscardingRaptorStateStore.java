@@ -11,17 +11,18 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
+@SuppressWarnings("unchecked")
 public class PathDiscardingRaptorStateStore implements RaptorStateStore {
-    /** stores what is reachable in the current round. This stores clock time in seconds since midnight.  */
-    private TObjectIntMap<TransitStop> current = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
+	// suppressing warnings because generic arrays don't work in Java . . .
+    @SuppressWarnings("rawtypes")
+	private TObjectIntMap[] matrix;
     
-    /** stores what was reachable in the previous round */
-    private TObjectIntMap<TransitStop> prev;
+    int current = 0;
     
     @Override
     public boolean put(TransitStop t, int time) {
-        if (time < current.get(t)) {
-            current.put(t, time);
+        if (time < matrix[current].get(t)) {
+            matrix[current].put(t, time);
             return true;
         }
         return false;
@@ -29,26 +30,43 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
 
     @Override
     public void proceed() {
-        prev = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
-        prev.putAll(current);
+        matrix[current + 1].putAll(matrix[current]);
+        current++;
     }
 
     @Override
     public int getCurrent(TransitStop t) {
-        return current.get(t);
+        return matrix[current].get(t);
     }
 
     @Override
     public int getPrev(TransitStop t) {
-        return prev.get(t);
+        return matrix[current - 1].get(t);
     }
     
     public TObjectIntIterator<TransitStop> currentIterator() {
-        return current.iterator();
+        return matrix[current].iterator();
     }
     
     public TObjectIntIterator<TransitStop> prevIterator() {
-        return prev.iterator();
+        return matrix[current - 1].iterator();
     }
-
+    
+    /** Restart the search from the first round. Used when running repeated RAPTOR searches using the dynamic programming
+     * algorithm.
+     * 
+     * TODO write up the dynamic programming algorithm.
+     */
+    public void restart () {
+    	current = 0;
+    }
+    
+    /** Create a new store with the given number of rounds. Remember to include the initial walk as a "round" */
+    public PathDiscardingRaptorStateStore(int rounds) {
+    	matrix = new TObjectIntMap[rounds];
+    	
+    	for (int i = 0; i < rounds; i++) {
+    		matrix[i] = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
+    	}
+    }
 }
