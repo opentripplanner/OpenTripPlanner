@@ -92,7 +92,6 @@ public class RepeatedRaptorProfileRouter {
         Map<TripPattern, TripTimeSubset> timetables =
         		TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + 120 * 60); 
         
-        // loop backwards with intention of eventually implementing dynamic programming/rRAPTOR based approach
         int i = 1;
         
         // + 2 is because we have one additional round because there is one more ride than transfer
@@ -149,8 +148,6 @@ public class RepeatedRaptorProfileRouter {
         makeSurfaces();
         
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
-        
-        rr.cleanup();
     }
     
     /** find the boarding stops */
