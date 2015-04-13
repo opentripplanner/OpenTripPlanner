@@ -59,7 +59,8 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
         return matrix[current - 1].iterator();
     }
     
-    /** Restart the search from the first round. Used when running repeated RAPTOR searches using the dynamic programming
+    /**
+     * Restart the search from the first round. Used when running repeated RAPTOR searches using the dynamic programming
      * algorithm.
      * 
      * TODO write up the dynamic programming algorithm.
