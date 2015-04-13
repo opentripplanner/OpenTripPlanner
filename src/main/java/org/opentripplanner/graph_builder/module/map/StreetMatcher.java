@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.EdgeInfo;
 import org.opentripplanner.routing.edgetype.PublicTransitEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -106,19 +107,15 @@ public class StreetMatcher {
 
         // compute initial states
         for (Edge initialEdge : nearbyEdges) {
-            //For bus we skip all train/tram/subway edges
-            if (traverseMode.equals(TraverseMode.BUS)) {
-                if (initialEdge instanceof PublicTransitEdge) {
+
+            if(initialEdge instanceof EdgeInfo) {
+                if (!((EdgeInfo) initialEdge).getPublicTransitType().equals(traverseMode)) {
                     continue;
                 }
-            //For train/tram/subway we skip all street edges and all edges that haven't got correct traverse mode
             } else {
-                if (initialEdge instanceof StreetEdge) {
-                    continue;
-                } else if (initialEdge instanceof PublicTransitEdge
-                        && !(((PublicTransitEdge) initialEdge).getPublicTransitType().equals(traverseMode))) {
-                    continue;
-                }
+                //Other edges are StreetTransitLink and preboard edges and other links
+                //log.warn("initial Edge {} is not from EdgeInfo!", initialEdge.getClass().getName());
+                continue;
             }
             Geometry edgeGeometry = initialEdge.getGeometry();
             

@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.EdgeInfo;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -150,7 +151,8 @@ public class MidblockMatchState extends MatchState {
                 
                 for (Edge e : getOutgoingMatchableEdges(toVertex, traverseMode)) {
                     double cost = error + NEW_SEGMENT_PENALTY;
-                    if (traverseMode.equals(TraverseMode.BUS) && !carsCanTraverse(e)) {
+                    //if (traverseMode.equals(TraverseMode.BUS) && !carsCanTraverse(e)) {
+                    if (e instanceof EdgeInfo && !((EdgeInfo) e).getPublicTransitType().equals(traverseMode)) {
                         cost += NO_TRAVERSE_PENALTY;
                     }
                     MatchState nextState = new MidblockMatchState(this, routeGeometry, e,
@@ -200,7 +202,8 @@ public class MidblockMatchState extends MatchState {
                     }
 
                     double cost = error + NEW_SEGMENT_PENALTY;
-                    if (traverseMode.equals(TraverseMode.BUS) && !carsCanTraverse(e)) {
+                    //if (traverseMode.equals(TraverseMode.BUS) && !carsCanTraverse(e)) {
+                    if (e instanceof EdgeInfo && !((EdgeInfo) e).getPublicTransitType().equals(traverseMode)) {
                         cost += NO_TRAVERSE_PENALTY;
                     }
 
