@@ -100,6 +100,10 @@ public class RepeatedRaptorProfileRouter {
         
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
+    	// we run the search many times in reverse order - this is the rRAPTOR extension to RAPTOR.
+    	// It's a dynamic programming approach - observe that an upper bound on the earliest arrival
+    	// given that you departed at minute N is the arrival of the fastest trip at minute N+1; you always can wait
+    	// 1 minute and then take that trip. This we do not reinitialize the RaptorStateStore on every iteration.
         for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
         	// note that we do not have to change any times (except the times at the access stops)
         	// because this stores clock times not elapsed times.

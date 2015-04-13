@@ -104,7 +104,7 @@ public class Raptor {
     */
     
     public void run () {
-        // slightly hacky, but proceed here so that prev is fixed and we can modify current.
+        // the 0th round is the initial access to the stops
         store.proceed();
         for (int round = 0; round <= options.maxTransfers; round++) {
             if (!doRound(round == options.maxTransfers))
@@ -126,6 +126,7 @@ public class Raptor {
     	
     	//LOG.info("Exploring {} patterns", oldMarkedPatterns.size());
     	
+    	// Loop over the patterns we marked in the previous iteration
         PATTERNS: for (TripPattern tp : oldMarkedPatterns) {
             STOPS: for (int i = 0; i < tp.stopVertices.length; i++) {
                 int time = store.getPrev(tp.stopVertices[i]);
@@ -136,9 +137,21 @@ public class Raptor {
             }
         }
         
-        // Find all possible transfers
+        // Find all possible transfers. No need to do this on the last round though.
     	if (!isLast) {
     		store.proceed();
+    		
+    		// FIXME this allows the walk limit to be disregarded. Suppose there is a transit stop that
+    		// has no service on the day in question, but has a transfer from a stop that does.
+    		// Further suppose that there is a point that is within walking distance of the stop
+    		// that does not have service, but not of any stop that does. Adding the transfers into
+    		// the state store would allow one to transfer to that stop and egress from it without
+    		// ever boarding a vehicle. Given that we don't store enough information to reconstruct paths,
+    		// though, I don't see a good way around this.
+    		
+    		// Also, there is almost certainly a walking route that disregards the walk limit but is faster
+    		// than walking to a point by way of another transit stop.
+    		
     		findTransfers();
     	}
         
@@ -148,7 +161,7 @@ public class Raptor {
     
     /** Find all the transfers from the last round to this round */
     public void findTransfers () {
-        // TODO: don't transfer from things that were not updated this round
+        // only find transfers from stops that were touched in this round.
         for (TransitStop tstop : markedStops) {        	            
             for (Edge e : tstop.getOutgoing()) {
                 if (e instanceof SimpleTransfer) {
@@ -248,6 +261,7 @@ public class Raptor {
     	if (tripIndex == -1)
     		return;
     	
+    	// Propagate the times
     	for (int reachedIdx = stopIndex + 1; reachedIdx < tripPattern.stopVertices.length; reachedIdx++) {
     		TransitStop v = tripPattern.stopVertices[reachedIdx];
     		int arrTime = tts.getArrivalTime(tripIndex, reachedIdx);
