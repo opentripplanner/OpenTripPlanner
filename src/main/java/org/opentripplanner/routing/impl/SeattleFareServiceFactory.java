@@ -45,20 +45,21 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
 
         /**
          * Various GTFS fares are missing default fares. We add them there, as standard FareRuleSet.
+         * Updated to match March 1, 2015 fare changes from KCM and
          */
 
         // KCM - King County Metro
         // metro.kingcounty.gov/fares/
         // Data within King Metro GTFS
-        addMissingFare(youthFareRules, 1.25f, SeattleFareServiceImpl.KCM_KCM_AGENCY_ID);
-        addMissingFare(seniorFareRules, 0.75f, SeattleFareServiceImpl.KCM_KCM_AGENCY_ID);
+        addMissingFare(youthFareRules, 1.50f, SeattleFareServiceImpl.KCM_KCM_AGENCY_ID);
+        addMissingFare(seniorFareRules, 1.00f, SeattleFareServiceImpl.KCM_KCM_AGENCY_ID);
 
         // EOS - Seattle Street Car
-        // http://www.seattlestreetcar.org/slu.htm
+        // http://www.seattlestreetcar.org/ride_fares.htm
         // Data within King Metro GTFS
-        addMissingFare(regularFareRules, 2.50f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
-        addMissingFare(youthFareRules, 1.25f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
-        addMissingFare(seniorFareRules, 0.75f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
+        addMissingFare(regularFareRules, 2.25f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
+        addMissingFare(youthFareRules, 1.50f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
+        addMissingFare(seniorFareRules, 1.00f, SeattleFareServiceImpl.KCM_EOS_AGENCY_ID);
 
         // Sound Transit Express Bus
         // http://www.soundtransit.org/Fares-and-Passes/ST-Express-bus-fares
