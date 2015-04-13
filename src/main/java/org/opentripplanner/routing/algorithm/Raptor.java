@@ -97,7 +97,7 @@ public class Raptor {
         // slightly hacky, but proceed here so that prev is fixed and we can modify current.
         store.proceed();
         for (int round = 0; round <= options.maxTransfers; round++) {
-            if (!doRound())
+            if (!doRound(round == options.maxTransfers))
             	break;
         }
     }
@@ -106,7 +106,7 @@ public class Raptor {
      * perform one round of a RAPTOR search.
      * @return whether this round relaxed any bounds.
      */
-    private boolean doRound () {
+    private boolean doRound (boolean isLast) {
     	//LOG.info("Begin RAPTOR round");
         // TODO: filter to routes that are running
         // TODO: implement the rest of the optimizations in the paper, in particular not going past the destination
@@ -127,8 +127,10 @@ public class Raptor {
         }
         
         // Find all possible transfers
-        store.proceed();
-        findTransfers();
+    	if (!isLast) {
+    		store.proceed();
+    		findTransfers();
+    	}
         
         // check if it changed
         return !markedPatterns.isEmpty();

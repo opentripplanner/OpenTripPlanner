@@ -97,7 +97,7 @@ public class RepeatedRaptorProfileRouter {
         
         // + 2 is because we have one additional round because there is one more ride than transfer
         // (fencepost problem) and one additional round for the initial walk.
-    	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 3, request.toTime + 120 * 60);
+    	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 2, request.toTime + 120 * 60);
         
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
