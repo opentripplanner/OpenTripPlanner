@@ -16,4 +16,6 @@ public interface EdgeInfo {
     public Boolean isReliableLevel();
 
     public TraverseMode getPublicTransitType();
+
+    public long getOsmID();
 }

@@ -79,6 +79,8 @@ public class StreetEdge extends Edge implements Cloneable, EdgeInfo {
     private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
     private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
 
+    private long osmID;
+
     /** back, roundabout, stairs, ... */
     private byte flags;
 
@@ -728,5 +730,13 @@ public class StreetEdge extends Edge implements Cloneable, EdgeInfo {
         } else {
             return TraverseMode.LEG_SWITCH;
         }
+    }
+
+    public long getOsmID() {
+        return osmID;
+    }
+
+    public void setOsmID(long osmID) {
+        this.osmID = osmID;
     }
 }

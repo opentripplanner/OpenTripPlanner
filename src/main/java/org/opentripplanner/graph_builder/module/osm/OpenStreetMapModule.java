@@ -1051,6 +1051,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     permissions, back);
             street.setCarSpeed(carSpeed);
 
+            street.setOsmID(way.getId());
+
             String highway = way.getTag("highway");
             int cls;
             if ("crossing".equals(highway) && !way.isTag("bicycle", "designated")) {
