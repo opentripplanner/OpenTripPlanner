@@ -10,8 +10,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.apache.lucene.document.Field.Store;
 import org.joda.time.DateTimeZone;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
@@ -54,12 +57,12 @@ public class RepeatedRaptorProfileRouter {
     
     public TimeSurface.RangeSet timeSurfaceRangeSet;
     
-    TObjectIntMap<Vertex> mins = new TObjectIntHashMap<Vertex>(3000, 0.75f, Integer.MAX_VALUE); 
-    TObjectIntMap<Vertex> maxs = new TObjectIntHashMap<Vertex>(3000, 0.75f, Integer.MIN_VALUE);
+    TObjectIntMap<TransitStop> mins = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MAX_VALUE); 
+    TObjectIntMap<TransitStop> maxs = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MIN_VALUE);
     
     // accumulate the travel times to create an average
-    TObjectLongMap<Vertex> accumulator = new TObjectLongHashMap<Vertex>();
-    TObjectIntMap<Vertex> counts = new TObjectIntHashMap<Vertex>();
+    TObjectLongMap<TransitStop> accumulator = new TObjectLongHashMap<TransitStop>();
+    TObjectIntMap<TransitStop> counts = new TObjectIntHashMap<TransitStop>();
     
     public RepeatedRaptorProfileRouter (Graph graph, ProfileRequest request) {
         this.request = request;
@@ -94,7 +97,7 @@ public class RepeatedRaptorProfileRouter {
         
         // + 2 is because we have one additional round because there is one more ride than transfer
         // (fencepost problem) and one additional round for the initial walk.
-    	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 3);
+    	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 3, request.toTime + 120 * 60);
         
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
@@ -126,7 +129,7 @@ public class RepeatedRaptorProfileRouter {
                 it.advance();
                 
                 int et = it.value() - startTime;
-                Vertex v = it.key();
+                TransitStop v = it.key();
                 if (et < mins.get(v))
                     mins.put(v, et);
                 
@@ -185,58 +188,57 @@ public class RepeatedRaptorProfileRouter {
         return stops;
     }
     
-    private void makeSurfaces() {
-        LOG.info("Propagating from transit stops to the street network...");
-        List<State> lower = Lists.newArrayList();
-        List<State> upper = Lists.newArrayList();
-        List<State> avg = Lists.newArrayList();
-        
-        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.batch = (true);
-        rr.from = new GenericLocation(request.fromLat, request.fromLon);
-        rr.setRoutingContext(graph);
-        rr.longDistance = true;
-        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
-        rr.setNumItineraries(1);
-        rr.worstTime = rr.dateTime + 2 * 60 * 60;
-       
-        long startTime = rr.dateTime;
-        
-        State origin = new State(rr);
-        
-        // Iterate over all rides at all clusters
-        // Note that some may be dominated, but it doesn't matter
-        // Multi-origin Dijkstra search; preinitialize the queue with states at each transit stop
-        for (Vertex v : mins.keySet()) {
-        	if (maxs.get(v) > 60 * 999)
-        		continue;
-        	
-            lower.add(new State(v, null, mins.get(v) + startTime, startTime, rr));
-            upper.add(new State(v, null, maxs.get(v) + startTime, startTime, rr));
-            
-            // just use a long, avoid repeated casting
-            long average = accumulator.get(v) / counts.get(v);
-            avg.add(new State(v, null, average + startTime, startTime, rr));
-        }
-        
-        // get direct trips as well
-        lower.add(origin);
-        upper.add(origin);
-        avg.add(origin);
-        
-        // create timesurfaces
-        timeSurfaceRangeSet = new TimeSurface.RangeSet();
+    private void makeSurfaces () {
+	    LOG.info("Propagating from transit stops to the street network...");
+	    // A map to store the travel time to each vertex
+	    TimeSurface minSurface = new TimeSurface(this);
+	    TimeSurface avgSurface = new TimeSurface(this);
+	    TimeSurface maxSurface = new TimeSurface(this);
+	    // Grab a cached map of distances to street intersections from each transit stop
+	    StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
+	    // Iterate over all nondominated rides at all clusters
+	    for (TransitStop tstop : mins.keySet()) {
+	        int lb0 = mins.get(tstop);
+	        int ub0 = maxs.get(tstop);
+	        int avg0 = (int) (accumulator.get(tstop) / counts.get(tstop));
 
-        AStar astar = new AStar();
-        timeSurfaceRangeSet.min = new TimeSurface(astar.getShortestPathTree(rr, 20, null, lower), false);
-        astar = new AStar();
-        timeSurfaceRangeSet.max = new TimeSurface(astar.getShortestPathTree(rr, 20, null, upper), false);
-        astar = new AStar();
-        timeSurfaceRangeSet.avg = new TimeSurface(astar.getShortestPathTree(rr, 20, null, avg), false);
-        
-        rr.cleanup();
-        
-        LOG.info("Done with propagation.");
-        /* Store the results in a field in the router object. */
-    }
+            // Iterate over street intersections in the vicinity of this particular transit stop.
+            // Shift the time range at this transit stop, merging it into that for all reachable street intersections.
+            TObjectIntMap<Vertex> distanceToVertex = stopTreeCache.getDistancesForStop(tstop);
+            for (TObjectIntIterator<Vertex> iter = distanceToVertex.iterator(); iter.hasNext(); ) {
+                iter.advance();
+                Vertex vertex = iter.key();
+                // distance in meters over walkspeed in meters per second --> seconds
+                int egressWalkTimeSeconds = (int) (iter.value() / request.walkSpeed);
+                if (egressWalkTimeSeconds > request.maxWalkTime * 60) {
+                    continue;
+                }
+                int propagated_min = lb0 + egressWalkTimeSeconds;
+                int propagated_max = ub0 + egressWalkTimeSeconds;
+                // TODO: we can't take the min propagated average and call it an average
+                int propagated_avg = avg0 + egressWalkTimeSeconds;
+                int existing_min = minSurface.times.get(vertex);
+                int existing_max = maxSurface.times.get(vertex);
+                int existing_avg = avgSurface.times.get(vertex);
+                // FIXME this is taking the least lower bound and the least upper bound
+                // which is not necessarily wrong but it's a crude way to perform the combination
+                if (existing_min == TimeSurface.UNREACHABLE || existing_min > propagated_min) {
+                    minSurface.times.put(vertex, propagated_min);
+                }
+                if (existing_max == TimeSurface.UNREACHABLE || existing_max > propagated_max) {
+                    maxSurface.times.put(vertex, propagated_max);
+                }
+                if (existing_avg == TimeSurface.UNREACHABLE || existing_avg > propagated_avg) {
+                    avgSurface.times.put(vertex, propagated_avg);
+                }
+	        }
+	    }
+	    LOG.info("Done with propagation.");
+	    /* Store the results in a field in the router object. */
+	    timeSurfaceRangeSet = new TimeSurface.RangeSet();
+	    timeSurfaceRangeSet.min = minSurface;
+	    timeSurfaceRangeSet.max = maxSurface;
+	    timeSurfaceRangeSet.avg = avgSurface;
+	}
+
 }

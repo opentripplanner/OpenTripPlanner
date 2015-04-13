@@ -17,11 +17,13 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     @SuppressWarnings("rawtypes")
 	private TObjectIntMap[] matrix;
     
+    public final int maxTime;
+    
     int current = 0;
     
     @Override
     public boolean put(TransitStop t, int time) {
-        if (time < matrix[current].get(t)) {
+        if (time < matrix[current].get(t) && time < maxTime) {
             matrix[current].put(t, time);
             return true;
         }
@@ -63,6 +65,12 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     
     /** Create a new store with the given number of rounds. Remember to include the initial walk as a "round" */
     public PathDiscardingRaptorStateStore(int rounds) {
+    	this(rounds, Integer.MAX_VALUE);
+    }
+    
+    public PathDiscardingRaptorStateStore(int rounds, int maxTime) {
+    	this.maxTime = maxTime;
+    	
     	matrix = new TObjectIntMap[rounds];
     	
     	for (int i = 0; i < rounds; i++) {
