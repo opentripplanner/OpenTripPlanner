@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -8,21 +9,26 @@ import gnu.trove.map.hash.TObjectLongHashMap;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTimeZone;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.PathDiscardingRaptorStateStore;
 import org.opentripplanner.routing.algorithm.Raptor;
+import org.opentripplanner.routing.algorithm.RaptorStateStore;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.TripTimeSubset;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +70,7 @@ public class RepeatedRaptorProfileRouter {
     	long computationStartTime = System.currentTimeMillis();
     	LOG.info("Begin profile request");
         LOG.info("Finding initial stops");
+        
         Collection<State> states = findInitialStops(false);
         
         LOG.info("Found {} initial stops", states.size());
@@ -79,33 +86,27 @@ public class RepeatedRaptorProfileRouter {
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 + request.fromTime;
         rr.setRoutingContext(graph);
         
+        Map<TripPattern, TripTimeSubset> timetables =
+        		TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + 120 * 60); 
+        
         // loop backwards with intention of eventually implementing dynamic programming/rRAPTOR based approach
         int i = 1;
         
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
         for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
+        	RaptorStateStore rss = new PathDiscardingRaptorStateStore();
+        	
+        	for (State state : states) {
+        		rss.put((TransitStop) state.getVertex(), (int) (state.getElapsedTimeSeconds() + startTime));
+        	}
         	
         	if (++i % 30 == 0)
         		LOG.info("Completed {} RAPTOR searches", i);
             
         	//LOG.info("Filtering RAPTOR states");
-        	            
-            final long startTimeEpoch = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 + startTime;
-            rr.dateTime = startTimeEpoch;
             
-            // clooge: create new states offset in time.
-            // for Modeify we won't be able to do this as we need to be able to reconstruct paths
-            Collection<State> raptorStates = Collections2.transform(states, new Function<State, State> () {
-
-                @Override
-                public State apply(State input) {
-                    return new State(input.getVertex(), null, input.getElapsedTimeSeconds() + startTimeEpoch, startTimeEpoch, rr);
-                }
-                
-            });
-            
-            Raptor raptor = new Raptor(raptorStates, rr);
+            Raptor raptor = new Raptor(rss, rr, timetables);
 
             //LOG.info("Performing RAPTOR search for minute {}", i++);
             
@@ -114,11 +115,11 @@ public class RepeatedRaptorProfileRouter {
             //LOG.info("Finished RAPTOR search in {} milliseconds", System.currentTimeMillis() - roundStartTime);
             
             // loop over all states, accumulating mins, maxes, etc.
-            for (Iterator<State> it = raptor.iterator(); it.hasNext();) {
-                State state = it.next();
+            for (TObjectIntIterator<TransitStop> it = raptor.iterator(); it.hasNext();) {
+                it.advance();
                 
-                int et = (int) state.getElapsedTimeSeconds();
-                Vertex v = state.getVertex();
+                int et = it.value() - startTime;
+                Vertex v = it.key();
                 if (et < mins.get(v))
                     mins.put(v, et);
                 
