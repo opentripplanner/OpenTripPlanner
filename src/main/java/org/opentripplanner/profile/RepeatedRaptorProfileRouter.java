@@ -115,7 +115,7 @@ public class RepeatedRaptorProfileRouter {
             
         	//LOG.info("Filtering RAPTOR states");
             
-            Raptor raptor = new Raptor(rss, rr, timetables);
+            Raptor raptor = new Raptor(rss, rr, request.date, timetables);
 
             //LOG.info("Performing RAPTOR search for minute {}", i++);
             

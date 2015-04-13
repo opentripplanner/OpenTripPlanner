@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import flexjson.PathExpression;
 import gnu.trove.iterator.TObjectIntIterator;
 
+import org.joda.time.LocalDate;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -44,6 +45,13 @@ public class Raptor {
     private HashSet<TransitStop> markedStops;
     
     private Map<TripPattern, TripTimeSubset> times;
+    
+    /**
+     * the date of the search
+     * We could infer this from the routing request but we want to eventually get rid of the routing request
+     * in profile mode.
+     */
+    private LocalDate date;
         
     /** Initialize a RAPTOR router from states at transit stops and the timetables of trips running in the window. */
     /*public Raptor(Collection<State> states, RoutingRequest options, Map<TripPattern, TripTimeSubset> times) {
@@ -64,10 +72,11 @@ public class Raptor {
     }*/
     
     /** Initialize a RAPTOR router from an existing RaptorStateStore, a routing request, and the timetables of active trips */
-    public Raptor(RaptorStateStore store, RoutingRequest options, Map<TripPattern, TripTimeSubset> times) {
+    public Raptor(RaptorStateStore store, RoutingRequest options, LocalDate date, Map<TripPattern, TripTimeSubset> times) {
     	this.options = options;
     	this.store = store;
     	this.times = times;
+    	this.date = date;
     	
     	for (TObjectIntIterator<TransitStop> it = store.currentIterator(); it.hasNext();) {
     		it.advance();
@@ -153,22 +162,26 @@ public class Raptor {
         }
     }
     
-    /** Propagate a state down a trip pattern */
+    /** Propagate a time down a trip pattern, using frequencies if available, otherwise schedules. */
     public void propagate (int time, TripPattern tripPattern, int stopIndex) {
     	
     	if (!propagateFrequencies(time, tripPattern, stopIndex))
     		propagateSchedules(time, tripPattern, stopIndex);
     }
     
+    /** Propagate times using frequency entries */
     public boolean propagateFrequencies (int time, TripPattern tripPattern, int stopIndex) {    	
     	// first check for frequency trips
     	boolean foundFrequencyEntry = false;
     	
+    	// Figure out what the best frequency entry is. Note that it may be worthwhile to wait for a frequency based trip
+    	// if we're near but before the start of the window.
     	int bestFreqBoardTime = Integer.MAX_VALUE;
     	FrequencyEntry bestFreq = null;
     	
     	for (FrequencyEntry freq : tripPattern.scheduledTimetable.frequencyEntries) {
-    		// TODO FIXME !!!: CHECK DATE
+    		if (!options.rctx.graph.index.servicesRunning(date).get(freq.tripTimes.serviceCode))
+    			continue;
     		
     		// we set this here rather than below the time check, because in Analyst we run
     		// RAPTOR many times and we don't want the same patterns switching back and forth
@@ -222,6 +235,7 @@ public class Raptor {
     	return foundFrequencyEntry;
     }
     	
+    /** Propagate times using schedules. */
     public void propagateSchedules(int time, TripPattern tripPattern, int stopIndex) {
     	TripTimeSubset tts = times.get(tripPattern);
     	
