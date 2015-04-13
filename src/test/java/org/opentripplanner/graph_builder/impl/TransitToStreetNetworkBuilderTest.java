@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.FileWriter;
 import java.nio.charset.Charset;
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -244,8 +246,9 @@ public class TransitToStreetNetworkBuilderTest {
         Graph gg = loadGraph(osm_filename, gtfs_filename, true, true);
         assertNotNull(gg);
         CsvWriter writer = null;
+        PrintWriter pw = new PrintWriter("diffs/" + name + ".txt");
         if (transit_stats) {
-            writer = new CsvWriter("transit_stats_" + name + ".csv", ':', Charset.forName("UTF8"));
+            writer = new CsvWriter("diffs/transit_stats_" + name + ".csv", ':', Charset.forName("UTF8"));
             writer.writeRecord(new String[]{"stop_modes", "distance", "street_type", "street_modes", "stop_id", "stop_name"});
         }
         //Reads saved correct transit stop -> Street edge connections
@@ -324,6 +327,7 @@ public class TransitToStreetNetworkBuilderTest {
                         }
                     }
                     if (!foundConnection) {
+                        pw.println(ts.getLabel() + " NOT CONNECTED");
                         //assertTrue(String.format("Transit stop %s connected wrongly", ts.getLabel()), foundConnection);
                         //collector.checkThat(sb.toString(), CoreMatchers.equalTo(wantedEdgeLabel));
                         collector.checkThat(sb.toString(), CoreMatchers.describedAs("TransitStop %0 should be connected to %1", CoreMatchers.equalTo(wantedEdgeLabel), ts.getLabel(), wantedEdgeLabel));
@@ -332,15 +336,27 @@ public class TransitToStreetNetworkBuilderTest {
                         } else {
                             LOG.warn("To vertex has no outgoing edges");
                         }
-                    } 
+                    }  else {
+                        pw.println(ts.getLabel() + " CONNECTED");
+                    }
                 }
             }
         }
         
         LOG.info("Correctly linked {}/{} ({}%) stations for {}", correctlyLinkedStops, allStops-unknownStops, Math.round((double)correctlyLinkedStops/(double)(allStops-unknownStops)*100), osm_filename);
         LOG.info("Not checked: {} stations.", unknownStops);
+
+        try {
+            PrintWriter pw_readme = new PrintWriter(new FileWriter("diffs/readme.txt", true));
+            pw_readme.println(String.format("Correctly linked %d/%d (%d%%) stations for %s", correctlyLinkedStops, allStops-unknownStops, Math.round((double)correctlyLinkedStops/(double)(allStops-unknownStops)*100), osm_filename));
+            pw_readme.println(String.format("Not checked: %d stations.", unknownStops));
+            pw_readme.close();
+        } catch (IOException e) {
+            LOG.error("Error:", e);
+        }
         
-        writeGeoJson("correct_" + name +".geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
+        writeGeoJson("diffs/correct_" + name +".geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
+        pw.close();
     }
     
     /**
