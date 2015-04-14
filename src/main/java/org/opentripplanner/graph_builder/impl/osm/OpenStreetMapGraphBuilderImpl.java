@@ -14,10 +14,7 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -71,6 +68,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
 
     public boolean skipVisibility = false;
+    
+    private Geometry region;
 
     // Members that can be set by clients.
 
@@ -149,8 +148,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     /**
      * Construct and set providers all at once.
      */
-    public OpenStreetMapGraphBuilderImpl(List<OpenStreetMapProvider> providers) {
+    public OpenStreetMapGraphBuilderImpl(List<OpenStreetMapProvider> providers, Geometry region) {
         this.setProviders(providers);
+        this.region = region;
     }
 
     public OpenStreetMapGraphBuilderImpl() {
@@ -158,7 +158,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        OSMDatabase osmdb = new OSMDatabase();
+        OSMDatabase osmdb = new OSMDatabase(region);
         Handler handler = new Handler(graph, osmdb);
         for (OpenStreetMapProvider provider : _providers) {
             LOG.info("Gathering OSM from provider: " + provider);

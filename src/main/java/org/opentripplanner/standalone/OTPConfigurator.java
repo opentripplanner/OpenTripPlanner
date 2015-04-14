@@ -20,6 +20,7 @@ import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
@@ -58,10 +59,17 @@ public class OTPConfigurator {
     
     private final CommandLineParameters params;
     
-    private GraphService graphService = null;
+    private Geometry region;
     
+    private GraphService graphService = null;
+
     public OTPConfigurator (CommandLineParameters params) {
         this.params = params;
+    }
+
+    public OTPConfigurator (CommandLineParameters params, Geometry region) {
+        this.params = params;
+        this.region = region;
     }
 
     private OTPServer server;
@@ -169,7 +177,7 @@ public class OTPConfigurator {
                 OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
                 osmProviders.add(osmProvider);
             }
-            OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders);
+            OpenStreetMapGraphBuilderImpl osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders, region);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
             streetEdgeFactory.useElevationData = params.elevation;
             osmBuilder.edgeFactory = streetEdgeFactory;

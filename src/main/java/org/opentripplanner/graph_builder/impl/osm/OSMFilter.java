@@ -91,7 +91,7 @@ public class OSMFilter {
          */
         if (entity.isGeneralAccessDenied()) {
             // this can actually be overridden
-            permission = StreetTraversalPermission.NONE;
+            permission = StreetTraversalPermission.PEDESTRIAN;
             if (entity.isMotorcarExplicitlyAllowed()) {
                 permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
             }

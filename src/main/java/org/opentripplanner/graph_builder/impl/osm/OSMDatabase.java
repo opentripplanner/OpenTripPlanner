@@ -37,6 +37,19 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class OSMDatabase implements OpenStreetMapContentHandler {
+    
+    private Geometry region;
+    private GeometryFactory gf;
+
+    public OSMDatabase() {
+    }
+
+    public OSMDatabase(Geometry region) {
+        this.region = region;
+        if (region != null) {
+            gf = new GeometryFactory(region.getPrecisionModel(), region.getSRID());
+        }
+    }
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
@@ -187,6 +200,9 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     @Override
     public void addNode(OSMNode node) {
+        if (region != null && !region.contains(gf.createPoint(new Coordinate(node.lon, node.lat)))) {
+            return;
+        }
         if (node.isBikeRental()) {
             bikeRentalNodes.put(node.getId(), node);
             return;
