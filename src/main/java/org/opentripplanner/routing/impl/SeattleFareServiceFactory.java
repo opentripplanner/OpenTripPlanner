@@ -64,7 +64,6 @@ public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
         // Sound Transit Express Bus
         // http://www.soundtransit.org/Fares-and-Passes/ST-Express-bus-fares
         // Data within King Metro GTFS
-        addMissingFare(regularFareRules, 2.50f, SeattleFareServiceImpl.KCM_ST_AGENCY_ID);
         addMissingFare(youthFareRules, 1.25f, SeattleFareServiceImpl.KCM_ST_AGENCY_ID);
         addMissingFare(seniorFareRules, 0.75f, SeattleFareServiceImpl.KCM_ST_AGENCY_ID);
         // Data within Pierce Transit GTFS
