@@ -6,6 +6,8 @@ import com.google.common.cache.LoadingCache;
 import org.joda.time.LocalDate;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.BitSet;
 import java.util.Map;
@@ -17,6 +19,8 @@ import java.util.Map;
  */
 public class TripTimeSubsetCache {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TripTimeSubset.class);
+
     private final Graph graph;
     private final LoadingCache<CacheKey, Map<TripPattern, TripTimeSubset>> cache;
 
@@ -26,6 +30,7 @@ public class TripTimeSubsetCache {
             new CacheLoader<CacheKey, Map<TripPattern, TripTimeSubset>>() {
                 @Override
                 public Map<TripPattern, TripTimeSubset> load(CacheKey key) throws Exception {
+                    LOG.info("Compacted and filtered timetables not found for key {}, making them...", key);
                     return TripTimeSubset.indexGraph(graph, key.servicesRunning, key.startTime, key.endTime);
                 }
             }
@@ -84,6 +89,16 @@ public class TripTimeSubsetCache {
             result = 31 * result + endTime;
             return result;
         }
+
+        @Override
+        public String toString() {
+            return "CacheKey{" +
+                    "servicesRunning=" + servicesRunning +
+                    ", startTime=" + startTime +
+                    ", endTime=" + endTime +
+                    '}';
+        }
+
     }
 
 }
