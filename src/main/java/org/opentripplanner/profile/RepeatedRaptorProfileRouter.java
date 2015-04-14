@@ -1,27 +1,18 @@
 package org.opentripplanner.profile;
 
+import com.google.common.collect.Lists;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.lucene.document.Field.Store;
 import org.joda.time.DateTimeZone;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.PathDiscardingRaptorStateStore;
 import org.opentripplanner.routing.algorithm.Raptor;
-import org.opentripplanner.routing.algorithm.RaptorStateStore;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -36,14 +27,15 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Perform profile routing using repeated RAPTOR searches.
  * 
- * This is conceptually very similar to the work of the Minnesota Accessibility Observatory (http://www.its.umn.edu/Publications/ResearchReports/pdfdownloadl.pl?id=2504)
+ * This is conceptually very similar to the work of the Minnesota Accessibility Observatory
+ * (http://www.its.umn.edu/Publications/ResearchReports/pdfdownloadl.pl?id=2504)
  * They run repeated searches. We take advantage of the fact that the street network is static
  * (for the most part, assuming time-dependent turn restrictions and traffic are consistent across the time window)
  * and only run a fast transit search for each minute in the window.
@@ -88,9 +80,8 @@ public class RepeatedRaptorProfileRouter {
         // we need to set the time here even though we change it later, to ensure the graph index picks up the right day.
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 + request.fromTime;
         rr.setRoutingContext(graph);
-        
         Map<TripPattern, TripTimeSubset> timetables =
-        		TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + 120 * 60); 
+                graph.tripTimeSubsetCache.getOrMake(request.date, request.fromTime, request.toTime + 120 * 60);
         
         int i = 1;
         
