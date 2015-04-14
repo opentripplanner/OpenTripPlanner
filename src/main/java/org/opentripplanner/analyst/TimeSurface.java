@@ -1,15 +1,15 @@
 package org.opentripplanner.analyst;
 
 import com.vividsolutions.jts.geom.Coordinate;
-
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
-import org.opentripplanner.common.geometry.*;
+import org.opentripplanner.common.geometry.AccumulativeGridSampler;
+import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.profile.AnalystProfileRouterPrototype;
 import org.opentripplanner.profile.ProfileRequest;
@@ -25,12 +25,9 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.font.NumericShaper;
 import java.io.Serializable;
 import java.util.Map;
 
-import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.min;
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
@@ -136,6 +133,7 @@ public class TimeSurface implements Serializable {
         id = makeUniqueId();
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
+        cutoffMinutes = 90; // FIXME is there any well-defined cutoff? This is needed for generating isochrone curves.
     }
 
 	public static TimeSurface.RangeSet makeSurfaces (AnalystProfileRouterPrototype profileRouter) {
