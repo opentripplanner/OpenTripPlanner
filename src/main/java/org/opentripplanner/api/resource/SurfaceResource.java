@@ -1,18 +1,18 @@
 package org.opentripplanner.api.resource;
 
 import com.google.common.collect.Maps;
-
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.PointSet;
+import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.ResultSetWithTimes;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.core.SlippyTile;
 import org.opentripplanner.analyst.request.RenderRequest;
+import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
@@ -27,7 +27,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -42,7 +41,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -145,6 +143,7 @@ public class SurfaceResource extends RoutingResource {
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
         if (spacing < 1) spacing = 5;
         List<IsochroneData> isochrones = getIsochronesAccumulative(surf, spacing);
+        // NOTE that cutoffMinutes in the surface must be properly set for the following call to work
         final FeatureCollection fc = LIsochrone.makeContourFeatures(isochrones);
         return Response.ok().entity(new StreamingOutput() {
             @Override
