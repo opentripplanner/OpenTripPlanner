@@ -123,20 +123,10 @@ public class ProfileResource {
             }
             TimeSurface.RangeSet result;
 
-            if (graph.hasFrequencyService && ! graph.hasScheduledService) {
-                /* Use the new prototype profile-analyst for frequency-only cases. */
-                AnalystProfileRouterPrototype router = new AnalystProfileRouterPrototype(graph, req);
-                result = router.route();
-            } else {
-                /* Use the Modeify profile router for the general case. */
-                ProfileRouter router = new ProfileRouter(graph, req);
-                try {
-                    router.route();
-                    result = router.timeSurfaceRangeSet;
-                } finally {
-                    router.cleanup();
-                }
-            }
+            /* There are rarely frequency-only graphs. Use the Raptor profile router for both freqs and schedules. */
+            RepeatedRaptorProfileRouter router = new RepeatedRaptorProfileRouter(graph, req);
+            router.route();
+            result = router.timeSurfaceRangeSet;
             Map<String, Integer> idForSurface = Maps.newHashMap();
             idForSurface.put("min", surfaceCache.add(result.min)); // requires analyst mode turned on
             idForSurface.put("avg", surfaceCache.add(result.avg));
