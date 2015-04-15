@@ -54,6 +54,8 @@ The **OTP Analyst Web Services** provide network analysis results such as travel
 
 The **OTP Analyst Batch Processor** is a command-line tool that handles more complex one-off network analysis tasks. It uses the same core routing library and data sources as other OTP services, but allows for very open-ended configuration and the inclusion of population or opportunity data. While configuration and use are currently somewhat opaque for non-developers, the "Batch Analyst" is becoming a powerful tool for visualizing how transportation networks affect access to urban opportunities. See [this article](http://www.theatlanticcities.com/commute/2013/01/best-maps-weve-seen-sandys-transit-outage-new-york/4488/) for an example case study on the effects of hurricane Sandy in New York.
 
+The **OTP Scripting API** allow the execution of routing requests from within scripts (such as _Python_). It is composed of a stable internal API, and an embedded Jython interpreter. It can be used in different contexts, such as batch analysis or automated regression testing. [More information here](Scripting).
+
 ## Additional Documentation
 
  * [Basic Usage (get started quickly)](Basic-Usage)
