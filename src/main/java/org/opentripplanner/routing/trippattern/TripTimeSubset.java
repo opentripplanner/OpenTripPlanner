@@ -2,9 +2,12 @@ package org.opentripplanner.routing.trippattern;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.joda.time.LocalDate;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.BitSet;
 import java.util.Collections;
@@ -24,6 +27,8 @@ import java.util.Map;
  * describing a scenario in the future.
  */
 public class TripTimeSubset {
+	private static final Logger LOG = LoggerFactory.getLogger(TripTimeSubset.class);
+	
 	/**
 	 * The times of this pattern.
 	 * This is a one-dimensional array because in Java one-dimensional arrays are contiguous in memory.
@@ -118,6 +123,24 @@ public class TripTimeSubset {
 			for (int stopIdx = 0; stopIdx < tts.tripLength; stopIdx++) {
 				tts.times[(tripIdx * tts.tripLength + stopIdx) * 2] = tt.scheduledArrivalTimes[stopIdx] + tt.timeShift;
 				tts.times[(tripIdx * tts.tripLength + stopIdx) * 2 + 1] = tt.scheduledDepartureTimes[stopIdx] + tt.timeShift;
+				
+				// ensure trips are non-overtaking, as otherwise the binary search won't work
+				if (tripIdx >= 1) {
+					if (tts.times[(tripIdx * tts.tripLength + stopIdx) * 2] <=
+							tts.times[((tripIdx - 1) * tts.tripLength + stopIdx) * 2]) {
+						LOG.warn("Overtaking/duplicate arrival times on trip pattern {}, trip {} at stop {}," +
+							" trashing this pattern.", tp, tripIdx, stopIdx);
+						return null;
+					}
+					
+					
+					if (tts.times[(tripIdx * tts.tripLength + stopIdx) * 2 + 1] <=
+							tts.times[((tripIdx - 1) * tts.tripLength + stopIdx) * 2 + 1]) {
+						LOG.warn("Overtaking/duplicate departure times on trip pattern {}, trip {} at stop {}," +
+							" trashing this pattern.", tp, tripIdx, stopIdx);
+						return null;
+					}
+				}
 			}
 			tripIdx++;
 		}
