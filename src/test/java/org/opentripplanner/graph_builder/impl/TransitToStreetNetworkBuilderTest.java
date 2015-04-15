@@ -271,7 +271,9 @@ public class TransitToStreetNetworkBuilderTest {
         }
         ois.close();
         fis.close();
-        
+	//Stops that are in tests but weren't connected to graph at all
+        List<StreetFeature> missingStops = new ArrayList<>(stop_id_toEdge.size());
+
         List<TransitToStreetConnection> transitConnections = new ArrayList<>();
         //All found stops
         int allStops = 0;
@@ -281,6 +283,8 @@ public class TransitToStreetNetworkBuilderTest {
         int correctlyLinkedStops = 0;
         //For each transit stop in current graph check if transitStop is correctly connected
         for(TransitStop ts: Iterables.filter(gg.getVertices(), TransitStop.class)) {
+	    //Used for checking if this stop has any connection
+            int savedAllStops = allStops;
             //Each stop usually has 2 outgoing StreetTransit links each for a different direction
             for (StreetTransitLink e : Iterables.filter(ts.getOutgoing(), StreetTransitLink.class)) {
                 allStops++;
@@ -341,6 +345,14 @@ public class TransitToStreetNetworkBuilderTest {
                     }
                 }
             }
+            //no connections in this stop
+            if (allStops == savedAllStops) {
+                TransitStopConnToWantedEdge wanted_con = stop_id_toEdge.get(ts.getLabel());
+                //This stop has wanted street link
+                if (wanted_con != null) {
+                    missingStops.addAll(TransitToStreetConnection.toStreetFeatureMissing(ts, wanted_con.getStreetEdge()));
+                }
+            }
         }
         
         LOG.info("Correctly linked {}/{} ({}%) stations for {}", correctlyLinkedStops, allStops-unknownStops, Math.round((double)correctlyLinkedStops/(double)(allStops-unknownStops)*100), osm_filename);
@@ -350,12 +362,15 @@ public class TransitToStreetNetworkBuilderTest {
             PrintWriter pw_readme = new PrintWriter(new FileWriter("diffs/readme.txt", true));
             pw_readme.println(String.format("Correctly linked %d/%d (%d%%) stations for %s", correctlyLinkedStops, allStops-unknownStops, Math.round((double)correctlyLinkedStops/(double)(allStops-unknownStops)*100), osm_filename));
             pw_readme.println(String.format("Not checked: %d stations.", unknownStops));
+            pw_readme.println(String.format("All stops: %d", stop_id_toEdge.size()));
             pw_readme.close();
         } catch (IOException e) {
             LOG.error("Error:", e);
         }
-        
-        writeGeoJson("diffs/correct_" + name +".geojson", TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK));
+
+
+        missingStops.addAll(TransitToStreetConnection.toFeatureCollection(transitConnections, TransitToStreetConnection.CollectionType.CORRECT_LINK).getFeatures());
+        writeGeoJson("diffs/correct_" + name + ".geojson", new StreetFeatureCollection(missingStops));
         pw.close();
     }
     
