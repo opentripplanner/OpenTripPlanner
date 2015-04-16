@@ -49,6 +49,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Surfaces cannot be isolated per-router because sometimes you want to compare two surfaces from different router IDs.
+ * Though one could question whether that really makes sense (perhaps alternative scenarios should be "within" the same router)
+ */
 @Path("/surfaces")
 @Produces({ MediaType.APPLICATION_JSON })
 public class SurfaceResource extends RoutingResource {

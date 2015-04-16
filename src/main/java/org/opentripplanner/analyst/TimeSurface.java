@@ -7,7 +7,9 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
-import org.opentripplanner.common.geometry.*;
+import org.opentripplanner.common.geometry.AccumulativeGridSampler;
+import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.profile.AnalystProfileRouterPrototype;
 import org.opentripplanner.profile.ProfileRequest;
@@ -21,18 +23,13 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.font.NumericShaper;
 import java.io.Serializable;
 import java.util.Map;
 
-import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.min;
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
  * A travel time surface. Timing information from the leaves of a ShortestPathTree.
- * In Portland, one timesurface takes roughly one MB of memory and is also about that size as JSON.
- * However it is proportionate to the graph size not the time cutoff.
  */
 public class TimeSurface implements Serializable {
 
