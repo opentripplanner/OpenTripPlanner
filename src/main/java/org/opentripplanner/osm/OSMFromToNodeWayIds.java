@@ -11,11 +11,15 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.osm;
+
+import java.io.Serializable;
 
 import com.google.common.base.Objects;
 
-public class OsmFromToNodeWayIds {
+public class OSMFromToNodeWayIds implements Serializable {
+
+    private static final long serialVersionUID = 8845024754586200971L;
 
     public final long fromNodeId;
 
@@ -23,7 +27,7 @@ public class OsmFromToNodeWayIds {
 
     public final long wayId;
 
-    public OsmFromToNodeWayIds(long fromNodeId, long toNodeId, long wayId) {
+    public OSMFromToNodeWayIds(long fromNodeId, long toNodeId, long wayId) {
         this.fromNodeId = fromNodeId;
         this.toNodeId = toNodeId;
         this.wayId = wayId;
@@ -41,12 +45,12 @@ public class OsmFromToNodeWayIds {
 
     @Override
     public boolean equals(Object another) {
-        if (!(another instanceof OsmFromToNodeWayIds))
+        if (!(another instanceof OSMFromToNodeWayIds))
             return false;
         if (another == this)
             return true;
 
-        OsmFromToNodeWayIds rhs = (OsmFromToNodeWayIds) another;
+        OSMFromToNodeWayIds rhs = (OSMFromToNodeWayIds) another;
         return fromNodeId == rhs.fromNodeId && toNodeId == rhs.toNodeId && wayId == rhs.wayId;
     }
 }
