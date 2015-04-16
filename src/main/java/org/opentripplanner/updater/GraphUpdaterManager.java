@@ -13,7 +13,6 @@
 
 package org.opentripplanner.updater;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
