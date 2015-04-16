@@ -72,7 +72,7 @@ public class RepeatedRaptorProfileRouter {
         
         final RoutingRequest rr = new RoutingRequest();
         rr.batch = true;
-        rr.maxTransfers = 3;
+        rr.maxTransfers = 5;
         rr.arriveBy = false;
         rr.modes = new TraverseModeSet("WALK,TRANSIT");
         rr.from = new GenericLocation(request.fromLat, request.fromLon);
@@ -85,10 +85,7 @@ public class RepeatedRaptorProfileRouter {
         
         int i = 1;
         
-        // + 2 is because we have one additional round because there is one more ride than transfer
-        // (fencepost problem) and one additional round for the initial walk.
-    	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 2, request.toTime + 120 * 60);
-        
+
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
     	// we run the search many times in reverse order - this is the rRAPTOR extension to RAPTOR.
@@ -96,9 +93,10 @@ public class RepeatedRaptorProfileRouter {
     	// given that you departed at minute N is the arrival of the fastest trip at minute N+1; you always can wait
     	// 1 minute and then take that trip. This we do not reinitialize the RaptorStateStore on every iteration.
         for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
-        	// note that we do not have to change any times (except the times at the access stops)
-        	// because this stores clock times not elapsed times.
-        	rss.restart();
+            // + 2 is because we have one additional round because there is one more ride than transfer
+            // (fencepost problem) and one additional round for the initial walk.
+        	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 2, startTime + 120 * 60);
+            
         	
         	// add the initial stops, or move back the times at them if not on the first search
         	for (State state : states) {
@@ -175,6 +173,12 @@ public class RepeatedRaptorProfileRouter {
             }
         }
         
+        // initialize propagation with direct modes
+        timeSurfaceRangeSet = new TimeSurface.RangeSet();
+        timeSurfaceRangeSet.min = new TimeSurface(spt, false);
+        timeSurfaceRangeSet.max = new TimeSurface(spt, false);
+        timeSurfaceRangeSet.avg = new TimeSurface(spt, false);
+        
         rr.cleanup();
         
         return stops;
@@ -182,10 +186,6 @@ public class RepeatedRaptorProfileRouter {
     
     private void makeSurfaces () {
 	    LOG.info("Propagating from transit stops to the street network...");
-	    // A map to store the travel time to each vertex
-	    TimeSurface minSurface = new TimeSurface(this);
-	    TimeSurface avgSurface = new TimeSurface(this);
-	    TimeSurface maxSurface = new TimeSurface(this);
 	    // Grab a cached map of distances to street intersections from each transit stop
 	    StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
 	    // Iterate over all nondominated rides at all clusters
@@ -209,28 +209,25 @@ public class RepeatedRaptorProfileRouter {
                 int propagated_max = ub0 + egressWalkTimeSeconds;
                 // TODO: we can't take the min propagated average and call it an average
                 int propagated_avg = avg0 + egressWalkTimeSeconds;
-                int existing_min = minSurface.times.get(vertex);
-                int existing_max = maxSurface.times.get(vertex);
-                int existing_avg = avgSurface.times.get(vertex);
+                int existing_min = timeSurfaceRangeSet.min.times.get(vertex);
+                int existing_max = timeSurfaceRangeSet.max.times.get(vertex);
+                int existing_avg = timeSurfaceRangeSet.avg.times.get(vertex);
                 // FIXME this is taking the least lower bound and the least upper bound
                 // which is not necessarily wrong but it's a crude way to perform the combination
                 if (existing_min == TimeSurface.UNREACHABLE || existing_min > propagated_min) {
-                    minSurface.times.put(vertex, propagated_min);
+                    timeSurfaceRangeSet.min.times.put(vertex, propagated_min);
                 }
                 if (existing_max == TimeSurface.UNREACHABLE || existing_max > propagated_max) {
-                    maxSurface.times.put(vertex, propagated_max);
+                    timeSurfaceRangeSet.max.times.put(vertex, propagated_max);
                 }
                 if (existing_avg == TimeSurface.UNREACHABLE || existing_avg > propagated_avg) {
-                    avgSurface.times.put(vertex, propagated_avg);
+                    timeSurfaceRangeSet.avg.times.put(vertex, propagated_avg);
                 }
 	        }
 	    }
+	    
 	    LOG.info("Done with propagation.");
 	    /* Store the results in a field in the router object. */
-	    timeSurfaceRangeSet = new TimeSurface.RangeSet();
-	    timeSurfaceRangeSet.min = minSurface;
-	    timeSurfaceRangeSet.max = maxSurface;
-	    timeSurfaceRangeSet.avg = avgSurface;
 	}
 
 }
