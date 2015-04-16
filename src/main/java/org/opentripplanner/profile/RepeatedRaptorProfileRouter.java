@@ -81,8 +81,8 @@ public class RepeatedRaptorProfileRouter {
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 + request.fromTime;
         rr.setRoutingContext(graph);
         Map<TripPattern, TripTimeSubset> timetables =
-                graph.tripTimeSubsetCache.getOrMake(request.date, request.fromTime, request.toTime + 120 * 60);
-        
+                TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + 120 * 60);
+
         int i = 1;
         
         // + 2 is because we have one additional round because there is one more ride than transfer

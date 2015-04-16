@@ -51,7 +51,6 @@ import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimeSubsetCache;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -199,9 +198,6 @@ public class Graph implements Serializable {
 
     /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
     public boolean hasScheduledService = false;
-
-    /** Optimized, compact subsets of TripTimes used for repeated searching in profile routing and spatial analysis. */
-    public transient TripTimeSubsetCache tripTimeSubsetCache;
 
     public Graph(Graph basedOn) {
         this();
@@ -703,7 +699,6 @@ public class Graph implements Serializable {
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
-        this.tripTimeSubsetCache = new TripTimeSubsetCache(this);
     }
     
     /**

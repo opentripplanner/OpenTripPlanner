@@ -148,7 +148,14 @@ public class TripTimeSubset {
 		return tts;
 	}
 
-	/** Create TripTimeSubsets for every trip pattern in a graph that is running at a time window */
+	/**
+	 * Create TripTimeSubsets for every trip pattern in a graph that is running at a time window.
+	 * These custom timetables enable some very effective optimizations in profile routing / spatial analysis which speed
+	 * up repeated RAPTOR routing by 80 percent for example. However, despite yielding a significant speedup over
+	 * the course of a full search, this initial timetable building operation is quite fast (a few milliseconds for
+	 * Washington DC). Therefore there's no need to cache the timetables, we can just compute a custom timetable at the
+	 * beginning of each search.
+	 */
 	public static Map<TripPattern, TripTimeSubset> indexGraph(Graph graph, LocalDate date, int startTime, int endTime) {
 		return indexGraph(graph, graph.index.servicesRunning(date), startTime, endTime);
 	}
