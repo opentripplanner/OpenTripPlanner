@@ -32,6 +32,7 @@ import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.annotation.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.annotation.StreetCarSpeedZero;
+import org.opentripplanner.graph_builder.module.EdgesExtra;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -143,6 +144,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      */
     public boolean staticBikeParkAndRide = false;
 
+    /**
+     * Whether we should add extra OSM node/ways ids for edges.
+     */
+    public boolean indexEdgeOsmIds = false;
+
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
     }
@@ -246,6 +252,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
         public void buildGraph(HashMap<Class<?>, Object> extra) {
 
+            if (indexEdgeOsmIds) {
+                if (!extra.containsKey(EdgesExtra.class))
+                    extra.put(EdgesExtra.class, new EdgesExtra());
+            }
+
             if (staticBikeRental) {
                 processBikeRentalNodes();
             }
@@ -261,7 +272,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             // figure out which nodes that are actually intersections
             initIntersectionNodes();
 
-            buildBasicGraph();
+            buildBasicGraph((EdgesExtra)extra.get(EdgesExtra.class));
             if (skipVisibility) {
                 LOG.info("Skipping visibility graph construction for walkable areas.");
             } else {
@@ -514,7 +525,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             return AreaGroup.groupAreas(areasLevels);
         }
 
-        private void buildBasicGraph() {
+        private void buildBasicGraph(EdgesExtra edgesExtra) {
 
             /* build the street segment graph from OSM ways */
             long wayIndex = 0;
@@ -645,7 +656,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                         }
                     }
                     P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
-                            way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
+                            way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry, edgesExtra);
 
                     StreetEdge street = streets.first;
                     StreetEdge backStreet = streets.second;
@@ -975,9 +986,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * @param end
          * @param start
          */
-        private P2<StreetEdge> getEdgesForStreet(IntersectionVertex start,
-                                                      IntersectionVertex end, OSMWay way, int index, long startNode, long endNode,
-                                                      StreetTraversalPermission permissions, LineString geometry) {
+        private P2<StreetEdge> getEdgesForStreet(IntersectionVertex start, IntersectionVertex end,
+                OSMWay way, int index, long startNode, long endNode,
+                StreetTraversalPermission permissions, LineString geometry, EdgesExtra edgesExtra) {
             // No point in returning edges that can't be traversed by anyone.
             if (permissions.allowsNothing()) {
                 return new P2<StreetEdge>(null, null);
@@ -994,11 +1005,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             if (permissionsFront.allowsAnything()) {
                 street = getEdgeForStreet(start, end, way, index, startNode, endNode, length,
-                        permissionsFront, geometry, false);
+                        permissionsFront, geometry, false, edgesExtra);
             }
             if (permissionsBack.allowsAnything()) {
                 backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, length,
-                        permissionsBack, backGeometry, true);
+                        permissionsBack, backGeometry, true, edgesExtra);
             }
             if (street != null && backStreet != null) {
                 backStreet.shareData(street);
@@ -1016,8 +1027,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         private StreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
-                                                 OSMWay way, int index, long startNode, long endNode, double length,
-                                                 StreetTraversalPermission permissions, LineString geometry, boolean back) {
+                OSMWay way, int index, long startNode, long endNode, double length,
+                StreetTraversalPermission permissions, LineString geometry, boolean back,
+                EdgesExtra edgesExtra) {
 
             String label = "way " + way.getId() + " from " + index;
             label = unique(label);
@@ -1034,6 +1046,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             StreetEdge street = edgeFactory.createEdge(start, end, geometry, name, length,
                     permissions, back);
             street.setCarSpeed(carSpeed);
+
+            if (edgesExtra != null) {
+                edgesExtra.addExtra(street, new OsmFromToNodeWayIds(startNode, endNode, way.getId()));
+            }
 
             String highway = way.getTag("highway");
             int cls;
