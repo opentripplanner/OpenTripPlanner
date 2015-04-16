@@ -44,7 +44,7 @@ public class RepeatedRaptorProfileRouter {
 
     private Logger LOG = LoggerFactory.getLogger(RepeatedRaptorProfileRouter.class);
 
-    public static final int MAX_DURATION = 60 * 60 * 2; // seconds
+    public static final int DURATION = 60 * 60 * 2; // seconds
 
     public ProfileRequest request;
     
@@ -84,13 +84,13 @@ public class RepeatedRaptorProfileRouter {
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 + request.fromTime;
         rr.setRoutingContext(graph);
         Map<TripPattern, TripTimeSubset> timetables =
-                TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
+                TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + DURATION);
 
         int i = 1;
         
         // + 2 is because we have one additional round because there is one more ride than transfer
         // (fencepost problem) and one additional round for the initial walk.
-    	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 2, request.toTime + MAX_DURATION);
+    	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 2, request.toTime + DURATION);
         
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.

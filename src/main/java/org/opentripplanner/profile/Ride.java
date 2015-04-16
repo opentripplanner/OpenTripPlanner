@@ -4,16 +4,17 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.trippattern.TripTimeSubset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -162,49 +163,55 @@ public class Ride {
      * There are two separate Stats objects: The rideStats includes the time spent on the patterns themselves.
      * The waitStats capture the time spent waiting to board those patterns (transfer or initial boarding).
      */
-    public void calcStats(TimeWindow window, double walkSpeed) {
+    public void calcRideStats() {
         /* Stats for the ride on transit. */
         List<Stats> stats = Lists.newArrayList();
         for (PatternRide patternRide : patternRides) {
             stats.add(patternRide.stats);
         }
         rideStats = new Stats(stats);
+    }
+
+    /**
+     * Calculate statistics for boarding the bundle of patterns in the given ride.
+     * @return true if any patterns are running and the stats are meaningful
+     */
+    public boolean calcWaitStats(TimeWindow window, Map<TripPattern, TripTimeSubset> timetables, double walkSpeed) {
         /* Stats for the wait between the last ride and this one, NOT including walk time. */
-        waitStats = calcStatsForFreqs(window);
+        this.waitStats = null; //FIXME calcStatsForFreqs(timetables); // TODO use compacted timetables for freqs?
         // Only try schedule-based boarding if there were no non-exact frequency entries.
         // FIXME there is an assumption here that there are only frequency or non-frequency entries in a PatternRide
-        if (waitStats == null) {
-            if (previous == null) {
+        if (this.waitStats == null) {
+            if (this.previous == null) {
                 // If there is no previous ride, assume uniformly distributed arrival times.
-                waitStats = calcStatsForBoarding(window);
+                waitStats = calcStatsForBoarding(window, timetables);
             } else {
                 // There is a previous ride, so account for arrival and departure times before and after the transfer.
-                waitStats = calcStatsForTransfer(window, walkSpeed);
+                waitStats = calcStatsForTransfer(timetables, walkSpeed);
             }
         }
+        return waitStats != null;
     }
 
     /* Maybe store transfer distances by stop pair, and look them up. */
     /**
      * @param arrivals find arrival times rather than departure times for this Ride.
      * @return a list of sorted departure or arrival times within the window.
-     * FIXME this is a hot spot in execution, about 50 percent of runtime.
+     * FIXME this is a hot spot in execution, about 50 percent of runtime. (use of Trove int lists is helping a lot)
      */
-    public List<Integer> getSortedStoptimes (TimeWindow window, boolean arrivals) {
-        // Using Lists because we don't know the length in advance
-        List<Integer> times = Lists.newArrayList();
+    public TIntArrayList getSortedStoptimes (Map<TripPattern, TripTimeSubset> timetables, boolean arrivals) {
+        TIntArrayList times = new TIntArrayList(1000);
         // TODO include exact-times frequency trips along with non-frequency trips
         // non-exact (headway-based) frequency trips will be handled elsewhere since they don't have specific boarding times.
         for (PatternRide patternRide : patternRides) {
-            for (TripTimes tt : patternRide.pattern.scheduledTimetable.tripTimes) {
-                if (window.servicesRunning.get(tt.serviceCode)) {
-                    int t = arrivals ? tt.getArrivalTime(patternRide.toIndex)
-                                     : tt.getDepartureTime(patternRide.fromIndex);
-                    if (window.includes(t)) times.add(t);
-                }
+            TripTimeSubset tts = timetables.get(patternRide.pattern);
+            for (int tripIndex = 0; tripIndex < tts.getNumTrips(); tripIndex++) {
+                int t = arrivals ? tts.getArrivalTime(tripIndex, patternRide.toIndex)
+                                 : tts.getDepartureTime(tripIndex, patternRide.fromIndex);
+                times.add(t);
             }
         }
-        Collections.sort(times);
+        times.sort();
         return times;
     }
 
@@ -237,15 +244,19 @@ public class Ride {
      * Produce stats about boarding an initial Ride, which has no previous ride.
      * This assumes arrival times are uniformly distributed during the window.
      * The Ride must contain some trips, and the window must have a positive duration.
+     * @return null if there are no active boardable patterns in this ride
      */
-    public Stats calcStatsForBoarding(TimeWindow window) {
+    public Stats calcStatsForBoarding(TimeWindow window, Map<TripPattern, TripTimeSubset> timetables) {
         Stats stats = new Stats ();
-        stats.min = 0; // You can always arrive just before a train departs.
-        List<Integer> departures = getSortedStoptimes(window, false);
+        stats.min = 0; // You can always arrive just before a train departs, so min is always zero.
+        TIntArrayList departures = getSortedStoptimes(timetables, false);
+        // There are no previous rides, so the first time at which we will attempt to board is the beginning of the window
         int last = window.from;
         double avgAccumulated = 0.0;
-        /* All departures in the list are known to be running and within the window. */
-        for (int dep : departures) {
+        /* All departures in the list are pre-filtered: they are known to be running within the time window. */
+        TIntIterator departureIterator = departures.iterator();
+        while (departureIterator.hasNext()) {
+            int dep = departureIterator.next();
             int maxWait = dep - last;
             if (maxWait > stats.max) stats.max = maxWait;
             /* Weight the average of each interval by the number of seconds it contains. */
@@ -255,6 +266,8 @@ public class Ride {
         }
         if (stats.num > 0) {
             stats.avg = (int) (avgAccumulated / stats.num);
+        } else {
+            stats = null; // if there are no active patterns in this ride, then the stats are meaningless
         }
         return stats;
     }
@@ -265,15 +278,18 @@ public class Ride {
      * Distances can be stored in rides, including the first and last distance. But waits must be
      * calculated from full sets of patterns, which are not known until a round is over.
      */
-    public Stats calcStatsForTransfer (TimeWindow window, double walkSpeed) {
-        List<Integer> arrivals = previous.getSortedStoptimes(window, true);
-        List<Integer> departures = this.getSortedStoptimes(window, false);
-        List<Integer> waits = Lists.newArrayList();
-        Iterator<Integer> departureIterator = departures.iterator(); 
+    public Stats calcStatsForTransfer (Map<TripPattern, TripTimeSubset> timetables, double walkSpeed) {
+        TIntArrayList arrivals = previous.getSortedStoptimes(timetables, true);
+        TIntArrayList departures = this.getSortedStoptimes(timetables, false);
+        TIntArrayList waits = new TIntArrayList(departures.size() + 1);
+        TIntIterator arrivalIterator = arrivals.iterator();
+        TIntIterator departureIterator = departures.iterator();
         int departure = departureIterator.next();
-        ARRIVAL : for (int arrival : arrivals) {
+        ARRIVAL : while (arrivalIterator.hasNext()) {
+            int arrival = arrivalIterator.next();
             // On transfers the access stats should have max=min=avg
-            // We use the min, which would be best if min != max since it should only relax the bounds somewhat.
+            // (only the walk mode is used, which has a fixed speed)
+            // We use the min, which would be best even if min != max since it should only relax the bounds somewhat.
             int boardTime = arrival + accessStats.min + ProfileRouter.SLACK;
             while (departure <= boardTime) {
                 if (!departureIterator.hasNext()) break ARRIVAL;

@@ -5,13 +5,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
-
-import org.mapdb.Fun.Tuple2;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -33,7 +29,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
+import org.opentripplanner.routing.trippattern.TripTimeSubset;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +75,10 @@ public class ProfileRouter {
     Multimap<StopCluster, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop cluster
     List<RoutingContext> routingContexts = Lists.newArrayList();
 
+    /* Custom compacted timetables for all TripPatterns that might be used in this particular search. */
+    // TODO make a real class for this, and include the time window in it so it can be passed around to other methods
+    Map<TripPattern, TripTimeSubset> timetables;
+
     /* Analyst: time bounds for each vertex. This field contains the output after the search is run. */
     public TimeSurface.RangeSet timeSurfaceRangeSet = null;
 
@@ -91,9 +91,6 @@ public class ProfileRouter {
     Multimap<TripPattern, StopAtDistance> fromStops, toStops;
     TimeWindow window; // filters trips used by time of day and service schedule
     
-    /** Map from trip pattern and stop cluster to a set of reachable stops from that stop cluster on that pattern */
-    Map<Tuple2<StopCluster, TripPattern>, ReachableStopSet> travelTimeCache = Maps.newHashMap();
-
     /** @return true if the given stop cluster has at least one transfer coming from the given pattern. */
     private boolean hasTransfers(StopCluster stopCluster, TripPattern pattern) {
         for (ProfileTransfer tr : graph.index.transfersFromStopCluster.get(stopCluster)) {
@@ -102,8 +99,12 @@ public class ProfileRouter {
         return false;
     }
 
+    /** @return whether any trips are active at all on the given pattern to allow filtering. */
+    private boolean patternActive(TripPattern pattern) {
+        return timetables.containsKey(pattern);
+    }
+
     /* Maybe don't even try to accumulate stats and weights on the fly, just enumerate options. */
-    /* TODO Or actually use a priority queue based on the min time. */
 
     public ProfileResponse route () {
 
@@ -111,6 +112,7 @@ public class ProfileRouter {
         graph.index.clusterStopsAsNeeded();
         
         // Lazy-initialize profile transfers (before setting timeouts, since this is slow)
+        // TODO make index.createProfileTransfersAsNeeded()
         if (graph.index.transfersFromStopCluster == null) {
             synchronized (graph.index) {
                 // why another if statement? so that if another thread initialized this in the meantime
@@ -126,8 +128,9 @@ public class ProfileRouter {
         
         // TimeWindow could constructed in the caller, which does have access to the graph index.
         this.window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
-        
-        indexTripPatternTravelTimeRanges();
+
+        // Make a custom compact timetable for the time window of interest
+        this.timetables = TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
 
         // Establish search timeouts
         long searchBeginTime = System.currentTimeMillis();
@@ -205,8 +208,7 @@ public class ProfileRouter {
             // at its destination, not at this stop!
             if (!ride.equals(initialRides.get(ride.from)) && (ride.previous == null || !retainedRides.get(ride.previous.to).contains(ride.previous)))
                 continue;
-            
-            //LOG.info("dequeued ride {}", ride);
+            //LOG.trace("dequeued ride {}", ride);
             //ride.dump();
             // maybe when ride is complete, then find transfers here, but that makes for more queue operations.
             if (ride.to != null) throw new AssertionError("Ride should be unfinished.");
@@ -216,15 +218,21 @@ public class ProfileRouter {
              * partial ride. This is done by scanning through the Pattern, creating rides to all downstream stops that
              * are near the destination or have relevant transfers. */
             PR: for (PatternRide pr : ride.patternRides) {
-                // LOG.info(" {}", pr);
+                //LOG.trace(" {}", pr);
+                TripTimeSubset tts = timetables.get(pr.pattern);
+                if (tts == null)
+                    continue; // no trips are running on this pattern. TODO these could be filtered even earlier with patternActive()
                 List<Stop> stops = pr.pattern.getStops();
-                for (int s = pr.fromIndex + 1; s < stops.size(); ++s) {
-                    StopCluster cluster = graph.index.stopClusterForStop.get(stops.get(s));
+                for (int toStopIndex = pr.fromIndex + 1; toStopIndex < stops.size(); ++toStopIndex) {
+                    StopCluster cluster = graph.index.stopClusterForStop.get(stops.get(toStopIndex));
                     /* Originally we only extended rides to destination stops considered useful in the search, i.e.
                      * those that had transfers leading out of them or were known to be near the destination.
                      * However, analyst needs to know the times we can reach every stop, and pruning is more effective
                      * if we know when rides pass through all stops.*/
-                    PatternRide pr2 = extendToIndex(pr, ride.from, s, window);
+                    // There is no need to accumulate information as we move down the pattern.
+                    // Arrive/depart times in tables are absolute.
+                    Stats stats = tts.makeStats(pr.fromIndex, toStopIndex);
+                    PatternRide pr2 = new PatternRide(pr, toStopIndex, stats); // extend to this destination stop
                     // PatternRide may be empty because there are no trips in time window.
                     if (pr2 == null) continue PR;
                     // LOG.info("   {}", pr2);
@@ -241,14 +249,13 @@ public class ProfileRouter {
             /* Build new downstream Rides by transferring from patterns in current Rides. */
             Map<StopCluster, Ride> xferRides = Maps.newHashMap(); // A map of incomplete rides after transfers, one for each stop.
             for (Ride r1 : rides.values()) {
-                r1.calcStats(window, request.walkSpeed);
-                if (r1.waitStats == null) {
-                    // This is a sign of a questionable algorithm: we're only seeing if it was possible
-                    // to board these trips after the fact, and removing the ride late.
-                    // It might make more sense to keep bags of arrival times per ride+stop.
-                    continue;
-                }
-                if (!nondominated(r1, true)) continue; // abandon this ride if it is dominated by some existing ride at the same location
+                r1.calcRideStats();
+                // This is a sign of a questionable algorithm: we're only seeing if it was possible
+                // to board these trips after the fact, and removing the ride late.
+                // It might make more sense to keep bags of arrival times per ride+stop.
+                if ( ! r1.calcWaitStats(window, timetables, request.walkSpeed)) continue;
+                // abandon this ride if it is dominated by some existing ride at the same location
+                if ( ! nondominated(r1, true)) continue;
                 // We have a new, nondominated, completed ride.
 
                 /* Find transfers out of this new ride. */
@@ -259,6 +266,7 @@ public class ProfileRouter {
                 // Invariant: r1.to should be the same as r1's key in rides
                 // TODO benchmark, this is so not efficient
                 for (ProfileTransfer tr : graph.index.transfersFromStopCluster.get(r1.to)) {
+                    if ( ! patternActive(tr.tp1) || ! patternActive(tr.tp2)) continue;
                     if ( ! request.transitModes.contains(tr.tp2.mode)) continue;
                     if (r1.containsPattern(tr.tp1)) {
                         // Prune loopy or repetitive paths.
@@ -375,27 +383,6 @@ public class ProfileRouter {
         
         return true; // No existing ride is strictly better than the new ride.
     }
-    
-    public PatternRide extendToIndex (PatternRide patternRide, StopCluster from, int targetIndex, TimeWindow timeWindow) {
-        ReachableStopSet rss = travelTimeCache.get(new Tuple2(from, patternRide.pattern));
-        
-        if (rss == null)
-            return null;
-        
-        Stats stats = new Stats();
-        int idx = targetIndex - patternRide.fromIndex - 1;
-        
-        if (rss.min[idx] == Integer.MAX_VALUE)
-            return null;
-        
-        stats.min = rss.min[idx];
-        stats.max = rss.max[idx];
-        // TODO we can do better than this.
-        stats.avg = (stats.min + stats.max) / 2;
-        stats.num = rss.num;
-        
-        return new PatternRide(patternRide, targetIndex, stats);
-    }
 
     /**
      * @param stopClusters a multimap from stop clusters to one or more StopAtDistance objects at the corresponding cluster.
@@ -414,6 +401,7 @@ public class ProfileRouter {
         for (StopAtDistance stopDist : stopClusters.values()) {
             for (Stop stop : stopDist.stop.children) {
                 for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
+                    // TODO will it help much to do this conditionally if (patternActive(pattern)) ?
                     closest.putMin(new T2(pattern, stopDist.qmode), stopDist);
                 }
             }
@@ -474,7 +462,7 @@ public class ProfileRouter {
             rr.bikeSpeed = request.bikeSpeed;
             minAccessTime = request.minBikeTime;
             maxAccessTime = request.maxBikeTime;
-            rr.optimize = OptimizeType.TRIANGLE;
+            //rr.optimize = OptimizeType.TRIANGLE;
             rr.setTriangleNormalized(request.bikeSafe, request.bikeSlope, request.bikeTime);
         } else if (qmode.mode == TraverseMode.CAR) {
             rr.carSpeed = request.carSpeed;
@@ -496,40 +484,6 @@ public class ProfileRouter {
         return visitor.stopClustersFound.values();
     }
     
-    /** Index the trip pattern travel time ranges: how long it takes to get from every stop to every other stop */
-    public void indexTripPatternTravelTimeRanges () {
-        LOG.info("Caching travel time ranges for all patterns");
-        TRIPPATTERN: for (TripPattern tp : graph.index.patternForId.values()) {
-            List<Stop> stops =  tp.getStops();
-            for (int i = 0; i < stops.size(); i++) {
-                StopCluster clusterI = graph.index.stopClusterForStop.get(stops.get(i));
-                ReachableStopSet reachableStops = new ReachableStopSet(stops.size() - i);
-                
-                // FIXME: this means equal weights are being applied for all trips!!!!!!!!
-                reachableStops.num = 1;
-                
-                for (int j = i + 1; j < stops.size(); j++) {
-                    StopCluster clusterJ = graph.index.stopClusterForStop.get(stops.get(j));
-                    
-                    reachableStops.stopCluster[j - i - 1] = clusterJ;
-                    
-                    Stats s = Stats.create(tp, i, j, window);
-                    
-                    if (s == null)
-                        continue;
-                    
-                    reachableStops.min[j - i - 1] = s.min;
-                    reachableStops.max[j - i - 1] = s.max;
-                    // TODO no need to re-set this on each iteration (though it doesn't hurt)
-                    reachableStops.num = s.num;
-                }
-                
-                travelTimeCache.put(new Tuple2(clusterI, tp), reachableStops);
-            }
-        }
-        LOG.info("Done caching travel time ranges for all patterns");
-    }
-
     static class StopFinderTraverseVisitor implements TraverseVisitor {
         QualifiedMode qmode;
         int minTravelTimeSeconds = 0;

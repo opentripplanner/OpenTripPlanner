@@ -2,6 +2,8 @@ package org.opentripplanner.profile;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TIntList;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -13,7 +15,7 @@ import java.util.List;
  * num may be 0 if there are no observations.
  * num will become 1 when adding a scalar or another Stats.
  */
-class Stats implements Cloneable {
+public class Stats implements Cloneable {
     
     public int min = 0;
     public int avg = 0;
@@ -126,7 +128,23 @@ class Stats implements Cloneable {
         num = ints.size();
         avg = (int) (accumulated / num);
     }
-    
+
+    /** Construct a Stats containing the min, max, average, and count of the given ints. */
+    public Stats (TIntList ints) {
+        if (ints == null || ints.isEmpty()) throw new AssertionError("Stats are undefined if there are no values.");
+        min = Integer.MAX_VALUE;
+        double accumulated = 0;
+        TIntIterator intIterator = ints.iterator();
+        while (intIterator.hasNext()) {
+            int i = intIterator.next();
+            if (i > max) max = i;
+            if (i < min) min = i;
+            accumulated += i;
+        }
+        num = ints.size();
+        avg = (int) (accumulated / num);
+    }
+
     public void dump() {
         System.out.printf("min %d avg %d max %d\n", min, avg, max);
     }

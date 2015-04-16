@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.joda.time.LocalDate;
+import org.opentripplanner.profile.Stats;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ import java.util.Map;
  * which is generally the case in clean input data. The key difference here is that profile routing and spatial analysis
  * do not need to take real-time (GTFS-RT) updates into account since they are intended to be generic results
  * describing a scenario in the future.
+ *
+ * This is quite tied to a single TripPattern, TODO perhaps change the name to something like CompactedTripPatternTimetable
  */
 public class TripTimeSubset {
 	private static final Logger LOG = LoggerFactory.getLogger(TripTimeSubset.class);
@@ -53,7 +56,17 @@ public class TripTimeSubset {
 		int idx = (trip * tripLength + stop) * 2 + 1;
 		return times[idx];
 	}
-	
+
+	// TODO consider using final int fields set in the constructor instead of accessor methods
+
+	public int getNumTrips()  {
+		return tripCount;
+	}
+
+	public int getNumStops()  {
+		return tripLength;
+	}
+
 	/**
 	 * Find the index of the trip that departs the given stop index after a given time, in seconds since midnight.
 	 * This uses a binary search so it should be pretty fast.
@@ -85,6 +98,7 @@ public class TripTimeSubset {
 	 * Create a TripTimeSubset from a given trip pattern, bitset of services running, and time window.
 	 * All trips running at any time during the window will be included.
 	 * This uses the scheduled times of the trip (i.e. no real time updates are taken into account).
+	 * @return null if no trips are running on this pattern
 	 */
 	public static TripTimeSubset create(Graph graph, TripPattern tp, BitSet servicesRunning, int startTime, int endTime) {
 		// filter down the trips
@@ -149,6 +163,39 @@ public class TripTimeSubset {
 	}
 
 	/**
+	 * Create a Stats object summarizing the possible ride times from the given from stop index to the given to stop
+	 * index on all the trips in this TripTimeSubset.
+	 * TODO filter to include only trips running at the board time
+	 */
+	public Stats makeStats(int fromStopIndex, int toStopIndex) {
+
+		/* Initialize the result object. */
+		Stats stats = new Stats();
+		stats.min = Integer.MAX_VALUE;
+		stats.max = Integer.MIN_VALUE;
+		stats.num = 0;
+
+        /* Scan through all non-frequency trips accumulating them into stats. */
+		for (int tripIndex = 0; tripIndex < this.tripCount; tripIndex++) {
+			int depart = this.getDepartureTime(tripIndex, fromStopIndex);
+			int arrive = this.getArrivalTime(tripIndex, toStopIndex);
+			int t = arrive - depart;
+			if (t < stats.min) stats.min = t;
+			if (t > stats.max) stats.max = t;
+			stats.avg += t;
+			stats.num += 1;
+		}
+        /* TODO Do the same thing for any frequency-based trips. */
+
+		if (stats.num > 0) {
+			stats.avg /= stats.num;
+		} else {
+			throw new AssertionError("There should be some trips on any pattern.");
+		}
+		return stats;
+	}
+
+	/**
 	 * Create TripTimeSubsets for every trip pattern in a graph that is running at a time window.
 	 * These custom timetables enable some very effective optimizations in profile routing / spatial analysis which speed
 	 * up repeated RAPTOR routing by 80 percent for example. However, despite yielding a significant speedup over
@@ -160,18 +207,20 @@ public class TripTimeSubset {
 		return indexGraph(graph, graph.index.servicesRunning(date), startTime, endTime);
 	}
 
-	/** Create TripTimeSubsets for every trip pattern in a graph that is running at a time window */
+	/**
+	 * Create TripTimeSubsets for every trip pattern in a graph that is running at a time window.
+	 *
+	 */
 	public static Map<TripPattern, TripTimeSubset> indexGraph(Graph graph, BitSet servicesRunning,
 															  int startTime, int endTime) {
 		Map<TripPattern, TripTimeSubset> ret = Maps.newHashMap();
-		
+		LOG.info("Creating a compacted timetable for all trips active during this particular search...");
 		for (TripPattern tp : graph.index.patternForId.values()) {
 			TripTimeSubset tts = create(graph, tp, servicesRunning, startTime, endTime);
-			
 			if (tts != null)
 				ret.put(tp, tts);
 		}
-		
+		LOG.info("Done.");
 		return ret;
 	}
 }
