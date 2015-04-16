@@ -15,9 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.opentripplanner.common.TurnRestriction;
