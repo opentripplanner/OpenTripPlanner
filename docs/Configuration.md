@@ -158,7 +158,7 @@ national geographic surveys, or you can always fall back on the worldwide
 (roughly 30 meters horizontally) but it can give acceptable results.
 
 Simply place the elevation data file in the directory with the other graph builder inputs, alongside the GTFS and OSM data.
-Make sure the file has a `.tiff` extension, and the graph builder should detect its presence and apply
+Make sure the file has a `.tiff` or `.tif` extension, and the graph builder should detect its presence and apply
 the elevation data to the streets.
 
 
