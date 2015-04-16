@@ -53,7 +53,7 @@ public class OSMFilter {
         if (way.isGeneralAccessDenied()) {
             // There are exceptions.
             return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
-                    .isPedestrianExplicitlyAllowed());
+                    .isPedestrianExplicitlyAllowed() || way.isMotorVehicleExplicitlyAllowed());
         }
 
         return true;
@@ -92,7 +92,7 @@ public class OSMFilter {
         if (entity.isGeneralAccessDenied()) {
             // this can actually be overridden
             permission = StreetTraversalPermission.NONE;
-            if (entity.isMotorcarExplicitlyAllowed()) {
+            if (entity.isMotorcarExplicitlyAllowed() || entity.isMotorVehicleExplicitlyAllowed()) {
                 permission = permission.add(StreetTraversalPermission.CAR);
             }
             if (entity.isBicycleExplicitlyAllowed()) {
@@ -105,9 +105,9 @@ public class OSMFilter {
             permission = def;
         }
 
-        if (entity.isMotorcarExplicitlyDenied()) {
+        if (entity.isMotorcarExplicitlyDenied() || entity.isMotorVehicleExplicitlyDenied()) {
             permission = permission.remove(StreetTraversalPermission.CAR);
-        } else if (entity.hasTag("motorcar")) {
+        } else if (entity.hasTag("motorcar") || entity.hasTag("motor_vehicle")) {
             permission = permission.add(StreetTraversalPermission.CAR);
         }
 
