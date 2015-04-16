@@ -69,20 +69,10 @@ public class RepeatedRaptorProfileRouter {
     	LOG.info("Begin profile request");
         LOG.info("Finding initial stops");
         
-        Collection<State> states = findInitialStops(false);
+        TObjectIntMap<TransitStop> accessTimes = findInitialStops(false);
         
-        LOG.info("Found {} initial stops", states.size());
+        LOG.info("Found {} initial stops", accessTimes.size());
         
-        final RoutingRequest rr = new RoutingRequest();
-        rr.batch = true;
-        rr.maxTransfers = 5;
-        rr.arriveBy = false;
-        rr.modes = new TraverseModeSet("WALK,TRANSIT");
-        rr.from = new GenericLocation(request.fromLat, request.fromLon);
-        rr.to = request.analyst ? new GenericLocation(request.fromLat, request.fromLon) : new GenericLocation(request.toLat, request.toLon);
-        // we need to set the time here even though we change it later, to ensure the graph index picks up the right day.
-        rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 + request.fromTime;
-        rr.setRoutingContext(graph);
         Map<TripPattern, TripTimeSubset> timetables =
                 TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
 
@@ -91,21 +81,12 @@ public class RepeatedRaptorProfileRouter {
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
         for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
-            // + 2 is because we have one additional round because there is one more ride than transfer
-            // (fencepost problem) and one additional round for the initial walk.
-        	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 2, startTime + MAX_DURATION);
-            
-        	// add the initial stops, or move back the times at them if not on the first search
-        	for (State state : states) {
-        		rss.put((TransitStop) state.getVertex(), (int) (state.getElapsedTimeSeconds() + startTime));
-        	}
-        	
         	if (++i % 30 == 0)
         		LOG.info("Completed {} RAPTOR searches", i);
             
         	//LOG.info("Filtering RAPTOR states");
             
-            Raptor raptor = new Raptor(rss, rr, request.date, timetables);
+            Raptor raptor = new Raptor(graph, 3, request.walkSpeed, accessTimes, startTime, request.date, timetables);
 
             //LOG.info("Performing RAPTOR search for minute {}", i++);
             
@@ -141,13 +122,11 @@ public class RepeatedRaptorProfileRouter {
     }
     
     /** find the boarding stops */
-    private Collection<State> findInitialStops(boolean dest) {
+    private TObjectIntMap<TransitStop> findInitialStops(boolean dest) {
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
         QualifiedModeSet modes = dest ? request.accessModes : request.egressModes;
-        
-        List<State> stops = Lists.newArrayList();
-        
+                
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         rr.batch = true;
@@ -163,10 +142,13 @@ public class RepeatedRaptorProfileRouter {
         rr.longDistance = true;
         rr.setNumItineraries(1);
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
+        
+        TObjectIntMap<TransitStop> accessTimes = new TObjectIntHashMap<TransitStop>(); 
+        
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             State s = spt.getState(tstop);
             if (s != null) {
-                stops.add(s);
+                accessTimes.put(tstop, (int) s.getElapsedTimeSeconds());
             }
         }
         
@@ -178,7 +160,7 @@ public class RepeatedRaptorProfileRouter {
         
         rr.cleanup();
         
-        return stops;
+        return accessTimes;
     }
     
     private void makeSurfaces () {

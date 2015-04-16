@@ -13,6 +13,8 @@ import com.google.common.collect.Lists;
 
 import flexjson.PathExpression;
 import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import org.joda.time.LocalDate;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -25,6 +27,7 @@ import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -36,13 +39,14 @@ import org.slf4j.LoggerFactory;
 
 /** Implements the RAPTOR algorithm; see http://research.microsoft.com/pubs/156567/raptor_alenex.pdf */
 public class Raptor {
-    public RaptorStateStore store;
-    public RoutingRequest options;
+    public final Graph graph;
+    public final int maxTransfers;
+    public final float walkSpeed;
     
     private static final Logger LOG = LoggerFactory.getLogger(Raptor.class);
     
     private HashSet<TripPattern> markedPatterns = Sets.newHashSet();
-    private HashSet<TransitStop> markedStops;
+    private HashSet<TransitStop> markedStops = Sets.newHashSet();
     
     private Map<TripPattern, TripTimeSubset> times;
     
@@ -52,36 +56,22 @@ public class Raptor {
      * in profile mode.
      */
     private LocalDate date;
-        
-    /** Initialize a RAPTOR router from states at transit stops and the timetables of trips running in the window. */
-    /*public Raptor(Collection<State> states, RoutingRequest options, Map<TripPattern, TripTimeSubset> times) {
-        // TODO: don't hardwire store type
-        store = new PathDiscardingRaptorStateStore();
-        this.options = options;
-        this.times = times;
-        
-        for (State state : states) {
-        	Vertex v = state.getVertex();
-        	
-        	if (!(v instanceof TransitStop))
-        		throw new IllegalStateException("Initial state is not at transit stop!");
-        			
-            store.put((TransitStop) v, (int) state.);
-            markedPatterns.addAll(options.rctx.graph.index.patternsForStop.get(((TransitStop) v).getStop()));
-        }
-    }*/
+    
+	private TObjectIntMap<TransitStop> transferStops = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
+	private TObjectIntMap<TransitStop> bestFinalTimes = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
     
     /** Initialize a RAPTOR router from an existing RaptorStateStore, a routing request, and the timetables of active trips */
-    public Raptor(RaptorStateStore store, RoutingRequest options, LocalDate date, Map<TripPattern, TripTimeSubset> times) {
-    	this.options = options;
-    	this.store = store;
-    	this.times = times;
+    public Raptor(Graph graph, int maxTransfers, float walkSpeed, TObjectIntMap<TransitStop> accessTimes, int startTime, LocalDate date, Map<TripPattern, TripTimeSubset> timetables) {
+    	this.graph = graph;    	
+    	this.maxTransfers = maxTransfers;
+    	this.times = timetables;
+    	this.walkSpeed = walkSpeed;
     	this.date = date;
     	
-    	for (TObjectIntIterator<TransitStop> it = store.currentIterator(); it.hasNext();) {
+    	for (TObjectIntIterator<TransitStop> it = accessTimes.iterator(); it.hasNext();) {
     		it.advance();
-    		
-    		markedPatterns.addAll(options.rctx.graph.index.patternsForStop.get(it.key().getStop()));
+    		transferStops.put(it.key(), startTime + it.value());
+    		markedPatterns.addAll(graph.index.patternsForStop.get(it.key().getStop()));
     	}
     }
     
@@ -104,10 +94,8 @@ public class Raptor {
     */
     
     public void run () {
-        // the 0th round is the initial access to the stops
-        store.proceed();
-        for (int round = 0; round <= options.maxTransfers; round++) {
-            if (!doRound(round == options.maxTransfers))
+        for (int round = 0; round <= maxTransfers; round++) {
+            if (!doRound(round == maxTransfers))
             	break;
         }
     }
@@ -122,14 +110,14 @@ public class Raptor {
         // TODO: implement the rest of the optimizations in the paper, in particular not going past the destination
     	Set<TripPattern> oldMarkedPatterns = markedPatterns;
     	markedPatterns = Sets.newHashSet();
-    	markedStops = Sets.newHashSet();
+    	markedStops.clear();
     	
     	//LOG.info("Exploring {} patterns", oldMarkedPatterns.size());
     	
     	// Loop over the patterns we marked in the previous iteration
         PATTERNS: for (TripPattern tp : oldMarkedPatterns) {
             STOPS: for (int i = 0; i < tp.stopVertices.length; i++) {
-                int time = store.getPrev(tp.stopVertices[i]);
+                int time = transferStops.get(tp.stopVertices[i]);
                 if (time == Integer.MAX_VALUE)
                     continue STOPS;
                 
@@ -139,19 +127,7 @@ public class Raptor {
         
         // Find all possible transfers. No need to do this on the last round though.
     	if (!isLast) {
-    		store.proceed();
-    		
-    		// FIXME this allows the walk limit to be disregarded. Suppose there is a transit stop that
-    		// has no service on the day in question, but has a transfer from a stop that does.
-    		// Further suppose that there is a point that is within walking distance of the stop
-    		// that does not have service, but not of any stop that does. Adding the transfers into
-    		// the state store would allow one to transfer to that stop and egress from it without
-    		// ever boarding a vehicle. Given that we don't store enough information to reconstruct paths,
-    		// though, I don't see a good way around this.
-    		
-    		// Also, there is almost certainly a walking route that disregards the walk limit but is faster
-    		// than walking to a point by way of another transit stop.
-    		
+    		transferStops.clear();
     		findTransfers();
     	}
         
@@ -162,14 +138,26 @@ public class Raptor {
     /** Find all the transfers from the last round to this round */
     public void findTransfers () {
         // only find transfers from stops that were touched in this round.
-        for (TransitStop tstop : markedStops) {        	            
+        for (TransitStop tstop : markedStops) {  
+        	
+        	// we know that bestFinalTimes for this stop was updated on the last round because we mark stops
+        	int timeAtOriginStop = bestFinalTimes.get(tstop);
+        	
+        	// 0-time loop transfers
+        	// patterns are already marked; they were marked when the stop was first reached
+        	if (timeAtOriginStop < transferStops.get(tstop))
+        		transferStops.put(tstop, timeAtOriginStop);
+        	
             for (Edge e : tstop.getOutgoing()) {
                 if (e instanceof SimpleTransfer) {
                 	TransitStop to = (TransitStop) e.getToVertex();
                 	
-                    if (store.put(to, (int) (store.getPrev(tstop) + e.getDistance() / options.walkSpeed))) {
-                        markedPatterns.addAll(options.rctx.graph.index.patternsForStop.get(to.getStop()));	
-                    }
+                	int timeAtDestStop = (int) (bestFinalTimes.get(tstop) + e.getDistance() / walkSpeed);
+                	
+                	if (timeAtDestStop < bestFinalTimes.get(to) && timeAtDestStop < transferStops.get(to)) {
+                		transferStops.put(to, timeAtDestStop);
+                		markedPatterns.addAll(graph.index.patternsForStop.get(to.getStop()));
+                	}
                 }
             }
         }
@@ -193,7 +181,7 @@ public class Raptor {
     	FrequencyEntry bestFreq = null;
     	
     	for (FrequencyEntry freq : tripPattern.scheduledTimetable.frequencyEntries) {
-    		if (!options.rctx.graph.index.servicesRunning(date).get(freq.tripTimes.serviceCode))
+    		if (!graph.index.servicesRunning(date).get(freq.tripTimes.serviceCode))
     			continue;
     		
     		// we set this here rather than below the time check, because in Analyst we run
@@ -235,14 +223,17 @@ public class Raptor {
     		// board time already includes headway, if we are computing the worst-case
     		int arrTime = bestFreqBoardTime + bestFreq.tripTimes.getScheduledArrivalTime(reachedIdx) - boardOffset;
     		
-    		if (store.put(v, arrTime)) {
-    			for (TripPattern tp : options.rctx.graph.index.patternsForStop.get(v.getStop())) {
+    		if (arrTime < bestFinalTimes.get(v)) {
+    			// this is a final stop
+    			bestFinalTimes.put(v, arrTime);
+    			
+    			markedStops.add(v);
+    			
+    			for (TripPattern tp : graph.index.patternsForStop.get(v.getStop())) {
     				if (tp != tripPattern)
     					markedPatterns.add(tp);
     			}
-    			
-    			markedStops.add(v);
-    		}
+       		}
     	}
     	
     	return foundFrequencyEntry;
@@ -266,8 +257,9 @@ public class Raptor {
     		TransitStop v = tripPattern.stopVertices[reachedIdx];
     		int arrTime = tts.getArrivalTime(tripIndex, reachedIdx);
     		
-    		if (store.put(v, arrTime)) {
-    			for (TripPattern tp : options.rctx.graph.index.patternsForStop.get(v.getStop())) {
+    		if (arrTime < bestFinalTimes.get(v)) {
+    			bestFinalTimes.put(v, arrTime);
+    			for (TripPattern tp : graph.index.patternsForStop.get(v.getStop())) {
     				if (tp != tripPattern)
     					markedPatterns.add(tp);
     			}
@@ -279,7 +271,7 @@ public class Raptor {
     
     /** Get an iterator over all the nondominated target states of this RAPTOR search */
     public TObjectIntIterator<TransitStop> iterator () {
-        return store.currentIterator();
+        return bestFinalTimes.iterator();
     }
     
     /*
