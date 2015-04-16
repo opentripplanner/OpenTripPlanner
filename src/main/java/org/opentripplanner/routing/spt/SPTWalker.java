@@ -114,7 +114,8 @@ public class SPTWalker {
                          * walk...) and edge properties (car max speed, slope, etc...)
                          */
                         TraverseMode mode = s0.getNonTransitMode();
-                        speedAlongEdge = se.calculateSpeed(spt.getOptions(), mode);
+                        speedAlongEdge = se.calculateSpeed(spt.getOptions(), mode,
+                                s0.getTimeInMillis(), true);
                         if (mode != TraverseMode.CAR)
                             speedAlongEdge = speedAlongEdge * se.getDistance() / se.getSlopeSpeedEffectiveLength();
                         double avgSpeed = se.getDistance()

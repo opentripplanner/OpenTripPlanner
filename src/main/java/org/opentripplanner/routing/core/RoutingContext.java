@@ -15,16 +15,17 @@ package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.LineString;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.carspeed.CarSpeedSnapshot;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
@@ -95,6 +96,9 @@ public class RoutingContext implements Cloneable {
 
     /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
     public final TimetableSnapshot timetableSnapshot;
+
+    /** The carSpeedSnapshot for this request to get car_speed = f(edge, time) */
+    public final CarSpeedSnapshot carSpeedSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
@@ -224,6 +228,9 @@ public class RoutingContext implements Cloneable {
         }
         calendarService = graph.getCalendarService();
         setServiceDays();
+
+        carSpeedSnapshot = graph.carSpeedSnapshotSource == null ? null
+                : graph.carSpeedSnapshotSource.getCarSpeedSnapshot();
 
         Edge fromBackEdge = null;
         Edge toBackEdge = null;

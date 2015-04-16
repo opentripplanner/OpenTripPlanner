@@ -56,6 +56,7 @@ import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.carspeed.CarSpeedSnapshotSource;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
@@ -148,6 +149,8 @@ public class Graph implements Serializable {
     public final Map<AgencyAndId, Integer> serviceCodes = Maps.newHashMap();
 
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
+
+    public transient CarSpeedSnapshotSource carSpeedSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 

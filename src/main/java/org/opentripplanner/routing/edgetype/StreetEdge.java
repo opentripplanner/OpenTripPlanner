@@ -25,6 +25,7 @@ import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.routing.carspeed.CarSpeedSnapshot;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -273,8 +274,8 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         // Automobiles have variable speeds depending on the edge type
-        double speed = calculateSpeed(options, traverseMode);
-        
+        double speed = calculateSpeed(options, traverseMode, s0.getTimeInMillis(), !options.arriveBy);
+
         double time = getDistance() / speed;
         double weight;
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
@@ -355,7 +356,8 @@ public class StreetEdge extends Edge implements Cloneable {
             backPSE = (StreetEdge) backEdge;
             RoutingRequest backOptions = backWalkingBike ?
                     s0.getOptions().bikeWalkingOptions : s0.getOptions();
-            double backSpeed = backPSE.calculateSpeed(backOptions, backMode);
+            double backSpeed = backPSE.calculateSpeed(backOptions, backMode, s0.getBackState()
+                    .getTimeInMillis(), !options.arriveBy);
             final double realTurnCost;  // Units are seconds.
 
             // Apply turn restrictions
@@ -476,19 +478,40 @@ public class StreetEdge extends Edge implements Cloneable {
      * Calculate the average automobile traversal speed of this segment, given
      * the RoutingRequest, and return it in meters per second.
      */
-    private double calculateCarSpeed(RoutingRequest options) {
-        return getCarSpeed();
+    private double calculateCarSpeed(RoutingRequest options, long timestampMs, boolean forward) {
+        float carSpeed = getCarSpeed();
+        /*
+         * Note: in reverse-optimize, we can compute a different speed value than
+         * the one used in the way forward, as the provided timestamp will differ.
+         */
+        CarSpeedSnapshot carSpeedSnapshot = options.getRoutingContext().carSpeedSnapshot;
+        if (carSpeedSnapshot != null) {
+            /*
+             * Adjust the timestamp to have the same base value whatever the direction we travel in:
+             * base timestamp is the state time, which is the current time at the "start" of the
+             * edge, that is the end-time when traversing backward (arriveBy mode). We adjust to
+             * take the base timestamp to be the theorical time at the middle of the edge. Of course
+             * we cannot know the exact time, as this would require a rather expensive iterative
+             * process...
+             */
+            long timestampAdjustMs = Math.round(getDistance() / 2 / carSpeed * 1000.0f);
+            timestampMs += forward ? timestampAdjustMs : -timestampAdjustMs;
+            carSpeed = carSpeedSnapshot.getCarSpeed(this, timestampMs, carSpeed);
+        }
+        return carSpeed;
     }
     
     /**
-     * Calculate the speed appropriately given the RoutingRequest and traverseMode.
+     * Calculate the speed appropriately given the RoutingRequest and traverseMode. We provide
+     * the timestamp and forward direction flag, to adjust the timestamp for car speed in case
+     * we have a dynamic car speed source.
      */
-    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode) {
+    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode,
+            long timestampMs, boolean forward) {
         if (traverseMode == null) {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
-            // NOTE: Automobiles have variable speeds depending on the edge type
-            return calculateCarSpeed(options);
+            return calculateCarSpeed(options, timestampMs, forward);
         }
         return options.getSpeed(traverseMode);
     }
