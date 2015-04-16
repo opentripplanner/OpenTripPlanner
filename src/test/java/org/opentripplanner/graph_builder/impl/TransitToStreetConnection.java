@@ -12,8 +12,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package org.opentripplanner.graph_builder.impl;
 
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.util.StreetType;
-import com.vividsolutions.jts.geom.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -175,7 +176,6 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             addColorStreetType(sf, "stroke");
             curFeatures.add(sf);
         } else if (collectionType == CollectionType.WANTED_LINK) {
-            //TODO: different modes have different icons
             //Adds bus stop marker
             StreetFeature bus_stop_feat = new StreetFeature(GeometryUtils.getGeometryFactory().createPoint(transitStop.getCoordinate()));
             bus_stop_feat.addPropertie("title", transitStop.getName() + "(" + transitStop.getStopId().getId() + ")");
@@ -183,7 +183,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             //bus_stop_feat.addPropertie("stop_index", transitStop.getIndex());
             bus_stop_feat.addPropertie("edge_label", wantedPath.getName());
             bus_stop_feat.addPropertie("marker-size", "small");
-            bus_stop_feat.addPropertie("marker-symbol", "bus");
+            addTransportMode(bus_stop_feat, transitStop.getModes());
             addColorStreetType(bus_stop_feat, "marker-color");
             curFeatures.add(bus_stop_feat);
             
@@ -200,7 +200,6 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             if (correctlyLinked == null) {
                 throw new Exception("For CORRECT_LINK feature correctlyLinked parameter can't be null!");
             }
-            //TODO: different modes have different icons
             //Adds bus stop marker
             StreetFeature bus_stop_feat = new StreetFeature(GeometryUtils.getGeometryFactory().createPoint(transitStop.getCoordinate()));
             bus_stop_feat.addPropertie("title", transitStop.getName() + "(" + transitStop.getStopId().getId() + ")");
@@ -209,7 +208,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
             bus_stop_feat.addPropertie("wanted_edge_label", wantedPath.getName());
             bus_stop_feat.addPropertie("current_edge_label", this.currentLink.getName());
             bus_stop_feat.addPropertie("marker-size", "small");
-            bus_stop_feat.addPropertie("marker-symbol", "bus");
+            addTransportMode(bus_stop_feat, transitStop.getModes());
             addColorCoretness(bus_stop_feat, "marker-color");
             curFeatures.add(bus_stop_feat);
             
@@ -236,9 +235,52 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         return curFeatures;
     }
 
+    /**
+     * Adds marker-symbol based on transport mode and which modes are for this stop in "modes"
+     * <p/>
+     * Symbols are:
+     * - RAIL - rail
+     * - TRAM - rail-metro
+     * - SUBWAY - rail-light
+     * - FERRY - ferry
+     * - GONDOLA - heliport
+     * - FUNICULAR - logging
+     * - BUS - bus
+     *
+     * @param streetFeature    to which feature should symbol be added
+     * @param stopTransitModes modes based on which symbol is chosen
+     */
+    private static void addTransportMode(StreetFeature streetFeature,
+            TraverseModeSet stopTransitModes) {
+        if (stopTransitModes.contains(TraverseMode.RAIL)) {
+            streetFeature.addPropertie("marker-symbol", "rail");
+        } else if (stopTransitModes.contains(TraverseMode.TRAM)) {
+            streetFeature.addPropertie("marker-symbol", "rail-metro");
+        } else if (stopTransitModes.contains(TraverseMode.SUBWAY)) {
+            streetFeature.addPropertie("marker-symbol", "rail-light");
+        } else if (stopTransitModes.contains(TraverseMode.FERRY)) {
+            streetFeature.addPropertie("marker-symbol", "ferry");
+        } else if (stopTransitModes.contains(TraverseMode.GONDOLA)) {
+            streetFeature.addPropertie("marker-symbol", "heliport");
+        } else if (stopTransitModes.contains(TraverseMode.FUNICULAR)) {
+            streetFeature.addPropertie("marker-symbol", "logging");
+        } else if (stopTransitModes.contains(TraverseMode.BUS)) {
+            streetFeature.addPropertie("marker-symbol", "bus");
+        }
+        String modes = stopTransitModes.toString().replace("TraverseMode (", "").replace(")", "");
+        streetFeature.addPropertie("modes", modes);
+    }
+
+    /**
+     * Creates StreetFeature for Stops which don't have any connections. They are missing in results and colored grey.
+     *
+     * @param transitStop Stop which is missing
+     * @param wantedPath Street to which it shouls be connected
+     * @return All streetFeatures which are used to show it (Point for stop and Linestring for wantedStreet)
+     */
     static List<StreetFeature> toStreetFeatureMissing(TransitStop transitStop, StreetEdge wantedPath) {
         List <StreetFeature> curFeatures = new ArrayList<>(3);
-        String yellowColor = "#ffff00";
+        String featureColor = "#808080"; //GREY
         //Adds bus stop marker
         StreetFeature bus_stop_feat = new StreetFeature(GeometryUtils.getGeometryFactory().createPoint(transitStop.getCoordinate()));
         bus_stop_feat.addPropertie("title", transitStop.getName() + "(" + transitStop.getStopId().getId() + ")");
@@ -247,8 +289,8 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         bus_stop_feat.addPropertie("wanted_edge_label", wantedPath.getName());
         //bus_stop_feat.addPropertie("current_edge_label", this.currentLink.getName());
         bus_stop_feat.addPropertie("marker-size", "small");
-        bus_stop_feat.addPropertie("marker-symbol", "bus");
-        bus_stop_feat.addPropertie("marker-color", yellowColor);
+        addTransportMode(bus_stop_feat, transitStop.getModes());
+        bus_stop_feat.addPropertie("marker-color", featureColor);
 
         curFeatures.add(bus_stop_feat);
 
@@ -259,7 +301,7 @@ public class TransitToStreetConnection extends TransitStopConnToWantedEdge{
         //wanted_edge_feat.addPropertie("id", wantedPath.getId());
         wanted_edge_feat.addPropertie("stop_label", transitStop.getLabel());
         wanted_edge_feat.addPropertie("opacity", "0.8");
-        wanted_edge_feat.addPropertie("stroke", yellowColor);
+        wanted_edge_feat.addPropertie("stroke", featureColor);
         curFeatures.add(wanted_edge_feat);
 
         return curFeatures;
