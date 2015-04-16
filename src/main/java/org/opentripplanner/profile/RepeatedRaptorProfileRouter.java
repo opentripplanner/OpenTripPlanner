@@ -41,8 +41,11 @@ import java.util.Map;
  * and only run a fast transit search for each minute in the window.
  */
 public class RepeatedRaptorProfileRouter {
+
     private Logger LOG = LoggerFactory.getLogger(RepeatedRaptorProfileRouter.class);
-    
+
+    public static final int MAX_DURATION = 60 * 60 * 2; // seconds
+
     public ProfileRequest request;
     
     public Graph graph;
@@ -81,23 +84,17 @@ public class RepeatedRaptorProfileRouter {
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 + request.fromTime;
         rr.setRoutingContext(graph);
         Map<TripPattern, TripTimeSubset> timetables =
-                graph.tripTimeSubsetCache.getOrMake(request.date, request.fromTime, request.toTime + 120 * 60);
-        
+                TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
+
         int i = 1;
         
-
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
-    	// we run the search many times in reverse order - this is the rRAPTOR extension to RAPTOR.
-    	// It's a dynamic programming approach - observe that an upper bound on the earliest arrival
-    	// given that you departed at minute N is the arrival of the fastest trip at minute N+1; you always can wait
-    	// 1 minute and then take that trip. This we do not reinitialize the RaptorStateStore on every iteration.
         for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
             // + 2 is because we have one additional round because there is one more ride than transfer
             // (fencepost problem) and one additional round for the initial walk.
-        	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 2, startTime + 120 * 60);
+        	PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(rr.maxTransfers + 2, startTime + MAX_DURATION);
             
-        	
         	// add the initial stops, or move back the times at them if not on the first search
         	for (State state : states) {
         		rss.put((TransitStop) state.getVertex(), (int) (state.getElapsedTimeSeconds() + startTime));
