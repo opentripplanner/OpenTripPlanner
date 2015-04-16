@@ -14,11 +14,12 @@
 package org.opentripplanner.routing.services;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.opentripplanner.osm.OSMFromToNodeWayIds;
 import org.opentripplanner.routing.graph.Edge;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * This class is used to store some optional extra information about edges, which for memory-saving
@@ -30,23 +31,28 @@ public class EdgesExtra implements Serializable {
 
     private static final long serialVersionUID = -8267295762562813810L;
 
-    private Map<Edge, OSMFromToNodeWayIds> osmExtras = new HashMap<Edge, OSMFromToNodeWayIds>();
+    private BiMap<OSMFromToNodeWayIds, Edge> osmExtras = HashBiMap.create();
 
     public EdgesExtra() {
     }
 
     public void addOsmFromToNodeWayId(Edge edge, OSMFromToNodeWayIds osmExtra) {
-        if (osmExtras.containsKey(edge))
+        if (osmExtras.inverse().containsKey(edge))
             throw new IllegalArgumentException("Only a single OSM ids per edge is allowed. Edge: "
                     + edge);
-        osmExtras.put(edge, osmExtra);
+        osmExtras.put(osmExtra, edge);
     }
 
-    public OSMFromToNodeWayIds getOsmFromToNodeWayIds(Edge edge) {
-        return osmExtras.get(edge);
+    public OSMFromToNodeWayIds getOsmIdsFromEdge(Edge edge) {
+        return osmExtras.inverse().get(edge);
+    }
+
+    public Edge getEdgeFromOsmIds(OSMFromToNodeWayIds osmIds) {
+        return osmExtras.get(osmIds);
     }
 
     public void removeEdge(Edge edge) {
-        osmExtras.remove(edge);
+        /* Note: no need to synchronize, as no temporary edges should be present here. */
+        osmExtras.inverse().remove(edge);
     }
 }
