@@ -5,7 +5,6 @@
  */
 package org.opentripplanner.graph_builder.impl;
 
-import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.util.StreetType;
 import com.csvreader.CsvWriter;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -133,8 +132,6 @@ public class TransitToStreetNetworkBuilderTest {
         
         GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);
 
-        BusRouteStreetMatcher busRouteStreetMatcher = new BusRouteStreetMatcher();
-
         provider.setPath(file);
         loader.setProvider(provider);
 
@@ -154,8 +151,6 @@ public class TransitToStreetNetworkBuilderTest {
         }
         
         if (normalBuilder) {
-            busRouteStreetMatcher.buildGraph(gg, extra);
-
             TransitToStreetNetworkModule transitToStreetNetworkGraphBuilderImpl = new TransitToStreetNetworkModule();
             transitToStreetNetworkGraphBuilderImpl.buildGraph(gg, extra);
         }
