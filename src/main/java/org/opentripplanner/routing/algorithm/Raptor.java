@@ -57,7 +57,15 @@ public class Raptor {
      */
     private LocalDate date;
     
+    /**
+     * These are all the stops that could be reached after the previous round by transfers
+     * (including explicit zero-time loop transfers).
+     */
 	private TObjectIntMap<TransitStop> transferStops = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
+	
+	/**
+	 * This keeps track of the overall best time at any stop when that stop is reached by a ride rather than a transfer.
+	 */
 	private TObjectIntMap<TransitStop> bestFinalTimes = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
     
     /** Initialize a RAPTOR router from an existing RaptorStateStore, a routing request, and the timetables of active trips */
