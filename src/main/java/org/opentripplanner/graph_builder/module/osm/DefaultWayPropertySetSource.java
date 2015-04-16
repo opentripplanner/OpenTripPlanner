@@ -346,6 +346,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
                 0.84, 0.84);
         setProperties(props, "highway=residential;bicycle=designated",
                 StreetTraversalPermission.ALL, 0.95, 0.95);
+        setProperties(props, "highway=unclassified;bicycle=designated",
+                StreetTraversalPermission.ALL, 0.95, 0.95);
         setProperties(props, "highway=residential_link;bicycle=designated",
                 StreetTraversalPermission.ALL, 0.95, 0.95);
         setProperties(props, "highway=tertiary;bicycle=designated", StreetTraversalPermission.ALL,
