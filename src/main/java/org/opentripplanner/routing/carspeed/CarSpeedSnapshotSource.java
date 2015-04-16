@@ -21,7 +21,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class CarSpeedSnapshotSource {
 
-    private Map<StreetEdge, StreetEdgeCarSpeedProvider> currentProviders;
+    private Map<StreetEdge, StreetEdgeCarSpeedProvider> currentProviders = new HashMap<>();
 
     private CarSpeedSnapshot currentSnapshot;
 
@@ -32,7 +32,7 @@ public class CarSpeedSnapshotSource {
         return currentSnapshot;
     }
 
-    public void updateCarSpeedProvider(StreetEdge streetEdge, StreetEdgeCarSpeedProvider provider) {
+    public synchronized void updateCarSpeedProvider(StreetEdge streetEdge, StreetEdgeCarSpeedProvider provider) {
         /* If a previous provider exists, it will be kept as long as a CarSpeedSnapshot use it. */
         if (provider == null) {
             /* This special case ensure we do not store unneeded null values. */
@@ -42,7 +42,7 @@ public class CarSpeedSnapshotSource {
         }
     }
 
-    public void commit() {
+    public synchronized void commit() {
         // Make a copy of the map
         Map<StreetEdge, StreetEdgeCarSpeedProvider> newProviders = new HashMap<>(currentProviders);
         // Assignment of references are atomic in java, no need to synchronize
