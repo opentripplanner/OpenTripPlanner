@@ -76,6 +76,9 @@ public class RepeatedRaptorProfileRouter {
         Map<TripPattern, TripTimeSubset> timetables =
                 TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
 
+        
+        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(5);
+        
         int i = 1;
         
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
@@ -83,10 +86,23 @@ public class RepeatedRaptorProfileRouter {
         for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
         	if (++i % 30 == 0)
         		LOG.info("Completed {} RAPTOR searches", i);
+        	
+        	// adjust the max time
+        	rss.maxTime = startTime + 120 * 60;
+        	
+        	// reset the counter
+        	rss.restart();
+        	
+        	// relax the times at the start stops
+        	for (TObjectIntIterator<TransitStop> it = accessTimes.iterator(); it.hasNext();) {
+        		it.advance();
+        		// this is "transfer" from the origin
+        		rss.put(it.key(), startTime + it.value(), true);
+        	}
             
         	//LOG.info("Filtering RAPTOR states");
             
-            Raptor raptor = new Raptor(graph, 3, request.walkSpeed, accessTimes, startTime, request.date, timetables);
+            Raptor raptor = new Raptor(graph, 3, request.walkSpeed, rss, startTime, request.date, timetables);
 
             //LOG.info("Performing RAPTOR search for minute {}", i++);
             
@@ -99,6 +115,11 @@ public class RepeatedRaptorProfileRouter {
                 it.advance();
                 
                 int et = it.value() - startTime;
+                
+                // this can happen if the time is left from a previous search at a later start time
+                if (et > 120 * 60)
+                	continue;
+                
                 TransitStop v = it.key();
                 if (et < mins.get(v))
                     mins.put(v, et);

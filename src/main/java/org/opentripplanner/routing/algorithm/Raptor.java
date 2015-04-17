@@ -43,6 +43,8 @@ public class Raptor {
     public final int maxTransfers;
     public final float walkSpeed;
     
+    private RaptorStateStore store;
+    
     private static final Logger LOG = LoggerFactory.getLogger(Raptor.class);
     
     private HashSet<TripPattern> markedPatterns = Sets.newHashSet();
@@ -57,29 +59,17 @@ public class Raptor {
      */
     private LocalDate date;
     
-    /**
-     * These are all the stops that could be reached after the previous round by transfers
-     * (including explicit zero-time loop transfers).
-     */
-	private TObjectIntMap<TransitStop> transferStops = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
-	
-	/**
-	 * This keeps track of the overall best time at any stop when that stop is reached by a ride rather than a transfer.
-	 */
-	private TObjectIntMap<TransitStop> bestFinalTimes = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
-    
     /** Initialize a RAPTOR router from an existing RaptorStateStore, a routing request, and the timetables of active trips */
-    public Raptor(Graph graph, int maxTransfers, float walkSpeed, TObjectIntMap<TransitStop> accessTimes, int startTime, LocalDate date, Map<TripPattern, TripTimeSubset> timetables) {
+    public Raptor(Graph graph, int maxTransfers, float walkSpeed, RaptorStateStore store, int startTime, LocalDate date, Map<TripPattern, TripTimeSubset> timetables) {
     	this.graph = graph;    	
     	this.maxTransfers = maxTransfers;
     	this.times = timetables;
     	this.walkSpeed = walkSpeed;
     	this.date = date;
+    	this.store = store;
     	
-    	for (TObjectIntIterator<TransitStop> it = accessTimes.iterator(); it.hasNext();) {
-    		it.advance();
-    		transferStops.put(it.key(), startTime + it.value());
-    		markedPatterns.addAll(graph.index.patternsForStop.get(it.key().getStop()));
+    	for (TransitStop tstop : store.getTouchedStopsIncludingTransfers()) {
+    		markedPatterns.addAll(graph.index.patternsForStop.get(tstop.getStop()));    		
     	}
     }
     
@@ -102,6 +92,7 @@ public class Raptor {
     */
     
     public void run () {
+    	store.proceed();
         for (int round = 0; round <= maxTransfers; round++) {
             if (!doRound(round == maxTransfers))
             	break;
@@ -125,7 +116,7 @@ public class Raptor {
     	// Loop over the patterns we marked in the previous iteration
         PATTERNS: for (TripPattern tp : oldMarkedPatterns) {
             STOPS: for (int i = 0; i < tp.stopVertices.length; i++) {
-                int time = transferStops.get(tp.stopVertices[i]);
+                int time = store.getPrev(tp.stopVertices[i]);
                 if (time == Integer.MAX_VALUE)
                     continue STOPS;
                 
@@ -135,7 +126,7 @@ public class Raptor {
         
         // Find all possible transfers. No need to do this on the last round though.
     	if (!isLast) {
-    		transferStops.clear();
+    		store.proceed();
     		findTransfers();
     	}
         
@@ -148,22 +139,16 @@ public class Raptor {
         // only find transfers from stops that were touched in this round.
         for (TransitStop tstop : markedStops) {  
         	
-        	// we know that bestFinalTimes for this stop was updated on the last round because we mark stops
-        	int timeAtOriginStop = bestFinalTimes.get(tstop);
-        	
-        	// 0-time loop transfers
-        	// patterns are already marked; they were marked when the stop was first reached
-        	if (timeAtOriginStop < transferStops.get(tstop))
-        		transferStops.put(tstop, timeAtOriginStop);
+        	// we know that the best time for this stop was updated on the last round because we mark stops
+        	int timeAtOriginStop = store.getTime(tstop);
         	
             for (Edge e : tstop.getOutgoing()) {
                 if (e instanceof SimpleTransfer) {
                 	TransitStop to = (TransitStop) e.getToVertex();
                 	
-                	int timeAtDestStop = (int) (bestFinalTimes.get(tstop) + e.getDistance() / walkSpeed);
+                	int timeAtDestStop = (int) (timeAtOriginStop + e.getDistance() / walkSpeed);
                 	
-                	if (timeAtDestStop < bestFinalTimes.get(to) && timeAtDestStop < transferStops.get(to)) {
-                		transferStops.put(to, timeAtDestStop);
+                	if (store.put(to, timeAtDestStop, true)) {
                 		markedPatterns.addAll(graph.index.patternsForStop.get(to.getStop()));
                 	}
                 }
@@ -231,10 +216,7 @@ public class Raptor {
     		// board time already includes headway, if we are computing the worst-case
     		int arrTime = bestFreqBoardTime + bestFreq.tripTimes.getScheduledArrivalTime(reachedIdx) - boardOffset;
     		
-    		if (arrTime < bestFinalTimes.get(v)) {
-    			// this is a final stop
-    			bestFinalTimes.put(v, arrTime);
-    			
+    		if (store.put(v, arrTime, false)) {    			
     			markedStops.add(v);
     			
     			for (TripPattern tp : graph.index.patternsForStop.get(v.getStop())) {
@@ -265,8 +247,7 @@ public class Raptor {
     		TransitStop v = tripPattern.stopVertices[reachedIdx];
     		int arrTime = tts.getArrivalTime(tripIndex, reachedIdx);
     		
-    		if (arrTime < bestFinalTimes.get(v)) {
-    			bestFinalTimes.put(v, arrTime);
+    		if (store.put(v, arrTime, false)) {
     			for (TripPattern tp : graph.index.patternsForStop.get(v.getStop())) {
     				if (tp != tripPattern)
     					markedPatterns.add(tp);
@@ -279,7 +260,7 @@ public class Raptor {
     
     /** Get an iterator over all the nondominated target states of this RAPTOR search */
     public TObjectIntIterator<TransitStop> iterator () {
-        return bestFinalTimes.iterator();
+        return store.iterator();
     }
     
     /*

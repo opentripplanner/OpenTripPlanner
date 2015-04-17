@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import gnu.trove.iterator.TObjectIntIterator;
@@ -17,14 +18,22 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     @SuppressWarnings("rawtypes")
 	private TObjectIntMap[] matrix;
     
-    public final int maxTime;
+    private TObjectIntMap<TransitStop> bestStops;
+    
+    public int maxTime;
     
     int current = 0;
     
     @Override
-    public boolean put(TransitStop t, int time) {
-        if (time < matrix[current].get(t) && time < maxTime) {
+    public boolean put(TransitStop t, int time, boolean transfer) {
+        if (time < matrix[current].get(t) && time < bestStops.get(t) && time < maxTime) {
             matrix[current].put(t, time);
+           
+            // Only update bestStops if this is not the result of a transfer, so that transit stops
+            // cannot be used to go past the walk distance by transferring and then egressing without boarding.
+            if (!transfer)
+            	bestStops.put(t,  time);
+            
             return true;
         }
         return false;
@@ -32,7 +41,7 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
 
     @Override
     public void proceed() {
-    	for (TObjectIntIterator<TransitStop> it = currentIterator(); it.hasNext();) {
+    	for (TObjectIntIterator<TransitStop> it = matrix[current].iterator(); it.hasNext();) {
     		it.advance();
     		
     		if (it.value() < matrix[current + 1].get(it.key()))
@@ -40,23 +49,13 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     	}
         current++;
     }
-
-    @Override
-    public int getCurrent(TransitStop t) {
-        return matrix[current].get(t);
-    }
-
-    @Override
-    public int getPrev(TransitStop t) {
-        return matrix[current - 1].get(t);
+    
+    public int getTime (TransitStop t) {
+    	return bestStops.get(t);
     }
     
-    public TObjectIntIterator<TransitStop> currentIterator() {
-        return matrix[current].iterator();
-    }
-    
-    public TObjectIntIterator<TransitStop> prevIterator() {
-        return matrix[current - 1].iterator();
+    public int getPrev (TransitStop t) {
+    	return matrix[current - 1].get(t);
     }
     
     /**
@@ -67,6 +66,10 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
      */
     public void restart () {
     	current = 0;
+    }
+    
+    public TObjectIntIterator<TransitStop> iterator () {
+    	return bestStops.iterator();
     }
     
     /** Create a new store with the given number of rounds. Remember to include the initial walk as a "round" */
@@ -82,5 +85,11 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     	for (int i = 0; i < rounds; i++) {
     		matrix[i] = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
     	}
+    	
+    	bestStops = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
+    }
+    
+    public Collection<TransitStop> getTouchedStopsIncludingTransfers () {
+    	return matrix[current].keySet();
     }
 }
