@@ -273,6 +273,8 @@ public class StreetEdge extends Edge implements Cloneable {
 
         // Automobiles have variable speeds depending on the edge type
         double speed = calculateSpeed(options, traverseMode, s0.getTimeInMillis(), !options.arriveBy);
+        if (speed == 0.0)
+            return null; // This is legal: for dynamic car speed source, speed=0 means no traffic
 
         double time = getDistance() / speed;
         double weight;
