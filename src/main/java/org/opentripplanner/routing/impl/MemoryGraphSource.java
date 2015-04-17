@@ -13,9 +13,6 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.Properties;
-import java.util.prefs.Preferences;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.graph.Graph;

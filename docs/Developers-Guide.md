@@ -12,7 +12,7 @@ IntelliJ IDEA is a commercial product, but its authors give free licenses to ope
 development community has received such a license. If you want to use IntelliJ just ask us for the license key. It's
 an excellent IDE, and in my experience is quicker and more stable than the competition.
 
-Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP Github
+Rather than using the version control support in my IDE, I usually find it more straightforward to clone the OTP GitHub
 repository manually (on the command line or using some other Git interface tool), then import the resulting local OTP
 repository into my IDE as a Maven project. The IDE should then take care of fetching all the libraries OTP depends on,
 based on the Maven project description (POM file) in the base of the OTP repository. This step can take a long time because
@@ -20,7 +20,7 @@ it involves downloading a lot of JAR files.
 
 When running your local copy of the OTP source within an IDE, all command line switches and configuration options will
 be identical to the ones used when running the OTP JAR from the command line (as described in the
-[basic introduction](Basic-Usage) and [configuration reference](Configuration). The only difference is that you need to
+[basic introduction](Basic-Usage) and [configuration reference](Configuration)). The only difference is that you need to
 manually specify the main class. When you run a JAR from the command line, the JVM automatically knows which class
 contains the entry point into the program (the `main` function), but in IDEs you must create a "run configuration".
 
@@ -49,16 +49,16 @@ There are several ways to get involved:
 
 ### Issues and commits
 
-All commits should reference a specific issue number (this was formally decided decided in issue #175).
+All commits should reference a specific issue number (this was formally decided in issue #175).
 For example, `Simplify module X configuration #9999`.
 If no ticket exists for the feature or bug your code implements or fixes,
 you should [create a new ticket](http://github.com/openplans/OpenTripPlanner/issues/new) prior to checking in, or
 ideally even prior to your development work since this provides a place to carry out implementation discussions (in the comments).
 
-Github will automatically update issues when commits are merged in: if your commit message includes the text
+GitHub will automatically update issues when commits are merged in: if your commit message includes the text
 ` fixes #123 `, it will automatically append your message as a comment on the isse and close it.
 If you simply mention ` #123 ` in your message, your message will be appended to the issue but it will remain open.
-Many other expressions exist to close issues via commit messages. See [the Github help page on this topic](https://help.github.com/articles/closing-issues-via-commit-messages/).
+Many other expressions exist to close issues via commit messages. See [the GitHub help page on this topic](https://help.github.com/articles/closing-issues-via-commit-messages/).
 
 
 ### Code Comments
@@ -72,7 +72,7 @@ Javadoc or the empty Javadoc stubs added by IDEs, such as `@param` annotations w
 
 ### Documentation
 
-Most documentation should be included directly in the OpenTripPlanner repository rather than the Github wiki.
+Most documentation should be included directly in the OpenTripPlanner repository rather than the GitHub wiki.
 This allows version control to be applied to documentation as well as program source code.
 All pull requests that change how OTP is used or configured should include changes to the documentation alongside code
 modifications. Pages that help organize development teams or serve as scratchpads can still go
@@ -123,7 +123,7 @@ Deadline for response is 2015-10-29. Assuming I've heard no blocking votes by th
 Note that you should make sure to include a **deadline** by which you will go ahead and do what you're proposing 
 if you don't hear any blocking responses. In general, you should leave at least 72 hours for people to respond. 
 This is not a hard-and-fast rule and you should use your best judgement in determining how far in the future the 
-deadline should be depending on the magnitude of the proposal and how much it will effect the overall project and the 
+deadline should be depending on the magnitude of the proposal and how much it will affect the overall project and the 
 rest of the community.
 
 Of course you may always fork the [OTP repo on GitHub](https://github.com/opentripplanner/OpenTripPlanner/) 

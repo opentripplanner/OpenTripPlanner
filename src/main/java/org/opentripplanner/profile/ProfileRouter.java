@@ -5,13 +5,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
-
-import org.mapdb.Fun.Tuple2;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -33,14 +29,11 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -63,7 +56,7 @@ public class ProfileRouter {
 
     /* Search configuration constants */
     public static final int SLACK = 60; // in seconds, time required to catch a transit vehicle
-    private static final int TIMEOUT = 600; // in seconds, maximum computation time
+    private static final int TIMEOUT = 20; // in seconds, maximum computation time
     public static final int MAX_DURATION = 90 * 60; // in seconds, the longest we want to travel
     private static final int MAX_RIDES = 3; // maximum number of boardings in a trip
 
@@ -90,9 +83,6 @@ public class ProfileRouter {
     // TODO rename fromStopsByPattern
     Multimap<TripPattern, StopAtDistance> fromStops, toStops;
     TimeWindow window; // filters trips used by time of day and service schedule
-    
-    /** Map from trip pattern and stop cluster to a set of reachable stops from that stop cluster on that pattern */
-    Map<Tuple2<StopCluster, TripPattern>, ReachableStopSet> travelTimeCache = Maps.newHashMap();
 
     /** @return true if the given stop cluster has at least one transfer coming from the given pattern. */
     private boolean hasTransfers(StopCluster stopCluster, TripPattern pattern) {
@@ -102,6 +92,23 @@ public class ProfileRouter {
         return false;
     }
 
+    public void printStopsForPatterns(String prefix, Multimap<TripPattern, StopAtDistance> stopClustersByPattern) {
+        for (TripPattern tp : stopClustersByPattern.keySet()) {
+            LOG.info("{} {}", prefix, tp.code);
+            for (StopAtDistance sd : stopClustersByPattern.get(tp)) {
+                LOG.info("    {}", sd);
+            }
+        }
+    }
+
+    private static void logRide(Ride ride) {
+        LOG.info("{}", ride.toString());
+        LOG.info("    {}", ride.accessStats);
+        for (PatternRide pr : ride.patternRides) {
+            LOG.info("    {} {}", pr.pattern.route, pr);
+        }
+    }
+
     /* Maybe don't even try to accumulate stats and weights on the fly, just enumerate options. */
     /* TODO Or actually use a priority queue based on the min time. */
 
@@ -109,7 +116,7 @@ public class ProfileRouter {
 
         // Lazy-initialize stop clusters (threadsafe method)
         graph.index.clusterStopsAsNeeded();
-        
+
         // Lazy-initialize profile transfers (before setting timeouts, since this is slow)
         if (graph.index.transfersFromStopCluster == null) {
             synchronized (graph.index) {
@@ -123,15 +130,13 @@ public class ProfileRouter {
         LOG.info("access modes: {}", request.accessModes);
         LOG.info("egress modes: {}", request.egressModes);
         LOG.info("direct modes: {}", request.directModes);
-        
-        // TimeWindow could constructed in the caller, which does have access to the graph index.
-        this.window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
-        
-        indexTripPatternTravelTimeRanges();
 
         // Establish search timeouts
         long searchBeginTime = System.currentTimeMillis();
         long abortTime = searchBeginTime + TIMEOUT * 1000;
+
+        // TimeWindow could constructed in the caller, which does have access to the graph index.
+        this.window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
 
         LOG.info("Finding access/egress paths.");
         // Look for stops that are within a given time threshold of the origin and destination
@@ -150,8 +155,8 @@ public class ProfileRouter {
             }
         }
         LOG.info("Done finding access/egress paths.");
-        LOG.info("From patterns/stops: {}", fromStops);
-        LOG.info("To patterns/stops: {}", toStops);
+        //printStopsForPatterns("from", fromStops);
+        //printStopsForPatterns("to", toStops);
 
         /* Enqueue an unfinished PatternRide for each pattern near the origin, grouped by Stop into unfinished Rides. */
         Map<StopCluster, Ride> initialRides = Maps.newHashMap(); // One ride per stop cluster
@@ -163,19 +168,19 @@ public class ProfileRouter {
             Collection<StopAtDistance> sds = fromStops.get(pattern);
             for (StopAtDistance sd : sds) {
                 /* Fetch or construct a new Ride beginning at this stop cluster. */
-                Ride ride = initialRides.get(sd.stop);
+                Ride ride = initialRides.get(sd.stopCluster);
                 if (ride == null) {
-                    ride = new Ride(sd.stop, null); // null previous ride because this is the first ride
+                    ride = new Ride(sd.stopCluster, null); // null previous ride because this is the first ride
                     ride.accessStats = new Stats(); // empty stats, times for each access mode will be merged in
                     ride.accessStats.min = Integer.MAX_VALUE; // higher than any value that will be merged in
-                    ride.accessDist = (int) sd.state.getWalkDistance(); // TODO verify correctness
-                    initialRides.put(sd.stop, ride);
+                    ride.accessDist = (int) sd.state.getWalkDistance(); // TODO verify correctness and uses
+                    initialRides.put(sd.stopCluster, ride);
                 }
                 /* Record the access time for this mode in the stats. */
                 ride.accessStats.merge(sd.etime);
                 /* Loop over stop clusters in case stop cluster appears more than once in the pattern. */
                 STOP_INDEX: for (int i = 0; i < pattern.getStops().size(); ++i) {
-                    if (sd.stop == graph.index.stopClusterForStop.get(pattern.getStops().get(i))) {
+                    if (sd.stopCluster == graph.index.stopClusterForStop.get(pattern.getStops().get(i))) {
                         PatternRide newPatternRide = new PatternRide(pattern, i);
                         /* Only add the PatternRide once per unique (pattern,stopIndex). */
                         // TODO this would be a !contains() call if PatternRides had semantic equality
@@ -191,30 +196,22 @@ public class ProfileRouter {
             }
         }
         for (Ride ride : initialRides.values()) {
+            // logRide(ride);
             queue.insert(ride, 0);
         }
         /* Explore incomplete rides as long as there are any in the queue. */
         while ( ! queue.empty()) {
             /* Get the minimum-time unfinished ride off the queue. */
             Ride ride = queue.extract_min();
-            
-            // retainedRides must contain the key of this stop cluster, because it either contains this ride
-            // or another ride that dominated this ride
-            // note that domination is only done once rides are finished
-            // Note that we are checking to see if the previous ride has been dominated, but we must check to see if it has been dominated
-            // at its destination, not at this stop!
-            if (!ride.equals(initialRides.get(ride.from)) && (ride.previous == null || !retainedRides.get(ride.previous.to).contains(ride.previous)))
-                continue;
-            
-            //LOG.info("dequeued ride {}", ride);
-            //ride.dump();
-            // maybe when ride is complete, then find transfers here, but that makes for more queue operations.
+            /* Skip this ride if it has been dominated since it was enqueued. */
+            // TODO should we check whether ride.previous != null (it is an initial ride)?
+            if (dominated(ride, ride.from)) continue;
+            // Maybe when ride is complete, then find transfers here, but that makes for more queue operations.
             if (ride.to != null) throw new AssertionError("Ride should be unfinished.");
-            /* Track finished rides by their destination stop, so we can add PatternRides to them. */
+            /* Track finished Rides by their destination StopCluster, so we can add PatternRides to them. */
             Map<StopCluster, Ride> rides = Maps.newHashMap();
             /* Complete partial PatternRides (with only a pattern and a beginning stop) which were enqueued in this
-             * partial ride. This is done by scanning through the Pattern, creating rides to all downstream stops that
-             * are near the destination or have relevant transfers. */
+             * partial ride. This is done by scanning through the Pattern, creating rides to all downstream stops. */
             PR: for (PatternRide pr : ride.patternRides) {
                 // LOG.info(" {}", pr);
                 List<Stop> stops = pr.pattern.getStops();
@@ -224,7 +221,7 @@ public class ProfileRouter {
                      * those that had transfers leading out of them or were known to be near the destination.
                      * However, analyst needs to know the times we can reach every stop, and pruning is more effective
                      * if we know when rides pass through all stops.*/
-                    PatternRide pr2 = extendToIndex(pr, ride.from, s, window);
+                    PatternRide pr2 = pr.extendToIndex(s, window);
                     // PatternRide may be empty because there are no trips in time window.
                     if (pr2 == null) continue PR;
                     // LOG.info("   {}", pr2);
@@ -239,21 +236,22 @@ public class ProfileRouter {
                 }
             }
             /* Build new downstream Rides by transferring from patterns in current Rides. */
-            Map<StopCluster, Ride> xferRides = Maps.newHashMap(); // A map of incomplete rides after transfers, one for each stop.
+            // Create a map of incomplete rides (start but no end point) after transfers, one for each stop.
+            Map<StopCluster, Ride> xferRides = Maps.newHashMap();
             for (Ride r1 : rides.values()) {
                 r1.calcStats(window, request.walkSpeed);
                 if (r1.waitStats == null) {
-                    // This is a sign of a questionable algorithm: we're only seeing if it was possible
-                    // to board these trips after the fact, and removing the ride late.
-                    // It might make more sense to keep bags of arrival times per ride+stop.
+                    // WaitStats can be null if it was not possible to board these trips in the time window.
+                    // This is a sign of a questionable algorithm, since we eliminate the ride rather late.
                     continue;
+                } else {
+                    r1.recomputeBounds();
                 }
-                if (!nondominated(r1, true)) continue; // abandon this ride if it is dominated by some existing ride at the same location
-                // We have a new, nondominated, completed ride.
-
-                /* Find transfers out of this new ride. */
-                // Do not transfer too many times. Check after calculating stats since stats are needed in any case.
-                int nRides = r1.pathLength();
+                /* Retain this ride if it is not dominated by some existing ride at the same location. */
+                if (dominated(r1, r1.to)) continue;
+                retainedRides.put(r1.to, r1);
+                /* We have a new, non-dominated, completed ride. Find transfers out of this new ride, respecting the transfer limit. */
+                int nRides = r1.pathLength;
                 if (nRides >= MAX_RIDES) continue;
                 boolean penultimateRide = (nRides == MAX_RIDES - 1);
                 // Invariant: r1.to should be the same as r1's key in rides
@@ -277,6 +275,7 @@ public class ProfileRouter {
                                     r2 = new Ride(tr.sc2, r1);
                                     r2.accessDist = tr.distance;
                                     r2.accessStats = new Stats((int)(tr.distance / request.walkSpeed));
+                                    r2.recomputeBounds();
                                     xferRides.put(tr.sc2, r2);
                                 }
                                 for (PatternRide pr : r2.patternRides) {
@@ -291,41 +290,52 @@ public class ProfileRouter {
                     }
                 }
             }
-            /* Enqueue new incomplete Rides with non-excessive durations. */
+            /* Enqueue new incomplete Rides resulting from transfers if they are not dominated at their from-cluster. */
             for (Ride r : xferRides.values()) {
-                // ride is unfinished, use previous ride's time as key
-                if (nondominated(r, false)) queue.insert(r, r.previous.durationLowerBound());
+                if ( ! dominated(r, r.from)) {
+                    // This ride is unfinished, use the previous ride's travel time lower bound as the p-queue key.
+                    // Note that we are not adding these transfer results to the retained rides, just enqueuing them.
+                    queue.insert(r, r.dlb);
+                }
             }
-            if (System.currentTimeMillis() > abortTime) throw new RuntimeException("TIMEOUT");
+            if (System.currentTimeMillis() > abortTime)
+                throw new RuntimeException("TIMEOUT");
         }
         LOG.info("Profile routing request finished in {} sec.", (System.currentTimeMillis() - searchBeginTime) / 1000.0);
         if (request.analyst) {
             makeSurfaces();
             return null;
         }
-        /* Non-analyst: Determine which rides are good ways to reach the destination. */
-        Set<Ride> targetRides = Sets.newHashSet();
-        // FIXME there are multiple copies of the same ride because we are iterating over all clusters near dest (hence using a set)
-        // FIXME do not examine every cluster near the destination, only those that are closest on at least one pattern
-        // use a Set<StopCluster>
+
+        /* In non-analyst (point-to-point) mode, determine which rides are good ways to reach the destination. */
+        /* A fake stop cluster to allow applying generic domination logic at the final destination. */
+        final StopCluster DESTINATION = new StopCluster("The Destination", "The Destination");
         for (StopCluster cluster : toStopPaths.keySet()) {
+            // TODO shared logic for making access/egress stats
+            Stats egressStats = new Stats();
+            egressStats.min = Integer.MAX_VALUE;
+            for (StopAtDistance sd : toStopPaths.get(cluster)) {
+                egressStats.merge(sd.etime);
+            }
             for (Ride ride : retainedRides.get(cluster)) {
-                PATTERN: for (PatternRide pr : ride.patternRides) {
-                    for (StopAtDistance clusterForPattern : toStops.get(pr.pattern)) {
-                        if (clusterForPattern != null && clusterForPattern.stop == cluster) {
-                            targetRides.add(ride);
-                            break PATTERN;
-                        }
-                    }
+                // Construct a new unfinished ride, representing "transferring" from the final stop to the destination
+                Ride rideAtDestination = new Ride(DESTINATION, ride);
+                rideAtDestination.accessStats = egressStats;
+                rideAtDestination.recomputeBounds();
+                if ( ! dominated(rideAtDestination, DESTINATION)) {
+                    retainedRides.put(DESTINATION, rideAtDestination);
                 }
             }
         }
-        LOG.info("{} nondominated rides stop near the destination.", targetRides.size());
+        LOG.info("{} nondominated rides reach the destination.", retainedRides.get(DESTINATION).size());
+
         /* Non-analyst: Build the list of Options by following the back-pointers in Rides. */
         List<Option> options = Lists.newArrayList();
-        for (Ride ride : targetRides) {
-            //
-            // We board / alight from all patterns in a ride at the same stop.
+        for (Ride ride : retainedRides.get(DESTINATION)) {
+            // slice off the final unfinished ride that only contains the egress stats
+            // TODO actually use this ride in preparing the response
+            ride = ride.previous;
+            // All PatternRides in a Ride end at the same stop.
             Collection<StopAtDistance> accessPaths = fromStopPaths.get(ride.getAccessStopCluster());
             Collection<StopAtDistance> egressPaths = toStopPaths.get(ride.getEgressStopCluster());
             Option option = new Option(ride, accessPaths, egressPaths);
@@ -336,65 +346,42 @@ public class ProfileRouter {
         return new ProfileResponse(options, request.orderBy, request.limit);
     }
 
-    /** Check whether a new ride has too long a duration relative to existing rides at the same location or global time limit. If the boolean argument is true,
-     * the ride will be added to retainedRides */
-    public boolean nondominated(Ride newRide, boolean add) {
-        StopCluster cluster = newRide.to;
-        if (cluster == null) { // if ride is unfinished, calculate time to its from-cluster based on previous ride
-            cluster = newRide.from;
-            newRide = newRide.previous;
+    /** @return the set of qualified modes used to access the chain of rides ending with the given ride. */
+    private Set<QualifiedMode> accessModesForRide(Ride ride) {
+        Collection<StopAtDistance> sds = fromStopPaths.get(ride.getAccessStopCluster());
+        Set<QualifiedMode> qmodes = Sets.newHashSetWithExpectedSize(sds.size());
+        for (StopAtDistance sd : sds) {
+            qmodes.add(sd.qmode);
         }
-        if (newRide.durationLowerBound() > MAX_DURATION) return false;
-        // Check whether any existing rides at the same location (stop cluster) dominate the new one.
-        for (Iterator<Ride> it = retainedRides.get(cluster).iterator(); it.hasNext();) {
-            Ride oldRide = it.next();
-            
-            if (oldRide.to == null) oldRide = oldRide.previous; // rides may be unfinished
-            // New rides must be strictly better (min and max) than any existing one with less transfers.
-            // This avoids alternatives formed by simply inserting extra unnecessary rides.
-            if (oldRide.pathLength() < newRide.pathLength() &&
-                oldRide.durationLowerBound() < newRide.durationLowerBound() &&
-                oldRide.durationUpperBound() < newRide.durationUpperBound()) {
-                return false;
-            }
-            // State is not strictly dominated. Perhaps it has the same number of transfers.
-            // In this case we want to keep it as long as it's sometimes better than all the others (time ranges overlap).
-            if (newRide.durationLowerBound() > oldRide.durationUpperBound() + request.suboptimalMinutes) {
-                return false;
-            }
-            
-            if (add && oldRide.durationLowerBound() > newRide.durationUpperBound() + request.suboptimalMinutes) {
-                // old ride is dominated by new ride, remove it
-                // TODO: remove propagation from old ride at this location? Or do we want to do this?
-                it.remove();
-            }
-        }
-        
-        if (add)
-            retainedRides.put(cluster, newRide);
-        
-        return true; // No existing ride is strictly better than the new ride.
+        return qmodes;
     }
-    
-    public PatternRide extendToIndex (PatternRide patternRide, StopCluster from, int targetIndex, TimeWindow timeWindow) {
-        ReachableStopSet rss = travelTimeCache.get(new Tuple2(from, patternRide.pattern));
-        
-        if (rss == null)
-            return null;
-        
-        Stats stats = new Stats();
-        int idx = targetIndex - patternRide.fromIndex - 1;
-        
-        if (rss.min[idx] == Integer.MAX_VALUE)
-            return null;
-        
-        stats.min = rss.min[idx];
-        stats.max = rss.max[idx];
-        // TODO we can do better than this.
-        stats.avg = (stats.min + stats.max) / 2;
-        stats.num = rss.num;
-        
-        return new PatternRide(patternRide, targetIndex, stats);
+
+    /**
+     * Check whether a new ride has too long a duration relative to existing rides at the given location,
+     * or relative to the global travel time limit.
+     * TODO auto-detect unfinished rides via to==null
+     */
+    public boolean dominated (Ride newRide, StopCluster atCluster) {
+        if (newRide.dlb > MAX_DURATION) return true;
+        // Check whether any existing rides at the same location (stop cluster) dominate the new one.
+        Set<QualifiedMode> newRideAccessModes = accessModesForRide(newRide);
+        for (Ride oldRide : retainedRides.get(atCluster)) {
+            // All retained rides should be finished (to != null), except those at DESTINATION.
+            // Certain pairs of options should not be presented as alternatives to one another.
+            // They are in direct competition with one another and strict dominance applies.
+            if (oldRide.pathLength < newRide.pathLength &&
+                oldRide.dlb < newRide.dlb &&
+                oldRide.dub < newRide.dub &&
+                accessModesForRide(oldRide).containsAll(newRideAccessModes)) {
+                return true;
+            }
+            // Strict dominance does not apply.
+            // Check whether time ranges overlap, considering the tolerance for suboptimality.
+            if (newRide.dlb > oldRide.dub + request.suboptimalMinutes * 60) {
+                return true;
+            }
+        }
+        return false; // No existing ride is considered sufficiently better than the new ride to eject it.
     }
 
     /**
@@ -412,7 +399,7 @@ public class ProfileRouter {
         SimpleIsochrone.MinMap<T2<TripPattern, QualifiedMode>, StopAtDistance> closest = new SimpleIsochrone.MinMap<>();
         // Iterate over all StopAtDistance for all Stops. The fastest mode will win at each stop.
         for (StopAtDistance stopDist : stopClusters.values()) {
-            for (Stop stop : stopDist.stop.children) {
+            for (Stop stop : stopDist.stopCluster.children) {
                 for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
                     closest.putMin(new T2(pattern, stopDist.qmode), stopDist);
                 }
@@ -442,7 +429,7 @@ public class ProfileRouter {
         for (QualifiedMode qmode : qModes.qModes) {
             LOG.info("{} mode {}", dest ? "egress" : "access", qmode);
             for (StopAtDistance sd : findClosestStops(qmode, dest)) {
-                pathsByStop.put(sd.stop, sd);
+                pathsByStop.put(sd.stopCluster, sd);
             }
         }
         return pathsByStop;
@@ -465,7 +452,7 @@ public class ProfileRouter {
         // Set batch after context, so both origin and dest vertices will be found.
         rr.batch = (true);
         rr.walkSpeed = request.walkSpeed;
-        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+        rr.dominanceFunction = new DominanceFunction.MinimumWeight();
         // RR dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
         int minAccessTime = 0;
@@ -484,8 +471,6 @@ public class ProfileRouter {
         long worstElapsedTimeSeconds = maxAccessTime * 60; // convert from minutes to seconds
         if (dest) worstElapsedTimeSeconds *= -1;
         rr.worstTime = (rr.dateTime + worstElapsedTimeSeconds);
-        // Note that the (forward) search is intentionally unlimited so it will reach the destination
-        // on-street, even though only transit boarding locations closer than req.streetDist will be used.
         AStar astar = new AStar();
         rr.setNumItineraries(1);
         StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(qmode, minAccessTime * 60);
@@ -494,40 +479,6 @@ public class ProfileRouter {
         // Save the routing context for later cleanup. We need its temporary edges to render street segments at the end.
         routingContexts.add(rr.rctx);
         return visitor.stopClustersFound.values();
-    }
-    
-    /** Index the trip pattern travel time ranges: how long it takes to get from every stop to every other stop */
-    public void indexTripPatternTravelTimeRanges () {
-        LOG.info("Caching travel time ranges for all patterns");
-        TRIPPATTERN: for (TripPattern tp : graph.index.patternForId.values()) {
-            List<Stop> stops =  tp.getStops();
-            for (int i = 0; i < stops.size(); i++) {
-                StopCluster clusterI = graph.index.stopClusterForStop.get(stops.get(i));
-                ReachableStopSet reachableStops = new ReachableStopSet(stops.size() - i);
-                
-                // FIXME: this means equal weights are being applied for all trips!!!!!!!!
-                reachableStops.num = 1;
-                
-                for (int j = i + 1; j < stops.size(); j++) {
-                    StopCluster clusterJ = graph.index.stopClusterForStop.get(stops.get(j));
-                    
-                    reachableStops.stopCluster[j - i - 1] = clusterJ;
-                    
-                    Stats s = Stats.create(tp, i, j, window);
-                    
-                    if (s == null)
-                        continue;
-                    
-                    reachableStops.min[j - i - 1] = s.min;
-                    reachableStops.max[j - i - 1] = s.max;
-                    // TODO no need to re-set this on each iteration (though it doesn't hurt)
-                    reachableStops.num = s.num;
-                }
-                
-                travelTimeCache.put(new Tuple2(clusterI, tp), reachableStops);
-            }
-        }
-        LOG.info("Done caching travel time ranges for all patterns");
     }
 
     static class StopFinderTraverseVisitor implements TraverseVisitor {
@@ -546,9 +497,9 @@ public class ProfileRouter {
             if (vertex instanceof TransitStop) {
                 StopAtDistance sd = new StopAtDistance(state, qmode);
                 if (qmode.mode == TraverseMode.CAR && sd.etime < minTravelTimeSeconds) return;
-                if (stopClustersFound.containsKey(sd.stop)) return; // record only the closest stop in each cluster
+                if (stopClustersFound.containsKey(sd.stopCluster)) return; // record only the closest stop in each cluster
                 LOG.debug("found stop cluster: {}", sd);
-                stopClustersFound.put(sd.stop, sd);
+                stopClustersFound.put(sd.stopCluster, sd);
             }
         }
     }
@@ -567,7 +518,7 @@ public class ProfileRouter {
         rr.to = new GenericLocation(request.toLat, request.toLon);
         rr.setArriveBy(false);
         rr.setRoutingContext(graph);
-        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+        rr.dominanceFunction = new DominanceFunction.MinimumWeight();
         // This is not a batch search, it is a point-to-point search with goal direction.
         // Impose a max time to protect against very slow searches.
         int worstElapsedTime = request.streetTime * 60;
@@ -625,8 +576,6 @@ public class ProfileRouter {
         for (Entry<StopCluster, Ride> entry : retainedRides.entries()) {
             StopCluster cluster = entry.getKey();
             Ride ride = entry.getValue();
-            int lb0 = ride.durationLowerBound();
-            int ub0 = ride.durationUpperBound();
             for (Stop stop : cluster.children) {
                 TransitStop tstop = graph.index.stopVertexForStop.get(stop);
                 // Iterate over street intersections in the vicinity of this particular transit stop.
@@ -640,8 +589,8 @@ public class ProfileRouter {
                     if (egressWalkTimeSeconds > request.maxWalkTime * 60) {
                         continue;
                     }
-                    int propagated_min = lb0 + egressWalkTimeSeconds;
-                    int propagated_max = ub0 + egressWalkTimeSeconds;
+                    int propagated_min = ride.dlb + egressWalkTimeSeconds;
+                    int propagated_max = ride.dub + egressWalkTimeSeconds;
                     int propagated_avg = (int)(((long) propagated_min + propagated_max) / 2); // FIXME HACK
                     int existing_min = minSurface.times.get(vertex);
                     int existing_max = maxSurface.times.get(vertex);
@@ -668,30 +617,4 @@ public class ProfileRouter {
         timeSurfaceRangeSet.avg = avgSurface;
     }
 
-    /** Represents a set of reachable stop clusters from a given stop using a particular trip pattern */
-    public static class ReachableStopSet {
-        /** The minimum time to reach this stop cluster */
-        public int[] min;
-        
-        /** The maximum time to reach this stop cluster */
-        public int[] max;
-        
-        /** The number of trips on this pattern */
-        public int num;
-        
-        /** The name of the stop cluster */
-        public StopCluster[] stopCluster;
-        
-        /** the size */
-        public int length;
-        
-        public ReachableStopSet(int size) {
-            this.min = new int[size];
-            Arrays.fill(this.min, Integer.MAX_VALUE);
-            this.max = new int[size];
-            Arrays.fill(this.max, Integer.MAX_VALUE);
-            this.stopCluster = new StopCluster[size];
-            this.length = size;
-        }
-    }
 }

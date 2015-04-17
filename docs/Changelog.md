@@ -1,8 +1,21 @@
 # Changelog
 
-## 0.15.0 (next release, in progress)
+## 0.16.0-SNAPSHOT
 
-- Artifact version is 0.15.0-SNAPSHOT instead of 1.0.0-SNAPSHOT (anticipating frequent point releases)
+- next release, work in progress on master branch
+
+## 0.15.0 (2015-04-14)
+
+- Fare module for Seattle
+- JSON fare module and OSM street naming configuration
+- Significant improvements to speed and result quality of Profile Routing
+- Support for added and modified GTFS-RT trips (thanks Jaap Koelewijn of DAT Mobility and Plannerstack)
+- Detailed edge lists in profile routing responses (for Transitive.js)
+- Support for multiple access modes including bike rental in profile routing
+- Fixes to graph reloading via web API
+- Improved comments in code and documentation of PointSets
+- Pulled MapDB GTFS loader out into a separate repo
+- Working artifact version was 0.15.0-SNAPSHOT instead of 1.0.0-SNAPSHOT (anticipating frequent point releases)
 
 ## 0.14.0 (2015-03-28)
 

@@ -59,7 +59,7 @@ public class ProfileResource {
             @QueryParam("minCarTime")   @DefaultValue("1")     int minCarTime,
             @QueryParam("minBikeTime")  @DefaultValue("1")     int minBikeTime,
             @QueryParam("orderBy")      @DefaultValue("AVG")   Option.SortOrder orderBy,
-            @QueryParam("limit")        @DefaultValue("10")    int limit,       // max options to return PER ACCESS MODE
+            @QueryParam("limit")        @DefaultValue("15")    int limit,       // max options to return PER ACCESS MODE
             @QueryParam("suboptimal")   @DefaultValue("5")     int suboptimalMinutes,
             @QueryParam("bikeSafe")     @DefaultValue("1")     int bikeSafe,
             @QueryParam("bikeSlope")    @DefaultValue("1")     int bikeSlope,
@@ -137,6 +137,9 @@ public class ProfileResource {
             try {
                 ProfileResponse response = router.route();
                 return Response.status(Status.OK).entity(response).build();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                return Response.status(Status.INTERNAL_SERVER_ERROR).entity(throwable.toString()).build();
             } finally {
                 router.cleanup(); // destroy routing contexts even when an exception happens
             }

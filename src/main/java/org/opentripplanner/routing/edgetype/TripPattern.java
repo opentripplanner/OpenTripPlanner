@@ -107,7 +107,10 @@ public class TripPattern implements Serializable {
     /** The human-readable, unique name for this trip pattern. */
     public String name;
 
-    /** The short unique identifier for this trip pattern. */
+    /**
+     * The short unique identifier for this trip pattern,
+     * generally in the format Agency:RouteId:DirectionId:PatternNumber.
+     */
     public String code;
 
     /* The vertices in the Graph that correspond to each Stop in this pattern. */

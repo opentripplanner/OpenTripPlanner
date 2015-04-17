@@ -32,8 +32,6 @@ import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
  * A travel time surface. Timing information from the leaves of a ShortestPathTree.
- * In Portland, one timesurface takes roughly one MB of memory and is also about that size as JSON.
- * However it is proportionate to the graph size not the time cutoff.
  */
 public class TimeSurface implements Serializable {
 

@@ -28,7 +28,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.standalone.OTPMain;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,6 +124,7 @@ public class InputStreamGraphSource implements GraphSource {
             if (preEvict) {
                 synchronized (preEvictMutex) {
                     if (router != null) {
+                        LOG.info("Reloading '{}': pre-evicting router", routerId);
                         router.shutdown();
                     }
                     /*
@@ -140,6 +140,7 @@ public class InputStreamGraphSource implements GraphSource {
                 if (newRouter != null) {
                     // Load OK
                     if (router != null) {
+                        LOG.info("Reloading '{}': post-evicting router", routerId);
                         router.shutdown();
                     }
                     router = newRouter; // Assignment in java is atomic

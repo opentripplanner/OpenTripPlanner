@@ -233,7 +233,7 @@ public class ShortestPathTree {
     }
 
     public String toString() {
-        return "MultiSPT(" + this.stateSets.size() + " vertices)";
+        return "ShortestPathTree(" + this.stateSets.size() + " vertices)";
     }
 
 }
