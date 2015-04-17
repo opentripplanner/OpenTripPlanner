@@ -131,5 +131,15 @@ public class TestCarSpeed extends TestCase {
         path = tree.getPath(v2, false);
         assertNotNull(path);
         assertEquals(Math.round(DISTANCE / DYNAMIC_CAR_SPEED), path.getDuration());
+
+        // Test for zero speed - imply no traversal
+        graph.carSpeedSnapshotSource.updateCarSpeedProvider(e1,
+                new StreetEdgeConstantCarSpeedProvider(0.0f));
+        graph.carSpeedSnapshotSource.commit();
+        options = new RoutingRequest(new TraverseModeSet(TraverseMode.CAR));
+        options.setRoutingContext(graph, v1, v2);
+        tree = aStar.getShortestPathTree(options);
+        path = tree.getPath(v2, false);
+        assertNull(path);
     }
 }
