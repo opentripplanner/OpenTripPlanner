@@ -15,10 +15,17 @@ package org.opentripplanner.routing.carspeed;
 
 import junit.framework.TestCase;
 
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeConstantCarSpeedProvider;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
@@ -37,7 +44,8 @@ public class TestCarSpeed extends TestCase {
         graph = new Graph();
         v1 = new IntersectionVertex(graph, "v1", 0, 0, "v1");
         v2 = new IntersectionVertex(graph, "v2", 0, 0.01, "v2");
-        e1 = new StreetEdge(v1, v2, null, "Demo", 87, StreetTraversalPermission.ALL, false);
+        double len = SphericalDistanceLibrary.fastDistance(v1.getCoordinate(), v2.getCoordinate());
+        e1 = new StreetEdge(v1, v2, null, "Demo", len, StreetTraversalPermission.ALL, false);
     }
 
     /**
@@ -86,4 +94,42 @@ public class TestCarSpeed extends TestCase {
         assertEquals(42.0f, carSpeed);
     }
 
+    /**
+     * Basic routing test with dynamic car speed source.
+     */
+    public void testRouting() throws Exception {
+
+        AStar aStar = new AStar();
+
+        final float STATIC_CAR_SPEED = 20.0f;
+        final float DYNAMIC_CAR_SPEED = 20.0f;
+        final double DISTANCE = e1.getDistance();
+        e1.setCarSpeed(STATIC_CAR_SPEED);
+
+        graph.carSpeedSnapshotSource = new CarSpeedSnapshotSource();
+
+        // Going from v1 to v2 should take t=d/v
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.CAR));
+        options.setRoutingContext(graph, v1, v2);
+        ShortestPathTree tree = aStar.getShortestPathTree(options);
+        GraphPath path = tree.getPath(v2, false);
+        assertEquals(Math.round(DISTANCE / STATIC_CAR_SPEED), path.getDuration());
+
+        graph.carSpeedSnapshotSource.updateCarSpeedProvider(e1,
+                new StreetEdgeConstantCarSpeedProvider(DYNAMIC_CAR_SPEED));
+        graph.carSpeedSnapshotSource.commit();
+
+        // Same static speed, using the snapshot from the origin request
+        tree = aStar.getShortestPathTree(options);
+        path = tree.getPath(v2, false);
+        assertEquals(Math.round(DISTANCE / STATIC_CAR_SPEED), path.getDuration());
+
+        // Now we should be using the dynamic speed
+        options = new RoutingRequest(new TraverseModeSet(TraverseMode.CAR));
+        options.setRoutingContext(graph, v1, v2);
+        tree = aStar.getShortestPathTree(options);
+        path = tree.getPath(v2, false);
+        assertNotNull(path);
+        assertEquals(Math.round(DISTANCE / DYNAMIC_CAR_SPEED), path.getDuration());
+    }
 }
