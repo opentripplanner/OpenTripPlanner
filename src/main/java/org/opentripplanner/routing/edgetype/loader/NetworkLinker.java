@@ -13,13 +13,7 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-
 import com.google.common.collect.Iterables;
-
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
@@ -36,6 +30,10 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class NetworkLinker {
 
@@ -92,13 +90,13 @@ public class NetworkLinker {
         if (nUnlinked > 0) {
             LOG.warn("{} transit stops were not close enough to the street network to be connected to it.", nUnlinked);
         }
-        //remove replaced edges
-        for (HashSet<StreetEdge> toRemove : networkLinkerLibrary.replacements.keySet()) {
-            for (StreetEdge edge : toRemove) {
-                edge.getFromVertex().removeOutgoing(edge);
-                edge.getToVertex().removeIncoming(edge);
-            }
-        }
+        //remove replaced edges. DISABLED until issue #1887 is resolved properly
+//        for (HashSet<StreetEdge> toRemove : networkLinkerLibrary.replacements.keySet()) {
+//            for (StreetEdge edge : toRemove) {
+//                edge.getFromVertex().removeOutgoing(edge);
+//                edge.getToVertex().removeIncoming(edge);
+//            }
+//        }
         //and add back in replacements
         for (LinkedList<P2<StreetEdge>> toAdd : networkLinkerLibrary.replacements.values()) {
             for (P2<StreetEdge> edges : toAdd) {

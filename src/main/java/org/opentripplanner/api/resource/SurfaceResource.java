@@ -7,6 +7,7 @@ import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.PointSet;
+import org.opentripplanner.analyst.ResultSetWithTimes;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.core.IsochroneData;
@@ -48,6 +49,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Surfaces cannot be isolated per-router because sometimes you want to compare two surfaces from different router IDs.
+ * Though one could question whether that really makes sense (perhaps alternative scenarios should be "within" the same router)
+ */
 @Path("/surfaces")
 @Produces({ MediaType.APPLICATION_JSON })
 public class SurfaceResource extends RoutingResource {
@@ -116,7 +121,6 @@ public class SurfaceResource extends RoutingResource {
                                   @QueryParam("detail")   boolean detail) {
 
         final TimeSurface surf = otpServer.surfaceCache.get(surfaceId);
-
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
         final PointSet pset = otpServer.pointSetCache.get(targetPointSetId);
         if (pset == null) return badRequest("Missing or invalid target PointSet ID.");
@@ -124,7 +128,7 @@ public class SurfaceResource extends RoutingResource {
         Router router = otpServer.getRouter(surf.routerId);
         // TODO cache this sampleset
         SampleSet samples = pset.getSampleSet(router.graph);
-        final ResultSet indicator = new ResultSet(samples, surf);
+        final ResultSet indicator = detail ? new ResultSetWithTimes(samples, surf) : new ResultSet(samples, surf);
         if (indicator == null) return badServer("Could not compute indicator as requested.");
 
         return Response.ok().entity(new StreamingOutput() {

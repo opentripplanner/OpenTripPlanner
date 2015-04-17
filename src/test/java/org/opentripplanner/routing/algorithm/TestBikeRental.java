@@ -19,7 +19,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -109,7 +109,7 @@ public class TestBikeRental extends TestCase {
 
         // now we succeed!
         options = new RoutingRequest();
-        new QualifiedModeSetSequence("BICYCLE_RENT,TRANSIT").applyToRequest(options);
+        new QualifiedModeSet("BICYCLE_RENT,TRANSIT").applyToRoutingRequest(options);
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
 

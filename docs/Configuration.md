@@ -158,7 +158,7 @@ national geographic surveys, or you can always fall back on the worldwide
 (roughly 30 meters horizontally) but it can give acceptable results.
 
 Simply place the elevation data file in the directory with the other graph builder inputs, alongside the GTFS and OSM data.
-Make sure the file has a `.tiff` extension, and the graph builder should detect its presence and apply
+Make sure the file has a `.tiff` or `.tif` extension, and the graph builder should detect its presence and apply
 the elevation data to the streets.
 
 
@@ -262,7 +262,7 @@ connect to a network resource is the `url` field.
             defaultAgencyId: "TriMet"
         },
 
-        // Polling bike rental updater for Citybikes
+        // Polling bike rental updater.
         // sourceType can be jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets, city-bikes, vcub
         {
             type: "bike-rental",
@@ -270,6 +270,15 @@ connect to a network resource is the `url` field.
             sourceType: "city-bikes",
             url: "http://host.domain.tld"
         },
+
+        // Polling bike rental updater for DC bikeshare (a Bixi system)
+        // Negative update frequency means to run once and then stop updating (essentially static data)
+        {
+            type: "bike-rental",
+            sourceType: "bixi",
+            url: "https://www.capitalbikeshare.com/data/stations/bikeStations.xml",
+            frequencySec: -1
+		},
 
         // Bike parking availability
         {
@@ -293,3 +302,76 @@ connect to a network resource is the `url` field.
     ]
 }
 ```
+
+## Fares configuration
+
+By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.
+For more complex scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
+`fares` section in `build-config.json`. You can combine different fares (for example transit and bike-rental)
+by defining a `combinationStrategy` parameter, and a list of sub-fares to combine (all fields starting with `fare`
+are considered to be sub-fares).
+
+```JSON
+// build-config.json
+{
+  // Select the custom fare "seattle"
+  fares: "seattle"
+  // OR this alternative form that could allow additional configuration
+  fares: {
+	type: "seattle"
+  }
+}
+```
+
+```JSON
+// build-config.json
+{
+  fares: {
+    // Combine two fares by simply adding them
+    combinationStrategy: "additive",
+    // First fare to combine
+    fare0: "new-york",
+    // Second fare to combine
+    fare1: {
+      type: "bike-rental-time-based",
+      currency: "USD",
+      prices: {
+          // For trip shorter than 30', $4 fare
+          "30":   4.00,
+          // For trip shorter than 1h, $6 fare
+          "1:00": 6.00
+      }
+    }
+    // We could also add fareFoo, fareBar...
+  }
+}
+```
+
+The current list of custom fare type is:
+
+- `bike-rental-time-based` - accepting the following parameters:
+    - `currency` - the ISO 4217 currency code to use, such as `"EUR"` or `"USD"`,
+    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed time of bike rental is lower than the defined time.
+- `san-francisco` (no parameters)
+- `new-york` (no parameters)
+- `seattle` (no parameters)
+
+The current list of `combinationStrategy` is:
+
+- `additive` - simply adds all sub-fares.
+
+## Custom OSM naming
+
+You can define a custom OSM naming scheme by defining `osmNaming` in `build-config.json`,
+such as:
+
+```JSON
+// build-config.json
+{
+  osmNaming: "portland"
+}
+```
+
+The current list of OSM custom naming is:
+
+- `portland` (no parameters)

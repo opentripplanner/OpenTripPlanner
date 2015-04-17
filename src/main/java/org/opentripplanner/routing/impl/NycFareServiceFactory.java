@@ -17,14 +17,19 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
-public class NycFareServiceFactory implements FareServiceFactory {
-    
-	public FareService makeFareService() {
-		return new NycFareServiceImpl(); 
-	}
+import com.fasterxml.jackson.databind.JsonNode;
 
-        
-	@Override
-	public void setDao(GtfsRelationalDao dao) {
-	}
+public class NycFareServiceFactory implements FareServiceFactory {
+
+    public FareService makeFareService() {
+        return new NycFareServiceImpl();
+    }
+
+    @Override
+    public void processGtfs(GtfsRelationalDao dao) {
+    }
+
+    @Override
+    public void configure(JsonNode config) {
+    }
 }

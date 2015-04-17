@@ -164,7 +164,7 @@ public class GraphServiceTest extends TestCase {
         graphSourceFactory.save("A", new ByteArrayInputStream(smallGraphData));
 
         // Force a reload, get again the graph
-        graphService.reloadGraphs(false);
+        graphService.reloadGraphs(false, true);
         graph = graphService.getRouter("A").graph;
 
         // Check if loaded graph is the one modified
@@ -175,7 +175,7 @@ public class GraphServiceTest extends TestCase {
         boolean deleted = new File(new File(basePath, "A"), InputStreamGraphSource.GRAPH_FILENAME)
                 .delete();
         assertTrue(deleted);
-        graphService.reloadGraphs(false);
+        graphService.reloadGraphs(false, true);
 
         // Check that the graph have been evicted
         assertEquals(0, graphService.getRouterIds().size());

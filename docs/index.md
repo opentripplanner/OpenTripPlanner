@@ -25,7 +25,7 @@ The code is under active development with a variety of [deployments](Deployments
 ## Status
 
 [![Build Status](http://ci.opentripplanner.org/buildStatus/icon?job=OpenTripPlanner)](http://ci.opentripplanner.org/job/OpenTripPlanner/)
-OpenTripPlanner is presently at **version 0.13.0**. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
+OpenTripPlanner is presently at **version 0.14.0**. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
 
  * Plans multi-modal walking, wheelchair, bicycle and transit trips
  * Takes travel time, road type, safety, and elevation into account, and allows users to customize the weighting of these three factors
@@ -53,6 +53,8 @@ The term "OTP Analyst" refers to parts of OTP that apply the routing engine to t
 The **OTP Analyst Web Services** provide network analysis results such as travel time maps and isochrones as standard web Mercator tiles or GIS rasters via a [WMS](http://en.wikipedia.org/wiki/Web_Map_Service)-derived API. These web services are conceptually separate from the routing API, but are provided by the same servlet: once you have a working OTP trip planner you can also use it to produce travel time maps and other visualizations of transit service. See [this blog post](http://conveyal.com/blog/2012/07/02/analyst/) for discussion and examples.
 
 The **OTP Analyst Batch Processor** is a command-line tool that handles more complex one-off network analysis tasks. It uses the same core routing library and data sources as other OTP services, but allows for very open-ended configuration and the inclusion of population or opportunity data. While configuration and use are currently somewhat opaque for non-developers, the "Batch Analyst" is becoming a powerful tool for visualizing how transportation networks affect access to urban opportunities. See [this article](http://www.theatlanticcities.com/commute/2013/01/best-maps-weve-seen-sandys-transit-outage-new-york/4488/) for an example case study on the effects of hurricane Sandy in New York.
+
+The **OTP Scripting API** allow the execution of routing requests from within scripts (such as _Python_). It is composed of a stable internal API, and an embedded Jython interpreter. It can be used in different contexts, such as batch analysis or automated regression testing. [More information here](Scripting).
 
 ## Additional Documentation
 

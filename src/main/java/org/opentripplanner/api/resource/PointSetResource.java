@@ -1,23 +1,15 @@
 package org.opentripplanner.api.resource;
 
 import org.opentripplanner.analyst.PointSet;
-import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.model.PointSetShort;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -49,7 +41,6 @@ public class PointSetResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPointSet (
     		@PathParam("pointSetId") String pointSetId) {
-    	
     	
         final PointSet pset = server.pointSetCache.get(pointSetId);
         if (pset == null) {

@@ -1,7 +1,60 @@
 # Changelog
 
-## 0.14.0 (2015-02-25)
-- Coming soon...
+## 0.16.0-SNAPSHOT
+
+- next release, work in progress on master branch
+
+## 0.15.0 (2015-04-14)
+
+- Fare module for Seattle
+- JSON fare module and OSM street naming configuration
+- Significant improvements to speed and result quality of Profile Routing
+- Support for added and modified GTFS-RT trips (thanks Jaap Koelewijn of DAT Mobility and Plannerstack)
+- Detailed edge lists in profile routing responses (for Transitive.js)
+- Support for multiple access modes including bike rental in profile routing
+- Fixes to graph reloading via web API
+- Improved comments in code and documentation of PointSets
+- Pulled MapDB GTFS loader out into a separate repo
+- Working artifact version was 0.15.0-SNAPSHOT instead of 1.0.0-SNAPSHOT (anticipating frequent point releases)
+
+## 0.14.0 (2015-03-28)
+
+- JSON configuration of graph building and routers
+- Began moving documentation (including this changelog) into the OTP repo and rewriting it page by page. It is built statically from Markdown using mkdocs and published on readthedocs.
+- Street edge lists and bike rental station IDs in profile routing results (allows better rendering)
+- Improved correctness of profile routing
+- Qualified modes including rented bikes work in profile routing
+- Simplification of qualified mode sets
+- Elevation models are loaded from TIFFs in graph directory
+- Tiles for differences between TimeSurfaces
+- Restructured relationship between Routers and Graphs
+- Various changes enabling use of Analyst features in a cluster computing environment.
+- Removed several single-implementation interfaces, factories, services and other superfluous abstractions
+- Various client fixes related to the transit index API
+- Revised nearby stops logic and transfer generation to eliminate useless transfer edges
+- New Index API endpoints for geometries, transfers etc.
+- Isochrone generation fixes
+- Default mode of operation is now “long distance mode”
+- Process for finding alternative routes is now based on banning trips and retrying, while reusing the heuristic
+- Optimization objective functions are swappable, and have been simplified and corrected
+- All client Javascript librariess are now pulled from a CDN
+- Dutch BAG and French BANO geocoders
+- Bus to street matching improvements
+- Complete MapDB based GTFS and OSM loader libraries (will become separate projects, not yet connected to OTP graph builder)
+- API documentation generation working again
+- Disable some time consuming graph building steps by default
+- Finnish and Swedish translations
+- Subway-specific JSON configuration options (street to platform time)
+- Realtime fetch / streaming configurable via JSON
+- Stairs reluctance is much higher when carrying a bike
+- Graph visualizer routing progress animates when a search is triggered via the web API
+- Assume WGS84 (spherical distance calculations) everywhere
+- Removed custom motor vehicle (which was unmaintained and not documented)
+- Ability to poll for bike rental locations only once at startup
+- Stoptimes are fetched for a specific service day in index API
+- Bicycle triangle support in profile routing
+- Proper handling of multiple access modes with different speeds in profile routing
+- Command line option to output OTP's version
 
 ## 0.13.0 (2014-12-05)
 - Detect apparent errors in GTFS interlining

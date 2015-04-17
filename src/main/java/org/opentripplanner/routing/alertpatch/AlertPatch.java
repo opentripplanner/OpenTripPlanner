@@ -63,7 +63,15 @@ public class AlertPatch implements Serializable {
 
     private AgencyAndId stop;
 
+    /**
+     * The headsign of the alert
+     */
     private String direction;
+
+    /**
+     * Direction id of the GTFS trips this alert concerns, set to -1 if no direction.
+     */
+    private int directionId = -1;
 
     @XmlElement
     public Alert getAlert() {
@@ -115,6 +123,9 @@ public class AlertPatch implements Serializable {
                 if (direction != null && ! direction.equals(tripPattern.getDirection())) {
                     continue;
                 }
+                if (directionId != -1 && directionId == tripPattern.directionId) {
+                    continue;
+                }
                 for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
                     if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
                         graph.addAlertPatch(tripPattern.boardEdges[i], this);
@@ -164,6 +175,9 @@ public class AlertPatch implements Serializable {
 
             for (TripPattern tripPattern : tripPatterns) {
                 if (direction != null && ! direction.equals(tripPattern.getDirection())) {
+                    continue;
+                }
+                if (directionId != -1 && directionId != tripPattern.directionId) {
                     continue;
                 }
                 for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
@@ -245,9 +259,18 @@ public class AlertPatch implements Serializable {
         this.direction = direction;
     }
 
+    public void setDirectionId(int direction) {
+        this.directionId = direction;
+    }
+
     @XmlElement
     public String getDirection() {
         return direction;
+    }
+
+    @XmlElement
+    public int getDirectionId() {
+        return directionId;
     }
 
     public void setStop(AgencyAndId stop) {
@@ -267,6 +290,9 @@ public class AlertPatch implements Serializable {
             if (!direction.equals(other.direction)) {
                 return false;
             }
+        }
+        if (directionId != other.directionId) {
+            return false;
         }
         if (agency == null) {
             if (other.agency != null) {
@@ -336,6 +362,7 @@ public class AlertPatch implements Serializable {
 
     public int hashCode() {
         return ((direction == null ? 0 : direction.hashCode()) +
+                directionId +
                 (agency == null ? 0 : agency.hashCode()) +
                 (trip == null ? 0 : trip.hashCode()) +
                 (stop == null ? 0 : stop.hashCode()) +

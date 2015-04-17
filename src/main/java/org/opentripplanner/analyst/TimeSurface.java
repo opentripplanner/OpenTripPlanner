@@ -7,7 +7,9 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
-import org.opentripplanner.common.geometry.*;
+import org.opentripplanner.common.geometry.AccumulativeGridSampler;
+import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.profile.AnalystProfileRouterPrototype;
 import org.opentripplanner.profile.ProfileRequest;
@@ -21,18 +23,13 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.font.NumericShaper;
 import java.io.Serializable;
 import java.util.Map;
 
-import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.min;
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
  * A travel time surface. Timing information from the leaves of a ShortestPathTree.
- * In Portland, one timesurface takes roughly one MB of memory and is also about that size as JSON.
- * However it is proportionate to the graph size not the time cutoff.
  */
 public class TimeSurface implements Serializable {
 
@@ -49,10 +46,12 @@ public class TimeSurface implements Serializable {
     public Map<String, String> params; // The query params sent by the user, for reference only
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
     public String description;
+    public double walkSpeed = 1.33; // meters/sec TODO could we just store the whole routing request instead of params?
 
     public TimeSurface(ShortestPathTree spt) {
 
         params = spt.getOptions().parameters;
+        walkSpeed = spt.getOptions().walkSpeed;
 
         String routerId = spt.getOptions().routerId;
         if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
@@ -92,6 +91,7 @@ public class TimeSurface implements Serializable {
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
+        walkSpeed = profileRouter.request.walkSpeed;
     }
 
     /** Make a max or min timesurface from propagated times in a ProfileRouter. */
@@ -105,6 +105,7 @@ public class TimeSurface implements Serializable {
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
+        walkSpeed = profileRouter.request.walkSpeed;
     }
 
     public static TimeSurface.RangeSet makeSurfaces (AnalystProfileRouterPrototype profileRouter) {

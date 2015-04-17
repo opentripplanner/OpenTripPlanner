@@ -13,12 +13,12 @@
 
 package org.opentripplanner.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MavenVersion implements Serializable {
 
@@ -109,6 +109,15 @@ public class MavenVersion implements Serializable {
 
     public String toStringVerbose() {
         return String.format("%s => %s UID=%d", version, this.toString(), getUID());
+    }
+
+    public String getShortVersionString() {
+        return "OpenTripPlanner " + version + " " + commit;
+    }
+
+    public String getLongVersionString() {
+        String format = "version: %s\nmajor: %s\nminor: %s\npatch: %s\nqualifier: %s\ncommit: %s\n";
+        return String.format(format, version, major, minor, incremental, qualifier, commit);
     }
 
     public int hashCode () {

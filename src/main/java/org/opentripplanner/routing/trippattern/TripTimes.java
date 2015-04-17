@@ -21,7 +21,6 @@ import java.util.List;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
@@ -111,7 +110,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /**
      * Is this trip cancelled?
      */
-    private boolean cancelled = false;
+    private boolean canceled = false;
 
     /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
     private final BitSet timepoints;
@@ -264,6 +263,13 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         return departureTimes == null && arrivalTimes == null;
     }
 
+    /**
+     * @return true if this TripTimes is canceled
+     */
+    public boolean isCanceled() {
+        return canceled;
+    }
+
     /** Used in debugging / dumping times. */
     public static String formatSeconds(int s) {
         int m = s / 60;
@@ -323,7 +329,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
 
     /** Cancel this entire trip */
     public void cancel() {
-        cancelled = true;
+        canceled = true;
         arrivalTimes = new int[getNumStops()];
         Arrays.fill(arrivalTimes, UNAVAILABLE);
         departureTimes = arrivalTimes;

@@ -31,7 +31,6 @@ public enum StreetTraversalPermission {
     CAR(4),
     PEDESTRIAN_AND_CAR(4 | 1),
     BICYCLE_AND_CAR(4 | 2),
-    PEDESTRIAN_AND_BICYCLE_AND_CAR(4 | 2 | 1),
     ALL(4 | 2 | 1);
 
     private static final Map<Integer, StreetTraversalPermission> lookup = new HashMap<Integer, StreetTraversalPermission>();

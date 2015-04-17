@@ -13,23 +13,11 @@
 
 package org.opentripplanner.routing.core;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-
 import com.google.common.base.Objects;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
@@ -42,6 +30,17 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries.
@@ -99,7 +98,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
-    public OptimizeType optimize = OptimizeType.QUICK; // TODO this should be completely removed and done only with individual cost parameters
+    public OptimizeType optimize = OptimizeType.QUICK;
+    // TODO this should be completely removed and done only with individual cost parameters
+    // Also: apparently OptimizeType only affects BICYCLE mode traversal of street segments.
+    // If this is the case it should be very well documented and carried over into the Enum name.
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
@@ -428,14 +430,14 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.setModes(modes);
     }
 
-    public RoutingRequest(QualifiedModeSetSequence qmodes) {
+    public RoutingRequest(QualifiedModeSet qmodes) {
         this();
-        qmodes.applyToRequest(this);
+        qmodes.applyToRoutingRequest(this);
     }
 
     public RoutingRequest(String qmodes) {
         this();
-        new QualifiedModeSetSequence(qmodes).applyToRequest(this);
+        new QualifiedModeSet(qmodes).applyToRoutingRequest(this);
     }
 
     public RoutingRequest(TraverseMode mode) {
@@ -1126,6 +1128,21 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         // Considering that buses can travel on highways, return the same max speed for all other transit.
         return 40; // TODO find accurate max speeds
+    }
+
+    /**
+     * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness, and speed.
+     * These three fields of the RoutingRequest should have values between 0 and 1, and should add up to 1.
+     * This setter function accepts any three numbers and will normalize them to add up to 1.
+     */
+    public void setTriangleNormalized (double safe, double slope, double time) {
+        double total = safe + slope + time;
+        safe /= total;
+        slope /= total;
+        time /= total;
+        this.triangleSafetyFactor = safe;
+        this.triangleSlopeFactor = slope;
+        this.triangleTimeFactor = time;
     }
 
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */

@@ -13,7 +13,9 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -22,8 +24,8 @@ import java.util.HashMap;
  */
 public class Fare {
 
-    public static enum FareType {
-        regular, student, senior, tram, special
+    public static enum FareType implements Serializable {
+        regular, student, senior, tram, special, youth
     }
 
     /**
@@ -33,6 +35,16 @@ public class Fare {
 
     public Fare() {
         fare = new HashMap<FareType, Money>();
+    }
+
+    public Fare(Fare aFare) {
+        this();
+        if (aFare != null) {
+            for (Map.Entry<FareType, Money> kv : aFare.fare.entrySet()) {
+                fare.put(kv.getKey(), new Money(kv.getValue().getCurrency(), kv.getValue()
+                        .getCents()));
+            }
+        }
     }
 
     public void addFare(FareType fareType, WrappedCurrency currency, int cents) {

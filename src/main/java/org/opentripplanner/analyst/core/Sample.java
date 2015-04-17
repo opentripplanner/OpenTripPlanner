@@ -20,14 +20,14 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class Sample {
 
-    public final int t0, t1; // TODO change from times to distances.
+    public final int d0, d1; // TODO change from times to distances.
     public final Vertex v0, v1;
     
-    public Sample (Vertex v0, int t0, Vertex v1, int t1) {
+    public Sample (Vertex v0, int d0, Vertex v1, int d1) {
         this.v0 = v0;
-        this.t0 = t0;
+        this.d0 = d0;
         this.v1 = v1;
-        this.t1 = t1;
+        this.d1 = d1;
     }
 
     public byte evalBoardings(ShortestPathTree spt) {
@@ -41,16 +41,21 @@ public class Sample {
             m1 = (s1.getNumBoardings()); 
         return (byte) ((m0 < m1) ? m0 : m1); 
     }
-    
+
+    /**
+     * @param spt the ShortestPathTree with respect to which this sample will be evaluated
+     * @return the travel time to reach this Sample point from the SPT's origin
+     */
     public long eval(ShortestPathTree spt) {
         State s0 = spt.getState(v0);
         State s1 = spt.getState(v1);
         long m0 = Long.MAX_VALUE;
         long m1 = Long.MAX_VALUE;
+        double walkSpeed = spt.getOptions().walkSpeed;
         if (s0 != null)
-            m0 = (s0.getActiveTime() + t0); 
+            m0 = (int)(s0.getActiveTime() + d0 / walkSpeed);
         if (s1 != null)
-            m1 = (s1.getActiveTime() + t1); 
+            m1 = (int)(s1.getActiveTime() + d1 / walkSpeed);
         return (m0 < m1) ? m0 : m1; 
     }
 
@@ -59,13 +64,10 @@ public class Sample {
         State s1 = spt.getState(v1);
         double m0 = Double.NaN;
         double m1 = Double.NaN;
-        // TODO When using distance instead of t0/t1 times
-        // the computation will be made simpler.
-        double walkSpeed = spt.getOptions().walkSpeed;
         if (s0 != null)
-            m0 = (s0.getWalkDistance() + t0 * walkSpeed);
+            m0 = (s0.getWalkDistance() + d0);
         if (s1 != null)
-            m1 = (s1.getWalkDistance() + t1 * walkSpeed);
+            m1 = (s1.getWalkDistance() + d1);
         return (m0 < m1) ? m0 : m1;
     }
 
@@ -76,20 +78,20 @@ public class Sample {
         if (v0 != null) {
             int s0 = surf.getTime(v0);
             if (s0 != TimeSurface.UNREACHABLE) {
-                m0 = (int) (s0 + t0);
+                m0 = (int) (s0 + d0 / surf.walkSpeed);
             }
         }
         if (v1 != null) {
             int s1 = surf.getTime(v1);
             if (s1 != TimeSurface.UNREACHABLE) {
-                m1 = (int) (s1 + t1);
+                m1 = (int) (s1 + d1 / surf.walkSpeed);
             }
         }
         return (m0 < m1) ? m0 : m1;
     }
 
     public String toString() {
-        return String.format("Sample: %s in %d sec or %s in %d sec\n", v0, t0, v1, t1);
+        return String.format("Sample: %s at %d meters or %s at %d meters\n", v0, d0, v1, d1);
     }
     
 }
