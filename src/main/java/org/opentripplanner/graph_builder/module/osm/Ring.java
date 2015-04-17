@@ -16,8 +16,8 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.beust.jcommander.internal.Lists;
 import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.osm.Node;
-import org.opentripplanner.osm.OSM;
+import com.conveyal.osmlib.Node;
+import com.conveyal.osmlib.OSM;
 import org.opentripplanner.visibility.VLPoint;
 import org.opentripplanner.visibility.VLPolygon;
 

@@ -15,8 +15,8 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.osm.Tagged;
-import org.opentripplanner.osm.Way;
+import com.conveyal.osmlib.OSMEntity;
+import com.conveyal.osmlib.Way;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
@@ -160,7 +160,7 @@ public class WayPropertySet {
     }
 
     // TODO rename all of this, we are passing things other than ways in here
-    public String getCreativeNameForWay(Tagged tagged) {
+    public String getCreativeNameForWay(OSMEntity tagged) {
         CreativeNamer bestNamer = null;
         int bestScore = 0;
         for (CreativeNamerPicker picker : creativeNamers) {

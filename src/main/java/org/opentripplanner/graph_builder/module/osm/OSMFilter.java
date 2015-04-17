@@ -16,9 +16,9 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.beust.jcommander.internal.Maps;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
-import org.opentripplanner.osm.Node;
-import org.opentripplanner.osm.Tagged;
-import org.opentripplanner.osm.Way;
+import com.conveyal.osmlib.Node;
+import com.conveyal.osmlib.OSMEntity;
+import com.conveyal.osmlib.Way;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -36,18 +36,18 @@ public abstract class OSMFilter {
     private static Logger LOG = LoggerFactory.getLogger(OSMFilter.class);
 
     /** @return true if the given key is explicitly denied access to the given entity. */
-    private static boolean keyExplicitlyDeniesAccess(Tagged entity, String key) {
+    private static boolean keyExplicitlyDeniesAccess(OSMEntity entity, String key) {
         String tagValue = entity.getTag(key);
         return "no".equals(tagValue) || "license".equals(tagValue);
     }
 
     /** For bicycles, in addition to the usual access denial values, check requirement to use a separate sidepath. */
-    private static boolean bicycleExplicitlyDenied (Tagged entity) {
+    private static boolean bicycleExplicitlyDenied (OSMEntity entity) {
         return keyExplicitlyDeniesAccess(entity, "bicycle") || "use_sidepath".equals(entity.getTag("bicycle"));
     }
 
     /** @return true if the given key is explicitly allowed access to the given entity. */
-    public static boolean keyExplicitlyAllowsAccess(Tagged entity, String key) {
+    public static boolean keyExplicitlyAllowsAccess(OSMEntity entity, String key) {
         if (entity.hasNoTags()) {
             return false;
         }
@@ -60,7 +60,7 @@ public abstract class OSMFilter {
     }
 
     /** @return true if access is generally denied to this element (potentially with exceptions). */
-    public static boolean isGeneralAccessDenied(Tagged entity) {
+    public static boolean isGeneralAccessDenied(OSMEntity entity) {
         return keyExplicitlyDeniesAccess(entity, "access");
     }
 
@@ -75,7 +75,7 @@ public abstract class OSMFilter {
      *
      * TODO why is this separate from isOsmEntityRoutable? It's being applied to relations as well.
      */
-    public static boolean isWayRoutable (Tagged way) {
+    public static boolean isWayRoutable (OSMEntity way) {
         if (!isOsmEntityRoutable(way)) {
             return false;
         }
@@ -102,7 +102,7 @@ public abstract class OSMFilter {
      * usage=tourism. This prevents miniature tourist railways like the one in Portland's Zoo from
      * receiving a better score and pulling search endpoints away from real transit stops.
      */
-    public static boolean isOsmEntityRoutable(Tagged osmEntity) {
+    public static boolean isOsmEntityRoutable(OSMEntity osmEntity) {
         if (osmEntity.hasTag("highway")) {
             return true;
         }
@@ -117,7 +117,7 @@ public abstract class OSMFilter {
     }
 
     /** @return true if this node / area is a park-and-ride lot. */
-    public static boolean isParkAndRide(Tagged entity) {
+    public static boolean isParkAndRide(OSMEntity entity) {
         String parkingType = entity.getTag("parking");
         String parkAndRide = entity.getTag("park_ride");
         return entity.hasTag("amenity", "parking")
@@ -126,23 +126,23 @@ public abstract class OSMFilter {
     }
 
     /** @return true if this node / area is a bike parking. */
-    public static boolean isBikeParking (Tagged entity) {
+    public static boolean isBikeParking (OSMEntity entity) {
         return entity.hasTag("amenity", "bicycle_parking")
                 && !entity.hasTag("access", "private") && !entity.hasTag("access", "no");
     }
 
     /** @return True if this node is a bike rental station. */
-    public static boolean isBikeRental(Tagged entity) {
+    public static boolean isBikeRental(OSMEntity entity) {
         return entity.hasTag("amenity", "bicycle_rental");
     }
 
-    public static boolean isUnderConstruction(Tagged entity) {
+    public static boolean isUnderConstruction(OSMEntity entity) {
         return "construction".equals(entity.getTag("highway")) ||
                 "construction".equals(entity.getTag("cycleway"));
     }
 
     /** Gets OTP street traversal permissions based on the tags in an OSM entity of any kind. */
-    public static StreetTraversalPermission getPermissionsForEntity(Tagged entity, StreetTraversalPermission def) {
+    public static StreetTraversalPermission getPermissionsForEntity(OSMEntity entity, StreetTraversalPermission def) {
         StreetTraversalPermission permission = null;
 
         /*
@@ -296,7 +296,7 @@ public abstract class OSMFilter {
         return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
     }
 
-    public static int getStreetClasses(Tagged way) {
+    public static int getStreetClasses(OSMEntity way) {
         int link = 0;
         String highway = way.getTag("highway");
         if (highway != null && highway.endsWith(("_link"))) {
@@ -305,7 +305,7 @@ public abstract class OSMFilter {
         return getPlatformClass(way) | link;
     }
 
-    public static int getPlatformClass(Tagged way) {
+    public static int getPlatformClass(OSMEntity way) {
         String highway = way.getTag("highway");
         if ("platform".equals(way.getTag("railway"))) {
             return StreetEdge.CLASS_TRAIN_PLATFORM;
@@ -324,7 +324,7 @@ public abstract class OSMFilter {
      * @return whether the node is a public transport stop that can be linked to a transit stop vertex later on
      * @author hannesj
      */
-    public static boolean isStop(Tagged entity) {
+    public static boolean isStop(OSMEntity entity) {
         return "bus_stop".equals(entity.getTag("highway"))
                 || "tram_stop".equals(entity.getTag("railway"))
                 || "station".equals(entity.getTag("railway"))
@@ -342,12 +342,12 @@ public abstract class OSMFilter {
     }
 
     /** @return true if these are steps. */
-    public static boolean isSteps(Tagged entity) {
+    public static boolean isSteps(OSMEntity entity) {
         return "steps".equals(entity.getTag("highway"));
     }
 
     /** @return true if this is a roundabout. */
-    public static boolean isRoundabout(Tagged entity) {
+    public static boolean isRoundabout(OSMEntity entity) {
         return "roundabout".equals(entity.getTag("junction"));
     }
 
@@ -356,7 +356,7 @@ public abstract class OSMFilter {
      * The otp: namespaced tags are created by OpenStreetMapModule#processRelations(). We should probably stop doing
      * that.
      */
-    public static String getAssumedName(Tagged entity) {
+    public static String getAssumedName(OSMEntity entity) {
 
         String name;
 
@@ -398,7 +398,7 @@ public abstract class OSMFilter {
     }
 
     /** @return true if through traffic is not allowed. */
-    public static boolean throughTrafficDisallowed(Tagged entity) {
+    public static boolean throughTrafficDisallowed(OSMEntity entity) {
         String access = entity.getTag("access");
         return "destination".equals(access) || "private".equals(access)
                 || "customers".equals(access) || "delivery".equals(access)
@@ -407,37 +407,37 @@ public abstract class OSMFilter {
 
 
     /** @return true if this is a one-way street for driving. */
-    public static boolean isOneWayForwardDriving(Tagged entity) {
+    public static boolean isOneWayForwardDriving(OSMEntity entity) {
         return entity.tagIsTrue("oneway");
     }
 
     /** @return true if this way is one-way in the opposite direction of its definition. */
-    public static boolean isOneWayReverseDriving(Tagged entity) {
+    public static boolean isOneWayReverseDriving(OSMEntity entity) {
         return entity.hasTag("oneway", "-1");
     }
 
     /** @return true if bikes can only go forward. */
-    public static boolean isOneWayForwardBicycle(Tagged entity) {
+    public static boolean isOneWayForwardBicycle(OSMEntity entity) {
         return entity.tagIsTrue("oneway:bicycle") || entity.tagIsFalse("bicycle:backwards");
     }
 
     /** @return true if bikes can only go in the reverse direction. */
-    public static boolean isOneWayReverseBicycle(Tagged entity) {
+    public static boolean isOneWayReverseBicycle(OSMEntity entity) {
         return entity.hasTag("oneway:bicycle", "-1");
     }
 
     /** @return true if bikes must use a separate sidepath in the forward direction of travel. */
-    public static boolean isForwardDirectionSidepath(Tagged entity) {
+    public static boolean isForwardDirectionSidepath(OSMEntity entity) {
         return entity.hasTag("bicycle:forward", "use_sidepath");
     }
 
     /** @return true if bikes must use a separate sidepath in the reverse direction of travel. */
-    public static boolean isReverseDirectionSidepath(Tagged entity) {
+    public static boolean isReverseDirectionSidepath(OSMEntity entity) {
         return entity.hasTag("bicycle:backward", "use_sidepath");
     }
 
     /** @return whether there is a contraflow cycle path here. */
-    public static boolean isOpposableCycleway(Tagged entity) {
+    public static boolean isOpposableCycleway(OSMEntity entity) {
         // any cycleway which is opposite* allows contraflow biking
         String cycleway = entity.getTag("cycleway");
         String cyclewayLeft = entity.getTag("cycleway:left");
@@ -448,9 +448,9 @@ public abstract class OSMFilter {
     }
 
     /** @return a map of key-value pairs for all tags whose keys begin with the given prefix and a colon. */
-    public static Map<String, String> getTagsByPrefix (Tagged entity, String prefix) {
+    public static Map<String, String> getTagsByPrefix (OSMEntity entity, String prefix) {
         Map<String, String> out = Maps.newHashMap();
-        for (Tagged.Tag tag : entity.tags) {
+        for (OSMEntity.Tag tag : entity.tags) {
             if (tag.key.equals(prefix) || tag.key.startsWith(prefix + ":")) {
                 out.put(tag.key, tag.value);
             }

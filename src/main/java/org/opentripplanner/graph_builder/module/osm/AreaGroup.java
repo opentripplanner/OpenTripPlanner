@@ -21,8 +21,8 @@ import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.osm.Node;
-import org.opentripplanner.osm.OSM;
+import com.conveyal.osmlib.Node;
+import com.conveyal.osmlib.OSM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

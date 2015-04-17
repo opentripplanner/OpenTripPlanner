@@ -35,10 +35,10 @@ import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
-import org.opentripplanner.osm.Node;
-import org.opentripplanner.osm.OSM;
-import org.opentripplanner.osm.Tagged;
-import org.opentripplanner.osm.Way;
+import com.conveyal.osmlib.Node;
+import com.conveyal.osmlib.OSM;
+import com.conveyal.osmlib.OSMEntity;
+import com.conveyal.osmlib.Way;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -625,7 +625,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
     }
 
-    private void setWayName(Tagged tagged) {
+    private void setWayName(OSMEntity tagged) {
         if (!tagged.hasTag("name")) {
             String creativeName = wayPropertySet.getCreativeNameForWay(tagged);
             if (creativeName != null) {

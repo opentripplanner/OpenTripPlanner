@@ -14,7 +14,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.osm.Tagged;
+import com.conveyal.osmlib.OSMEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class OSMSpecifier {
      *
      * @param entity an OSM entity to compare to this specifier
      */
-    public P2<Integer> matchScores(Tagged entity) {
+    public P2<Integer> matchScores(OSMEntity entity) {
         int leftScore = 0, rightScore = 0;
         int leftMatches = 0, rightMatches = 0;
         for (P2<String> pair : kvpairs) {
@@ -99,7 +99,7 @@ public class OSMSpecifier {
      * Calculates a score expressing how well an OSM entity's tags match this specifier.
      * This does exactly the same thing as matchScores but without regard for :left and :right.
      */
-    public int matchScore(Tagged match) {
+    public int matchScore(OSMEntity match) {
         int score = 0;
         int matches = 0;
         for (P2<String> pair : kvpairs) {

@@ -32,7 +32,7 @@ import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
-import org.opentripplanner.osm.*;
+import com.conveyal.osmlib.*;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -111,7 +111,7 @@ public class OSMDatabase {
      * yet at that point. Also values are only used when creating the Area objects (to see if any unconnected nodes 
      * within the area should be part of the Area), so it doesn't matter if they are lost after that.
      */
-    public final Map<Tagged, Set<Long>> stopsInAreas = Maps.newHashMap();
+    public final Map<OSMEntity, Set<Long>> stopsInAreas = Maps.newHashMap();
     
     /* List of graph annotations registered during building, to add to the graph. */
     private List<GraphBuilderAnnotation> annotations = new ArrayList<>();
@@ -530,7 +530,7 @@ public class OSMDatabase {
     // It used to work fine because the keys of the level-for-way map were OSM entity objects with identity equality.
     // Now the keys must be long integer IDs, which could (albeit rarely) lead to ID collisions across entity types.
     // FIXME this is not really "applying" the levels, it's recording them
-    private void applyLevelsForWay(long entityId, Tagged entity) {
+    private void applyLevelsForWay(long entityId, OSMEntity entity) {
 
         /* Determine OSM level for each way, if it was not already set */
         if (!wayLevels.containsKey(entityId)) {
@@ -865,7 +865,7 @@ public class OSMDatabase {
      * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
      */
     private void processPublicTransportStopArea(long relationId, Relation relation) {
-        Tagged platformArea = null;
+        OSMEntity platformArea = null;
         Set<Long> platformNodes = Sets.newHashSet();
         for (Relation.Member member : relation.members) {
             if (member.type == Relation.Type.WAY && "platform".equals(member.role)

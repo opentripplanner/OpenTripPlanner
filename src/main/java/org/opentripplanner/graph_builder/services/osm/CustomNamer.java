@@ -13,13 +13,11 @@
 
 package org.opentripplanner.graph_builder.services.osm;
 
-import org.opentripplanner.osm.Tagged;
+import com.conveyal.osmlib.OSMEntity;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.graph_builder.module.osm.PortlandCustomNamer;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * For when CreativeNamePicker/WayPropertySet is just not powerful enough.
@@ -27,9 +25,9 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public interface CustomNamer {
 
-    public String name(Tagged way, String defaultName);
+    public String name(OSMEntity way, String defaultName);
 
-    public void nameWithEdge(Tagged way, StreetEdge edge);
+    public void nameWithEdge(OSMEntity way, StreetEdge edge);
 
     public void postprocess(Graph graph);
 

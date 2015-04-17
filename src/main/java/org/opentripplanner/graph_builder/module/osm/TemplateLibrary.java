@@ -13,8 +13,8 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.osm.Tagged;
-import org.opentripplanner.osm.Way;
+import com.conveyal.osmlib.OSMEntity;
+import com.conveyal.osmlib.Way;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public class TemplateLibrary {
     private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
 
-    public static String generate(String pattern, Tagged way) {
+    public static String generate(String pattern, OSMEntity way) {
 
         if (pattern == null) {
             return null;

@@ -363,6 +363,13 @@
             <version>1.0.6</version>
         </dependency>
 
+        <!-- Conveyal disk-backed OSM loader library -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>osm-lib</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- Logging library -->
         <dependency>
             <groupId>ch.qos.logback</groupId>

@@ -14,7 +14,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.osm.Way;
+import com.conveyal.osmlib.Way;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.services.notes.NoteMatcher;

@@ -19,9 +19,9 @@ import com.google.common.primitives.Longs;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.osm.OSM;
-import org.opentripplanner.osm.Tagged;
-import org.opentripplanner.osm.Way;
+import com.conveyal.osmlib.OSM;
+import com.conveyal.osmlib.OSMEntity;
+import com.conveyal.osmlib.Way;
 
 import java.util.*;
 
@@ -40,7 +40,7 @@ class Area {
     }
 
     // The way or relation from which this Area was created, and which holds the relevant tags for this Area
-    Tagged parent;
+    OSMEntity parent;
 
     long parentId; // TODO set me
 
@@ -54,7 +54,7 @@ class Area {
     private MultiPolygon jtsMultiPolygon;
 
     /** Construct a new Area */
-    Area(Tagged parent, List<Long> outerRingWays, List<Long> innerRingWays, OSM osm) {
+    Area(OSMEntity parent, List<Long> outerRingWays, List<Long> innerRingWays, OSM osm) {
         this.parent = parent;
         // ring assignment
         List<List<Long>> innerRingNodes = constructRings(innerRingWays, osm);
