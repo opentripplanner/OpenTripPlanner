@@ -230,6 +230,7 @@ public class GraphBuilder implements Runnable {
                 osmProviders.add(osmProvider);
             }
             OpenStreetMapModule osmBuilder = new OpenStreetMapModule(osmProviders);
+            osmBuilder.indexEdgeOsmIds = builderParams.indexEdgeOsmIds;
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
             streetEdgeFactory.useElevationData = builderParams.fetchElevationUS || (demFile != null);
             osmBuilder.edgeFactory = streetEdgeFactory;

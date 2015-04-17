@@ -89,6 +89,12 @@ public class GraphBuilderParameters {
     public final CustomNamer customNamer;
 
     /**
+     * Index edges with their OSM IDs (from-to nodes IDs, way ID). This is used by some car speed
+     * dynamic updaters.
+     */
+    public final boolean indexEdgeOsmIds;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -109,6 +115,7 @@ public class GraphBuilderParameters {
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
+        indexEdgeOsmIds = config.path("indexEdgeOsmIds").asBoolean(false);
     }
 
 }
