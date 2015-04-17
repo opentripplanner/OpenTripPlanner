@@ -13,15 +13,10 @@
 
 package org.opentripplanner.graph_builder.module.osm;
 
-import com.google.common.collect.Iterables;
-import java.util.HashSet;
-
+import com.conveyal.osmlib.OSMEntity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterables;
-
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import com.conveyal.osmlib.OSMEntity;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;

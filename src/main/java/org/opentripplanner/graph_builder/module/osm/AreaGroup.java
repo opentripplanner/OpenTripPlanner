@@ -20,7 +20,6 @@ import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.*;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.openstreetmap.model.OSMLevel;
 import com.conveyal.osmlib.Node;
 import com.conveyal.osmlib.OSM;
 import org.slf4j.Logger;
