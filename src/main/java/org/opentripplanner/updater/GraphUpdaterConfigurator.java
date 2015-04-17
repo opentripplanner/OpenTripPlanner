@@ -14,10 +14,12 @@
 package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.carspeed.CarSpeedPollingUpdater;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -97,6 +99,9 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("real-time-alerts")) {
                     updater = new GtfsRealtimeAlertsUpdater();
+                }
+                else if (type.equals("car-speed")) {
+                    updater = new CarSpeedPollingUpdater();
                 }
                 else if (type.equals("example-updater")) {
                     updater = new ExampleGraphUpdater();
