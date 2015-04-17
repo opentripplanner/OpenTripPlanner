@@ -67,7 +67,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.EdgesExtra;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
@@ -268,7 +267,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             // figure out which nodes that are actually intersections
             initIntersectionNodes();
 
-            buildBasicGraph((EdgesExtra)extra.get(EdgesExtra.class));
+            buildBasicGraph();
             if (skipVisibility) {
                 LOG.info("Skipping visibility graph construction for walkable areas.");
             } else {
@@ -521,7 +520,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             return AreaGroup.groupAreas(areasLevels);
         }
 
-        private void buildBasicGraph(EdgesExtra edgesExtra) {
+        private void buildBasicGraph() {
 
             /* build the street segment graph from OSM ways */
             long wayIndex = 0;
