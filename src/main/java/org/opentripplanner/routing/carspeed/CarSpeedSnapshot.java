@@ -28,6 +28,24 @@ public class CarSpeedSnapshot {
         public float getCarSpeed(StreetEdge streetEdge, long timestamp, float defaultSpeed);
     }
 
+    /**
+     * An ultra simple car speed provider that returns always the same constant speed. Used for unit
+     * testing and some simple cases (zone restricting for example).
+     */
+    public static class StreetEdgeConstantCarSpeedProvider implements StreetEdgeCarSpeedProvider {
+
+        private final float constantCarSpeed;
+
+        public StreetEdgeConstantCarSpeedProvider(float constantSpeed) {
+            this.constantCarSpeed = constantSpeed;
+        }
+
+        @Override
+        public float getCarSpeed(StreetEdge streetEdge, long timestamp, float defaultSpeed) {
+            return constantCarSpeed;
+        }
+    }
+
     private Map<StreetEdge, StreetEdgeCarSpeedProvider> providers;
 
     protected CarSpeedSnapshot(Map<StreetEdge, StreetEdgeCarSpeedProvider> providers) {
