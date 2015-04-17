@@ -2,6 +2,7 @@ package org.opentripplanner.standalone;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.analyst.request.*;
+import org.opentripplanner.analyst.scenario.ScenarioStore;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.reflect.ReflectiveInitializer;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -41,6 +42,9 @@ public class Router {
 
     /** A graphical window that is used for visualizing search progress (debugging). */
     public GraphVisualizer graphVisualizer = null;
+
+    /** Storage for non-descructive alternatives analysis scenarios. */
+    public ScenarioStore scenarioStore = new ScenarioStore();
 
     public Router(String id, Graph graph) {
         this.id = id;

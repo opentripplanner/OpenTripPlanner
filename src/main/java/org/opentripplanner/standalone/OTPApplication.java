@@ -94,6 +94,7 @@ public class OTPApplication extends Application {
             GraphInspectorTileResource.class,
             ScriptResource.class,
             UpdaterStatusResource.class,
+            ScenarioResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             CorsFilter.class,
             MultiPartFeature.class

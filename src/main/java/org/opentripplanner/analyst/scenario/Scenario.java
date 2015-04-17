@@ -9,12 +9,14 @@ import java.util.List;
  */
 public class Scenario {
 
-    public String description;
+    public final int id;
+
+    public String description = "no description provided";
 
     public final List<Modification> modifications = Lists.newArrayList();
 
-    public Scenario (String description) {
-        this.description = description;
+    public Scenario (int id) {
+        this.id = id;
     }
 
     public void applyToGraph() {
