@@ -16,35 +16,24 @@ package org.opentripplanner.updater.carspeed;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeCarSpeedProvider;
+import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeConstantCarSpeedProvider;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
- * TODO Remove this
- * 
+ * This is a demo for a really simple car speed source: it just set the
+ * speed to zero in some "exclusion zone".
  */
-public class DummyCarSpeedDataSource implements CarSpeedDataSource, JsonConfigurable {
+public class ExclusionZoneCarSpeedDataSource implements CarSpeedDataSource, JsonConfigurable {
 
     private List<T2<StreetEdge, StreetEdgeCarSpeedProvider>> dummy = new ArrayList<>();
-
-    private static class ConstantCarSpeedProvider implements StreetEdgeCarSpeedProvider {
-
-        private final float constantSpeed;
-
-        public ConstantCarSpeedProvider(float constantSpeed) {
-            this.constantSpeed = constantSpeed;
-        }
-
-        @Override
-        public float getCarSpeed(StreetEdge streetEdge, long timestamp, float defaultSpeed) {
-            return constantSpeed;
-        }
-    }
 
     @Override
     public List<T2<StreetEdge, StreetEdgeCarSpeedProvider>> getUpdatedEntries() {
@@ -55,15 +44,25 @@ public class DummyCarSpeedDataSource implements CarSpeedDataSource, JsonConfigur
 
     @Override
     public void configure(Graph graph, JsonNode jsonNode) throws Exception {
-        ConstantCarSpeedProvider zeroSpeed = new ConstantCarSpeedProvider(0.001f);
-        for (StreetEdge edge : graph.getStreetEdges()) {
-            if (edge.getName().length() > 20) {
-                dummy.add(new T2<StreetEdge, StreetEdgeCarSpeedProvider>(edge, zeroSpeed));
-            } else
-            if (edge.getDistance() > 100) {
-                float dummySpeed = edge.getName().length();
-                ConstantCarSpeedProvider provider = new ConstantCarSpeedProvider(dummySpeed);
-                dummy.add(new T2<StreetEdge, StreetEdgeCarSpeedProvider>(edge, provider));
+
+        // TODO We should be really reading the exclusion zone from somewhere
+        // and use a generic "exclusion zone source". But this is a demo.
+
+        double lat = jsonNode.path("center").path("lat").asDouble();
+        double lon = jsonNode.path("center").path("lon").asDouble();
+        double radius = jsonNode.path("radiusMeters").asDouble();
+        Coordinate center = new Coordinate(lon, lat);
+
+        StreetEdgeCarSpeedProvider noTraffic = new StreetEdgeConstantCarSpeedProvider(0f);
+
+        // TODO This is not really efficient, use spatial index to query only edges in the zone
+        for (StreetEdge streetEdge : graph.getStreetEdges()) {
+            double d1 = SphericalDistanceLibrary.fastDistance(center, streetEdge.getFromVertex()
+                    .getCoordinate());
+            double d2 = SphericalDistanceLibrary.fastDistance(center, streetEdge.getToVertex()
+                    .getCoordinate());
+            if (d1 < radius || d2 < radius) {
+                dummy.add(new T2<>(streetEdge, noTraffic));
             }
         }
     }

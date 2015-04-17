@@ -57,8 +57,8 @@ public class CarSpeedPollingUpdater extends PollingGraphUpdater {
         String sourceType = config.path("sourceType").asText();
         source = null;
         if (sourceType != null) {
-            if (sourceType.equals("dummy")) {
-                source = new DummyCarSpeedDataSource();
+            if (sourceType.equals("exclusion-zone")) {
+                source = new ExclusionZoneCarSpeedDataSource();
             }
         }
 
