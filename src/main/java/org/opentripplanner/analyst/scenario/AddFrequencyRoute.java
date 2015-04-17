@@ -19,10 +19,14 @@ public class AddFrequencyRoute extends Modification {
     public double headwayMinutes;
 
     /** The geometry of the route alignment in WGS84 coordinates. */
-    public LineString alignment;
+    private LineString alignment;
 
     /** A set of coordinate indexes in the alignment that are transit stops. */
     public BitSet stops = new BitSet();
+
+    public String getCoordinates() {
+        return "TEST";
+    }
 
     /**
      * Specify the transit route as a String in the format "lat0,lon0;lat1,lon1;lat2,lon2..."

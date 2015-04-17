@@ -67,6 +67,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+// TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
+
 @Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class IndexAPI {
