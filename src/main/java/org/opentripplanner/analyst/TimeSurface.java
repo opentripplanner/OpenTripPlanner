@@ -46,10 +46,12 @@ public class TimeSurface implements Serializable {
     public Map<String, String> params; // The query params sent by the user, for reference only
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
     public String description;
+    public double walkSpeed = 1.33; // meters/sec TODO could we just store the whole routing request instead of params?
 
     public TimeSurface(ShortestPathTree spt) {
 
         params = spt.getOptions().parameters;
+        walkSpeed = spt.getOptions().walkSpeed;
 
         String routerId = spt.getOptions().routerId;
         if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
@@ -89,6 +91,7 @@ public class TimeSurface implements Serializable {
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
+        walkSpeed = profileRouter.request.walkSpeed;
     }
 
     /** Make a max or min timesurface from propagated times in a ProfileRouter. */
@@ -102,6 +105,7 @@ public class TimeSurface implements Serializable {
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
+        walkSpeed = profileRouter.request.walkSpeed;
     }
 
     public static TimeSurface.RangeSet makeSurfaces (AnalystProfileRouterPrototype profileRouter) {

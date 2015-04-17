@@ -13,8 +13,10 @@
 
 package org.opentripplanner.analyst.request;
 
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
@@ -23,10 +25,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import java.util.List;
 
 public class SampleFactory implements SampleSource {
 
@@ -112,10 +111,8 @@ public class SampleFactory implements SampleSource {
             if (d > searchRadiusM)
                 return null;
             double d0 = d + best.distanceAlong();
-            int t0 = (int) (d0 / 1.33);
             double d1 = d + best.distanceToEnd();
-            int t1 = (int) (d1 / 1.33);
-            Sample s = new Sample(v0, t0, v1, t1);
+            Sample s = new Sample(v0, (int) d0, v1, (int) d1);
             //System.out.println(s.toString());
             return s;
         } 
