@@ -109,7 +109,7 @@ otp.modules.analyst.AnalystModule =
             layers : 'traveltime',
             styles : 'color30',
             time : (this.time) ? this.time : moment().format("h:mma"),
-            date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("MM-DD-YYYY") : moment().format("MM-DD-YYYY"),
+            date : (this.date) ? moment(this.date, otp.config.locale.time.date_format).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"),
             mode : this.mode,
             maxWalkDistance : this.maxWalkDistance,
             arriveBy : this.arriveBy,

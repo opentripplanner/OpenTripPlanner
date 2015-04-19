@@ -191,7 +191,7 @@ otp.widgets.ItinerariesWidget =
             _.extend(params, {
                 startTransitStopId :  stopId,
                 time : otp.util.Time.formatItinTime(newEndTime, "h:mma"),
-                date : otp.util.Time.formatItinTime(newEndTime, "MM-DD-YYYY"),
+                date : otp.util.Time.formatItinTime(newEndTime, "YYYY-MM-DD"),
                 arriveBy : true
             });
             this_.refreshActiveOnly = true;
@@ -207,7 +207,7 @@ otp.widgets.ItinerariesWidget =
             _.extend(params, {
                 startTransitStopId :  stopId,
                 time : otp.util.Time.formatItinTime(newStartTime, "h:mma"),
-                date : otp.util.Time.formatItinTime(newStartTime, "MM-DD-YYYY"),
+                date : otp.util.Time.formatItinTime(newStartTime, "YYYY-MM-DD"),
                 arriveBy : false
             });
             this_.refreshActiveOnly = true;
@@ -221,7 +221,7 @@ otp.widgets.ItinerariesWidget =
             var stopId = itin.getFirstStopID();
             _.extend(params, {
                 startTransitStopId :  stopId,
-                date : moment(this_.module.date, "MM-DD-YYYY").add('days', 1).format("MM-DD-YYYY"),
+                date : moment(this_.module.date, "YYYY-MM-DD").add('days', 1).format("YYYY-MM-DD"),
                 time : serviceBreakTime,
                 arriveBy : true
             });

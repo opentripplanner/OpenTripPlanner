@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author Frank Purcell (p u r c e l l f @ t r i m e t . o r g)
  * @date October 20, 2009
  */
-public class DateUtils implements DateConstants {
+public class DateUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(DateUtils.class);
 
@@ -146,47 +146,12 @@ public class DateUtils implements DateConstants {
         return retVal;
     }
 
-    // TODO: could be replaced with Apache's DateFormat.parseDate ???
+
+    // Only accept ISO dates (YYYY-MM-DD)
     static public Date parseDate(String input, TimeZone tz) {
-        Date retVal = null;
-        try {
-            String newString = input.trim().replace('_', '.').replace('-', '.').replace(':', '.').replace(
-                    '/', '.');
-            if (newString != null) {
-                List<String> dl = DF_LIST;
-
-                if (newString.length() <= 8) {
-                    if (newString.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
-                        // Accept dates without punctuation if they consist of exactly eight digits.
-                        newString = newString.substring(0, 4)
-                                + '.' + newString.substring(4, 6)
-                                + '.' + newString.substring(6, 8);
-                    } else if (!(newString.matches(".*20\\d\\d.*"))) {
-                        // if it looks like we have a small date format, ala 11.4.09, then use
-                        // another set of compares
-                        dl = SMALL_DF_LIST;
-                    }
-                }
-
-                for (String df : dl) {
-                    SimpleDateFormat sdf = new SimpleDateFormat(df);
-                    sdf.setTimeZone(tz);
-                    retVal = DateUtils.parseDate(sdf, newString);
-                    if (retVal != null) {
-                        Calendar cal = new GregorianCalendar(tz);
-                        cal.setTime(retVal);
-                        int year = cal.get(Calendar.YEAR);
-                        if (year >= SANITY_CHECK_CUTOFF_YEAR) {
-                            break;
-                        }
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("Could not parse " + input);
-        }
-
-        return retVal;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setTimeZone(tz);
+        return DateUtils.parseDate(sdf, input);
     }
 
     public static int getIntegerFromString(String input) {
@@ -237,7 +202,7 @@ public class DateUtils implements DateConstants {
     }
 
     public static String getAmPm(int time) {
-        return getAmPm(time, AM, PM);
+        return getAmPm(time, "am", "pm");
     }
 
     public static String getAmPm(int time, String am, String pm) {

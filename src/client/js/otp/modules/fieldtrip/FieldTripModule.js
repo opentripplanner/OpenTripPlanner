@@ -508,7 +508,7 @@ otp.modules.fieldtrip.FieldTripModule =
         this.clearTrip();
         var queryParams = {
             time : moment(request.arriveDestinationTime).format("h:mma"),
-            date : moment(request.travelDate).format("MM-DD-YYYY"),            
+            date : moment(request.travelDate).format("YYYY-MM-DD"),
             arriveBy : true,
             groupSize : otp.util.FieldTrip.getGroupSize(request),
         };
@@ -535,7 +535,7 @@ otp.modules.fieldtrip.FieldTripModule =
         this.clearTrip();
         var queryParams = {
             time : moment(request.leaveDestinationTime).format("h:mma"),
-            date : moment(request.travelDate).format("MM-DD-YYYY"),            
+            date : moment(request.travelDate).format("YYYY-MM-DD"),
             arriveBy : false,
             groupSize : otp.util.FieldTrip.getGroupSize(request),
         };
