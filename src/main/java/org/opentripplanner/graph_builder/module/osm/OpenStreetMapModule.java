@@ -160,6 +160,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         this.graph = graph;
         OSM osm = new OSM(null);
         osm.loadFromPBFFile(osmFiles.get(0).getAbsolutePath()); // TODO merge files
+        // TODO load envelopes from Vex server at dev.opentripplanner.org
         osmdb = new OSMDatabase(osm);
         // phases etc.
         osmdb.postLoad();
