@@ -92,6 +92,7 @@ public class Raptor {
     */
     
     public void run () {
+    	// the initial walk is a "round"
     	store.proceed();
         for (int round = 0; round <= maxTransfers; round++) {
             if (!doRound(round == maxTransfers))
@@ -103,7 +104,7 @@ public class Raptor {
      * perform one round of a RAPTOR search.
      * @return whether this round relaxed any bounds.
      */
-    private boolean doRound (boolean isLast) {
+    private boolean doRound (boolean isLast) {    	
     	//LOG.info("Begin RAPTOR round");
         // TODO: filter to routes that are running
         // TODO: implement the rest of the optimizations in the paper, in particular not going past the destination
@@ -126,8 +127,8 @@ public class Raptor {
         
         // Find all possible transfers. No need to do this on the last round though.
     	if (!isLast) {
-    		store.proceed();
     		findTransfers();
+    		store.proceed();
     	}
         
         // check if it changed
@@ -197,7 +198,7 @@ public class Raptor {
     		// is no guarantee that first trip left at exactly the start time of the frequency entry,
     		// only within headway_seconds.
     		if (freq.startTime + offsetSecs > time) {
-    			boardTime += freq.startTime + offsetSecs - time;
+    			boardTime = freq.startTime + offsetSecs + freq.headway;
     		}
     		
     		if (boardTime < bestFreqBoardTime) {
