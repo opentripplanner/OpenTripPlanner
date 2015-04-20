@@ -262,6 +262,11 @@ public class Graph implements Serializable {
 
             if (e instanceof EdgeWithCleanup) ((EdgeWithCleanup) e).detach();
 
+            if (e instanceof StreetEdge && carSpeedSnapshotSource != null) {
+                // This should not be necessary, but we provide it for completeness just in case
+                carSpeedSnapshotSource.updateCarSpeedProvider((StreetEdge) e, null);
+            }
+
             if (e.fromv != null) {
                 e.fromv.removeOutgoing(e);
 
