@@ -1,28 +1,23 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+
+import java.util.Collection;
 
 @SuppressWarnings("unchecked")
 public class PathDiscardingRaptorStateStore implements RaptorStateStore {
 	// suppressing warnings because generic arrays don't work in Java . . .
     @SuppressWarnings("rawtypes")
-	private TObjectIntMap[] matrix;
+    private TObjectIntMap[] matrix; // maps from stops to arrival times, one per round
+
+    private TObjectIntMap<TransitStop> bestStops; // what is this?
     
-    private TObjectIntMap<TransitStop> bestStops;
+    public int maxTime; // in seconds?
     
-    public int maxTime;
-    
-    int current = 0;
+    int current = 0; // current round?
     
     @Override
     public boolean put(TransitStop t, int time, boolean transfer) {

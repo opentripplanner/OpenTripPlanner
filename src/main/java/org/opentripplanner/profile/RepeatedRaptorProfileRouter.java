@@ -1,12 +1,12 @@
 package org.opentripplanner.profile;
 
-import com.google.common.collect.Lists;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
-import org.joda.time.DateTimeZone;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
@@ -16,7 +16,6 @@ import org.opentripplanner.routing.algorithm.Raptor;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -27,8 +26,6 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,9 +49,12 @@ public class RepeatedRaptorProfileRouter {
     
     public TimeSurface.RangeSet timeSurfaceRangeSet;
     
-    TObjectIntMap<TransitStop> mins = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MAX_VALUE); 
-    TObjectIntMap<TransitStop> maxs = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MIN_VALUE);
-    
+    public TObjectIntMap<TransitStop> mins = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MAX_VALUE);
+    public TObjectIntMap<TransitStop> maxs = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MIN_VALUE);
+
+    // Remove this route from the calculations. Format agency:id
+    public AgencyAndId banRoute = null;
+
     // accumulate the travel times to create an average
     TObjectLongMap<TransitStop> accumulator = new TObjectLongHashMap<TransitStop>();
     TObjectIntMap<TransitStop> counts = new TObjectIntHashMap<TransitStop>();
@@ -76,14 +76,24 @@ public class RepeatedRaptorProfileRouter {
         Map<TripPattern, TripTimeSubset> timetables =
                 TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
 
-        
+        if (banRoute != null) {
+            Route route = graph.index.routeForId.get(banRoute);
+            LOG.info("Banning route {}", route);
+            int n = 0;
+            for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
+                timetables.remove(pattern);
+                n++;
+            }
+            LOG.info("Removed {} patterns.", n);
+        }
+
         PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(5);
         
-        int i = 1;
+        int i = 1; // The current iteration (minute) number for display purposes
         
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
         // at the end of the window.
-        for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
+        for (int startTime = request.fromTime; ; ) {
         	if (++i % 30 == 0)
         		LOG.info("Completed {} RAPTOR searches", i);
         	
@@ -133,11 +143,12 @@ public class RepeatedRaptorProfileRouter {
                 accumulator.adjustValue(v, et);
                 counts.increment(v);
             }
+            break; // only one iteration DEBUG
         }
         
-        LOG.info("Profile request complete, propagating to the street network");
-        
-        makeSurfaces();
+        // Disabled until we're sure transit routing works right
+        // LOG.info("Profile request complete, propagating to the street network");
+        // makeSurfaces();
         
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
@@ -180,7 +191,19 @@ public class RepeatedRaptorProfileRouter {
         timeSurfaceRangeSet.avg = new TimeSurface(spt, false);
         
         rr.cleanup();
-        
+
+        TransitStop bestStop = null;
+        int bestTime = Integer.MAX_VALUE;
+        for (TransitStop stop : accessTimes.keySet()) {
+            int etime = accessTimes.get(stop);
+            if (etime < bestTime) {
+                bestTime = etime;
+                bestStop = stop;
+            }
+        }
+        LOG.info("{} at {} sec", bestStop, bestTime);
+        accessTimes.clear();
+        accessTimes.put(bestStop, bestTime);
         return accessTimes;
     }
     
