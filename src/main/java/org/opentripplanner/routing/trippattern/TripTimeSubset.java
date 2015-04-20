@@ -60,25 +60,16 @@ public class TripTimeSubset {
 	 * 
 	 * This assumes that trips on a particular pattern are non-overtaking.
 	 */ 
-	public int findTripAfter (int stop, int time) {
+	/*public int findTripAfter (int stop, int time) {
 		return findTripAfter (stop, time, 0, tripCount);
-	}
+	}*/
 	
-	private int findTripAfter (int stop, int time, int minInclusive, int maxExclusive) {
-		int idx = (minInclusive + maxExclusive) / 2;
-		
-		if (idx == 0 || idx == tripCount - 1) {
-			return getArrivalTime(idx, stop) < time ? -1 : idx;
+	public int findTripAfter (int stop, int time) {
+		for (int idx = 0; idx < tripCount; idx++) {
+			if (getDepartureTime(idx, stop) >= time)
+				return idx;
 		}
-		
-		if (getArrivalTime(idx, stop) >= time && getArrivalTime(idx - 1, stop) < time)
-			return idx;
-		
-		if (getArrivalTime(idx, stop) >= time)
-			return findTripAfter(stop, time, minInclusive, idx);
-		
-		else
-			return findTripAfter(stop, time, idx + 1, maxExclusive);
+		return -1;
 	}
 
 	/**
@@ -138,6 +129,21 @@ public class TripTimeSubset {
 							tts.times[((tripIdx - 1) * tts.tripLength + stopIdx) * 2 + 1]) {
 						LOG.warn("Overtaking/duplicate departure times on trip pattern {}, trip {} at stop {}," +
 							" trashing this pattern.", tp, tripIdx, stopIdx);
+						return null;
+					}
+					
+					if (stopIdx > 0 &&
+							tts.times[(tripIdx * tts.tripLength + stopIdx) * 2] -
+								tts.times[(tripIdx * tts.tripLength + stopIdx) * 2 - 1]
+								< 0) {
+						LOG.warn("Negative hop time on trip pattern {}, trip {} at stop {}, trashing pattern",
+								tp, tripIdx, stopIdx);
+						return null;
+					}
+					
+					if (tts.times[(tripIdx * tts.tripLength + stopIdx) * 2 + 1] - tts.times[(tripIdx * tts.tripLength + stopIdx) * 2] < 0) {
+						LOG.warn("Negative dwell time on trip pattern {}, trip {} at stop {}, trashing pattern",
+								tp, tripIdx, stopIdx);
 						return null;
 					}
 				}
