@@ -16,7 +16,7 @@ package org.opentripplanner.updater.carspeed;
 import java.util.List;
 
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeCarSpeedProvider;
+import org.opentripplanner.routing.carspeed.StreetEdgeCarSpeedProvider;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 /**

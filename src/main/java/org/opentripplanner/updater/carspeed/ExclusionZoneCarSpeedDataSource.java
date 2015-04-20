@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeCarSpeedProvider;
-import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeConstantCarSpeedProvider;
+import org.opentripplanner.routing.carspeed.StreetEdgeCarSpeedProvider;
+import org.opentripplanner.routing.carspeed.StreetEdgeCarSpeedProvider.StreetEdgeConstantCarSpeedProvider;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.JsonConfigurable;

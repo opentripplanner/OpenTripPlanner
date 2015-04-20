@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeConstantCarSpeedProvider;
+import org.opentripplanner.routing.carspeed.StreetEdgeCarSpeedProvider.StreetEdgeConstantCarSpeedProvider;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;

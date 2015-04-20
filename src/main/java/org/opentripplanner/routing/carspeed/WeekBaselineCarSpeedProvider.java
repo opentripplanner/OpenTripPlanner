@@ -18,7 +18,6 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeCarSpeedProvider;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 /**

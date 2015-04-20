@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.carspeed.CarSpeedSnapshotSource;
-import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeCarSpeedProvider;
+import org.opentripplanner.routing.carspeed.StreetEdgeCarSpeedProvider;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;

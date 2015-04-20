@@ -19,33 +19,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class CarSpeedSnapshot {
 
-    public interface StreetEdgeCarSpeedProvider {
-
-        /**
-         * Note that we pass the edge as a parameter to the provider, as some implementation could
-         * be shared for multiple edges (for example a provider for an exclusion zone).
-         */
-        public float getCarSpeed(StreetEdge streetEdge, long timestamp, float defaultSpeed);
-    }
-
-    /**
-     * An ultra simple car speed provider that returns always the same constant speed. Used for unit
-     * testing and some simple cases (zone restricting for example).
-     */
-    public static class StreetEdgeConstantCarSpeedProvider implements StreetEdgeCarSpeedProvider {
-
-        private final float constantCarSpeed;
-
-        public StreetEdgeConstantCarSpeedProvider(float constantSpeed) {
-            this.constantCarSpeed = constantSpeed;
-        }
-
-        @Override
-        public float getCarSpeed(StreetEdge streetEdge, long timestamp, float defaultSpeed) {
-            return constantCarSpeed;
-        }
-    }
-
     private Map<StreetEdge, StreetEdgeCarSpeedProvider> providers;
 
     protected CarSpeedSnapshot(Map<StreetEdge, StreetEdgeCarSpeedProvider> providers) {

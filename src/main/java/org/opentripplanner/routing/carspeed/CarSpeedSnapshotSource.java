@@ -16,7 +16,6 @@ package org.opentripplanner.routing.carspeed;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opentripplanner.routing.carspeed.CarSpeedSnapshot.StreetEdgeCarSpeedProvider;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class CarSpeedSnapshotSource {
