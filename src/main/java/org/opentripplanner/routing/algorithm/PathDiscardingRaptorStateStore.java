@@ -26,17 +26,22 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     
     @Override
     public boolean put(TransitStop t, int time, boolean transfer) {
-        if (time < matrix[current].get(t) && time < bestStops.get(t) && time < maxTime) {
+    	boolean stored = false;
+    	
+    	if (time > maxTime)
+    		return false;
+    	
+        if (time < matrix[current].get(t)) {
             matrix[current].put(t, time);
-           
-            // Only update bestStops if this is not the result of a transfer, so that transit stops
-            // cannot be used to go past the walk distance by transferring and then egressing without boarding.
-            if (!transfer)
-            	bestStops.put(t,  time);
-            
-            return true;
+            stored = true;
         }
-        return false;
+        
+    	 if (!transfer && time < bestStops.get(t)) {
+    		 bestStops.put(t, time);
+    		 stored = true;
+    	 }
+        
+        return stored;
     }    
 
     @Override
