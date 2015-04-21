@@ -4,6 +4,7 @@ import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SurfaceCache;
+import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.profile.ProfileRequest;
@@ -11,7 +12,7 @@ import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
@@ -84,8 +85,8 @@ public class RepeatedRaptorTestResource {
         ProfileRequest req = new ProfileRequest();
         req.fromLat      = lat;
         req.fromLon      = lon;
-        req.fromTime     = 8 * 60 * 60;
-        req.toTime       = req.fromTime + 61;
+        req.fromTime     = 60 * 60 * 7;
+        req.toTime       = 60 * 60 * 9;
         req.walkSpeed    = 2;
         req.bikeSpeed    = 4;
         req.carSpeed     = 8;
@@ -114,6 +115,7 @@ public class RepeatedRaptorTestResource {
 
         System.out.printf("stop, min_a, min_b, min_diff, max_a, max_b, max_diff\n");
         boolean decreased = false;
+/*
         for (TransitStop destVertex : graph.index.stopVertexForStop.values()) {
             int min_a = router_a.mins.get(destVertex);
             int max_a = router_a.maxs.get(destVertex);
@@ -144,6 +146,42 @@ public class RepeatedRaptorTestResource {
         if (decreased) {
             LOG.error("Decreases happened at this origin!");
         }
-        LOG.info("{} increased, {} decreased out of {} destinations total", n_increase, n_decrease, n_total);
+        LOG.info("Stop Vertices: {} increased, {} decreased out of {} destinations total", n_increase, n_decrease, n_total);
+*/
+        // Now compare the propagated results
+        decreased = false;
+        TimeSurface.RangeSet timeSurfaces_a = router_a.timeSurfaceRangeSet;
+        TimeSurface.RangeSet timeSurfaces_b = router_b.timeSurfaceRangeSet;
+        for (Vertex destVertex : timeSurfaces_a.min.times.keySet()) {
+            int min_a = timeSurfaces_a.min.getTime(destVertex);
+            int max_a = timeSurfaces_a.max.getTime(destVertex);
+            int min_b = timeSurfaces_b.min.getTime(destVertex);
+            int max_b = timeSurfaces_b.max.getTime(destVertex);
+            long min_diff = (long) min_b - min_a;
+            long max_diff = (long) max_b - max_a;
+            if (min_b == TimeSurface.UNREACHABLE) {
+                min_diff = Integer.MAX_VALUE;
+            }
+            if (max_b == TimeSurface.UNREACHABLE) {
+                max_diff = Integer.MAX_VALUE;
+            }
+            n_total += 1;
+            if (min_diff < 0 || max_diff < 0) {
+                n_decrease += 1;
+                // Time decreased due to banning a route. This is bad, print it out.
+                System.out.printf("\"%s\",%d,%d,%d,%d,%d,%d\n",
+                        destVertex.getName(), min_a, min_b, min_diff, max_a, max_b, max_diff);
+                decreased = true;
+            } else if (min_diff > 0 || max_diff > 0) {
+                n_increase += 1;
+            } else {
+                n_same += 1;
+            }
+
+        }
+        LOG.info("Street Vertices: {} increased, {} decreased out of {} destinations total", n_increase, n_decrease, n_total);
+        if (decreased) {
+            LOG.error("Decreases happened at this origin!");
+        }
     }
 }
