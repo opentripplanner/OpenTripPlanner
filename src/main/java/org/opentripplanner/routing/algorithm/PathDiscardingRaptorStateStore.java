@@ -26,8 +26,8 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     
     @Override
     public boolean put(TransitStop t, int time, boolean transfer) {
-    	if (time > maxTime)
-    		return false;
+    	/*if (time > maxTime)
+    		return false;*/
 
         // This does not store internal algorithm state as it used to, but rather only the output.
         // The reasoning is that, in dynamic programming/range RAPTOR mode, bestStops is carried over between runs of
@@ -37,12 +37,12 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
             bestStops.put(t, time);
 
         if (time < matrix[current].get(t)) {
-            matrix[current].put(t, time);
+             matrix[current].put(t, time);
             return true;
         }
 
         return false;
-    }    
+    }
 
     @Override
     public void proceed() {

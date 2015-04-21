@@ -66,7 +66,7 @@ public class TripTimeSubset {
 	
 	public int findTripAfter (int stop, int time) {
 		for (int idx = 0; idx < tripCount; idx++) {
-			if (getDepartureTime(idx, stop) >= time)
+			if (getDepartureTime(idx, stop) > time)
 				return idx;
 		}
 		return -1;

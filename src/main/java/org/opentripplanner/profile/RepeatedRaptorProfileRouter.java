@@ -117,8 +117,8 @@ public class RepeatedRaptorProfileRouter {
                 int et = it.value() - startTime;
                 
                 // this can happen if the time is left from a previous search at a later start time
-                if (et > 120 * 60)
-                	continue;
+                /*if (et > 120 * 60)
+                	continue;*/
                 
                 TransitStop v = it.key();
                 if (et < mins.get(v))
@@ -155,7 +155,8 @@ public class RepeatedRaptorProfileRouter {
         rr.walkSpeed = request.walkSpeed;
         rr.to = rr.from;
         rr.setRoutingContext(graph);
-        
+        rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 +
+                request.fromTime;
         // RoutingRequest dateTime defaults to currentTime.
         // If elapsed time is not capped, searches are very slow.
         rr.worstTime = (rr.dateTime + request.maxWalkTime * 60);
