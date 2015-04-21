@@ -98,13 +98,13 @@ public class RepeatedRaptorProfileRouter {
             LOG.info("Removed {} patterns.", n);
         }
 
+        /** Iterate over all minutes in the time window, running a RAPTOR search at each minute. */
+        for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
+
         // Create a state store which will be reused calling RAPTOR with each departure time in reverse order.
         // This causes portions of the solution that do not change to be reused and should provide some speedup
         // over naively creating a new, empty state store for each minute.
         PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(MAX_TRANSFERS + 2);
-
-        /** Iterate over all minutes in the time window, running a RAPTOR search at each minute. */
-        for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
 
             // Log progress every thirty minutes (iterations)
             if (++i % 30 == 0) {
@@ -157,8 +157,8 @@ public class RepeatedRaptorProfileRouter {
         }
         
         // Disabled until we're sure transit routing works right
-        LOG.info("Profile request complete, propagating to the street network");
-        makeSurfaces();
+        // LOG.info("Profile request complete, propagating to the street network");
+        // makeSurfaces();
         
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }

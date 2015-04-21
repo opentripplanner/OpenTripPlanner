@@ -4,7 +4,6 @@ import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SurfaceCache;
-import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.profile.ProfileRequest;
@@ -12,7 +11,7 @@ import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
@@ -115,7 +114,7 @@ public class RepeatedRaptorTestResource {
 
         System.out.printf("stop, min_a, min_b, min_diff, max_a, max_b, max_diff\n");
         boolean decreased = false;
-/*
+
         for (TransitStop destVertex : graph.index.stopVertexForStop.values()) {
             int min_a = router_a.mins.get(destVertex);
             int max_a = router_a.maxs.get(destVertex);
@@ -147,7 +146,8 @@ public class RepeatedRaptorTestResource {
             LOG.error("Decreases happened at this origin!");
         }
         LOG.info("Stop Vertices: {} increased, {} decreased out of {} destinations total", n_increase, n_decrease, n_total);
-*/
+
+    /*
         // Now compare the propagated results
         decreased = false;
         TimeSurface.RangeSet timeSurfaces_a = router_a.timeSurfaceRangeSet;
@@ -183,5 +183,6 @@ public class RepeatedRaptorTestResource {
         if (decreased) {
             LOG.error("Decreases happened at this origin!");
         }
+    */
     }
 }
