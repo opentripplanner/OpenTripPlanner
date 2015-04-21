@@ -9,22 +9,27 @@ import java.util.Collection;
 
 @SuppressWarnings("unchecked")
 public class PathDiscardingRaptorStateStore implements RaptorStateStore {
+
+    /** Maps from stops to arrival times by transit _or_ by transfer from another stop, one map per round. */
 	// suppressing warnings because generic arrays don't work in Java . . .
     @SuppressWarnings("rawtypes")
-    private TObjectIntMap[] matrix; // maps from stops to arrival times, one per round
+    private TObjectIntMap[] matrix;
 
-    private TObjectIntMap<TransitStop> bestStops; // what is this?
-    
-    public int maxTime; // in seconds?
-    
-    int current = 0; // current round?
+    /** The best time to reach each stop in any round by transit only, not by transfer from another stop. */
+    private TObjectIntMap<TransitStop> bestStops;
+
+    /** The maximum acceptable clock time in seconds since midnight. All arrivals after this time will be ignored. */
+    public int maxTime;
+
+    /** Current round? TODO rename var */
+    int current = 0;
     
     @Override
     public boolean put(TransitStop t, int time, boolean transfer) {
     	boolean stored = false;
     	
-    	if (time > maxTime)
-    		return false;
+//    	if (time > maxTime)
+//    		return false;
     	
         if (time < matrix[current].get(t)) {
             matrix[current].put(t, time);

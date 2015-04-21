@@ -43,20 +43,26 @@ public class RepeatedRaptorProfileRouter {
 
     public static final int MAX_DURATION = 60 * 60 * 2; // seconds
 
+    private static final int MAX_TRANSFERS = 6;
+
     public ProfileRequest request;
-    
+
     public Graph graph;
-    
+
+    /** Three time surfaces for min, max, and average travel time over the given time window. */
     public TimeSurface.RangeSet timeSurfaceRangeSet;
-    
+
+    /** Minimum maximum earliest-arrival travel time at each transit stop over the given time window. */
     public TObjectIntMap<TransitStop> mins = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MAX_VALUE);
     public TObjectIntMap<TransitStop> maxs = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MIN_VALUE);
 
-    // Remove this route from the calculations. Format agency:id
+    /** If not null, completely skip this route during the calculations. Format agency:id */
     public AgencyAndId banRoute = null;
 
-    // accumulate the travel times to create an average
+    /** The sum of all earliest-arrival travel times to a given transit stop. Will be divided to create an average. */
     TObjectLongMap<TransitStop> accumulator = new TObjectLongHashMap<TransitStop>();
+
+    /** The number of travel time observations added into the accumulator. The divisor when calculating an average. */
     TObjectIntMap<TransitStop> counts = new TObjectIntHashMap<TransitStop>();
     
     public RepeatedRaptorProfileRouter (Graph graph, ProfileRequest request) {
@@ -71,11 +77,16 @@ public class RepeatedRaptorProfileRouter {
         
         TObjectIntMap<TransitStop> accessTimes = findInitialStops(false);
         
-        LOG.info("Found {} initial stops", accessTimes.size());
-        
+        LOG.info("Found {} initial transit stops", accessTimes.size());
+
+        /** The current iteration number (start minute within the time window) for display purposes only. */
+        int i = 1;
+
+        /** A compacted tabular representation of all the patterns that are running on this date in this time window. */
         Map<TripPattern, TripTimeSubset> timetables =
                 TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
 
+        /** If a route is banned, remove all patterns belonging to that route from the timetable. */
         if (banRoute != null) {
             Route route = graph.index.routeForId.get(banRoute);
             LOG.info("Banning route {}", route);
@@ -87,48 +98,47 @@ public class RepeatedRaptorProfileRouter {
             LOG.info("Removed {} patterns.", n);
         }
 
-        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(5);
-        
-        int i = 1; // The current iteration (minute) number for display purposes
-        
-        // We assume the times are aligned to minutes, and we don't do a depart-after search starting
-        // at the end of the window.
-        for (int startTime = request.fromTime; ; ) {
-        	if (++i % 30 == 0)
-        		LOG.info("Completed {} RAPTOR searches", i);
+        // Create a state store which will be reused calling RAPTOR with each departure time in reverse order.
+        // This causes portions of the solution that do not change to be reused and should provide some speedup
+        // over naively creating a new, empty state store for each minute.
+        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(MAX_TRANSFERS + 2);
+
+        /** Iterate over all minutes in the time window, running a RAPTOR search at each minute. */
+        for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
+
+            // Log progress every thirty minutes (iterations)
+            if (++i % 30 == 0) {
+                LOG.info("Completed {} RAPTOR searches", i);
+            }
+
+        	// The departure time has changed; adjust the maximum clock time that the state store will retain
+//            rss.maxTime = startTime + MAX_DURATION;
         	
-        	// adjust the max time
-        	rss.maxTime = startTime + 120 * 60;
-        	
-        	// reset the counter
+        	// Reset the counter. This is important if reusing the state store from one call to the next.
         	rss.restart();
         	
-        	// relax the times at the start stops
+        	// Find the arrival times at the initial transit stops
         	for (TObjectIntIterator<TransitStop> it = accessTimes.iterator(); it.hasNext();) {
         		it.advance();
         		// this is "transfer" from the origin
         		rss.put(it.key(), startTime + it.value(), true);
         	}
             
-        	//LOG.info("Filtering RAPTOR states");
-            
-            Raptor raptor = new Raptor(graph, 3, request.walkSpeed, rss, startTime, request.date, timetables);
-
-            //LOG.info("Performing RAPTOR search for minute {}", i++);
-            
+            // Call the RAPTOR algorithm for this start time
+            Raptor raptor = new Raptor(graph, MAX_TRANSFERS, request.walkSpeed, rss, startTime, request.date, timetables);
             raptor.run();
             
-            //LOG.info("Finished RAPTOR search in {} milliseconds", System.currentTimeMillis() - roundStartTime);
-            
-            // loop over all states, accumulating mins, maxes, etc.
+            // Loop over all transit stops reached by RAPTOR at this minute,
+            // updating min, max, and average travel time across all minutes (for the entire time window)
             for (TObjectIntIterator<TransitStop> it = raptor.iterator(); it.hasNext();) {
                 it.advance();
                 
                 int et = it.value() - startTime;
                 
-                // this can happen if the time is left from a previous search at a later start time
-                if (et > 120 * 60)
-                	continue;
+                // In the dynamic programming (range-RAPTOR) method, some travel times can be left over from a previous
+                // RAPTOR call at a later departure time, and therefore be greater than the time limit
+//                if (et > MAX_DURATION)
+//                	continue;
                 
                 TransitStop v = it.key();
                 if (et < mins.get(v))
@@ -143,12 +153,12 @@ public class RepeatedRaptorProfileRouter {
                 accumulator.adjustValue(v, et);
                 counts.increment(v);
             }
-            break; // only one iteration DEBUG
+
         }
         
         // Disabled until we're sure transit routing works right
-        // LOG.info("Profile request complete, propagating to the street network");
-        // makeSurfaces();
+        LOG.info("Profile request complete, propagating to the street network");
+        makeSurfaces();
         
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
@@ -192,6 +202,7 @@ public class RepeatedRaptorProfileRouter {
         
         rr.cleanup();
 
+        /*
         TransitStop bestStop = null;
         int bestTime = Integer.MAX_VALUE;
         for (TransitStop stop : accessTimes.keySet()) {
@@ -204,6 +215,7 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("{} at {} sec", bestStop, bestTime);
         accessTimes.clear();
         accessTimes.put(bestStop, bestTime);
+        */
         return accessTimes;
     }
     
