@@ -43,7 +43,7 @@ public class RepeatedRaptorProfileRouter {
 
     public static final int MAX_DURATION = 60 * 60 * 2; // seconds
 
-    private static final int MAX_TRANSFERS = 6;
+    private static final int MAX_TRANSFERS = 20;
 
     public ProfileRequest request;
 
@@ -112,7 +112,7 @@ public class RepeatedRaptorProfileRouter {
             }
 
         	// The departure time has changed; adjust the maximum clock time that the state store will retain
-//            rss.maxTime = startTime + MAX_DURATION;
+            rss.maxTime = startTime + MAX_DURATION;
         	
         	// Reset the counter. This is important if reusing the state store from one call to the next.
         	rss.restart();
