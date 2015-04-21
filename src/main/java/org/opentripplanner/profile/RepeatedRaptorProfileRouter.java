@@ -1,11 +1,13 @@
 package org.opentripplanner.profile;
 
 import com.google.common.collect.Lists;
+
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
+
 import org.joda.time.DateTimeZone;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -20,6 +22,9 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
+import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.TripTimeSubset;
@@ -72,7 +77,7 @@ public class RepeatedRaptorProfileRouter {
         TObjectIntMap<TransitStop> accessTimes = findInitialStops(false);
         
         LOG.info("Found {} initial stops", accessTimes.size());
-        
+
         Map<TripPattern, TripTimeSubset> timetables =
                 TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
 
@@ -155,6 +160,7 @@ public class RepeatedRaptorProfileRouter {
         rr.walkSpeed = request.walkSpeed;
         rr.to = rr.from;
         rr.setRoutingContext(graph);
+        rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 +
                 request.fromTime;
         // RoutingRequest dateTime defaults to currentTime.
