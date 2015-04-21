@@ -17,31 +17,31 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
 	// suppressing warnings because generic arrays don't work in Java . . .
     @SuppressWarnings("rawtypes")
 	private TObjectIntMap[] matrix;
-    
+
     private TObjectIntMap<TransitStop> bestStops;
-    
+
     public int maxTime;
     
     int current = 0;
     
     @Override
     public boolean put(TransitStop t, int time, boolean transfer) {
-    	boolean stored = false;
-    	
     	if (time > maxTime)
     		return false;
-    	
+
+        // This does not store internal algorithm state as it used to, but rather only the output.
+        // The reasoning is that, in dynamic programming/range RAPTOR mode, bestStops is carried over between runs of
+        // the algorithm. But you still want to propagate a non-optimal time with fewer transfers, because the
+        // optimal time at this stop might have already used up all of the transfers.
+        if (!transfer && time < bestStops.get(t))
+            bestStops.put(t, time);
+
         if (time < matrix[current].get(t)) {
             matrix[current].put(t, time);
-            stored = true;
+            return true;
         }
-        
-    	 if (!transfer && time < bestStops.get(t)) {
-    		 bestStops.put(t, time);
-    		 stored = true;
-    	 }
-        
-        return stored;
+
+        return false;
     }    
 
     @Override

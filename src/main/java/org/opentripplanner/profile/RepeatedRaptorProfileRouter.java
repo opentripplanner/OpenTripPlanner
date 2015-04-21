@@ -52,8 +52,8 @@ public class RepeatedRaptorProfileRouter {
     
     public TimeSurface.RangeSet timeSurfaceRangeSet;
     
-    TObjectIntMap<TransitStop> mins = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MAX_VALUE); 
-    TObjectIntMap<TransitStop> maxs = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MIN_VALUE);
+    public TObjectIntMap<TransitStop> mins = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MAX_VALUE);
+    public TObjectIntMap<TransitStop> maxs = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MIN_VALUE);
     
     // accumulate the travel times to create an average
     TObjectLongMap<TransitStop> accumulator = new TObjectLongHashMap<TransitStop>();
@@ -76,9 +76,9 @@ public class RepeatedRaptorProfileRouter {
         Map<TripPattern, TripTimeSubset> timetables =
                 TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
 
-        
-        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(5);
-        
+
+        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(9);
+
         int i = 1;
         
         // We assume the times are aligned to minutes, and we don't do a depart-after search starting
