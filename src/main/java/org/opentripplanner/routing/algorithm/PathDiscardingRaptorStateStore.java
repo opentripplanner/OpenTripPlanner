@@ -19,6 +19,7 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     private TObjectIntMap<TransitStop> bestStops;
 
     /** The maximum acceptable clock time in seconds since midnight. All arrivals after this time will be ignored. */
+
     public int maxTime;
 
     /** Current round? TODO rename var */
@@ -26,22 +27,25 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     
     @Override
     public boolean put(TransitStop t, int time, boolean transfer) {
+
     	boolean stored = false;
     	
 //    	if (time > maxTime)
 //    		return false;
-    	
+
+        // This does not store internal algorithm state as it used to, but rather only the output.
+        // The reasoning is that, in dynamic programming/range RAPTOR mode, bestStops is carried over between runs of
+        // the algorithm. But you still want to propagate a non-optimal time with fewer transfers, because the
+        // optimal time at this stop might have already used up all of the transfers.
+        if (!transfer && time < bestStops.get(t))
+            bestStops.put(t, time);
+
         if (time < matrix[current].get(t)) {
             matrix[current].put(t, time);
-            stored = true;
+            return true;
         }
-        
-    	 if (!transfer && time < bestStops.get(t)) {
-    		 bestStops.put(t, time);
-    		 stored = true;
-    	 }
-        
-        return stored;
+
+        return false;
     }    
 
     @Override

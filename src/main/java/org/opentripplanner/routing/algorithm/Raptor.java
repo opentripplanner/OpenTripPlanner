@@ -108,6 +108,11 @@ public class Raptor {
         
         // Find all possible transfers. No need to do this on the last round though.
     	if (!isLast) {
+			// we proceed both before and after finding transfers, because finding transfers is effectively
+			// another "round." We used to use bestStops in the profile store to track this, but that doesn't
+			// work with dynamic programming/range-RAPTOR mode because bestStops may contain optimal trips found in
+			// future rounds,
+			store.proceed();
     		findTransfers();
     		store.proceed();
     	}
@@ -121,8 +126,11 @@ public class Raptor {
         // only find transfers from stops that were touched in this round.
         for (TransitStop tstop : markedStops) {  
         	
-        	// we know that the best time for this stop was updated on the last round because we mark stops
-        	int timeAtOriginStop = store.getTime(tstop);
+        	// we know that the best time for this stop was updated on the last round because we mark stops,
+			// so we can't be transferring from a transfer that was copied forward.
+			// We are using getPrev rather than getTime because bestStops may contain information from future rounds
+			// in dynamic programming/range-RAPTOR mode.
+        	int timeAtOriginStop = store.getPrev(tstop);
         	
             for (Edge e : tstop.getOutgoing()) {
                 if (e instanceof SimpleTransfer) {
