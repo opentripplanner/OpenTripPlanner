@@ -7,6 +7,8 @@ import static org.opentripplanner.routing.automata.Nonterminal.*;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
+import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
@@ -20,7 +22,7 @@ public class InitialStopSearchPathParser extends PathParser {
 	private static DFA dfa;
 	
 	static {
-		Nonterminal complete = seq(star(STREET), TRANSITSTOP);
+		Nonterminal complete = seq(optional(OTHER), star(STREET), TRANSITSTOP);
 		dfa = complete.toDFA().minimize();
 	}
 	
@@ -28,7 +30,7 @@ public class InitialStopSearchPathParser extends PathParser {
 	public int terminalFor(State state) {
 		Vertex v = state.getVertex();
 		
-		if (v instanceof IntersectionVertex)
+		if (v instanceof IntersectionVertex || v instanceof ElevatorOffboardVertex || v instanceof ElevatorOnboardVertex)
 			return STREET;
 		
 		else if (v instanceof TransitStop)
