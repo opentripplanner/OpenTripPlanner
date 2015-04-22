@@ -17,7 +17,7 @@ public class InitialStopSearchPathParser extends PathParser {
 	
 	private static final int STREET = 1;
 	private static final int TRANSITSTOP = 2;
-	private static final int OTHER = Integer.MAX_VALUE;
+	private static final int OTHER = 3;
 
 	private static DFA dfa;
 	
