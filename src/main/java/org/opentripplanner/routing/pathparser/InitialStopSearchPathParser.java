@@ -7,6 +7,7 @@ import static org.opentripplanner.routing.automata.Nonterminal.*;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
@@ -28,13 +29,11 @@ public class InitialStopSearchPathParser extends PathParser {
 	public int terminalFor(State state) {
 		Vertex v = state.getVertex();
 		
-		if (v instanceof IntersectionVertex)
-			return STREET;
-		
-		else if (v instanceof TransitStop)
+		if (v instanceof TransitStop)
 			return TRANSITSTOP;
 		
-		else return OTHER;
+		else
+			return STREET;
 	}
 
 	@Override
