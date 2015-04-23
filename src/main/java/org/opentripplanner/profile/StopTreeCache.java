@@ -1,6 +1,7 @@
 package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Maps;
+
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -12,6 +13,13 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.Map;
 
@@ -25,12 +33,12 @@ public class StopTreeCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(StopTreeCache.class);
     final int timeCutoffMinutes;
-    // Flattened 2D array of (streetVertexIndex, distanceFromStop) for each TransitStop
-    private final Map<TransitStop, int[]> distancesForStop = Maps.newHashMap();
+    // Map from Vertex ID -> Map<Transit Stop ID, distance>
+    public final TIntObjectMap<TIntIntMap> distancesForVertex = new TIntObjectHashMap<TIntIntMap>();
 
     public StopTreeCache (Graph graph, int timeCutoffMinutes) {
         this.timeCutoffMinutes = timeCutoffMinutes;
-        LOG.info("Caching distances to nearby street intersections from each transit stop...");
+        LOG.info("Caching distances from each street intersection to nearby transit stops . . .");
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = (true);
@@ -43,43 +51,26 @@ public class StopTreeCache {
             rr.dominanceFunction = new DominanceFunction.EarliestArrival();
             rr.setNumItineraries(1);
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
-            // Copy vertex indices and distances into a flattened 2D array
-            int[] distances = new int[spt.getVertexCount() * 2];
-            int i = 0;
+
+            // note that this implicitly leaves out stops that are not reachable
             for (Vertex vertex : spt.getVertices()) {
                 State state = spt.getState(vertex);
-                distances[i++] = vertex.getIndex();
-                distances[i++] = (int) state.getWalkDistance();
+                
+                TIntIntMap distances;
+                
+                int vidx = vertex.getIndex();
+                
+                if (!distancesForVertex.containsKey(vidx)) {
+                	distances = new TIntIntHashMap();
+                	distancesForVertex.put(vidx, distances);
+                }
+                else {
+                	distances = distancesForVertex.get(vidx);	
+                }
+                distances.put(tstop.getIndex(), (int) state.getWalkDistance());
             }
-            distancesForStop.put(tstop, distances);
             rr.cleanup();
         }
         LOG.info("Done caching distances to nearby street intersections from each transit stop.");
     }
-
-    /**
-     * Given a travel time to a transit stop, fill in the array with minimum travel times to all nearby street vertices.
-     * This function is meant to be called repeatedly on multiple transit stops, accumulating minima
-     * into the same targetArray.
-     */
-    public void propagateStop(TransitStop transitStop, int baseTimeSeconds, double walkSpeed, int[] targetArray) {
-        // Iterate over street intersections in the vicinity of this particular transit stop.
-        // Shift the time range at this transit stop, merging it into that for all reachable street intersections.
-        int[] distances = distancesForStop.get(transitStop);
-        int v = 0;
-        while (v < distances.length) {
-            // Unravel flattened 2D array
-            int vertexIndex = distances[v++];
-            int distance = distances[v++];
-            // distance in meters over walkspeed in meters per second --> seconds
-            int egressWalkTimeSeconds = (int) (distance / walkSpeed);
-            int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
-            int existing_min = targetArray[vertexIndex];
-            if (existing_min == 0 || existing_min > propagated_time) {
-                targetArray[vertexIndex] = propagated_time;
-            }
-        }
-
-    }
-
 }

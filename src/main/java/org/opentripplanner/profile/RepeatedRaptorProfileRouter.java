@@ -1,11 +1,17 @@
 package org.opentripplanner.profile;
 
+import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
+import gnu.trove.procedure.TIntObjectProcedure;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.joda.time.DateTimeZone;
@@ -107,10 +113,12 @@ public class RepeatedRaptorProfileRouter {
         // for transferring), and one additional round for the initial walk.
         PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore((MAX_TRANSFERS + 1) * 2 + 1);
 
-        // Summary stats across all minutes of the time window
-        PropagatedTimesStore windowSummary = new PropagatedTimesStore(graph);
-        // PropagatedHistogramsStore windowHistograms = new PropagatedHistogramsStore(90);
-
+        // figure out how many iterations we will do
+        int iterations = (request.toTime - request.fromTime) / 60 * stepMinutes + 1; 
+        
+        // all the times you could reach every transit stop
+        TIntObjectMap<int[]> timesAtStops = new TIntObjectHashMap<int[]>();
+        
         /** Iterate over all minutes in the time window, running a RAPTOR search at each minute. */
         for (int i = 0, departureTime = request.toTime - 60 * stepMinutes;
              departureTime >= request.fromTime;
@@ -137,28 +145,34 @@ public class RepeatedRaptorProfileRouter {
             Raptor raptor = new Raptor(graph, MAX_TRANSFERS, request.walkSpeed, rss, departureTime, request.date, timetables);
             raptor.run();
 
-            // Propagate minimum travel times out to vertices in the street network
-            StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
-            TObjectIntIterator<TransitStop> resultIterator = raptor.iterator();
-            int[] minsPerVertex = new int[Vertex.getMaxIndex()];
-            while (resultIterator.hasNext()) {
-                resultIterator.advance();
-                TransitStop transitStop = resultIterator.key();
-                int arrivalTime = resultIterator.value();
-                if (arrivalTime == Integer.MAX_VALUE) continue; // stop was not reached in this round (why was it included in map?)
-                int elapsedTime = arrivalTime - departureTime;
-                stopTreeCache.propagateStop(transitStop, elapsedTime, request.walkSpeed, minsPerVertex);
-            }
-            // We now have the minimum travel times to reach each street vertex for this departure minute.
-            // Accumulate them into the summary statistics for the entire time window.
-            windowSummary.mergeIn(minsPerVertex);
-
-            // The Holy Grail: histograms per street vertex. It actually seems as fast or faster than summary stats.
-            // windowHistograms.mergeIn(minsPerVertex);
+           for (TObjectIntIterator<TransitStop> it = rss.iterator(); it.hasNext();) {
+        	   it.advance();
+        	   
+        	   int time = it.value();
+        	   int tsidx = it.key().getIndex();
+        	   
+        	   if (time == Integer.MAX_VALUE) continue;
+        	   
+        	   time -= departureTime;
+        	   
+        	   int[] times;
+        	   if (timesAtStops.containsKey(tsidx)) {
+        		   times = timesAtStops.get(tsidx);
+        	   }
+        	   else {
+        		   times = new int[iterations];
+        		   Arrays.fill(times, Integer.MAX_VALUE);
+        		   timesAtStops.put(tsidx, times);
+        	   }
+        	   
+        	   times[i] = time;
+           }
         }
 
         LOG.info("Profile request complete, creating time surfaces.");
-        windowSummary.makeSurfaces(timeSurfaceRangeSet);
+        
+        makeSurfaces(timesAtStops, iterations);
+        
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
 
@@ -207,4 +221,90 @@ public class RepeatedRaptorProfileRouter {
     }
     
 
+    private void makeSurfaces (final TIntObjectMap<int[]> timesAtStops, final int iterations) {
+	    LOG.info("Propagating from transit stops to the street network...");
+	    // Grab a cached map of distances to street intersections from each transit stop
+	    StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
+	    // Iterate over all vertices that are near transit stops
+	    stopTreeCache.distancesForVertex.forEachEntry(new TIntObjectProcedure<TIntIntMap>() {
+
+			@Override
+			public boolean execute(int vidx, TIntIntMap distancesToTransitStops) {
+				Vertex v = graph.getVertexById(vidx);
+				
+				// get the best travel time to this vertex at every minute
+				int[] bestTravelTimeAtMinute = new int[iterations];
+				Arrays.fill(bestTravelTimeAtMinute, Integer.MAX_VALUE);
+				
+				for (TIntIntIterator it = distancesToTransitStops.iterator(); it.hasNext();) {
+					it.advance();
+					int tsidx = it.key();
+					int[] timesAtStop = timesAtStops.get(tsidx);
+					
+					// this stop is never reachable
+					if (timesAtStop == null)
+						continue;
+					
+					for (int i = 0; i < timesAtStop.length; i++) {
+						int time = timesAtStop[i];
+						
+						// this stop is not reachable at this minute
+						if (time == Integer.MAX_VALUE)
+							continue;
+						
+						// propagate
+						// this does not affect the original array.
+						time += it.value() / request.walkSpeed;
+						
+						// find the best travel time to this vertex
+						if (time < bestTravelTimeAtMinute[i])
+							bestTravelTimeAtMinute[i] = time;
+					}
+				}
+				
+				// get the average min and max
+				int min = Integer.MAX_VALUE;
+				int max = Integer.MIN_VALUE;
+				long sum = 0;
+				int count = 0;
+				
+				for (int time : bestTravelTimeAtMinute) {
+					if (time == Integer.MAX_VALUE) continue;
+					
+					if (time < min) min = time;
+					if (time > max) max = time;
+					
+					sum += time;
+					count++;
+				}
+				
+				// unreachable
+				// note that min and max must be defined if count > 0
+				if (count == 0) return true;
+				
+				int avg = (int) (sum / count);
+				
+				// we still need to compare and not just blindly put, in case walking is faster
+				// TODO: do we ever want to mix transit and walking (e.g. max is walking but min is transit)
+				// this is clearly a scenario that can exist in the world: if you're going five blocks, it might be fastest
+				// to take the transit line if it's there, otherwise walk rather than waiting. 
+				int existingMin = timeSurfaceRangeSet.min.times.get(v);
+				if (existingMin == TimeSurface.UNREACHABLE || min < existingMin)
+					timeSurfaceRangeSet.min.times.put(v, min);
+				
+				int existingMax = timeSurfaceRangeSet.max.times.get(v);
+				if (existingMax == TimeSurface.UNREACHABLE || max < existingMax)
+					timeSurfaceRangeSet.max.times.put(v, max);
+				
+				int existingAvg = timeSurfaceRangeSet.avg.times.get(v);
+				if (existingAvg == TimeSurface.UNREACHABLE || avg < existingAvg)
+					timeSurfaceRangeSet.avg.times.put(v, avg);
+				
+				return true;
+				
+			}
+		});
+	    
+	    LOG.info("Done with propagation.");
+	}
 }
