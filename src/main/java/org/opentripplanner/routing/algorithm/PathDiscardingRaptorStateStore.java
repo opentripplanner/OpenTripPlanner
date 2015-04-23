@@ -16,7 +16,7 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
     private TObjectIntMap[] matrix;
 
     /** The best time to reach each stop in any round by transit only, not by transfer from another stop. */
-    private TObjectIntMap<TransitStop> bestStops;
+    public TObjectIntMap<TransitStop> bestStops;
 
     /** The maximum acceptable clock time in seconds since midnight. All arrivals after this time will be ignored. */
 
