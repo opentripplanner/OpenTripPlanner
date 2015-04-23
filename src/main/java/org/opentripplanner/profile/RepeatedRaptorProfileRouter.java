@@ -46,7 +46,7 @@ public class RepeatedRaptorProfileRouter {
 
     public static final int MAX_DURATION = 60 * 60 * 2; // seconds
 
-    private static final int MAX_TRANSFERS = 3;
+    private static final int MAX_TRANSFERS = 20;
 
     public ProfileRequest request;
 
@@ -60,6 +60,8 @@ public class RepeatedRaptorProfileRouter {
 
     /** If not null, completely skip this agency during the calculations. */
     public String banAgency = null;
+    
+    private ShortestPathTree walkOnlySpt;
 
     /** The sum of all earliest-arrival travel times to a given transit stop. Will be divided to create an average. */
     TObjectLongMap<TransitStop> accumulator = new TObjectLongHashMap<TransitStop>();
@@ -141,6 +143,17 @@ public class RepeatedRaptorProfileRouter {
             StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
             TObjectIntIterator<TransitStop> resultIterator = raptor.iterator();
             int[] minsPerVertex = new int[Vertex.getMaxIndex()];
+            
+            // pre-fill minsPerVertex with walk-only times
+            for (State s : walkOnlySpt.getAllStates()) {
+            	Vertex v = s.getVertex();
+            	int time = (int) (s.getWalkDistance() / request.walkSpeed);
+            	int existing = minsPerVertex[v.getIndex()];
+            	if (existing == 0 || existing > time) {
+            		minsPerVertex[v.getIndex()] = time;
+            	}
+            }
+            
             while (resultIterator.hasNext()) {
                 resultIterator.advance();
                 TransitStop transitStop = resultIterator.key();
@@ -158,6 +171,10 @@ public class RepeatedRaptorProfileRouter {
         }
 
         LOG.info("Profile request complete, creating time surfaces.");
+        timeSurfaceRangeSet = new TimeSurface.RangeSet();
+        timeSurfaceRangeSet.min = new TimeSurface(this);
+        timeSurfaceRangeSet.max = new TimeSurface(this);
+        timeSurfaceRangeSet.avg = new TimeSurface(this);
         windowSummary.makeSurfaces(timeSurfaceRangeSet);
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
@@ -196,11 +213,7 @@ public class RepeatedRaptorProfileRouter {
             }
         }
 
-        // Initialize time surfaces (which will hold the final results) using the on-street search parameters
-        timeSurfaceRangeSet = new TimeSurface.RangeSet();
-        timeSurfaceRangeSet.min = new TimeSurface(spt, false);
-        timeSurfaceRangeSet.max = new TimeSurface(spt, false);
-        timeSurfaceRangeSet.avg = new TimeSurface(spt, false);
+        this.walkOnlySpt = spt;
 
         rr.cleanup();
         return accessTimes;
