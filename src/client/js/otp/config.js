@@ -65,8 +65,14 @@ otp.config = {
      *       applicable
      *       
      */
-     
+
     baseLayers: [
+        {
+            name: 'Transport Tiles',
+            tileUrl: 'http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png',
+            subdomains : ['a','b','c'],
+            attribution: 'Data from <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors. Tiles from <a href="http://www.thunderforest.com/transport/">Andy Allan</a>'
+        },
         {
             name: 'MapQuest OSM',
             tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
@@ -78,7 +84,12 @@ otp.config = {
             tileUrl: 'http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
             subdomains : ['otile1','otile2','otile3','otile4'],
             attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-        },           
+        },
+        {
+            name: 'Conveyal Tiles',
+            tileUrl: 'http://a.tiles.mapbox.com/v3/conveyal.hml987j0/{z}/{x}/{y}.png',
+            attribution: 'Data from <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors. Tiles from MapBox.</a>'
+        }
     ],
     
 
