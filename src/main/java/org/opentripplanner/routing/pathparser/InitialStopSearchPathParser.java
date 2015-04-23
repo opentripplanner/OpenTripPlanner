@@ -15,9 +15,9 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 
 public class InitialStopSearchPathParser extends PathParser {
 	
-	private static final int STREET = 1;
-	private static final int TRANSITSTOP = 2;
-	private static final int OTHER = 3;
+	protected static final int STREET = 1;
+	protected static final int TRANSITSTOP = 2;
+	protected static final int OTHER = 3;
 
 	private static DFA dfa;
 	

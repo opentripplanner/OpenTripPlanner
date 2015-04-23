@@ -1,12 +1,15 @@
 package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Maps;
+
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.pathparser.ProfilePropagationPathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -35,6 +38,7 @@ public class StopTreeCache {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = (true);
             rr.setRoutingContext(graph, tstop, tstop);
+            rr.rctx.pathParsers = new PathParser[] { new ProfilePropagationPathParser() };
             // RoutingReqeust dateTime defaults to currentTime.
             // If elapsed time is not capped, searches are very slow.
             rr.worstTime = (rr.dateTime + timeCutoffMinutes * 60);
@@ -48,6 +52,10 @@ public class StopTreeCache {
             int i = 0;
             for (Vertex vertex : spt.getVertices()) {
                 State state = spt.getState(vertex);
+                
+                if (state == null)
+                	continue;
+                
                 distances[i++] = vertex.getIndex();
                 distances[i++] = (int) state.getWalkDistance();
             }
