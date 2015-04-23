@@ -46,14 +46,14 @@ public class RepeatedRaptorProfileRouter {
 
     public static final int MAX_DURATION = 60 * 60 * 2; // seconds
 
-    private static final int MAX_TRANSFERS = 20;
+    private static final int MAX_TRANSFERS = 3;
 
     public ProfileRequest request;
 
     public Graph graph;
 
     // The spacing in minutes between RAPTOR calls within the time window
-    public int stepMinutes = 2;
+    public int stepMinutes = 1;
 
     /** Three time surfaces for min, max, and average travel time over the given time window. */
     public TimeSurface.RangeSet timeSurfaceRangeSet;
@@ -103,7 +103,9 @@ public class RepeatedRaptorProfileRouter {
         // Create a state store which will be reused calling RAPTOR with each departure time in reverse order.
         // This causes portions of the solution that do not change to be reused and should provide some speedup
         // over naively creating a new, empty state store for each minute.
-        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(MAX_TRANSFERS * 2 + 1);
+        // There is one more ride than transfer (hence MAX_TRANSFERS + 1), two rounds per ride (one for riding and one
+        // for transferring), and one additional round for the initial walk.
+        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore((MAX_TRANSFERS + 1) * 2 + 1);
 
         // Summary stats across all minutes of the time window
         PropagatedTimesStore windowSummary = new PropagatedTimesStore(graph);
@@ -183,9 +185,6 @@ public class RepeatedRaptorProfileRouter {
         rr.longDistance = true;
         rr.setNumItineraries(1);
 
-        // Set a path parser to avoid strange edge sequences.
-        // TODO choose a path parser that actually works here, or reuse nearbyStopFinder!
-        //rr.rctx.pathParsers = new PathParser[] { new BasicPathParser() };
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
         
         TObjectIntMap<TransitStop> accessTimes = new TObjectIntHashMap<TransitStop>(); 
