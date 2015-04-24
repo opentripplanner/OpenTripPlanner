@@ -77,6 +77,20 @@ public class RepeatedRaptorProfileRouter {
         
         LOG.info("Found {} initial transit stops", accessTimes.size());
 
+        /** THIN WORKERS */
+        LOG.info("Make data...", accessTimes.size());
+        TimeWindow window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
+        RaptorWorkerData raptorWorkerData = new RaptorWorkerData(graph, window);
+        LOG.info("Done.", accessTimes.size());
+
+        RaptorWorker worker = new RaptorWorker(raptorWorkerData);
+        PropagatedTimesStore propagatedTimesStore = worker.runRaptor(graph, accessTimes);
+        propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
+
+        if (true) {
+            return;
+        }
+
         /** A compacted tabular representation of all the patterns that are running on this date in this time window. */
         Map<TripPattern, TripTimeSubset> timetables =
                 TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);

@@ -1,0 +1,119 @@
+package org.opentripplanner.profile;
+
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Iterables;
+import gnu.trove.TIntCollection;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vertextype.TransitStop;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class RaptorWorkerData {
+
+    public final int nStops;
+
+    public final int nPatterns;
+
+    /** For every stop, one pair of ints (targetStopIndex, distanceMeters) for each transfer out of that stop. */
+    public final Jagged2DIntArray transfersForStop = new Jagged2DIntArray();
+
+    /** A list of pattern indexes passing through each stop. */
+    public final Jagged2DIntArray patternsForStop = new Jagged2DIntArray();
+
+    /** An ordered list of stops visited by each pattern. */
+    public final Jagged2DIntArray stopsForPattern = new Jagged2DIntArray();
+
+    /** For each pattern, a 2D array of stoptimes for each trip on the pattern. */
+    public List<RaptorWorkerTimetable> timetablesForPattern = new ArrayList<>();
+
+    /** For each stop, one pair of ints (targetStreetVertex, distanceMeters) for each reachable intersection from that stop. */
+    public final Jagged2DIntArray reachableIntersectionsForStop = new Jagged2DIntArray();
+
+    /** Optional debug data: the name of each stop. */
+    public transient final TObjectIntMap<Stop> indexForStop;
+    public transient final List<String> stopNames = new ArrayList<>();
+    public transient final List<String> patternNames = new ArrayList<>();
+
+
+    public RaptorWorkerData (Graph graph, TimeWindow window) {
+        int totalPatterns = graph.index.patternForId.size();
+        int totalStops = graph.index.stopForId.size();
+        timetablesForPattern = new ArrayList<RaptorWorkerTimetable>(totalPatterns);
+        List<TripPattern> patternForIndex = Lists.newArrayList(totalPatterns);
+        TObjectIntMap<TripPattern> indexForPattern = new TObjectIntHashMap<>(totalPatterns, 0.75f, -1);
+        indexForStop = new TObjectIntHashMap<>(totalStops, 0.75f, -1);
+        List<Stop> stopForIndex = new ArrayList<>(totalStops);
+
+        /* Make timetables for active trip patterns and record the stops each active pattern uses. */
+        for (TripPattern pattern : graph.index.patternForId.values()) {
+            RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forPattern(graph, pattern, window);
+            if (timetable == null) {
+                // Pattern is not running during the time window
+                continue;
+            }
+            timetablesForPattern.add(timetable);
+            // Temporary bidirectional mapping between 0-based indexes and patterns
+            indexForPattern.put(pattern, patternForIndex.size());
+            patternForIndex.add(pattern);
+            patternNames.add(pattern.code);
+            TIntCollection stopIndexesForPattern = new TIntArrayList();
+            for (Stop stop : pattern.getStops()) {
+                int stopIndex = indexForStop.get(stop);
+                if (stopIndex == -1) {
+                    stopIndex = indexForStop.size();
+                    indexForStop.put(stop, stopIndex);
+                    stopForIndex.add(stop);
+                    stopNames.add(stop.getName());
+                }
+                stopIndexesForPattern.add(stopIndex);
+            }
+            stopsForPattern.appendRow(stopIndexesForPattern);
+        }
+        /** Fill in used pattern indexes for each used stop. */
+        for (Stop stop : stopForIndex) {
+            TIntList patterns = new TIntArrayList();
+            for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
+                int patternIndex = indexForPattern.get(pattern);
+                if (patternIndex != -1) {
+                    patterns.add(patternIndex);
+                }
+            }
+            patternsForStop.appendRow(patterns);
+        }
+        /** Record transfers between all used stops. */
+        for (Stop stop : stopForIndex) {
+            TIntList transfers = new TIntArrayList();
+            TransitStop tstop = graph.index.stopVertexForStop.get(stop);
+            for (SimpleTransfer simpleTransfer : Iterables.filter(tstop.getOutgoing(), SimpleTransfer.class)) {
+                int targetStopIndex = indexForStop.get(((TransitStop) simpleTransfer.getToVertex()).getStop());
+                if (targetStopIndex != -1) {
+                    transfers.add(targetStopIndex);
+                    transfers.add((int)(simpleTransfer.getDistance()));
+                }
+            }
+            transfersForStop.appendRow(transfers);
+        }
+        // Record distances to nearby intersections for all used stops.
+        // This is just a copy of StopTreeCache using int indexes for stops.
+        StopTreeCache stc = graph.index.getStopTreeCache();
+        for (Stop stop : stopForIndex) {
+            TransitStop tstop = graph.index.stopVertexForStop.get(stop);
+            reachableIntersectionsForStop.appendRow(stc.distancesForStop.get(tstop));
+        }
+        stopsForPattern.finish();
+        patternsForStop.finish();
+        transfersForStop.finish();
+        reachableIntersectionsForStop.finish();
+        nStops = stopForIndex.size();
+        nPatterns = patternForIndex.size();
+    }
+
+}
