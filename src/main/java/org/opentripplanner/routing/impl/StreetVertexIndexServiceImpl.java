@@ -84,7 +84,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public static final double DISTANCE_ERROR = 0.000001;
 
     // If a point is within MAX_CORNER_DISTANCE, it is treated as at the corner.
-    private static final double MAX_CORNER_DISTANCE_METERS = 1000;
+    private static final double MAX_CORNER_DISTANCE_METERS = 10;
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
@@ -281,7 +281,122 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
         StreetVertex intersection = getIntersectionAt(coord);
-        return intersection;
+        String calculatedName = location.name;
+        if (intersection != null) {
+            // We have an intersection vertex. Check that this vertex has edges we can traverse.
+            boolean canEscape = false;
+            if (options == null) {
+                canEscape = true; // Some tests do not supply options.
+            } else {
+                TraversalRequirements reqs = new TraversalRequirements(options);
+                for (StreetEdge e : Iterables.filter ( options.arriveBy ?
+                        intersection.getIncoming() : intersection.getOutgoing(),
+                        StreetEdge.class)) {
+                    if (reqs.canBeTraversed(e)) {
+                        canEscape = true;
+                        break;
+                    }
+                }
+            }       
+            if (canEscape) { 
+                // Coordinate is at an intersection or street endpoint, and has traversible edges.
+                if (!location.hasName()) {
+                    LOG.debug("found intersection {}. not splitting.", intersection);
+                    // generate names for corners when no name was given
+                    Set<String> uniqueNameSet = new HashSet<String>();
+                    for (Edge e : intersection.getOutgoing()) {
+                        if (e instanceof StreetEdge) {
+                            uniqueNameSet.add(e.getName());
+                        }
+                    }
+                    List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
+                    Locale locale;
+                    if (options == null) {
+                        locale = new Locale("en");
+                    } else {
+                        locale = options.locale;
+                    }
+                    ResourceBundle resources = ResourceBundle.getBundle("internals", locale);
+                    String fmt = resources.getString("corner");
+                    if (uniqueNames.size() > 1) {
+                        calculatedName = String.format(fmt, uniqueNames.get(0), uniqueNames.get(1));
+                    } else if (uniqueNames.size() == 1) {
+                        calculatedName = uniqueNames.get(0);
+                    } else {
+                        calculatedName = resources.getString("unnamedStreet");
+                    }
+                }
+                TemporaryStreetLocation closest = new TemporaryStreetLocation(
+                        "corner " + Math.random(), coord, calculatedName, endVertex);
+                if (endVertex) {
+                    new TemporaryFreeEdge(intersection, closest);
+                } else {
+                    new TemporaryFreeEdge(closest, intersection);
+                }
+
+                return closest;
+            }
+        }
+
+        // if no intersection vertices were found, then find the closest transit stop
+        // (we can return stops here because this method is not used when street-transit linking)
+        double closestStopDistance = Double.POSITIVE_INFINITY;
+        Vertex closestStop = null;
+        // elsewhere options=null means no restrictions, find anything.
+        // here we skip examining stops, as they are really only relevant when transit is being used
+        if (options != null && options.modes.isTransit()) {
+            for (TransitStop v : getNearbyTransitStops(coord, 1000)) {
+                if (!v.isStreetLinkable()) continue;
+
+                double d = SphericalDistanceLibrary.distance(v.getCoordinate(), coord);
+                if (d < closestStopDistance) {
+                    closestStopDistance = d;
+                    closestStop = v;
+                }
+            }
+        }
+        LOG.debug(" best stop: {} distance: {}", closestStop, closestStopDistance);
+
+        // then find closest walkable street
+        TemporaryStreetLocation closestStreet = null;
+        CandidateEdgeBundle bundle = getClosestEdges(location, options, extraEdges, null, false);
+        CandidateEdge candidate = bundle.best;
+        double closestStreetDistance = Double.POSITIVE_INFINITY;
+        if (candidate != null) {
+            StreetEdge bestStreet = candidate.edge;
+            Coordinate nearestPoint = candidate.nearestPointOnEdge;
+            closestStreetDistance = SphericalDistanceLibrary.distance(coord, nearestPoint);
+            LOG.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
+            if (calculatedName == null || "".equals(calculatedName)) {
+                calculatedName = bestStreet.getName();
+            }
+            String closestName = String.format("%s_%s", bestStreet.getName(), location.toString());
+            closestStreet = createTemporaryStreetLocation(graph, closestName, calculatedName,
+                    bundle.toEdgeList(), nearestPoint, endVertex);
+        }
+
+        // decide whether to return street, or street + stop
+        if (closestStreet == null) {
+            // no street found, return closest stop or null
+            LOG.debug("returning only transit stop (no street found)");
+            return closestStop; // which will be null if none was found
+        } else {
+            // street found
+            if (closestStop != null) {
+                // both street and stop found
+                double relativeStopDistance = closestStopDistance / closestStreetDistance;
+                if (relativeStopDistance < 1.5) {
+                    LOG.debug("linking transit stop to street (distances are comparable)");
+                    if (endVertex) {
+                        new TemporaryFreeEdge(closestStop, closestStreet);
+                    } else {
+                        new TemporaryFreeEdge(closestStreet, closestStop);
+                    }
+                }
+            }
+            LOG.debug("returning split street");
+            return closestStreet;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -425,10 +540,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @return The nearest intersection, null if none found.
      */
     public StreetVertex getIntersectionAt(Coordinate coordinate) {
-    	coordinate = (Coordinate) coordinate.clone();
-    	coordinate.x = ((int) (coordinate.x * 1e5)) / (double) 1e5;
-    	coordinate.y = ((int) (coordinate.y * 1e5)) / (double) 1e5;
-    	
         double dLon = SphericalDistanceLibrary.metersToLonDegrees(MAX_CORNER_DISTANCE_METERS,
                 coordinate.y);
         double dLat = SphericalDistanceLibrary.metersToDegrees(MAX_CORNER_DISTANCE_METERS);
@@ -439,9 +550,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double bestDistanceMeter = Double.POSITIVE_INFINITY;
         for (Vertex v : nearby) {
             if (v instanceof StreetVertex) {
-            	if (!v.getLabel().startsWith("osm:"))
-            		continue;
-            	
                 double distanceMeter = SphericalDistanceLibrary.fastDistance(coordinate, v.getCoordinate());
                 if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
                     if (distanceMeter < bestDistanceMeter) {
