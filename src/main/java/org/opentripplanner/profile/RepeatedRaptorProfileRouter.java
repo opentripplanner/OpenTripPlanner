@@ -1,14 +1,15 @@
 package org.opentripplanner.profile;
 
-import com.google.common.collect.Lists;
-
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 
+import java.util.Map;
+
 import org.joda.time.DateTimeZone;
+import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
@@ -18,11 +19,9 @@ import org.opentripplanner.routing.algorithm.Raptor;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
@@ -31,10 +30,6 @@ import org.opentripplanner.routing.trippattern.TripTimeSubset;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Perform profile routing using repeated RAPTOR searches.
@@ -51,17 +46,27 @@ public class RepeatedRaptorProfileRouter {
 
     public static final int MAX_DURATION = 60 * 60 * 2; // seconds
 
+    private static final int MAX_TRANSFERS = 20;
+
     public ProfileRequest request;
-    
+
     public Graph graph;
-    
+
+    // The spacing in minutes between RAPTOR calls within the time window
+    public int stepMinutes = 1;
+
+    /** Three time surfaces for min, max, and average travel time over the given time window. */
     public TimeSurface.RangeSet timeSurfaceRangeSet;
+
+    /** If not null, completely skip this agency during the calculations. */
+    public String banAgency = null;
     
-    public TObjectIntMap<TransitStop> mins = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MAX_VALUE);
-    public TObjectIntMap<TransitStop> maxs = new TObjectIntHashMap<TransitStop>(3000, 0.75f, Integer.MIN_VALUE);
-    
-    // accumulate the travel times to create an average
+    private ShortestPathTree walkOnlySpt;
+
+    /** The sum of all earliest-arrival travel times to a given transit stop. Will be divided to create an average. */
     TObjectLongMap<TransitStop> accumulator = new TObjectLongHashMap<TransitStop>();
+
+    /** The number of travel time observations added into the accumulator. The divisor when calculating an average. */
     TObjectIntMap<TransitStop> counts = new TObjectIntHashMap<TransitStop>();
     
     public RepeatedRaptorProfileRouter (Graph graph, ProfileRequest request) {
@@ -76,77 +81,104 @@ public class RepeatedRaptorProfileRouter {
         
         TObjectIntMap<TransitStop> accessTimes = findInitialStops(false);
         
-        LOG.info("Found {} initial stops", accessTimes.size());
+        LOG.info("Found {} initial transit stops", accessTimes.size());
 
+        /** A compacted tabular representation of all the patterns that are running on this date in this time window. */
         Map<TripPattern, TripTimeSubset> timetables =
                 TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
 
-
-        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore(9);
-
-        int i = 1;
-        
-        // We assume the times are aligned to minutes, and we don't do a depart-after search starting
-        // at the end of the window.
-        for (int startTime = request.toTime - 60; startTime >= request.fromTime; startTime -= 60) {
-        	if (++i % 30 == 0)
-        		LOG.info("Completed {} RAPTOR searches", i);
-        	
-        	// adjust the max time
-        	rss.maxTime = startTime + 120 * 60;
-        	
-        	// reset the counter
-        	rss.restart();
-        	
-        	// relax the times at the start stops
-        	for (TObjectIntIterator<TransitStop> it = accessTimes.iterator(); it.hasNext();) {
-        		it.advance();
-        		// this is "transfer" from the origin
-        		rss.put(it.key(), startTime + it.value(), true);
-        	}
-            
-        	//LOG.info("Filtering RAPTOR states");
-            
-            Raptor raptor = new Raptor(graph, 3, request.walkSpeed, rss, startTime, request.date, timetables);
-
-            //LOG.info("Performing RAPTOR search for minute {}", i++);
-            
-            raptor.run();
-            
-            //LOG.info("Finished RAPTOR search in {} milliseconds", System.currentTimeMillis() - roundStartTime);
-            
-            // loop over all states, accumulating mins, maxes, etc.
-            for (TObjectIntIterator<TransitStop> it = raptor.iterator(); it.hasNext();) {
-                it.advance();
-                
-                int et = it.value() - startTime;
-                
-                // this can happen if the time is left from a previous search at a later start time
-                /*if (et > 120 * 60)
-                	continue;*/
-                
-                TransitStop v = it.key();
-                if (et < mins.get(v))
-                    mins.put(v, et);
-                
-                if (et > maxs.get(v))
-                    maxs.put(v, et);
-                
-                accumulator.putIfAbsent(v, 0);
-                counts.putIfAbsent(v, 0);
-                
-                accumulator.adjustValue(v, et);
-                counts.increment(v);
+        /** If a route is banned, remove all patterns belonging to that route from the timetable. */
+        if (banAgency != null) {
+            for (Route route : graph.index.routeForId.values()) {
+                if (route.getAgency().getId().equals(banAgency)) {
+                    LOG.info("Banning route {}", route);
+                    int n = 0;
+                    for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
+                        timetables.remove(pattern);
+                        n++;
+                    }
+                    LOG.info("Removed {} patterns.", n);
+                }
             }
         }
-        
-        LOG.info("Profile request complete, propagating to the street network");
-        
-        makeSurfaces();
-        
+
+        // Create a state store which will be reused calling RAPTOR with each departure time in reverse order.
+        // This causes portions of the solution that do not change to be reused and should provide some speedup
+        // over naively creating a new, empty state store for each minute.
+        // There is one more ride than transfer (hence MAX_TRANSFERS + 1), two rounds per ride (one for riding and one
+        // for transferring), and one additional round for the initial walk.
+        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore((MAX_TRANSFERS + 1) * 2 + 1);
+
+        // Summary stats across all minutes of the time window
+        PropagatedTimesStore windowSummary = new PropagatedTimesStore(graph);
+        // PropagatedHistogramsStore windowHistograms = new PropagatedHistogramsStore(90);
+
+        /** Iterate over all minutes in the time window, running a RAPTOR search at each minute. */
+        for (int i = 0, departureTime = request.toTime - 60 * stepMinutes;
+             departureTime >= request.fromTime;
+             departureTime -= 60 * stepMinutes) {
+
+            // Log progress every N iterations
+            if (++i % 5 == 0) {
+                LOG.info("Completed {} RAPTOR searches", i);
+            }
+
+        	// The departure time has changed; adjust the maximum clock time that the state store will retain
+            rss.maxTime = departureTime + MAX_DURATION;
+        	
+        	// Reset the counter. This is important if reusing the state store from one call to the next.
+        	rss.restart();
+        	
+        	// Find the arrival times at the initial transit stops
+        	for (TObjectIntIterator<TransitStop> it = accessTimes.iterator(); it.hasNext();) {
+        		it.advance();
+        		rss.put(it.key(), departureTime + it.value(), true); // store walk times for reachable transit stops
+        	}
+            
+            // Call the RAPTOR algorithm for this particular departure time
+            Raptor raptor = new Raptor(graph, MAX_TRANSFERS, request.walkSpeed, rss, departureTime, request.date, timetables);
+            raptor.run();
+
+            // Propagate minimum travel times out to vertices in the street network
+            StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
+            TObjectIntIterator<TransitStop> resultIterator = raptor.iterator();
+            int[] minsPerVertex = new int[Vertex.getMaxIndex()];
+            
+            // pre-fill minsPerVertex with walk-only times
+            for (State s : walkOnlySpt.getAllStates()) {
+            	Vertex v = s.getVertex();
+            	int time = (int) (s.getWalkDistance() / request.walkSpeed);
+            	int existing = minsPerVertex[v.getIndex()];
+            	if (existing == 0 || existing > time) {
+            		minsPerVertex[v.getIndex()] = time;
+            	}
+            }
+            
+            while (resultIterator.hasNext()) {
+                resultIterator.advance();
+                TransitStop transitStop = resultIterator.key();
+                int arrivalTime = resultIterator.value();
+                if (arrivalTime == Integer.MAX_VALUE) continue; // stop was not reached in this round (why was it included in map?)
+                int elapsedTime = arrivalTime - departureTime;
+                stopTreeCache.propagateStop(transitStop, elapsedTime, request.walkSpeed, minsPerVertex);
+            }
+            // We now have the minimum travel times to reach each street vertex for this departure minute.
+            // Accumulate them into the summary statistics for the entire time window.
+            windowSummary.mergeIn(minsPerVertex);
+
+            // The Holy Grail: histograms per street vertex. It actually seems as fast or faster than summary stats.
+            // windowHistograms.mergeIn(minsPerVertex);
+        }
+
+        LOG.info("Profile request complete, creating time surfaces.");
+        timeSurfaceRangeSet = new TimeSurface.RangeSet();
+        timeSurfaceRangeSet.min = new TimeSurface(this);
+        timeSurfaceRangeSet.max = new TimeSurface(this);
+        timeSurfaceRangeSet.avg = new TimeSurface(this);
+        windowSummary.makeSurfaces(timeSurfaceRangeSet);
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
-    
+
     /** find the boarding stops */
     private TObjectIntMap<TransitStop> findInitialStops(boolean dest) {
         double lat = dest ? request.toLat : request.fromLat;
@@ -169,6 +201,7 @@ public class RepeatedRaptorProfileRouter {
         AStar astar = new AStar();
         rr.longDistance = true;
         rr.setNumItineraries(1);
+
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
         
         TObjectIntMap<TransitStop> accessTimes = new TObjectIntHashMap<TransitStop>(); 
@@ -179,62 +212,12 @@ public class RepeatedRaptorProfileRouter {
                 accessTimes.put(tstop, (int) s.getElapsedTimeSeconds());
             }
         }
-        
-        // initialize propagation with direct modes
-        timeSurfaceRangeSet = new TimeSurface.RangeSet();
-        timeSurfaceRangeSet.min = new TimeSurface(spt, false);
-        timeSurfaceRangeSet.max = new TimeSurface(spt, false);
-        timeSurfaceRangeSet.avg = new TimeSurface(spt, false);
-        
+
+        this.walkOnlySpt = spt;
+
         rr.cleanup();
-        
         return accessTimes;
     }
     
-    private void makeSurfaces () {
-	    LOG.info("Propagating from transit stops to the street network...");
-	    // Grab a cached map of distances to street intersections from each transit stop
-	    StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
-	    // Iterate over all nondominated rides at all clusters
-	    for (TransitStop tstop : mins.keySet()) {
-	        int lb0 = mins.get(tstop);
-	        int ub0 = maxs.get(tstop);
-	        int avg0 = (int) (accumulator.get(tstop) / counts.get(tstop));
-
-            // Iterate over street intersections in the vicinity of this particular transit stop.
-            // Shift the time range at this transit stop, merging it into that for all reachable street intersections.
-            TObjectIntMap<Vertex> distanceToVertex = stopTreeCache.getDistancesForStop(tstop);
-            for (TObjectIntIterator<Vertex> iter = distanceToVertex.iterator(); iter.hasNext(); ) {
-                iter.advance();
-                Vertex vertex = iter.key();
-                // distance in meters over walkspeed in meters per second --> seconds
-                int egressWalkTimeSeconds = (int) (iter.value() / request.walkSpeed);
-                if (egressWalkTimeSeconds > request.maxWalkTime * 60) {
-                    continue;
-                }
-                int propagated_min = lb0 + egressWalkTimeSeconds;
-                int propagated_max = ub0 + egressWalkTimeSeconds;
-                // TODO: we can't take the min propagated average and call it an average
-                int propagated_avg = avg0 + egressWalkTimeSeconds;
-                int existing_min = timeSurfaceRangeSet.min.times.get(vertex);
-                int existing_max = timeSurfaceRangeSet.max.times.get(vertex);
-                int existing_avg = timeSurfaceRangeSet.avg.times.get(vertex);
-                // FIXME this is taking the least lower bound and the least upper bound
-                // which is not necessarily wrong but it's a crude way to perform the combination
-                if (existing_min == TimeSurface.UNREACHABLE || existing_min > propagated_min) {
-                    timeSurfaceRangeSet.min.times.put(vertex, propagated_min);
-                }
-                if (existing_max == TimeSurface.UNREACHABLE || existing_max > propagated_max) {
-                    timeSurfaceRangeSet.max.times.put(vertex, propagated_max);
-                }
-                if (existing_avg == TimeSurface.UNREACHABLE || existing_avg > propagated_avg) {
-                    timeSurfaceRangeSet.avg.times.put(vertex, propagated_avg);
-                }
-	        }
-	    }
-	    
-	    LOG.info("Done with propagation.");
-	    /* Store the results in a field in the router object. */
-	}
 
 }

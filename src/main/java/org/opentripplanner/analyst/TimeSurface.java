@@ -43,7 +43,7 @@ public class TimeSurface implements Serializable {
     public final int id;
     public final TObjectIntMap<Vertex> times = new TObjectIntHashMap<Vertex>(500000, 0.5f, UNREACHABLE);
     public final double lat, lon;
-    public int cutoffMinutes;
+    public int cutoffMinutes = 90; // this should really be copied from the data source but the new repeated raptor does not do so
     public long dateTime;
     public Map<String, String> params; // The query params sent by the user, for reference only
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation

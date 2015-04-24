@@ -1,34 +1,32 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+
+import java.util.Collection;
 
 @SuppressWarnings("unchecked")
 public class PathDiscardingRaptorStateStore implements RaptorStateStore {
+
+    /** Maps from stops to arrival times by transit _or_ by transfer from another stop, one map per round. */
 	// suppressing warnings because generic arrays don't work in Java . . .
     @SuppressWarnings("rawtypes")
-	private TObjectIntMap[] matrix;
+    private TObjectIntMap[] matrix;
 
-    private TObjectIntMap<TransitStop> bestStops;
+    /** The best time to reach each stop in any round by transit only, not by transfer from another stop. */
+    public TObjectIntMap<TransitStop> bestStops;
+
+    /** The maximum acceptable clock time in seconds since midnight. All arrivals after this time will be ignored. */
 
     public int maxTime;
-    
+
+    /** Current round? TODO rename var */
     int current = 0;
     
     @Override
     public boolean put(TransitStop t, int time, boolean transfer) {
-    	/*if (time > maxTime)
-    		return false;*/
-
         // This does not store internal algorithm state as it used to, but rather only the output.
         // The reasoning is that, in dynamic programming/range RAPTOR mode, bestStops is carried over between runs of
         // the algorithm. But you still want to propagate a non-optimal time with fewer transfers, because the

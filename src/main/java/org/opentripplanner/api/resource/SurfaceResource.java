@@ -142,11 +142,12 @@ public class SurfaceResource extends RoutingResource {
     @GET @Path("/{surfaceId}/isochrone")
     public Response getIsochrone (
             @PathParam("surfaceId") Integer surfaceId,
-            @QueryParam("spacing") int spacing) {
+            @QueryParam("spacing") int spacing,
+            @QueryParam("nMax") @DefaultValue("1") int nMax) {
         final TimeSurface surf = otpServer.surfaceCache.get(surfaceId);
         if (surf == null) return badRequest("Invalid TimeSurface ID.");
-        if (spacing < 1) spacing = 5;
-        List<IsochroneData> isochrones = getIsochronesAccumulative(surf, spacing);
+        if (spacing < 1) spacing = 30;
+        List<IsochroneData> isochrones = getIsochronesAccumulative(surf, spacing, nMax);
         // NOTE that cutoffMinutes in the surface must be properly set for the following call to work
         final FeatureCollection fc = LIsochrone.makeContourFeatures(isochrones);
         return Response.ok().entity(new StreamingOutput() {
@@ -235,7 +236,7 @@ public class SurfaceResource extends RoutingResource {
      * @param spacing the number of minutes between isochrones
      * @return a list of evenly-spaced isochrones up to the timesurface's cutoff point
      */
-    private List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing) {
+    private List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing, int nMax) {
 
         long t0 = System.currentTimeMillis();
         if (surf.sampleGrid == null) {
@@ -246,7 +247,7 @@ public class SurfaceResource extends RoutingResource {
                 surf.sampleGrid.delaunayTriangulate(), new WTWD.IsolineMetric());
 
         List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
-        for (int minutes = spacing; minutes <= surf.cutoffMinutes; minutes += spacing) {
+        for (int minutes = spacing, n = 0; minutes <= surf.cutoffMinutes && n < nMax; minutes += spacing, n++) {
             int seconds = minutes * 60;
             WTWD z0 = new WTWD();
             z0.w = 1.0;
@@ -254,7 +255,10 @@ public class SurfaceResource extends RoutingResource {
             z0.d = 300; // meters. TODO set dynamically / properly, make sure it matches grid cell size?
             IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
             isochrones.add(isochrone);
-        }
+            if (++n >= nMax) {
+                break;
+            }
+         }
 
         long t1 = System.currentTimeMillis();
         LOG.debug("Computed {} isochrones in {} msec", isochrones.size(), (int) (t1 - t0));

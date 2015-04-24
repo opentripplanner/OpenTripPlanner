@@ -1,41 +1,21 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import jersey.repackaged.com.google.common.collect.Sets;
-
-import com.google.common.collect.Lists;
-
-import flexjson.PathExpression;
 import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
+import jersey.repackaged.com.google.common.collect.Sets;
 import org.joda.time.LocalDate;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimeSubset;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /** Implements the RAPTOR algorithm; see http://research.microsoft.com/pubs/156567/raptor_alenex.pdf */
 public class Raptor {
@@ -95,6 +75,7 @@ public class Raptor {
     	// the initial walk is a "round"
     	store.proceed();
         for (int round = 0; round <= maxTransfers; round++) {
+			// LOG.info("round {}", round);
             if (!doRound(round == maxTransfers))
             	break;
         }
@@ -154,7 +135,6 @@ public class Raptor {
             for (Edge e : tstop.getOutgoing()) {
                 if (e instanceof SimpleTransfer) {
                 	TransitStop to = (TransitStop) e.getToVertex();
-                	
                 	int timeAtDestStop = (int) (timeAtOriginStop + e.getDistance() / walkSpeed);
                 	
                 	if (store.put(to, timeAtDestStop, true)) {
