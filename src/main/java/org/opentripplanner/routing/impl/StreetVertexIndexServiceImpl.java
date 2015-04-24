@@ -14,15 +14,12 @@
 package org.opentripplanner.routing.impl;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-
+import com.google.common.collect.Iterables;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.index.SpatialIndex;
+import com.vividsolutions.jts.index.strtree.STRtree;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -46,12 +43,14 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.index.SpatialIndex;
-import com.vividsolutions.jts.index.strtree.STRtree;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
@@ -550,6 +549,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double bestDistanceMeter = Double.POSITIVE_INFINITY;
         for (Vertex v : nearby) {
             if (v instanceof StreetVertex) {
+                v.getLabel().startsWith("osm:");
                 double distanceMeter = SphericalDistanceLibrary.fastDistance(coordinate, v.getCoordinate());
                 if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
                     if (distanceMeter < bestDistanceMeter) {

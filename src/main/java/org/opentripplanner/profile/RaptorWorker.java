@@ -3,6 +3,7 @@ package org.opentripplanner.profile;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.list.TIntList;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -64,6 +65,7 @@ public class RaptorWorker {
             initialStops.put(stopIndex, accessTime);
         }
         PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph);
+        PropagatedHistogramsStore propagatedHistogramsStore = new PropagatedHistogramsStore(90);
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
         for (int departureTime = 9 * 60 * 60, n = 0; departureTime >= 8 * 60 * 60; departureTime -= 60, n++) {
             if (n % 15 == 0) {
@@ -96,7 +98,8 @@ public class RaptorWorker {
                     }
                 }
             }
-            propagatedTimesStore.mergeIn(timesOnStreets);
+            //propagatedTimesStore.mergeIn(timesOnStreets);
+            propagatedHistogramsStore.mergeIn(timesOnStreets);
         }
         LOG.info("calc time {}sec", (System.currentTimeMillis() - beginCalcTime) / 1000.0);
         return propagatedTimesStore;
