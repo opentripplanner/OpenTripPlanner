@@ -5,12 +5,13 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class RaptorWorkerTimetable extends Contiguous2DIntArray {
+public class RaptorWorkerTimetable extends Contiguous2DIntArray implements Serializable {
 
     // TODO put stop indexes in array here
 

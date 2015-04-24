@@ -13,10 +13,11 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RaptorWorkerData {
+public class RaptorWorkerData implements Serializable {
 
     public final int nStops;
 

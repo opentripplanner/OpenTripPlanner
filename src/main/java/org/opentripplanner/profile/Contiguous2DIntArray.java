@@ -1,9 +1,10 @@
 package org.opentripplanner.profile;
 
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Contiguous2DIntArray {
+public class Contiguous2DIntArray implements Serializable {
 
     final int dx, dy;
     final int[] values;

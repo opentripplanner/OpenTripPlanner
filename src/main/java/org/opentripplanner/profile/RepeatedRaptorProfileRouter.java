@@ -25,6 +25,10 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Map;
 
 /**
@@ -81,6 +85,23 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("Make data...", accessTimes.size());
         TimeWindow window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
         RaptorWorkerData raptorWorkerData = new RaptorWorkerData(graph, window);
+        try {
+            LOG.info("begin write");
+            FileOutputStream fileOut = new FileOutputStream("/Users/abyrd/worker.obj");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(raptorWorkerData);
+            out.close();
+            fileOut.close();
+            LOG.info("begin read");
+            FileInputStream fileIn = new FileInputStream("/Users/abyrd/worker.obj");
+            ObjectInputStream oin = new ObjectInputStream(fileIn);
+            RaptorWorkerData dummy = (RaptorWorkerData) oin.readObject();
+            oin.close();
+            fileIn.close();
+            LOG.info("end read.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         LOG.info("Done.", accessTimes.size());
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData);

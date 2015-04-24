@@ -4,10 +4,12 @@ import gnu.trove.TIntCollection;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 
+import java.io.Serializable;
+
 /**
  * Created by abyrd on 23/04/15.
  */
-public class Jagged2DIntArray {
+public class Jagged2DIntArray implements Serializable {
 
     public final TIntArrayList offsets;
     public final TIntArrayList data;
