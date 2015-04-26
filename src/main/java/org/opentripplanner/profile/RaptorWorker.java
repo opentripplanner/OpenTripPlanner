@@ -1,7 +1,6 @@
 package org.opentripplanner.profile;
 
 import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
@@ -88,27 +87,17 @@ public class RaptorWorker {
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
                     // LOG.info("{} {}", baseTimeSeconds / 60, data.stopNames.get(s));
-                    TIntIterator intersectionIterator = data.targetsForStop.rowIterator(s);
-                    while (intersectionIterator.hasNext()) {
-                        int streetVertexIndex = intersectionIterator.next();
-                        int distance = intersectionIterator.next();
-                        // distance in meters over walkspeed in meters per second --> seconds
+                    int[] targets = data.targetsForStop.get(s);
+                    for (int i = 0; i < targets.length; i++) {
+                        int streetVertexIndex = targets[i++]; // increment i after read
+                        int distance = targets[i]; // i will be incremented at loop end
+                        // distance in meters over walk speed in meters per second --> seconds
                         int egressWalkTimeSeconds = distance;
                         int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
                         vTimes.setIfLess(n, streetVertexIndex, propagated_time);
-//                        int existing_min = timesOnStreets[streetVertexIndex];
-//                        if (existing_min == 0 || existing_min > propagated_time) {
-//                            //timesOnStreets[streetVertexIndex] = propagated_time;
-//                            timesOnStreets[streetVertexIndex] = propagated_time;
-//                        }
                     }
                 }
             }
-            // Rather than merging we should just keep the whole array or transpose them
-            // or make a byte array
-            // propagatedTimesStore.mergeIn(timesOnStreets);
-            //propagatedHistogramsStore.mergeIn(timesOnStreets);
-//            timesPerMinute[n] = timesOnStreets;
             totalPropagationTime += (System.currentTimeMillis() - beginPropagationTime);
         }
         long calcTime = System.currentTimeMillis() - beginCalcTime;
@@ -157,10 +146,10 @@ public class RaptorWorker {
             // LOG.info("pattern {} {}", p, data.patternNames.get(p));
             int onTrip = -1;
             RaptorWorkerTimetable timetable = data.timetablesForPattern.get(p);
-            TIntIterator stopIterator = data.stopsForPattern.rowIterator(p);
-            for (int stopPositionInPattern = 0; stopIterator.hasNext(); stopPositionInPattern++) {
-                int stopIndex = stopIterator.next();
-                // LOG.info("{} {} {}", stopPositionInPattern, onTrip, data.stopNames.get(stopIndex));
+            int[] stops = data.stopsForPattern.get(p);
+            int stopPositionInPattern = -1; // first increment will land this at zero
+            for (int stopIndex : stops) {
+                stopPositionInPattern += 1;
                 if (onTrip == -1) {
                     // We haven't boarded yet
                     if (bestTimes[stopIndex] == UNREACHED) {
@@ -201,10 +190,10 @@ public class RaptorWorker {
         for (int stop = stopsTouched.nextSetBit(0); stop >= 0; stop = stopsTouched.nextSetBit(stop + 1)) {
             markPatternsForStop(stop);
             int fromTime = bestTimes[stop];
-            TIntIterator transferIterator = data.transfersForStop.rowIterator(stop);
-            while (transferIterator.hasNext()) {
-                int toStop = transferIterator.next();
-                int distance = transferIterator.next();
+            int[] transfers = data.transfersForStop.get(stop);
+            for (int i = 0; i < transfers.length; i++) {
+                int toStop = transfers[i++]; // increment i
+                int distance = transfers[i]; // i will be incremented at the end of the loop
                 int toTime = fromTime + distance; // * 1.33
                 if (toTime < max_time && toTime < bestTimes[toStop]) {
                     bestTimes[toStop] = toTime;
@@ -216,9 +205,8 @@ public class RaptorWorker {
 
     /** Mark all the patterns passing through the given stop. */
     private void markPatternsForStop(int stop) {
-        TIntIterator patternIterator = data.patternsForStop.rowIterator(stop);
-        while (patternIterator.hasNext()) {
-            int pattern = patternIterator.next();
+        int[] patterns = data.patternsForStop.get(stop);
+        for (int pattern : patterns) {
             patternsTouched.set(pattern);
         }
     }

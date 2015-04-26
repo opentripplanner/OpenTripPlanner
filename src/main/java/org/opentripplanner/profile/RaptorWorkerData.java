@@ -2,7 +2,6 @@ package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Iterables;
-import gnu.trove.TIntCollection;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TObjectIntMap;
@@ -24,13 +23,13 @@ public class RaptorWorkerData implements Serializable {
     public final int nPatterns;
 
     /** For every stop, one pair of ints (targetStopIndex, distanceMeters) for each transfer out of that stop. */
-    public final Jagged2DIntArray transfersForStop = new Jagged2DIntArray();
+    public final List<int[]> transfersForStop = new ArrayList<>();
 
     /** A list of pattern indexes passing through each stop. */
-    public final Jagged2DIntArray patternsForStop = new Jagged2DIntArray();
+    public final List<int[]> patternsForStop = new ArrayList<>();
 
     /** An ordered list of stops visited by each pattern. */
-    public final Jagged2DIntArray stopsForPattern = new Jagged2DIntArray();
+    public final List<int[]> stopsForPattern = new ArrayList<>();
 
     /** For each pattern, a 2D array of stoptimes for each trip on the pattern. */
     public List<RaptorWorkerTimetable> timetablesForPattern = new ArrayList<>();
@@ -40,13 +39,12 @@ public class RaptorWorkerData implements Serializable {
      * For generic TimeSurfaces these are street intersections. They could be anything though since the worker doesn't
      * care what the IDs stand for. For example, they could be point indexes in a pointset.
      */
-    public final Jagged2DIntArray targetsForStop = new Jagged2DIntArray();
+    public final List<int[]> targetsForStop = new ArrayList<>();;
 
     /** Optional debug data: the name of each stop. */
     public transient final TObjectIntMap<Stop> indexForStop;
     public transient final List<String> stopNames = new ArrayList<>();
     public transient final List<String> patternNames = new ArrayList<>();
-
 
     public RaptorWorkerData (Graph graph, TimeWindow window) {
         int totalPatterns = graph.index.patternForId.size();
@@ -69,7 +67,7 @@ public class RaptorWorkerData implements Serializable {
             indexForPattern.put(pattern, patternForIndex.size());
             patternForIndex.add(pattern);
             patternNames.add(pattern.code);
-            TIntCollection stopIndexesForPattern = new TIntArrayList();
+            TIntList stopIndexesForPattern = new TIntArrayList();
             for (Stop stop : pattern.getStops()) {
                 int stopIndex = indexForStop.get(stop);
                 if (stopIndex == -1) {
@@ -80,7 +78,7 @@ public class RaptorWorkerData implements Serializable {
                 }
                 stopIndexesForPattern.add(stopIndex);
             }
-            stopsForPattern.appendRow(stopIndexesForPattern);
+            stopsForPattern.add(stopIndexesForPattern.toArray());
         }
         /** Fill in used pattern indexes for each used stop. */
         for (Stop stop : stopForIndex) {
@@ -91,7 +89,7 @@ public class RaptorWorkerData implements Serializable {
                     patterns.add(patternIndex);
                 }
             }
-            patternsForStop.appendRow(patterns);
+            patternsForStop.add(patterns.toArray());
         }
         /** Record transfers between all used stops. */
         for (Stop stop : stopForIndex) {
@@ -104,19 +102,15 @@ public class RaptorWorkerData implements Serializable {
                     transfers.add((int)(simpleTransfer.getDistance()));
                 }
             }
-            transfersForStop.appendRow(transfers);
+            transfersForStop.add(transfers.toArray());
         }
         // Record distances to nearby intersections for all used stops.
         // This is just a copy of StopTreeCache using int indexes for stops.
         StopTreeCache stc = graph.index.getStopTreeCache();
         for (Stop stop : stopForIndex) {
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
-            targetsForStop.appendRow(stc.distancesForStop.get(tstop));
+            targetsForStop.add(stc.distancesForStop.get(tstop));
         }
-        stopsForPattern.finish();
-        patternsForStop.finish();
-        transfersForStop.finish();
-        targetsForStop.finish();
         nStops = stopForIndex.size();
         nPatterns = patternForIndex.size();
     }

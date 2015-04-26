@@ -11,20 +11,25 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class RaptorWorkerTimetable extends Contiguous2DIntArray implements Serializable {
+public class RaptorWorkerTimetable implements Serializable {
 
     // TODO put stop indexes in array here
     // TODO serialize using deltas and variable-width from Protobuf libs
 
+    int nTrips, nStops;
+    private int[][] timesPerTrip;
+
     private RaptorWorkerTimetable(int nTrips, int nStops) {
-        super(nTrips, nStops);
+        this.nTrips = nTrips;
+        this.nStops = nStops;
+        timesPerTrip = new int[nTrips][];
     }
 
     /**
      * Return the trip index within the pattern of the soonest departure at the given stop number.
      */
     public int findDepartureAfter(int stop, int time) {
-        for (int trip = 0; trip < dx; trip++) {
+        for (int trip = 0; trip < timesPerTrip.length; trip++) {
             if (getDeparture(trip, stop) > time + 60) {
                 return trip;
             }
@@ -33,11 +38,11 @@ public class RaptorWorkerTimetable extends Contiguous2DIntArray implements Seria
     }
 
     public int getArrival (int trip, int stop) {
-        return get (trip, stop * 2);
+        return timesPerTrip[trip][stop * 2];
     }
 
     public int getDeparture (int trip, int stop) {
-        return get (trip, stop * 2 + 1);
+        return timesPerTrip[trip][stop * 2 + 1];
     }
 
     /** This is a factory function rather than a constructor to avoid calling the super constructor for rejected patterns. */
@@ -51,14 +56,6 @@ public class RaptorWorkerTimetable extends Contiguous2DIntArray implements Seria
             if (servicesRunning.get(tt.serviceCode) &&
                     tt.getScheduledArrivalTime(0) < window.to &&
                     tt.getScheduledDepartureTime(tt.getNumStops() - 1) >= window.from) {
-
-//                for (int s = 0; s < pattern.getStops().size(); s++) {
-//                    int arrival = tt.getScheduledArrivalTime(s);
-//                    int departure = tt.getScheduledDepartureTime(s);
-//                    if (departure > Short.MAX_VALUE || arrival > Short.MAX_VALUE) {
-//                        continue TT;
-//                    }
-//                }
                 tripTimes.add(tt);
             }
         }
@@ -78,13 +75,14 @@ public class RaptorWorkerTimetable extends Contiguous2DIntArray implements Seria
         RaptorWorkerTimetable rwtt = new RaptorWorkerTimetable(tripTimes.size(), pattern.getStops().size() * 2);
         int t = 0;
         for (TripTimes tt : tripTimes) {
+            int[] times = new int[rwtt.nStops];
             for (int s = 0; s < pattern.getStops().size(); s++) {
                 int arrival = tt.getScheduledArrivalTime(s);
                 int departure = tt.getScheduledDepartureTime(s);
-                rwtt.set(t, s * 2, arrival);
-                rwtt.set(t, s * 2 + 1, departure);
+                times[s * 2] = arrival;
+                times[s * 2 + 1] = departure;
             }
-            t++;
+            rwtt.timesPerTrip[t++] = times;
         }
         return rwtt;
     }
