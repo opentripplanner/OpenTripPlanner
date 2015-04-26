@@ -3,12 +3,11 @@ package org.opentripplanner.profile;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.list.TIntList;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +51,7 @@ public class RaptorWorker {
 
     public PropagatedTimesStore runRaptor (Graph graph, TObjectIntMap<TransitStop> accessTimes) {
         long beginCalcTime = System.currentTimeMillis();
+        long totalPropagationTime = 0;
         TIntIntMap initialStops = new TIntIntHashMap();
         TObjectIntIterator<TransitStop> initialIterator = accessTimes.iterator();
         while (initialIterator.hasNext()) {
@@ -65,9 +65,10 @@ public class RaptorWorker {
             initialStops.put(stopIndex, accessTime);
         }
         PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph);
-        PropagatedHistogramsStore propagatedHistogramsStore = new PropagatedHistogramsStore(90);
+        // TIntIntMap[] timesPerMinute = new TIntIntHashMap[60];
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
-        for (int departureTime = 9 * 60 * 60, n = 0; departureTime >= 8 * 60 * 60; departureTime -= 60, n++) {
+        Contiguous2DIntArray vTimes = new Contiguous2DIntArray(60, StreetVertex.getMaxIndex());
+        for (int departureTime = 9 * 60 * 60 - 60, n = 0; departureTime >= 8 * 60 * 60; departureTime -= 60, n++) {
             if (n % 15 == 0) {
                 LOG.info("minute {}", n);
             }
@@ -78,30 +79,53 @@ public class RaptorWorker {
 //                }
 //            }
             // At this point we should have the best travel times possible. Propagate to the streets.
-            int[] timesOnStreets = new int[Vertex.getMaxIndex()];
+//            int[] timesOnStreets = new int[StreetVertex.getMaxIndex()];
+
+            long beginPropagationTime = System.currentTimeMillis();
+            //int[] timesOnStreets = new int[StreetVertex.getMaxIndex()];
             for (int s = 0; s < data.nStops; s++) {
                 int baseTimeSeconds = bestTimes[s];
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
                     // LOG.info("{} {}", baseTimeSeconds / 60, data.stopNames.get(s));
-                    TIntIterator intersectionIterator = data.reachableIntersectionsForStop.rowIterator(s);
+                    TIntIterator intersectionIterator = data.targetsForStop.rowIterator(s);
                     while (intersectionIterator.hasNext()) {
                         int streetVertexIndex = intersectionIterator.next();
                         int distance = intersectionIterator.next();
                         // distance in meters over walkspeed in meters per second --> seconds
                         int egressWalkTimeSeconds = distance;
                         int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
-                        int existing_min = timesOnStreets[streetVertexIndex];
-                        if (existing_min == 0 || existing_min > propagated_time) {
-                            timesOnStreets[streetVertexIndex] = propagated_time;
-                        }
+                        vTimes.setIfLess(n, streetVertexIndex, propagated_time);
+//                        int existing_min = timesOnStreets[streetVertexIndex];
+//                        if (existing_min == 0 || existing_min > propagated_time) {
+//                            //timesOnStreets[streetVertexIndex] = propagated_time;
+//                            timesOnStreets[streetVertexIndex] = propagated_time;
+//                        }
                     }
                 }
             }
-            //propagatedTimesStore.mergeIn(timesOnStreets);
-            propagatedHistogramsStore.mergeIn(timesOnStreets);
+            // Rather than merging we should just keep the whole array or transpose them
+            // or make a byte array
+            // propagatedTimesStore.mergeIn(timesOnStreets);
+            //propagatedHistogramsStore.mergeIn(timesOnStreets);
+//            timesPerMinute[n] = timesOnStreets;
+            totalPropagationTime += (System.currentTimeMillis() - beginPropagationTime);
         }
-        LOG.info("calc time {}sec", (System.currentTimeMillis() - beginCalcTime) / 1000.0);
+        long calcTime = System.currentTimeMillis() - beginCalcTime;
+        LOG.info("calc time {}sec", calcTime / 1000.0);
+        LOG.info("  propagation {}sec", totalPropagationTime / 1000.0);
+        LOG.info("  raptor {}sec", (calcTime - totalPropagationTime) / 1000.0);
+////        int nonZero = 0;
+////        for (int i = 0; i < timesPerMinute.length; i++) {
+////            int[] times = new int[StreetVertex.getMaxIndex()];
+////            for (int j = 0; j < timesPerMinute[i].size(); j++) {
+////                times[j] = timesPerMinute[i].get(j);
+////            }
+////            propagatedTimesStore.mergeIn(times);
+////        }
+//        LOG.info("{}", nonZero); // thwart JIT
+        vTimes.dumpVariableByte();
+        propagatedTimesStore.setFromBytes(vTimes);
         return propagatedTimesStore;
     }
 

@@ -82,6 +82,16 @@ public class RepeatedRaptorProfileRouter {
         TimeWindow window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
         RaptorWorkerData raptorWorkerData = new RaptorWorkerData(graph, window);
         LOG.info("Done.");
+// TEST SERIALIZED SIZE and SPEED
+//        try {
+//            LOG.info("serializing...");
+//            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("/Users/abyrd/worker.data"));
+//            out.writeObject(raptorWorkerData);
+//            out.close();
+//            LOG.info("done");
+//        } catch(IOException i) {
+//            i.printStackTrace();
+//        }
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData);
         PropagatedTimesStore propagatedTimesStore = worker.runRaptor(graph, accessTimes);

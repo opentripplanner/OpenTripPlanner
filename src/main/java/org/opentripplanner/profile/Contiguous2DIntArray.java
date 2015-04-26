@@ -1,6 +1,10 @@
 package org.opentripplanner.profile;
 
+import com.google.protobuf.CodedOutputStream;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -41,7 +45,7 @@ public class Contiguous2DIntArray implements Serializable {
 
     public boolean setIfLess (int x, int y, int value) {
         int index = x * dy + y;
-        if (values[index] > value) {
+        if (values[index] == 0 || values[index] > value) { // if greater OR ZERO replace
             values[index] = value;
             return true;
         }
@@ -51,6 +55,22 @@ public class Contiguous2DIntArray implements Serializable {
     public void adjust (int x, int y, int amount) {
         int index = x * dy + y;
         values[index] += amount;
+    }
+
+    public void dumpVariableByte() {
+        try {
+            FileOutputStream fos = new FileOutputStream("/Users/abyrd/results.dat");
+            CodedOutputStream cos = CodedOutputStream.newInstance(fos);
+            for (int val : values) {
+                cos.writeUInt32NoTag(val);
+            }
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

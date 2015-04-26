@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import gnu.trove.map.TIntIntMap;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -33,6 +34,25 @@ public class PropagatedTimesStore {
         Arrays.fill(mins, Integer.MAX_VALUE);
     }
 
+    public void setFromBytes (Contiguous2DIntArray vTimes) {
+        for (int i = 0; i < vTimes.dx; i++) {
+            for (int v = 0; v < size; v++) {
+                int newValue = vTimes.get(i, v);
+                if (newValue == 0) {
+                    continue;
+                }
+                if (mins[v] > newValue) {
+                    mins[v] = newValue;
+                }
+                if (maxs[v] < newValue) {
+                    maxs[v] = newValue;
+                }
+                sums[v] += newValue;
+                counts[v] += 1;
+            }
+        }
+    }
+
     /**
      * Merge in min travel times to all vertices from one raptor call, finding minimum-of-min, maximum-of-min, and
      * average-of-min travel times.
@@ -41,6 +61,27 @@ public class PropagatedTimesStore {
         for (int i = 0; i < size; i++) {
             int newValue = news[i];
             if (newValue == 0) {
+                continue;
+            }
+            if (mins[i] > newValue) {
+                mins[i] = newValue;
+            }
+            if (maxs[i] < newValue) {
+                maxs[i] = newValue;
+            }
+            sums[i] += newValue;
+            counts[i] += 1;
+        }
+    }
+
+    /**
+     * Merge in min travel times to all vertices from one raptor call, finding minimum-of-min, maximum-of-min, and
+     * average-of-min travel times.
+     */
+    public void mergeIn(TIntIntMap news) {
+        for (int i = 0; i < size; i++) {
+            int newValue = news.get(i);
+            if (newValue == 0) { // Trove default value is 0 like an array
                 continue;
             }
             if (mins[i] > newValue) {

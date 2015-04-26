@@ -35,8 +35,12 @@ public class RaptorWorkerData implements Serializable {
     /** For each pattern, a 2D array of stoptimes for each trip on the pattern. */
     public List<RaptorWorkerTimetable> timetablesForPattern = new ArrayList<>();
 
-    /** For each stop, one pair of ints (targetStreetVertex, distanceMeters) for each reachable intersection from that stop. */
-    public final Jagged2DIntArray reachableIntersectionsForStop = new Jagged2DIntArray();
+    /**
+     * For each stop, one pair of ints (targetID, distanceMeters) for each destination near that stop.
+     * For generic TimeSurfaces these are street intersections. They could be anything though since the worker doesn't
+     * care what the IDs stand for. For example, they could be point indexes in a pointset.
+     */
+    public final Jagged2DIntArray targetsForStop = new Jagged2DIntArray();
 
     /** Optional debug data: the name of each stop. */
     public transient final TObjectIntMap<Stop> indexForStop;
@@ -107,12 +111,12 @@ public class RaptorWorkerData implements Serializable {
         StopTreeCache stc = graph.index.getStopTreeCache();
         for (Stop stop : stopForIndex) {
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
-            reachableIntersectionsForStop.appendRow(stc.distancesForStop.get(tstop));
+            targetsForStop.appendRow(stc.distancesForStop.get(tstop));
         }
         stopsForPattern.finish();
         patternsForStop.finish();
         transfersForStop.finish();
-        reachableIntersectionsForStop.finish();
+        targetsForStop.finish();
         nStops = stopForIndex.size();
         nPatterns = patternForIndex.size();
     }

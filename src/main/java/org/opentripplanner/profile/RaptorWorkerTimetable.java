@@ -14,6 +14,7 @@ import java.util.List;
 public class RaptorWorkerTimetable extends Contiguous2DIntArray implements Serializable {
 
     // TODO put stop indexes in array here
+    // TODO serialize using deltas and variable-width from Protobuf libs
 
     private RaptorWorkerTimetable(int nTrips, int nStops) {
         super(nTrips, nStops);
@@ -46,10 +47,18 @@ public class RaptorWorkerTimetable extends Contiguous2DIntArray implements Seria
         // This filtering can reduce number of trips and run time by 80 percent
         BitSet servicesRunning = window.servicesRunning;
         List<TripTimes> tripTimes = Lists.newArrayList();
-        for (TripTimes tt : pattern.scheduledTimetable.tripTimes) {
+        TT: for (TripTimes tt : pattern.scheduledTimetable.tripTimes) {
             if (servicesRunning.get(tt.serviceCode) &&
                     tt.getScheduledArrivalTime(0) < window.to &&
                     tt.getScheduledDepartureTime(tt.getNumStops() - 1) >= window.from) {
+
+//                for (int s = 0; s < pattern.getStops().size(); s++) {
+//                    int arrival = tt.getScheduledArrivalTime(s);
+//                    int departure = tt.getScheduledDepartureTime(s);
+//                    if (departure > Short.MAX_VALUE || arrival > Short.MAX_VALUE) {
+//                        continue TT;
+//                    }
+//                }
                 tripTimes.add(tt);
             }
         }
