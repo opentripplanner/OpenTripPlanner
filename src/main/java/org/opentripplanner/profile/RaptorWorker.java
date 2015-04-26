@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import com.google.protobuf.CodedOutputStream;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TIntIntMap;
@@ -11,6 +12,9 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
@@ -66,35 +70,28 @@ public class RaptorWorker {
         PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph);
         // TIntIntMap[] timesPerMinute = new TIntIntHashMap[60];
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
-        Contiguous2DIntArray vTimes = new Contiguous2DIntArray(60, StreetVertex.getMaxIndex());
+        int[][] timesAtTargetsEachMinute = new int[60][StreetVertex.getMaxIndex()];
         for (int departureTime = 9 * 60 * 60 - 60, n = 0; departureTime >= 8 * 60 * 60; departureTime -= 60, n++) {
             if (n % 15 == 0) {
                 LOG.info("minute {}", n);
             }
             this.runRaptor(initialStops, departureTime);
-//            for (int s = 0; s < data.nStops; s++) {
-//                if (bestTimes[s] != UNREACHED) {
-//                    LOG.info("{} {}", bestTimes[s] / 60, data.stopNames.get(s));
-//                }
-//            }
-            // At this point we should have the best travel times possible. Propagate to the streets.
-//            int[] timesOnStreets = new int[StreetVertex.getMaxIndex()];
-
             long beginPropagationTime = System.currentTimeMillis();
-            //int[] timesOnStreets = new int[StreetVertex.getMaxIndex()];
+            int[] timesAtTargets = timesAtTargetsEachMinute[n];
             for (int s = 0; s < data.nStops; s++) {
                 int baseTimeSeconds = bestTimes[s];
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
-                    // LOG.info("{} {}", baseTimeSeconds / 60, data.stopNames.get(s));
                     int[] targets = data.targetsForStop.get(s);
                     for (int i = 0; i < targets.length; i++) {
-                        int streetVertexIndex = targets[i++]; // increment i after read
+                        int targetIndex = targets[i++]; // increment i after read
                         int distance = targets[i]; // i will be incremented at loop end
                         // distance in meters over walk speed in meters per second --> seconds
                         int egressWalkTimeSeconds = distance;
                         int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
-                        vTimes.setIfLess(n, streetVertexIndex, propagated_time);
+                        if (timesAtTargets[targetIndex] == 0 || timesAtTargets[targetIndex] > propagated_time) {
+                            timesAtTargets[targetIndex] = propagated_time; // if greater OR ZERO replace TODO initialize arrays to MAX_VALUE?
+                        }
                     }
                 }
             }
@@ -104,18 +101,28 @@ public class RaptorWorker {
         LOG.info("calc time {}sec", calcTime / 1000.0);
         LOG.info("  propagation {}sec", totalPropagationTime / 1000.0);
         LOG.info("  raptor {}sec", (calcTime - totalPropagationTime) / 1000.0);
-////        int nonZero = 0;
-////        for (int i = 0; i < timesPerMinute.length; i++) {
-////            int[] times = new int[StreetVertex.getMaxIndex()];
-////            for (int j = 0; j < timesPerMinute[i].size(); j++) {
-////                times[j] = timesPerMinute[i].get(j);
-////            }
-////            propagatedTimesStore.mergeIn(times);
-////        }
-//        LOG.info("{}", nonZero); // thwart JIT
-        vTimes.dumpVariableByte();
-        propagatedTimesStore.setFromBytes(vTimes);
+        dumpVariableByte(timesAtTargetsEachMinute);
+        propagatedTimesStore.setFromArray(timesAtTargetsEachMinute);
         return propagatedTimesStore;
+    }
+
+    public void dumpVariableByte(int[][] array) {
+        try {
+            FileOutputStream fos = new FileOutputStream("/Users/abyrd/results.dat");
+            CodedOutputStream cos = CodedOutputStream.newInstance(fos);
+            cos.writeUInt32NoTag(array.length);
+            for (int[] subArray : array) {
+                cos.writeUInt32NoTag(subArray.length);
+                for (int val : subArray) {
+                    cos.writeInt32NoTag(val);
+                }
+            }
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void runRaptor (TIntIntMap initialStops, int departureTime) {

@@ -1,10 +1,5 @@
 package org.opentripplanner.profile;
 
-import com.google.protobuf.CodedOutputStream;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -57,20 +52,5 @@ public class Contiguous2DIntArray implements Serializable {
         values[index] += amount;
     }
 
-    public void dumpVariableByte() {
-        try {
-            FileOutputStream fos = new FileOutputStream("/Users/abyrd/results.dat");
-            CodedOutputStream cos = CodedOutputStream.newInstance(fos);
-            for (int val : values) {
-                cos.writeUInt32NoTag(val);
-            }
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 
 }

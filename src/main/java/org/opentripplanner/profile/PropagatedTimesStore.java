@@ -34,10 +34,10 @@ public class PropagatedTimesStore {
         Arrays.fill(mins, Integer.MAX_VALUE);
     }
 
-    public void setFromBytes (Contiguous2DIntArray vTimes) {
-        for (int i = 0; i < vTimes.dx; i++) {
-            for (int v = 0; v < size; v++) {
-                int newValue = vTimes.get(i, v);
+    public void setFromArray(int[][] times) {
+        for (int i = 0; i < times.length; i++) {
+            for (int v = 0; v < times[i].length; v++) {
+                int newValue = times[i][v];
                 if (newValue == 0) {
                     continue;
                 }
