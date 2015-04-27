@@ -6,6 +6,7 @@ import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.joda.time.DateTimeZone;
@@ -98,34 +99,27 @@ public class RepeatedRaptorProfileRouter {
 //        } catch(IOException i) {
 //            i.printStackTrace();
 //        }
+        
+        int[] walkTimes = new int[Vertex.getMaxIndex()];
+        Arrays.fill(walkTimes, RaptorWorker.UNREACHED);
+        
+        for (State state : walkOnlySpt.getAllStates()) {
+        	int time = (int) state.getElapsedTimeSeconds();
+        	int vidx = state.getVertex().getIndex();
+        	int otime = walkTimes[vidx];
+        	
+        	if (otime == RaptorWorker.UNREACHED || otime > time)
+        		walkTimes[vidx] = time;
+        	
+        }
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData, request);
-        PropagatedTimesStore propagatedTimesStore = worker.runRaptor(graph, accessTimes);
+        PropagatedTimesStore propagatedTimesStore = worker.runRaptor(graph, accessTimes, walkTimes);
         timeSurfaceRangeSet = new TimeSurface.RangeSet();
         timeSurfaceRangeSet.min = new TimeSurface(this);
         timeSurfaceRangeSet.avg = new TimeSurface(this);
         timeSurfaceRangeSet.max = new TimeSurface(this);
         propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
-        
-        // add walk-only options.
-        for (State state : walkOnlySpt.getAllStates()) {
-        	int time = (int) state.getElapsedTimeSeconds();
-        	Vertex v = state.getVertex();
-        	
-        	int emin = timeSurfaceRangeSet.min.getTime(v);
-        	if (emin == TimeSurface.UNREACHABLE || time < emin)
-        		timeSurfaceRangeSet.min.times.put(v, time);
-        	
-        	int emax = timeSurfaceRangeSet.max.getTime(v);
-        	if (emax == TimeSurface.UNREACHABLE || time < emax)
-        		timeSurfaceRangeSet.max.times.put(v, time);
-        	
-        	// TODO: this assumes that you always choose either to walk or to take transit
-        	// but there are cases when you might choose one or the other at different times within the window 
-        	int eavg = timeSurfaceRangeSet.avg.getTime(v);
-        	if (eavg == TimeSurface.UNREACHABLE || time < eavg)
-        		timeSurfaceRangeSet.avg.times.put(v, time);
-        }
 
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }

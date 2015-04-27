@@ -22,7 +22,7 @@ import java.util.List;
 public class RaptorWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorker.class);
-    private static final int UNREACHED = Integer.MAX_VALUE;
+    public static final int UNREACHED = Integer.MAX_VALUE;
     static final int MAX_ROUNDS = 8;
     static final int MAX_DURATION = 90 * 60;
 
@@ -55,7 +55,7 @@ public class RaptorWorker {
 //        timesPerStopPerRound.add(timesPerStop);
     }
 
-    public PropagatedTimesStore runRaptor (Graph graph, TObjectIntMap<TransitStop> accessTimes) {
+    public PropagatedTimesStore runRaptor (Graph graph, TObjectIntMap<TransitStop> accessTimes, int[] walkTimes) {
         long beginCalcTime = System.currentTimeMillis();
         long totalPropagationTime = 0;
         TIntIntMap initialStops = new TIntIntHashMap();
@@ -75,8 +75,7 @@ public class RaptorWorker {
         int iterations = (req.toTime - req.fromTime - 60) / 60 + 1;
         
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
-        // TODO if we run this on a machine that doesn't have a reference to the graph Vertex.getMaxIndex() is meaningless        
-        int[][] timesAtTargetsEachMinute = new int[iterations][StreetVertex.getMaxIndex()];
+        int[][] timesAtTargetsEachMinute = new int[iterations][walkTimes.length];
         
         for (int departureTime = req.toTime - 60, n = 0; departureTime >= req.fromTime; departureTime -= 60, n++) {
             if (n % 15 == 0) {
@@ -85,6 +84,11 @@ public class RaptorWorker {
             this.runRaptor(initialStops, departureTime);
             long beginPropagationTime = System.currentTimeMillis();
             int[] timesAtTargets = timesAtTargetsEachMinute[n];
+            
+            for (int i = 0; i < timesAtTargets.length; i++) {
+            	timesAtTargets[i] = walkTimes[i];
+            }
+            
             for (int s = 0; s < data.nStops; s++) {
                 int baseTimeSeconds = bestTimes[s];
                 if (baseTimeSeconds != UNREACHED) {
@@ -94,7 +98,7 @@ public class RaptorWorker {
                         int targetIndex = targets[i++]; // increment i after read
                         int distance = targets[i]; // i will be incremented at loop end
                         // distance in meters over walk speed in meters per second --> seconds
-                        int egressWalkTimeSeconds = distance;
+                        int egressWalkTimeSeconds = (int) (distance / req.walkSpeed);
                         int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
                         if (timesAtTargets[targetIndex] == 0 || timesAtTargets[targetIndex] > propagated_time) {
                             timesAtTargets[targetIndex] = propagated_time; // if greater OR ZERO replace TODO initialize arrays to MAX_VALUE?
