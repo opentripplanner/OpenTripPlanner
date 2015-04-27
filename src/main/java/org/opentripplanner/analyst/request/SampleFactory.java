@@ -17,6 +17,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
+
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
@@ -24,6 +25,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
 
 import java.util.List;
 
@@ -78,6 +80,12 @@ public class SampleFactory implements SampleSource {
              * directly. */
             c.edge = edge;
             LineString ls = (LineString)(edge.getGeometry());
+            
+            // both the from and to vertices must be OSM vertices so that linking is stable if the transit network changes
+            // and streets get split.
+            if (!(edge.getFromVertex() instanceof OsmVertex && edge.getToVertex() instanceof OsmVertex))
+            	continue;
+            
             CoordinateSequence coordSeq = ls.getCoordinateSequence();
             int numCoords = coordSeq.size();
             for (int seg = 0; seg < numCoords - 1; seg++) {
