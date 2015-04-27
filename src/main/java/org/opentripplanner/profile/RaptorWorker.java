@@ -23,7 +23,6 @@ public class RaptorWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorker.class);
     public static final int UNREACHED = Integer.MAX_VALUE;
-    static final int MAX_ROUNDS = 8;
     static final int MAX_DURATION = 90 * 60;
 
     int max_time = 0;
@@ -53,6 +52,8 @@ public class RaptorWorker {
 //        timesPerStop = new int[data.nStops];
 //        Arrays.fill(timesPerStop, UNREACHED);
 //        timesPerStopPerRound.add(timesPerStop);
+        // uncomment to disable range-raptor
+        //Arrays.fill(bestTimes, UNREACHED);
     }
 
     public PropagatedTimesStore runRaptor (Graph graph, TObjectIntMap<TransitStop> accessTimes, int[] walkTimes) {
@@ -86,10 +87,6 @@ public class RaptorWorker {
             int[] timesAtTargets = timesAtTargetsEachMinute[n];
 
             System.arraycopy(walkTimes, 0, timesAtTargets, 0, walkTimes.length);
-            
-            for (int i = 0; i < timesAtTargets.length; i++) {
-            	timesAtTargets[i] = walkTimes[i];
-            }
             
             for (int s = 0; s < data.nStops; s++) {
             	// it's safe to use the best time at this stop for any number of transfers, even in range-raptor,
@@ -153,20 +150,20 @@ public class RaptorWorker {
             iterator.advance();
             int stopIndex = iterator.key();
             int time = iterator.value() + departureTime;
-            bestTimes[stopIndex] = time;
+            bestTimes[stopIndex] = Math.min(time, bestTimes[stopIndex]);
             markPatternsForStop(stopIndex);
         }
         // Anytime a round updates some stops, move on to another round
-        while (round <= MAX_ROUNDS && doOneRound()) {
+        while (doOneRound()) {
             advance();
         }
     }
 
     public boolean doOneRound () {
-        // LOG.info("round {}", round);
+        LOG.info("round {}", round);
         stopsTouched.clear(); // clear any stops left over from previous round.
         for (int p = patternsTouched.nextSetBit(0); p >= 0; p = patternsTouched.nextSetBit(p+1)) {
-            // LOG.info("pattern {} {}", p, data.patternNames.get(p));
+            LOG.info("pattern {} {}", p, data.patternNames.get(p));
             int onTrip = -1;
             RaptorWorkerTimetable timetable = data.timetablesForPattern.get(p);
             int[] stops = data.stopsForPattern.get(p);
@@ -188,7 +185,8 @@ public class RaptorWorker {
                         bestTimes[stopIndex] = arrivalTime;
                         stopsTouched.set(stopIndex);
                     }
-                    // Check whether we can back up to an earlier trip.
+                    // Check whether we can back up to an earlier trip. This could be due to an overtaking trip,
+                    // or (more likely) because there was a faster way to get to a stop further down the line. 
                     while (onTrip > 0) {
                         int departureOnPreviousTrip = timetable.getDeparture(onTrip - 1, stopPositionInPattern);
                         if (departureOnPreviousTrip > bestTimes[stopIndex]) {
@@ -209,20 +207,29 @@ public class RaptorWorker {
      * Mark all the patterns passing through these stops and any stops transferred to.
      */
     private void doTransfers() {
+    	// copy and update bestTimes, because if the best way to get to a stop is a transfer but that
+    	// stop was also touched in the last round, we don't want to transfer from the transfer.
+    	// This doesn't matter in the transit phase, because, since we don't limit transfers, it's fine
+    	// if a particular round explores multiple connected transit rides.
+    	int[] newBestTimes = bestTimes.clone();
+    	
         patternsTouched.clear();
         for (int stop = stopsTouched.nextSetBit(0); stop >= 0; stop = stopsTouched.nextSetBit(stop + 1)) {
+        	// TODO this is reboarding every trip at every stop.
             markPatternsForStop(stop);
             int fromTime = bestTimes[stop];
             int[] transfers = data.transfersForStop.get(stop);
             for (int i = 0; i < transfers.length; i++) {
                 int toStop = transfers[i++]; // increment i
                 int distance = transfers[i]; // i will be incremented at the end of the loop
-                int toTime = fromTime + (int) (distance / req.walkSpeed); // * 1.33
-                if (toTime < max_time && toTime < bestTimes[toStop]) {
-                    bestTimes[toStop] = toTime;
+                int toTime = fromTime + (int) (distance / req.walkSpeed);
+                if (toTime < max_time && toTime < newBestTimes[toStop]) {
+                    newBestTimes[toStop] = toTime;
                     markPatternsForStop(toStop);
                 }
              }
+            
+            bestTimes = newBestTimes;
         }
     }
 
