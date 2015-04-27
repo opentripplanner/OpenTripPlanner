@@ -84,6 +84,8 @@ public class RaptorWorker {
             this.runRaptor(initialStops, departureTime);
             long beginPropagationTime = System.currentTimeMillis();
             int[] timesAtTargets = timesAtTargetsEachMinute[n];
+
+            System.arraycopy(walkTimes, 0, timesAtTargets, 0, walkTimes.length);
             
             for (int i = 0; i < timesAtTargets.length; i++) {
             	timesAtTargets[i] = walkTimes[i];
