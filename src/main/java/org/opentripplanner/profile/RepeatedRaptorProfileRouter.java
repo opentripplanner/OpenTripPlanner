@@ -99,7 +99,7 @@ public class RepeatedRaptorProfileRouter {
 //            i.printStackTrace();
 //        }
 
-        RaptorWorker worker = new RaptorWorker(raptorWorkerData);
+        RaptorWorker worker = new RaptorWorker(raptorWorkerData, request);
         PropagatedTimesStore propagatedTimesStore = worker.runRaptor(graph, accessTimes);
         timeSurfaceRangeSet = new TimeSurface.RangeSet();
         timeSurfaceRangeSet.min = new TimeSurface(this);

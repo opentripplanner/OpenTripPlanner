@@ -36,12 +36,15 @@ public class RaptorWorker {
 
     BitSet stopsTouched;
     BitSet patternsTouched;
+    
+    private ProfileRequest req;
 
-    public RaptorWorker(RaptorWorkerData data) {
+    public RaptorWorker(RaptorWorkerData data, ProfileRequest req) {
         this.data = data;
         this.bestTimes = new int[data.nStops];
         stopsTouched = new BitSet(data.nStops);
         patternsTouched = new BitSet(data.nPatterns);
+        this.req = req; 
         Arrays.fill(bestTimes, UNREACHED); // initialize once here and reuse on subsequent iterations.
     }
 
@@ -68,10 +71,14 @@ public class RaptorWorker {
             initialStops.put(stopIndex, accessTime);
         }
         PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph);
-        // TIntIntMap[] timesPerMinute = new TIntIntHashMap[60];
+        
+        int iterations = (req.toTime - req.fromTime - 60) / 60 + 1;
+        
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
-        int[][] timesAtTargetsEachMinute = new int[60][StreetVertex.getMaxIndex()];
-        for (int departureTime = 9 * 60 * 60 - 60, n = 0; departureTime >= 8 * 60 * 60; departureTime -= 60, n++) {
+        // TODO if we run this on a machine that doesn't have a reference to the graph Vertex.getMaxIndex() is meaningless        
+        int[][] timesAtTargetsEachMinute = new int[iterations][StreetVertex.getMaxIndex()];
+        
+        for (int departureTime = req.toTime - 60, n = 0; departureTime >= req.fromTime; departureTime -= 60, n++) {
             if (n % 15 == 0) {
                 LOG.info("minute {}", n);
             }
