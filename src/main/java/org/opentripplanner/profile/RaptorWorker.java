@@ -30,6 +30,9 @@ public class RaptorWorker {
     List<int[]> timesPerStopPerRound;
     int[] timesPerStop;
     int[] bestTimes;
+    
+    /** The best times for reaching stops via transit rather than via a transfer from another stop */
+    int[] bestNonTransferTimes;
     int[] transferResults;
     RaptorWorkerData data;
 
@@ -41,10 +44,12 @@ public class RaptorWorker {
     public RaptorWorker(RaptorWorkerData data, ProfileRequest req) {
         this.data = data;
         this.bestTimes = new int[data.nStops];
+        this.bestNonTransferTimes = new int[data.nStops];
         stopsTouched = new BitSet(data.nStops);
         patternsTouched = new BitSet(data.nPatterns);
         this.req = req; 
         Arrays.fill(bestTimes, UNREACHED); // initialize once here and reuse on subsequent iterations.
+        Arrays.fill(bestNonTransferTimes, UNREACHED);
     }
 
     public void advance () {
@@ -91,8 +96,9 @@ public class RaptorWorker {
             for (int s = 0; s < data.nStops; s++) {
             	// it's safe to use the best time at this stop for any number of transfers, even in range-raptor,
             	// because we allow unlimited transfers. this is slightly different from the original RAPTOR implementation:
-            	// we do not necessarily compute all pareto-optimal paths on (journey time, number of transfers)
-                int baseTimeSeconds = bestTimes[s];
+            	// we do not necessarily compute all pareto-optimal paths on (journey time, number of transfers).
+            	// TODO this allows egressing from transfers.
+                int baseTimeSeconds = bestNonTransferTimes[s];
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
                     int[] targets = data.targetsForStop.get(s);
@@ -150,6 +156,7 @@ public class RaptorWorker {
             iterator.advance();
             int stopIndex = iterator.key();
             int time = iterator.value() + departureTime;
+            // note not setting bestNonTransferTimes here because the initial walk is effectively a "transfer"
             bestTimes[stopIndex] = Math.min(time, bestTimes[stopIndex]);
             markPatternsForStop(stopIndex);
         }
@@ -181,15 +188,19 @@ public class RaptorWorker {
                 } else {
                     // We're on board a trip.
                     int arrivalTime = timetable.getArrival(onTrip, stopPositionInPattern);
-                    if (arrivalTime < max_time && arrivalTime < bestTimes[stopIndex]) {
-                        bestTimes[stopIndex] = arrivalTime;
+                    if (arrivalTime < max_time && arrivalTime < bestNonTransferTimes[stopIndex]) {
+                        bestNonTransferTimes[stopIndex] = arrivalTime;
+                        
+                        if (arrivalTime < bestTimes[stopIndex])
+                        	bestTimes[stopIndex] = arrivalTime;
+                        
                         stopsTouched.set(stopIndex);
                     }
                     // Check whether we can back up to an earlier trip. This could be due to an overtaking trip,
                     // or (more likely) because there was a faster way to get to a stop further down the line. 
                     while (onTrip > 0) {
                         int departureOnPreviousTrip = timetable.getDeparture(onTrip - 1, stopPositionInPattern);
-                        if (departureOnPreviousTrip > bestTimes[stopIndex]) {
+                        if (departureOnPreviousTrip > bestNonTransferTimes[stopIndex]) {
                             onTrip--;
                         } else {
                             break;
@@ -207,29 +218,21 @@ public class RaptorWorker {
      * Mark all the patterns passing through these stops and any stops transferred to.
      */
     private void doTransfers() {
-    	// copy and update bestTimes, because if the best way to get to a stop is a transfer but that
-    	// stop was also touched in the last round, we don't want to transfer from the transfer.
-    	// This doesn't matter in the transit phase, because, since we don't limit transfers, it's fine
-    	// if a particular round explores multiple connected transit rides.
-    	int[] newBestTimes = bestTimes.clone();
-    	
         patternsTouched.clear();
         for (int stop = stopsTouched.nextSetBit(0); stop >= 0; stop = stopsTouched.nextSetBit(stop + 1)) {
         	// TODO this is reboarding every trip at every stop.
             markPatternsForStop(stop);
-            int fromTime = bestTimes[stop];
+            int fromTime = bestNonTransferTimes[stop];
             int[] transfers = data.transfersForStop.get(stop);
             for (int i = 0; i < transfers.length; i++) {
                 int toStop = transfers[i++]; // increment i
                 int distance = transfers[i]; // i will be incremented at the end of the loop
                 int toTime = fromTime + (int) (distance / req.walkSpeed);
-                if (toTime < max_time && toTime < newBestTimes[toStop]) {
-                    newBestTimes[toStop] = toTime;
+                if (toTime < max_time && toTime < bestTimes[toStop]) {
+                    bestTimes[toStop] = toTime;
                     markPatternsForStop(toStop);
                 }
              }
-            
-            bestTimes = newBestTimes;
         }
     }
 
