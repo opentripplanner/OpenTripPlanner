@@ -101,105 +101,32 @@ public class RepeatedRaptorProfileRouter {
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData);
         PropagatedTimesStore propagatedTimesStore = worker.runRaptor(graph, accessTimes);
-        propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
-
-        if (true) {
-            return;
-        }
-
-        /** A compacted tabular representation of all the patterns that are running on this date in this time window. */
-        Map<TripPattern, TripTimeSubset> timetables =
-                TripTimeSubset.indexGraph(graph, request.date, request.fromTime, request.toTime + MAX_DURATION);
-
-        /** If a route is banned, remove all patterns belonging to that route from the timetable. */
-        if (banAgency != null) {
-            for (Route route : graph.index.routeForId.values()) {
-                if (route.getAgency().getId().equals(banAgency)) {
-                    LOG.info("Banning route {}", route);
-                    int n = 0;
-                    for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
-                        timetables.remove(pattern);
-                        n++;
-                    }
-                    LOG.info("Removed {} patterns.", n);
-                }
-            }
-        }
-
-        // Create a state store which will be reused calling RAPTOR with each departure time in reverse order.
-        // This causes portions of the solution that do not change to be reused and should provide some speedup
-        // over naively creating a new, empty state store for each minute.
-        // There is one more ride than transfer (hence MAX_TRANSFERS + 1), two rounds per ride (one for riding and one
-        // for transferring), and one additional round for the initial walk.
-        PathDiscardingRaptorStateStore rss = new PathDiscardingRaptorStateStore((MAX_TRANSFERS + 1) * 2 + 1);
-
-        // Summary stats across all minutes of the time window
-        PropagatedTimesStore windowSummary = new PropagatedTimesStore(graph);
-        // PropagatedHistogramsStore windowHistograms = new PropagatedHistogramsStore(90);
-
-        /** Iterate over all minutes in the time window, running a RAPTOR search at each minute. */
-        for (int i = 0, departureTime = request.toTime - 60 * stepMinutes;
-             departureTime >= request.fromTime;
-             departureTime -= 60 * stepMinutes) {
-
-            // Log progress every N iterations
-            if (++i % 5 == 0) {
-                LOG.info("Completed {} RAPTOR searches", i);
-            }
-
-        	// The departure time has changed; adjust the maximum clock time that the state store will retain
-            rss.maxTime = departureTime + MAX_DURATION;
-        	
-        	// Reset the counter. This is important if reusing the state store from one call to the next.
-        	rss.restart();
-        	
-        	// Find the arrival times at the initial transit stops
-        	for (TObjectIntIterator<TransitStop> it = accessTimes.iterator(); it.hasNext();) {
-        		it.advance();
-        		rss.put(it.key(), departureTime + it.value(), true); // store walk times for reachable transit stops
-        	}
-            
-            // Call the RAPTOR algorithm for this particular departure time
-            Raptor raptor = new Raptor(graph, MAX_TRANSFERS, request.walkSpeed, rss, departureTime, request.date, timetables);
-            raptor.run();
-
-            // Propagate minimum travel times out to vertices in the street network
-            StopTreeCache stopTreeCache = graph.index.getStopTreeCache();
-            TObjectIntIterator<TransitStop> resultIterator = raptor.iterator();
-            int[] minsPerVertex = new int[Vertex.getMaxIndex()];
-            
-            // pre-fill minsPerVertex with walk-only times
-            for (State s : walkOnlySpt.getAllStates()) {
-            	Vertex v = s.getVertex();
-            	int time = (int) (s.getWalkDistance() / request.walkSpeed);
-            	int existing = minsPerVertex[v.getIndex()];
-            	if (existing == 0 || existing > time) {
-            		minsPerVertex[v.getIndex()] = time;
-            	}
-            }
-            
-            while (resultIterator.hasNext()) {
-                resultIterator.advance();
-                TransitStop transitStop = resultIterator.key();
-                int arrivalTime = resultIterator.value();
-                if (arrivalTime == Integer.MAX_VALUE) continue; // stop was not reached in this round (why was it included in map?)
-                int elapsedTime = arrivalTime - departureTime;
-                stopTreeCache.propagateStop(transitStop, elapsedTime, request.walkSpeed, minsPerVertex);
-            }
-            // We now have the minimum travel times to reach each street vertex for this departure minute.
-            // Accumulate them into the summary statistics for the entire time window.
-            windowSummary.mergeIn(minsPerVertex);
-
-            // The Holy Grail: histograms per street vertex. It actually seems as fast or faster than summary stats.
-            // windowHistograms.mergeIn(minsPerVertex);
-        }
-
-        LOG.info("Profile request complete, creating time surfaces.");
         timeSurfaceRangeSet = new TimeSurface.RangeSet();
         timeSurfaceRangeSet.min = new TimeSurface(this);
-        timeSurfaceRangeSet.max = new TimeSurface(this);
         timeSurfaceRangeSet.avg = new TimeSurface(this);
-        windowSummary.makeSurfaces(timeSurfaceRangeSet);
+        timeSurfaceRangeSet.max = new TimeSurface(this);
+        propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
+        
+        // add walk-only options.
+        for (State state : walkOnlySpt.getAllStates()) {
+        	int time = (int) state.getElapsedTimeSeconds();
+        	Vertex v = state.getVertex();
+        	
+        	int emin = timeSurfaceRangeSet.min.getTime(v);
+        	if (emin == TimeSurface.UNREACHABLE || time < emin)
+        		timeSurfaceRangeSet.min.times.put(v, time);
+        	
+        	int emax = timeSurfaceRangeSet.max.getTime(v);
+        	if (emax == TimeSurface.UNREACHABLE || time < emax)
+        		timeSurfaceRangeSet.max.times.put(v, time);
+        	
+        	// TODO: this assumes that you always choose either to walk or to take transit
+        	// but there are cases when you might choose one or the other at different times within the window 
+        	int eavg = timeSurfaceRangeSet.avg.getTime(v);
+        	if (eavg == TimeSurface.UNREACHABLE || time < eavg)
+        		timeSurfaceRangeSet.avg.times.put(v, time);
+        }
+
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
 

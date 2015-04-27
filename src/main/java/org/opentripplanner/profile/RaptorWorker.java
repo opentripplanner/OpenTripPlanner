@@ -101,7 +101,7 @@ public class RaptorWorker {
         LOG.info("calc time {}sec", calcTime / 1000.0);
         LOG.info("  propagation {}sec", totalPropagationTime / 1000.0);
         LOG.info("  raptor {}sec", (calcTime - totalPropagationTime) / 1000.0);
-        dumpVariableByte(timesAtTargetsEachMinute);
+        //dumpVariableByte(timesAtTargetsEachMinute);
         propagatedTimesStore.setFromArray(timesAtTargetsEachMinute);
         return propagatedTimesStore;
     }
