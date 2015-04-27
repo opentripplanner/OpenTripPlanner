@@ -38,9 +38,10 @@ public class PropagatedTimesStore {
         for (int i = 0; i < times.length; i++) {
             for (int v = 0; v < times[i].length; v++) {
                 int newValue = times[i][v];
-                if (newValue == 0) {
-                    continue;
-                }
+
+            	if (newValue == RaptorWorker.UNREACHED)
+            		continue;
+            	
                 if (mins[v] > newValue) {
                     mins[v] = newValue;
                 }

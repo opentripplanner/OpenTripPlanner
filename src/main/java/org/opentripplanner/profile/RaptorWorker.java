@@ -217,7 +217,7 @@ public class RaptorWorker {
             for (int i = 0; i < transfers.length; i++) {
                 int toStop = transfers[i++]; // increment i
                 int distance = transfers[i]; // i will be incremented at the end of the loop
-                int toTime = fromTime + distance; // * 1.33
+                int toTime = fromTime + (int) (distance / req.walkSpeed); // * 1.33
                 if (toTime < max_time && toTime < bestTimes[toStop]) {
                     bestTimes[toStop] = toTime;
                     markPatternsForStop(toStop);
