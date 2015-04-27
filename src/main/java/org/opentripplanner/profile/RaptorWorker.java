@@ -92,6 +92,9 @@ public class RaptorWorker {
             }
             
             for (int s = 0; s < data.nStops; s++) {
+            	// it's safe to use the best time at this stop for any number of transfers, even in range-raptor,
+            	// because we allow unlimited transfers. this is slightly different from the original RAPTOR implementation:
+            	// we do not necessarily compute all pareto-optimal paths on (journey time, number of transfers)
                 int baseTimeSeconds = bestTimes[s];
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
@@ -102,8 +105,8 @@ public class RaptorWorker {
                         // distance in meters over walk speed in meters per second --> seconds
                         int egressWalkTimeSeconds = (int) (distance / req.walkSpeed);
                         int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
-                        if (timesAtTargets[targetIndex] == 0 || timesAtTargets[targetIndex] > propagated_time) {
-                            timesAtTargets[targetIndex] = propagated_time; // if greater OR ZERO replace TODO initialize arrays to MAX_VALUE?
+                        if (timesAtTargets[targetIndex] > propagated_time) {
+                            timesAtTargets[targetIndex] = propagated_time;
                         }
                     }
                 }
