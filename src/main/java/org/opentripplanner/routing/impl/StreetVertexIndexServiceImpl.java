@@ -571,45 +571,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return nearest;
     }
     
-    /** Get the nearest OSM vertex, or null if none was found */
-    @Override
-    public OsmVertex getOsmVertexNear (Coordinate coord) {    	
-    	double maxLon =  SphericalDistanceLibrary.metersToLonDegrees(MAX_INTERSECTION_DISTANCE_METERS,
-                coord.y);
-    	double sLon = SphericalDistanceLibrary.metersToLonDegrees(50, coord.x);
-    	double maxLat = SphericalDistanceLibrary.metersToDegrees(MAX_INTERSECTION_DISTANCE_METERS);
-    	double sLat = SphericalDistanceLibrary.metersToDegrees(50);
-    	    	
-    	do {
-    		sLon *= 1.5;
-    		sLat *= 1.5;
-    		
-    		Envelope env = new Envelope(coord);
-    		env.expandBy(Math.min(sLon, maxLon), Math.min(sLat, maxLat));
-    		
-            List<Vertex> nearby = getVerticesForEnvelope(env);
-            OsmVertex nearest = null;
-    		double bestDistanceMeter = Double.POSITIVE_INFINITY;
-            for (Vertex v : nearby) {
-                if (v instanceof OsmVertex) {
-                    double distanceMeter = SphericalDistanceLibrary.fastDistance(coord, v.getCoordinate());
-                    if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
-                        if (distanceMeter < bestDistanceMeter) {
-                            bestDistanceMeter = distanceMeter;
-                            nearest = (OsmVertex) v;
-                        }
-                    }
-                }
-            }
-            
-            if (nearest != null) {
-            	return nearest;
-            }
-    	} while (sLat < maxLat && sLon < maxLon);
-    	
-    	return null;
-    }
-
     @Override
     public Vertex getVertexForLocation(GenericLocation loc, RoutingRequest options,
                                        boolean endVertex) {

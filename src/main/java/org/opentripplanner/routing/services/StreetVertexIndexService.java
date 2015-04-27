@@ -103,9 +103,6 @@ public interface StreetVertexIndexService {
      */
     public Coordinate getClosestPointOnStreet(Coordinate coordinate);
 
-    /** Find the OSM vertex closest to a given location */
-	public OsmVertex getOsmVertexNear(Coordinate coord);
-
 	/** Get a vertex at a given coordinate, using the same logic as in Samples. Used in Analyst
 	 * so that origins and destinations are linked the same way. */
 	public Vertex getSampleVertexAt(Coordinate coordinate);
