@@ -2,7 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.graph.Graph;
 
-public class TransitStopStreetVertex extends IntersectionVertex {
+public class TransitStopStreetVertex extends OsmVertex {
 
     public String stopCode;
 
