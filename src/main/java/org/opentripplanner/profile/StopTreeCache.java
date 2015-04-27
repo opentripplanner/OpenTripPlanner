@@ -29,7 +29,7 @@ public class StopTreeCache {
     private static final Logger LOG = LoggerFactory.getLogger(StopTreeCache.class);
     final int timeCutoffMinutes;
     // Flattened 2D array of (streetVertexIndex, distanceFromStop) for each TransitStop
-    private final Map<TransitStop, int[]> distancesForStop = Maps.newHashMap();
+    public final Map<TransitStop, int[]> distancesForStop = Maps.newHashMap();
 
     public StopTreeCache (Graph graph, int timeCutoffMinutes) {
         this.timeCutoffMinutes = timeCutoffMinutes;

@@ -40,12 +40,10 @@ import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.TemporaryConcreteEdge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -91,9 +89,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     // If a point is within MAX_CORNER_DISTANCE, it is treated as at the corner.
     private static final double MAX_CORNER_DISTANCE_METERS = 10;
-    
-    /** When finding an OSM vertex, how far away can we go before we say the vertex is not found? */
-    private static final double MAX_INTERSECTION_DISTANCE_METERS = 500;
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
@@ -559,6 +554,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double bestDistanceMeter = Double.POSITIVE_INFINITY;
         for (Vertex v : nearby) {
             if (v instanceof StreetVertex) {
+                v.getLabel().startsWith("osm:");
                 double distanceMeter = SphericalDistanceLibrary.fastDistance(coordinate, v.getCoordinate());
                 if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
                     if (distanceMeter < bestDistanceMeter) {
