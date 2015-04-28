@@ -107,19 +107,19 @@ public class OSMFilter {
 
         if (entity.isMotorcarExplicitlyDenied() || entity.isMotorVehicleExplicitlyDenied()) {
             permission = permission.remove(StreetTraversalPermission.CAR);
-        } else if (entity.hasTag("motorcar") || entity.hasTag("motor_vehicle")) {
+        } else if (entity.isMotorcarExplicitlyAllowed() || entity.isMotorVehicleExplicitlyAllowed()) {
             permission = permission.add(StreetTraversalPermission.CAR);
         }
 
         if (entity.isBicycleExplicitlyDenied()) {
             permission = permission.remove(StreetTraversalPermission.BICYCLE);
-        } else if (entity.hasTag("bicycle")) {
+        } else if (entity.isBicycleExplicitlyAllowed()) {
             permission = permission.add(StreetTraversalPermission.BICYCLE);
         }
 
         if (entity.isPedestrianExplicitlyDenied()) {
             permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-        } else if (entity.hasTag("foot")) {
+        } else if (entity.isPedestrianExplicitlyAllowed()) {
             permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
         }
 

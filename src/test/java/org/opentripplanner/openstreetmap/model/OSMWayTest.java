@@ -189,10 +189,6 @@ public class OSMWayTest {
         P2<StreetTraversalPermission> permissionPair = getWayProperties(way);
         assertTrue(permissionPair.first.allows(StreetTraversalPermission.ALL));
 
-        way.addTag("access", "yes");
-        permissionPair = getWayProperties(way);
-        assertTrue(permissionPair.first.allows(StreetTraversalPermission.ALL));
-
         way.addTag("motorcar", "no");
         permissionPair = getWayProperties(way);
         assertTrue(permissionPair.first.allows(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE));
@@ -205,11 +201,12 @@ public class OSMWayTest {
         permissionPair = getWayProperties(way);
         assertTrue(permissionPair.first.allowsNothing());
 
-        way.addTag("motorcar", "private");
+        //normal road with specific mode of transport private only is doubtful
+        /*way.addTag("motorcar", "private");
         way.addTag("bicycle", "private");
         way.addTag("foot", "private");
         permissionPair = getWayProperties(way);
-        assertTrue(permissionPair.first.allowsNothing());
+        assertTrue(permissionPair.first.allowsNothing());*/
     }
 
     /**
@@ -259,10 +256,6 @@ public class OSMWayTest {
         P2<StreetTraversalPermission> permissionPair = getWayProperties(way);
         assertTrue(permissionPair.first.allows(StreetTraversalPermission.ALL));
 
-        way.addTag("access", "yes");
-        permissionPair = getWayProperties(way);
-        assertTrue(permissionPair.first.allows(StreetTraversalPermission.ALL));
-
         way.addTag("motor_vehicle", "no");
         permissionPair = getWayProperties(way);
         assertTrue(permissionPair.first.allows(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE));
@@ -275,11 +268,12 @@ public class OSMWayTest {
         permissionPair = getWayProperties(way);
         assertTrue(permissionPair.first.allowsNothing());
 
-        way.addTag("motor_vehicle", "private");
+        //normal road with specific mode of transport private only is doubtful
+        /*way.addTag("motor_vehicle", "private");
         way.addTag("bicycle", "private");
         way.addTag("foot", "private");
         permissionPair = getWayProperties(way);
-        assertTrue(permissionPair.first.allowsNothing());
+        assertTrue(permissionPair.first.allowsNothing());*/
     }
 
     private P2<StreetTraversalPermission> getWayProperties(OSMWay way) {
