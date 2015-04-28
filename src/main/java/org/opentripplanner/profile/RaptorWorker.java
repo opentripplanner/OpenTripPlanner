@@ -97,7 +97,6 @@ public class RaptorWorker {
             	// it's safe to use the best time at this stop for any number of transfers, even in range-raptor,
             	// because we allow unlimited transfers. this is slightly different from the original RAPTOR implementation:
             	// we do not necessarily compute all pareto-optimal paths on (journey time, number of transfers).
-            	// TODO this allows egressing from transfers.
                 int baseTimeSeconds = bestNonTransferTimes[s];
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
@@ -167,10 +166,10 @@ public class RaptorWorker {
     }
 
     public boolean doOneRound () {
-        LOG.info("round {}", round);
+        //LOG.info("round {}", round);
         stopsTouched.clear(); // clear any stops left over from previous round.
         for (int p = patternsTouched.nextSetBit(0); p >= 0; p = patternsTouched.nextSetBit(p+1)) {
-            LOG.info("pattern {} {}", p, data.patternNames.get(p));
+            //LOG.info("pattern {} {}", p, data.patternNames.get(p));
             int onTrip = -1;
             RaptorWorkerTimetable timetable = data.timetablesForPattern.get(p);
             int[] stops = data.stopsForPattern.get(p);
@@ -200,6 +199,7 @@ public class RaptorWorker {
                     // or (more likely) because there was a faster way to get to a stop further down the line. 
                     while (onTrip > 0) {
                         int departureOnPreviousTrip = timetable.getDeparture(onTrip - 1, stopPositionInPattern);
+                        // use bestTime not bestNonTransferTimes to allow transferring to this trip later on down the route
                         if (departureOnPreviousTrip > bestNonTransferTimes[stopIndex]) {
                             onTrip--;
                         } else {
