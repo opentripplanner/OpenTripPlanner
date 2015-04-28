@@ -23,7 +23,7 @@ public class RaptorWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorker.class);
     public static final int UNREACHED = Integer.MAX_VALUE;
-    static final int MAX_DURATION = 90 * 60;
+    static final int MAX_DURATION = 120 * 60;
 
     int max_time = 0;
     int round = 0;
@@ -200,7 +200,7 @@ public class RaptorWorker {
                     while (onTrip > 0) {
                         int departureOnPreviousTrip = timetable.getDeparture(onTrip - 1, stopPositionInPattern);
                         // use bestTime not bestNonTransferTimes to allow transferring to this trip later on down the route
-                        if (departureOnPreviousTrip > bestNonTransferTimes[stopIndex]) {
+                        if (departureOnPreviousTrip > bestTimes[stopIndex]) {
                             onTrip--;
                         } else {
                             break;

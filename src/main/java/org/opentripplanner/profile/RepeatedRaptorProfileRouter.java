@@ -86,7 +86,7 @@ public class RepeatedRaptorProfileRouter {
 
         /** THIN WORKERS */
         LOG.info("Make data...");
-        TimeWindow window = new TimeWindow(request.fromTime, request.toTime, graph.index.servicesRunning(request.date));
+        TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date));
         RaptorWorkerData raptorWorkerData = new RaptorWorkerData(graph, window);
         LOG.info("Done.");
 // TEST SERIALIZED SIZE and SPEED
