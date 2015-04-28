@@ -49,6 +49,11 @@ public class SampleFactory implements SampleSource {
     @Override
     /** implements SampleSource interface */
     public Sample getSample(double lon, double lat) {
+    	// round off values because they often are centroids of blocks, we want to move them far enough that they
+    	// deterministically link to the same streets.
+    	lon = ((int) (lon * 1e6)) / 1e6;
+    	lat = ((int) (lat * 1e6)) / 1e6;
+    	
         Coordinate c = new Coordinate(lon, lat);
         // query always returns a (possibly empty) list, but never null
         Envelope env = new Envelope(c);
