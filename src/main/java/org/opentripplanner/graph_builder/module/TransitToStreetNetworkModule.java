@@ -124,13 +124,14 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
     }
 
     /*
-     * TODO Those two steps should be in a separate builder, really. We re-use this builder to
-     * prevent having to spatially re-index several times the street network. Instead we could
-     * have a "spatial indexer" builder that add a spatial index to the graph, and make all
-     * builders that rely on spatial indexing to add a dependency to this builder. And we do not
+     * We re-use this builder to prevent having to spatially re-index several times the street network,
+     * and to group together all the linking operations which are very similar (all use the same linker function).
+     * Alternatively we could add a spatial index to the graph right after the OSM module, and make all
+     * builders that rely on spatial indexing have a dependency on that spatial index builder. And we do not
      * link stations directly in the OSM build as they can come from other builders (static bike
      * rental or P+R builders) and street data can be coming from shapefiles.
      */
+
     /**
      * Links Bike rental vertices to streets
      */
