@@ -258,20 +258,24 @@ public class GraphBuilder implements Runnable {
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);
-            graphBuilder.addGraphBuilder(gtfsBuilder);
             if ( hasOSM ) {
                 if (builderParams.matchBusRoutesToStreets) {
                     graphBuilder.addGraphBuilder(new BusRouteStreetMatcher());
                 }
                 graphBuilder.addGraphBuilder(new TransitToTaggedStopsModule());
-                graphBuilder.addGraphBuilder(new TransitToStreetNetworkModule());
             }
+            gtfsBuilder.setFareServiceFactory(builderParams.fareServiceFactory);
+            graphBuilder.addGraphBuilder(gtfsBuilder);
+        }
+        // This module is outside the hasGTFS conditional block because it also links things like bike rental
+        // which need to be done even when there's no transit.
+        graphBuilder.addGraphBuilder(new TransitToStreetNetworkModule());
+        if ( hasGTFS ) {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
                 graphBuilder.addGraphBuilder(new DirectTransferGenerator());
             }
-            gtfsBuilder.setFareServiceFactory(builderParams.fareServiceFactory);
         }
         if (builderParams.fetchElevationUS) {
             File cacheDirectory = new File(params.cacheDirectory, "ned");
