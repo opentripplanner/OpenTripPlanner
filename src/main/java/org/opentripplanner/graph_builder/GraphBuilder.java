@@ -20,7 +20,7 @@ import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
-import org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -80,7 +80,7 @@ public class GraphBuilder implements Runnable {
     /** Should the graph be serialized to disk after being created or not? */
     public boolean serializeGraph = true;
 
-    public void addGraphBuilder(GraphBuilderModule loader) {
+    public void addModule(GraphBuilderModule loader) {
         _graphBuilderModules.add(loader);
     }
 
@@ -234,16 +234,16 @@ public class GraphBuilder implements Runnable {
                 OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
                 osmProviders.add(osmProvider);
             }
-            OpenStreetMapModule osmBuilder = new OpenStreetMapModule(osmProviders);
+            OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
             streetEdgeFactory.useElevationData = builderParams.fetchElevationUS || (demFile != null);
-            osmBuilder.edgeFactory = streetEdgeFactory;
-            osmBuilder.customNamer = builderParams.customNamer;
+            osmModule.edgeFactory = streetEdgeFactory;
+            osmModule.customNamer = builderParams.customNamer;
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
-            osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
-            osmBuilder.skipVisibility = !builderParams.areaVisibility;
-            graphBuilder.addGraphBuilder(osmBuilder);
-            graphBuilder.addGraphBuilder(new PruneFloatingIslands());
+            osmModule.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
+            osmModule.skipVisibility = !builderParams.areaVisibility;
+            graphBuilder.addModule(osmModule);
+            graphBuilder.addModule(new PruneFloatingIslands());
         }
         if ( hasGTFS ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
@@ -257,39 +257,39 @@ public class GraphBuilder implements Runnable {
                 gtfsBundle.subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
                 gtfsBundles.add(gtfsBundle);
             }
-            GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);
+            GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
             if ( hasOSM ) {
                 if (builderParams.matchBusRoutesToStreets) {
-                    graphBuilder.addGraphBuilder(new BusRouteStreetMatcher());
+                    graphBuilder.addModule(new BusRouteStreetMatcher());
                 }
-                graphBuilder.addGraphBuilder(new TransitToTaggedStopsModule());
+                graphBuilder.addModule(new TransitToTaggedStopsModule());
             }
-            gtfsBuilder.setFareServiceFactory(builderParams.fareServiceFactory);
-            graphBuilder.addGraphBuilder(gtfsBuilder);
+            gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
+            graphBuilder.addModule(gtfsModule);
         }
         // This module is outside the hasGTFS conditional block because it also links things like bike rental
         // which need to be done even when there's no transit.
-        graphBuilder.addGraphBuilder(new TransitToStreetNetworkModule());
+        graphBuilder.addModule(new StreetLinkerModule());
         if ( hasGTFS ) {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addGraphBuilder(new DirectTransferGenerator());
+                graphBuilder.addModule(new DirectTransferGenerator());
             }
         }
         if (builderParams.fetchElevationUS) {
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
-            graphBuilder.addGraphBuilder(elevationBuilder);
+            graphBuilder.addModule(elevationBuilder);
         } else  if (demFile != null) {
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
-            graphBuilder.addGraphBuilder(elevationBuilder);
+            graphBuilder.addModule(elevationBuilder);
         }
-        graphBuilder.addGraphBuilder(new EmbedConfig(builderConfig, routerConfig));
+        graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));
         if (builderParams.htmlAnnotations) {
-            graphBuilder.addGraphBuilder(new AnnotationsToHTML(new File(params.build, "report.html")));
+            graphBuilder.addModule(new AnnotationsToHTML(new File(params.build, "report.html")));
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;

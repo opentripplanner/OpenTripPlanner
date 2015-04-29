@@ -22,7 +22,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -468,7 +468,7 @@ public class TestHalfEdges extends TestCase {
 
     public void testNetworkLinker() {
         int numVerticesBefore = graph.getVertices().size();
-        TransitToStreetNetworkModule ttsnm = new TransitToStreetNetworkModule();
+        StreetLinkerModule ttsnm = new StreetLinkerModule();
         ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);

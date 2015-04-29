@@ -52,7 +52,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
      */
     private String islandLogFile;
 
-    private TransitToStreetNetworkModule transitToStreetNetwork;
+    private StreetLinkerModule transitToStreetNetwork;
 
     public List<String> provides() {
         return Collections.emptyList();

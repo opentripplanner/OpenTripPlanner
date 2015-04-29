@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.opentripplanner.graph_builder.module.TransitToStreetNetworkModule;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
@@ -81,7 +81,7 @@ public class ConstantsForTests {
             throw new RuntimeException(e);
         }
 
-        TransitToStreetNetworkModule ttsnm = new TransitToStreetNetworkModule();
+        StreetLinkerModule ttsnm = new StreetLinkerModule();
         ttsnm.buildGraph(portlandGraph, new HashMap<Class<?>, Object>());
     }
     

@@ -37,12 +37,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links up the stops of a transit
- * network to a street network. Should be called after both the transit network and street network are loaded.
+ * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links various objects
+ * in the graph to the street network. It should be run after both the transit network and street network are loaded.
+ * It links three things: transit stops, bike rental stations, and park-and-ride lots. Therefore it should be run
+ * even when there's no GTFS data present to make bike rental services and parking lots usable.
  */
-public class TransitToStreetNetworkModule implements GraphBuilderModule {
+public class StreetLinkerModule implements GraphBuilderModule {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkModule.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
 
     private NetworkLinkerLibrary networkLinkerLibrary;
 
