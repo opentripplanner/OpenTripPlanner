@@ -13,15 +13,7 @@
 
 package org.opentripplanner.graph_builder.module.ned;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
 import org.jets3t.service.S3Service;
 import org.jets3t.service.S3ServiceException;
 import org.jets3t.service.ServiceException;
@@ -35,7 +27,14 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Download one-degree-wide, 1/3 arcsecond NED tiles from S3 (or get them from a directory of files
@@ -51,9 +50,11 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
     private File cacheDirectory;
 
-    private String awsAccessKey;
+    public String awsAccessKey;
 
-    private String awsSecretKey;
+    public String awsSecretKey;
+
+    public String awsBucketName;
 
     @Override
     public void setGraph(Graph graph) {
@@ -111,13 +112,13 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
             if (awsAccessKey == null || awsSecretKey == null) {
                 throw new RuntimeException("Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set");
             }
-            log.debug("Downloading NED degree tile " + path);
+            log.info("Downloading NED degree tile " + path);
             // download the file from S3.
             AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
             try {
                 S3Service s3Service = new RestS3Service(awsCredentials);
                 String key = formatLatLon(x, y) + ".tiff";
-                S3Object object = s3Service.getObject("ned13", key);
+                S3Object object = s3Service.getObject(awsBucketName, key);
 
                 InputStream istream = object.getDataInputStream();
                 FileOutputStream ostream = new FileOutputStream(path);
@@ -150,20 +151,5 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
     }
 
-    public String getAwsAccessKey() {
-        return awsAccessKey;
-    }
-
-    public void setAwsAccessKey(String awsAccessKey) {
-        this.awsAccessKey = awsAccessKey;
-    }
-
-    public String getAwsSecretKey() {
-        return awsSecretKey;
-    }
-
-    public void setAwsSecretKey(String awsSecretKey) {
-        this.awsSecretKey = awsSecretKey;
-    }
 
 }

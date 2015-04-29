@@ -13,15 +13,6 @@
 
 package org.opentripplanner.graph_builder.module.ned;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.media.jai.InterpolationBilinear;
-
 import com.google.common.io.ByteStreams;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
@@ -31,6 +22,18 @@ import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.media.jai.InterpolationBilinear;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * A coverage factory that works off of the NED caches from {@link NEDDownloader}.
@@ -46,7 +49,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private File cacheDirectory;
 
-    private NEDTileSource tileSource = new NEDDownloader();
+    public NEDTileSource tileSource = new NEDDownloader();
 
     private List<VerticalDatum> datums;
 

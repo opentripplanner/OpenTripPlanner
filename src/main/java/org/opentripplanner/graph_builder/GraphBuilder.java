@@ -23,6 +23,7 @@ import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
+import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
@@ -41,6 +42,7 @@ import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.OTPMain;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.S3BucketConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -277,12 +279,27 @@ public class GraphBuilder implements Runnable {
                 graphBuilder.addModule(new DirectTransferGenerator());
             }
         }
-        if (builderParams.fetchElevationUS) {
+        if (builderParams.elevationBucket != null) {
+            // Download the elevation tiles from an Amazon S3 bucket
+            S3BucketConfig bucketConfig = builderParams.elevationBucket;
+            File cacheDirectory = new File(params.cacheDirectory, "ned");
+            DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
+            awsTileSource = new DegreeGridNEDTileSource();
+            awsTileSource.awsAccessKey = bucketConfig.accessKey;
+            awsTileSource.awsSecretKey = bucketConfig.secretKey;
+            awsTileSource.awsBucketName = bucketConfig.bucketName;
+            NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
+            gcf.tileSource = awsTileSource;
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            graphBuilder.addModule(elevationBuilder);
+        } else if (builderParams.fetchElevationUS) {
+            // Download the elevation tiles from the official web service
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
             graphBuilder.addModule(elevationBuilder);
-        } else  if (demFile != null) {
+        } else if (demFile != null) {
+            // Load the elevation from a file in the graph inputs directory
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
             graphBuilder.addModule(elevationBuilder);

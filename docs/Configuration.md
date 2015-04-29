@@ -145,9 +145,19 @@ directory:
 You may also want to add the `--cache <directory>` command line parameter to specify a custom NED tile cache location.
 
 NED downloads take quite a long time and slow down the graph building process. The USGS will also deliver the
-whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA).
-OpenTripPlanner contains another module that will then automatically fetch data in this format from an Amazon S3 copy of
-your bulk data.
+whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA). OpenTripPlanner contains
+another module that will then automatically fetch data in this format from an Amazon S3 copy of your bulk data.
+You can configure it as follows in `build-config.json`:
+
+```JSON
+{
+    "elevationBucket" : {
+        "accessKey" : "your-aws-access-key",
+        "secretKey" : "corresponding-aws-secret-key",
+        "bucketName" : "ned13"
+    }
+}
+```
 
 
 ### Other raster elevation data
