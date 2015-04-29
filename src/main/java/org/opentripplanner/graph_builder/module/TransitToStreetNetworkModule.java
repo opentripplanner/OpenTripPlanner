@@ -97,8 +97,9 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
         LOG.info("Linking transit stops to streets...");
         int nUnlinked = 0;
         for (TransitStop ts : stopVertices) {
-            // if the street is already linked there is no need to linked it again,
-            // could happened if using the prune isolated island
+            // There are two stop-to-street linkers in OTP. One using tagged stops, and this one, which uses geometry and heuristics.
+            // If this stop was already linked using the "tagged stop" hints from OSM, there is no need to link it again.
+            // This could happen if using the "prune isolated islands" <-- TODO clarify this last line of comment
             boolean alreadyLinked = false;
             for(Edge e:ts.getOutgoing()){
                 if(e instanceof StreetTransitLink) {
