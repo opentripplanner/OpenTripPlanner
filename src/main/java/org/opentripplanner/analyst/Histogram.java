@@ -28,7 +28,7 @@ public class Histogram implements Serializable {
 	
 	/**
 	 * The steepness of the logistic rolloff, basically a smoothing parameter.
-	 * Must be negative or your results will be backwards (i.e. jobs nearby will be worth more than jobs far away).
+	 * Must be negative or your results will be backwards (i.e. jobs nearby will be worth less than jobs far away).
 	 * 
 	 * The larger it is in magnitude, the less smoothing. setting it to -2 / 60.0 yields a rolloff of about 5 minutes.
 	 */
