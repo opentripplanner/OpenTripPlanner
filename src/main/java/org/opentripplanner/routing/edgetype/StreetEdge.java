@@ -20,6 +20,7 @@ import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,7 +42,7 @@ import java.util.List;
  * @author novalis
  * 
  */
-public class StreetEdge extends Edge implements Cloneable {
+public class StreetEdge extends Edge implements Cloneable, EdgeInfo {
 
     private static Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
@@ -101,6 +102,11 @@ public class StreetEdge extends Edge implements Cloneable {
      * this street segment.
      */
     private float carSpeed;
+
+    private int floorNumber;
+    private boolean reliableLevel;
+    private boolean hasLevel = false;
+
 
     /**
      * The angle at the start of the edge geometry.
@@ -573,8 +579,38 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
         return super.detachFrom(graph);
+        return graph.getTurnRestrictions(this);
     }
 
+    @Override
+    public void setLevel(OSMLevel level) {
+        floorNumber = level.floorNumber;
+        reliableLevel = level.reliable;
+        hasLevel = true;
+    }
+
+    @Override
+    public String getNiceLevel() {
+        if (!hasLevel) {
+            return "";
+        } else {
+            return Integer.toString(floorNumber) + " [" + Boolean.toString(reliableLevel) + "]";
+        }
+    }
+
+    @Override
+    public Integer getLevel() {
+        return floorNumber;
+    }
+
+    @Override
+    public Boolean isReliableLevel() {
+        return reliableLevel;
+    }
+
+    @Override
+    public TraverseMode getPublicTransitType() {
+        return TraverseMode.BUS;
 	@Override
 	public String getName() {
 		return this.name;
