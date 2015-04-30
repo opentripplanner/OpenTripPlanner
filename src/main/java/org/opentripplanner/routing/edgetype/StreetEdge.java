@@ -579,7 +579,6 @@ public class StreetEdge extends Edge implements Cloneable, EdgeInfo {
             }
         }
         return super.detachFrom(graph);
-        return graph.getTurnRestrictions(this);
     }
 
     @Override
@@ -615,6 +614,8 @@ public class StreetEdge extends Edge implements Cloneable, EdgeInfo {
         } else {
             return TraverseMode.LEG_SWITCH;
         }
+    }
+    
 	@Override
 	public String getName() {
 		return this.name;
