@@ -1,6 +1,9 @@
 package org.opentripplanner.profile;
 
 import gnu.trove.map.TIntIntMap;
+
+import org.opentripplanner.analyst.ResultSet;
+import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -25,8 +28,13 @@ public class PropagatedTimesStore {
     int[] mins, maxs, sums, counts;
 
     public PropagatedTimesStore(Graph graph) {
+    	this(graph, Vertex.getMaxIndex());
+    }
+    
+    public PropagatedTimesStore(Graph graph, int size) {
         this.graph = graph;
-        size = Vertex.getMaxIndex();
+        
+        this.size = size;
         mins = new int[size];
         maxs = new int[size];
         sums = new int[size];
@@ -111,5 +119,31 @@ public class PropagatedTimesStore {
             rangeSet.avg.times.put(vertex, sum / count);
         }
     }
-
+    
+    /** Make a ResultSet directly given a sample set (must have constructed RaptorWorkerData from the same sampleset) */
+    public ResultSet.RangeSet makeResults(SampleSet ss, boolean includeTimes) {
+    	ResultSet.RangeSet ret = new ResultSet.RangeSet();
+    	
+    	int[] avgs = new int[sums.length];
+    	
+    	for (int i = 0; i < ss.pset.capacity; i++) {
+    		int sum = sums[i];
+    		int count = counts[i];
+    		
+    		// Note: this is destructive
+    		if (count <= 0) {
+    			mins[i] = Integer.MAX_VALUE;
+    			maxs[i] = Integer.MAX_VALUE;
+    			avgs[i] = Integer.MAX_VALUE;
+    		}
+    		else {
+    			avgs[i] = sum / count;
+    		}
+    	}
+    	
+    	ret.min = new ResultSet(mins, ss.pset, includeTimes);
+    	ret.avg = new ResultSet(avgs, ss.pset, includeTimes);
+    	ret.max = new ResultSet(maxs, ss.pset, includeTimes);
+        return ret;
+    }
 }

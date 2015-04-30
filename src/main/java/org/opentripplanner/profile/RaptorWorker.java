@@ -76,12 +76,13 @@ public class RaptorWorker {
             }
             initialStops.put(stopIndex, accessTime);
         }
-        PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph);
+        
+        PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph, data.nTargets);
         
         int iterations = (req.toTime - req.fromTime - 60) / 60 + 1;
         
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
-        int[][] timesAtTargetsEachMinute = new int[iterations][walkTimes.length];
+        int[][] timesAtTargetsEachMinute = new int[iterations][data.nTargets];
         
         for (int departureTime = req.toTime - 60, n = 0; departureTime >= req.fromTime; departureTime -= 60, n++) {
             if (n % 15 == 0) {

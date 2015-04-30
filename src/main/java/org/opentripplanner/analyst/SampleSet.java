@@ -12,12 +12,12 @@ public class SampleSet {
     public final PointSet pset;
 
     /* Vertices at the two ends of a road, one per sample. */
-    Vertex[] v0s;
-    Vertex[] v1s;
+    public Vertex[] v0s;
+    public Vertex[] v1s;
 
     /* Distances to the vertices at the two ends of a road, one per sample. */
-    float[] d0s;
-    float[] d1s;
+    public float[] d0s;
+    public float[] d1s;
 
     public SampleSet (PointSet pset, SampleFactory sfac) {
         this.pset = pset;

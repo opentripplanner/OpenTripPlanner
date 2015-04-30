@@ -11,6 +11,9 @@ import java.util.Map;
 
 import org.joda.time.DateTimeZone;
 import org.onebusaway.gtfs.model.Route;
+import org.opentripplanner.analyst.ResultSet;
+import org.opentripplanner.analyst.ResultSet.RangeSet;
+import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
@@ -69,10 +72,35 @@ public class RepeatedRaptorProfileRouter {
 
     /** The number of travel time observations added into the accumulator. The divisor when calculating an average. */
     TObjectIntMap<TransitStop> counts = new TObjectIntHashMap<TransitStop>();
+
+    /** Samples to propagate times to */
+	private SampleSet sampleSet;
+
+	private PropagatedTimesStore propagatedTimesStore;
     
-    public RepeatedRaptorProfileRouter (Graph graph, ProfileRequest request) {
+    /**
+     * Make a router to use for making time surfaces only.
+     * If you're building ResultSets, you should use the below method that uses a SampleSet; otherwise you maximum and average may not be correct.
+     */
+    public RepeatedRaptorProfileRouter(Graph graph, ProfileRequest request) {
+    	this(graph, request, null);
+    }
+    
+    /**
+     * Make a router to use for making ResultSets. This propagates times all the way to the samples, so that
+     * average and maximum travel time are correct.
+     * 
+     * Samples are linked to two vertices at the ends of an edge, and it is possible that the average for the sample
+     * (as well as the max) is lower than the average or the max at either of the vertices, because it may be that
+     * every time the max at one vertex is occurring, a lower value is occurring at the other. This initially
+     * seems improbable, but consider the case when there are two parallel transit services running out of phase.
+     * It may be that some of the time it makes sense to go out of your house and turn left, and sometimes it makes
+     * sense to turn right, depending on which is coming first.
+     */
+    public RepeatedRaptorProfileRouter (Graph graph, ProfileRequest request, SampleSet sampleSet) {
         this.request = request;
         this.graph = graph;
+        this.sampleSet = sampleSet;
     }
     
     public void route () {
@@ -87,7 +115,12 @@ public class RepeatedRaptorProfileRouter {
         /** THIN WORKERS */
         LOG.info("Make data...");
         TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date));
-        RaptorWorkerData raptorWorkerData = new RaptorWorkerData(graph, window);
+        
+        RaptorWorkerData raptorWorkerData;
+        if (sampleSet == null)
+        	raptorWorkerData = new RaptorWorkerData(graph, window);
+        else
+        	raptorWorkerData = new RaptorWorkerData(graph, window, sampleSet);
         LOG.info("Done.");
 // TEST SERIALIZED SIZE and SPEED
 //        try {
@@ -100,26 +133,40 @@ public class RepeatedRaptorProfileRouter {
 //            i.printStackTrace();
 //        }
         
-        int[] walkTimes = new int[Vertex.getMaxIndex()];
-        Arrays.fill(walkTimes, RaptorWorker.UNREACHED);
+        int[] walkTimes;
         
-        for (State state : walkOnlySpt.getAllStates()) {
-        	int time = (int) state.getElapsedTimeSeconds();
-        	int vidx = state.getVertex().getIndex();
-        	int otime = walkTimes[vidx];
-        	
-        	if (otime == RaptorWorker.UNREACHED || otime > time)
-        		walkTimes[vidx] = time;
-        	
+        if (sampleSet == null) {
+	        walkTimes = new int[Vertex.getMaxIndex()];
+	        Arrays.fill(walkTimes, RaptorWorker.UNREACHED);
+	        
+	        for (State state : walkOnlySpt.getAllStates()) {
+	        	int time = (int) state.getElapsedTimeSeconds();
+	        	int vidx = state.getVertex().getIndex();
+	        	int otime = walkTimes[vidx];
+	        	
+	        	if (otime == RaptorWorker.UNREACHED || otime > time)
+	        		walkTimes[vidx] = time;
+		        	
+		    }
+        }
+        
+        else {
+        	// propagate walk times all the way to samples
+        	TimeSurface walk = new TimeSurface(walkOnlySpt, false);
+        	ResultSet walkRs = new ResultSet(sampleSet, walk, true);
+        	walkTimes = walkRs.times;
         }
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData, request);
-        PropagatedTimesStore propagatedTimesStore = worker.runRaptor(graph, accessTimes, walkTimes);
-        timeSurfaceRangeSet = new TimeSurface.RangeSet();
-        timeSurfaceRangeSet.min = new TimeSurface(this);
-        timeSurfaceRangeSet.avg = new TimeSurface(this);
-        timeSurfaceRangeSet.max = new TimeSurface(this);
-        propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
+        propagatedTimesStore = worker.runRaptor(graph, accessTimes, walkTimes);
+        
+        if (sampleSet == null) {
+	        timeSurfaceRangeSet = new TimeSurface.RangeSet();
+	        timeSurfaceRangeSet.min = new TimeSurface(this);
+	        timeSurfaceRangeSet.avg = new TimeSurface(this);
+	        timeSurfaceRangeSet.max = new TimeSurface(this);
+	        propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
+        }
 
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
@@ -164,5 +211,8 @@ public class RepeatedRaptorProfileRouter {
         return accessTimes;
     }
     
-
+    /** Make a result set range set, optionally including times */
+    public ResultSet.RangeSet makeResults (boolean includeTimes) {
+    	return propagatedTimesStore.makeResults(sampleSet, includeTimes);
+   }
 }
