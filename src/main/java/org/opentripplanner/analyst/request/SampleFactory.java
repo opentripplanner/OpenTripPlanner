@@ -50,7 +50,7 @@ public class SampleFactory implements SampleSource {
     /** implements SampleSource interface */
     public Sample getSample(double lon, double lat) {
     	// round off values because they often are centroids of blocks, we want to move them far enough that they
-    	// deterministically link to the same streets.
+    	// deterministically link to the same streets over multiple graph builds.
     	lon = ((int) (lon * 1e6)) / 1e6;
     	lat = ((int) (lat * 1e6)) / 1e6;
     	
@@ -59,7 +59,7 @@ public class SampleFactory implements SampleSource {
         Envelope env = new Envelope(c);
         // find scaling factor for equirectangular projection
         double xscale = Math.cos(c.y * Math.PI / 180);
-        env.expandBy(searchRadiusLat * xscale, searchRadiusLat);
+        env.expandBy(searchRadiusLat / xscale, searchRadiusLat);
         @SuppressWarnings("unchecked")
         List<Edge> edges = (List<Edge>) index.queryPedestrian(env);
         // look for edges and make a sample
