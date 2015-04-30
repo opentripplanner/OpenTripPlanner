@@ -102,7 +102,8 @@ public class SampleFactory implements SampleSource {
                 // use bounding rectangle to find a lower bound on (squared) distance ?
                 // this would mean more squaring or roots.
                 c.frac = GeometryUtils.segmentFraction(x0, y0, x1, y1, pt.x, pt.y, xscale);
-                // project to get closest point 
+                // project to get closest point
+                // note: no need to multiply anything by xscale; the fraction is scaleless.
                 c.x = x0 + c.frac * (x1 - x0);
                 c.y = y0 + c.frac * (y1 - y0);
                 // find ersatz distance to edge (do not take root)

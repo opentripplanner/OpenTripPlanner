@@ -187,6 +187,8 @@ public class RaptorWorkerData implements Serializable {
         			// Possible optimization: it's possible (indeed, likely) that the sample
         			// is reachable two ways from a given stop. We could collapse this array down
         			// and make propagation faster.
+        			// TODO: need to throw out samples that push us above the original limit on the stop tree cache,
+        			// so that samples far from streets don't get a larger egress walk distance budget.
         			SAMPLE: for (HalfSample s : sampleIndex.get(v)) {
         				out.add(s.index);
         				out.add(Math.round(d + s.distance));
