@@ -72,10 +72,10 @@ public class PublicTransitEdge extends Edge {
     private boolean reliableLevel;
     private boolean hasLevel = false;
 
-    public PublicTransitEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
+    public PublicTransitEdge(int id, long osmId, StreetVertex v1, StreetVertex v2, LineString geometry,
                              String name, double length, TraverseMode publicTransitType,
                              boolean back) {
-        super(v1, v2);
+        super(id, osmId, v1, v2, back);
         this.setBack(back);
         this.setGeometry(geometry);
         this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS

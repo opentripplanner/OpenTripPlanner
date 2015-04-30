@@ -1085,8 +1085,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 LOG.warn("Way {} has unknown railway: {}", way.getId(), way.getTag("railway"));
             }
 
-            street = ptEdgeFactory.createEdge(start, end, geometry, name, length, ptype, false);
-
+            street = ptEdgeFactory.createEdge(0, start, end, geometry, name, length, ptype, false, way.getId());
+            int fwdId = street == null ? 0 : street.getId();
+            
             OSMLevel level = osmdb.getLevelForWay(way);
             street.setLevel(level);
             /*if (customNamer != null) {
@@ -1095,7 +1096,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             //Gondolas and one way streets are one directional
             //TODO: correct oneway handling
             if (ptype != TraverseMode.GONDOLA || !way.isTag("oneway", "yes")) {
-                backStreet = ptEdgeFactory.createEdge(end, start, backGeometry, name, length, ptype, true);
+                backStreet = ptEdgeFactory.createEdge(fwdId, end, start, backGeometry, name, length, ptype, true, way.getId());
                 backStreet.setLevel(level);
             }
 

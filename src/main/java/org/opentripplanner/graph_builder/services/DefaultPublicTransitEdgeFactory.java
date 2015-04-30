@@ -10,10 +10,10 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
  */
 public class DefaultPublicTransitEdgeFactory {
 
-    public PublicTransitEdge createEdge(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
+    public PublicTransitEdge createEdge(int fwdId, IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
                                         LineString geometry, String name, double length, TraverseMode publicTransitType,
-                                        boolean back) {
-        PublicTransitEdge pte = new PublicTransitEdge(startEndpoint, endEndpoint, geometry, name, length, publicTransitType, back);
-        return pte;
+                                        boolean back, long osmID) {
+        return new PublicTransitEdge(back ? fwdId : 0, osmID, startEndpoint, endEndpoint, geometry,
+                name, length, publicTransitType, back);
     }
 }
