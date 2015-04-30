@@ -238,7 +238,17 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         applyLevelsForWay(way);
 
         /* filter out ways that are not relevant for routing */
-        if (!(OSMFilter.isWayRoutable(way) || way.isParkAndRide() || way.isBikeParking())) {
+        //For now we keep PublicTransportEdges (railways, trams, subways) they are used for better linking
+        if (!(OSMFilter.isWayRoutable(way) || way.isParkAndRide() || way.isBikeParking() || way.isPublicTransport())) {
+            String name = way.getAssumedName();
+            if (name == null) {
+                name = way.toString();
+            } else {
+                name = way.toString() + name;
+            }
+            if (way.hasTag("railway")) {
+                LOG.info("Skipped railway: {} ({})", name, way.getTag("railway"));
+            }
             return;
         }
         /* An area can be specified as such, or be one by default as an amenity */

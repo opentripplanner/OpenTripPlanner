@@ -64,7 +64,7 @@ public class MapBuilder implements GraphBuilder {
                     /* we can only match geometry to streets on bus routes */
                     // FIXME patterns do not have geometries generated, so this can't work
                     log.debug("Matching {} ncoords={}", pattern, pattern.geometry.getNumPoints());
-                    List<Edge> edges = matcher.match(pattern.geometry);
+                    List<Edge> edges = matcher.match(pattern.geometry, pattern.mode);
                     if (edges == null) {
                         log.warn("Could not match to street network: {}", pattern);
                         continue;

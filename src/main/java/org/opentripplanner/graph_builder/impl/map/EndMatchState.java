@@ -13,6 +13,8 @@
 
 package org.opentripplanner.graph_builder.impl.map;
 
+import org.opentripplanner.routing.core.TraverseMode;
+
 import java.util.List;
 
 /** 
@@ -28,7 +30,7 @@ public class EndMatchState extends MatchState {
     }
 
     @Override
-    public List<MatchState> getNextStates() {
+    public List<MatchState> getNextStates(TraverseMode traverseMode) {
         return null;
     }
 

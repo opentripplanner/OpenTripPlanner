@@ -14,7 +14,10 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -26,6 +29,7 @@ import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.annotation.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.annotation.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
+import org.opentripplanner.graph_builder.services.DefaultPublicTransitEdgeFactory;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
@@ -68,7 +72,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
 
     public boolean skipVisibility = false;
-    
+
     private Geometry region;
 
     // Members that can be set by clients.
@@ -87,7 +91,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * Allows for arbitrary custom naming of edges.
      */
     public CustomNamer customNamer;
-    
+
     /**
      * Ignore wheelchair accessibility information.
      */
@@ -98,6 +102,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * around.
      */
     public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
+
+    public DefaultPublicTransitEdgeFactory ptEdgeFactory = new DefaultPublicTransitEdgeFactory();
 
     /**
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
@@ -353,7 +359,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * linked to the street network (they are most of the time buildings). We just create a bike
          * P+R in the middle of the area envelope and rely on the same linking mechanism as for
          * nodes to connect them to the nearest streets.
-         * 
+         *
          * @param area
          */
         private void buildBikeParkAndRideForArea(Area area) {
@@ -386,11 +392,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (AreaGroup group : areaGroups) {
                 walkableAreaBuilder.build(group);
             }
-            
+
             // running a request caches the timezone; we need to clear it now so that when agencies are loaded
             // the graph time zone is set to the agency time zone.
             graph.clearTimeZone();
-            
+
             LOG.info("Done building visibility graphs for walkable areas.");
         }
 
@@ -438,17 +444,17 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (IntersectionVertex accessVertex : accessVertexes) {
                 for (Edge incoming : accessVertex.getIncoming()) {
                     if (incoming instanceof StreetEdge) {
-                        if (walkReq.canBeTraversed((StreetEdge)incoming))
+                        if (walkReq.canBeTraversed((StreetEdge) incoming))
                             walkAccessibleIn = true;
-                        if (driveReq.canBeTraversed((StreetEdge)incoming))
+                        if (driveReq.canBeTraversed((StreetEdge) incoming))
                             carAccessibleIn = true;
                     }
                 }
                 for (Edge outgoing : accessVertex.getOutgoing()) {
                     if (outgoing instanceof StreetEdge) {
-                        if (walkReq.canBeTraversed((StreetEdge)outgoing))
+                        if (walkReq.canBeTraversed((StreetEdge) outgoing))
                             walkAccessibleOut = true;
-                        if (driveReq.canBeTraversed((StreetEdge)outgoing))
+                        if (driveReq.canBeTraversed((StreetEdge) outgoing))
                             carAccessibleOut = true;
                     }
                 }
@@ -506,9 +512,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(way,
                         wayData.getPermission(), graph);
-                if (!OSMFilter.isWayRoutable(way) || permissions.allowsNothing())
-                    continue;
-
+                if (!OSMFilter.isWayRoutable(way) || permissions.allowsNothing()) {
+                    //do not skip over public transport ways even if they are not routable (they are used in linking)
+                    if (!way.isPublicTransport()) {
+                        continue;
+                    }
+                }
                 // handle duplicate nodes in OSM ways
                 // this is a workaround for crappy OSM data quality
                 ArrayList<Long> nodes = new ArrayList<Long>(way.getNodeRefs().size());
@@ -617,14 +626,17 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             elevationData.put(endEndpoint, elevation);
                         }
                     }
-                    P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
-                            way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
-
-                    StreetEdge street = streets.first;
-                    StreetEdge backStreet = streets.second;
-                    applyWayProperties(street, backStreet, wayData, way);
-
-                    applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
+                    if (way.isPublicTransport()) {
+                        P2<PublicTransitEdge> streets = getEdgesForPT(startEndpoint, endEndpoint,
+                                way, i, osmStartNode.getId(), osmEndNode.getId(), geometry);
+                    } else {
+                        P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
+                                way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
+                        StreetEdge street = streets.first;
+                        StreetEdge backStreet = streets.second;
+                        applyWayProperties(street, backStreet, wayData, way);
+                        applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
+                    }
                     startNode = endNode;
                     osmStartNode = osmdb.getNode(startNode);
                 }
@@ -633,16 +645,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         // TODO Set this to private once WalkableAreaBuilder is gone
         protected void applyWayProperties(StreetEdge street, StreetEdge backStreet,
-                                        WayProperties wayData, OSMWithTags way) {
+                                          WayProperties wayData, OSMWithTags way) {
 
             Set<T2<Alert, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().first;
-                street.setBicycleSafetyFactor((float)safety);
+                street.setBicycleSafetyFactor((float) safety);
                 if (safety < bestBikeSafety) {
-                    bestBikeSafety = (float)safety;
+                    bestBikeSafety = (float) safety;
                 }
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
@@ -654,9 +666,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (backStreet != null) {
                 double safety = wayData.getSafetyFeatures().second;
                 if (safety < bestBikeSafety) {
-                    bestBikeSafety = (float)safety;
+                    bestBikeSafety = (float) safety;
                 }
-                backStreet.setBicycleSafetyFactor((float)safety);
+                backStreet.setBicycleSafetyFactor((float) safety);
                 if (notes != null) {
                     for (T2<Alert, NoteMatcher> note : notes)
                         graph.streetNotesService.addStaticNote(backStreet, note.first, note.second);
@@ -781,23 +793,23 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                 angleDiff += 360;
                             }
                             switch (restrictionTag.direction) {
-                            case LEFT:
-                                if (angleDiff >= 160) {
-                                    continue; // not a left turn
-                                }
-                                break;
-                            case RIGHT:
-                                if (angleDiff <= 200)
-                                    continue; // not a right turn
-                                break;
-                            case U:
-                                if ((angleDiff <= 150 || angleDiff > 210))
-                                    continue; // not a U turn
-                                break;
-                            case STRAIGHT:
-                                if (angleDiff >= 30 && angleDiff < 330)
-                                    continue; // not straight
-                                break;
+                                case LEFT:
+                                    if (angleDiff >= 160) {
+                                        continue; // not a left turn
+                                    }
+                                    break;
+                                case RIGHT:
+                                    if (angleDiff <= 200)
+                                        continue; // not a right turn
+                                    break;
+                                case U:
+                                    if ((angleDiff <= 150 || angleDiff > 210))
+                                        continue; // not a U turn
+                                    break;
+                                case STRAIGHT:
+                                    if (angleDiff >= 30 && angleDiff < 330)
+                                        continue; // not straight
+                                    break;
                             }
                             TurnRestriction restriction = new TurnRestriction();
                             restriction.from = from;
@@ -869,7 +881,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * The safest bike lane should have a safety weight no lower than the time weight of a flat street. This method divides the safety lengths by
          * the length ratio of the safest street, ensuring this property.
-         * 
+         * <p/>
          * TODO Move this away, this is common to all street builders.
          *
          * @param graph
@@ -950,8 +962,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param start
          */
         private P2<StreetEdge> getEdgesForStreet(IntersectionVertex start,
-                                                      IntersectionVertex end, OSMWay way, int index, long startNode, long endNode,
-                                                      StreetTraversalPermission permissions, LineString geometry) {
+                                                 IntersectionVertex end, OSMWay way, int index, long startNode, long endNode,
+                                                 StreetTraversalPermission permissions, LineString geometry) {
             // No point in returning edges that can't be traversed by anyone.
             if (permissions.allowsNothing()) {
                 return new P2<StreetEdge>(null, null);
@@ -991,8 +1003,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private StreetEdge getEdgeForStreet(int id, long osmId, IntersectionVertex start, IntersectionVertex end,
-                                                 OSMWay way, int index, long startNode, long endNode, double length,
-                                                 StreetTraversalPermission permissions, LineString geometry, boolean back) {
+                                            OSMWay way, int index, long startNode, long endNode, double length,
+                                            StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
             String label = "way " + way.getId() + " from " + index;
             label = unique(label);
@@ -1054,6 +1066,47 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return street;
         }
 
+        /**
+         * Creates graph edges for public transport (rail, tram, subway)
+         */
+        private P2<PublicTransitEdge> getEdgesForPT(IntersectionVertex start, IntersectionVertex end,
+                                                    OSMWay way, int index, long startNode, long endNode,
+                                                    LineString geometry) {
+            LineString backGeometry = (LineString) geometry.reverse();
+            PublicTransitEdge street = null, backStreet = null;
+            double length = this.getGeometryLengthMeters(geometry);
+
+            String label = "way " + way.getId() + " from " + index;
+            label = unique(label);
+            String name = getNameForWay(way, label);
+
+            TraverseMode ptype = way.getPublicTransitType();
+            if (!ptype.isTransit()) {
+                LOG.warn("Way {} has unknown railway: {}", way.getId(), way.getTag("railway"));
+            }
+
+            street = ptEdgeFactory.createEdge(start, end, geometry, name, length, ptype, false);
+
+            OSMLevel level = osmdb.getLevelForWay(way);
+            street.setLevel(level);
+            /*if (customNamer != null) {
+                customNamer.nameWithEdge(way, street);
+            }*/
+            //Gondolas and one way streets are one directional
+            //TODO: correct oneway handling
+            if (ptype != TraverseMode.GONDOLA || !way.isTag("oneway", "yes")) {
+                backStreet = ptEdgeFactory.createEdge(end, start, backGeometry, name, length, ptype, true);
+                backStreet.setLevel(level);
+            }
+
+            if (street != null && backStreet != null) {
+                backStreet.shareData(street);
+            }
+
+            return new P2<PublicTransitEdge>(street, backStreet);
+
+        }
+
         // TODO Set this to private once WalkableAreaBuilder is gone
         protected String getNameForWay(OSMWithTags way, String id) {
             String name = way.getAssumedName();
@@ -1071,7 +1124,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * Record the level of the way for this node, e.g. if the way is at level 5, mark that this node is active at level 5.
          *
-         * @param way the way that has the level
+         * @param way  the way that has the level
          * @param node the node to record for
          * @author mattwigway
          */

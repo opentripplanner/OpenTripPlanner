@@ -17,6 +17,8 @@ package org.opentripplanner.openstreetmap.model;
 
 import com.google.common.collect.Maps;
 
+import org.opentripplanner.routing.core.TraverseMode;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ import java.util.Map;
 public class OSMWithTags {
 
     /* To save memory this is only created when an entity actually has tags. */
-    private Map<String, String> _tags = Maps.newHashMap();;
+    private Map<String, String> _tags = Maps.newHashMap();
 
     protected long id;
 
@@ -143,6 +145,9 @@ public class OSMWithTags {
      * {@link org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl#processRelations processRelations}
      */
     public String getAssumedName() {
+        if (_tags == null) {
+            return null;
+        }
         if (_tags.containsKey("name"))
             return _tags.get("name");
 
@@ -298,5 +303,36 @@ public class OSMWithTags {
     public boolean isBikeParking() {
         return isTag("amenity", "bicycle_parking") && !isTag("access", "private")
                 && !isTag("access", "no");
+    }
+
+    /**
+     * @return True if this way is rail, tram, light_rail or subway with help of {@link #getPublicTransitType()}
+     */
+    public boolean isPublicTransport() {
+        //return isTag("railway", "rail") || isTag("railway", "tram") || isTag("railway", "subway") || isTag("railway", "light_rail");
+        return getPublicTransitType().isTransit();
+    }
+
+    /**
+     * Gets type of public transit for this way:
+     *
+     * - railway=rail = rail
+     * - railway=tram/light_rail = tram
+     * - railway=subway = subway
+     *
+     * Used in {@link #isPublicTransport()}
+     */
+    public TraverseMode getPublicTransitType() {
+        if (isTag("railway", "rail")) {
+            return TraverseMode.RAIL;
+        } else if (isTag("railway", "tram") || isTag("railway", "light_rail")) {
+            return TraverseMode.TRAM;
+        } else if (isTag("railway", "subway")) {
+            return TraverseMode.SUBWAY;
+        } else {
+            //throw new Exception("Wrong PT type:" + way.getTag("railway"));
+            //TODO: some error mode
+            return TraverseMode.LEG_SWITCH;
+        }
     }
 }
