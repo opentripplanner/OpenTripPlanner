@@ -59,7 +59,7 @@ public class SampleFactory implements SampleSource {
         Envelope env = new Envelope(c);
         // find scaling factor for equirectangular projection
         double xscale = Math.cos(c.y * Math.PI / 180);
-        env.expandBy(searchRadiusLat / xscale, searchRadiusLat);
+        env.expandBy(searchRadiusLat * xscale, searchRadiusLat);
         @SuppressWarnings("unchecked")
         List<Edge> edges = (List<Edge>) index.queryPedestrian(env);
         // look for edges and make a sample
@@ -106,7 +106,7 @@ public class SampleFactory implements SampleSource {
                 c.x = x0 + c.frac * (x1 - x0);
                 c.y = y0 + c.frac * (y1 - y0);
                 // find ersatz distance to edge (do not take root)
-                double dx = c.x - pt.x; // * xscale;
+                double dx = (c.x - pt.x) * xscale;
                 double dy = c.y - pt.y;
                 c.dist2 = dx * dx + dy * dy;
                 // replace best segments
