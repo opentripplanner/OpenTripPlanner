@@ -86,10 +86,9 @@ public class SampleFactory implements SampleSource {
             c.edge = edge;
             LineString ls = (LineString)(edge.getGeometry());
             
-            // both the from and to vertices must be OSM vertices so that linking is stable if the transit network changes
-            // and streets get split.
-            if (!(edge.getFromVertex() instanceof OsmVertex && edge.getToVertex() instanceof OsmVertex))
-            	continue;
+            // We used to require samples to link to OSM vertices, but that means that
+            // walking to a transit stop adjacent to the sample requires walking to the
+            // end of the street and back. 
             
             CoordinateSequence coordSeq = ls.getCoordinateSequence();
             int numCoords = coordSeq.size();
