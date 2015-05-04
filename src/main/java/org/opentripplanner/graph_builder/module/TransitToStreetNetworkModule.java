@@ -42,8 +42,13 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Linking transit stops to streets...");
-        NetworkLinker linker = new NetworkLinker(graph, extra);
-        linker.createLinkage();
+        // split streets
+        //NetworkLinker linker = new NetworkLinker(graph, extra);
+        //linker.createLinkage();
+        
+        // don't split streets
+        SampleStopLinker linker = new SampleStopLinker(graph);
+        linker.link(true);
     }
 
     @Override
