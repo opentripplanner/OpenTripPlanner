@@ -24,7 +24,10 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -34,6 +37,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.BitSetUtils;
 import org.slf4j.Logger;
@@ -687,5 +691,52 @@ public class StreetEdge extends Edge implements Cloneable {
 
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);
+    }
+    
+    /** calculate the length of this street segement from its geometry */
+    protected void calculateLengthFromGeometry () {
+    	double accumulatedMeters = 0;
+    	
+    	LineString geom = getGeometry();
+    	
+    	for (int i = 1; i < geom.getNumPoints(); i++) {
+    		accumulatedMeters += SphericalDistanceLibrary.distance(geom.getCoordinateN(i - 1), geom.getCoordinateN(i));
+    	}
+    	
+    	length_mm = (int) (accumulatedMeters * 1000);
+    }
+    
+    /** Split this street edge and return the resulting street edges */
+    public P2<StreetEdge> split (SplitterVertex v) {
+    	P2<LineString> geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
+    	StreetEdge e1 = new StreetEdge((StreetVertex) fromv, v, geoms.first, name, 0, permission, this.isBack());
+    	StreetEdge e2 = new StreetEdge(v, (StreetVertex) tov, geoms.second, name, 0, permission, this.isBack());
+    	
+    	// figure the lengths, ensuring that they sum to the length of this edge
+    	e1.calculateLengthFromGeometry();
+    	e2.calculateLengthFromGeometry();
+    	
+    	// cast before the divide so that the sum is promoted
+    	double frac = (double) e1.length_mm / (e1.length_mm + e2.length_mm);
+    	
+    	e1.length_mm = (int) (length_mm * frac);    	
+    	e2.length_mm = length_mm - e1.length_mm;
+    	
+    	if (e2.length_mm < 0) {
+    		e1.tov.removeIncoming(e1);
+    		e1.fromv.removeOutgoing(e1);
+    		e2.tov.removeIncoming(e2);
+    		e2.fromv.removeOutgoing(e2);
+    		throw new IllegalStateException("Split street is longer than original street!");
+    	}
+    	
+    	for (StreetEdge e : new StreetEdge[] { e1, e2 }) {
+            e.setBicycleSafetyFactor(getBicycleSafetyFactor());
+            e.setHasBogusName(hasBogusName());
+            e.setStairs(isStairs());
+            e.setWheelchairAccessible(isWheelchairAccessible());
+    	}
+    	
+    	return new P2<StreetEdge>(e1, e2);
     }
 }

@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.graph_builder.linking;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,9 +46,12 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
         //NetworkLinker linker = new NetworkLinker(graph, extra);
         //linker.createLinkage();
         
+        SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
+        splitter.link();
+        
         // don't split streets
-        SampleStopLinker linker = new SampleStopLinker(graph);
-        linker.link(true);
+        //SampleStopLinker linker = new SampleStopLinker(graph);
+        //linker.link(true);
     }
 
     @Override

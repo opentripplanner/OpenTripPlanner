@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.StreetUtils;
+import org.opentripplanner.graph_builder.linking.TransitToStreetNetworkModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.*;
