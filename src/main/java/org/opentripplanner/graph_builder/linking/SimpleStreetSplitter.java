@@ -8,6 +8,8 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PartialStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -73,6 +75,9 @@ public class SimpleStreetSplitter {
 			StreetEdge bestEdge = null;
 			
 			for (StreetEdge edge : idx.query(env)) {
+				if (!edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)))
+					continue;
+				
 				// only link to edges that are still in the graph
 				if (!edge.getToVertex().getIncoming().contains(edge))
 					continue;
@@ -182,7 +187,6 @@ public class SimpleStreetSplitter {
 	 * of it.
 	 */
 	private void makeLinkEdges (TransitStop tstop, StreetVertex v) {
-		// TODO is this the proper source for the wheelchair info?
 		new StreetTransitLink(tstop, v, tstop.hasWheelchairEntrance());
 		new StreetTransitLink(v, tstop, tstop.hasWheelchairEntrance());
 		
