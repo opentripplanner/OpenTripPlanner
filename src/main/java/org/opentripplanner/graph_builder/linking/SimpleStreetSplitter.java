@@ -109,11 +109,15 @@ public class SimpleStreetSplitter {
 			makeLinkEdges(tstop, (StreetVertex) edge.getFromVertex());
 			return;
 		}
-		else if (ll.getSegmentIndex() == orig.getNumPoints()) {
+		// -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
+		// past the last point
+		else if (ll.getSegmentIndex() == orig.getNumPoints() - 1) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getToVertex());
 			return;
 		}
-		else if (ll.getSegmentIndex() == orig.getNumPoints() - 1 && ll.getSegmentFraction() > 0.95) {
+		
+		// nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
+		else if (ll.getSegmentIndex() == orig.getNumPoints() - 2 && ll.getSegmentFraction() > 0.95) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getToVertex());
 		}
 				
