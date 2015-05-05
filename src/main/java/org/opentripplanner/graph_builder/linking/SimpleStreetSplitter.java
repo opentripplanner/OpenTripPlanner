@@ -107,55 +107,61 @@ public class SimpleStreetSplitter {
 		// cut to the chase and link directly
 		if (ll.getSegmentIndex() == 0 && ll.getSegmentFraction() < 0.05) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getFromVertex());
-			return;
 		}
 		// -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
 		// past the last point
 		else if (ll.getSegmentIndex() == orig.getNumPoints() - 1) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getToVertex());
-			return;
 		}
 		
 		// nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
 		else if (ll.getSegmentIndex() == orig.getNumPoints() - 2 && ll.getSegmentFraction() > 0.95) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getToVertex());
 		}
-				
-		// split the edge, get the split vertex
-		SplitterVertex v0 = split(edge, ll);
 		
-		// check for a back edge
-		Vertex fromv = edge.getFromVertex();
-		
-		// already split links have differing from and to vertices
-		if (fromv instanceof SplitterVertex)
-			fromv = ((SplitterVertex) fromv).opposite;
-		
-		Vertex tov = edge.getToVertex();
-		
-		if (tov instanceof SplitterVertex)
-			tov = ((SplitterVertex) tov).opposite;
-		
-		// if either of these are null we have a one-way edge that has been split
-		// FIXME: pedestrians can walk in both directions on every edge, no?
-		if (fromv != null && tov != null) {
-			for (StreetEdge back : Iterables.filter(tov.getOutgoing(), StreetEdge.class)) {
-				if (back.getToVertex() == fromv) {
-					orig = back.getGeometry();
-					transformed = equirectangularProject(orig, xscale);
-					il = new LocationIndexedLine(transformed);
-					ll = il.project(new Coordinate(tstop.getLon() * xscale, tstop.getLat()));
-					
-					SplitterVertex v1 = split(back, ll);
-					
-					v1.opposite = v0;
-					v0.opposite = v1;
+		else {	
+			// split the edge, get the split vertex
+			SplitterVertex v0 = split(edge, ll);
+			
+			// check for a back edge
+			Vertex fromv = edge.getFromVertex();
+			
+			// already split links have differing from and to vertices
+			if (fromv instanceof SplitterVertex)
+				fromv = ((SplitterVertex) fromv).opposite;
+			
+			Vertex tov = edge.getToVertex();
+			
+			if (tov instanceof SplitterVertex)
+				tov = ((SplitterVertex) tov).opposite;
+			
+			// if either of these are null we have a one-way edge that has been split
+			// FIXME: pedestrians can walk in both directions on every edge, no?
+			StreetEdge back = null;
+			if (fromv != null && tov != null) {
+				for (StreetEdge other : Iterables.filter(tov.getOutgoing(), StreetEdge.class)) {
+					if (other.getToVertex() == fromv) {
+						back = other;
+						break;
+					}
 				}
 			}
+			
+			if (back != null) {
+				orig = back.getGeometry();
+				transformed = equirectangularProject(orig, xscale);
+				il = new LocationIndexedLine(transformed);
+				ll = il.project(new Coordinate(tstop.getLon() * xscale, tstop.getLat()));
+				
+				SplitterVertex v1 = split(back, ll);
+				
+				v1.opposite = v0;
+				v0.opposite = v1;
+			}
+			
+			// if there was a back edge, this will make link edge to it as well
+			makeLinkEdges(tstop, v0);
 		}
-		
-		// if there was a back edge, this will make link edge to it as well
-		makeLinkEdges(tstop, v0);
 	}
 	
 	/** Split the street edge at the given fraction */
