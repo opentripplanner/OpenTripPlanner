@@ -52,13 +52,20 @@ otp.locale.Italian = {
      */
     infoWidgets : [
             {
-                title: 'Progetto',
-                content: '<p>Informazioni sul progetto</p>',
+                title: 'Il Servizio',
+                content: '<p>Il servizio di Calcolo Percorsi Regionale si basa sui dati del servizio programmato delle aziende aderenti al sistema di Bigliettazione Elettronica piemontese BIP.</p>\
+                <p>Il cuore del sistema è costituito dal modulo di calcolo percorsi, basato sul consolidato motore OpenTripPlanner (OTP), progetto open source ormai giunto al suo quinto anno di sviluppo continuativo.</p>\
+                <p>OTP permette di ricercare percorsi multimodali utilizzando il trasporto pubblico (in tutte le sue declinazioni: bus e tram urbani, servizi extraurbani, treni, ecc); permette inoltre di calcolare percorsi pedonali con funzionalità uniche quali l’attraversamento diagonale di piazze o aree libere.</p>\
+                <p>OTP è interamente basato su standard aperti, largamente diffusi e consolidati, quali:</p>\
+                <p>- OpenStreetMap (OSM) per il grafo di navigazione stradale</p>\
+                <p>- il GTFS per la descrizione dei servizi di trasporto pubblico</p>\
+                ',
                 //cssClass: 'otp-contactWidget',
             },
             {
                 title: 'Contatti',
-                content: '<p>Commenti? Contattaci  su...</p>'
+                content: '<p>Per informazioni su percorsi e orari contattare il numero verde 800333444.</p>\
+                          <p>Per suggerimenti contattare:<br>Regione Piemonte<br>Settore Trasporto Pubblico Locale<br>via Belfiore 23<br>e-mail: tpl@regione.piemonte.it</p>'
             },
     ],
 

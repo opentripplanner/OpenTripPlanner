@@ -699,7 +699,7 @@ msgstr "Errore %(error_id)d"
 #. Title of no trip dialog
 #: src/client/js/otp/modules/planner/PlannerModule.js:457
 msgid "No Trip Found"
-msgstr "nessun percoro trovato"
+msgstr "nessun percorso trovato"
 
 #. shown when clicked on route on map
 #: src/client/js/otp/modules/planner/PlannerModule.js:513

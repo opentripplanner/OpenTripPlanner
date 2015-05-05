@@ -11,6 +11,8 @@
 <!--  Mobile Viewport Fix -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!--  Let the poor EI behave decently -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
 <link rel="stylesheet" href="js/lib/jquery-ui/css/smoothness/jquery-ui-1.9.1.custom.css" />
 <link rel="stylesheet" href="js/lib/jquery-ui/addons/jquery-ui-timepicker.css" />
@@ -27,6 +29,7 @@
 <link rel="stylesheet" href="js/otp/widgets/tripoptions/tripoptions-style.css?v=1" />
 <link rel="stylesheet" href="js/otp/widgets/transit/widgets-transit-style.css?v=1" />
 <link rel="stylesheet" href="style.css?v=1" />
+<link rel="stylesheet" href="style-5t.css?v=1" />
 
 <!--Loads jquery, underscore, leaflet, json2, momentjs and raphael makes 7 requests less-->
 <script src="//cdn.jsdelivr.net/g/jquery@1.9.1,underscorejs@1.4.2,leaflet@0.7.3,json2@0.1,momentjs@1.7.2,raphael@2.1.2"></script>
@@ -185,6 +188,8 @@
 
 <script src="js/otp/layers/StopsLayer.js?v=1"></script>
 
+
+
 <!-- make legacy Internet Explorer play nice(r) -->
 <!--[if lt IE 9]>
   <script src="//cdn.jsdelivr.net/html5shiv/3.7.0/html5shiv.js"></script>
@@ -231,30 +236,34 @@ $(document).ready(function() {
 
 <header id="branding" role="banner" class="clearfix">
 
-  <!--<hgroup id="logo">
-    <div class="ribbon">
-      <h1 id="site-title"><span><a href="/" title="cibi.me" rel="home">cibi.me</a></span></h1>
-      <h2 id="site-description">Where can you bike to?</h2>
-    </div>
-  </hgroup>-->
+  <hgroup id="logo">
+      <h1 id="site-title">Pronto TPL</h1>
+  </hgroup>
+	<nav id="main-menu-container" class="main-menu-container">
+	<!--<ul id="main-menu-5t" class="main-menu-5t">
+			<li class="first active"><a href="#">Calcolo percorso</a></li>
+			<li><a href="#">Avvisi</a></li>
+			<li><a href="#">Contatti</a></li>
+		</ul>-->
+		<div id="language-switcher" class="language-switcher" />
+	</nav>
+	<div class="partner">
+		<div class="partner-aux">
+			<a href="http://www.regione.piemonte.it/" class="logo-1 first" target="_blank">Regione Piemonte</a>
+		</div>
+	</div>
 
-  <!--<p id="splash-text"><span>Bike share is coming to NYC this summer!</span> <span>How will you use it to get around?</span></p>-->
-
- <!--
-  <div class="search">
-
-    <input type="text" name="location_search" placeholder="Search for a location&hellip;" />
-  </div>
- -->
 </header><!-- #branding -->
 
-<div id="map"></div>
+<div id="map">
+	<a class="powered-by" href="http://www.5t.torino.it">Powered by 5T</a>
+</div>
 <div id="otp-minimize-tray"></div>
 
 <div id="otp-spinner"><img src="images/spinner.gif"></div>
 
 <script type="text/javascript">
-
+/*
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-8102379-22']);
   _gaq.push(['_trackPageview']);
@@ -264,7 +273,7 @@ $(document).ready(function() {
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
-
+*/
 </script>
 
 </body>

@@ -18,21 +18,21 @@ var resourcePath = otp.config.resourcePath || "";
 
 var StartFlagIcon = L.Icon.extend({
     options: {
-        iconUrl: resourcePath + 'images/marker-flag-start-shadowed.png',
+        iconUrl: resourcePath + 'images/5t/marker-flag-start.png',
         shadowUrl: null,
-        iconSize: new L.Point(48, 49),
-        iconAnchor: new L.Point(46, 42),
-        popupAnchor: new L.Point(0, -16)
+        iconSize: new L.Point(87, 48),
+        iconAnchor: new L.Point(43, 48),
+        popupAnchor: new L.Point(0, -48)
     }
 });
 
 var EndFlagIcon = L.Icon.extend({
     options: {
-        iconUrl: resourcePath + 'images/marker-flag-end-shadowed.png',
+        iconUrl: resourcePath + 'images/5t/marker-flag-end.png',
         shadowUrl: null,
-        iconSize: new L.Point(48, 49),
-        iconAnchor: new L.Point(46, 42),
-        popupAnchor: new L.Point(0, -16)
+        iconSize: new L.Point(71, 48),
+        iconAnchor: new L.Point(35, 48),
+        popupAnchor: new L.Point(0, -48)
     }
 });
 

@@ -89,7 +89,7 @@ otp.widgets.transit.StopViewerWidget =
         this.stopId = stopId;
         this.clearTimes();
         //TRANSLATORS: Public transport <Stop> (stop name)
-        this.stopInfo.html("<b>" + _tr("Stop") + ":</b> " + stopName + " ("  + stopId + ")");
+        this.stopInfo.html("<b>" + _tr("Stop") + ":</b> " + stopName + " ("  + stopId.substring(0,stopId.lastIndexOf(':')) + ")");
         this.runTimesQuery();
     },
 

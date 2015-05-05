@@ -192,12 +192,16 @@ otp.core.Webapp = otp.Class({
             this_.widgetManagerMenu.show(); // showWidgetManagerMenu();
         });
 
+        // complete the language-switcher - 5T
+        $('#language-switcher').append(otp.config.languageMenu());
 
         // create the info widgets and links along header bar
 
         if(otp.config.infoWidgets !== undefined && otp.config.infoWidgets.length > 0) {
-            var nav = $('<nav id="main-menu" role="article">').appendTo('#branding');
-            var ul = $('<ul>').appendTo(nav);
+            //var ul = $('<ul id="main-menu-5t" class="main-menu-5t">').appendTo('#main-menu-container');
+            var ul = $('<ul id="main-menu-5t" class="main-menu-5t">').insertBefore('#language-switcher');
+            //var nav = $('<nav id="main-menu" role="article">').appendTo('#branding');
+            //var ul = $('<ul>').appendTo(nav);
 
             for(var i=0; i<otp.config.infoWidgets.length; i++) {
 

@@ -205,18 +205,13 @@ public class GtfsModule implements GraphBuilderModule {
                 reader.setDefaultAgencyId(defaultAgencyId); // not sure this is a good idea, setting it to the first-of-many IDs.
             }
         }
-
+        // NOTE for those entities which *do not have* an explicit relation to an agency we are setting the defaultAgencyId
+        // for those entities which *do have* an explicit relation to an agency (ie. routes and trips), this is not necessary
         for (ShapePoint shapePoint : store.getAllEntitiesForType(ShapePoint.class)) {
             shapePoint.getShapeId().setAgencyId(reader.getDefaultAgencyId());
         }
-        for (Route route : store.getAllEntitiesForType(Route.class)) {
-            route.getId().setAgencyId(reader.getDefaultAgencyId());
-        }
         for (Stop stop : store.getAllEntitiesForType(Stop.class)) {
             stop.getId().setAgencyId(reader.getDefaultAgencyId());
-        }
-        for (Trip trip : store.getAllEntitiesForType(Trip.class)) {
-            trip.getId().setAgencyId(reader.getDefaultAgencyId());
         }
         for (ServiceCalendar serviceCalendar : store.getAllEntitiesForType(ServiceCalendar.class)) {
             serviceCalendar.getServiceId().setAgencyId(reader.getDefaultAgencyId());

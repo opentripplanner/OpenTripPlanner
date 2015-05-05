@@ -41,11 +41,13 @@ otp.layers.StopsLayer =
         this.module.addLayer("stops", this);
         this.module.webapp.map.lmap.on('dragend zoomend', $.proxy(this.refresh, this));
         this.module.webapp.map.lmap.on('popupopen', function (e) {
-            this_.module.webapp.indexApi.loadRoutesForStop(e.popup._source._stopId, this_, function(data) {
-                _.each(data, function(route) {
-                    ich['otp-stopsLayer-popupRoute'](route).appendTo($('.routeList'));
+            if (e.popup._source != undefined && e.popup._source._stopId != undefined) {
+                this_.module.webapp.indexApi.loadRoutesForStop(e.popup._source._stopId, this_, function(data) {
+                    _.each(data, function(route) {
+                        ich['otp-stopsLayer-popupRoute'](route).appendTo($('.routeList'));
+                    });
                 });
-            });
+            }
         });
     },
 
