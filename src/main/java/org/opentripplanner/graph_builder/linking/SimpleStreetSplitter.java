@@ -53,7 +53,9 @@ public class SimpleStreetSplitter {
 		idx = new HashGridSpatialIndex<StreetEdge>();
 		
 		for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
-			idx.insert(se.getGeometry().getEnvelopeInternal(), se);
+			if (true || !se.isBack()) {
+				idx.insert(se.getGeometry().getEnvelopeInternal(), se);
+			}
 		}
 		
 		for (TransitStop tstop : Iterables.filter(graph.getVertices(), TransitStop.class)) {
@@ -103,7 +105,7 @@ public class SimpleStreetSplitter {
 		LocationIndexedLine il = new LocationIndexedLine(transformed);
 		LinearLocation ll = il.project(new Coordinate(tstop.getLon() * xscale, tstop.getLat()));
 		
-		// if we're very close to one end of the line or the other, or is endwise, don't bother to split,
+		// if we're very close to one end of the line or the other, or endwise, don't bother to split,
 		// cut to the chase and link directly
 		if (ll.getSegmentIndex() == 0 && ll.getSegmentFraction() < 0.05) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getFromVertex());
@@ -140,7 +142,7 @@ public class SimpleStreetSplitter {
 			StreetEdge back = null;
 			if (fromv != null && tov != null) {
 				for (StreetEdge other : Iterables.filter(tov.getOutgoing(), StreetEdge.class)) {
-					if (other.getToVertex() == fromv) {
+					if (other.getToVertex() == fromv && other.getDistance() == edge.getDistance()) {
 						back = other;
 						break;
 					}
