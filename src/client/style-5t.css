@@ -79,9 +79,11 @@ author: Madeincima.it
     .otp-defaultTripWidget hr,#otp-planner-optionsWidget-locSelector-startDropdown,#otp-planner-optionsWidget-locSelector-endDropdown{display:none;}
     .otp-widget-header{cursor:move;height:18px;padding:0 36px 0 0;margin-bottom:10px;text-transform:uppercase;;font-size:1.1em;color:#1f4168;}
     .otp-widget-header-buttons{top:13px;right:13px;width:auto;}
-    .otp-widget-header-buttons div{background:#efefef;font-size:1.3em;padding:2px 9px 4px 7px;}
+    .otp-widget-header-buttons div{background:#efefef;font-size:1.3em;padding:4px 10px 5px 8px}
     .otp-widget-header-buttons div:hover{background:#e6e6e6;color:#666;text-shadow:none;}/*#1f4168  #fb9922*/
-    .otp-widget-header-buttons div:first-child{display:none;}
+    .otp-widget-header-buttons div:first-child{/*display:none;*/padding:5px 10px 4px 8px}
+    #otp-planner-optionsWidget .otp-widget-header-buttons div:first-child{display:none}
+    .otp-widget-header-buttons div:first-child div{display:none;}
     .otp-widget-header-button{margin-left:4px;font-weight:normal;}
 
     #otp-planner-optionsWidget-locSelector-reverseButton{background: #fff url(images/5t/arrow-revert-fields.gif) -27px 0 no-repeat;cursor: pointer;display: block;height:25px;width:20px;border:0;position:absolute;top:27%;left:90%;}
@@ -108,6 +110,31 @@ author: Madeincima.it
     #otp-planner-optionsWidget-timeSelector-timeSelector{width:100%;clear:both;margin-bottom:5px;}
     #otp-planner-optionsWidget-modeSelector{margin-left:10px;width:80%;max-width:255px;}
     .otp-minimized-tab{background:#fff;border:#fff;text-transform:uppercase;color:#1f4168;padding:9px 10px;font-size:1em;text-align:center;}
+
+
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{background:#fafafa;}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{border-color:#e9e9e9;border-radius:4px;}
+.otp-widget-nonTransparent{padding: 20px 25px 25px;}
+
+.ui-accordion .ui-accordion-content{padding:0 0 0 10px;border:0;margin-top:15px;margin-bottom:15px;position:relative;}
+.ui-accordion .ui-accordion-content .ui-accordion-content{margin-top:5px;margin-top:12px}
+.otp-itin-step-row{background:#fff !important;border-bottom:1px solid #e9e9e9;}
+.otp-itin-step-text{font-size:12px;margin-top:4px;}
+.ui-accordion .ui-accordion-header{padding:0.6em 0.5em 0.6em 2.2em}
+.ui-helper-reset{margin-bottom:4px;}
+.otp-itinTripSummary,.otp-itinsButtonRow{display:none;} /* eventualmente da nascondere via HTML */
+.otp-itinStartRow{margin-bottom:1em;}
+.otp-itinEndRow{margin-top:1em;}
+.otp-itin-leg-endpointDesc,.otp-itin-leg-endpointDescSub,.otp-itin-leg-buffer,.otp-itin-leg-elapsedDesc{border-color:#e9e9e9;}
+.otp-itinsAccord-header-time{background:none;color:#000;font-size:12px;top:1px;}
+
+.otp-itinAlertRow{background:#fff4f4;border:1px solid #e7abab;border-radius:4px;padding:10px;margin-bottom:10px;font-size:11px;color:#c25454;}
+
+#otp-spinner{padding:20px;opacity:.95;background:#fff;border-radius:5px;box-shadow:0px 0px 5px #666;}
+
+.otp-itin-div-icon-sw{background:url(images/5t/mode_bubble_sw.png);}
+
 
 
 }/* END MEDIA SCREEN*/	
