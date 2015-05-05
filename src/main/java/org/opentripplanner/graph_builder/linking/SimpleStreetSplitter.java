@@ -34,10 +34,6 @@ public class SimpleStreetSplitter {
 	
 	public static final int MAX_SEARCH_RADIUS_METERS = 1000;
 	
-	// if there is a vertex (intersection or existing split) within this many meters of 
-	// where a split would occur, don't make another split.
-	public static final int MAX_CORNER_DISTANCE_METERS = 10;
-	
 	private Graph graph;
 	
 	private HashGridSpatialIndex<StreetEdge> idx;
@@ -53,7 +49,9 @@ public class SimpleStreetSplitter {
 		idx = new HashGridSpatialIndex<StreetEdge>();
 		
 		for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
-			if (true || !se.isBack()) {
+			// not including back edges makes it more efficient, and should not change results if the algorithm is working properly
+			// feel free to comment the test out to check.
+			if (!se.isBack()) {
 				idx.insert(se.getGeometry().getEnvelopeInternal(), se);
 			}
 		}
@@ -142,6 +140,8 @@ public class SimpleStreetSplitter {
 			StreetEdge back = null;
 			if (fromv != null && tov != null) {
 				for (StreetEdge other : Iterables.filter(tov.getOutgoing(), StreetEdge.class)) {
+					// double equality should work fine since they are being constructed from int divide so I would assume that
+					// they would end up with the same components
 					if (other.getToVertex() == fromv && other.getDistance() == edge.getDistance()) {
 						back = other;
 						break;
