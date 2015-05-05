@@ -716,13 +716,24 @@ public class StreetEdge extends Edge implements Cloneable {
     	e1.calculateLengthFromGeometry();
     	e2.calculateLengthFromGeometry();
     	
-    	// cast before the divide so that the sum is promoted
-    	double frac = (double) e1.length_mm / (e1.length_mm + e2.length_mm);
+    	// we have this code implemented in both directions, because splits are fudged half a millimeter
+    	// when the length of this is odd. We want to make sure the lengths of the split streets end up
+    	// exactly the same as their backStreets so that if they are split again the error does not accumulate
+    	// and so that the order in which they are split does not matter.
+    	if (!isBack()) {
+        	// cast before the divide so that the sum is promoted
+        	double frac = (double) e1.length_mm / (e1.length_mm + e2.length_mm);
+    		e1.length_mm = (int) (length_mm * frac);    	
+    		e2.length_mm = length_mm - e1.length_mm;
+    	}
+    	else {
+        	// cast before the divide so that the sum is promoted
+        	double frac = (double) e2.length_mm / (e1.length_mm + e2.length_mm);
+    		e2.length_mm = (int) (length_mm * frac);    	
+    		e1.length_mm = length_mm - e2.length_mm;
+    	}
     	
-    	e1.length_mm = (int) (length_mm * frac);    	
-    	e2.length_mm = length_mm - e1.length_mm;
-    	
-    	if (e2.length_mm < 0) {
+    	if (e1.length_mm < 0 || e2.length_mm < 0) {
     		e1.tov.removeIncoming(e1);
     		e1.fromv.removeOutgoing(e1);
     		e2.tov.removeIncoming(e2);
@@ -735,6 +746,7 @@ public class StreetEdge extends Edge implements Cloneable {
             e.setHasBogusName(hasBogusName());
             e.setStairs(isStairs());
             e.setWheelchairAccessible(isWheelchairAccessible());
+            e.setBack(isBack());
     	}
     	
     	return new P2<StreetEdge>(e1, e2);
