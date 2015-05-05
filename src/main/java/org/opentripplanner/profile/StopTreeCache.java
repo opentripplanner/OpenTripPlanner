@@ -44,7 +44,7 @@ public class StopTreeCache {
             rr.worstTime = (rr.dateTime + timeCutoffMinutes * 60);
             AStar astar = new AStar();
             rr.longDistance = true;
-            rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+            rr.dominanceFunction = new DominanceFunction.LeastWalk();
             rr.setNumItineraries(1);
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
             // Copy vertex indices and distances into a flattened 2D array
