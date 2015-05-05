@@ -19,7 +19,7 @@ public class ProfilePropagationPathParser extends InitialStopSearchPathParser {
 	private static final DFA pppDfa;
 	
 	static {
-		Nonterminal nt = seq(TRANSITSTOP, star(STREET), optional(OTHER));
+		Nonterminal nt = seq(optional(TRANSITSTOP), star(STREET), optional(OTHER));
 		pppDfa = nt.toDFA().minimize();
 	}
 	
