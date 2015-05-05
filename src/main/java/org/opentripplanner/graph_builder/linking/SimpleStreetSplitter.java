@@ -1,7 +1,18 @@
 package org.opentripplanner.graph_builder.linking;
 
-import java.util.Collection;
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import jersey.repackaged.com.google.common.collect.Lists;
+
+import com.google.common.collect.Collections2;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -34,6 +45,9 @@ public class SimpleStreetSplitter {
 	
 	public static final int MAX_SEARCH_RADIUS_METERS = 1000;
 	
+	/** if there are two ways and the distances to them differ by less than this value, we link to both of them */
+	public static final double DUPLICATE_WAY_EPSILON_METERS = 0.1;
+		
 	private Graph graph;
 	
 	private HashGridSpatialIndex<StreetEdge> idx;
@@ -49,53 +63,87 @@ public class SimpleStreetSplitter {
 		idx = new HashGridSpatialIndex<StreetEdge>();
 		
 		for (StreetEdge se : Iterables.filter(graph.getEdges(), StreetEdge.class)) {
-			// not including back edges makes it more efficient, and should not change results if the algorithm is working properly
-			// feel free to comment the test out to check.
-			if (!se.isBack()) {
-				idx.insert(se.getGeometry().getEnvelopeInternal(), se);
-			}
+			idx.insert(se.getGeometry().getEnvelopeInternal(), se);
 		}
 		
-		for (TransitStop tstop : Iterables.filter(graph.getVertices(), TransitStop.class)) {
+		STOPS: for (final TransitStop tstop : Iterables.filter(graph.getVertices(), TransitStop.class)) {
 			// find nearby street edges
 			// TODO: we used to use an expanding-envelope search, which is more efficient in
 			// dense areas. but first let's see how inefficient this is. I suspect it's not too
 			// bad and the gains in simplicity are considerable.
-			double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_SEARCH_RADIUS_METERS);
+			final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_SEARCH_RADIUS_METERS);
 			
 			Envelope env = new Envelope(tstop.getCoordinate());
 			
 			// local equirectangular projection
-			double xscale = Math.cos(tstop.getLat() * Math.PI / 180);
+			final double xscale = Math.cos(tstop.getLat() * Math.PI / 180);
 			
 			env.expandBy(radiusDeg / xscale, radiusDeg);
 			
-			// find the best edge
-			double bestEdgeDist = Double.POSITIVE_INFINITY;
-			StreetEdge bestEdge = null;
+			double duplicateDeg = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
 			
-			for (StreetEdge edge : idx.query(env)) {
-				if (!edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)))
-					continue;
-				
-				// only link to edges that are still in the graph
-				if (!edge.getToVertex().getIncoming().contains(edge))
-					continue;
+			// We sort the list of candidate edges by distance to the stop
+			// This should remove any issues with things coming out of the spatial index in different orders
+			// Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
+			// so that we capture back edges and duplicate ways.
+			List<StreetEdge> candidateEdges = new ArrayList<StreetEdge>(
+					Collections2.filter(idx.query(env), new Predicate<StreetEdge>() {
+
+						@Override
+						public boolean apply(StreetEdge edge) {
+							// note: not filtering by radius here as distance calculation is expensive
+							// we do that below.
+							return edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)) &&
+									// only link to edges still in the graph.
+									edge.getToVertex().getIncoming().contains(edge);
+						}
+					})
+					);
 			
-				double dist = distance(tstop, edge, xscale);
-				
-				if (dist < radiusDeg && dist < bestEdgeDist) {
-					bestEdgeDist = dist;
-					bestEdge = edge;
-				}
+			// make a map of distances
+			final TIntDoubleMap distances = new TIntDoubleHashMap();
+			
+			for (StreetEdge e : candidateEdges) {
+				distances.put(e.getId(), distance(tstop, e, xscale));
 			}
 			
-			if (bestEdge != null)
-				link(tstop, bestEdge, xscale);
+			// sort the list
+			Collections.sort(candidateEdges, new Comparator<StreetEdge> () {
+
+				@Override
+				public int compare(StreetEdge o1, StreetEdge o2) {
+					double diff = distances.get(o1.getId()) - distances.get(o2.getId());
+					if (diff < 0)
+						return -1;
+					if (diff > 0)
+						return 1;
+					return 0;
+				}
+				
+			});
+			
+			// find the closest candidate edges
+			if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg)
+				continue STOPS;
+			
+			// find the best edge
+			double bestDist = distances.get(candidateEdges.get(0).getId());
+			List<StreetEdge> bestEdges = Lists.newArrayList();
+			
+			for (StreetEdge e : candidateEdges) {
+				if (distances.get(e.getId()) > bestDist + duplicateDeg)
+					break;
+				
+				bestEdges.add(e);
+			}
+			
+			for (StreetEdge edge : bestEdges) {
+				link(tstop, edge, xscale);
+			}			
 		}
 	}
 	
-	/** split the edge (and backEdge, if applicable) and link in the transit stop */
+	/** split the edge and link in the transit stop */
 	private void link (TransitStop tstop, StreetEdge edge, double xscale) {
 		// TODO: we've already built this line string, we should save it
 		LineString orig = edge.getGeometry();
@@ -122,46 +170,6 @@ public class SimpleStreetSplitter {
 		else {	
 			// split the edge, get the split vertex
 			SplitterVertex v0 = split(edge, ll);
-			
-			// check for a back edge
-			Vertex fromv = edge.getFromVertex();
-			
-			// already split links have differing from and to vertices
-			if (fromv instanceof SplitterVertex)
-				fromv = ((SplitterVertex) fromv).opposite;
-			
-			Vertex tov = edge.getToVertex();
-			
-			if (tov instanceof SplitterVertex)
-				tov = ((SplitterVertex) tov).opposite;
-			
-			// if either of these are null we have a one-way edge that has been split
-			// FIXME: pedestrians can walk in both directions on every edge, no?
-			StreetEdge back = null;
-			if (fromv != null && tov != null) {
-				for (StreetEdge other : Iterables.filter(tov.getOutgoing(), StreetEdge.class)) {
-					// double equality should work fine since they are being constructed from int divide so I would assume that
-					// they would end up with the same components
-					if (other.getToVertex() == fromv && other.getDistance() == edge.getDistance()) {
-						back = other;
-						break;
-					}
-				}
-			}
-			
-			if (back != null) {
-				orig = back.getGeometry();
-				transformed = equirectangularProject(orig, xscale);
-				il = new LocationIndexedLine(transformed);
-				ll = il.project(new Coordinate(tstop.getLon() * xscale, tstop.getLat()));
-				
-				SplitterVertex v1 = split(back, ll);
-				
-				v1.opposite = v0;
-				v0.opposite = v1;
-			}
-			
-			// if there was a back edge, this will make link edge to it as well
 			makeLinkEdges(tstop, v0);
 		}
 	}
@@ -195,21 +203,18 @@ public class SimpleStreetSplitter {
 	}
 	
 	/** 
-	 * Make link edges. Also handles ensuring that if we snap to an existing split we get linked to both sides
-	 * of it.
+	 * Make link edges, unless they already exist.
 	 */
 	private void makeLinkEdges (TransitStop tstop, StreetVertex v) {
+		// ensure that the requisite edges do not already exist
+		// this can happen if we link to duplicate ways that have the same start/end vertices.
+		for (StreetTransitLink e : Iterables.filter(tstop.getOutgoing(), StreetTransitLink.class)) {
+			if (e.getToVertex() == v)
+				return;
+		}
+		
 		new StreetTransitLink(tstop, v, tstop.hasWheelchairEntrance());
 		new StreetTransitLink(v, tstop, tstop.hasWheelchairEntrance());
-		
-		if (v instanceof SplitterVertex) {
-			SplitterVertex sv = (SplitterVertex) v;
-			
-			if (sv.opposite != null) {
-				new StreetTransitLink(tstop, sv.opposite, tstop.hasWheelchairEntrance());
-				new StreetTransitLink(sv.opposite, tstop, tstop.hasWheelchairEntrance());
-			}				
-		}
 	}
 	
 	/** projected distance from stop to edge */

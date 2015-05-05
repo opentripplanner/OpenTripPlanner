@@ -9,9 +9,6 @@ public class SplitterVertex extends IntersectionVertex {
 		// always free.
 		this.freeFlowing = true;
 	}
-	
-	/** SplitterVertices have opposites that are the split on the back edge */
-	public SplitterVertex opposite;
 
 	private static final long serialVersionUID = 1L;
 
