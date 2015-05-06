@@ -91,7 +91,7 @@ public abstract class DominanceFunction implements Serializable {
     
     /**
      * A dominance function that prefers the least walking. This should only be used with walk-only searches because
-     * it does not include any finctions of time, and once transit is boarded walk distance is constant.
+     * it does not include any functions of time, and once transit is boarded walk distance is constant.
      * 
      * It is used when building stop tree caches for egress from transit stops.
      */
