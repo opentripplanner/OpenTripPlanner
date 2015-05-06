@@ -443,7 +443,7 @@ public class GraphIndex {
     	if (stopTreeCache == null) {
 	        synchronized (this) {
 	            if (stopTreeCache == null) {
-	                stopTreeCache = new StopTreeCache(graph, 20); // TODO make this max-distance variable
+	                stopTreeCache = new StopTreeCache(graph, 2000); // TODO make this max-distance variable
 	            }
 	        }
     	}

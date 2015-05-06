@@ -27,25 +27,24 @@ import java.util.Map;
 public class StopTreeCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(StopTreeCache.class);
-    final int timeCutoffMinutes;
+    final int maxWalkMeters;
     // Flattened 2D array of (streetVertexIndex, distanceFromStop) for each TransitStop
     public final Map<TransitStop, int[]> distancesForStop = Maps.newHashMap();
 
-    public StopTreeCache (Graph graph, int timeCutoffMinutes) {
-        this.timeCutoffMinutes = timeCutoffMinutes;
+    public StopTreeCache (Graph graph, int maxWalkMeters) {
+        this.maxWalkMeters = maxWalkMeters;
         LOG.info("Caching distances to nearby street intersections from each transit stop...");
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = (true);
             rr.setRoutingContext(graph, tstop, tstop);
             rr.rctx.pathParsers = new PathParser[] { new ProfilePropagationPathParser() };
-            // RoutingReqeust dateTime defaults to currentTime.
-            // If elapsed time is not capped, searches are very slow.
-            rr.worstTime = (rr.dateTime + timeCutoffMinutes * 60);
             AStar astar = new AStar();
             rr.longDistance = true;
             rr.dominanceFunction = new DominanceFunction.LeastWalk();
             rr.setNumItineraries(1);
+            rr.maxWalkDistance = maxWalkMeters;
+            rr.softWalkLimiting = false;
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
             // Copy vertex indices and distances into a flattened 2D array
             int[] distances = new int[spt.getVertexCount() * 2];
