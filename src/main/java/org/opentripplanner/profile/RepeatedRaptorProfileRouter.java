@@ -50,8 +50,6 @@ public class RepeatedRaptorProfileRouter {
 
     public static final int MAX_DURATION = 60 * 60 * 2; // seconds
 
-    private static final int MAX_TRANSFERS = 20;
-
     public ProfileRequest request;
 
     public Graph graph;
