@@ -176,18 +176,19 @@ public class RepeatedRaptorProfileRouter {
         QualifiedModeSet modes = dest ? request.accessModes : request.egressModes;
                 
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+        rr.dominanceFunction = new DominanceFunction.LeastWalk();
         rr.batch = true;
         rr.from = new GenericLocation(lat, lon);
-        rr.walkSpeed = request.walkSpeed;
+        //rr.walkSpeed = request.walkSpeed;
         rr.to = rr.from;
         rr.setRoutingContext(graph);
         rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 +
                 request.fromTime;
-        // RoutingRequest dateTime defaults to currentTime.
-        // If elapsed time is not capped, searches are very slow.
-        rr.worstTime = (rr.dateTime + request.maxWalkTime * 60);
+       
+        rr.maxWalkDistance = 2000;
+        rr.softWalkLimiting = false;
+        
         AStar astar = new AStar();
         rr.longDistance = true;
         rr.setNumItineraries(1);
@@ -199,7 +200,9 @@ public class RepeatedRaptorProfileRouter {
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             State s = spt.getState(tstop);
             if (s != null) {
-                accessTimes.put(tstop, (int) s.getElapsedTimeSeconds());
+            	// note that we calculate the time based on the walk speed here rather than
+            	// based on the time. this matches what we do in the stop tree cache.
+                accessTimes.put(tstop, (int) (s.getWalkDistance() / request.walkSpeed));
             }
         }
 
