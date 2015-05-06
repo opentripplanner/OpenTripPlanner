@@ -46,7 +46,7 @@ public class SimpleStreetSplitter {
 	public static final int MAX_SEARCH_RADIUS_METERS = 1000;
 	
 	/** if there are two ways and the distances to them differ by less than this value, we link to both of them */
-	public static final double DUPLICATE_WAY_EPSILON_METERS = 0.1;
+	public static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
 		
 	private Graph graph;
 	
@@ -153,7 +153,7 @@ public class SimpleStreetSplitter {
 		
 		// if we're very close to one end of the line or the other, or endwise, don't bother to split,
 		// cut to the chase and link directly
-		if (ll.getSegmentIndex() == 0 && ll.getSegmentFraction() < 0.05) {
+		if (ll.getSegmentIndex() == 0 && ll.getSegmentFraction() < 1e-8) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getFromVertex());
 		}
 		// -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
@@ -163,7 +163,7 @@ public class SimpleStreetSplitter {
 		}
 		
 		// nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
-		else if (ll.getSegmentIndex() == orig.getNumPoints() - 2 && ll.getSegmentFraction() > 0.95) {
+		else if (ll.getSegmentIndex() == orig.getNumPoints() - 2 && ll.getSegmentFraction() > 1 - 1e-8) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getToVertex());
 		}
 		
