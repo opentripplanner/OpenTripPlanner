@@ -205,10 +205,11 @@ Maven repository.
 
 Release checklist:
 
+- update the docs/Changelog.md, check it in, and push
 - ssh into ci.opentripplanner.org
+- change to the ~/git/OpenTripPlanner directory
 - check that you are on the master branch with no uncommitted changes (git status; git clean -df)
-- change to the ~/git/OpenTripPlanner directory, and pull down the latest master code
-- update the docs/Changelog.md and check it in
+- pull down the latest master code
 - verify that git push succeeds without prompting for a password (i.e. ~/.ssh/id_rsa.pub is known to Github)
 - run a test build: mvn clean package site
 - check that `~/.m2/settings.xml` contains AWS credentials for the repo
