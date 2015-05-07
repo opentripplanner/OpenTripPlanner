@@ -130,12 +130,12 @@ public class SimpleStreetSplitter {
 			double bestDist = distances.get(candidateEdges.get(0).getId());
 			List<StreetEdge> bestEdges = Lists.newArrayList();
 			
-			for (StreetEdge e : candidateEdges) {
-				if (distances.get(e.getId()) > bestDist + duplicateDeg)
-					break;
-				
-				bestEdges.add(e);
-			}
+			// add edges until there is a break of epsilon meters.
+			int i = 0;
+			do {
+				bestEdges.add(candidateEdges.get(i++));
+			} while (i < candidateEdges.size() &&
+					distances.get(candidateEdges.get(i).getId()) - distances.get(candidateEdges.get(i - 1).getId()) < duplicateDeg);
 			
 			for (StreetEdge edge : bestEdges) {
 				link(tstop, edge, xscale);
@@ -217,7 +217,7 @@ public class SimpleStreetSplitter {
 		new StreetTransitLink(v, tstop, tstop.hasWheelchairEntrance());
 	}
 	
-	/** projected distance from stop to edge */
+	/** projected distance from stop to edge, in latitude degrees */
 	private static double distance (TransitStop tstop, StreetEdge edge, double xscale) {
 		// use JTS internal tools wherever possible
 		LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
