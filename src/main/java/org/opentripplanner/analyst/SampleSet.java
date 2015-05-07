@@ -61,5 +61,29 @@ public class SampleSet {
         }
         return ret;
     }
+    
+    /** Evaluate an array of times where indices are keyed to vertex indices, with TimeSurface.UNREACHABLE indicating unreachability */
+    public int[] eval(int[] times) {
+        final float WALK_SPEED = 1.3f;
+        int[] ret = new int[pset.capacity];
+        for (int i = 0; i < pset.capacity; i++) {
+            int m0 = Integer.MAX_VALUE;
+            int m1 = Integer.MAX_VALUE;
+            if (v0s[i] != null) {
+                int s0 = times[v0s[i].getIndex()];
+                if (s0 != TimeSurface.UNREACHABLE) {
+                    m0 = (int) (s0 + d0s[i] / WALK_SPEED);
+                }
+            }
+            if (v1s[i] != null) {
+                int s1 = times[v1s[i].getIndex()];
+                if (s1 != TimeSurface.UNREACHABLE) {
+                    m1 = (int) (s1 + d1s[i] / WALK_SPEED);
+                }
+            }
+            ret[i] = (m0 < m1) ? m0 : m1;
+        }
+        return ret;
+    }
 
 }

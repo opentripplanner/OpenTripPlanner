@@ -48,7 +48,7 @@ public class RepeatedRaptorProfileRouter {
 
     private Logger LOG = LoggerFactory.getLogger(RepeatedRaptorProfileRouter.class);
 
-    public static final int MAX_DURATION = 60 * 60 * 2; // seconds
+    public static final int MAX_DURATION = 10 * 60 * 2; // seconds
 
     public ProfileRequest request;
 
@@ -131,28 +131,28 @@ public class RepeatedRaptorProfileRouter {
 //            i.printStackTrace();
 //        }
         
+        int[] timesAtVertices = new int[Vertex.getMaxIndex()];
+        Arrays.fill(timesAtVertices, TimeSurface.UNREACHABLE);
+        
+        for (State state : walkOnlySpt.getAllStates()) {
+        	// Note that we are using the walk distance divided by speed here in order to be consistent with the
+        	// least-walk optimization in the initial stop search (and the stop tree cache which is used at egress)
+        	int time = (int) (state.getWalkDistance() / request.walkSpeed);
+        	int vidx = state.getVertex().getIndex();
+        	int otime = timesAtVertices[vidx];
+        	
+        	if (otime == TimeSurface.UNREACHABLE || otime > time)
+        		timesAtVertices[vidx] = time;
+	        	
+	    }
+        
         int[] walkTimes;
         
         if (sampleSet == null) {
-	        walkTimes = new int[Vertex.getMaxIndex()];
-	        Arrays.fill(walkTimes, RaptorWorker.UNREACHED);
-	        
-	        for (State state : walkOnlySpt.getAllStates()) {
-	        	int time = (int) state.getElapsedTimeSeconds();
-	        	int vidx = state.getVertex().getIndex();
-	        	int otime = walkTimes[vidx];
-	        	
-	        	if (otime == RaptorWorker.UNREACHED || otime > time)
-	        		walkTimes[vidx] = time;
-		        	
-		    }
+        	walkTimes = timesAtVertices;
         }
-        
         else {
-        	// propagate walk times all the way to samples
-        	TimeSurface walk = new TimeSurface(walkOnlySpt, false);
-        	ResultSet walkRs = new ResultSet(sampleSet, walk, true);
-        	walkTimes = walkRs.times;
+        	walkTimes = sampleSet.eval(timesAtVertices);
         }
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData, request);
@@ -176,7 +176,6 @@ public class RepeatedRaptorProfileRouter {
         QualifiedModeSet modes = dest ? request.accessModes : request.egressModes;
                 
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.dominanceFunction = new DominanceFunction.LeastWalk();
         rr.batch = true;
         rr.from = new GenericLocation(lat, lon);
         //rr.walkSpeed = request.walkSpeed;
@@ -186,8 +185,13 @@ public class RepeatedRaptorProfileRouter {
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 +
                 request.fromTime;
        
+        // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
+        // which is implemented this way because walk times can change when walk speed changes. Also, walk times are floating
+        // point and can change slightly when streets are split. Street lengths are internally fixed-point ints, which do not
+        // suffer from roundoff. Great care is taken when splitting to preserve sums.
         rr.maxWalkDistance = 2000;
         rr.softWalkLimiting = false;
+        rr.dominanceFunction = new DominanceFunction.LeastWalk();
         
         AStar astar = new AStar();
         rr.longDistance = true;
