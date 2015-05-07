@@ -70,7 +70,7 @@ public class Properties {
         String retVal = null;
         try {
             retVal = get(name, l);
-        } catch (Exception _) {
+        } catch (Exception ex) {
         }
 
         if (retVal == null || retVal.length() < 1)
@@ -123,7 +123,7 @@ public class Properties {
             String r = get(name, l);
             if (r != null && r.equalsIgnoreCase("true"))
                 retVal = true;
-        } catch (Exception _) {
+        } catch (Exception ex) {
         }
 
         return retVal;

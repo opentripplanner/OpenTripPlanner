@@ -1,19 +1,17 @@
 package org.opentripplanner.analyst;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.opentripplanner.analyst.pointset.PropertyMetadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ResultSet implements Serializable{
 
@@ -21,13 +19,17 @@ public class ResultSet implements Serializable{
 
     private static final Logger LOG = LoggerFactory.getLogger(ResultSet.class);
 
+    /** An identifier consisting of the ids for the pointset and time surface that were combined. */
     public String id;
-    public Map<String,Histogram> histograms = new HashMap<String,Histogram>();
+    
+    /** One histogram for each */
+    public Map<String,Histogram> histograms = Maps.newHashMap();
 
     public ResultSet() {
-
+        // TODO is this ever used?
     }
 
+    /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points. */
     public ResultSet(SampleSet samples, TimeSurface surface){
         id = samples.pset.id + "_" + surface.id;
 
@@ -38,11 +40,16 @@ public class ResultSet implements Serializable{
 
     }
 
+    /** 
+     * Given an array of travel times to reach each point in the supplied pointset, make a histogram of 
+     * travel times to reach each separate category of points (i.e. "property") within the pointset.
+     * Each new histogram object will be stored as a part of this result set keyed on its property/category.
+     */
     protected void buildHistograms(int[] times, PointSet targets) {
-        for (Entry<String, int[]> cat : targets.properties.entrySet()) {
-            String catId = cat.getKey();
-            int[] mags = cat.getValue();
-            this.histograms.put(catId, new Histogram(times, mags));
+        for (Entry<String, int[]> entry : targets.properties.entrySet()) {
+            String property = entry.getKey();
+            int[] magnitudes = entry.getValue();
+            this.histograms.put(property, new Histogram(times, magnitudes));
         }
     }
 
@@ -84,19 +91,19 @@ public class ResultSet implements Serializable{
         return value;
     }
 
-
     /**
-     * Each origin will yield CSV with columns category,min,q25,q50,q75,max
-     * Another column for the origin ID would allow this to extend to many-to-many.
+     * Serialize this ResultSet to the given output stream as a JSON document, when the pointset is not available.
+     * TODO: explain why and when that would happen 
      */
-    void toCsv() {
-
-    }
-
     public void writeJson(OutputStream output) {
         writeJson(output, null);
     }
 
+    /** 
+     * Serialize this ResultSet to the given output stream as a JSON document.
+     * properties: a list of the names of all the pointSet properties for which we have histograms.
+     * data: for each property, a histogram of arrival times.
+     */
     public void writeJson(OutputStream output, PointSet ps) {
         try {
             JsonFactory jsonFactory = new JsonFactory(); 

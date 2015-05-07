@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -67,7 +66,6 @@ import org.opentripplanner.util.ResourceBundleSingleton;
  * because it creates a spatial index of all of the intersections in the graph.
  */
 public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
-    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private Graph graph;
 
@@ -142,7 +140,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             wheelchairAccessible |= ((StreetEdge) street).isWheelchairAccessible();
             /* forward edges and vertices */
             Vertex edgeLocation;
-            if (distanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
+            if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
                 // no need to link to area edges caught on-end
                 edgeLocation = fromv;
 
@@ -151,7 +149,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 } else {
                     new TemporaryFreeEdge(location, edgeLocation);
                 }
-            } else if (distanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
+            } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
                 // no need to link to area edges caught on-end
                 edgeLocation = tov;
 
@@ -259,7 +257,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         List<TransitStop> nearby = getTransitStopForEnvelope(env);
         List<TransitStop> results = new ArrayList<TransitStop>();
         for (TransitStop v : nearby) {
-            if (distanceLibrary.distance(v.getCoordinate(), coordinate) <= radius) {
+            if (SphericalDistanceLibrary.distance(v.getCoordinate(), coordinate) <= radius) {
                 results.add(v);
             }
         }
@@ -357,7 +355,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             for (TransitStop v : getNearbyTransitStops(coord, 1000)) {
                 if (!v.isStreetLinkable()) continue;
 
-                double d = distanceLibrary.distance(v.getCoordinate(), coord);
+                double d = SphericalDistanceLibrary.distance(v.getCoordinate(), coord);
                 if (d < closestStopDistance) {
                     closestStopDistance = d;
                     closestStop = v;
@@ -374,7 +372,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (candidate != null) {
             StreetEdge bestStreet = candidate.edge;
             Coordinate nearestPoint = candidate.nearestPointOnEdge;
-            closestStreetDistance = distanceLibrary.distance(coord, nearestPoint);
+            closestStreetDistance = SphericalDistanceLibrary.distance(coord, nearestPoint);
             LOG.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
             if (calculatedName == null || "".equals(calculatedName.toString(locale))) {
                 calculatedName = new NonLocalizedString(bestStreet.getName(locale));
@@ -560,7 +558,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double bestDistanceMeter = Double.POSITIVE_INFINITY;
         for (Vertex v : nearby) {
             if (v instanceof StreetVertex) {
-                double distanceMeter = distanceLibrary.fastDistance(coordinate, v.getCoordinate());
+                double distanceMeter = SphericalDistanceLibrary.fastDistance(coordinate, v.getCoordinate());
                 if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
                     if (distanceMeter < bestDistanceMeter) {
                         bestDistanceMeter = distanceMeter;

@@ -24,10 +24,11 @@ import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -49,7 +50,7 @@ public class TestOnBoardRouting extends TestCase {
 
     private Graph graph;
 
-    private GenericAStar aStar = new GenericAStar();
+    private AStar aStar = new AStar();
 
     public void setUp() throws Exception {
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
@@ -204,7 +205,9 @@ public class TestOnBoardRouting extends TestCase {
             assertTrue(numBoardings2 < numBoardings1);
 
             /* Cleanup edges */
-            onboardOrigin.removeAllEdges();
+            for (Edge edge : onboardOrigin.getOutgoing()) {
+                graph.removeEdge(edge);
+            }
 
             n++;
             if (n > NTESTS)

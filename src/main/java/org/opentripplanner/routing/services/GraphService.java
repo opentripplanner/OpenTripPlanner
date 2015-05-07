@@ -65,8 +65,6 @@ public class GraphService {
 
     public GraphSource.Factory graphSourceFactory;
 
-    public Router.LifecycleManager routerLifecycleManager;
-
     private ScheduledExecutorService scanExecutor;
 
     public GraphService() {
@@ -136,27 +134,43 @@ public class GraphService {
     }
 
     /**
-     * Reload all registered graphs from wherever they came from.
-     * 
-     * @param preEvict When true, release the existing graph (if any) before loading. This will
-     *        halve the amount of memory needed for the operation, but routing will be unavailable
-     *        for that graph during the load process
-     * @return whether the operation completed successfully
+     * Reload all registered graphs from wherever they came from. See reloadGraph().
+     * @return whether the operation completed successfully (all reloads are successful).
      */
-    public boolean reloadGraphs(boolean preEvict) {
+    public boolean reloadGraphs(boolean preEvict, boolean force) {
         boolean allSucceeded = true;
         synchronized (graphSources) {
             Collection<String> routerIds = getRouterIds();
             for (String routerId : routerIds) {
-                GraphSource graphSource = graphSources.get(routerId);
-                boolean success = graphSource.reload(true, preEvict);
-                if (!success) {
-                    evictRouter(routerId);
-                }
-                allSucceeded &= success;
+                allSucceeded &= reloadGraph(routerId, preEvict, force);
             }
         }
         return allSucceeded;
+    }
+
+    /**
+     * Reload a registered graph. If the reload fails, evict (remove) the graph.
+     * 
+     * @param routerId ID of the router
+     * @param preEvict When true, release the existing graph (if any) before loading. This will
+     *        halve the amount of memory needed for the operation, but routing will be unavailable
+     *        for that graph during the load process
+     * @param force When true, force a reload. If false, only check if the source has been modified,
+     *        and reload if so.
+     * @return True if the reload is successful, false otherwise.
+     */
+    public boolean reloadGraph(String routerId, boolean preEvict, boolean force) {
+        synchronized (graphSources) {
+            GraphSource graphSource = graphSources.get(routerId);
+            if (graphSource == null) {
+                return false;
+            }
+            boolean success = graphSource.reload(force, preEvict);
+            if (!success) {
+                evictRouter(routerId);
+            }
+            return success;
+        }
     }
 
     /** @return a collection of all valid router IDs for this server */
@@ -179,9 +193,6 @@ public class GraphService {
                     "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
                     routerId);
             return false;
-        }
-        if (routerLifecycleManager != null) {
-            graphSource.setRouterLifecycleManager(routerLifecycleManager);
         }
         graphSource.reload(true, false);
         if (graphSource.getRouter() == null) {

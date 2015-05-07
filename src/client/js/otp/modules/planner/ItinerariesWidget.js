@@ -174,7 +174,7 @@ otp.widgets.ItinerariesWidget =
             var stopId = itin.getFirstStopID();
             _.extend(params, {
                 startTransitStopId :  stopId,
-                date : this_.module.date,
+                date: moment(this_.module.date, otp.config.locale.time.date_format).format("MM-DD-YYYY"),
                 time : serviceBreakTime,
                 arriveBy : false
             });
@@ -221,7 +221,7 @@ otp.widgets.ItinerariesWidget =
             var stopId = itin.getFirstStopID();
             _.extend(params, {
                 startTransitStopId :  stopId,
-                date : moment(this_.module.date, "MM-DD-YYYY").add('days', 1).format("MM-DD-YYYY"),
+                date : moment(this_.module.date, otp.config.locale.time.date_format).add('days', 1).format("MM-DD-YYYY"),
                 time : serviceBreakTime,
                 arriveBy : true
             });
@@ -553,8 +553,13 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
 
+            var stopHtml = '<div class="otp-itin-leg-endpointDescSub">';
+            if( typeof leg.from.stopCode != 'undefined' ) {
+                stopHtml += _tr("Stop") + ' #'+leg.from.stopCode+ ' ';
+            }
+            stopHtml += '[<a href="#">' + _tr("Stop Viewer") +'</a>]</div>';
 
-            $('<div class="otp-itin-leg-endpointDescSub">' + _tr("Stop") + ' #'+leg.from.stopId.id+' [<a href="#">' + _tr("Stop Viewer") +'</a>]</div>')
+            $(stopHtml)
             .appendTo(legDiv)
             .click(function(evt) {
                 if(!this_.module.stopViewerWidget) {

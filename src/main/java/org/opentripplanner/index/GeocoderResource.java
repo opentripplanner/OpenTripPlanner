@@ -5,6 +5,7 @@ import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -36,9 +37,24 @@ public class GeocoderResource {
         }
     }
 
+    /**
+     * Geocode using data using the OTP graph for stops, clusters and street names
+     *
+     * @param query The query string we want to geocode
+     * @param autocomplete Whether we should use the query string to do a prefix match
+     * @param stops Search for stops, either by name or stop code
+     * @param clusters Search for clusters by their name
+     * @param corners Search for street corners using at least one of the street names
+     * @return list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet client
+     */
     @GET
-    public Response textSearch (@QueryParam("query") String query) {
-        return Response.status(Response.Status.OK).entity(index.query(query)).build();
+    public Response textSearch (@QueryParam("query") String query,
+                                @QueryParam("autocomplete") @DefaultValue("false") boolean autocomplete,
+                                @QueryParam("stops") @DefaultValue("true") boolean stops,
+                                @QueryParam("clusters") @DefaultValue("false") boolean clusters,
+                                @QueryParam("corners") @DefaultValue("true") boolean corners
+                                ) {
+        return Response.status(Response.Status.OK).entity(index.query(query, autocomplete, stops, clusters, corners)).build();
     }
 
 }

@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.io.File;
-import java.util.Random;
 
 import junit.framework.TestCase;
 
@@ -32,7 +31,7 @@ import org.opentripplanner.util.TestUtils;
 
 public class TestAStar extends TestCase {
     
-    GenericAStar aStar = new GenericAStar();
+    AStar aStar = new AStar();
 
     public void testBasic() throws Exception {
 

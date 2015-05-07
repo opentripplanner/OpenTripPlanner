@@ -12,6 +12,9 @@ import com.google.common.collect.Maps;
  * Each block is 64 64-bit longs. At 512 bytes long, it tracks 4096 IDs.
  * Node numbers in OSM tend to be contiguous so maybe the blocks should be bigger.
  * Disabled debug statements have no measurable effect on speed (verified).
+ *
+ * MapDB TreeSets are much faster than MapDB HashSets, but in-memory NodeTrackers are
+ * much faster than MapDB TreeSets.
  */
 public class NodeTracker {
 

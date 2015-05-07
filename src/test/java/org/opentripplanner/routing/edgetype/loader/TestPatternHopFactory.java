@@ -34,9 +34,10 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -62,7 +63,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class TestPatternHopFactory extends TestCase {
 
     private Graph graph;
-    private GenericAStar aStar = new GenericAStar();
+    private AStar aStar = new AStar();
     private GtfsContext context;
 
     public void setUp() throws Exception {
@@ -74,7 +75,7 @@ public class TestPatternHopFactory extends TestCase {
         factory.run(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
         
-        String[] stops = {"agency:A", "agency:B", "agency:C", "agency:D", "agency:E"};
+        String[] stops = {"agency:A", "agency:B", "agency:C", "agency:D", "agency:E", "agency:entrance_a", "agency:entrance_b"};
         for (int i = 0; i < stops.length; ++i) {
             TransitStop stop = (TransitStop) (graph.getVertex(stops[i]));
             
@@ -85,8 +86,11 @@ public class TestPatternHopFactory extends TestCase {
             StreetEdge street2 = new StreetEdge(back, front, GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "street", 100, StreetTraversalPermission.ALL, true);
         }
 
-        NetworkLinker nl = new NetworkLinker(graph);
-        nl.createLinkage();
+        StreetLinkerModule ttsnm = new StreetLinkerModule();
+        //Linkers aren't run otherwise
+        graph.hasStreets = true;
+        graph.hasTransit = true;
+        ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
     }
 
     public void testAnnotation() {
@@ -435,8 +439,8 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testWheelchairAccessible() throws Exception {
-        Vertex near_a = graph.getVertex("near_1_agency_A");
-        Vertex near_b = graph.getVertex("near_1_agency_B");
+        Vertex near_a = graph.getVertex("near_1_agency_entrance_a");
+        Vertex near_b = graph.getVertex("near_1_agency_entrance_b");
         Vertex near_c = graph.getVertex("near_1_agency_C");
         Vertex near_e = graph.getVertex("near_1_agency_E");
 

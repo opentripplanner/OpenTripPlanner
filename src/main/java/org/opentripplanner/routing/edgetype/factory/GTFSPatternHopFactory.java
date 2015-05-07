@@ -37,19 +37,19 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -81,6 +81,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.HashMultimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -157,14 +158,13 @@ class IndexedLineSegment {
     int index;
     Coordinate start;
     Coordinate end;
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     private double lineLength;
 
     public IndexedLineSegment(int index, Coordinate start, Coordinate end) {
         this.index = index;
         this.start = start;
         this.end = end;
-        this.lineLength = distanceLibrary.fastDistance(start, end);
+        this.lineLength = SphericalDistanceLibrary.fastDistance(start, end);
     }
 
     // in radians
@@ -179,7 +179,7 @@ class IndexedLineSegment {
     }
 
     double crossTrackError(Coordinate coord) {
-        double distanceFromStart = distanceLibrary.fastDistance(start, coord);
+        double distanceFromStart = SphericalDistanceLibrary.fastDistance(start, coord);
         double bearingToCoord = bearing(start, coord);
         double bearingToEnd = bearing(start, end);
         return FastMath.asin(FastMath.sin(distanceFromStart / RADIUS)
@@ -191,8 +191,8 @@ class IndexedLineSegment {
         double cte = crossTrackError(coord);
         double atd = alongTrackDistance(coord, cte);
         double inverseAtd = inverseAlongTrackDistance(coord, -cte);
-        double distanceToStart = distanceLibrary.fastDistance(coord, start);
-        double distanceToEnd = distanceLibrary.fastDistance(coord, end);
+        double distanceToStart = SphericalDistanceLibrary.fastDistance(coord, start);
+        double distanceToEnd = SphericalDistanceLibrary.fastDistance(coord, end);
 
         if (distanceToStart < distanceToEnd) {
             //we might be behind the line start
@@ -216,7 +216,7 @@ class IndexedLineSegment {
     }
 
     private double inverseAlongTrackDistance(Coordinate coord, double inverseCrossTrackError) {
-        double distanceFromEnd = distanceLibrary.fastDistance(end, coord);
+        double distanceFromEnd = SphericalDistanceLibrary.fastDistance(end, coord);
         double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromEnd / RADIUS)
             / FastMath.cos(inverseCrossTrackError / RADIUS))
             * RADIUS;
@@ -225,8 +225,8 @@ class IndexedLineSegment {
 
     public double fraction(Coordinate coord) {
         double cte = crossTrackError(coord);
-        double distanceToStart = distanceLibrary.fastDistance(coord, start);
-        double distanceToEnd = distanceLibrary.fastDistance(coord, end);
+        double distanceToStart = SphericalDistanceLibrary.fastDistance(coord, start);
+        double distanceToEnd = SphericalDistanceLibrary.fastDistance(coord, end);
 
         if (cte < distanceToStart && cte < distanceToEnd) {
             double atd = alongTrackDistance(coord, cte);
@@ -241,7 +241,7 @@ class IndexedLineSegment {
     }
 
     private double alongTrackDistance(Coordinate coord, double crossTrackError) {
-        double distanceFromStart = distanceLibrary.fastDistance(start, coord);
+        double distanceFromStart = SphericalDistanceLibrary.fastDistance(start, coord);
         double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromStart / RADIUS)
             / FastMath.cos(crossTrackError / RADIUS))
             * RADIUS;
@@ -286,13 +286,11 @@ public class GTFSPatternHopFactory {
     
     private FareServiceFactory fareServiceFactory;
 
-    private Map<StopPattern, TripPattern> tripPatterns = Maps.newHashMap();
+    private Multimap<StopPattern, TripPattern> tripPatterns = HashMultimap.create();
 
     private GtfsStopContext context = new GtfsStopContext();
 
-    private int defaultStreetToStopTime;
-
-    private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    public int subwayAccessTime = 0;
 
     private double maxStopToShapeSnapDistance = 150;
 
@@ -311,7 +309,7 @@ public class GTFSPatternHopFactory {
         if (fareServiceFactory == null) {
             fareServiceFactory = new DefaultFareServiceFactory();
         }
-        fareServiceFactory.setDao(_dao);
+        fareServiceFactory.processGtfs(_dao);
         
         // TODO: Why are we loading stops? The Javadoc above says this method assumes stops are aleady loaded.
         loadStops(graph);
@@ -348,7 +346,7 @@ public class GTFSPatternHopFactory {
         /* The hops don't actually exist when we build their geometries, but we have to build their geometries
          * below, before we throw away the modified stopTimes, saving only the tripTimes (which don't have enough
          * information to build a geometry). So we keep them here.
-         * 
+         *
          *  A trip pattern actually does not have a single geometry, but one per hop, so we store an array.
          *  FIXME _why_ doesn't it have a single geometry?
          */
@@ -381,13 +379,18 @@ public class GTFSPatternHopFactory {
                 continue TRIP;
             }
 
+            /* Try to get the direction id for the trip, set to -1 if not found */
+            int directionId;
+            try {
+                directionId = Integer.parseInt(trip.getDirectionId());
+            } catch (NumberFormatException e) {
+                LOG.debug("Trip {} does not have direction id, defaults to -1");
+                directionId = -1;
+            }
+
             /* Get the existing TripPattern for this filtered StopPattern, or create one. */
             StopPattern stopPattern = new StopPattern(stopTimes);
-            TripPattern tripPattern = tripPatterns.get(stopPattern);
-            if (tripPattern == null) {
-                tripPattern = new TripPattern(trip.getRoute(), stopPattern);
-                tripPatterns.put(stopPattern, tripPattern);
-            }
+            TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), directionId);
 
             /* Create a TripTimes object for this list of stoptimes, which form one trip. */
             TripTimes tripTimes = new TripTimes(trip, stopTimes, graph.deduplicator);
@@ -421,6 +424,8 @@ public class GTFSPatternHopFactory {
 
         } // end foreach TRIP
         LOG.info("Added {} frequency-based and {} single-trip timetable entries.", freqCount, nonFreqCount);
+        graph.hasFrequencyService = graph.hasFrequencyService || freqCount > 0;
+        graph.hasScheduledService = graph.hasScheduledService || nonFreqCount > 0;
 
         /* Generate unique human-readable names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns.values());
@@ -428,20 +433,31 @@ public class GTFSPatternHopFactory {
         /* Generate unique short IDs for all the TableTripPatterns. */
         TripPattern.generateUniqueIds(tripPatterns.values());
 
-        /* Loop over all new TripPatterns, setting the service codes. */
+        /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns.values()) {
-            tripPattern.makePatternVerticesAndEdges(graph, context);
-            
+            tripPattern.makePatternVerticesAndEdges(graph, context.stationStopNodes);
             // Add the geometries to the hop edges.
             LineString[] geom = geometriesByTripPattern.get(tripPattern);
             if (geom != null) {
                 for (int i = 0; i < tripPattern.hopEdges.length; i++) {
                     tripPattern.hopEdges[i].setGeometry(geom[i]);
                 }
+                // Make a geometry for the whole TripPattern from all its constituent hops.
+                // This happens only if geometry is found in geometriesByTripPattern,
+                // because that means that geometry was created from shapes instead "as crow flies"
+                tripPattern.makeGeometry();
             }
-            // Make a geometry for the whole TripPattern from all its constituent hops.
-            tripPattern.makeGeometry();
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
+
+            /* Iterate over all stops in this pattern recording mode information. */
+            TraverseMode mode = GtfsLibrary.getTraverseMode(tripPattern.route);
+            for (TransitStop tstop : tripPattern.stopVertices) {
+                tstop.addMode(mode);
+                if (mode == TraverseMode.SUBWAY) {
+                    tstop.setStreetToStopTime(subwayAccessTime);
+                }
+            }
+
         }
 
         /* Identify interlined trips and create the necessary edges. */
@@ -459,6 +475,19 @@ public class GTFSPatternHopFactory {
         clearCachedData(); // eh?
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
+    }
+
+    private TripPattern findOrCreateTripPattern(StopPattern stopPattern, Route route, int directionId) {
+        for(TripPattern tripPattern : tripPatterns.get(stopPattern)) {
+            if(tripPattern.route.equals(route) && tripPattern.directionId == directionId) {
+                return tripPattern;
+            }
+        }
+
+        TripPattern tripPattern = new TripPattern(route, stopPattern);
+        tripPattern.directionId = directionId;
+        tripPatterns.put(stopPattern, tripPattern);
+        return tripPattern;
     }
 
     /**
@@ -503,7 +532,7 @@ public class GTFSPatternHopFactory {
             for (TripTimes curr : blockTripTimes) {
                 if (prev != null) {
                     if (prev.getDepartureTime(prev.getNumStops() - 1) > curr.getArrivalTime(0)) {
-                        LOG.error("Trip times within block {} on service {} are not increasing on service {} after trip {}.",
+                        LOG.error("Trip times within block {} are not increasing on service {} after trip {}.",
                                 block.blockId, block.serviceId, prev.trip.getId());
                         continue SERVICE_BLOCK;
                     }
@@ -511,7 +540,7 @@ public class GTFSPatternHopFactory {
                     TripPattern currPattern = patternForTripTimes.get(curr);
                     Stop fromStop = prevPattern.getStop(prevPattern.getStops().size() - 1);
                     Stop toStop   = currPattern.getStop(0);
-                    double teleportationDistance = distanceLibrary.fastDistance(
+                    double teleportationDistance = SphericalDistanceLibrary.fastDistance(
                                         fromStop.getLat(), fromStop.getLon(), toStop.getLat(), toStop.getLon());
                     if (teleportationDistance > 200) {
                         // FIXME Trimet data contains a lot of these -- in their data, two trips sharing a block ID just
@@ -820,7 +849,7 @@ public class GTFSPatternHopFactory {
                     st1.setArrivalTime(st0.getDepartureTime());
                 }
             }
-            double hopDistance = distanceLibrary.fastDistance(
+            double hopDistance = SphericalDistanceLibrary.fastDistance(
                    st0.getStop().getLat(), st0.getStop().getLon(),
                    st1.getStop().getLat(), st1.getStop().getLon());
             double hopSpeed = hopDistance/runningTime;
@@ -894,9 +923,7 @@ public class GTFSPatternHopFactory {
                 context.stationStopNodes.put(stop, new TransitStation(graph, stop));
             } else {
                 TransitStop stopVertex = new TransitStop(graph, stop);
-                stopVertex.setStreetToStopTime(defaultStreetToStopTime);
                 context.stationStopNodes.put(stop, stopVertex);
-
                 if (locationType != 2) {
                     // Add a vertex representing arriving at the stop
                     TransitStopArrive arrive = new TransitStopArrive(graph, stop, stopVertex);
@@ -1117,9 +1144,9 @@ public class GTFSPatternHopFactory {
         
         Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
         Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
-        if (distanceLibrary.fastDistance(startCoord, geometryStartCoord) > maxStopToShapeSnapDistance) {
+        if (SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord) > maxStopToShapeSnapDistance) {
             return false;
-        } else if (distanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance) {
+        } else if (SphericalDistanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance) {
             return false;
         }
         return true;
@@ -1290,7 +1317,7 @@ public class GTFSPatternHopFactory {
      * it's important to provide in-station transfers for fare computation).
      * 
      * This step used to be automatically applied whenever transfers.txt was used to create 
-     * transfers (rathen than or in addition to transfers through the street netowrk), 
+     * transfers (rather than or in addition to transfers through the street netowrk),
      * but has been separated out since it is really a separate process.
      */
     public void createParentStationTransfers () {
@@ -1379,7 +1406,7 @@ public class GTFSPatternHopFactory {
             TransitStationStop fromv = context.stationStopNodes.get(transfer.getFromStop());
             TransitStationStop tov = context.stationStopNodes.get(transfer.getToStop());
 
-            double distance = distanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
+            double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
             int time;
             if (transfer.getTransferType() == 2) {
                 time = transfer.getMinTransferTime();
@@ -1393,14 +1420,6 @@ public class GTFSPatternHopFactory {
             LineString geometry = _geometryFactory.createLineString(sequence);
             transferEdge.setGeometry(geometry);
         }
-    }
-
-    public int getDefaultStreetToStopTime() {
-        return defaultStreetToStopTime;
-    }
-
-    public void setDefaultStreetToStopTime(int defaultStreetToStopTime) {
-        this.defaultStreetToStopTime = defaultStreetToStopTime;
     }
 
     public void setStopContext(GtfsStopContext context) {

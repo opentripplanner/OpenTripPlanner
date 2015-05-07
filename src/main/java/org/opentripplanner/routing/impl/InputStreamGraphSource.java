@@ -19,15 +19,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.standalone.Router;
-import org.opentripplanner.standalone.Router.LifecycleManager;
-import org.opentripplanner.updater.PropertiesPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +42,6 @@ import com.google.common.io.ByteStreams;
 public class InputStreamGraphSource implements GraphSource {
 
     public static final String GRAPH_FILENAME = "Graph.obj";
-
-    public static final String CONFIG_FILENAME = "Graph.properties";
 
     private static final Logger LOG = LoggerFactory.getLogger(InputStreamGraphSource.class);
 
@@ -66,12 +65,10 @@ public class InputStreamGraphSource implements GraphSource {
     /**
      * The current used input stream implementation for getting graph data source.
      */
-    private GraphInputStream graphInputStream;
+    private Streams streams;
 
     // TODO Why do we need a factory? There is a single one implementation.
     private StreetVertexIndexFactory streetVertexIndexFactory = new DefaultStreetVertexIndexFactory();
-
-    private Router.LifecycleManager routerLifecycleManager;
 
     /**
      * @param routerId
@@ -81,7 +78,7 @@ public class InputStreamGraphSource implements GraphSource {
      */
     public static InputStreamGraphSource newFileGraphSource(String routerId, File path,
             LoadLevel loadLevel) {
-        return new InputStreamGraphSource(routerId, loadLevel, new FileGraphInputStream(path));
+        return new InputStreamGraphSource(routerId, loadLevel, new FileStreams(path));
     }
 
     /**
@@ -93,19 +90,14 @@ public class InputStreamGraphSource implements GraphSource {
      */
     public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path,
             LoadLevel loadLevel) {
-        return new InputStreamGraphSource(routerId, loadLevel, new ClasspathGraphInputStream(path));
+        return new InputStreamGraphSource(routerId, loadLevel, new ClasspathStreams(path));
     }
 
     private InputStreamGraphSource(String routerId, LoadLevel loadLevel,
-            GraphInputStream graphInputStream) {
+            Streams streams) {
         this.routerId = routerId;
         this.loadLevel = loadLevel;
-        this.graphInputStream = graphInputStream;
-    }
-
-    @Override
-    public void setRouterLifecycleManager(LifecycleManager routerLifecycleManager) {
-        this.routerLifecycleManager = routerLifecycleManager;
+        this.streams = streams;
     }
 
     @Override
@@ -125,14 +117,15 @@ public class InputStreamGraphSource implements GraphSource {
     public boolean reload(boolean force, boolean preEvict) {
         /* We synchronize on 'this' to prevent multiple reloads from being called at the same time */
         synchronized (this) {
-            long lastModified = graphInputStream.getLastModified();
+            long lastModified = streams.getLastModified();
             boolean doReload = force ? true : checkAutoReload(lastModified);
             if (!doReload)
                 return true;
             if (preEvict) {
                 synchronized (preEvictMutex) {
-                    if (router != null && routerLifecycleManager != null) {
-                        routerLifecycleManager.shutdownRouter(router);
+                    if (router != null) {
+                        LOG.info("Reloading '{}': pre-evicting router", routerId);
+                        router.shutdown();
                     }
                     /*
                      * Forcing router to null here should remove any references to the graph once
@@ -146,16 +139,17 @@ public class InputStreamGraphSource implements GraphSource {
                 Router newRouter = loadGraph();
                 if (newRouter != null) {
                     // Load OK
-                    if (router != null && routerLifecycleManager != null) {
-                        routerLifecycleManager.shutdownRouter(router);
+                    if (router != null) {
+                        LOG.info("Reloading '{}': post-evicting router", routerId);
+                        router.shutdown();
                     }
                     router = newRouter; // Assignment in java is atomic
                 } else {
                     // Load failed
                     if (force || router == null) {
                         LOG.warn("Unable to load data for router '{}'.", routerId);
-                        if (router != null && routerLifecycleManager != null) {
-                            routerLifecycleManager.shutdownRouter(router);
+                        if (router != null) {
+                            router.shutdown();
                         }
                         router = null;
                     } else {
@@ -203,9 +197,7 @@ public class InputStreamGraphSource implements GraphSource {
     public void evict() {
         synchronized (this) {
             if (router != null) {
-                if (routerLifecycleManager != null) {
-                    routerLifecycleManager.shutdownRouter(router);
-                }
+                router.shutdown();
                 router = null;
             }
         }
@@ -214,12 +206,10 @@ public class InputStreamGraphSource implements GraphSource {
     /**
      * Do the actual operation of graph loading. Load configuration if present, and startup the
      * router with the help of the router lifecycle manager.
-     * 
-     * @return
      */
     private Router loadGraph() {
         final Graph newGraph;
-        try (InputStream is = graphInputStream.getGraphInputStream()) {
+        try (InputStream is = streams.getGraphInputStream()) {
             LOG.info("Loading graph...");
             try {
                 newGraph = Graph.load(new ObjectInputStream(is), loadLevel,
@@ -236,17 +226,23 @@ public class InputStreamGraphSource implements GraphSource {
             return null;
         }
 
-        // Decorate the graph. Even if a config file is not present
-        // one could be bundled inside.
-        try (InputStream is = graphInputStream.getConfigInputStream()) {
-            Preferences config = is == null ? null : new PropertiesPreferences(is);
-            Router newRouter = new Router(routerId, newGraph);
-            if (routerLifecycleManager != null) {
-                routerLifecycleManager.startupRouter(newRouter, config);
+        // Decorate the graph TODO how are we "decorating" it? This appears to refer to loading its configuration.
+        // Even if a config file is not present on disk one could be bundled inside.
+        try (InputStream is = streams.getConfigInputStream()) {
+            JsonNode config = MissingNode.getInstance();
+            if (is != null) {
+                // TODO reuse the exact same JSON loader from OTPConfigurator
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+                mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+                config = mapper.readTree(is);
             }
+            Router newRouter = new Router(routerId, newGraph);
+            newRouter.startup(config);
             return newRouter;
         } catch (IOException e) {
-            LOG.error("Can't read config file", e);
+            LOG.error("Can't read config file.");
+            LOG.error(e.getMessage());
             return null;
         }
     }
@@ -254,8 +250,10 @@ public class InputStreamGraphSource implements GraphSource {
     /**
      * InputStreamGraphSource delegates to some actual implementation the fact of getting the input
      * stream and checking the last modification timestamp for a given routerId.
+     * FIXME this seems like a lot of boilerplate just to switch between FileInputStream and getResourceAsStream
+     * a couple of conditional blocks and a boolean field "onClasspath" might do the trick.
      */
-    private interface GraphInputStream {
+    private interface Streams {
         public abstract InputStream getGraphInputStream() throws IOException;
 
         public abstract InputStream getConfigInputStream() throws IOException;
@@ -263,11 +261,11 @@ public class InputStreamGraphSource implements GraphSource {
         public abstract long getLastModified();
     }
 
-    private static class FileGraphInputStream implements GraphInputStream {
+    private static class FileStreams implements Streams {
 
         private File path;
 
-        private FileGraphInputStream(File path) {
+        private FileStreams(File path) {
             this.path = path;
         }
 
@@ -280,7 +278,7 @@ public class InputStreamGraphSource implements GraphSource {
 
         @Override
         public InputStream getConfigInputStream() throws IOException {
-            File configFile = new File(path, CONFIG_FILENAME);
+            File configFile = new File(path, Router.ROUTER_CONFIG_FILENAME);
             if (configFile.canRead()) {
                 LOG.debug("Loading config from file '{}'", configFile.getPath());
                 return new FileInputStream(configFile);
@@ -296,11 +294,11 @@ public class InputStreamGraphSource implements GraphSource {
         }
     }
 
-    private static class ClasspathGraphInputStream implements GraphInputStream {
+    private static class ClasspathStreams implements Streams {
 
         private File path;
 
-        private ClasspathGraphInputStream(File path) {
+        private ClasspathStreams(File path) {
             this.path = path;
         }
 
@@ -314,7 +312,7 @@ public class InputStreamGraphSource implements GraphSource {
 
         @Override
         public InputStream getConfigInputStream() {
-            File configFile = new File(path, CONFIG_FILENAME);
+            File configFile = new File(path, Router.ROUTER_CONFIG_FILENAME);
             LOG.debug("Trying to load config on classpath at '{}'", configFile.getPath());
             return Thread.currentThread().getContextClassLoader()
                     .getResourceAsStream(configFile.getPath());
@@ -332,8 +330,6 @@ public class InputStreamGraphSource implements GraphSource {
 
     /**
      * A GraphSource factory creating InputStreamGraphSource from file.
-     * 
-     * @see FileGraphSource
      */
     public static class FileFactory implements GraphSource.Factory {
 

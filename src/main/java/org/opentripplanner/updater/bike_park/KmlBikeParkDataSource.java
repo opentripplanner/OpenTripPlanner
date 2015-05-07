@@ -18,9 +18,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.PreferencesConfigurable;
+import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +36,15 @@ import org.slf4j.LoggerFactory;
  * @author laurent
  * @author GoAbout
  */
-public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesConfigurable {
+public class KmlBikeParkDataSource implements BikeParkDataSource, JsonConfigurable {
 
     private static final Logger LOG = LoggerFactory.getLogger(KmlBikeParkDataSource.class);
 
     private String url;
 
     private String namePrefix = null;
+
+    private boolean zip;
 
     private XmlDataListDownloader<BikePark> xmlDownloader;
 
@@ -50,7 +53,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
     public KmlBikeParkDataSource() {
         xmlDownloader = new XmlDataListDownloader<BikePark>();
         xmlDownloader
-                .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']");
+                .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']|//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Folder']/*[local-name()='Placemark']");
         xmlDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<BikePark>() {
             @Override
             public BikePark build(Map<String, String> attributes) {
@@ -77,14 +80,6 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
         });
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public void setNamePrefix(String namePrefix) {
-        this.namePrefix = namePrefix;
-    }
-
     /**
      * Update the data from the source;
      * 
@@ -92,7 +87,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
      */
     @Override
     public boolean update() {
-        List<BikePark> newBikeParks = xmlDownloader.download(url);
+        List<BikePark> newBikeParks = xmlDownloader.download(url, zip);
         if (newBikeParks != null) {
             synchronized (this) {
                 // Update atomically
@@ -114,11 +109,15 @@ public class KmlBikeParkDataSource implements BikeParkDataSource, PreferencesCon
     }
 
     @Override
-    public void configure(Graph graph, Preferences preferences) {
-        String url = preferences.get("url", null);
-        if (url == null)
+    public void configure (Graph graph, JsonNode config) {
+        String url = config.path("url").asText();
+        if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
-        setUrl(url);
-        setNamePrefix(preferences.get("namePrefix", null));
+        }
+        this.url = url;
+        this.namePrefix = config.path("namePrefix").asText();
+        this.zip = "true".equals(config.path("zip").asText());
     }
+
+    public void setUrl (String url) {this.url = url;}
 }

@@ -40,6 +40,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.*;
 import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
@@ -61,6 +62,7 @@ import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -158,10 +160,11 @@ public class Graph implements Serializable {
     /** The density center of the graph for determining the initial geographic extent in the client. */
     private Coordinate center = null;
 
-    /**
-     * Makes it possible to embed a default configuration inside a graph.
-     */
-    public Properties embeddedPreferences = null;
+    /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
+    public String builderConfig = null;
+
+    /** Embed a router configuration inside the graph, for starting up with a single file. */
+    public String routerConfig = null;
 
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;
@@ -187,6 +190,12 @@ public class Graph implements Serializable {
 
     /** True if direct single-edge transfers were generated between transit stops in this Graph. */
     public boolean hasDirectTransfers = false;
+
+    /** True if frequency-based services exist in this Graph (GTFS frequencies with exact_times = 0). */
+    public boolean hasFrequencyService = false;
+
+    /** True if schedule-based services exist in this Graph (including GTFS frequencies with exact_times = 1). */
+    public boolean hasScheduledService = false;
 
     public Graph(Graph basedOn) {
         this();
@@ -224,6 +233,43 @@ public class Graph implements Serializable {
             LOG.error(
                     "attempting to remove vertex that is not in graph (or mapping value was null): {}",
                     v);
+        }
+    }
+
+    /**
+     * Removes an edge from the graph. This method is not thread-safe.
+     * @param e The edge to be removed
+     */
+    public void removeEdge(Edge e) {
+        if (e != null) {
+            synchronized (alertPatches) {   // This synchronization is somewhat silly because this
+                alertPatches.remove(e);     // method isn't thread-safe anyway, but it is consistent
+            }
+
+            turnRestrictions.remove(e);
+            streetNotesService.removeStaticNotes(e);
+            edgeById.remove(e.getId());
+
+            if (e instanceof EdgeWithCleanup) ((EdgeWithCleanup) e).detach();
+
+            if (e.fromv != null) {
+                e.fromv.removeOutgoing(e);
+
+                for (Edge otherEdge : e.fromv.getIncoming()) {
+                    for (TurnRestriction turnRestriction : getTurnRestrictions(otherEdge)) {
+                        if (turnRestriction.to == e) {
+                            removeTurnRestriction(otherEdge, turnRestriction);
+                        }
+                    }
+                }
+
+                e.fromv = null;
+            }
+
+            if (e.tov != null) {
+                e.tov.removeIncoming(e);
+                e.tov = null;
+            }
         }
     }
 
@@ -440,7 +486,19 @@ public class Graph implements Serializable {
         if (!containsVertex(vertex)) {
             throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
-        vertex.removeAllEdges();
+
+        /*
+         * Note: We have to handle the removal of looping edges (for example RentABikeOn/OffEdge),
+         * we use a set to prevent having multiple times the same edge.
+         */
+        Set<Edge> edges = new HashSet<Edge>(vertex.getDegreeIn() + vertex.getDegreeOut());
+        edges.addAll(vertex.getIncoming());
+        edges.addAll(vertex.getOutgoing());
+
+        for (Edge edge : edges) {
+            removeEdge(edge);
+        }
+
         this.remove(vertex);
     }
 

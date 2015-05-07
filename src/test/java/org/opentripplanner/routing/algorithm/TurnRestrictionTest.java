@@ -111,7 +111,7 @@ public class TurnRestrictionTest {
         options.walkSpeed = 1.0;
 
         options.setRoutingContext(_graph, topRight, bottomLeft);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
         assertNotNull(path);
@@ -136,7 +136,7 @@ public class TurnRestrictionTest {
         options.walkSpeed = 1.0;
         
         options.setRoutingContext(_graph, topRight, bottomLeft);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
         assertNotNull(path);
@@ -161,33 +161,7 @@ public class TurnRestrictionTest {
         options.carSpeed = 1.0;
 
         options.setRoutingContext(_graph, topRight, bottomLeft);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
-
-        GraphPath path = tree.getPath(bottomLeft, false);
-        assertNotNull(path);
-
-        // If not for turn restrictions, the shortest path would be to take 1st to Main,
-        // Main to 2nd, 2nd to Broad and Broad until the corner of Broad and 3rd.
-        // However, most of these turns are not allowed. Instead, the shortest allowed
-        // path is 1st to Broad, Broad to 3rd.
-
-        List<State> states = path.states;
-        assertEquals(5, states.size());
-
-        assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-        assertEquals("main_1st", states.get(1).getVertex().getLabel());
-        assertEquals("broad_1st", states.get(2).getVertex().getLabel());
-        assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-        assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
-    }
-
-    @Test
-    public void testForwardAsCustomMotorVehicle() {
-        RoutingRequest options = new RoutingRequest(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        options.carSpeed = 1.0;
-
-        options.setRoutingContext(_graph, topRight, bottomLeft);
-        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+        ShortestPathTree tree = new AStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(bottomLeft, false);
         assertNotNull(path);
@@ -218,10 +192,6 @@ public class TurnRestrictionTest {
 
     /**
      * Create an edge. If twoWay, create two edges (back and forth).
-     * 
-     * @param vA
-     * @param vB
-     * @param length
      * @param back true if this is a reverse edge
      */
     private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
@@ -239,7 +209,7 @@ public class TurnRestrictionTest {
 
     private void DisallowTurn(StreetEdge from, StreetEdge to) {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
-        TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.CUSTOM_MOTOR_VEHICLE);
+        TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
         TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
         _graph.addTurnRestriction(from, restrict);
     }

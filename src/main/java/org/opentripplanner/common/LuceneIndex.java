@@ -19,12 +19,15 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -80,6 +83,10 @@ public class LuceneIndex {
             for (Stop stop : graphIndex.stopForId.values()) {
                 addStop(writer, stop);
             }
+            graphIndex.clusterStopsAsNeeded();
+            for (StopCluster stopCluster : graphIndex.stopClusterForId.values()) {
+                addCluster(writer, stopCluster);
+            }
             for (StreetVertex sv : Iterables.filter(graphIndex.vertexForId.values(), StreetVertex.class)) {
                 addCorner(writer, sv);
             }
@@ -103,6 +110,16 @@ public class LuceneIndex {
         doc.add(new DoubleField("lon", stop.getLon(), Field.Store.YES));
         doc.add(new StringField("id", stop.getId().toString(), Field.Store.YES));
         doc.add(new StringField("category", Category.STOP.name(), Field.Store.YES));
+        iwriter.addDocument(doc);
+    }
+
+    private void addCluster(IndexWriter iwriter, StopCluster stopCluster) throws IOException {
+        Document doc = new Document();
+        doc.add(new TextField("name", stopCluster.name, Field.Store.YES));
+        doc.add(new DoubleField("lat", stopCluster.lat, Field.Store.YES));
+        doc.add(new DoubleField("lon", stopCluster.lon, Field.Store.YES));
+        doc.add(new StringField("id", stopCluster.id, Field.Store.YES));
+        doc.add(new StringField("category", Category.CLUSTER.name(), Field.Store.YES));
         iwriter.addDocument(doc);
     }
 
@@ -132,12 +149,46 @@ public class LuceneIndex {
         }
     }
 
-    /** Return a list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet client. */
-    public List<LuceneResult> query (String queryString) {
-        /* Turn the query string into a Lucene query. Terms are fuzzy and should all be present. */
+    /** Fetch results for the geocoder using the OTP graph for stops, clusters and street names
+     *
+     * @param queryString
+     * @param autocomplete Whether we should use the query string to do a prefix match
+     * @param stops Search for stops, either by name or stop code
+     * @param clusters Search for clusters by their name
+     * @param corners Search for street corners using at least one of the street names
+     * @return list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet client
+     */
+    public List<LuceneResult> query (String queryString, boolean autocomplete,
+                                     boolean stops, boolean clusters, boolean corners) {
+        /* Turn the query string into a Lucene query.*/
         BooleanQuery query = new BooleanQuery();
+        BooleanQuery termQuery = new BooleanQuery();
         for (String term : queryString.split(" ")) {
-            query.add(new FuzzyQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
+            /* PrefixQuery matches all strings that start with the query string */
+            if (autocomplete) {
+                termQuery.add(new PrefixQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
+            /* FuzzyQuery matches with all string stat are maximum 2 edits away from the query sring */
+            } else {
+                termQuery.add(new FuzzyQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
+            }
+            /* TermQuery matches if the string is equal to the query string.
+             This makes it possible to search for a stop code */
+            termQuery.add(new TermQuery(new Term("code", term)), BooleanClause.Occur.SHOULD);
+        }
+
+        query.add(termQuery, BooleanClause.Occur.MUST);
+        if (stops || clusters || corners) {
+            BooleanQuery typeQuery = new BooleanQuery();
+            if (stops) {
+                typeQuery.add(new TermQuery(new Term("category", Category.STOP.name())), BooleanClause.Occur.SHOULD);
+            }
+            if (clusters) {
+                typeQuery.add(new TermQuery(new Term("category", Category.CLUSTER.name())), BooleanClause.Occur.SHOULD);
+            }
+            if (corners) {
+                typeQuery.add(new TermQuery(new Term("category", Category.CORNER.name())), BooleanClause.Occur.SHOULD);
+            }
+            query.add(typeQuery, BooleanClause.Occur.MUST);
         }
         List<LuceneResult> result = Lists.newArrayList();
         try {
@@ -150,8 +201,18 @@ public class LuceneIndex {
                 lr.lat = doc.getField("lat").numericValue().doubleValue();
                 lr.lng = doc.getField("lon").numericValue().doubleValue();
                 String category = doc.getField("category").stringValue().toLowerCase();
+                String code;
+                if (doc.getField("code") != null){
+                    code = "(" + doc.getField("code").stringValue() + ")";
+                } else {
+                    code = "";
+                }
+                if (doc.getField("category").stringValue().equals(Category.STOP.name()) ||
+                        doc.getField("category").stringValue().equals(Category.CLUSTER.name())) {
+                    lr.id = doc.getField("id").stringValue();
+                }
                 String name = doc.getField("name").stringValue();
-                lr.description = category + " " + name;
+                lr.description = category + " " + name + " " + code;
                 result.add(lr);
             }
         } catch (Exception ex) {
@@ -167,8 +228,9 @@ public class LuceneIndex {
         public double lat;
         public double lng;
         public String description;
+        public String id;
     }
 
-    public static enum Category { STOP, CORNER; }
+    public static enum Category { STOP, CORNER, CLUSTER; }
 }
 

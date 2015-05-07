@@ -24,7 +24,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.FileCsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
-import org.opentripplanner.graph_builder.impl.DownloadableGtfsInputSource;
+import org.opentripplanner.graph_builder.module.DownloadableGtfsInputSource;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class GtfsBundle {
 
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
 
-    private int defaultStreetToStopTime;
+    public int subwayAccessTime;
 
     private double maxStopToShapeSnapDistance = 150;
 
@@ -182,14 +182,6 @@ public class GtfsBundle {
         this.transfersTxtDefinesStationPaths = transfersTxtDefinesStationPaths;
     }
 
-    public int getDefaultStreetToStopTime() {
-        return defaultStreetToStopTime;
-    }
-
-    public void setDefaultStreetToStopTime(int time) {
-        defaultStreetToStopTime = time;
-    }
-    
     public void checkInputs() {
         if (csvInputSource != null) {
             LOG.warn("unknown CSV source type; cannot check inputs");

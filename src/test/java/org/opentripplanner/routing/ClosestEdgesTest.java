@@ -140,27 +140,8 @@ public class ClosestEdgesTest {
         checkClosestEdgeModes(loc, reqs, 2);
     }
 
-    @Test
-    public void testInteriorEdgeCase() {
-        // Lies smack in the middle of the box
-        Coordinate c = new Coordinate(-74.005, 40.005);
-        GenericLocation loc = new GenericLocation(c);
-        TraversalRequirements reqs = new TraversalRequirements();
-
-        // Should only return 2 edges even though all edges are equidistant.
-        // TODO(flamholz): this doesn't feel like the right behavior to me.
-        // Consider fixing it.
-        CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
-        assertEquals(2, edges.size());
-    }
-
     /**
      * Checks that the best edge found is this one and that the number of edges found matches.
-     * 
-     * @param reqs
-     * @param loc
-     * @param expectedBest
-     * @param expectedCandidates
      */
     private void checkBest(TraversalRequirements reqs, GenericLocation loc,
             StreetEdge expectedBest, int expectedCandidates) {

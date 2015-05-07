@@ -21,23 +21,23 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.algorithm.TraverseVisitor;
+import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.OnBoardDepartService;
-import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -54,16 +54,15 @@ import java.util.Set;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
- * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph. Includes things like
- * (temporary) endpoint vertices, transfer tables, service day caches, etc.
- * 
- * @author abyrd
+ * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
+ * Includes things like (temporary) endpoint vertices, transfer tables, service day caches, etc.
+ *
+ * In addition, while the RoutingRequest should only carry parameters _in_ to the routing operation, the routing context
+ * should be used to carry information back out, such as debug figures or flags that certain thresholds have been exceeded.
  */
 public class RoutingContext implements Cloneable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
-
-    private static RemainingWeightHeuristicFactory heuristicFactory = new DefaultRemainingWeightHeuristicFactoryImpl();
 
     /* FINAL FIELDS */
 
@@ -95,8 +94,8 @@ public class RoutingContext implements Cloneable {
 
     public final TransferTable transferTable;
 
-    /** The timetableSnapshot is a {@link TimetableResolver} for looking up real-time updates. */
-    public final TimetableResolver timetableSnapshot;
+    /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
+    public final TimetableSnapshot timetableSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
@@ -122,7 +121,10 @@ public class RoutingContext implements Cloneable {
 
     /** Indicates that the search timed out or was otherwise aborted. */
     public boolean aborted;
-    
+
+    /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
+    public boolean slopeRestrictionRemoved = false;
+
     /* CONSTRUCTORS */
 
     /**
@@ -287,7 +289,7 @@ public class RoutingContext implements Cloneable {
         if (opt.batch)
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         else
-            remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
+            remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
 
         if (this.origin != null) {
             LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());

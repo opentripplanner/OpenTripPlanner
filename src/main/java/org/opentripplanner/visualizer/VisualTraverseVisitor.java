@@ -13,9 +13,8 @@
 
 package org.opentripplanner.visualizer;
 
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 
@@ -24,7 +23,7 @@ public class VisualTraverseVisitor implements TraverseVisitor {
     private ShowGraph gui;
 
     private final int SLEEP_AFTER = 50;
-    private final int SLEEP_LEN = 1;
+    private final int SLEEP_LEN = 2;
     
     private int sleepAfter = SLEEP_AFTER;
     
@@ -40,7 +39,7 @@ public class VisualTraverseVisitor implements TraverseVisitor {
 
     @Override
     public void visitVertex(State state) {
-    	// every SLEEP_AFTER visits of the vertex, sleep for SLEEP_LEN
+    	// every SLEEP_AFTER visits of a vertex, sleep for SLEEP_LEN
     	// this slows down the search so it animates prettily
         if (--sleepAfter <= 0) {
             sleepAfter = SLEEP_AFTER;
@@ -61,16 +60,4 @@ public class VisualTraverseVisitor implements TraverseVisitor {
 //        }
     }
     
-    public GenericAStarFactory getAStarSearchFactory() {
-        return new GenericAStarFactory() {
-
-            @Override
-            public GenericAStar createAStarInstance() {
-                GenericAStar astar = new GenericAStar();
-                astar.setTraverseVisitor(VisualTraverseVisitor.this);
-                return astar;
-            }
-        };
-    }
-
 }

@@ -13,11 +13,7 @@
 
 package org.opentripplanner.api.resource;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import org.opentripplanner.common.MavenVersion;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,12 +21,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.opentripplanner.common.MavenVersion;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 @Path("/")
 @XmlRootElement 
 public class ServerInfo {
+
+    /** Quality value prioritizes MIME types */
     static final String Q = ";qs=0.5";
     
     private static final ServerInfo SERVER_INFO = new ServerInfo();
@@ -41,10 +42,8 @@ public class ServerInfo {
         return SERVER_INFO;
     }    
     
-    /* Fields must be public or have a public getter to be auto-serialized to JSON;
-    they are annotated with @XmlElement to be serialized to XML elements (as opposed to attributes).
-    Adding Lombok @Getter does not work because the name of the auto-generated getNCores getter 
-    function confuses JSON field capitalization. */
+    // Fields must be public or have a public getter to be auto-serialized to JSON;
+    // they are annotated with @XmlElement to be serialized to XML elements (as opposed to attributes).
 
     @XmlElement 
     public MavenVersion serverVersion = MavenVersion.VERSION; 

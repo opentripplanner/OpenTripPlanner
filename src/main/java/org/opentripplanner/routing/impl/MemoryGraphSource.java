@@ -13,42 +13,32 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.Properties;
-import java.util.prefs.Preferences;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.standalone.Router;
-import org.opentripplanner.standalone.Router.LifecycleManager;
-import org.opentripplanner.updater.PropertiesPreferences;
 
 /**
  * An implementation of GraphSource that store a transient graph in memory.
- * 
  */
 public class MemoryGraphSource implements GraphSource {
 
     private Router router;
 
-    private Preferences config;
+    private JsonNode config;
 
-    private Router.LifecycleManager routerLifecycleManager;
-
+    /** Create an in-memory graph source with no runtime router configuration. */
     public MemoryGraphSource(String routerId, Graph graph) {
-        this(routerId, graph, new PropertiesPreferences(new Properties()));
+        this(routerId, graph, MissingNode.getInstance());
     }
 
-    public MemoryGraphSource(String routerId, Graph graph, Preferences config) {
+    /** Create an in-memory graph source with the specififed runtime router configuration JSON. */
+    public MemoryGraphSource(String routerId, Graph graph, JsonNode config) {
         router = new Router(routerId, graph);
         router.graph.routerId = routerId;
         this.config = config;
-        // We will startup the router later on
-    }
-
-    @Override
-    public void setRouterLifecycleManager(LifecycleManager routerLifecycleManager) {
-        this.routerLifecycleManager = routerLifecycleManager;
-        this.routerLifecycleManager.startupRouter(router, config);
+        // We will start up the router later on (updaters and runtime configuration options)
     }
 
     @Override
@@ -58,19 +48,17 @@ public class MemoryGraphSource implements GraphSource {
 
     @Override
     public boolean reload(boolean force, boolean preEvict) {
-        /*
-         * The method does not make sense for memory-graph, but we want to be able to support it if
-         * we want to mix in-memory graph with file-based graphs.
-         */
+        // "Reloading" does not make sense for memory-graph, but we want to support mixing in-memory and file-based graphs.
+        // Start up graph updaters and apply runtime configuration options
+        // TODO will the updaters be started repeatedly due to reload calls?
+        router.startup(config);
         return true;
     }
 
     @Override
     public void evict() {
         if (router != null) {
-            if (routerLifecycleManager != null) {
-                routerLifecycleManager.shutdownRouter(router);
-            }
+            router.shutdown();
         }
         router = null;
     }

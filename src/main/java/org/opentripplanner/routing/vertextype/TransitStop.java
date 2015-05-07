@@ -19,8 +19,15 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransitStop extends TransitStationStop {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TransitStop.class);
+
+    // Do we actually need a set of modes for each stop?
+    // It's nice to have for the index web API but can be generated on demand.
     private TraverseModeSet modes = new TraverseModeSet();
 
     private static final long serialVersionUID = 1L;
@@ -64,6 +71,11 @@ public class TransitStop extends TransitStationStop {
                 return true;
             }
         }
+        for (Edge e : this.getIncoming()) {
+            if (e instanceof PathwayEdge) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -73,6 +85,7 @@ public class TransitStop extends TransitStationStop {
 
     public void setStreetToStopTime(int streetToStopTime) {
         this.streetToStopTime = streetToStopTime;
+        LOG.debug("Stop {} access time from street level set to {}", this, streetToStopTime);
     }
 
     public TraverseModeSet getModes() {

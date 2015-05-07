@@ -13,14 +13,7 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import junit.framework.TestCase;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.ConstantsForTests;
@@ -36,9 +29,11 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
 
+import java.util.*;
+
 public class TestBanning extends TestCase {
 
-    GenericAStar aStar = new GenericAStar();
+    AStar aStar = new AStar();
 
     public void testBannedRoutes() {
 
@@ -111,8 +106,7 @@ public class TestBanning extends TestCase {
 
         for (int i = 0; i < 20; i++) {
             RoutingRequest options = new RoutingRequest();
-            options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34,
-                    25);
+            options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
             // Pick two random locations
             Vertex start = null;
             Vertex end = null;
@@ -122,7 +116,6 @@ public class TestBanning extends TestCase {
                 end = graph.getVertex("TriMet:" + rand.nextInt(10000));
             options.setRoutingContext(graph, start, end);
             ShortestPathTree spt = null;
-
             int n = rand.nextInt(5) + 3;
             for (int j = 0; j < n; j++) {
                 spt = aStar.getShortestPathTree(options);

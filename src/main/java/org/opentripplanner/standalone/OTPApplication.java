@@ -6,28 +6,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.model.JSONObjectMapperProvider;
-import org.opentripplanner.api.resource.AlertPatcher;
-import org.opentripplanner.api.resource.BikeRental;
-import org.opentripplanner.api.resource.ExternalGeocoderResource;
-import org.opentripplanner.api.resource.GraphInspectorTileResource;
-import org.opentripplanner.api.resource.Metadata;
-import org.opentripplanner.api.resource.Planner;
-import org.opentripplanner.api.resource.PointSetResource;
-import org.opentripplanner.api.resource.ProfileResource;
-import org.opentripplanner.api.resource.Routers;
-import org.opentripplanner.api.resource.ServerInfo;
-import org.opentripplanner.api.resource.LIsochrone;
-import org.opentripplanner.api.resource.LegendResource;
-import org.opentripplanner.api.resource.Raster;
-import org.opentripplanner.api.resource.SIsochrone;
-import org.opentripplanner.api.resource.SimpleIsochrone;
-import org.opentripplanner.api.resource.SurfaceResource;
-import org.opentripplanner.api.resource.TileService;
-import org.opentripplanner.api.resource.TimeGridWs;
+import org.opentripplanner.api.resource.*;
 import org.opentripplanner.index.GeocoderResource;
 import org.opentripplanner.index.IndexAPI;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -85,7 +69,7 @@ public class OTPApplication extends Application {
         Set<Class<?>> classes = Sets.newHashSet();
         classes.addAll(Arrays.asList(
             /* Jersey resource classes: define web services, i.e. an HTTP API. */
-            Planner.class,
+            PlannerResource.class,
             IndexAPI.class,
             ExternalGeocoderResource.class,
             GeocoderResource.class,
@@ -96,7 +80,7 @@ public class OTPApplication extends Application {
             ExternalGeocoderResource.class,
             TimeGridWs.class,
             AlertPatcher.class,
-            Planner.class,
+            PlannerResource.class,
             SIsochrone.class,
             Routers.class,
             Raster.class,
@@ -108,8 +92,12 @@ public class OTPApplication extends Application {
             SurfaceResource.class,
             PointSetResource.class,
             GraphInspectorTileResource.class,
+            ScriptResource.class,
+            UpdaterStatusResource.class,
+            ScenarioResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
-            CorsFilter.class
+            CorsFilter.class,
+            MultiPartFeature.class
         ));
         
         if (this.secure) {

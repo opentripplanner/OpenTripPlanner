@@ -15,13 +15,14 @@ package org.opentripplanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Graph;
 
 public class ConstantsForTests {
@@ -31,15 +32,6 @@ public class ConstantsForTests {
     public static final String PORTLAND_GTFS = "src/test/resources/google_transit.zip";
 
     public static final String FAKE_GTFS = "src/test/resources/testagency.zip";
-
-    public static final String GENERATED_GTFS = "src/test/resources/generated.gtfs.zip";
-
-    public static final double WALKING_SPEED = 1.33; // meters/sec
-                                                     // (http://en.wikipedia.org/wiki/Walking),
-
-    // roughly 3mph
-
-    public static final String NY_GTFS = "src/test/resources/subway.zip";
 
     private static ConstantsForTests instance = null;
 
@@ -88,8 +80,9 @@ public class ConstantsForTests {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        NetworkLinker nl = new NetworkLinker(portlandGraph);
-        nl.createLinkage();
+
+        StreetLinkerModule ttsnm = new StreetLinkerModule();
+        ttsnm.buildGraph(portlandGraph, new HashMap<Class<?>, Object>());
     }
     
     public static Graph buildGraph(String path) {

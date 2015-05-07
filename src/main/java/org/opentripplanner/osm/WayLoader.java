@@ -39,7 +39,7 @@ public class WayLoader extends Parser {
     @Override
     public void handleWay(long id, Way way) {
         /* Skip ways that have no retained tags. */
-        if (way.tagless()) return;
+        if (way.hasNoTags()) return;
         /* Check if any node in this way is marked as being within the geometry. */
         boolean found = false;
         for (long node : way.nodes) {

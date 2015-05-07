@@ -15,6 +15,7 @@ package org.opentripplanner.updater.example;
 
 import java.util.prefs.Preferences;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -53,10 +54,9 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     // The property frequencySec is already read and used by the abstract base class.
     @Override
-    protected void configurePolling(Graph graph, Preferences preferences) throws Exception {
-        url = preferences.get("url", null);
-        LOG.info("Configured example polling updater: frequencySec={} and url={}",
-                frequencySec, url);
+    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
+        url = config.path("url").asText();
+        LOG.info("Configured example polling updater: frequencySec={} and url={}", frequencySec, url);
     }
 
     // Here the updater gets to know its parent manager to execute GraphWriterRunnables.

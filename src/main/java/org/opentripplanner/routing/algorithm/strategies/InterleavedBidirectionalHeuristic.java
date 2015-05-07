@@ -13,11 +13,8 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -27,8 +24,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
-import org.opentripplanner.routing.spt.BasicShortestPathTree;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
@@ -36,19 +32,31 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
 
+/**
+ * Euclidean heuristics are terrible for transit because the maximum transit speed is quite high, especially relative
+ * to the walk speed. Transit can require going away from the destination in Euclidean space to get closer according
+ * to the travel time metric. This heuristic is designed to be good for transit.
+ *
+ * After many experiments embedding transit travel time metrics in tables or low-dimensional Euclidean space I
+ * eventually came to the conclusion that the most efficient structure for representing the metric was already right
+ * in front of us: a graph.
+ *
+ * This heuristic searches backward from the target over the street and transit network, modifying it on the fly to
+ * remove any time-dependent component (e.g. by evaluating all boarding wait times as zero). This produces an
+ * admissible heuristic (which always underestimates path weight) making it valid independent of the clock time.
+ * This is important because you don't know precisely what time you will arrive at the destination until you get there.
+ */
 public class InterleavedBidirectionalHeuristic implements RemainingWeightHeuristic {
 
     private static final long serialVersionUID = 20130813L;
 
     private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 4; // TODO determine a good value empirically
+
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-
-    /* 
+    /*
      * http://en.wikipedia.org/wiki/Train_routes_in_the_Netherlands
      * http://en.wikipedia.org/wiki/File:Baanvaksnelheden.png 
      */
@@ -95,9 +103,10 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      */
     
     @Override
-    public void initialize(RoutingRequest options, Vertex origin, Vertex target, long abortTime) {
+    public void initialize(RoutingRequest options, long abortTime) {
+        Vertex target = options.rctx.target;
         if (target == this.target) {
-            LOG.debug("reusing existing heuristic");
+            LOG.debug("Reusing existing heuristic, the target vertex has not changed.");
             return;
         }
         long start = System.currentTimeMillis();
@@ -178,11 +187,6 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         }
     }
     
-    @Override
-    public double computeForwardWeight(State s, Vertex target) {
-        return computeReverseWeight(s, target);
-    }
-
     /**
      * We must return an underestimate of the cost to reach the destination no matter how much 
      * progress has been made on the heuristic search.
@@ -191,7 +195,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * This allows us to completely skip walking outside a certain radius of the origin/destination.
      */
     @Override
-    public double computeReverseWeight(State s, Vertex target) {
+    public double estimateRemainingWeight (State s) {
         final Vertex v = s.getVertex();
         // Temporary vertices (StreetLocations) might not be found in walk search.
         if (v instanceof StreetLocation) return 0;
@@ -211,7 +215,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (weight == Double.POSITIVE_INFINITY) {
             // A non-street vertex that was not yet touched by the reverse heuristic search.
             // Return the maximum of the Euclidean heuristic or the highest weight yet found by the heuristic search.
-            double dist = distanceLibrary.fastDistance(v.getY(), v.getX(), target.getY(), target.getX());
+            double dist = SphericalDistanceLibrary.fastDistance(v.getY(), v.getX(), target.getY(), target.getX());
             double time = dist / MAX_TRANSIT_SPEED;
             return Math.max(maxFound, time);
         }
@@ -219,8 +223,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     }
 
     @Override
-    public void reset() {
-    }
+    public void reset() { }
         
 
     /*
@@ -267,7 +270,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         if (fromTarget)
             rr.setArriveBy( ! rr.arriveBy);
         List<State> stopStates = Lists.newArrayList();
-        ShortestPathTree spt = new BasicShortestPathTree(rr);
+        ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(rr);
         BinHeap<State> pq = new BinHeap<State>();
         Vertex initVertex = fromTarget ? rr.rctx.target : rr.rctx.origin;
         State initState = new State(initVertex, rr);
@@ -326,17 +329,4 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         return stopStates;
     }
  
-    public static class Factory implements RemainingWeightHeuristicFactory {
-        @Override
-        public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
-            if (opt.modes.isTransit()) {
-                LOG.debug("Transit itinerary requested.");
-                return new InterleavedBidirectionalHeuristic (opt.rctx.graph);
-            } else {
-                LOG.debug("Non-transit itinerary requested.");
-                return new DefaultRemainingWeightHeuristic();
-            }
-        }
-    }
-
 }

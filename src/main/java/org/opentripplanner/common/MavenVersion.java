@@ -13,12 +13,12 @@
 
 package org.opentripplanner.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MavenVersion implements Serializable {
 
@@ -50,7 +50,7 @@ public class MavenVersion implements Serializable {
                                                     props.getProperty("git.commit.id.describe"),
                                                     props.getProperty("git.commit.time"),
                                                     props.getProperty("git.build.time"));
-            LOG.info("Parsed Maven artifact version: {}", version.toStringVerbose());
+            LOG.debug("Parsed Maven artifact version: {}", version.toStringVerbose());
             return version;
         } catch (Exception e) {
             LOG.error("Error reading version from properties file: {}", e.getMessage());
@@ -109,6 +109,15 @@ public class MavenVersion implements Serializable {
 
     public String toStringVerbose() {
         return String.format("%s => %s UID=%d", version, this.toString(), getUID());
+    }
+
+    public String getShortVersionString() {
+        return "OpenTripPlanner " + version + " " + commit;
+    }
+
+    public String getLongVersionString() {
+        String format = "version: %s\nmajor: %s\nminor: %s\npatch: %s\nqualifier: %s\ncommit: %s\n";
+        return String.format(format, version, major, minor, incremental, qualifier, commit);
     }
 
     public int hashCode () {

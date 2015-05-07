@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import jersey.repackaged.com.google.common.collect.Lists;
@@ -48,10 +46,6 @@ public class CommandLineParameters implements Cloneable {
             description = "Verbose output.")
     public boolean verbose;
 
-    @Parameter(names = {"--htmlAnnotations" },
-    description = "Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.")
-    boolean htmlAnnotations = false;
-   
     @Parameter(names = {"--basePath"}, validateWith = ReadWriteDirectory.class,
             description = "Set the path under which graphs, caches, etc. are stored by default.")
     public String basePath = DEFAULT_BASE_PATH;
@@ -60,15 +54,11 @@ public class CommandLineParameters implements Cloneable {
 
     @Parameter(names = {"--build"}, validateWith = ReadableDirectory.class,
             description = "Build graphs at specified paths.", variableArity = true)
-    public List<File> build;
+    public File build;
 
     @Parameter(names = {"--cache"}, validateWith = ReadWriteDirectory.class,
             description = "The directory under which to cache OSM and NED tiles. Default is BASE_PATH/cache.")
     public File cacheDirectory;
-
-    @Parameter(names = {"--elevation"},
-            description = "download and use elevation data for the graph")
-    public boolean elevation;
 
     @Parameter(names = {"--inMemory"},
             description = "Pass the graph to the server in-memory after building it, without saving to disk.")
@@ -78,38 +68,9 @@ public class CommandLineParameters implements Cloneable {
             description = "Pass the graph to the server in-memory after building it, and saving to disk.")
     public boolean preFlight;
 
-    @Parameter(names = {"--noTransit"},
-            description = "Skip all transit input files (GTFS).")
-    public boolean noTransit;
-
-    @Parameter(names = {"--useTransfersTxt"},
-            description = "Create direct transfer edges from transfers.txt in GTFS, instead of based on distance.")
-    public boolean useTransfersTxt;
-
-    @Parameter(names = {"--noParentStopLinking"},
-            description = "Skip linking of stops to parent stops (GTFS).")
-    public boolean noParentStopLinking;
-
-    @Parameter(names = {"--parentStationTransfers"},
-            description = "Create direct transfers between the constituent stops of each parent station.")
-    public boolean parentStationTransfers = false;
-
-    @Parameter(names = {"--noStreets"},
-            description = "Skip all street input files (OSM/PBF).")
-    public boolean noStreets;
-
-    @Parameter(names = {"--noEmbedConfig"},
-            description = "Skip embedding config in graph (Embed.properties).")
-    public boolean noEmbedConfig = false;
-
-    @Parameter(names = {"--skipVisibility"},
-            description = "Skip area visibility calculations, which are often time consuming.")
-    public boolean skipVisibility;
-
-    @Parameter(names = {"--matchBusRoutesToStreets"},
-            description = "Based on GTFS data, guess which OSM streets each bus runs on to improve stop linking.")
-    public boolean matchBusRoutesToStreets = false;
-
+    @Parameter(names = { "--version", },
+            description = "Print the version, and then exit.")
+    public boolean version = false;
 
     /* Options for the server sub-task. */
 
@@ -125,20 +86,11 @@ public class CommandLineParameters implements Cloneable {
             description = "Server port for HTTPS.")
     public Integer securePort;
 
-    // TODO remove this
-    @Parameter(names = {"--graphConfigFile"}, validateWith = ReadableFile.class,
-            description = "Path to graph configuration file.")
-    public String graphConfigFile;
-
     @Parameter(names = {"--autoScan"}, description = "Auto-scan for graphs to register in graph directory.")
     public boolean autoScan = false;
 
     @Parameter(names = {"--autoReload"}, description = "Auto-reload registered graphs when source data is modified.")
     public boolean autoReload = false;
-
-    @Parameter(names = {"--longDistance"},
-            description = "Use an algorithm tailored for big graphs (the size of New York or the Netherlands).")
-    public boolean longDistance = false;
 
     @Parameter(names = {"--port"}, validateWith = AvailablePort.class,
             description = "Server port for plain HTTP.")
@@ -151,6 +103,10 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--pointSets"}, validateWith = ReadableDirectory.class,
             description = "Path to directory containing PointSets. Defaults to BASE_PATH/pointsets.")
     public File pointSetDirectory;
+
+    @Parameter(names = {"--clientFiles"}, validateWith = ReadableDirectory.class,
+            description = "Path to directory containing local client files to serve.")
+    public File clientDirectory = null;
 
     @Parameter(names = {"--router"}, validateWith = RouterId.class,
             description = "One or more router IDs to build and/or serve, first one being the default.")
@@ -173,16 +129,16 @@ public class CommandLineParameters implements Cloneable {
             description = "Allow unauthenticated access to sensitive API resources, e.g. /routers")
     public boolean insecure = false;
 
+    @Parameter(names = { "--script" }, description = "run the specified OTP script (groovy, python)")
+    public File scriptFile = null;
+
+    @Parameter(names = { "--enableScriptingWebService" }, description = "enable scripting through a web-service (Warning! Very unsafe for public facing servers)")
+    boolean enableScriptingWebService = false;
+
     /** Set some convenience parameters based on other parameters' values. */
     public void infer() {
         server |= (inMemory || preFlight || port != null);
         if (basePath == null) basePath = DEFAULT_BASE_PATH;
-        if (routerIds == null) {
-            if (autoScan || inMemory || preFlight)
-                routerIds = Collections.emptyList();
-            else
-                routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
-        }
         /* If user has not overridden these paths, use default locations under the base path. */
         if (cacheDirectory == null) cacheDirectory = new File(basePath, "cache");
         if (graphDirectory == null) graphDirectory = new File(basePath, "graphs");
@@ -203,11 +159,6 @@ public class CommandLineParameters implements Cloneable {
             ret = (CommandLineParameters) super.clone();
         } catch (CloneNotSupportedException e) {
             return null;
-        }
-
-        if (this.build != null) {
-            ret.build = Lists.newArrayList();
-            ret.build.addAll(this.build);
         }
 
         if (this.routerIds != null) {

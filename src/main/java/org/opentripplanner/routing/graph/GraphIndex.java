@@ -17,7 +17,6 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.LuceneIndex;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -27,12 +26,10 @@ import org.opentripplanner.profile.ProfileTransfer;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.profile.StopNameNormalizer;
 import org.opentripplanner.profile.StopTreeCache;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -88,8 +85,10 @@ public class GraphIndex {
     public Multimap<StopCluster, ProfileTransfer> transfersFromStopCluster;
     private HashGridSpatialIndex<StopCluster> stopClusterSpatialIndex = null;
 
-    /* Extra index for applying realtime updates (lazy-initialized). */
+    /* Extra indices for applying realtime updates (lazy-initialized). */
+    public Map<String, Route> routeForIdWithoutAgency = null;
     public Map<String, Trip> tripForIdWithoutAgency = null;
+    public Map<String, Stop> stopForIdWithoutAgency = null;
 
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
@@ -179,8 +178,6 @@ public class GraphIndex {
         // of simple indexes in GraphIndex.
     }
 
-    private static DistanceLibrary distlib = new SphericalDistanceLibrary();
-
     /** Get all trip patterns running through any stop in the given stop cluster. */
     private Set<TripPattern> patternsForStopCluster(StopCluster sc) {
         Set<TripPattern> tripPatterns = Sets.newHashSet();
@@ -196,7 +193,7 @@ public class GraphIndex {
         transfersFromStopCluster = HashMultimap.create();
         final double TRANSFER_RADIUS = 500.0; // meters
         Map<P2<TripPattern>, ProfileTransfer.GoodTransferList> transfers = Maps.newHashMap();
-        LOG.info("Finding transfers...");
+        LOG.info("Finding transfers between clusters...");
         for (StopCluster sc0 : stopClusterForId.values()) {
             Set<TripPattern> tripPatterns0 = patternsForStopCluster(sc0);
             // Accounts for area-like (rather than point-like) nature of clusters
@@ -267,7 +264,7 @@ public class GraphIndex {
                 SphericalDistanceLibrary.metersToDegrees(radius));
         for (StopCluster cluster : stopClusterSpatialIndex.query(env)) {
             // TODO this should account for area-like nature of clusters. Use size of bounding boxes.
-            double distance = distlib.distance(sc.lat, sc.lon, cluster.lat, cluster.lon);
+            double distance = SphericalDistanceLibrary.distance(sc.lat, sc.lon, cluster.lat, cluster.lon);
             if (distance < radius) ret.put(cluster, distance);
         }
         return ret;
@@ -330,9 +327,9 @@ public class GraphIndex {
 
         long now = System.currentTimeMillis()/1000;
         List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableResolver timetableResolver = null;
+        TimetableSnapshot snapshot = null;
         if (graph.timetableSnapshotSource != null) {
-            timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         }
         ServiceDate[] serviceDates = {new ServiceDate().previous(), new ServiceDate(), new ServiceDate().next()};
 
@@ -352,8 +349,8 @@ public class GraphIndex {
             for (ServiceDate serviceDate : serviceDates) {
                 ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
                 Timetable tt;
-                if (timetableResolver != null){
-                    tt = timetableResolver.resolve(pattern, serviceDate);
+                if (snapshot != null){
+                    tt = snapshot.resolve(pattern, serviceDate);
                 } else {
                     tt = pattern.scheduledTimetable;
                 }
@@ -412,18 +409,26 @@ public class GraphIndex {
      */
     public List<StopTimesInPattern> getStopTimesForStop(Stop stop, ServiceDate serviceDate) {
         List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableResolver timetableResolver = graph.timetableSnapshotSource.getTimetableSnapshot();
+        TimetableSnapshot snapshot = null;
+        if (graph.timetableSnapshotSource != null) {
+            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
+        }
         Collection<TripPattern> patterns = patternsForStop.get(stop);
         for (TripPattern pattern : patterns) {
             StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
-            Timetable tt = timetableResolver.resolve(pattern, serviceDate);
+            Timetable tt;
+            if (snapshot != null){
+                tt = snapshot.resolve(pattern, serviceDate);
+            } else {
+                tt = pattern.scheduledTimetable;
+            }
             ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
             int sidx = 0;
             for (Stop currStop : pattern.stopPattern.stops) {
                 if (currStop == stop) {
                     for (TripTimes t : tt.tripTimes) {
                         if (!sd.serviceRunning(t.serviceCode)) continue;
-                        stopTimes.times.add(new TripTimeShort(t, sidx, stop));
+                        stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));
                     }
                 }
                 sidx++;
@@ -471,7 +476,8 @@ public class GraphIndex {
                     SphericalDistanceLibrary.metersToDegrees(CLUSTER_RADIUS));
             for (TransitStop ts1 : stopSpatialIndex.query(env)) {
                 Stop s1 = ts1.getStop();
-                double geoDistance = SphericalDistanceLibrary.getInstance().fastDistance(s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
+                double geoDistance = SphericalDistanceLibrary.fastDistance(
+                        s0.getLat(), s0.getLon(), s1.getLat(), s1.getLon());
                 if (geoDistance < CLUSTER_RADIUS) {
                     String s1normalizedName = StopNameNormalizer.normalize(s1.getName());
                     // LOG.info("   --> {}", s1normalizedName);

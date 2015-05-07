@@ -23,7 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
-import static org.opentripplanner.routing.core.TraverseMode.CUSTOM_MOTOR_VEHICLE;
 
 public class RoutingRequestTest {
 
@@ -39,13 +38,6 @@ public class RoutingRequestTest {
         assertTrue(request.modes.getCar());
         request.removeMode(CAR);
         assertFalse(request.modes.getCar());
-
-        request.addMode(CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.modes.getCar());
-        assertTrue(request.modes.getDriving());
-        request.removeMode(CUSTOM_MOTOR_VEHICLE);
-        assertFalse(request.modes.getCar());
-        assertFalse(request.modes.getDriving());
 
         request.setModes(new TraverseModeSet("BICYCLE,WALK"));
         assertFalse(request.modes.getCar());

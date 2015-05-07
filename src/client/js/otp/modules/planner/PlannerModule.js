@@ -379,6 +379,9 @@ otp.modules.planner.PlannerModule =
         this.currentRequest = $.ajax(url, {
             data:       queryParams,
             dataType:   'JSON',
+            //Sends arrays as &b=1&b=2 instead of b[]=1&b[]=2 which is what
+            //Jersey expects
+            traditional: true,
 
             success: function(data) {
                 $('#otp-spinner').hide();
@@ -631,7 +634,7 @@ otp.modules.planner.PlannerModule =
     	window.location.hash = this.currentHash;
 
         /*var shareRoute = $("#share-route");
-        shareRoute.find(".addthis_toolbox").attr("addthis:url", otp.config.siteURL+"/#"+this.currentHash);
+        shareRoute.find(".addthis_toolbox").attr("addthis:url", otp.config.siteUrl+"/#"+this.currentHash);
         addthis.toolbox(".addthis_toolbox_route");*/
     },
 

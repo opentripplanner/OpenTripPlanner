@@ -34,7 +34,7 @@ otp.core.Geocoder = otp.Class({
         lastXhr = $.ajax(this.url, {
             data : params,
             
-            success: function(data) {
+            success: function(data, status, xhr) {
               if (xhr === lastXhr){
                 if((typeof data) == "string") data = jQuery.parseXML(data);
                 var results = [];

@@ -115,25 +115,6 @@ public class PlainStreetEdgeTest {
     }
     
     @Test
-    public void testTraverseAsCustomMotorVehicle() {
-        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-        e1.setCarSpeed(10.0f);
-
-        RoutingRequest options = proto.clone();
-        options.setMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        options.setRoutingContext(_graph, v1, v2);
-        
-        State s0 = new State(options);
-        State s1 = e1.traverse(s0);
-        
-        // Should use the speed on the edge.
-        double expectedWeight = e1.getDistance() / e1.getCarSpeed();
-        long expectedDuration = (long) Math.ceil(expectedWeight);
-        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
-        assertEquals(expectedWeight, s1.getWeight(), 0.0);
-    }
-    
-    @Test
     public void testModeSetCanTraverse() {
         StreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
         
@@ -143,7 +124,7 @@ public class PlainStreetEdgeTest {
         modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK);
         assertTrue(e.canTraverse(modes));
         
-        e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL_DRIVING);
+        e = edge(v1, v2, 1.0, StreetTraversalPermission.CAR);
         assertFalse(e.canTraverse(modes));
         
         modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);

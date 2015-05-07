@@ -115,7 +115,7 @@ public class Place {
         this.lon = lon;
         this.lat = lat;
         this.name = name;
-	this.vertexType = VertexType.NORMAL;
+	    this.vertexType = VertexType.NORMAL;
     }
 
     public Place(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {

@@ -182,7 +182,7 @@ public class DateUtils implements DateConstants {
                     }
                 }
             }
-        } catch (Exception _) {
+        } catch (Exception ex) {
             throw new RuntimeException("Could not parse " + input);
         }
 
@@ -247,15 +247,13 @@ public class DateUtils implements DateConstants {
             return am;
     }
 
-    // /////////////////////////////
-
     public static String trim(String str) {
         String retVal = str;
         try {
             retVal = str.trim();
             retVal = retVal.replaceAll("%20;", "");
             retVal = retVal.replaceAll("%20", "");
-        } catch (Exception _) {
+        } catch (Exception ex) {
         }
         return retVal;
     }

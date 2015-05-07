@@ -18,7 +18,7 @@ package org.opentripplanner.openstreetmap.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opentripplanner.graph_builder.impl.osm.TemplateLibrary;
+import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
@@ -145,7 +145,7 @@ public class OSMWithTags {
 
     /**
      * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created by
-     * {@link org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl#processRelations processRelations}
+     * {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule#processRelations processRelations}
      */
     public I18NString getAssumedName() {
         if (_tags.containsKey("name"))
@@ -238,12 +238,32 @@ public class OSMWithTags {
     }
 
     /**
+     * Returns true if cars/motorcycles/HGV are explicitly denied access.
+     *
+     * @return
+     */
+    public boolean isMotorVehicleExplicitlyDenied() {
+        return isTagDeniedAccess("motor_vehicle");
+    }
+
+    /**
+     * Returns true if cars/motorcycles/HGV are explicitly allowed.
+     *
+     * @return
+     */
+    public boolean isMotorVehicleExplicitlyAllowed() {
+        return doesTagAllowAccess("motor_vehicle");
+    }
+
+
+    /**
      * Returns true if bikes are explicitly denied access.
      * 
+     * bicycle is denied if bicycle:no, bicycle:license or bicycle:use_sidepath
      * @return
      */
     public boolean isBicycleExplicitlyDenied() {
-        return isTagDeniedAccess("bicycle");
+        return isTagDeniedAccess("bicycle") || "use_sidepath".equals(getTag("bicycle"));
     }
 
     /**

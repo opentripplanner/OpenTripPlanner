@@ -62,8 +62,23 @@ otp.core.Webapp = otp.Class({
             decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
             query  = window.location.search.substring(1);
 
-        while (match = search.exec(query))
-            this.urlParams[decode(match[1])] = decode(match[2]);
+        //Parser URL query string
+        while (match = search.exec(query)) {
+            var currentKey = decode(match[1]);
+            //Same key already appeared in parameters
+            //We need to change values from string to to list of values
+            if (currentKey in this.urlParams) {
+                var tmpValues = this.urlParams[currentKey];
+                if ($.isArray(tmpValues)) {
+                    tmpValues.push(decode(match[2]));
+                } else {
+                    tmpValues = [tmpValues, decode(match[2])];
+                }
+                this.urlParams[currentKey] = tmpValues;
+            } else {
+                this.urlParams[currentKey] = decode(match[2]);
+            }
+        }
 
 
         // init siteUrl, if necessary
@@ -96,12 +111,12 @@ otp.core.Webapp = otp.Class({
         // set the logo & title
 
         if(otp.config.showLogo) {
-          //$('<div id="logo"><a href="'+otp.config.siteURL+'"><img src="'+otp.config.logoGraphic+'" style="height:100%"></a></div>').appendTo('#branding');
-            $(Mustache.render(otp.templates.img, {
+          //$('<div id="logo"><a href="'+otp.config.siteUrl+'"><img src="'+otp.config.logoGraphic+'" style="height:100%"></a></div>').appendTo('#branding');
+            $(Mustache.render(otp.templates.img, { 
                 src : otp.config.logoGraphic,
                 style : 'height:100%',
                 wrapLink : true,
-                linkHref : otp.config.siteURL,
+                linkHref : otp.config.siteUrl,
                 wrapDiv : true,
                 divId : 'logo'
             })).appendTo('#branding');
@@ -116,7 +131,7 @@ otp.core.Webapp = otp.Class({
         if(otp.config.siteName !== undefined) {
             document.title = otp.config.siteName;
             if(otp.config.showTitle) {
-                $("<div id='site-title'><a href='"+otp.config.siteURL+"'>"+otp.config.siteName+"</a></div>").appendTo('#branding');
+                $("<div id='site-title'><a href='"+otp.config.siteUrl+"'>"+otp.config.siteName+"</a></div>").appendTo('#branding');
             }
         }
 
@@ -147,7 +162,7 @@ otp.core.Webapp = otp.Class({
 
         if(otp.config.showAddThis) {
             var addThisHtml = '<div id="addthis" class="addthis_toolbox addthis_default_style"\n';
-            addThisHtml += 'addthis:url="'+otp.config.siteURL+'"\n';
+            addThisHtml += 'addthis:url="'+otp.config.siteUrl+'"\n';
             addThisHtml += 'addthis:title="'+otp.config.addThisTitle+'"\n';
             addThisHtml += 'addthis:description="'+otp.config.siteDescription+'">\n';
             addThisHtml += '<a class="addthis_button_twitter"></a>\n';

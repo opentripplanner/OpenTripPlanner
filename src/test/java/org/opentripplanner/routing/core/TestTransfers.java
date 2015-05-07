@@ -36,11 +36,11 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
@@ -49,6 +49,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.TestUtils;
@@ -65,7 +66,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.Schedu
 class Context {
     public Graph graph;
 
-    public GenericAStar aStar;
+    public AStar aStar;
 
     private static Context instance = null;
 
@@ -78,7 +79,7 @@ class Context {
 
     public Context() throws IOException {
         // Create a star search
-        aStar = new GenericAStar();
+        aStar = new AStar();
 
         // Create graph
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
@@ -98,13 +99,13 @@ class Context {
         // Add simple transfer to make transfer possible between U-V and I-J
         createSimpleTransfer("agency:V", "agency:I", 100);
 
-        // Create dummy TimetableResolver
-        TimetableResolver resolver = new TimetableResolver();
+        // Create dummy TimetableSnapshot
+        TimetableSnapshot snapshot = new TimetableSnapshot();
 
-        // Mock TimetableSnapshotSource to return dummy TimetableResolver
+        // Mock TimetableSnapshotSource to return dummy TimetableSnapshot
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
 
-        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
+        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(snapshot);
 
         graph.timetableSnapshotSource = (timetableSnapshotSource);
     }
@@ -128,7 +129,7 @@ class Context {
 public class TestTransfers extends TestCase {
     private Graph graph;
 
-    private GenericAStar aStar;
+    private AStar aStar;
 
     public void setUp() throws Exception {
         // Get graph and a star from singleton class
@@ -184,7 +185,7 @@ public class TestTransfers extends TestCase {
     private void applyUpdateToTripPattern(TripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
-        TimetableResolver snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
+        TimetableSnapshot snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
         Timetable timetable = snapshot.resolve(pattern, serviceDate);
         TimeZone timeZone = new SimpleTimeZone(-7, "PST");
         long today = serviceDate.getAsDate(timeZone).getTime() / 1000;
@@ -212,7 +213,11 @@ public class TestTransfers extends TestCase {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        assertTrue(timetable.update(tripUpdate, timeZone, serviceDate));
+        TripTimes updatedTripTimes = timetable.createUpdatedTripTimes(tripUpdate, timeZone, serviceDate); 
+        assertNotNull(updatedTripTimes);
+        int tripIndex = timetable.getTripIndex(tripId);
+        assertTrue(tripIndex != -1);
+        timetable.setTripTimes(tripIndex, updatedTripTimes);
     }
 
     public void testStopToStopTransfer() throws Exception {
@@ -364,9 +369,7 @@ public class TestTransfers extends TestCase {
         when(graph.getTransferTable()).thenReturn(table);
 
         // Compute a normal path between two stops
-        @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency:U");
-        @SuppressWarnings("deprecation")
         Vertex destination = graph.getVertex("agency:J");
 
         // Set options like time and routing context
@@ -581,7 +584,7 @@ public class TestTransfers extends TestCase {
         applyUpdateToTripPattern(pattern, "4.2", "F", 1, 82800, 82800,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
         // Remove the timed transfer from the graph
-        timedTransferEdge.detach(graph);
+        graph.removeEdge(timedTransferEdge);
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }

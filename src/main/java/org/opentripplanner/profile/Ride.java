@@ -1,24 +1,25 @@
 package org.opentripplanner.profile;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
 import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.regex.Pattern;
 
-import com.google.common.collect.Lists;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 /** 
@@ -43,11 +44,17 @@ public class Ride {
     final StopCluster to;
     final Ride previous;
     final List<PatternRide> patternRides = Lists.newArrayList();
-    Stats rideStats; // filled in only once the ride is complete (has all PatternRides).
-    Stats waitStats; // filled in only once the ride is complete (has all PatternRides).
-    int accessTime;  // minimum time to reach this ride from the previous one, or from the origin point on the first ride
-    int accessDist;  // meters from the previous ride, or from the origin point on the first ride
+    Stats rideStats;   // filled in only once the ride is complete (has all PatternRides).
+    Stats waitStats;   // filled in only once the ride is complete (has all PatternRides).
+    Stats accessStats; // min and max time to reach this ride from the previous one, or from the origin point on the first ride
+    int accessDist;    // meters from the previous ride, or from the origin point on the first ride
 
+    int dlb = 0;
+    int dub = Integer.MAX_VALUE;
+    int pathLength = 0;
+
+    /** Construct a partial ride (resulting from a transfer, waiting to be completed). */
+    // TODO add additional parameter for access stats, then recalc bounds in the constructor.
     public Ride (StopCluster from, Ride previous) {
         this.from = from;
         this.to = null; // this is a "partial ride" waiting to be completed.
@@ -59,8 +66,9 @@ public class Ride {
         this.from = other.from;
         this.to = to;
         this.previous = other.previous;
-        this.accessTime = other.accessTime;
+        this.accessStats = other.accessStats;
         this.accessDist = other.accessDist;
+        // Bounds will be recomputed when stats are computed.
     }
 
     /** Extend this incomplete ride to the given stop, creating a container for PatternRides. */
@@ -72,7 +80,8 @@ public class Ride {
         return String.format("Ride from %s to %s (%d patterns on routes %s)", from, to, patternRides.size(), getRoutes());
     }
 
-    public void dump() {
+    /** Output this entire chain of rides. */
+    public void dumpRideChain() {
         List<Ride> rides = Lists.newLinkedList();
         Ride ride = this;
         while (ride != null) {
@@ -102,16 +111,6 @@ public class Ride {
         return false;
     }
 
-    public int pathLength() {
-        int length = 0;
-        Ride ride = this;
-        while (ride != null) {
-            length += 1;
-            ride = ride.previous;
-        }
-        return length;
-    }
-
     public boolean pathContainsRoute(Route route) {
         // Linear search, could use sets if this proves to be time consuming
         Ride ride = this;
@@ -134,30 +133,34 @@ public class Ride {
         return false;
     }
 
-    /** Return a lower bound on the duration of this option. */
-    public int durationLowerBound() {
-        int ret = 0;
+    /**
+     * Calculate length and upper and lower bounds on duration for the chain of rides ending with this one.
+     * This should be called whenever the ride/wait/access stats for the ride are updated.
+     * We can't call it in the constructor or update methods because access stats are set after construction,
+     * and wait stats are sometimes null.
+     */
+    public void recomputeBounds() {
+        dlb = 0;
+        dub = 0;
+        pathLength = 0;
         Ride ride = this;
-        while (ride != null) {
-            ret += ride.rideStats.min;
-            ret += ride.waitStats.min;
-            ret += ride.accessTime; // minimum access time to first ride, or transfer walking time on subsequent ones.
+        if (ride.to == null) {
+            // This is an unfinished ride that just came off the queue.
+            // It is the result of a transfer. It has access time, but not wait or ride time yet.
+            dlb += ride.accessStats.min;
+            dub += ride.accessStats.max;
             ride = ride.previous;
         }
-        return ret;
-    }
-
-    /** Return an upper bound on the duration of this option. */
-    public int durationUpperBound() {
-        int ret = 0;
-        Ride ride = this;
         while (ride != null) {
-            ret += ride.rideStats.max;
-            ret += ride.waitStats.max;
-            ret += ride.accessTime; // FIXME using fastest access mode when calculating upper bound time... is this OK?
+            pathLength += 1;
+            dlb += ride.rideStats.min;
+            dlb += ride.waitStats.min;
+            dlb += ride.accessStats.min;
+            dub += ride.rideStats.max;
+            dub += ride.waitStats.max;
+            dub += ride.accessStats.max;
             ride = ride.previous;
         }
-        return ret;
     }
 
     /**
@@ -194,9 +197,9 @@ public class Ride {
      * @return a list of sorted departure or arrival times within the window.
      * FIXME this is a hot spot in execution, about 50 percent of runtime.
      */
-    public List<Integer> getSortedStoptimes (TimeWindow window, boolean arrivals) {
+    public TIntList getSortedStoptimes (TimeWindow window, boolean arrivals) {
         // Using Lists because we don't know the length in advance
-        List<Integer> times = Lists.newArrayList();
+        TIntList times = new TIntArrayList();
         // TODO include exact-times frequency trips along with non-frequency trips
         // non-exact (headway-based) frequency trips will be handled elsewhere since they don't have specific boarding times.
         for (PatternRide patternRide : patternRides) {
@@ -208,7 +211,7 @@ public class Ride {
                 }
             }
         }
-        Collections.sort(times);
+        times.sort();
         return times;
     }
 
@@ -245,11 +248,12 @@ public class Ride {
     public Stats calcStatsForBoarding(TimeWindow window) {
         Stats stats = new Stats ();
         stats.min = 0; // You can always arrive just before a train departs.
-        List<Integer> departures = getSortedStoptimes(window, false);
+        TIntList departures = getSortedStoptimes(window, false);
         int last = window.from;
         double avgAccumulated = 0.0;
         /* All departures in the list are known to be running and within the window. */
-        for (int dep : departures) {
+        for (TIntIterator it = departures.iterator(); it.hasNext();) {
+            int dep = it.next();
             int maxWait = dep - last;
             if (maxWait > stats.max) stats.max = maxWait;
             /* Weight the average of each interval by the number of seconds it contains. */
@@ -270,13 +274,16 @@ public class Ride {
      * calculated from full sets of patterns, which are not known until a round is over.
      */
     public Stats calcStatsForTransfer (TimeWindow window, double walkSpeed) {
-        List<Integer> arrivals = previous.getSortedStoptimes(window, true);
-        List<Integer> departures = this.getSortedStoptimes(window, false);
+        TIntList arrivals = previous.getSortedStoptimes(window, true);
+        TIntList departures = this.getSortedStoptimes(window, false);
         List<Integer> waits = Lists.newArrayList();
-        Iterator<Integer> departureIterator = departures.iterator(); 
+        TIntIterator departureIterator = departures.iterator();
         int departure = departureIterator.next();
-        ARRIVAL : for (int arrival : arrivals) {
-            int boardTime = arrival + accessTime + ProfileRouter.SLACK;
+        ARRIVAL : for (TIntIterator arrivalsIterator = arrivals.iterator(); arrivalsIterator.hasNext();) {
+            int arrival = arrivalsIterator.next();
+            // On transfers the access stats should have max=min=avg
+            // We use the min, which would be best if min != max since it should only relax the bounds somewhat.
+            int boardTime = arrival + accessStats.min + ProfileRouter.SLACK;
             while (departure <= boardTime) {
                 if (!departureIterator.hasNext()) break ARRIVAL;
                 departure = departureIterator.next();
@@ -296,7 +303,6 @@ public class Ride {
         }
         return ride.from;
     }
-
 
     /** @return the stop from which the rider will walk to the final destination, assuming this is the final Ride in a chain. */
     public StopCluster getEgressStopCluster() {

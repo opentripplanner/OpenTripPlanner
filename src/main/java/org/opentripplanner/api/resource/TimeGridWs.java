@@ -94,7 +94,7 @@ public class TimeGridWs extends RoutingResource {
             throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
 
         // Build the request
-        RoutingRequest sptRequest = buildRequest(0);
+        RoutingRequest sptRequest = buildRequest();
         SampleGridRequest tgRequest = new SampleGridRequest();
         tgRequest.maxTimeSec = maxTimeSec;
         tgRequest.precisionMeters = precisionMeters;

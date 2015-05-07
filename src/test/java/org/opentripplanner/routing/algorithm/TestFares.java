@@ -13,10 +13,7 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import java.io.File;
-
 import junit.framework.TestCase;
-
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -28,15 +25,16 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
 
+import java.io.File;
+
 public class TestFares extends TestCase {
 
-    private GenericAStar aStar = new GenericAStar();
+    private AStar aStar = new AStar();
     
     public void testBasic() throws Exception {
 

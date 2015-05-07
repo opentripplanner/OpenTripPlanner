@@ -25,9 +25,9 @@ import org.geotools.referencing.GeodeticCalculator;
 import org.opensphere.geometry.algorithm.ConcaveHull;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.DirectionUtils;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.ReversibleLineStringWrapper;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -96,8 +96,6 @@ public class SIsochrone extends RoutingResource {
 
     private boolean noRoadNearBy = false;
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-
     /**
      * Calculates walksheds for a given location, based on time given to walk and the walk speed. 
      *
@@ -140,7 +138,7 @@ public class SIsochrone extends RoutingResource {
         this.debugGeoms = new ArrayList();
         this.tooFastTraversedEdgeGeoms = new ArrayList();
 
-        RoutingRequest sptRequestA = buildRequest(0);
+        RoutingRequest sptRequestA = buildRequest();
         String from = sptRequestA.from.toString();
         int pos = 1;
         float lat = 0;
@@ -206,7 +204,7 @@ public class SIsochrone extends RoutingResource {
                 this.maxUserSpeed = sptRequestA.walkSpeed;
             } else if (modes.getBicycle()) {
                 this.maxUserSpeed = sptRequestA.bikeSpeed;
-            } else if (modes.getDriving()) {
+            } else if (modes.getCar()) {
                 this.maxUserSpeed = sptRequestA.carSpeed;
                 this.usesCar = true;
             }
@@ -238,8 +236,7 @@ public class SIsochrone extends RoutingResource {
             sptRequestA.setMode(TraverseMode.WALK); // fall back to walk mode
             sptRequestA.setRoutingContext(router.graph);
         }
-        ShortestPathTree sptA = router.sptServiceFactory.instantiate().getShortestPathTree(
-                sptRequestA);
+        ShortestPathTree sptA = new AStar().getShortestPathTree(sptRequestA);
         StreetLocation origin = (StreetLocation) sptRequestA.rctx.fromVertex;
         sptRequestA.cleanup(); // remove inserted points
 
@@ -250,7 +247,7 @@ public class SIsochrone extends RoutingResource {
         LineString pathToStreet = gf.createLineString(pathToStreetCoords);
 
         // get distance between origin and drop point for time correction
-        double distanceToRoad = this.distanceLibrary.distance(origin.getY(), origin.getX(),
+        double distanceToRoad = SphericalDistanceLibrary.distance(origin.getY(), origin.getX(),
                 dropPoint.y, dropPoint.x);
         long offRoadTimeCorrection = (long) (distanceToRoad / this.offRoadWalkspeed);
 
@@ -775,7 +772,7 @@ public class SIsochrone extends RoutingResource {
         Coordinate coord0 = line.getCoordinateN(0);
         Coordinate coord1 = line.getCoordinateN(numPoints - 1);
         int i = numPoints - 3;
-        while (distanceLibrary.fastDistance(coord0, coord1) < 10 && i >= 0) {
+        while (SphericalDistanceLibrary.fastDistance(coord0, coord1) < 10 && i >= 0) {
             coord1 = line.getCoordinateN(i--);
         }
 

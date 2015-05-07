@@ -7,9 +7,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -39,13 +37,22 @@ import java.util.Map.Entry;
 public class OSMMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OSMMain.class);
-    //static final String INPUT = "/var/otp/graphs/nl/netherlands-latest.osm.pbf";
-    static final String INPUT = "/var/otp/graphs/trimet/portland.osm.pbf";
     static final Envelope ENV = new Envelope(4.4, 5.5, 52.2, 53.3);
 
     public static void main(String[] args) {
-        /* Load OSM PBF with spatial filtering. */
-        OSM osm = OSM.fromPBF(INPUT);//, ENV);
+        /** This main method will convert a PBF file to VEX using an intermediate MapDB datastore. */
+        OSM osm = OSM.fromPBF(args[0]);//, ENV);
+        try (OutputStream fout = new FileOutputStream("test.vex")) {
+            LOG.info("begin writing vex");
+            new VexFormatCodec().writeVex(osm, fout);
+            LOG.info("end writing vex");
+        } catch (FileNotFoundException ex) {
+            LOG.error("FNFEX");
+        } catch (IOException ex) {
+            LOG.error("IOEX");
+        }
+        System.exit(0);
+
         List<Edge> edges = makeEdges(osm);
         PrintStream ps;
         try {
@@ -53,7 +60,7 @@ public class OSMMain {
             for (Edge edge : edges) {
                 Node fromNode = osm.nodes.get(edge.from);
                 Node toNode = osm.nodes.get(edge.to);
-                ps.printf("LINESTRING(%f %f,%f %f))\n", fromNode.lon, fromNode.lat, toNode.lon, toNode.lat);
+                ps.printf("LINESTRING(%f %f,%f %f))\n", fromNode.getLon(), fromNode.getLat(), toNode.getLon(), toNode.getLat());
             }   
         } catch (FileNotFoundException e1) {
             // TODO Auto-generated catch block
@@ -74,7 +81,7 @@ public class OSMMain {
     }
 
     public static List<Edge> makeEdges(OSM osm) {
-        osm.findIntersections();
+//        osm.findIntersections();
         LOG.info("Making edges from Ways.");
         List<Edge> edges = Lists.newArrayList();
         for (Entry<Long, Way> e : osm.ways.entrySet()) {
@@ -87,7 +94,7 @@ public class OSMMain {
                 if (n == (way.nodes.length - 1)) {
                     edge.to = node;
                     edges.add(edge);
-                } else if (osm.intersections.contains(node)) {
+//                } else if (osm.intersections.contains(node)) {
                     edge.to = node;
                     edges.add(edge);
                     edge = new Edge();

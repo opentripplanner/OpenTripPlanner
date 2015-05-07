@@ -1,13 +1,13 @@
 package org.opentripplanner.profile;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
+import com.google.common.primitives.Ints;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * num may be 0 if there are no observations.
@@ -20,7 +20,21 @@ class Stats implements Cloneable {
     public int max = 0;
     public int num = 0;
 
+    /** Construct a new empty Stats containing no values. */
     public Stats () { }
+
+    /** Construct a new Stats for a single int value. */
+    public Stats (int loneValue) {
+        min = loneValue;
+        max = loneValue;
+        avg = loneValue;
+        num = 1;
+    }
+
+    /** Construct a new Stats summarizing the given list of ints. */
+    public Stats (int... values) {
+        this(Ints.asList(values));
+    }
 
     /** Copy constructor. */
     public Stats (Stats other) {
@@ -51,7 +65,10 @@ class Stats implements Cloneable {
         num = 1; // it's poorly defined here
     }
 
-    /** */
+    /**
+     * Takes StreetSegments for each different access/egress mode and creates a stats describing the range of
+     * access/egress times present.
+     */
     public void add(Collection<StreetSegment> segs) {
         if (segs == null || segs.isEmpty()) return;
         List<Integer> times = Lists.newArrayList();
@@ -69,8 +86,20 @@ class Stats implements Cloneable {
         if (other.min < min) min = other.min;
         if (other.max > max) max = other.max;
         avg = (avg * num + other.avg * other.num) / (num + other.num); // TODO should be float math
+        // FIXME num is not updated?
     }
-    
+
+    /**
+     * Combines a single value into this stats in place.
+     * @return void to indicate that a new object is NOT created.
+     */
+    public void merge (int other) {
+        if (other < min) min = other;
+        if (other > max) max = other;
+        avg = (avg * num + other) / (num + 1); // TODO should be float math
+        num += 1;
+    }
+
     /** Build a composite Stats out of a bunch of other Stats. They are combined in parallel, as in merge(Stats). */
     public Stats (Iterable<Stats> stats) {
         min = Integer.MAX_VALUE;
@@ -147,6 +176,6 @@ class Stats implements Cloneable {
 
     @Override
     public String toString() {
-        return String.format("avg=%.1f min=%.1f max=%.1f", avg/60.0, min/60.0, max/60.0);
+        return String.format("min=%.1f avg=%.1f max=%.1f", min/60.0, avg/60.0, max/60.0);
     }
 }

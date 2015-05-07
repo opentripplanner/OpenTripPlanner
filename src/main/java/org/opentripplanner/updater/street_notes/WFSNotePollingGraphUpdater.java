@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.street_notes;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.vividsolutions.jts.geom.Geometry;
@@ -81,11 +82,10 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * The property frequencySec is already read and used by the abstract base class.
      */
     @Override
-    protected void configurePolling(Graph graph, Preferences preferences) throws Exception {
-        url = new URL(preferences.get("url", null));
-        featureType = preferences.get("featureType", null);
+    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
+        url = new URL(config.path("url").asText());
+        featureType = config.path("featureType").asText();
         this.graph = graph;
-
         LOG.info("Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
                 frequencySec, url.toString(), featureType);
     }

@@ -16,22 +16,30 @@ package org.opentripplanner.updater.stoptime;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
-import org.opentripplanner.updater.PreferencesConfigurable;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
-public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, PreferencesConfigurable {
+public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonConfigurable {
     private static final Logger LOG =
             LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
 
+    /**
+     * True iff the last list with updates represent all updates that are active right now, i.e. all
+     * previous updates should be disregarded
+     */
+    private boolean fullDataset = true;
+    
     /**
      * Default agency id that is used for the trip ids in the TripUpdates
      */
@@ -40,13 +48,13 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
     private String url;
 
     @Override
-    public void configure(Graph graph, Preferences preferences) throws Exception {
-        String url = preferences.get("url", null);
+    public void configure(Graph graph, JsonNode config) throws Exception {
+        String url = config.path("url").asText();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
-        this.agencyId = preferences.get("defaultAgencyId", null);
+        this.agencyId = config.path("defaultAgencyId").asText();
     }
 
     @Override
@@ -54,14 +62,26 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
         FeedMessage feedMessage = null;
         List<FeedEntity> feedEntityList = null;
         List<TripUpdate> updates = null;
+        fullDataset = true;
         try {
             InputStream is = HttpUtils.getData(url);
             if (is != null) {
+                // Decode message
                 feedMessage = FeedMessage.PARSER.parseFrom(is);
                 feedEntityList = feedMessage.getEntityList();
+                
+                // Change fullDataset value if this is an incremental update
+                if (feedMessage.hasHeader()
+                        && feedMessage.getHeader().hasIncrementality()
+                        && feedMessage.getHeader().getIncrementality()
+                                .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)) {
+                    fullDataset = false;
+                }
+                
+                // Create List of TripUpdates
                 updates = new ArrayList<TripUpdate>(feedEntityList.size());
                 for (FeedEntity feedEntity : feedEntityList) {
-                    updates.add(feedEntity.getTripUpdate());
+                    if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
                 }
             }
         } catch (Exception e) {
@@ -70,12 +90,17 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
         return updates;
     }
 
+    @Override
+    public boolean getFullDatasetValueOfLastUpdates() {
+        return fullDataset;
+    }
+    
     public String toString() {
         return "GtfsRealtimeHttpUpdateStreamer(" + url + ")";
     }
 
-	@Override
-	public String getAgencyId() {
-		return this.agencyId;
-	}
+    @Override
+    public String getAgencyId() {
+        return this.agencyId;
+    }
 }

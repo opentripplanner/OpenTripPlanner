@@ -13,28 +13,22 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-
+import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Sets;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
+import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
@@ -42,32 +36,26 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.PatternDepartVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.internal.Maps;
-import com.beust.jcommander.internal.Sets;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.vividsolutions.jts.geom.LineString;
-import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.*;
 
 /**
- * Represents a group of trips that all call at the same sequence of stops. For each stop, there
- * is a list of departure times, running times, arrival times, dwell times, and wheelchair
- * accessibility information (one of each of these per trip per stop).
+ * Represents a group of trips on a route, with the same direction id that all call at the same
+ * sequence of stops. For each stop, there is a list of departure times, running times, arrival
+ * times, dwell times, and wheelchair accessibility information (one of each of these per trip per
+ * stop).
  * Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a later trip.
  *
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
@@ -88,15 +76,18 @@ public class TripPattern implements Serializable {
     public static final int FLAG_BIKES_ALLOWED = 32;
 
     /**
-     * The GTFS Route of all trips in this pattern. GTFS technically allows the same pattern to appear in more
-     * than one route, but we make the assumption that all trips with the same pattern belong to the
-     * same Route.
-     * TODO: consider the case where there is a replacement bus that makes the same stops as a train. We may need to split out multiple patterns for multiple routes.
+     * The GTFS Route of all trips in this pattern.
      */
     public final Route route;
 
     /**
-     * As for the route field, this depends on there being a single GFTFS route per journey pattern. That is not always true.
+     * The direction id for all trips in this pattern.
+     * Use -1 for default direction id
+     */
+    public int directionId = -1;
+
+    /**
+     * The traverse mode for all trips in this pattern.
      */
     public final TraverseMode mode;
 
@@ -116,11 +107,14 @@ public class TripPattern implements Serializable {
     /** The human-readable, unique name for this trip pattern. */
     public String name;
 
-    /** The short unique identifier for this trip pattern. */
+    /**
+     * The short unique identifier for this trip pattern,
+     * generally in the format Agency:RouteId:DirectionId:PatternNumber.
+     */
     public String code;
 
     /* The vertices in the Graph that correspond to each Stop in this pattern. */
-    public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. are they even used?
+    public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. FIXME they appear to be all null. are they even used?
     public final PatternDepartVertex[] departVertices;
     public final PatternArriveVertex[] arriveVertices;
 
@@ -195,7 +189,7 @@ public class TripPattern implements Serializable {
     }
 
     // TODO verify correctness after substitution of StopPattern for ScheduledStopPattern
-    // also, maybe get rid of the per stop flags and just use the values in StopPattern, or an Enum
+    // TODO get rid of the per stop flags and just use the values in StopPattern, or an Enum
     private void setStopsFromStopPattern(StopPattern stopPattern) {
         patternHops = new PatternHop[stopPattern.size - 1];
         perStopFlags = new int[stopPattern.size];
@@ -502,33 +496,15 @@ public class TripPattern implements Serializable {
     }
 
     /**
-     * Repetitive logic pulled out of makePatternVerticesAndEdges().
-     * No longer works because we don't have access to the DAO here.
-     * But moving the makePatternVerticesAndEdges into TripPattern seems cleaner (certainly looks cleaner).
-     */
-    private <T> T getStopOrParent(Map<Stop, T> map, Stop stop, Graph graph) {
-        T vertex = map.get(stop);
-        if (vertex == null) {
-            Stop parent = null; //_dao.getStopForId(new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()));
-            vertex = map.get(parent);
-            /* FIXME: this is adding an annotation for a specific problem, but all we know is that the stop vertex does not exist. */
-            if (vertex == null) {
-                //LOG.warn(graph.addBuilderAnnotation(new StopAtEntrance(stop, false)));
-            } else {
-                //LOG.warn(graph.addBuilderAnnotation(new StopAtEntrance(stop, true)));
-            }
-        }
-        return vertex;
-    }
-
-    /**
      * Create the PatternStop vertices and PatternBoard/Hop/Dwell/Alight edges corresponding to a
      * StopPattern/TripPattern. StopTimes are passed in instead of Stops only because they are
      * needed for shape distances (actually, stop sequence numbers?).
      *
-     * TODO move GtfsStopContext into Graph.
+     * @param graph graph to create vertices and edges in
+     * @param transitStops map of transit stops given the stop; it is assumed all stops of this trip
+     *        pattern are included in this map and refer to TransitStops
      */
-    public void makePatternVerticesAndEdges(Graph graph, GtfsStopContext context) {
+    public void makePatternVerticesAndEdges(Graph graph, Map<Stop, ? extends TransitStationStop> transitStops) {
 
         /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */
         PatternArriveVertex pav0, pav1 = null;
@@ -548,16 +524,12 @@ public class TripPattern implements Serializable {
             hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
 
             /* Get the arrive and depart vertices for the current stop (not pattern stop). */
-            TransitStopDepart stopDepart = getStopOrParent(context.stopDepartNodes, s0, graph);
-            TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
+            TransitStopDepart stopDepart = ((TransitStop) transitStops.get(s0)).departVertex;
+            TransitStopArrive stopArrive = ((TransitStop) transitStops.get(s1)).arriveVertex;
 
-            /* Add this pattern's route's mode to the modes for this Stop. */
-            // This is updating a TraverseModeSet (which is a bitmask).
-            // Maybe we should just store that mask in the pattern when it is created.
-            // Isn't this skipping the first stop in the pattern?
-            // Do we actually need a set of modes for each stop?
-            TraverseMode mode = GtfsLibrary.getTraverseMode(this.route);
-            stopArrive.getStopVertex().addMode(mode);
+            /* Record the transit stop vertices visited on this pattern. */
+            stopVertices[stop] = stopDepart.getStopVertex();
+            stopVertices[stop + 1] = stopArrive.getStopVertex(); // this will only have an effect on the last stop
 
             /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
             if (this.canBoard(stop)) {
@@ -599,24 +571,39 @@ public class TripPattern implements Serializable {
         }
         scheduledTimetable.setServiceCodes (serviceCodes);
     }
+    
+    /**
+     * @return bitset of service codes
+     */
+    public BitSet getServices() {
+        return services;
+    }
+    
+    /**
+     * @param services bitset of service codes
+     */
+    public void setServices(BitSet services) {
+        this.services = services;
+    }
 
     public String getDirection() {
         return trips.get(0).getTripHeadsign();
     }
 
     /**
-     * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id, and an integer.
-     * We impose our assumption that all trips in the same pattern are on the same route.
+     * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id, the direction and
+     * an integer.
      * This only works if the Collection of TripPattern includes every TripPattern for the agency.
      */
     public static void generateUniqueIds(Collection<TripPattern> tripPatterns) {
-        Multimap<Route, TripPattern> patternsForRoute = HashMultimap.create();
+        Multimap<String, TripPattern> patternsForRoute = HashMultimap.create();
         for (TripPattern pattern : tripPatterns) {
             AgencyAndId routeId = pattern.route.getId();
-            patternsForRoute.put(pattern.route, pattern);
-            int count = patternsForRoute.get(pattern.route).size();
+            String direction = pattern.directionId != -1 ? String.valueOf(pattern.directionId) : "";
+            patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
+            int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
-            String id = String.format("%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), count);
+            String id = String.format("%s:%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), direction, count);
             pattern.code = (id);
         }
     }

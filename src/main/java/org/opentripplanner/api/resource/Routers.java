@@ -42,7 +42,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
-import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
@@ -50,13 +50,11 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.OTPConfigurator;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 
@@ -161,9 +159,10 @@ public class Routers {
      */
     @RolesAllowed({ "ROUTERS" })
     @PUT @Produces({ MediaType.APPLICATION_JSON })
-    public Response reloadGraphs(@QueryParam("path") String path, 
-            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        otpServer.getGraphService().reloadGraphs(preEvict);
+    public Response reloadGraphs(@QueryParam("path") String path,
+            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict,
+            @QueryParam("force") @DefaultValue("true") boolean force) {
+        otpServer.getGraphService().reloadGraphs(preEvict, force);
         return Response.status(Status.OK).build();
     }
 
@@ -172,28 +171,22 @@ public class Routers {
      * @param preEvict before reloading each graph, evict the existing graph. This will prevent 
      * memory usage from increasing during the reload, but routing will be unavailable on this 
      * routerId for the duration of the operation.
-     *
-     *                FIXME @param upload read the graph from the PUT data stream instead of from disk.
      */
     @RolesAllowed({ "ROUTERS" })
     @PUT @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
-    public Response putGraphId(
-            @PathParam("routerId") String routerId, 
+    public Response putGraphId(@PathParam("routerId") String routerId,
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
         LOG.debug("Attempting to load graph '{}' from server's local filesystem.", routerId);
-        try {
-            otpServer.getGraphService().getRouter(routerId);
-            return Response.status(404).entity("graph already registered.\n").build();
-        } catch (GraphNotFoundException e) {
-            if (preEvict) {
-                LOG.debug("Pre-evicting graph '{}'", routerId);
-                otpServer.getGraphService().evictRouter(routerId);
-            }
-            boolean success = otpServer.getGraphService()
-                    .registerGraph(
-                            routerId,
-                            otpServer.getGraphService().getGraphSourceFactory()
-                                    .createGraphSource(routerId));
+        GraphService graphService = otpServer.getGraphService();
+        if (graphService.getRouterIds().contains(routerId)) {
+            boolean success = graphService.reloadGraph(routerId, preEvict, false);
+            if (success)
+                return Response.status(201).entity("graph already registered, reloaded.\n").build();
+            else
+                return Response.status(404).entity("graph already registered, but reload failed.\n").build();
+        } else {
+            boolean success = graphService.registerGraph(routerId, graphService
+                    .getGraphSourceFactory().createGraphSource(routerId));
             if (success)
                 return Response.status(201).entity("graph registered.\n").build();
             else
@@ -274,15 +267,13 @@ public class Routers {
             return Response.status(Response.Status.BAD_REQUEST).entity("Could not extract zip file: " + ex.getMessage()).build();
         }
 
-           
         // set up the build, using default parameters
         // this is basically simulating calling otp -b on the command line
         CommandLineParameters params = otpServer.params.clone();
-        params.build = Lists.newArrayList();
-        params.build.add(tempDir);
+        params.build = tempDir;
         params.inMemory = true;
         
-        GraphBuilderTask graphBuilder = new OTPConfigurator(params).builderFromParameters();
+        GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, tempDir);
         
         graphBuilder.run();
         

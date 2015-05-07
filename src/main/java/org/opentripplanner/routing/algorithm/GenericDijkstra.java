@@ -23,11 +23,14 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.routing.spt.BasicShortestPathTree;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
  * Find the shortest path between graph vertices using Dijkstra's algorithm.
+ *
+ * TODO do we need this since we have GenericAStar and trivial remaining weight heuristic?
+ * It is used in pruning Area edges and in finding the distance to transit stops.
  */
 public class GenericDijkstra {
 
@@ -66,7 +69,7 @@ public class GenericDijkstra {
         if (options.rctx != null) {
             target = initialState.getOptions().rctx.target;
         }
-        ShortestPathTree spt = new BasicShortestPathTree(options);
+        ShortestPathTree spt = new DominanceFunction.MinimumWeight().getNewShortestPathTree(options);
         BinHeap<State> queue = new BinHeap<State>(1000);
 
         spt.add(initialState);
@@ -114,13 +117,12 @@ public class GenericDijkstra {
                     }
                     if (v.exceedsWeightLimit(options.maxWeight)) continue;
                     if (spt.add(v)) {
-                        double estimate = heuristic.computeForwardWeight(v, target);
+                        double estimate = heuristic.estimateRemainingWeight(v);
                         queue.insert(v, v.getWeight() + estimate);
                         if (traverseVisitor != null) traverseVisitor.visitEnqueue(v);
                     }
                 }
             }
-            spt.postVisit(u);
         }
         return spt;
     }

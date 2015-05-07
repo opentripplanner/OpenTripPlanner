@@ -13,25 +13,21 @@
 
 package org.opentripplanner.analyst.request;
 
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import java.util.List;
 
 public class SampleFactory implements SampleSource {
-
-    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public SampleFactory(GeometryIndex index) {
         this.index = index;
@@ -115,10 +111,8 @@ public class SampleFactory implements SampleSource {
             if (d > searchRadiusM)
                 return null;
             double d0 = d + best.distanceAlong();
-            int t0 = (int) (d0 / 1.33);
             double d1 = d + best.distanceToEnd();
-            int t1 = (int) (d1 / 1.33);
-            Sample s = new Sample(v0, t0, v1, t1);
+            Sample s = new Sample(v0, (int) d0, v1, (int) d1);
             //System.out.println(s.toString());
             return s;
         } 
@@ -144,7 +138,7 @@ public class SampleFactory implements SampleSource {
         }
 
         public double distanceTo(Coordinate c) {
-            return distanceLibrary.fastDistance(y, x, c.y, c.x);
+            return SphericalDistanceLibrary.fastDistance(y, x, c.y, c.x);
         }
         
         public double distanceAlong() {
@@ -155,11 +149,11 @@ public class SampleFactory implements SampleSource {
             for (int s = 1; s < seg; s++) { 
                 double x1 = cs.getX(s);
                 double y1 = cs.getY(s);
-                dist += distanceLibrary.fastDistance(y0, x0, y1, x1);
+                dist += SphericalDistanceLibrary.fastDistance(y0, x0, y1, x1);
                 x0 = x1;
                 y0 = y1;
             }
-            dist += distanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment 
+            dist += SphericalDistanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment
             return dist;
         }
 
@@ -168,12 +162,12 @@ public class SampleFactory implements SampleSource {
             int s = seg + 1;
             double x0 = cs.getX(s);
             double y0 = cs.getY(s);
-            double dist = distanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment
+            double dist = SphericalDistanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment
             int nc = cs.size();
             for (; s < nc; s++) { 
                 double x1 = cs.getX(s);
                 double y1 = cs.getY(s);
-                dist += distanceLibrary.fastDistance(y0, x0, y1, x1);
+                dist += SphericalDistanceLibrary.fastDistance(y0, x0, y1, x1);
                 x0 = x1;
                 y0 = y1;
             }
