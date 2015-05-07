@@ -129,19 +129,19 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
     /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
+     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs. (default false)
      */
-    public boolean staticBikeRental = false;
+    public boolean staticBikeRental;
 
     /**
-     * Whether we should create car P+R stations from OSM data.
+     * Whether we should create car P+R stations from OSM data. (default true)
      */
-    public boolean staticParkAndRide = true;
+    public boolean staticParkAndRide;
 
     /**
-     * Whether we should create bike P+R stations from OSM data.
+     * Whether we should create bike P+R stations from OSM data. (default false)
      */
-    public boolean staticBikeParkAndRide = false;
+    public boolean staticBikeParkAndRide;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
