@@ -968,7 +968,7 @@ public class Graph implements Serializable {
  // lazy-init sample factor on an as needed basis
     public SampleFactory getSampleFactory() {
     	if(this.sampleFactory == null)
-    		this.sampleFactory = new SampleFactory(this.getGeomIndex());
+    		this.sampleFactory = new SampleFactory(this);
     	
     	return this.sampleFactory;	
     }
