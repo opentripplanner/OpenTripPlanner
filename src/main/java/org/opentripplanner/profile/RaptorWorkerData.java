@@ -156,15 +156,17 @@ public class RaptorWorkerData implements Serializable {
         		list.add(new HalfSample(i, sampleSet.d0s[i]));
         		
         		// VERTEX 1
-        		int v1 = sampleSet.v1s[i].getIndex();
-        		if (sampleIndex.containsKey(v1))
-        			list = sampleIndex.get(v1);
-        		else {
-        			list = new ArrayList<HalfSample>();
-        			sampleIndex.put(v1, list);
+        		if (sampleSet.v1s[i] != null) {
+	        		int v1 = sampleSet.v1s[i].getIndex();
+	        		if (sampleIndex.containsKey(v1))
+	        			list = sampleIndex.get(v1);
+	        		else {
+	        			list = new ArrayList<HalfSample>();
+	        			sampleIndex.put(v1, list);
+	        		}
+	        		
+	        		list.add(new HalfSample(i, sampleSet.d1s[i]));
         		}
-        		
-        		list.add(new HalfSample(i, sampleSet.d1s[i]));
         	}
         	
         	// iterate over stops, build distances to samples
@@ -187,11 +189,13 @@ public class RaptorWorkerData implements Serializable {
         			// Possible optimization: it's possible (indeed, likely) that the sample
         			// is reachable two ways from a given stop. We could collapse this array down
         			// and make propagation faster.
-        			// TODO: need to throw out samples that push us above the original limit on the stop tree cache,
-        			// so that samples far from streets don't get a larger egress walk distance budget.
         			SAMPLE: for (HalfSample s : sampleIndex.get(v)) {
+        				int distance = Math.round(d + s.distance);
+        				if (distance > stc.maxWalkMeters)
+        					continue;
+        				
         				out.add(s.index);
-        				out.add(Math.round(d + s.distance));
+        				out.add(distance);
         			}
         		}
         		
