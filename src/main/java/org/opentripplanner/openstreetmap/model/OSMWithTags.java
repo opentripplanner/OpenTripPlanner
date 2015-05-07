@@ -231,6 +231,25 @@ public class OSMWithTags {
     }
 
     /**
+     * Returns true if cars/motorcycles/HGV are explicitly denied access.
+     *
+     * @return
+     */
+    public boolean isMotorVehicleExplicitlyDenied() {
+        return isTagDeniedAccess("motor_vehicle");
+    }
+
+    /**
+     * Returns true if cars/motorcycles/HGV are explicitly allowed.
+     *
+     * @return
+     */
+    public boolean isMotorVehicleExplicitlyAllowed() {
+        return doesTagAllowAccess("motor_vehicle");
+    }
+
+
+    /**
      * Returns true if bikes are explicitly denied access.
      * 
      * bicycle is denied if bicycle:no, bicycle:license or bicycle:use_sidepath

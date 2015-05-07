@@ -13,17 +13,23 @@
 
 package org.opentripplanner.graph_builder;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
-import org.opentripplanner.graph_builder.linking.TransitToStreetNetworkModule;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
+import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
@@ -42,16 +48,12 @@ import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.OTPMain;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.S3BucketConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
@@ -81,7 +83,7 @@ public class GraphBuilder implements Runnable {
     /** Should the graph be serialized to disk after being created or not? */
     public boolean serializeGraph = true;
 
-    public void addGraphBuilder(GraphBuilderModule loader) {
+    public void addModule(GraphBuilderModule loader) {
         _graphBuilderModules.add(loader);
     }
 
@@ -235,16 +237,16 @@ public class GraphBuilder implements Runnable {
                 OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
                 osmProviders.add(osmProvider);
             }
-            OpenStreetMapModule osmBuilder = new OpenStreetMapModule(osmProviders);
+            OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
             streetEdgeFactory.useElevationData = builderParams.fetchElevationUS || (demFile != null);
-            osmBuilder.edgeFactory = streetEdgeFactory;
-            osmBuilder.customNamer = builderParams.customNamer;
+            osmModule.edgeFactory = streetEdgeFactory;
+            osmModule.customNamer = builderParams.customNamer;
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
-            osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
-            osmBuilder.skipVisibility = !builderParams.areaVisibility;
-            graphBuilder.addGraphBuilder(osmBuilder);
-            graphBuilder.addGraphBuilder(new PruneFloatingIslands());
+            osmModule.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
+            osmModule.skipVisibility = !builderParams.areaVisibility;
+            graphBuilder.addModule(osmModule);
+            graphBuilder.addModule(new PruneFloatingIslands());
         }
         if ( hasGTFS ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
@@ -258,35 +260,54 @@ public class GraphBuilder implements Runnable {
                 gtfsBundle.subwayAccessTime = (int)(builderParams.subwayAccessTime * 60);
                 gtfsBundles.add(gtfsBundle);
             }
-            GtfsModule gtfsBuilder = new GtfsModule(gtfsBundles);
-            graphBuilder.addGraphBuilder(gtfsBuilder);
+            GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
             if ( hasOSM ) {
                 if (builderParams.matchBusRoutesToStreets) {
-                    graphBuilder.addGraphBuilder(new BusRouteStreetMatcher());
+                    graphBuilder.addModule(new BusRouteStreetMatcher());
                 }
-                graphBuilder.addGraphBuilder(new TransitToTaggedStopsModule());
-                graphBuilder.addGraphBuilder(new TransitToStreetNetworkModule());
+                graphBuilder.addModule(new TransitToTaggedStopsModule());
             }
+            gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
+            graphBuilder.addModule(gtfsModule);
+        }
+        // This module is outside the hasGTFS conditional block because it also links things like bike rental
+        // which need to be done even when there's no transit.
+        graphBuilder.addModule(new StreetLinkerModule());
+        if ( hasGTFS ) {
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! builderParams.useTransfersTxt) {
                 // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addGraphBuilder(new DirectTransferGenerator());
+                graphBuilder.addModule(new DirectTransferGenerator());
             }
-            gtfsBuilder.setFareServiceFactory(builderParams.fareServiceFactory);
         }
-        if (builderParams.fetchElevationUS) {
+        if (builderParams.elevationBucket != null) {
+            // Download the elevation tiles from an Amazon S3 bucket
+            S3BucketConfig bucketConfig = builderParams.elevationBucket;
+            File cacheDirectory = new File(params.cacheDirectory, "ned");
+            DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
+            awsTileSource = new DegreeGridNEDTileSource();
+            awsTileSource.awsAccessKey = bucketConfig.accessKey;
+            awsTileSource.awsSecretKey = bucketConfig.secretKey;
+            awsTileSource.awsBucketName = bucketConfig.bucketName;
+            NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
+            gcf.tileSource = awsTileSource;
+            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            graphBuilder.addModule(elevationBuilder);
+        } else if (builderParams.fetchElevationUS) {
+            // Download the elevation tiles from the official web service
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
-            graphBuilder.addGraphBuilder(elevationBuilder);
-        } else  if (demFile != null) {
+            graphBuilder.addModule(elevationBuilder);
+        } else if (demFile != null) {
+            // Load the elevation from a file in the graph inputs directory
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
-            graphBuilder.addGraphBuilder(elevationBuilder);
+            graphBuilder.addModule(elevationBuilder);
         }
-        graphBuilder.addGraphBuilder(new EmbedConfig(builderConfig, routerConfig));
+        graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));
         if (builderParams.htmlAnnotations) {
-            graphBuilder.addGraphBuilder(new AnnotationsToHTML(new File(params.build, "report.html")));
+            graphBuilder.addModule(new AnnotationsToHTML(new File(params.build, "report.html")));
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;

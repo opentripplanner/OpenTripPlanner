@@ -194,3 +194,31 @@ is pushed to the main OpenTripPlanner repository on GitHub, this server will com
 feedback on the stability of the build. It is also configured to run a battery of speed tests so that we can track
 improvements due to optimizations and spot drops in performance as an unintended consequence of changes.
 
+## Release Process
+
+This section is intended as a checklist for the person within the OTP development community who is responsible for
+performing releases (currently Andrew Byrd). Releases should be performed on the CI server because documentation and
+release JARs must be published after a release. The CI server serves as the OTP project web server, and also has a
+very fast network connection which makes uploading Maven artifacts to the repository on Amazon S3 less painful.
+Carrying out a release requires CI server login credentials as well as Amazon AWS credentials for deployment to our
+Maven repository.
+
+Release checklist:
+
+- update the docs/Changelog.md, check it in, and push
+- ssh into ci.opentripplanner.org
+- change to the ~/git/OpenTripPlanner directory
+- check that you are on the master branch with no uncommitted changes (git status; git clean -df)
+- pull down the latest master code
+- verify that git push succeeds without prompting for a password (i.e. ~/.ssh/id_rsa.pub is known to Github)
+- run a test build: mvn clean package site
+- check that `~/.m2/settings.xml` contains AWS credentials for the repo
+- mvn release:prepare
+- cp -R target/site/apidocs /usr/share/nginx/html/javadoc/x.y.0
+- cp -R target/site/enunciate /usr/share/nginx/html/apidoc/x.y.0
+- check that permissions are o+r (they should be by default)
+- mvn release:perform
+- cp target/otp-x.y.0.jar /usr/share/nginx/html/jars/
+- rm /usr/share/nginx/html/jars/otp-x.y.0-SNAPSHOT*
+- email the OTP dev and users mailing lists, and send a message on Slack
+

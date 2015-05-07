@@ -78,6 +78,9 @@ public class GraphBuilderParameters {
      */
     public final boolean fetchElevationUS;
 
+    /** If specified, download NED elevation tiles from the given AWS S3 bucket. */
+    public final S3BucketConfig elevationBucket;
+
     /**
      * A specific fares service to use.
      */
@@ -107,6 +110,7 @@ public class GraphBuilderParameters {
         areaVisibility = config.path("areaVisibility").asBoolean(false);
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
+        elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
     }

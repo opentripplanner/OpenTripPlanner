@@ -174,7 +174,7 @@ otp.widgets.ItinerariesWidget =
             var stopId = itin.getFirstStopID();
             _.extend(params, {
                 startTransitStopId :  stopId,
-                date : this_.module.date,
+                date: moment(this_.module.date, otp.config.locale.time.date_format).format("MM-DD-YYYY"),
                 time : serviceBreakTime,
                 arriveBy : false
             });
@@ -221,7 +221,7 @@ otp.widgets.ItinerariesWidget =
             var stopId = itin.getFirstStopID();
             _.extend(params, {
                 startTransitStopId :  stopId,
-                date : moment(this_.module.date, "MM-DD-YYYY").add('days', 1).format("MM-DD-YYYY"),
+                date : moment(this_.module.date, otp.config.locale.time.date_format).add('days', 1).format("MM-DD-YYYY"),
                 time : serviceBreakTime,
                 arriveBy : true
             });

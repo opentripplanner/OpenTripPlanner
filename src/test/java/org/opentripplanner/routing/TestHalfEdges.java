@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -31,7 +32,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -46,6 +46,7 @@ import org.opentripplanner.util.TestUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Set;
 
 import static com.google.common.collect.Iterables.filter;
@@ -122,6 +123,10 @@ public class TestHalfEdges extends TestCase {
         station2.addMode(TraverseMode.RAIL);
         
         graph.rebuildVertexAndEdgeIndices();
+
+        //Linkers aren't run otherwise in testNetworkLinker
+        graph.hasStreets = true;
+        graph.hasTransit = true;
     }
 
     public void testHalfEdges() {
@@ -463,8 +468,8 @@ public class TestHalfEdges extends TestCase {
 
     public void testNetworkLinker() {
         int numVerticesBefore = graph.getVertices().size();
-        NetworkLinker nl = new NetworkLinker(graph);
-        nl.createLinkage();
+        StreetLinkerModule ttsnm = new StreetLinkerModule();
+        ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();
