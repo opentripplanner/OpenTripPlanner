@@ -22,11 +22,6 @@
     </properties>
 
     <distributionManagement>
-        <site>
-            <id>opentripplanner-docs</id>
-            <name>OpenTripPlanner Documentation</name>
-            <url>s3://docs.opentripplanner.org/</url>
-        </site>
         <repository>
             <!-- Also used as snapshotRepository by default -->
             <id>conveyal-maven-repo</id>
