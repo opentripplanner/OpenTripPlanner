@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
