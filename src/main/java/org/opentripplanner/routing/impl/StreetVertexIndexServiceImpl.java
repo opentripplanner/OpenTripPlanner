@@ -615,6 +615,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 		
 		Sample s = sfac.getSample(coordinate.x, coordinate.y);
 		
+		if (s == null)
+			return null;
+		
 		// create temp vertex
 		// TODO dest sample vertices for arrive-by
 		SampleVertex v = new SampleVertex(graph, coordinate);
