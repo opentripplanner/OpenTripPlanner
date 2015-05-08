@@ -46,9 +46,8 @@ public class GraphMetadata {
     /* FIXME this is ultra slow, causing the server to stall for a long time the first time it's used. */
     public GraphMetadata(Graph graph) {
         /* generate extents */
-        Envelope leftEnv = new Envelope();
-        Envelope rightEnv = new Envelope();
-        double aRightCoordinate = 0;
+        Envelope envelope = new Envelope();
+
         for (Vertex v : graph.getVertices()) {
             for (Edge e: v.getOutgoing()) {
                 if (e instanceof PatternHop) {
@@ -56,43 +55,14 @@ public class GraphMetadata {
                 }
             }
             Coordinate c = v.getCoordinate();
-            if (c.x < 0) {
-                leftEnv.expandToInclude(c);
-            } else {
-                rightEnv.expandToInclude(c);
-                aRightCoordinate = c.x;
-            }
+            envelope.expandToInclude(c);
         }
 
-        if (leftEnv.getArea() == 0) {
-            //the entire area is in the eastern hemisphere
-            setLowerLeftLongitude(rightEnv.getMinX());
-            setUpperRightLongitude(rightEnv.getMaxX());
-            setLowerLeftLatitude(rightEnv.getMinY());
-            setUpperRightLatitude(rightEnv.getMaxY());
-        } else if (rightEnv.getArea() == 0) {
-            //the entire area is in the western hemisphere
-            setLowerLeftLongitude(leftEnv.getMinX());
-            setUpperRightLongitude(leftEnv.getMaxX());
-            setLowerLeftLatitude(leftEnv.getMinY());
-            setUpperRightLatitude(leftEnv.getMaxY());
-        } else {
-            //the area spans two hemispheres.  Either it crosses the prime meridian,
-            //or it crosses the 180th meridian (roughly, the international date line).  We'll check a random
-            //coordinate to find out
+        setLowerLeftLongitude(envelope.getMinX());
+        setUpperRightLongitude(envelope.getMaxX());
+        setLowerLeftLatitude(envelope.getMinY());
+        setUpperRightLatitude(envelope.getMaxY());
 
-            if (aRightCoordinate < 90) {
-                //assume prime meridian
-                setLowerLeftLongitude(leftEnv.getMinX());
-                setUpperRightLongitude(rightEnv.getMaxX());
-            } else {
-                //assume 180th meridian
-                setLowerLeftLongitude(leftEnv.getMaxX());
-                setUpperRightLongitude(rightEnv.getMinX());
-            }
-            setUpperRightLatitude(Math.max(rightEnv.getMaxY(), leftEnv.getMaxY()));
-            setLowerLeftLatitude(Math.min(rightEnv.getMinY(), leftEnv.getMinY()));
-        }
         // Does not work around 180th parallel.
         // Should be replaced by using k-means center code from TransitIndex, and storing the center directly in the graph.
         setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
