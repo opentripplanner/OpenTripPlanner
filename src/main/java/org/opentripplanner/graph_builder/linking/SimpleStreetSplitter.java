@@ -19,6 +19,10 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
+import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
+import org.opentripplanner.graph_builder.annotation.ParkAndRideUnlinked;
+import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -39,6 +43,8 @@ import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -50,6 +56,8 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 /** A class that links transit stops to streets by splitting the streets */
 public class SimpleStreetSplitter {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
 	
 	public static final int MAX_SEARCH_RADIUS_METERS = 1000;
 	
@@ -80,13 +88,20 @@ public class SimpleStreetSplitter {
 	
 	public void link () {		
 		for (Vertex v : graph.getVertices()) {
-			if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof ParkAndRideVertex)
-				link(v);		
+			if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex)
+				if (!link(v)) {
+					if (v instanceof TransitStop)
+						LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((TransitStop) v)));
+					else if (v instanceof BikeRentalStationVertex)
+						LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked((BikeRentalStationVertex) v)));
+					else if (v instanceof BikeParkVertex)
+						LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v)));
+				};		
 		}
 	}
 	
 	/** Link this vertex into the graph */
-	public void link (Vertex vertex) {
+	public boolean link (Vertex vertex) {
 		// find nearby street edges
 		// TODO: we used to use an expanding-envelope search, which is more efficient in
 		// dense areas. but first let's see how inefficient this is. I suspect it's not too
@@ -144,7 +159,7 @@ public class SimpleStreetSplitter {
 		
 		// find the closest candidate edges
 		if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg)
-			return;
+			return false;
 		
 		// find the best edge
 		double bestDist = distances.get(candidateEdges.get(0).getId());
@@ -159,7 +174,9 @@ public class SimpleStreetSplitter {
 		
 		for (StreetEdge edge : bestEdges) {
 			link(vertex, edge, xscale);
-		}	
+		}
+		
+		return true;
 	}
 	
 	/** split the edge and link in the transit stop */
@@ -228,18 +245,6 @@ public class SimpleStreetSplitter {
 			makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
 		else if (from instanceof BikeParkVertex)
 			makeBikeParkEdges((BikeParkVertex) from, to);
-		else if (from instanceof ParkAndRideVertex)
-			makeParkAndRideEdges((ParkAndRideVertex) from, to);
-	}
-	
-	private void makeParkAndRideEdges(ParkAndRideVertex from, StreetVertex to) {
-		for (ParkAndRideLinkEdge prle : Iterables.filter(from.getOutgoing(), ParkAndRideLinkEdge.class)) {
-			if (prle.getToVertex() == to)
-				return;
-		}
-		
-		new ParkAndRideLinkEdge(from, to);
-		new ParkAndRideLinkEdge(to, from);
 	}
 
 	/** Make bike park edges */
