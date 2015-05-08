@@ -49,7 +49,7 @@ public class SampleFactory implements SampleSource {
 
     public SampleFactory(Graph graph) {
         this.graph = graph;
-        this.setSearchRadiusM(200);
+        this.setSearchRadiusM(500);
     }
 
     private Graph graph;
