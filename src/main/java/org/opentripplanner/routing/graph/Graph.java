@@ -153,7 +153,7 @@ public class Graph implements Serializable {
 
     private transient TimeZone timeZone = null;
 
-    private transient GraphMetadata graphMetadata = null;
+    private GraphMetadata graphMetadata = null;
 
     private transient Geometry hull = null;
 
@@ -943,6 +943,28 @@ public class Graph implements Serializable {
             graphMetadata = new GraphMetadata(this);
         }
         return graphMetadata;
+    }
+
+    /**
+     * @return true if graph has metadata
+     */
+    public boolean hasMetadata() {
+        return graphMetadata != null;
+    }
+
+    /**
+     * This is used in {@link org.opentripplanner.graph_builder.module.StreetLinkerModule} to skip stops
+     * That aren't inside OSM data envelope
+     *
+     * @param c Stop coordinate
+     * @return true if coordinate is in graph envelope
+     */
+    public boolean containsInOSM(Coordinate c) {
+        if (graphMetadata != null) {
+            return graphMetadata.contains(c);
+        } else {
+            return false;
+        }
     }
 
     public Geometry getHull() {

@@ -199,6 +199,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         LOG.info("Building street graph from OSM");
         handler.buildGraph(extra);
         graph.hasStreets = true;
+        //Calculates envelope for OSM
+        graph.getMetadata();
     }
 
     /*

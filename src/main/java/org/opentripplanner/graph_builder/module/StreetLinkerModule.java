@@ -90,6 +90,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
             linkParkRideStations();
             cleanGraph();
         }
+        //Changes internal envelope from OSM envelope to envelope which also includes GTFS data
+        graph.getMetadata().updateEnvelope();
     }
 
     /**
@@ -99,6 +101,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
         LOG.info("Linking transit stops to streets...");
         int nUnlinked = 0;
         for (TransitStop ts : stopVertices) {
+            //Skips stops that aren't in street data envelope (min, max longitude and latitude of loaded street data)
+            if (!graph.containsInOSM(ts.getCoordinate())) {
+                continue;
+            }
             // There are two stop-to-street linkers in OTP. One using tagged stops, and this one, which uses geometry and heuristics.
             // If this stop was already linked using the "tagged stop" hints from OSM, there is no need to link it again.
             // This could happen if using the "prune isolated islands" <-- TODO clarify this last line of comment

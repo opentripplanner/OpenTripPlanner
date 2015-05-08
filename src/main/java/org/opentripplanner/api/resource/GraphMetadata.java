@@ -13,22 +13,30 @@
 
 package org.opentripplanner.api.resource;
 
+import java.io.Serializable;
 import java.util.HashSet;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * GraphMetada is first created after OSM is build.
+ *
+ * It has two envelopes. One with all of OSM vertices. This is used in {@link org.opentripplanner.graph_builder.module.StreetLinkerModule} and
+ * {@link org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule} to skip stops which are outside OSM data area.
+ *
+ * During GTFS reading second envelope is expanded to include each TransitStop with {@link #expandToInclude(double, double)}.
+ * TransitStop modes are added to transitModes variables with help of {@link #addMode(TraverseMode)}
+ */
 @XmlRootElement
-public class GraphMetadata {
+public class GraphMetadata implements Serializable {
 
     /** The bounding box of the graph, in decimal degrees. */
     private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
@@ -39,21 +47,27 @@ public class GraphMetadata {
 
     private double centerLongitude;
 
+    /**
+     * This is envelope with all of OSM data and after {@link #updateEnvelope()} is called with all of data.
+     */
+    private Envelope envelope;
+
+    /**
+     * This envelope starts with from envelope but gets expanded with {@link #expandToInclude(double, double)} for each {@link org.opentripplanner.routing.vertextype.TransitStop}.
+     *
+     * In {@link #updateEnvelope()} replaces envelope.
+     */
+    private transient Envelope newEnvelope;
+
     public GraphMetadata() {
     	// 0-arg constructor avoids com.sun.xml.bind.v2.runtime.IllegalAnnotationsException
     }
 
-    /* FIXME this is ultra slow, causing the server to stall for a long time the first time it's used. */
     public GraphMetadata(Graph graph) {
         /* generate extents */
-        Envelope envelope = new Envelope();
+        envelope = new Envelope();
 
         for (Vertex v : graph.getVertices()) {
-            for (Edge e: v.getOutgoing()) {
-                if (e instanceof PatternHop) {
-                    transitModes.add(((PatternHop) e).getMode());
-                }
-            }
             Coordinate c = v.getCoordinate();
             envelope.expandToInclude(c);
         }
@@ -62,6 +76,8 @@ public class GraphMetadata {
         setUpperRightLongitude(envelope.getMaxX());
         setLowerLeftLatitude(envelope.getMinY());
         setUpperRightLatitude(envelope.getMaxY());
+
+        newEnvelope = new Envelope(envelope);
 
         // Does not work around 180th parallel.
         // Should be replaced by using k-means center code from TransitIndex, and storing the center directly in the graph.
@@ -196,5 +212,48 @@ public class GraphMetadata {
 
     public void setCenterLatitude(double centerLatitude) {
         this.centerLatitude = centerLatitude;
+    }
+
+    /**
+     * @return true if coordinate is contained in graph envelope
+     */
+    public boolean contains(Coordinate c) {
+        return envelope.contains(c);
+    }
+
+    /**
+     * Expands new envelope to include given point
+     *
+     * This doesn't change envelope used in {@link #contains(Coordinate)}
+     * Because envelope needs to be unchanges because it is used in linking in
+     * {@link org.opentripplanner.graph_builder.module.StreetLinkerModule} to see
+     * if stops are inside OSM data area.
+     *
+     * @param  x  the value to lower the minimum x to or to raise the maximum x to
+     * @param  y  the value to lower the minimum y to or to raise the maximum y to
+     */
+    public void expandToInclude(double x, double y) {
+        newEnvelope.expandToInclude(x, y);
+    }
+
+    /**
+     * This switches previous envelope (created from OSM data) with new one
+     * which has data from TransitStops and modes
+     */
+    public void updateEnvelope() {
+        envelope = newEnvelope;
+
+        setLowerLeftLongitude(envelope.getMinX());
+        setUpperRightLongitude(envelope.getMaxX());
+        setLowerLeftLatitude(envelope.getMinY());
+        setUpperRightLatitude(envelope.getMaxY());
+    }
+
+    /**
+     * Adds mode of transport to transit modes in graph
+     * @param mode
+     */
+    public void addMode(TraverseMode mode) {
+        transitModes.add(mode);
     }
 }
