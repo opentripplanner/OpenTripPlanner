@@ -176,7 +176,10 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     vertex = new BikeRentalStationVertex(graph, station);
-                    linker.link(vertex);
+                    if (!linker.link(vertex)) {
+                    	// the toString includes the text "Bike rental station"
+                    	LOG.warn("{} not near any streets; it will not be usable.", station);
+                    }
                     verticesByStation.put(station, vertex);
                     new RentABikeOnEdge(vertex, vertex, station.networks);
                     if (station.allowDropoff)
