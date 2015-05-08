@@ -41,10 +41,16 @@ public class StopTreeCache {
             rr.rctx.pathParsers = new PathParser[] { new ProfilePropagationPathParser() };
             AStar astar = new AStar();
             rr.longDistance = true;
-            rr.dominanceFunction = new DominanceFunction.LeastWalk();
             rr.setNumItineraries(1);
+
+            // since we're storing distances and later using them to optimize
+            // (in the profile propagation code we optimize on distance / walkSpeed
+            //  not the actual time including turn costs etc.),
+            // we need to optimize on distance here as well.
             rr.maxWalkDistance = maxWalkMeters;
             rr.softWalkLimiting = false;
+            rr.dominanceFunction = new DominanceFunction.LeastWalk();
+
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
             // Copy vertex indices and distances into a flattened 2D array
             int[] distances = new int[spt.getVertexCount() * 2];

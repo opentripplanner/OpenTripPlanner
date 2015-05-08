@@ -4,16 +4,11 @@ import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import jersey.repackaged.com.google.common.collect.Lists;
-
-import com.google.common.collect.Collections2;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
@@ -21,36 +16,30 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
-import org.opentripplanner.graph_builder.annotation.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.PartialStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
@@ -86,6 +75,7 @@ public class SimpleStreetSplitter {
 		}
 	}
 	
+	/** Link all relevant vertices to the street network */
 	public void link () {		
 		for (Vertex v : graph.getVertices()) {
 			if (v instanceof TransitStop || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex)
@@ -161,11 +151,13 @@ public class SimpleStreetSplitter {
 		if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0).getId()) > radiusDeg)
 			return false;
 		
-		// find the best edge
-		double bestDist = distances.get(candidateEdges.get(0).getId());
+		// find the best edges
 		List<StreetEdge> bestEdges = Lists.newArrayList();
 		
 		// add edges until there is a break of epsilon meters.
+		// we do this to enforce determinism. if there are a lot of edges that are all extremely close to each other,
+		// we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
+		// fall just inside or beyond the cutoff depending on floating-point operations.
 		int i = 0;
 		do {
 			bestEdges.add(candidateEdges.get(i++));
@@ -189,6 +181,8 @@ public class SimpleStreetSplitter {
 		
 		// if we're very close to one end of the line or the other, or endwise, don't bother to split,
 		// cut to the chase and link directly
+		// We use a really tiny epsilon here because we only want points that actually snap to exactly the same location on the
+		// street to use the same vertices. Otherwise the order the stops are loaded in will affect where they are snapped.
 		if (ll.getSegmentIndex() == 0 && ll.getSegmentFraction() < 1e-8) {
 			makeLinkEdges(tstop, (StreetVertex) edge.getFromVertex());
 		}
@@ -238,6 +232,7 @@ public class SimpleStreetSplitter {
 		return v;
 	}
 	
+	/** Make the appropriate type of link edges from a vertex */
 	private void makeLinkEdges (Vertex from, StreetVertex to) {
 		if  (from instanceof TransitStop)
 			makeTransitLinkEdges((TransitStop) from, to);
@@ -259,7 +254,7 @@ public class SimpleStreetSplitter {
 	}
 
 	/** 
-	 * Make link edges, unless they already exist.
+	 * Make street transit link edges, unless they already exist.
 	 */
 	private void makeTransitLinkEdges (TransitStop tstop, StreetVertex v) {
 		// ensure that the requisite edges do not already exist
@@ -291,6 +286,7 @@ public class SimpleStreetSplitter {
 		return transformed.distance(geometryFactory.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat())));
 	}
 	
+	/** project this linestring to an equirectangular projection */
 	private static LineString equirectangularProject(LineString geometry, double xscale) {
 		Coordinate[] coords = new Coordinate[geometry.getNumPoints()];
 		

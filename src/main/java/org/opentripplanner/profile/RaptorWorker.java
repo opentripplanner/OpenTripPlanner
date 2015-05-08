@@ -92,6 +92,21 @@ public class RaptorWorker {
             long beginPropagationTime = System.currentTimeMillis();
             int[] timesAtTargets = timesAtTargetsEachMinute[n];
 
+            // Record distances to each sample or intersection
+            // We need to propagate all the way to samples (or intersections if there are no samples)
+            // when doing repeated RAPTOR.
+            // Consider the situation where there are two parallel transit lines on
+            // 5th Street and 6th Street, and you live on A Street halfway between 5th and 6th.
+            // Both lines run at 30 minute headways, but they are exactly out of phase, and for the
+            // purposes of this conversation both go the same place with the same in-vehicle travel time.
+            // Thus, even though the lines run every 30 minutes, you never experience a wait of more than
+            // 15 minutes because you are clever when you choose which line to take. The worst case at each
+            // transit stop is much worse than the worst case at samples. While unlikely, it is possible that
+            // a sample would be able to reach these two stops within the walk limit, but that the two
+            // intersections it is connected to cannot reach both.
+            
+            // We include the walk-only times to access transit in the results so that there are not increases in time
+            // to reach blocks around the origin due to being forced to ride transit.
             System.arraycopy(walkTimes, 0, timesAtTargets, 0, walkTimes.length);
             
             for (int s = 0; s < data.nStops; s++) {

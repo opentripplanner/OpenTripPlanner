@@ -141,6 +141,7 @@ public class RepeatedRaptorProfileRouter {
         	int vidx = state.getVertex().getIndex();
         	int otime = timesAtVertices[vidx];
         	
+        	// There may be dominated states in the SPT. Make sure we don't include them here.
         	if (otime == TimeSurface.UNREACHABLE || otime > time)
         		timesAtVertices[vidx] = time;
 	        	
