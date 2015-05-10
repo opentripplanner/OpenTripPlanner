@@ -54,7 +54,7 @@ will do the job. Place this PBF file in the same directory you created for the O
 ## Start up OTP
 
 As a Java program OTP must be run under a Java virtual machine (JVM), which is provided as part of the Java runtime
-(JRE) or Java development kit (JDK). Run `java -version` to check that you have version 1.7 or newer of the JVM installed.
+(JRE) or Java development kit (JDK). Run `java -version` to check that you have version 1.8 or newer of the JVM installed.
 If you do not you will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
 GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory

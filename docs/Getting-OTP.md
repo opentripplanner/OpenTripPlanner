@@ -16,7 +16,7 @@ You may also choose to build OTP from its source code. If you will be modifying 
 
 - Git, a version control system
 
-- Java Development Kit, preferably version 7 (AKA version 1.7)
+- Java Development Kit, preferably version 8 (AKA version 1.8)
 
 - Maven, a build and dependency management system
 
@@ -24,7 +24,7 @@ You may also choose to build OTP from its source code. If you will be modifying 
 You will also need a reliable internet connection so Maven can fetch all of OTP's dependencies (the libraries it uses). 
 To install these software packages on a Debian or Ubuntu system, run:
 
-    sudo apt-get install openjdk-7-jdk maven git
+    sudo apt-get install openjdk-8-jdk maven git
 
 Once you have these packages installed, create and/or switch to the directory where you will keep your Git repositories and make a local copy of the OTP source code:
 
