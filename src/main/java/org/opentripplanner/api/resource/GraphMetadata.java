@@ -14,6 +14,7 @@
 package org.opentripplanner.api.resource;
 
 import java.util.HashSet;
+import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -94,11 +95,12 @@ public class GraphMetadata {
             setLowerLeftLatitude(Math.min(rightEnv.getMinY(), leftEnv.getMinY()));
         }
 
-        Coordinate center = graph.getCenter();
-        if (center != null) {
+        Optional<Coordinate> centerOptional = graph.getCenter();
+        centerOptional.ifPresent(center -> {
             setCenterLongitude(center.x);
             setCenterLatitude(center.y);
-        } else {
+        });
+        if (!centerOptional.isPresent()) {
             // Does not work around 180th parallel.
             setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
             setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
