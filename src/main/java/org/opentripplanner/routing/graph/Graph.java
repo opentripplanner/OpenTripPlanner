@@ -981,12 +981,12 @@ public class Graph implements Serializable {
             TDoubleList longitudes = new TDoubleLinkedList();
             Median median = new Median();
 
-            for (Vertex v : getVertices()) {
-                if (v instanceof TransitStop) {
+            getVertices().stream()
+                .filter(v -> v instanceof TransitStop)
+                .forEach(v -> {
                     latitudes.add(v.getLat());
                     longitudes.add(v.getLon());
-                }
-            }
+                });
 
             median.setData(latitudes.toArray());
             double medianLatitude = median.evaluate();
