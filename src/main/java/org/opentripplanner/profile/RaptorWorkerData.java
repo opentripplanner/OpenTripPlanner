@@ -23,6 +23,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class RaptorWorkerData implements Serializable {
 
@@ -57,13 +58,13 @@ public class RaptorWorkerData implements Serializable {
     public transient final List<String> stopNames = new ArrayList<>();
     public transient final List<String> patternNames = new ArrayList<>();
 
-    /** Create RaptorWorkerData for the given window and graph */
-    public RaptorWorkerData (Graph graph, TimeWindow window) {
-    	this(graph, window, null);
+    /** Create RaptorWorkerData for the given window and graph, with the specified routes (specified as agencyid_routeid) banned */
+    public RaptorWorkerData (Graph graph, TimeWindow window, Set<String> bannedRoutes) {
+    	this(graph, window, bannedRoutes, null);
     }
     
     /** Create RaptorWorkerData to be used to build ResultSets directly without creating an intermediate SampleSet */
-    public RaptorWorkerData (Graph graph, TimeWindow window, SampleSet sampleSet) {
+    public RaptorWorkerData (Graph graph, TimeWindow window, Set<String> bannedRoutes, SampleSet sampleSet) {
         int totalPatterns = graph.index.patternForId.size();
         int totalStops = graph.index.stopForId.size();
         timetablesForPattern = new ArrayList<RaptorWorkerTimetable>(totalPatterns);
@@ -74,7 +75,7 @@ public class RaptorWorkerData implements Serializable {
 
         /* Make timetables for active trip patterns and record the stops each active pattern uses. */
         for (TripPattern pattern : graph.index.patternForId.values()) {
-            RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forPattern(graph, pattern, window);
+            RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forPattern(graph, pattern, window, bannedRoutes);
             if (timetable == null) {
                 // Pattern is not running during the time window
                 continue;

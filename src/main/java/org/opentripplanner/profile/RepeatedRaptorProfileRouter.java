@@ -7,7 +7,9 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.joda.time.DateTimeZone;
 import org.onebusaway.gtfs.model.Route;
@@ -114,11 +116,13 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("Make data...");
         TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date));
         
+        Set<String> bannedRoutes = request.bannedRoutes == null ? null : new HashSet<String>(request.bannedRoutes);
+        
         RaptorWorkerData raptorWorkerData;
         if (sampleSet == null)
-        	raptorWorkerData = new RaptorWorkerData(graph, window);
+        	raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes);
         else
-        	raptorWorkerData = new RaptorWorkerData(graph, window, sampleSet);
+        	raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes, sampleSet);
         LOG.info("Done.");
 // TEST SERIALIZED SIZE and SPEED
 //        try {

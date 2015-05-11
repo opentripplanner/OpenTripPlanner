@@ -2,6 +2,7 @@ package org.opentripplanner.profile;
 
 import com.google.common.collect.Lists;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -14,6 +15,7 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 public class RaptorWorkerTimetable implements Serializable {
 	
@@ -101,8 +103,11 @@ public class RaptorWorkerTimetable implements Serializable {
     	return headwaySecs.length;
     }
 
-    /** This is a factory function rather than a constructor to avoid calling the super constructor for rejected patterns. */
-    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window) {
+    /**
+     * This is a factory function rather than a constructor to avoid calling the super constructor for rejected patterns.
+     * BannedRoutes is formatted as agencyid_routeid.
+     */
+    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Set<String> bannedRoutes) {
 
         // Filter down the trips to only those running during the window
         // This filtering can reduce number of trips and run time by 80 percent
@@ -112,6 +117,11 @@ public class RaptorWorkerTimetable implements Serializable {
             if (servicesRunning.get(tt.serviceCode) &&
                     tt.getScheduledArrivalTime(0) < window.to &&
                     tt.getScheduledDepartureTime(tt.getNumStops() - 1) >= window.from) {
+            	
+            	AgencyAndId routeId = tt.trip.getRoute().getId();
+            	if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
+            		continue;
+            	
                 tripTimes.add(tt);
             }
         }
@@ -123,6 +133,11 @@ public class RaptorWorkerTimetable implements Serializable {
         			fe.getMinDeparture() < window.to &&
         			fe.getMaxArrival() > window.from
         			) {
+        		
+        		AgencyAndId routeId = fe.tripTimes.trip.getRoute().getId();
+            	if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
+            		continue;
+        		
         		// this frequency entry has the potential to be used
         		
         		if (fe.exactTimes) {
