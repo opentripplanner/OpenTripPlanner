@@ -42,6 +42,9 @@ import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.*;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.linked.TDoubleLinkedList;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -71,6 +74,7 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -970,6 +974,42 @@ public class Graph implements Serializable {
     	
     	return this.sampleFactory;	
     }
-    
-   
+
+    /**
+     * Calculates Transit center from median of coordinates of all transitStops if graph
+     * has transit. If it doesn't it isn't calculated. (mean walue of min, max latitude and longitudes are used)
+     *
+     * Transit center is saved in center variable
+     *
+     * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
+     * in memory, this can become problematic in large installations. It works without a problem on New York State.
+     * @see GraphMetadata
+     */
+    public void calculateTransitCenter() {
+        if (hasTransit) {
+
+            TDoubleList latitudes = new TDoubleLinkedList();
+            TDoubleList longitudes = new TDoubleLinkedList();
+            Median median = new Median();
+
+            for (Vertex v : getVertices()) {
+                if (v instanceof TransitStop) {
+                    latitudes.add(v.getLat());
+                    longitudes.add(v.getLon());
+                }
+            }
+
+            median.setData(latitudes.toArray());
+            double medianLatitude = median.evaluate();
+            median = new Median();
+            median.setData(longitudes.toArray());
+            double medianLongitude = median.evaluate();
+
+            this.center = new Coordinate(medianLongitude, medianLatitude);
+        }
+    }
+
+    public Coordinate getCenter() {
+        return center;
+    }
 }

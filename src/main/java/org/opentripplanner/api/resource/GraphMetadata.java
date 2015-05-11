@@ -93,11 +93,18 @@ public class GraphMetadata {
             setUpperRightLatitude(Math.max(rightEnv.getMaxY(), leftEnv.getMaxY()));
             setLowerLeftLatitude(Math.min(rightEnv.getMinY(), leftEnv.getMinY()));
         }
-        // Does not work around 180th parallel.
-        // Should be replaced by using k-means center code from TransitIndex, and storing the center directly in the graph.
-        setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
-        setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
+
+        Coordinate center = graph.getCenter();
+        if (center != null) {
+            setCenterLongitude(center.x);
+            setCenterLatitude(center.y);
+        } else {
+            // Does not work around 180th parallel.
+            setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
+            setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
+        }
     }
+
 
     public void setLowerLeftLatitude(double lowerLeftLatitude) {
         this.lowerLeftLatitude = lowerLeftLatitude;
