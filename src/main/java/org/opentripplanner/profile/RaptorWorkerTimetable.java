@@ -177,9 +177,14 @@ public class RaptorWorkerTimetable implements Serializable {
 		    	
 		    	int[] times = rwtt.frequencyTrips[i];
 		    	
+		    	// It's generally considered good practice to have frequency trips start at midnight, however that is
+		    	// not always the case, and we need to preserve the original times so that we can update them in
+		    	// real time.
+		    	int startTime = fe.tripTimes.getScheduledArrivalTime(0);
+		    	
 		    	for (int s = 0; s < fe.tripTimes.getNumStops(); s++) {
-		    		times[s * 2] = fe.tripTimes.getScheduledArrivalTime(s);
-		    		times[s * 2 + 1] = fe.tripTimes.getScheduledDepartureTime(s);
+		    		times[s * 2] = fe.tripTimes.getScheduledArrivalTime(s) - startTime;
+		    		times[s * 2 + 1] = fe.tripTimes.getScheduledDepartureTime(s) - startTime;
 		    	}
 		    	
 		    	i++;
