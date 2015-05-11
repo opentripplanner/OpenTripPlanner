@@ -33,6 +33,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.BitSetUtils;
@@ -270,6 +271,12 @@ public class StreetEdge extends Edge implements Cloneable {
                 return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
             }
             return null;
+        }
+        if (traverseMode == TraverseMode.CAR) {
+            if (fromv instanceof BarrierVertex || tov instanceof BarrierVertex) {
+                LOG.info("Can't traverse over barrier: {}", getName());
+                return null;
+            }
         }
 
         // Automobiles have variable speeds depending on the edge type

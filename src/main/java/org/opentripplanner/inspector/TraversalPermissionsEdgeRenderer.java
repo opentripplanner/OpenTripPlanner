@@ -22,11 +22,7 @@ import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
-import org.opentripplanner.routing.vertextype.TransitStation;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.*;
 
 /**
  * Render traversal permissions for each edge by color and label (walk, bicycle, car, stairs).
@@ -79,6 +75,9 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     public boolean renderVertex(Vertex v, VertexVisualAttributes attrs) {
         if (v instanceof IntersectionVertex) {
             attrs.color = STREET_COLOR_VERTEX;
+            if (v instanceof BarrierVertex) {
+                attrs.color = PARK_AND_RIDE_COLOR_VERTEX;
+            }
         } else if (v instanceof TransitStop) {
             attrs.color = TRANSIT_STOP_COLOR_VERTEX;
             attrs.label = v.getName();
