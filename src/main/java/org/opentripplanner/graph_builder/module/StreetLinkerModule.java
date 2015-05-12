@@ -46,9 +46,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         if(graph.hasStreets) {
-        	LOG.info("Linking transit stops, bike rental stations, bike parking areas, and park-and-rides to graph . . .");
-        	SimpleStreetSplitter linker = new SimpleStreetSplitter(graph);
-        	linker.link();
+            LOG.info("Linking transit stops, bike rental stations, bike parking areas, and park-and-rides to graph . . .");
+            SimpleStreetSplitter linker = new SimpleStreetSplitter(graph);
+            linker.link();
         }
     }
 

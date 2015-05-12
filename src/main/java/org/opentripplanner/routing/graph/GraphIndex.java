@@ -440,13 +440,13 @@ public class GraphIndex {
 
     /** Fetch a cache of nearby intersection distances for every transit stop in this graph, lazy-building as needed. */
     public StopTreeCache getStopTreeCache() {
-    	if (stopTreeCache == null) {
-	        synchronized (this) {
-	            if (stopTreeCache == null) {
-	                stopTreeCache = new StopTreeCache(graph, 2000); // TODO make this max-distance variable
-	            }
-	        }
-    	}
+        if (stopTreeCache == null) {
+            synchronized (this) {
+                if (stopTreeCache == null) {
+                    stopTreeCache = new StopTreeCache(graph, 2000); // TODO make this max-distance variable
+                }
+            }
+        }
         return stopTreeCache;
     }
 

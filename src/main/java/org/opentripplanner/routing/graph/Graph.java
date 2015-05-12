@@ -965,13 +965,13 @@ public class Graph implements Serializable {
     	return this.geomIndex;
     }
 
- // lazy-init sample factor on an as needed basis
+    // lazy-init sample factor on an as needed basis
     public SampleFactory getSampleFactory() {
-    	if(this.sampleFactory == null)
-    		this.sampleFactory = new SampleFactory(this);
-    	
-    	return this.sampleFactory;	
+        if(this.sampleFactory == null)
+            this.sampleFactory = new SampleFactory(this);
+
+        return this.sampleFactory;	
     }
-    
+
    
 }

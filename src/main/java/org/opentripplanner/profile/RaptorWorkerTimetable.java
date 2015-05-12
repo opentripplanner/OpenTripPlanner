@@ -18,27 +18,27 @@ import java.util.List;
 import java.util.Set;
 
 public class RaptorWorkerTimetable implements Serializable {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerTimetable.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerTimetable.class);
 
     // TODO put stop indexes in array here
     // TODO serialize using deltas and variable-width from Protobuf libs
 
     int nTrips, nStops;
     private int[][] timesPerTrip;
-    
+
     /** Times (0-based) for frequency trips */
     private int[][] frequencyTrips;
-    
+
     /** Headways (seconds) for frequency trips, parallel to above. Note that frequency trips are unsorted. */
     private int[] headwaySecs;
-    
+
     /** Start times (seconds since noon - 12h) for frequency trips */
     private int[] startTimes;
-    
+
     /** End times for frequency trips */
     private int[] endTimes;
-    
+
     /** slack required when boarding a transit vehicle */
     public static final int MIN_BOARD_TIME_SECONDS = 60;
 
@@ -68,39 +68,39 @@ public class RaptorWorkerTimetable implements Serializable {
     public int getDeparture (int trip, int stop) {
         return timesPerTrip[trip][stop * 2 + 1];
     }
-    
+
     /**
      * Get the departure on frequency trip trip at stop stop after time time,
      * assuming worst-case headway if worstCase is true.
      */
     public int getFrequencyDeparture (int trip, int stop, int time, boolean worstCase) {
-    	int timeToReachStop = frequencyTrips[trip][stop * 2 + 1];
-    	
-    	// move time forward if the frequency has not yet started.
-    	if (timeToReachStop + startTimes[trip] > time)
-    		time = timeToReachStop + startTimes[trip];
-    	
-    	if (time > timeToReachStop + endTimes[trip])
-    		return -1;
-    	
-    	if (worstCase)
-    		time += headwaySecs[trip];
-    	
-    	return time;
+        int timeToReachStop = frequencyTrips[trip][stop * 2 + 1];
+
+        // move time forward if the frequency has not yet started.
+        if (timeToReachStop + startTimes[trip] > time)
+            time = timeToReachStop + startTimes[trip];
+
+        if (time > timeToReachStop + endTimes[trip])
+            return -1;
+
+        if (worstCase)
+            time += headwaySecs[trip];
+
+        return time;
     }
-    
+
     /**
      * Get the travel time (departure to arrival) on frequency trip trip, from stop from to stop to.  
      */
     public int getFrequencyTravelTime (int trip, int from, int to) {
-    	return frequencyTrips[trip][to * 2] - frequencyTrips[trip][from * 2 + 1];
+        return frequencyTrips[trip][to * 2] - frequencyTrips[trip][from * 2 + 1];
     }
-    
+
     /**
      * Get the number of frequency trips on this pattern.
      */
     public int getFrequencyTripCount () {
-    	return headwaySecs.length;
+        return headwaySecs.length;
     }
 
     /**
@@ -117,43 +117,43 @@ public class RaptorWorkerTimetable implements Serializable {
             if (servicesRunning.get(tt.serviceCode) &&
                     tt.getScheduledArrivalTime(0) < window.to &&
                     tt.getScheduledDepartureTime(tt.getNumStops() - 1) >= window.from) {
-            	
-            	AgencyAndId routeId = tt.trip.getRoute().getId();
-            	if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
-            		continue;
-            	
+
+                AgencyAndId routeId = tt.trip.getRoute().getId();
+                if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
+                    continue;
+
                 tripTimes.add(tt);
             }
         }
-        
+
         // find frequency trips
         List<FrequencyEntry> freqs = Lists.newArrayList();
         for (FrequencyEntry fe : pattern.scheduledTimetable.frequencyEntries) {
-        	if (servicesRunning.get(fe.tripTimes.serviceCode) &&
-        			fe.getMinDeparture() < window.to &&
-        			fe.getMaxArrival() > window.from
-        			) {
-        		
-        		AgencyAndId routeId = fe.tripTimes.trip.getRoute().getId();
-            	if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
-            		continue;
-        		
-        		// this frequency entry has the potential to be used
-        		
-        		if (fe.exactTimes) {
-        			LOG.warn("Exact-times frequency trips not yet supported");
-        			continue;
-        		}
-        			
-        		
-        		freqs.add(fe);
-        	}
+            if (servicesRunning.get(fe.tripTimes.serviceCode) &&
+                    fe.getMinDeparture() < window.to &&
+                    fe.getMaxArrival() > window.from
+                    ) {
+
+                AgencyAndId routeId = fe.tripTimes.trip.getRoute().getId();
+                if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
+                    continue;
+
+                // this frequency entry has the potential to be used
+
+                if (fe.exactTimes) {
+                    LOG.warn("Exact-times frequency trips not yet supported");
+                    continue;
+                }
+
+
+                freqs.add(fe);
+            }
         }
-        
+
         if (tripTimes.isEmpty() && freqs.isEmpty()) {
             return null; // no trips active, don't bother storing a timetable
         }
-        
+
 
         // Sort the trip times by their first arrival time
         Collections.sort(tripTimes, new Comparator<TripTimes>() {
@@ -176,36 +176,36 @@ public class RaptorWorkerTimetable implements Serializable {
             }
             rwtt.timesPerTrip[t++] = times;
         }
-        
+
         // save frequency times
         rwtt.frequencyTrips = new int[freqs.size()][pattern.getStops().size() * 2];
         rwtt.endTimes = new int[freqs.size()];
         rwtt.startTimes = new int[freqs.size()];
         rwtt.headwaySecs = new int[freqs.size()];
-        
+
         {
-		    int i = 0;
-		    for (FrequencyEntry fe : freqs) {
-		    	rwtt.headwaySecs[i] = fe.headway;
-		    	rwtt.startTimes[i] = fe.startTime;
-		    	rwtt.endTimes[i] = fe.endTime;
-		    	
-		    	int[] times = rwtt.frequencyTrips[i];
-		    	
-		    	// It's generally considered good practice to have frequency trips start at midnight, however that is
-		    	// not always the case, and we need to preserve the original times so that we can update them in
-		    	// real time.
-		    	int startTime = fe.tripTimes.getScheduledArrivalTime(0);
-		    	
-		    	for (int s = 0; s < fe.tripTimes.getNumStops(); s++) {
-		    		times[s * 2] = fe.tripTimes.getScheduledArrivalTime(s) - startTime;
-		    		times[s * 2 + 1] = fe.tripTimes.getScheduledDepartureTime(s) - startTime;
-		    	}
-		    	
-		    	i++;
-		    }
+            int i = 0;
+            for (FrequencyEntry fe : freqs) {
+                rwtt.headwaySecs[i] = fe.headway;
+                rwtt.startTimes[i] = fe.startTime;
+                rwtt.endTimes[i] = fe.endTime;
+
+                int[] times = rwtt.frequencyTrips[i];
+
+                // It's generally considered good practice to have frequency trips start at midnight, however that is
+                // not always the case, and we need to preserve the original times so that we can update them in
+                // real time.
+                int startTime = fe.tripTimes.getScheduledArrivalTime(0);
+
+                for (int s = 0; s < fe.tripTimes.getNumStops(); s++) {
+                    times[s * 2] = fe.tripTimes.getScheduledArrivalTime(s) - startTime;
+                    times[s * 2 + 1] = fe.tripTimes.getScheduledDepartureTime(s) - startTime;
+                }
+
+                i++;
+            }
         }
-        
+
         return rwtt;
     }
 

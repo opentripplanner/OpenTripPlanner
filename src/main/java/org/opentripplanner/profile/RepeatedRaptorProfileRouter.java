@@ -64,7 +64,7 @@ public class RepeatedRaptorProfileRouter {
 
     /** If not null, completely skip this agency during the calculations. */
     public String banAgency = null;
-    
+
     private ShortestPathTree walkOnlySpt;
 
     /** The sum of all earliest-arrival travel times to a given transit stop. Will be divided to create an average. */
@@ -74,18 +74,18 @@ public class RepeatedRaptorProfileRouter {
     TObjectIntMap<TransitStop> counts = new TObjectIntHashMap<TransitStop>();
 
     /** Samples to propagate times to */
-	private SampleSet sampleSet;
+    private SampleSet sampleSet;
 
-	private PropagatedTimesStore propagatedTimesStore;
-    
+    private PropagatedTimesStore propagatedTimesStore;
+
     /**
      * Make a router to use for making time surfaces only.
      * If you're building ResultSets, you should use the below method that uses a SampleSet; otherwise you maximum and average may not be correct.
      */
     public RepeatedRaptorProfileRouter(Graph graph, ProfileRequest request) {
-    	this(graph, request, null);
+        this(graph, request, null);
     }
-    
+
     /**
      * Make a router to use for making ResultSets. This propagates times all the way to the samples, so that
      * average and maximum travel time are correct.
@@ -102,73 +102,73 @@ public class RepeatedRaptorProfileRouter {
         this.graph = graph;
         this.sampleSet = sampleSet;
     }
-    
+
     public void route () {
-    	long computationStartTime = System.currentTimeMillis();
-    	LOG.info("Begin profile request");
+        long computationStartTime = System.currentTimeMillis();
+        LOG.info("Begin profile request");
         LOG.info("Finding initial stops");
-        
+
         TObjectIntMap<TransitStop> accessTimes = findInitialStops(false);
-        
+
         LOG.info("Found {} initial transit stops", accessTimes.size());
 
         /** THIN WORKERS */
         LOG.info("Make data...");
         TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date));
-        
+
         Set<String> bannedRoutes = request.bannedRoutes == null ? null : new HashSet<String>(request.bannedRoutes);
-        
+
         RaptorWorkerData raptorWorkerData;
         if (sampleSet == null)
-        	raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes);
+            raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes);
         else
-        	raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes, sampleSet);
+            raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes, sampleSet);
         LOG.info("Done.");
-// TEST SERIALIZED SIZE and SPEED
-//        try {
-//            LOG.info("serializing...");
-//            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("/Users/abyrd/worker.data"));
-//            out.writeObject(raptorWorkerData);
-//            out.close();
-//            LOG.info("done");
-//        } catch(IOException i) {
-//            i.printStackTrace();
-//        }
-        
+        // TEST SERIALIZED SIZE and SPEED
+        //        try {
+        //            LOG.info("serializing...");
+        //            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("/Users/abyrd/worker.data"));
+        //            out.writeObject(raptorWorkerData);
+        //            out.close();
+        //            LOG.info("done");
+        //        } catch(IOException i) {
+        //            i.printStackTrace();
+        //        }
+
         int[] timesAtVertices = new int[Vertex.getMaxIndex()];
         Arrays.fill(timesAtVertices, TimeSurface.UNREACHABLE);
-        
+
         for (State state : walkOnlySpt.getAllStates()) {
-        	// Note that we are using the walk distance divided by speed here in order to be consistent with the
-        	// least-walk optimization in the initial stop search (and the stop tree cache which is used at egress)
-        	int time = (int) (state.getWalkDistance() / request.walkSpeed);
-        	int vidx = state.getVertex().getIndex();
-        	int otime = timesAtVertices[vidx];
-        	
-        	// There may be dominated states in the SPT. Make sure we don't include them here.
-        	if (otime == TimeSurface.UNREACHABLE || otime > time)
-        		timesAtVertices[vidx] = time;
-	        	
-	    }
-        
+            // Note that we are using the walk distance divided by speed here in order to be consistent with the
+            // least-walk optimization in the initial stop search (and the stop tree cache which is used at egress)
+            int time = (int) (state.getWalkDistance() / request.walkSpeed);
+            int vidx = state.getVertex().getIndex();
+            int otime = timesAtVertices[vidx];
+
+            // There may be dominated states in the SPT. Make sure we don't include them here.
+            if (otime == TimeSurface.UNREACHABLE || otime > time)
+                timesAtVertices[vidx] = time;
+
+        }
+
         int[] walkTimes;
-        
+
         if (sampleSet == null) {
-        	walkTimes = timesAtVertices;
+            walkTimes = timesAtVertices;
         }
         else {
-        	walkTimes = sampleSet.eval(timesAtVertices);
+            walkTimes = sampleSet.eval(timesAtVertices);
         }
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData, request);
         propagatedTimesStore = worker.runRaptor(graph, accessTimes, walkTimes);
-        
+
         if (sampleSet == null) {
-	        timeSurfaceRangeSet = new TimeSurface.RangeSet();
-	        timeSurfaceRangeSet.min = new TimeSurface(this);
-	        timeSurfaceRangeSet.avg = new TimeSurface(this);
-	        timeSurfaceRangeSet.max = new TimeSurface(this);
-	        propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
+            timeSurfaceRangeSet = new TimeSurface.RangeSet();
+            timeSurfaceRangeSet.min = new TimeSurface(this);
+            timeSurfaceRangeSet.avg = new TimeSurface(this);
+            timeSurfaceRangeSet.max = new TimeSurface(this);
+            propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
         }
 
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
@@ -179,7 +179,7 @@ public class RepeatedRaptorProfileRouter {
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
         QualifiedModeSet modes = dest ? request.accessModes : request.egressModes;
-                
+
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
         rr.batch = true;
         rr.from = new GenericLocation(lat, lon);
@@ -189,7 +189,7 @@ public class RepeatedRaptorProfileRouter {
         rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 +
                 request.fromTime;
-       
+
         // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
         // which is implemented this way because walk times can change when walk speed changes. Also, walk times are floating
         // point and can change slightly when streets are split. Street lengths are internally fixed-point ints, which do not
@@ -197,20 +197,20 @@ public class RepeatedRaptorProfileRouter {
         rr.maxWalkDistance = 2000;
         rr.softWalkLimiting = false;
         rr.dominanceFunction = new DominanceFunction.LeastWalk();
-        
+
         AStar astar = new AStar();
         rr.longDistance = true;
         rr.setNumItineraries(1);
 
         ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
-        
+
         TObjectIntMap<TransitStop> accessTimes = new TObjectIntHashMap<TransitStop>(); 
-        
+
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             State s = spt.getState(tstop);
             if (s != null) {
-            	// note that we calculate the time based on the walk speed here rather than
-            	// based on the time. this matches what we do in the stop tree cache.
+                // note that we calculate the time based on the walk speed here rather than
+                // based on the time. this matches what we do in the stop tree cache.
                 accessTimes.put(tstop, (int) (s.getWalkDistance() / request.walkSpeed));
             }
         }
@@ -220,9 +220,9 @@ public class RepeatedRaptorProfileRouter {
         rr.cleanup();
         return accessTimes;
     }
-    
+
     /** Make a result set range set, optionally including times */
     public ResultSet.RangeSet makeResults (boolean includeTimes) {
-    	return propagatedTimesStore.makeResults(sampleSet, includeTimes);
-   }
+        return propagatedTimesStore.makeResults(sampleSet, includeTimes);
+    }
 }

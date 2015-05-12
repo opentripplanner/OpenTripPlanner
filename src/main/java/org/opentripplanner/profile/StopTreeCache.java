@@ -59,7 +59,7 @@ public class StopTreeCache {
                 State state = spt.getState(vertex);
                 
                 if (state == null)
-                	continue;
+                    continue;
                 
                 distances[i++] = vertex.getIndex();
                 distances[i++] = (int) state.getWalkDistance();

@@ -16,16 +16,16 @@ import org.opentripplanner.routing.vertextype.TransitStop;
  *
  */
 public class ProfilePropagationPathParser extends InitialStopSearchPathParser {
-	private static final DFA pppDfa;
-	
-	static {
-		Nonterminal nt = seq(optional(TRANSITSTOP), star(STREET), optional(OTHER));
-		pppDfa = nt.toDFA().minimize();
-	}
-	
-	@Override
-	public DFA getDFA () {
-		return pppDfa;
-	}
+    private static final DFA pppDfa;
+
+    static {
+        Nonterminal nt = seq(optional(TRANSITSTOP), star(STREET), optional(OTHER));
+        pppDfa = nt.toDFA().minimize();
+    }
+
+    @Override
+    public DFA getDFA () {
+        return pppDfa;
+    }
 }
 

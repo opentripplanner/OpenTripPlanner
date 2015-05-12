@@ -97,11 +97,11 @@ public abstract class DominanceFunction implements Serializable {
      */
     public static class LeastWalk extends DominanceFunction {
 
-		@Override
-		protected boolean betterOrEqual(State a, State b) {
-			return a.getWalkDistance() <= b.getWalkDistance(); 
-		}
-    	
+        @Override
+        protected boolean betterOrEqual(State a, State b) {
+            return a.getWalkDistance() <= b.getWalkDistance(); 
+        }
+
     }
 
     /** In this implementation the relation is not symmetric. There are sets of mutually co-dominant states. */

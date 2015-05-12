@@ -39,93 +39,93 @@ import com.vividsolutions.jts.geom.LineString;
  * path is used and tested in multiple applications.
  */
 public class SampleStopLinker {
-	private Graph graph;
-	
-	/** keep track of stops that are linked to the same vertices */
-	private Multimap<VertexPair, TransitStop> links;
-	
-	public SampleStopLinker (Graph graph) {
-		this.graph = graph;
-	}
-	
-	/**
-	 * Link all transit stops. If makeTransfers is true, create direct transfer
-	 * edges between stops linked to the same pair of vertices. This is important
-	 * e.g. for transit centers where there are many stops on the same street segment;
-	 * we don't want to force the user to walk to the end of the street and back.
-	 * 
-	 * If you're not generating transfers via the street network there is no need to make
-	 * transfers at this stage. But if you're not generating transfers via the street network,
-	 * why are you using this module at all?
-	 */
-	public void link (boolean makeTransfers) {
-		if (makeTransfers)
-			links = HashMultimap.create();
-		
-		SampleFactory sf = graph.getSampleFactory();
-		
-		for (TransitStop tstop : Iterables.filter(graph.getVertices(), TransitStop.class)) {
-			Sample s = sf.getSample(tstop.getLon(), tstop.getLat());
-			
-			// TODO: stop unlinked annotation
-			if (s == null)
-				continue;
-			
-			new IntersectionTransitLink(tstop, (OsmVertex) s.v0, s.d0);
-			new IntersectionTransitLink((OsmVertex) s.v0, tstop, s.d0);
-			new IntersectionTransitLink(tstop, (OsmVertex) s.v1, s.d1);
-			new IntersectionTransitLink((OsmVertex) s.v1, tstop, s.d1);
-			
-			if (makeTransfers) {
-				// save the sample so we can make direct transfers between stops
-				VertexPair vp = new VertexPair(s.v0, s.v1);
-				links.put(vp, tstop);
-			}
-		}
-		
-		if (makeTransfers) {
-			// make direct transfers between stops
-			for (Collection<TransitStop> tss : links.asMap().values()) {
-				for (TransitStop ts0 : tss) {
-					for (TransitStop ts1 : tss) {
-						// make a geometry
-						GeometryFactory gf = GeometryUtils.getGeometryFactory();
-						LineString geom =
-								gf.createLineString(new Coordinate[] { ts0.getCoordinate(), ts1.getCoordinate() });
-						
-						double dist =
-								SphericalDistanceLibrary.distance(ts0.getLat(), ts0.getLon(), ts1.getLat(), ts1.getLon());
-						
-						// building unidirectional edge, we'll hit this again in the opposite direction
-						new SimpleTransfer(ts1, ts1, dist, geom);
-					}					
-				}
-			}
-		}
-	}
-	
-	/** represents an unordered pair of vertices from a sample */
-	private static class VertexPair {
-		private final int v1, v2;
-		
-		public VertexPair(Vertex v1, Vertex v2) {
-			this.v1 = v1.getIndex();
-			this.v2 = v2.getIndex();
-		}
-	
-		public int hashCode() {
-			// bidirectional hash code
-			return v1 + v2;
-		}
-	
-		public boolean equals (Object other) {
-			if (other instanceof VertexPair) {
-				VertexPair vpo = (VertexPair) other;
-				// bidirectional comparison
-				return vpo.v1 == v1 && vpo.v2 == v2 || vpo.v2 == v1 && vpo.v1 == v2; 
-			}
-			
-			return false;
-		}
-	}
+    private Graph graph;
+
+    /** keep track of stops that are linked to the same vertices */
+    private Multimap<VertexPair, TransitStop> links;
+
+    public SampleStopLinker (Graph graph) {
+        this.graph = graph;
+    }
+
+    /**
+     * Link all transit stops. If makeTransfers is true, create direct transfer
+     * edges between stops linked to the same pair of vertices. This is important
+     * e.g. for transit centers where there are many stops on the same street segment;
+     * we don't want to force the user to walk to the end of the street and back.
+     * 
+     * If you're not generating transfers via the street network there is no need to make
+     * transfers at this stage. But if you're not generating transfers via the street network,
+     * why are you using this module at all?
+     */
+    public void link (boolean makeTransfers) {
+        if (makeTransfers)
+            links = HashMultimap.create();
+
+        SampleFactory sf = graph.getSampleFactory();
+
+        for (TransitStop tstop : Iterables.filter(graph.getVertices(), TransitStop.class)) {
+            Sample s = sf.getSample(tstop.getLon(), tstop.getLat());
+
+            // TODO: stop unlinked annotation
+            if (s == null)
+                continue;
+
+            new IntersectionTransitLink(tstop, (OsmVertex) s.v0, s.d0);
+            new IntersectionTransitLink((OsmVertex) s.v0, tstop, s.d0);
+            new IntersectionTransitLink(tstop, (OsmVertex) s.v1, s.d1);
+            new IntersectionTransitLink((OsmVertex) s.v1, tstop, s.d1);
+
+            if (makeTransfers) {
+                // save the sample so we can make direct transfers between stops
+                VertexPair vp = new VertexPair(s.v0, s.v1);
+                links.put(vp, tstop);
+            }
+        }
+
+        if (makeTransfers) {
+            // make direct transfers between stops
+            for (Collection<TransitStop> tss : links.asMap().values()) {
+                for (TransitStop ts0 : tss) {
+                    for (TransitStop ts1 : tss) {
+                        // make a geometry
+                        GeometryFactory gf = GeometryUtils.getGeometryFactory();
+                        LineString geom =
+                                gf.createLineString(new Coordinate[] { ts0.getCoordinate(), ts1.getCoordinate() });
+
+                        double dist =
+                                SphericalDistanceLibrary.distance(ts0.getLat(), ts0.getLon(), ts1.getLat(), ts1.getLon());
+
+                        // building unidirectional edge, we'll hit this again in the opposite direction
+                        new SimpleTransfer(ts1, ts1, dist, geom);
+                    }
+                }
+            }
+        }
+    }
+
+    /** represents an unordered pair of vertices from a sample */
+    private static class VertexPair {
+        private final int v1, v2;
+
+        public VertexPair(Vertex v1, Vertex v2) {
+            this.v1 = v1.getIndex();
+            this.v2 = v2.getIndex();
+        }
+
+        public int hashCode() {
+            // bidirectional hash code
+            return v1 + v2;
+        }
+
+        public boolean equals (Object other) {
+            if (other instanceof VertexPair) {
+                VertexPair vpo = (VertexPair) other;
+                // bidirectional comparison
+                return vpo.v1 == v1 && vpo.v2 == v2 || vpo.v2 == v1 && vpo.v1 == v2; 
+            }
+
+            return false;
+        }
+    }
 }

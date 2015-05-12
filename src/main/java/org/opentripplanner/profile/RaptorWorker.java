@@ -30,7 +30,7 @@ public class RaptorWorker {
     List<int[]> timesPerStopPerRound;
     int[] timesPerStop;
     int[] bestTimes;
-    
+
     /** The best times for reaching stops via transit rather than via a transfer from another stop */
     int[] bestNonTransferTimes;
     int[] transferResults;
@@ -38,7 +38,7 @@ public class RaptorWorker {
 
     BitSet stopsTouched;
     BitSet patternsTouched;
-    
+
     private ProfileRequest req;
 
     public RaptorWorker(RaptorWorkerData data, ProfileRequest req) {
@@ -54,9 +54,9 @@ public class RaptorWorker {
 
     public void advance () {
         round++;
-//        timesPerStop = new int[data.nStops];
-//        Arrays.fill(timesPerStop, UNREACHED);
-//        timesPerStopPerRound.add(timesPerStop);
+        //        timesPerStop = new int[data.nStops];
+        //        Arrays.fill(timesPerStop, UNREACHED);
+        //        timesPerStopPerRound.add(timesPerStop);
         // uncomment to disable range-raptor
         //Arrays.fill(bestTimes, UNREACHED);
     }
@@ -76,14 +76,14 @@ public class RaptorWorker {
             }
             initialStops.put(stopIndex, accessTime);
         }
-        
+
         PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph, data.nTargets);
-        
+
         int iterations = (req.toTime - req.fromTime - 60) / 60 + 1;
-        
+
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
         int[][] timesAtTargetsEachMinute = new int[iterations][data.nTargets];
-        
+
         for (int departureTime = req.toTime - 60, n = 0; departureTime >= req.fromTime; departureTime -= 60, n++) {
             if (n % 15 == 0) {
                 LOG.info("minute {}", n);
@@ -104,15 +104,15 @@ public class RaptorWorker {
             // transit stop is much worse than the worst case at samples. While unlikely, it is possible that
             // a sample would be able to reach these two stops within the walk limit, but that the two
             // intersections it is connected to cannot reach both.
-            
+
             // We include the walk-only times to access transit in the results so that there are not increases in time
             // to reach blocks around the origin due to being forced to ride transit.
             System.arraycopy(walkTimes, 0, timesAtTargets, 0, walkTimes.length);
-            
+
             for (int s = 0; s < data.nStops; s++) {
-            	// it's safe to use the best time at this stop for any number of transfers, even in range-raptor,
-            	// because we allow unlimited transfers. this is slightly different from the original RAPTOR implementation:
-            	// we do not necessarily compute all pareto-optimal paths on (journey time, number of transfers).
+                // it's safe to use the best time at this stop for any number of transfers, even in range-raptor,
+                // because we allow unlimited transfers. this is slightly different from the original RAPTOR implementation:
+                // we do not necessarily compute all pareto-optimal paths on (journey time, number of transfers).
                 int baseTimeSeconds = bestNonTransferTimes[s];
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
@@ -190,69 +190,69 @@ public class RaptorWorker {
             RaptorWorkerTimetable timetable = data.timetablesForPattern.get(p);
             int[] stops = data.stopsForPattern.get(p);
             int stopPositionInPattern = -1; // first increment will land this at zero
-            
-        	int bestFreqBoardTime = Integer.MAX_VALUE;
-        	int bestFreqBoardStop = -1;
-        	int bestFreq = -1;
-            
+
+            int bestFreqBoardTime = Integer.MAX_VALUE;
+            int bestFreqBoardStop = -1;
+            int bestFreq = -1;
+
             // first look for a frequency entry
             for (int stopIndex : stops) {
-            	stopPositionInPattern += 1;
-            	
-            	// the time at this stop if we remain on board a vehicle we had already boarded
-            	int remainOnBoardTime;
-            	if (bestFreq != -1) {
-            		// we are already aboard a trip, stay on board
-            		remainOnBoardTime = bestFreqBoardTime +
-            				timetable.getFrequencyTravelTime(bestFreq, bestFreqBoardStop, stopPositionInPattern);  
-            	}
-            	else {
-            		// we cannot remain on board as we are not yet on board
-            		remainOnBoardTime = Integer.MAX_VALUE;
-            	}
-            	            	
-            	// the time at this stop if we board a new vehicle
-            	if (bestTimes[stopIndex] != UNREACHED) {
-	            	for (int trip = 0; trip < timetable.getFrequencyTripCount(); trip++) {
-	            		int boardTime = timetable.getFrequencyDeparture(trip, stopPositionInPattern, bestTimes[stopIndex], true);
-	            		
-	            		if (boardTime != -1 && boardTime < remainOnBoardTime) {
-	            			// make sure we board the best frequency entry at a stop
-	            			if (bestFreqBoardStop == stopPositionInPattern && bestFreqBoardTime < boardTime)
-	            				continue;
-	            			
-	            			// board this vehicle
-	            			// note: this boards the trip with the lowest headway at the given time.
-	            			// if there are overtaking trips all bets are off.
-	            			bestFreqBoardTime = boardTime;
-	            			bestFreqBoardStop = stopPositionInPattern;
-	            			bestFreq = trip;
-	            			// note that we do not break the loop in case there's another frequency entry that is better
-	            		}
-	            	}
-            	}
-            	
-            	// save the remain on board time. If we boarded a new trip then we know that the
-            	// remain on board time must be larger than the arrival time at the stop so will
-            	// not be saved; no need for an explicit check.
-            	if (remainOnBoardTime != Integer.MAX_VALUE && remainOnBoardTime < max_time) {
-            		if (bestNonTransferTimes[stopIndex] > remainOnBoardTime) {
-            			bestNonTransferTimes[stopIndex] = remainOnBoardTime;
-            			
-            			stopsTouched.set(stopIndex);
-            			
-                		if (bestTimes[stopIndex] > remainOnBoardTime)
-                			bestTimes[stopIndex] = remainOnBoardTime;
-            		}
-            	}
+                stopPositionInPattern += 1;
+
+                // the time at this stop if we remain on board a vehicle we had already boarded
+                int remainOnBoardTime;
+                if (bestFreq != -1) {
+                    // we are already aboard a trip, stay on board
+                    remainOnBoardTime = bestFreqBoardTime +
+                            timetable.getFrequencyTravelTime(bestFreq, bestFreqBoardStop, stopPositionInPattern);  
+                }
+                else {
+                    // we cannot remain on board as we are not yet on board
+                    remainOnBoardTime = Integer.MAX_VALUE;
+                }
+
+                // the time at this stop if we board a new vehicle
+                if (bestTimes[stopIndex] != UNREACHED) {
+                    for (int trip = 0; trip < timetable.getFrequencyTripCount(); trip++) {
+                        int boardTime = timetable.getFrequencyDeparture(trip, stopPositionInPattern, bestTimes[stopIndex], true);
+
+                        if (boardTime != -1 && boardTime < remainOnBoardTime) {
+                            // make sure we board the best frequency entry at a stop
+                            if (bestFreqBoardStop == stopPositionInPattern && bestFreqBoardTime < boardTime)
+                                continue;
+
+                            // board this vehicle
+                            // note: this boards the trip with the lowest headway at the given time.
+                            // if there are overtaking trips all bets are off.
+                            bestFreqBoardTime = boardTime;
+                            bestFreqBoardStop = stopPositionInPattern;
+                            bestFreq = trip;
+                            // note that we do not break the loop in case there's another frequency entry that is better
+                        }
+                    }
+                }
+
+                // save the remain on board time. If we boarded a new trip then we know that the
+                // remain on board time must be larger than the arrival time at the stop so will
+                // not be saved; no need for an explicit check.
+                if (remainOnBoardTime != Integer.MAX_VALUE && remainOnBoardTime < max_time) {
+                    if (bestNonTransferTimes[stopIndex] > remainOnBoardTime) {
+                        bestNonTransferTimes[stopIndex] = remainOnBoardTime;
+
+                        stopsTouched.set(stopIndex);
+
+                        if (bestTimes[stopIndex] > remainOnBoardTime)
+                            bestTimes[stopIndex] = remainOnBoardTime;
+                    }
+                }
             }
-            
+
             // don't mix frequencies and timetables
             if (bestFreq != -1)
-            	continue PATTERNS;
-            
+                continue PATTERNS;
+
             stopPositionInPattern = -1;
-            
+
             for (int stopIndex : stops) {
                 stopPositionInPattern += 1;
                 if (onTrip == -1) {
@@ -268,14 +268,14 @@ public class RaptorWorker {
                     int arrivalTime = timetable.getArrival(onTrip, stopPositionInPattern);
                     if (arrivalTime < max_time && arrivalTime < bestNonTransferTimes[stopIndex]) {
                         bestNonTransferTimes[stopIndex] = arrivalTime;
-                        
+
                         stopsTouched.set(stopIndex);
-                        
+
                         if (arrivalTime < bestTimes[stopIndex])
-                        	bestTimes[stopIndex] = arrivalTime;
-                        
+                            bestTimes[stopIndex] = arrivalTime;
+
                     }
-                    
+
                     // Check whether we can back up to an earlier trip. This could be due to an overtaking trip,
                     // or (more likely) because there was a faster way to get to a stop further down the line. 
                     while (onTrip > 0) {
@@ -301,7 +301,7 @@ public class RaptorWorker {
     private void doTransfers() {
         patternsTouched.clear();
         for (int stop = stopsTouched.nextSetBit(0); stop >= 0; stop = stopsTouched.nextSetBit(stop + 1)) {
-        	// TODO this is reboarding every trip at every stop.
+            // TODO this is reboarding every trip at every stop.
             markPatternsForStop(stop);
             int fromTime = bestNonTransferTimes[stop];
             int[] transfers = data.transfersForStop.get(stop);
@@ -313,7 +313,7 @@ public class RaptorWorker {
                     bestTimes[toStop] = toTime;
                     markPatternsForStop(toStop);
                 }
-             }
+            }
         }
     }
 

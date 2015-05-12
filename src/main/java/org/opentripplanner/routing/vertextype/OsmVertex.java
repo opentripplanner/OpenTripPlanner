@@ -10,13 +10,13 @@ import org.opentripplanner.routing.graph.Graph;
  * regardless of changes in the transit network between (or eventually within) graphs.
  */
 public class OsmVertex extends IntersectionVertex {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public OsmVertex(Graph g, String label, double x, double y) {
-		super(g, label, x, y);
-	}
+    public OsmVertex(Graph g, String label, double x, double y) {
+        super(g, label, x, y);
+    }
 
-	public OsmVertex(Graph g, String label, double x, double y, String name) {
-		super(g, label, x, y, name);
-	}
+    public OsmVertex(Graph g, String label, double x, double y, String name) {
+        super(g, label, x, y, name);
+    }
 }

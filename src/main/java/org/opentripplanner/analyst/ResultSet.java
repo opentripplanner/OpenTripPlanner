@@ -45,18 +45,18 @@ public class ResultSet implements Serializable{
         // Evaluate the surface at all points in the pointset
         int[] times = samples.eval(surface);
         buildHistograms(times, targets);
-        
+
         if (includeTimes)
-        	this.times = times;
+            this.times = times;
 
     }
     
     /** Build a new ResultSet directly from times at point features */
     public ResultSet(int[] times, PointSet targets, boolean includeTimes) {
         buildHistograms(times, targets);
-        
+
         if (includeTimes)
-        	this.times = times;
+            this.times = times;
     }
 
     /** 
@@ -165,10 +165,10 @@ public class ResultSet implements Serializable{
     
     /** A set of result sets from profile routing: min, avg, max */;
     public static class RangeSet implements Serializable {
-		public static final long serialVersionUID = 1L;
-		
-		public ResultSet min;
-    	public ResultSet avg;
-    	public ResultSet max;
+        public static final long serialVersionUID = 1L;
+
+        public ResultSet min;
+        public ResultSet avg;
+        public ResultSet max;
     }
 }

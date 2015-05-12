@@ -71,6 +71,6 @@ public class BikeRentalStation implements Serializable {
     }
     
     public String toString () {
-    	return String.format(Locale.US, "Bike rental station %s at %.6f, %.6f", name, y, x); 
+        return String.format(Locale.US, "Bike rental station %s at %.6f, %.6f", name, y, x); 
     }
 }

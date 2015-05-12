@@ -58,7 +58,7 @@ public class SampleFactory implements SampleSource {
     private double searchRadiusLat;
 
     /** When are two vertices considered equidistant and the origin should be moved slightly to avoid numerical issues? */
-	private final double EPSILON = 1e-10;
+    private final double EPSILON = 1e-10;
 
     public void setSearchRadiusM(double radiusMeters) {
         this.searchRadiusM = radiusMeters;
@@ -76,69 +76,69 @@ public class SampleFactory implements SampleSource {
         env.expandBy(searchRadiusLat / xscale, searchRadiusLat);
         @SuppressWarnings("unchecked")
         Collection<Vertex> vertices = graph.streetIndex.getVerticesForEnvelope(env);
-        
+
         // make sure things are in the radius
         final TIntDoubleMap distances = new TIntDoubleHashMap();
-        
+
         for (Vertex v : vertices) {
-        	if (!(v instanceof OsmVertex)) continue;
-        	
-        	// figure ersatz distance
-        	double dx = (lon - v.getLon()) * xscale;
-        	double dy = lat - v.getLat();
-        	distances.put(v.getIndex(), dx * dx + dy * dy);
+            if (!(v instanceof OsmVertex)) continue;
+
+            // figure ersatz distance
+            double dx = (lon - v.getLon()) * xscale;
+            double dy = lat - v.getLat();
+            distances.put(v.getIndex(), dx * dx + dy * dy);
         }
-        
+
         Collection<Vertex> osmVertices = Collections2.filter(vertices, new Predicate<Vertex>() {
 
-			@Override
-			public boolean apply(Vertex input) {
-				if (!(input instanceof OsmVertex &&
-						distances.get(input.getIndex()) < searchRadiusLat * searchRadiusLat))
-					return false;
-				
-				for (StreetEdge e : Iterables.filter(input.getOutgoing(), StreetEdge.class)) {
-					if (e.canTraverse(new TraverseModeSet(TraverseMode.WALK)))
-						return true;
-				}
-				
-				return false;
-			}
-        	
-		});
-        
+            @Override
+            public boolean apply(Vertex input) {
+                if (!(input instanceof OsmVertex &&
+                        distances.get(input.getIndex()) < searchRadiusLat * searchRadiusLat))
+                    return false;
+
+                for (StreetEdge e : Iterables.filter(input.getOutgoing(), StreetEdge.class)) {
+                    if (e.canTraverse(new TraverseModeSet(TraverseMode.WALK)))
+                        return true;
+                }
+
+                return false;
+            }
+
+        });
+
         // sort list by distance
         List<Vertex> sorted = new ArrayList<Vertex>(osmVertices);
-        
+
         Collections.sort(sorted, new Comparator<Vertex>() {
 
-			@Override
-			public int compare(Vertex o1, Vertex o2) {
-				double d1 = distances.get(o1.getIndex());
-				double d2 = distances.get(o2.getIndex());
-				
-				if (d1 < d2)
-					return -1;
-				else if (d1 > d2)
-					return 1;
-				else return 0;
-			}
-		});
-        
+            @Override
+            public int compare(Vertex o1, Vertex o2) {
+                double d1 = distances.get(o1.getIndex());
+                double d2 = distances.get(o2.getIndex());
+
+                if (d1 < d2)
+                    return -1;
+                else if (d1 > d2)
+                    return 1;
+                else return 0;
+            }
+        });
+
         // we want two vertices but we want to be sure that we're not nondeterministically excluding a third 
         if (sorted.size() > 2 && 
-        		distances.get(sorted.get(2).getIndex()) - distances.get(sorted.get(1).getIndex()) < EPSILON) {
-        	return getSample(lon + 1e-6, lat + 1e-6);
+                distances.get(sorted.get(2).getIndex()) - distances.get(sorted.get(1).getIndex()) < EPSILON) {
+            return getSample(lon + 1e-6, lat + 1e-6);
         }
         else if (sorted.isEmpty()) {
-        	return null;
+            return null;
         }
         else {
-        	Vertex v0 = sorted.get(0);
-        	Vertex v1 = sorted.size() > 1 ? sorted.get(1) : null;
-        	double d0 = v0 != null ? SphericalDistanceLibrary.distance(v0.getLat(),  v0.getLon(), lat, lon) : 0;
-        	double d1 = v1 != null ? SphericalDistanceLibrary.distance(v1.getLat(),  v1.getLon(), lat, lon) : 0;
-        	return new Sample(v0, (int) d0, v1, (int) d1);
+            Vertex v0 = sorted.get(0);
+            Vertex v1 = sorted.size() > 1 ? sorted.get(1) : null;
+            double d0 = v0 != null ? SphericalDistanceLibrary.distance(v0.getLat(),  v0.getLon(), lat, lon) : 0;
+            double d1 = v1 != null ? SphericalDistanceLibrary.distance(v1.getLat(),  v1.getLon(), lat, lon) : 0;
+            return new Sample(v0, (int) d0, v1, (int) d1);
         }
     }
 
@@ -155,24 +155,24 @@ public class SampleFactory implements SampleSource {
         Candidate c = new Candidate();
         // track the best geometry
         Candidate best = new Candidate();
-        
+
         for (Edge edge : edges) {
             /* LineString.getCoordinates() uses PackedCoordinateSequence.toCoordinateArray() which
              * necessarily builds new Coordinate objects.CoordinateSequence.getOrdinate() reads them 
              * directly. */
             c.edge = edge;
             LineString ls = (LineString)(edge.getGeometry());
-            
+
             // We used to require samples to link to OSM vertices, but that means that
             // walking to a transit stop adjacent to the sample requires walking to the
             // end of the street and back.
-            
+
             // However, linking to splitter vertices means that this sample can only be egressed in one direction,
             // because the splitter vertex is on one half of a bidirectional edge. Additionally, the splitter vertices and the connected edges
             // for the two directions are exactly coincident, which means that which one a sample gets linked to is effectively random.
             if (!edge.getFromVertex().getLabel().startsWith("osm:node:") || (edge instanceof StreetEdge && ((StreetEdge) edge).isBack()))
-            	continue;
-            
+                continue;
+
             CoordinateSequence coordSeq = ls.getCoordinateSequence();
             int numCoords = coordSeq.size();
             for (int seg = 0; seg < numCoords - 1; seg++) {
@@ -218,14 +218,14 @@ public class SampleFactory implements SampleSource {
     }
 
     private static class Candidate {
-        
+
         double dist2 = Double.POSITIVE_INFINITY;
         Edge edge = null;
         int seg = 0;
         double frac = 0;
         double x;
         double y;
-        
+
         public void setFrom(Candidate other) {
             dist2 = other.dist2;
             edge = other.edge;
@@ -238,7 +238,7 @@ public class SampleFactory implements SampleSource {
         public double distanceTo(Coordinate c) {
             return SphericalDistanceLibrary.fastDistance(y, x, c.y, c.x);
         }
-        
+
         public double distanceAlong() {
             CoordinateSequence cs = ( (LineString)(edge.getGeometry()) ).getCoordinateSequence();
             double dist = 0;
@@ -271,7 +271,7 @@ public class SampleFactory implements SampleSource {
             }
             return dist;
         }
-}
-    
-    
+    }
+
+
 }

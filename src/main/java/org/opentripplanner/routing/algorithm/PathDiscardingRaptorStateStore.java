@@ -11,7 +11,7 @@ import java.util.Collection;
 public class PathDiscardingRaptorStateStore implements RaptorStateStore {
 
     /** Maps from stops to arrival times by transit _or_ by transfer from another stop, one map per round. */
-	// suppressing warnings because generic arrays don't work in Java . . .
+    // suppressing warnings because generic arrays don't work in Java . . .
     @SuppressWarnings("rawtypes")
     private TObjectIntMap[] matrix;
 
@@ -24,7 +24,7 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
 
     /** Current round? TODO rename var */
     int current = 0;
-    
+
     @Override
     public boolean put(TransitStop t, int time, boolean transfer) {
         // This does not store internal algorithm state as it used to, but rather only the output.
@@ -35,7 +35,7 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
             bestStops.put(t, time);
 
         if (time < matrix[current].get(t)) {
-             matrix[current].put(t, time);
+            matrix[current].put(t, time);
             return true;
         }
 
@@ -44,23 +44,23 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
 
     @Override
     public void proceed() {
-    	for (TObjectIntIterator<TransitStop> it = matrix[current].iterator(); it.hasNext();) {
-    		it.advance();
-    		
-    		if (it.value() < matrix[current + 1].get(it.key()))
-    			matrix[current + 1].put(it.key(), it.value());
-    	}
+        for (TObjectIntIterator<TransitStop> it = matrix[current].iterator(); it.hasNext();) {
+            it.advance();
+
+            if (it.value() < matrix[current + 1].get(it.key()))
+                matrix[current + 1].put(it.key(), it.value());
+        }
         current++;
     }
-    
+
     public int getTime (TransitStop t) {
-    	return bestStops.get(t);
+        return bestStops.get(t);
     }
-    
+
     public int getPrev (TransitStop t) {
-    	return matrix[current - 1].get(t);
+        return matrix[current - 1].get(t);
     }
-    
+
     /**
      * Restart the search from the first round. Used when running repeated RAPTOR searches using the dynamic programming
      * algorithm.
@@ -68,31 +68,31 @@ public class PathDiscardingRaptorStateStore implements RaptorStateStore {
      * TODO write up the dynamic programming algorithm.
      */
     public void restart () {
-    	current = 0;
+        current = 0;
     }
-    
+
     public TObjectIntIterator<TransitStop> iterator () {
-    	return bestStops.iterator();
+        return bestStops.iterator();
     }
-    
+
     /** Create a new store with the given number of rounds. Remember to include the initial walk as a "round" */
     public PathDiscardingRaptorStateStore(int rounds) {
-    	this(rounds, Integer.MAX_VALUE);
+        this(rounds, Integer.MAX_VALUE);
     }
-    
+
     public PathDiscardingRaptorStateStore(int rounds, int maxTime) {
-    	this.maxTime = maxTime;
-    	
-    	matrix = new TObjectIntMap[rounds];
-    	
-    	for (int i = 0; i < rounds; i++) {
-    		matrix[i] = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
-    	}
-    	
-    	bestStops = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
+        this.maxTime = maxTime;
+
+        matrix = new TObjectIntMap[rounds];
+
+        for (int i = 0; i < rounds; i++) {
+            matrix[i] = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
+        }
+
+        bestStops = new TObjectIntHashMap<TransitStop>(1000, 0.75f, Integer.MAX_VALUE);
     }
-    
+
     public Collection<TransitStop> getTouchedStopsIncludingTransfers () {
-    	return matrix[current].keySet();
+        return matrix[current].keySet();
     }
 }

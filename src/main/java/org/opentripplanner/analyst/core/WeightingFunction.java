@@ -25,37 +25,37 @@ public abstract class WeightingFunction {
 
         double x0;  // cutoff point
         double k;   // steepness of the curve. negative
-        
+
         // the seconds at which the rolloff starts and ends.
         // (where the weight is equal to 0.999 and 0.001, respectively)
         int rolloffMin, rolloffMax;
-        
+
         // lookup table for weights
         double[] weights;
 
         public Logistic (int cutoff, double steepness) {
             this.x0 = cutoff;
             this.k = steepness;
-            
+
             // ln(1/epsilon - 1) / -k is the value at which the weight takes on the value epsilon
             this.rolloffMin = (int) (x0 + Math.log(1 / 0.999 - 1) / -k);
             this.rolloffMax = (int) (x0 + Math.log(1 / 0.001 - 1) / -k);
-            
+
             // make a lookup table for the weights
             weights = new double[rolloffMax - rolloffMin + 1];
             for (int i = rolloffMin; i <= rolloffMax; i++) {
-            	weights[i - rolloffMin] = 1 / (1 + Math.exp( -k * (i - x0)));
+                weights[i - rolloffMin] = 1 / (1 + Math.exp( -k * (i - x0)));
             }
         }
 
         @Override
         public double getWeight (int x) {
-        	if (x < rolloffMin)
-        		return 1;
-        	
-        	if (x > rolloffMax)
-        		return 0;
-        	
+            if (x < rolloffMin)
+                return 1;
+
+            if (x > rolloffMax)
+                return 0;
+
             return weights[x - rolloffMin];
         }
 

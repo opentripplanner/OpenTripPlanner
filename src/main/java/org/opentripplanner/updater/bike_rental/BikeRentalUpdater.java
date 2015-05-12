@@ -123,7 +123,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     @Override
     public void setup() throws InterruptedException, ExecutionException {
         // Creation of network linker library will not modify the graph
-    	linker = new SimpleStreetSplitter(graph);
+        linker = new SimpleStreetSplitter(graph);
 
         // Adding a bike rental station service needs a graph writer runnable
         updaterManager.executeBlocking(new GraphWriterRunnable() {
@@ -177,8 +177,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 if (vertex == null) {
                     vertex = new BikeRentalStationVertex(graph, station);
                     if (!linker.link(vertex)) {
-                    	// the toString includes the text "Bike rental station"
-                    	LOG.warn("{} not near any streets; it will not be usable.", station);
+                        // the toString includes the text "Bike rental station"
+                        LOG.warn("{} not near any streets; it will not be usable.", station);
                     }
                     verticesByStation.put(station, vertex);
                     new RentABikeOnEdge(vertex, vertex, station.networks);

@@ -15,49 +15,49 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class IntersectionTransitLink extends Edge {
-	private static final long serialVersionUID = 1L;
-	
-	private int length_mm;
-	
-	public IntersectionTransitLink(TransitStop tstop, OsmVertex intersection, int lengthMeters) {
-		super(tstop, intersection);
-		
-		length_mm = lengthMeters * 1000;
-	}
-	
-	public IntersectionTransitLink(OsmVertex intersection, TransitStop tstop, int lengthMeters) {
-		super(intersection, tstop);
-		
-		length_mm = lengthMeters * 1000;
-	}
-	
-	@Override
-	public State traverse(State s0) {
-		RoutingRequest options = s0.getOptions();
-		StateEditor s1 = s0.edit(this);
-		
-		boolean cycling = options.modes.contains(TraverseMode.BICYCLE) && !options.walkingBike;		
-		double speed = cycling ? options.bikeSpeed : options.walkSpeed;
-		
-		// speed in m/s, length in mm, so we get milliseconds
-		s1.incrementTimeInMilliseconds((long) (length_mm / speed));
-		
-		if (!cycling)
-			s1.incrementWalkDistance(length_mm / 1000d);
-		
-		return s1.makeState();
-	}
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public String getName() {
-		return "Intersection transit link: " + fromv.getName() + " -> " + tov.getName();
-	}
-	
-	@Override
-	public LineString getGeometry () {
-		GeometryFactory gf = GeometryUtils.getGeometryFactory();
-		// TODO hack so these appear in paths and the visualizer.
-		return gf.createLineString(new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()});
-	}
+    private int length_mm;
+
+    public IntersectionTransitLink(TransitStop tstop, OsmVertex intersection, int lengthMeters) {
+        super(tstop, intersection);
+
+        length_mm = lengthMeters * 1000;
+    }
+
+    public IntersectionTransitLink(OsmVertex intersection, TransitStop tstop, int lengthMeters) {
+        super(intersection, tstop);
+
+        length_mm = lengthMeters * 1000;
+    }
+
+    @Override
+    public State traverse(State s0) {
+        RoutingRequest options = s0.getOptions();
+        StateEditor s1 = s0.edit(this);
+
+        boolean cycling = options.modes.contains(TraverseMode.BICYCLE) && !options.walkingBike;		
+        double speed = cycling ? options.bikeSpeed : options.walkSpeed;
+
+        // speed in m/s, length in mm, so we get milliseconds
+        s1.incrementTimeInMilliseconds((long) (length_mm / speed));
+
+        if (!cycling)
+            s1.incrementWalkDistance(length_mm / 1000d);
+
+        return s1.makeState();
+    }
+
+    @Override
+    public String getName() {
+        return "Intersection transit link: " + fromv.getName() + " -> " + tov.getName();
+    }
+
+    @Override
+    public LineString getGeometry () {
+        GeometryFactory gf = GeometryUtils.getGeometryFactory();
+        // TODO hack so these appear in paths and the visualizer.
+        return gf.createLineString(new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()});
+    }
 
 }

@@ -33,7 +33,7 @@ public class RaptorWorkerData implements Serializable {
 
     /** The number of targets (vertices or samples) */
     public final int nTargets;
-    
+
     /** For every stop, one pair of ints (targetStopIndex, distanceMeters) for each transfer out of that stop. */
     public final List<int[]> transfersForStop = new ArrayList<>();
 
@@ -60,9 +60,9 @@ public class RaptorWorkerData implements Serializable {
 
     /** Create RaptorWorkerData for the given window and graph, with the specified routes (specified as agencyid_routeid) banned */
     public RaptorWorkerData (Graph graph, TimeWindow window, Set<String> bannedRoutes) {
-    	this(graph, window, bannedRoutes, null);
+        this(graph, window, bannedRoutes, null);
     }
-    
+
     /** Create RaptorWorkerData to be used to build ResultSets directly without creating an intermediate SampleSet */
     public RaptorWorkerData (Graph graph, TimeWindow window, Set<String> bannedRoutes, SampleSet sampleSet) {
         int totalPatterns = graph.index.patternForId.size();
@@ -128,13 +128,13 @@ public class RaptorWorkerData implements Serializable {
         // Record distances to nearby intersections for all used stops.
         // This is just a copy of StopTreeCache using int indices for stops.
         if (sampleSet == null) {
-	        for (Stop stop : stopForIndex) {
-	            TransitStop tstop = graph.index.stopVertexForStop.get(stop);
-	            targetsForStop.add(stc.distancesForStop.get(tstop));
-	        }
-	        nTargets = Vertex.getMaxIndex();
+            for (Stop stop : stopForIndex) {
+                TransitStop tstop = graph.index.stopVertexForStop.get(stop);
+                targetsForStop.add(stc.distancesForStop.get(tstop));
+            }
+            nTargets = Vertex.getMaxIndex();
         }
-        
+
         // Record distances to each sample
         // We need to propagate all the way to samples when doing repeated RAPTOR.
         // Consider the situation where there are two parallel transit lines on
@@ -147,87 +147,87 @@ public class RaptorWorkerData implements Serializable {
         // a sample would be able to reach these two stops within the walk limit, but that the two
         // intersections it is connected to cannot reach both.
         else {
-        	TIntObjectMap<List<HalfSample>> sampleIndex = new TIntObjectHashMap<List<HalfSample>>();
-        	
-        	for (int i = 0; i < sampleSet.pset.capacity; i++) {
-        		if (sampleSet.v0s[i] == null)
-        			continue;
-        		
-        		// VERTEX 0
-        		int v0 = sampleSet.v0s[i].getIndex();
-        		
-        		List<HalfSample> list;
-        		if (sampleIndex.containsKey(v0))
-        			list = sampleIndex.get(v0);
-        		else {
-        			list = new ArrayList<HalfSample>();
-        			sampleIndex.put(v0, list);
-        		}
-        		
-        		list.add(new HalfSample(i, sampleSet.d0s[i]));
-        		
-        		// VERTEX 1
-        		if (sampleSet.v1s[i] != null) {
-	        		int v1 = sampleSet.v1s[i].getIndex();
-	        		if (sampleIndex.containsKey(v1))
-	        			list = sampleIndex.get(v1);
-	        		else {
-	        			list = new ArrayList<HalfSample>();
-	        			sampleIndex.put(v1, list);
-	        		}
-	        		
-	        		list.add(new HalfSample(i, sampleSet.d1s[i]));
-        		}
-        	}
-        	
-        	// iterate over stops, build distances to samples
-        	TIntList out = new TIntArrayList();
-        	
-        	STOP: for (Stop stop : stopForIndex) {
-        		TransitStop tstop = graph.index.stopVertexForStop.get(stop);
-        		
-        		out.clear();
-        		
-        		int[] distancesForStop = stc.distancesForStop.get(tstop);
-        		
-        		STREET: for (int i = 0; i < distancesForStop.length; i++) {
-        			int v = distancesForStop[i++];
-        			int d = distancesForStop[i];
-        			
-        			if (!sampleIndex.containsKey(v))
-        				continue STREET;
-        			
-        			// Possible optimization: it's possible (indeed, likely) that the sample
-        			// is reachable two ways from a given stop. We could collapse this array down
-        			// and make propagation faster.
-        			SAMPLE: for (HalfSample s : sampleIndex.get(v)) {
-        				int distance = Math.round(d + s.distance);
-        				if (distance > stc.maxWalkMeters)
-        					continue;
-        				
-        				out.add(s.index);
-        				out.add(distance);
-        			}
-        		}
-        		
-        		targetsForStop.add(out.toArray());
-        	}
-        	
-        	nTargets = sampleSet.pset.capacity;
+            TIntObjectMap<List<HalfSample>> sampleIndex = new TIntObjectHashMap<List<HalfSample>>();
+
+            for (int i = 0; i < sampleSet.pset.capacity; i++) {
+                if (sampleSet.v0s[i] == null)
+                    continue;
+
+                // VERTEX 0
+                int v0 = sampleSet.v0s[i].getIndex();
+
+                List<HalfSample> list;
+                if (sampleIndex.containsKey(v0))
+                    list = sampleIndex.get(v0);
+                else {
+                    list = new ArrayList<HalfSample>();
+                    sampleIndex.put(v0, list);
+                }
+
+                list.add(new HalfSample(i, sampleSet.d0s[i]));
+
+                // VERTEX 1
+                if (sampleSet.v1s[i] != null) {
+                    int v1 = sampleSet.v1s[i].getIndex();
+                    if (sampleIndex.containsKey(v1))
+                        list = sampleIndex.get(v1);
+                    else {
+                        list = new ArrayList<HalfSample>();
+                        sampleIndex.put(v1, list);
+                    }
+
+                    list.add(new HalfSample(i, sampleSet.d1s[i]));
+                }
+            }
+
+            // iterate over stops, build distances to samples
+            TIntList out = new TIntArrayList();
+
+            STOP: for (Stop stop : stopForIndex) {
+                TransitStop tstop = graph.index.stopVertexForStop.get(stop);
+
+                out.clear();
+
+                int[] distancesForStop = stc.distancesForStop.get(tstop);
+
+                STREET: for (int i = 0; i < distancesForStop.length; i++) {
+                    int v = distancesForStop[i++];
+                    int d = distancesForStop[i];
+
+                    if (!sampleIndex.containsKey(v))
+                        continue STREET;
+
+                    // Possible optimization: it's possible (indeed, likely) that the sample
+                    // is reachable two ways from a given stop. We could collapse this array down
+                    // and make propagation faster.
+                    SAMPLE: for (HalfSample s : sampleIndex.get(v)) {
+                        int distance = Math.round(d + s.distance);
+                        if (distance > stc.maxWalkMeters)
+                            continue;
+
+                        out.add(s.index);
+                        out.add(distance);
+                    }
+                }
+
+                targetsForStop.add(out.toArray());
+            }
+
+            nTargets = sampleSet.pset.capacity;
         }
-        
+
         nStops = stopForIndex.size();
         nPatterns = patternForIndex.size();
     }
 
     /** half a sample: the index in the sample set, and the distance to one of the vertices */
     private static class HalfSample {
-    	public HalfSample(int index, float distance) {
-    		this.index = index;
-    		this.distance = distance;
-		}
-    	
-		int index;
-    	float distance;
+        public HalfSample(int index, float distance) {
+            this.index = index;
+            this.distance = distance;
+        }
+
+        int index;
+        float distance;
     }
 }

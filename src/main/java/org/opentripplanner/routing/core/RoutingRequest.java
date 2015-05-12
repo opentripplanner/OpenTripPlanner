@@ -551,9 +551,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     // or one with soft walk limiting, disable walk limit.
     public double getMaxWalkDistance() {
         if (modes.isTransit() || (batch && !softWalkLimiting)) {
-        	return maxWalkDistance;
+            return maxWalkDistance;
         } else {
-        	return Double.MAX_VALUE;            
+            return Double.MAX_VALUE;            
         }
     }
     

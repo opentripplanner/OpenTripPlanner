@@ -569,7 +569,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
 
                 OsmVertex startEndpoint = null;
-				OsmVertex endEndpoint = null;
+                OsmVertex endEndpoint = null;
 
                 ArrayList<Coordinate> segmentCoordinates = new ArrayList<Coordinate>();
 

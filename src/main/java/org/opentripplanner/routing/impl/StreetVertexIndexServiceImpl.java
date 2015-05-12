@@ -91,7 +91,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public static final double MAX_DISTANCE_FROM_STREET_METERS = 1000;
     
     private static final double MAX_DISTANCE_FROM_STREET_DEGREES =
-    		MAX_DISTANCE_FROM_STREET_METERS * 180 / Math.PI * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
+            MAX_DISTANCE_FROM_STREET_METERS * 180 / Math.PI * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
@@ -462,7 +462,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         CandidateEdgeBundle candidateEdges = new CandidateEdgeBundle();
         while (candidateEdges.size() == 0) {
             // expand envelope -- assumes many close searches and occasional far ones
-        	// scale the latitude degrees so that longitude is equivalent
+            // scale the latitude degrees so that longitude is equivalent
             envelope.expandBy(envelopeGrowthAmount / xscale, envelopeGrowthAmount);
             radius += envelopeGrowthAmount;
             if (radius > MAX_DISTANCE_FROM_STREET_DEGREES) {
@@ -609,23 +609,23 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return e != null ? e.nearestPointOnEdge : null;
     }
 
-	@Override
-	public Vertex getSampleVertexAt(Coordinate coordinate) {
-		SampleFactory sfac = graph.getSampleFactory();
-		
-		Sample s = sfac.getSample(coordinate.x, coordinate.y);
-		
-		if (s == null)
-			return null;
-		
-		// create temp vertex
-		// TODO dest sample vertices for arrive-by
-		SampleVertex v = new SampleVertex(graph, coordinate);
-		
-		// create edges
-		new SampleEdge(v, s.v0, s.d0);
-		new SampleEdge(v, s.v1, s.d1);
-		
-		return v;
-	}
+    @Override
+    public Vertex getSampleVertexAt(Coordinate coordinate) {
+        SampleFactory sfac = graph.getSampleFactory();
+
+        Sample s = sfac.getSample(coordinate.x, coordinate.y);
+
+        if (s == null)
+            return null;
+
+        // create temp vertex
+        // TODO dest sample vertices for arrive-by
+        SampleVertex v = new SampleVertex(graph, coordinate);
+
+        // create edges
+        new SampleEdge(v, s.v0, s.d0);
+        new SampleEdge(v, s.v1, s.d1);
+
+        return v;
+    }
 }
