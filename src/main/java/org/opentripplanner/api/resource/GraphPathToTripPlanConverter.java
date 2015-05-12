@@ -689,7 +689,7 @@ public abstract class GraphPathToTripPlanConverter {
      * 
      * @return
      */
-    public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale wantedLocale) {
+    public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale requestedLocale) {
         List<WalkStep> steps = new ArrayList<WalkStep>();
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
@@ -723,7 +723,7 @@ public abstract class GraphPathToTripPlanConverter {
             // before or will come after
             if (edge instanceof ElevatorAlightEdge) {
                 // don't care what came before or comes after
-                step = createWalkStep(graph, forwardState, wantedLocale);
+                step = createWalkStep(graph, forwardState, requestedLocale);
                 createdNewStep = true;
                 disableZagRemovalForThisStep = true;
 
@@ -733,7 +733,7 @@ public abstract class GraphPathToTripPlanConverter {
                 // exit != null and uses to <exit>
                 // the floor name is the AlightEdge name
                 // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-                step.streetName = ((ElevatorAlightEdge) edge).getName(wantedLocale); 
+                step.streetName = ((ElevatorAlightEdge) edge).getName(requestedLocale);
 
                 step.relativeDirection = RelativeDirection.ELEVATOR;
 
@@ -741,7 +741,7 @@ public abstract class GraphPathToTripPlanConverter {
                 continue;
             }
 
-            String streetName = edge.getName(wantedLocale);
+            String streetName = edge.getName(requestedLocale);
             int idx = streetName.indexOf('(');
             String streetNameNoParens;
             if (idx > 0)
@@ -751,7 +751,7 @@ public abstract class GraphPathToTripPlanConverter {
 
             if (step == null) {
                 // first step
-                step = createWalkStep(graph, forwardState, wantedLocale);
+                step = createWalkStep(graph, forwardState, requestedLocale);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -782,7 +782,7 @@ public abstract class GraphPathToTripPlanConverter {
                     roundaboutExit = 0;
                 }
                 /* start a new step */
-                step = createWalkStep(graph, forwardState, wantedLocale);
+                step = createWalkStep(graph, forwardState, requestedLocale);
                 createdNewStep = true;
 
                 steps.add(step);
@@ -790,7 +790,7 @@ public abstract class GraphPathToTripPlanConverter {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
-                    roundaboutPreviousStreet = backState.getBackEdge().getName(wantedLocale);
+                    roundaboutPreviousStreet = backState.getBackEdge().getName(requestedLocale);
                     idx = roundaboutPreviousStreet.indexOf('(');
                     if (idx > 0)
                         roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
@@ -827,7 +827,7 @@ public abstract class GraphPathToTripPlanConverter {
                         // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
-                            if (alternative.getName(wantedLocale).equals(streetName)) {
+                            if (alternative.getName(requestedLocale).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -852,7 +852,7 @@ public abstract class GraphPathToTripPlanConverter {
                                 continue; // this is not an alternative
                             }
                             alternative = alternatives.get(0);
-                            if (alternative.getName(wantedLocale).equals(streetName)) {
+                            if (alternative.getName(requestedLocale).equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
                                 continue;
@@ -869,7 +869,7 @@ public abstract class GraphPathToTripPlanConverter {
 
                     if (shouldGenerateContinue) {
                         // turn to stay on same-named street
-                        step = createWalkStep(graph, forwardState, wantedLocale);
+                        step = createWalkStep(graph, forwardState, requestedLocale);
                         createdNewStep = true;
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle, false);
@@ -962,7 +962,7 @@ public abstract class GraphPathToTripPlanConverter {
 
             // increment the total length for this step
             step.distance += edge.getDistance();
-            step.addAlerts(graph.streetNotesService.getNotes(forwardState), wantedLocale);
+            step.addAlerts(graph.streetNotesService.getNotes(forwardState), requestedLocale);
             lastAngle = DirectionUtils.getLastAngle(geom);
 
             step.edges.add(edge);
