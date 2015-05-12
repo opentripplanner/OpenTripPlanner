@@ -17,6 +17,8 @@ import java.util.Locale;
 
 /**
  *
+ * This interface is used when providing translations on server side.
+ *
  * @author mabu
  */
 public interface I18NString {

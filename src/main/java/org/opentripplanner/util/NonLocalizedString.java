@@ -17,6 +17,9 @@ import java.io.Serializable;
 import java.util.Locale;
 
 /**
+ * This is to support strings which can't be localized.
+ *
+ * It just returns string it is given in constructor.
  *
  * @author mabu
  */

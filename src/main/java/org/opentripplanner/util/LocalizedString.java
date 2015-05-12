@@ -25,6 +25,13 @@ import java.util.regex.Pattern;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
+ * This is used to localize strings for which localization are known beforehand.
+ * Those are local names for:
+ * unanamedStreet, corner of x and y, path, bike_path etc.
+ *
+ * Translations are in src/main/resources/WayProperties_lang.properties and internals_lang.properties
+ *
+ * locale is set in request.
  *
  * @author mabu
  */

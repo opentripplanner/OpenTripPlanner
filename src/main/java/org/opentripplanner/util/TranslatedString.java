@@ -6,6 +6,12 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * This is for translated strings for which translations are read from OSM or GTFS alerts.
+ *
+ * This can be translated street names, GTFS alerts and notes.
+ * @author Hannes Junnila
+ */
 public class TranslatedString implements I18NString, Serializable {
 
     /**
