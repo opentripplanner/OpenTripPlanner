@@ -330,7 +330,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     } else if (uniqueNames.size() == 1) {
                         calculatedName = new NonLocalizedString(uniqueNames.get(0));
                     } else {
-                        calculatedName = new LocalizedString("unnamedStreed", (String[]) null); 
+                        calculatedName = new LocalizedString("unnamedStreet", (String[]) null);
                     }
                 }
                 TemporaryStreetLocation closest = new TemporaryStreetLocation(
