@@ -51,6 +51,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -226,13 +227,22 @@ public class IndexAPI {
        return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
    }
 
-    /** Return upcoming vehicle arrival/departure times at the given stop. */
+    /** Return upcoming vehicle arrival/departure times at the given stop.
+     *
+     * @param stopIdString Stop ID in Agency:Stop ID format
+     * @param startTime Start time for the search. Seconds from UNIX epoch
+     * @param timeRange Searches forward for timeRange seconds from startTime
+     * @param numberOfDepartures Number of departures to fetch per pattern
+     */
     @GET
     @Path("/stops/{stopId}/stoptimes")
-    public Response getStoptimesForStop (@PathParam("stopId") String stopIdString) {
+    public Response getStoptimesForStop (@PathParam("stopId") String stopIdString,
+                                         @QueryParam("startTime") long startTime,
+                                         @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
+                                         @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        return Response.status(Status.OK).entity(index.stopTimesForStop(stop)).build();
+        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures)).build();
     }
 
     /**
