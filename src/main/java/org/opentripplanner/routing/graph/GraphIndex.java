@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.graph;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -37,14 +38,12 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -301,12 +300,9 @@ public class GraphIndex {
     /**
      * Fetch upcoming vehicle departures from a stop.
      * Fetches two departures for each pattern during the next 24 hours as default
-     *
-     * @param stop
-     * @return
      */
     public Collection<StopTimesInPattern> stopTimesForStop(Stop stop) {
-        return getStopTimesForStop(stop, 24 * 60 * 60, 2);
+        return stopTimesForStop(stop, 24 * 60 * 60, 2);
     }
 
     /**
@@ -317,13 +313,9 @@ public class GraphIndex {
      * eg. with sleeper trains.
      *
      * TODO: Add frequency based trips
-     *
-     * @param stop
-     * @param timeRange
-     * @param numberOfDepartures
-     * @return
+     * FIXME: document the meaning of the parameters. what is timeRange?
      */
-    public List<StopTimesInPattern> getStopTimesForStop(Stop stop, int timeRange, int numberOfDepartures) {
+    public List<StopTimesInPattern> stopTimesForStop(Stop stop, int timeRange, int numberOfDepartures) {
 
         long now = System.currentTimeMillis()/1000;
         List<StopTimesInPattern> ret = new ArrayList<>();
