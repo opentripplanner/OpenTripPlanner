@@ -23,6 +23,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.opentripplanner.analyst.core.Sample;
+import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -32,6 +34,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.SampleEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
@@ -41,6 +44,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -75,16 +79,19 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     // private static final double SEARCH_RADIUS_M = 100; // meters
     // private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
 
-    /* all distance constants here are plate-carée Euclidean, 0.001 ~= 100m at equator */
-
-    // Edges will only be found if they are closer than this distance
-    public static final double MAX_DISTANCE_FROM_STREET = 0.01000;
-
-    // Maximum difference in distance for two geometries to be considered coincident
+    // Maximum difference in distance for two geometries to be considered coincident, plate-carée Euclidean
+    // 0.001 ~= 100m at equator
     public static final double DISTANCE_ERROR = 0.000001;
 
     // If a point is within MAX_CORNER_DISTANCE, it is treated as at the corner.
     private static final double MAX_CORNER_DISTANCE_METERS = 10;
+    
+    // Edges will only be found if they are closer than this distance
+    // TODO: this default may be too large?
+    public static final double MAX_DISTANCE_FROM_STREET_METERS = 1000;
+    
+    private static final double MAX_DISTANCE_FROM_STREET_DEGREES =
+            MAX_DISTANCE_FROM_STREET_METERS * 180 / Math.PI * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
@@ -445,14 +452,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Coordinate coordinate = location.getCoordinate();
         Envelope envelope = new Envelope(coordinate);
 
-        double envelopeGrowthAmount = 0.001; // ~= 100 meters
+        double envelopeGrowthAmount = 0.001; // ~= 100 meters at equator
+        
+        // in latitude degrees, converted to longitude degrees as needed
         double radius = 0;
+        
+        double xscale = Math.cos(coordinate.y * Math.PI / 180);
+        
         CandidateEdgeBundle candidateEdges = new CandidateEdgeBundle();
         while (candidateEdges.size() == 0) {
             // expand envelope -- assumes many close searches and occasional far ones
-            envelope.expandBy(envelopeGrowthAmount);
+            // scale the latitude degrees so that longitude is equivalent
+            envelope.expandBy(envelopeGrowthAmount / xscale, envelopeGrowthAmount);
             radius += envelopeGrowthAmount;
-            if (radius > MAX_DISTANCE_FROM_STREET) {
+            if (radius > MAX_DISTANCE_FROM_STREET_DEGREES) {
                 return candidateEdges; // empty list
             }
 
@@ -486,6 +499,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
+                // The distance is represented in latitude degrees regardless of direction because the
+                // coordinate system is scaled
                 if (ce.distance < radius) {
                     candidateEdges.add(ce);
                 }
@@ -550,6 +565,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double bestDistanceMeter = Double.POSITIVE_INFINITY;
         for (Vertex v : nearby) {
             if (v instanceof StreetVertex) {
+                v.getLabel().startsWith("osm:");
                 double distanceMeter = SphericalDistanceLibrary.fastDistance(coordinate, v.getCoordinate());
                 if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
                     if (distanceMeter < bestDistanceMeter) {
@@ -561,7 +577,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return nearest;
     }
-
+    
     @Override
     public Vertex getVertexForLocation(GenericLocation loc, RoutingRequest options,
                                        boolean endVertex) {
@@ -591,5 +607,25 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public Coordinate getClosestPointOnStreet(Coordinate c) {
         CandidateEdge e = getClosestEdges(new GenericLocation(c), new TraversalRequirements()).best;
         return e != null ? e.nearestPointOnEdge : null;
+    }
+
+    @Override
+    public Vertex getSampleVertexAt(Coordinate coordinate) {
+        SampleFactory sfac = graph.getSampleFactory();
+
+        Sample s = sfac.getSample(coordinate.x, coordinate.y);
+
+        if (s == null)
+            return null;
+
+        // create temp vertex
+        // TODO dest sample vertices for arrive-by
+        SampleVertex v = new SampleVertex(graph, coordinate);
+
+        // create edges
+        new SampleEdge(v, s.v0, s.d0);
+        new SampleEdge(v, s.v1, s.d1);
+
+        return v;
     }
 }

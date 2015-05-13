@@ -228,30 +228,41 @@ public class RoutingContext implements Cloneable {
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
-            // normal mode, search for vertices based RoutingRequest
-            if (!opt.batch || opt.arriveBy) {
-                // non-batch mode, or arriveBy batch mode: we need a to vertex
+            if (opt.batch) {
+                // batch mode: find an OSM vertex, don't split
+                // We do this so that we are always linking to the same thing in analyst mode
+                // even if the transit network has changed.
+                // TODO offset time by distance to nearest OSM node?
+                if (opt.arriveBy) {
+                    // TODO what if there is no coordinate but instead a named place?
+                    toVertex = graph.streetIndex.getSampleVertexAt(opt.to.getCoordinate());
+                    fromVertex = null;
+                }
+                else {
+                    fromVertex = graph.streetIndex.getSampleVertexAt(opt.from.getCoordinate());
+                    toVertex = null;
+                }
+            }
+
+            else {
+                // normal mode, search for vertices based RoutingRequest and split streets
                 toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt, true);
                 if (opt.to.hasEdgeId()) {
                     toBackEdge = graph.getEdgeById(opt.to.edgeId);
                 }
-            } else {
-                toVertex = null;
-            }
-            if (opt.startingTransitTripId != null && !opt.arriveBy) {
-                // Depart on-board mode: set the from vertex to "on-board" state
-                OnBoardDepartService onBoardDepartService = graph.getService(OnBoardDepartService.class);
-                if (onBoardDepartService == null)
-                    throw new UnsupportedOperationException("Missing OnBoardDepartService");
-                fromVertex = onBoardDepartService.setupDepartOnBoard(this);
-            } else if (!opt.batch || !opt.arriveBy) {
-                // non-batch mode, or depart-after batch mode: we need a from vertex
-                fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, false);
-                if (opt.from.hasEdgeId()) {
-                    fromBackEdge = graph.getEdgeById(opt.from.edgeId);
+
+                if (opt.startingTransitTripId != null && !opt.arriveBy) {
+                    // Depart on-board mode: set the from vertex to "on-board" state
+                    OnBoardDepartService onBoardDepartService = graph.getService(OnBoardDepartService.class);
+                    if (onBoardDepartService == null)
+                        throw new UnsupportedOperationException("Missing OnBoardDepartService");
+                    fromVertex = onBoardDepartService.setupDepartOnBoard(this);
+                } else {
+                    fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, false);
+                    if (opt.from.hasEdgeId()) {
+                        fromBackEdge = graph.getEdgeById(opt.from.edgeId);
+                    }
                 }
-            } else {
-                fromVertex = null;
             }
         } else {
             // debug mode, force endpoint vertices to those specified rather than searching

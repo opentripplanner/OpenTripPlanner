@@ -282,6 +282,7 @@ public class GraphPathFinder {
             if (e instanceof TransferEdge)      return TRANSFER;
             if (e instanceof TimedTransferEdge) return TRANSFER;
             if (e instanceof StreetTransitLink) return LINK;
+            if (e instanceof IntersectionTransitLink) return LINK;
             if (e instanceof PathwayEdge)       return LINK;
             // Is it really correct to clasify all other edges as STREET?
             return STREET;

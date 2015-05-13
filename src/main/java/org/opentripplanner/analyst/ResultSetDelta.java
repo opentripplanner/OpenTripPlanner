@@ -2,7 +2,7 @@ package org.opentripplanner.analyst;
 
 import java.util.Map.Entry;
 
-public class ResultSetDelta extends ResultSetWithTimes {
+public class ResultSetDelta extends ResultSet {
 
     private static final long serialVersionUID = -6723127825189535112L;
 
@@ -22,7 +22,7 @@ public class ResultSetDelta extends ResultSetWithTimes {
     }
     
     /** build a resultsetdelta from two resultsetswithtimes that have already been precalculated */
-    public ResultSetDelta(ResultSetWithTimes result1, ResultSetWithTimes result2) {
+    public ResultSetDelta(ResultSet result1, ResultSet result2) {
         if (result1.times.length != result2.times.length)
             throw new IllegalArgumentException("Result sets do not match when constructing delta!");
         

@@ -54,7 +54,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * This allows re-using the same scheduled arrival and departure time arrays for many
      * different TripTimes. It is also used in materializing frequency-based TripTimes.
      */
-    private int timeShift;
+    int timeShift;
 
     /** The trips whose arrivals and departures are represented by this TripTimes */
     public final Trip trip;
@@ -76,25 +76,25 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
      * The time in seconds after midnight at which the vehicle should arrive at each stop according
      * to the original schedule.
      */
-    private final int[] scheduledArrivalTimes;
+    final int[] scheduledArrivalTimes;
 
     /**
      * The time in seconds after midnight at which the vehicle should leave each stop according
      * to the original schedule.
      */
-    private final int[] scheduledDepartureTimes;
+    final int[] scheduledDepartureTimes;
 
     /**
      * The time in seconds after midnight at which the vehicle arrives at each stop, accounting for
      * any real-time updates. Non-final to allow updates.
      */
-    private int[] arrivalTimes;
+    int[] arrivalTimes;
 
     /**
      * The time in seconds after midnight at which the vehicle leaves each stop, accounting for
      * any real-time updates. Non-final to allow updates.
      */
-    private int[] departureTimes;
+    int[] departureTimes;
 
     /**
      * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits

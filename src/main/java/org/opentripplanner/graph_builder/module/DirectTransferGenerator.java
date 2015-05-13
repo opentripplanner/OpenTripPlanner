@@ -51,7 +51,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-
         /* Initialize graph index which is needed by the nearby stop finder. */
         if (graph.index == null) {
             graph.index = new GraphIndex(graph);

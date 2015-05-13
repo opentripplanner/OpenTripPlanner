@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.bike_rental;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -67,5 +68,9 @@ public class BikeRentalStation implements Serializable {
     
     public int hashCode() {
         return id.hashCode() + 1;
+    }
+    
+    public String toString () {
+        return String.format(Locale.US, "Bike rental station %s at %.6f, %.6f", name, y, x); 
     }
 }

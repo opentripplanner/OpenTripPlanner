@@ -73,7 +73,8 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.slf4j.Logger;
@@ -228,16 +229,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
         // track OSM nodes which are decomposed into multiple graph vertices because they are
         // elevators. later they will be iterated over to build ElevatorEdges between them.
-        private HashMap<Long, HashMap<OSMLevel, IntersectionVertex>> multiLevelNodes = new HashMap<Long, HashMap<OSMLevel, IntersectionVertex>>();
+        private HashMap<Long, HashMap<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<Long, HashMap<OSMLevel, OsmVertex>>();
 
         // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
-        private Map<Long, IntersectionVertex> intersectionNodes = new HashMap<Long, IntersectionVertex>();
+        private Map<Long, OsmVertex> intersectionNodes = new HashMap<Long, OsmVertex>();
 
         // track vertices to be removed in the turn-graph conversion.
         // this is a superset of intersectionNodes.values, which contains
         // a null vertex reference for multilevel nodes. the individual vertices
         // for each level of a multilevel node are includeed in endpoints.
-        private ArrayList<IntersectionVertex> endpoints = new ArrayList<IntersectionVertex>();
+        private ArrayList<OsmVertex> endpoints = new ArrayList<OsmVertex>();
 
         public Handler(Graph graph, OSMDatabase osmdb) {
             this.graph = graph;
@@ -435,7 +436,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         private boolean buildParkAndRideAreasForGroup(AreaGroup group) {
             Envelope envelope = new Envelope();
             // Process all nodes from outer rings
-            List<IntersectionVertex> accessVertexes = new ArrayList<IntersectionVertex>();
+            // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
+            List<OsmVertex> accessVertexes = new ArrayList<OsmVertex>();
             String creativeName = null;
             long osmId = 0L;
             for (Area area : group.areas) {
@@ -445,7 +447,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 for (Ring ring : area.outermostRings) {
                     for (OSMNode node : ring.nodes) {
                         envelope.expandToInclude(new Coordinate(node.lon, node.lat));
-                        IntersectionVertex accessVertex = getVertexForOsmNode(node, area.parent);
+                        OsmVertex accessVertex = getVertexForOsmNode(node, area.parent);
                         if (accessVertex.getIncoming().isEmpty()
                                 || accessVertex.getOutgoing().isEmpty())
                             continue;
@@ -462,7 +464,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             boolean carAccessibleIn = false;
             boolean walkAccessibleOut = false;
             boolean carAccessibleOut = false;
-            for (IntersectionVertex accessVertex : accessVertexes) {
+            for (OsmVertex accessVertex : accessVertexes) {
                 for (Edge incoming : accessVertex.getIncoming()) {
                     if (incoming instanceof StreetEdge) {
                         if (walkReq.canBeTraversed((StreetEdge)incoming))
@@ -498,7 +500,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     "P+R_" + osmId, (envelope.getMinX() + envelope.getMaxX()) / 2,
                     (envelope.getMinY() + envelope.getMaxY()) / 2, creativeName);
             new ParkAndRideEdge(parkAndRideVertex);
-            for (IntersectionVertex accessVertex : accessVertexes) {
+            for (OsmVertex accessVertex : accessVertexes) {
                 new ParkAndRideLinkEdge(parkAndRideVertex, accessVertex);
                 new ParkAndRideLinkEdge(accessVertex, parkAndRideVertex);
             }
@@ -566,7 +568,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     lastLevel = level;
                 }
 
-                IntersectionVertex startEndpoint = null, endEndpoint = null;
+                OsmVertex startEndpoint = null;
+                OsmVertex endEndpoint = null;
 
                 ArrayList<Coordinate> segmentCoordinates = new ArrayList<Coordinate>();
 
@@ -711,7 +714,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 // subscript it so we can loop over it in twos. Assumedly, it will stay
                 // sorted when we convert it to an Array.
                 // The objects are Integers, but toArray returns Object[]
-                HashMap<OSMLevel, IntersectionVertex> vertices = multiLevelNodes.get(nodeId);
+                HashMap<OSMLevel, OsmVertex> vertices = multiLevelNodes.get(nodeId);
 
                 /*
                  * first, build FreeEdges to disconnect from the graph, GenericVertices to serve as attachment points, and ElevatorBoard and
@@ -730,7 +733,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 ArrayList<Vertex> onboardVertices = new ArrayList<Vertex>();
                 for (OSMLevel level : levels) {
                     // get the node to build the elevator out from
-                    IntersectionVertex sourceVertex = vertices.get(level);
+                    OsmVertex sourceVertex = vertices.get(level);
                     String sourceVertexLabel = sourceVertex.getLabel();
                     String levelName = level.longName;
 
@@ -972,11 +975,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * Handle oneway streets, cycleways, and other per-mode and universal access controls. See http://wiki.openstreetmap.org/wiki/Bicycle for
          * various scenarios, along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
          *
-         * @param end
-         * @param start
+         * @param endEndpoint
+         * @param startEndpoint
          */
-        private P2<StreetEdge> getEdgesForStreet(IntersectionVertex start,
-                                                      IntersectionVertex end, OSMWay way, int index, long startNode, long endNode,
+        private P2<StreetEdge> getEdgesForStreet(OsmVertex startEndpoint,
+                                                      OsmVertex endEndpoint, OSMWay way, int index, long startNode, long endNode,
                                                       StreetTraversalPermission permissions, LineString geometry) {
             // No point in returning edges that can't be traversed by anyone.
             if (permissions.allowsNothing()) {
@@ -993,11 +996,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             StreetTraversalPermission permissionsBack = permissionPair.second;
 
             if (permissionsFront.allowsAnything()) {
-                street = getEdgeForStreet(start, end, way, index, startNode, endNode, length,
+                street = getEdgeForStreet(startEndpoint, endEndpoint, way, index, startNode, endNode, length,
                         permissionsFront, geometry, false);
             }
             if (permissionsBack.allowsAnything()) {
-                backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, length,
+                backStreet = getEdgeForStreet(endEndpoint, startEndpoint, way, index, endNode, startNode, length,
                         permissionsBack, backGeometry, true);
             }
             if (street != null && backStreet != null) {
@@ -1015,7 +1018,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             return new P2<StreetEdge>(street, backStreet);
         }
 
-        private StreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
+        private StreetEdge getEdgeForStreet(OsmVertex startEndpoint, OsmVertex endEndpoint,
                                                  OSMWay way, int index, long startNode, long endNode, double length,
                                                  StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
@@ -1031,7 +1034,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
 
-            StreetEdge street = edgeFactory.createEdge(start, end, geometry, name, length,
+            StreetEdge street = edgeFactory.createEdge(startEndpoint, endEndpoint, geometry, name, length,
                     permissions, back);
             street.setCarSpeed(carSpeed);
 
@@ -1100,20 +1103,20 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * @param node the node to record for
          * @author mattwigway
          */
-        private IntersectionVertex recordLevel(OSMNode node, OSMWithTags way) {
+        private OsmVertex recordLevel(OSMNode node, OSMWithTags way) {
             OSMLevel level = osmdb.getLevelForWay(way);
-            HashMap<OSMLevel, IntersectionVertex> vertices;
+            HashMap<OSMLevel, OsmVertex> vertices;
             long nodeId = node.getId();
             if (multiLevelNodes.containsKey(nodeId)) {
                 vertices = multiLevelNodes.get(nodeId);
             } else {
-                vertices = new HashMap<OSMLevel, IntersectionVertex>();
+                vertices = new HashMap<OSMLevel, OsmVertex>();
                 multiLevelNodes.put(nodeId, vertices);
             }
             if (!vertices.containsKey(level)) {
                 Coordinate coordinate = getCoordinate(node);
                 String label = this.getLevelNodeLabel(node, level);
-                IntersectionVertex vertex = new IntersectionVertex(graph, label, coordinate.x,
+                OsmVertex vertex = new OsmVertex(graph, label, coordinate.x,
                         coordinate.y, label);
                 vertices.put(level, vertex);
                 // multilevel nodes should also undergo turn-conversion
@@ -1129,14 +1132,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          *
          * @param node The node to fetch a label for.
          * @param way  The way it is connected to (for fetching level information).
-         * @return vertex The graph vertex.
+         * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a TransitStopStreetVertex.
          */
         // TODO Set this to private once WalkableAreaBuilder is gone
-        protected IntersectionVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
+        protected OsmVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
             // If the node should be decomposed to multiple levels,
             // use the numeric level because it is unique, the human level may not be (although
             // it will likely lead to some head-scratching if it is not).
-            IntersectionVertex iv = null;
+            OsmVertex iv = null;
             if (node.isMultiLevel()) {
                 // make a separate node for every level
                 return recordLevel(node, way);
@@ -1167,7 +1170,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
 
                 if (iv == null) {
-                    iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
+                    iv = new OsmVertex(graph, label, coordinate.x, coordinate.y, label);
                     if (node.hasTrafficLight()) {
                         iv.trafficLight = (true);
                     }
