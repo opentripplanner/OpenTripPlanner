@@ -17,15 +17,36 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A RaptorWorkerTimetable is used by a RaptorWorker to perform large numbers of RAPTOR searches very quickly
+ * within a specific time window. It is used heavily in one-to-many profile routing, where we're interested in seeing
+ * how access to opportunities varies over time.
+ *
+ * This is an alternative representation of all the TripTimes in a single Graph that are running during a particular
+ * time range on a particular day. It allows for much faster spatial analysis because it places all
+ * data for a single TripPattern in a contiguous region of memory, and because pre-filtering the TripTimes based on
+ * whether they are running at all during the time window eliminates run-time checks that need to be performed when we
+ * search for the soonest departure.
+ *
+ * Unlike in "normal" OTP searches, we assume non-overtaking (FIFO) vehicle behavior within a single TripPattern,
+ * which is generally the case in clean input data. One key difference here is that profile routing and spatial analysis
+ * do not need to take real-time (GTFS-RT) updates into account since they are intended to be generic results
+ * describing a scenario in the future.
+ */
 public class RaptorWorkerTimetable implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerTimetable.class);
 
     // TODO put stop indexes in array here
-    // TODO serialize using deltas and variable-width from Protobuf libs
+    // TODO serialize using deltas and variable-width from Protobuf libs ?
+
+    /* Times for schedule-based trips/patterns are stored in a 2D array. */
 
     int nTrips, nStops;
+
     private int[][] timesPerTrip;
+
+    /* Times for frequency-based trips are stored in parallel arrays (a column store). */
 
     /** Times (0-based) for frequency trips */
     private int[][] frequencyTrips;

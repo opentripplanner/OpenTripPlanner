@@ -5,8 +5,12 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SampleVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 
+/**
+ * A temporary (single-request scoped) edge that connects a Sample to the street network.
+ * Sample is used here in the Analyst sense: a temporary and nondestructive linkage of
+ * a single geographic point into the street network.
+ */
 public class SampleEdge extends Edge implements TemporaryEdge {
     /** length in meters */
     private final int length;

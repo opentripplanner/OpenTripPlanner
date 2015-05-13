@@ -2,6 +2,12 @@ package org.opentripplanner.analyst;
 
 import java.util.Map.Entry;
 
+/**
+ * Represents the difference between two Analyst ResultSets. This expresses the change in travel time from one point to
+ * a whole set of points (improvement or worsening) when switching from one transport network scenario to another.
+ *
+ * TODO since the times2 are pulled out of another ResultSet I'd really expect this class to be a wrapper around two ResultSet instances.
+ */
 public class ResultSetDelta extends ResultSet {
 
     private static final long serialVersionUID = -6723127825189535112L;

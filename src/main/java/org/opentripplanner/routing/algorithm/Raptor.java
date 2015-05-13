@@ -17,7 +17,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/** Implements the RAPTOR algorithm; see http://research.microsoft.com/pubs/156567/raptor_alenex.pdf */
+/**
+ * TODO This seems to have been completely replaced by the thin RaptorWorkers.
+ * Copy any useful comments over to that class, and consider eliminating this variant.
+ */
 public class Raptor {
     public final Graph graph;
     public final int maxTransfers;

@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -9,11 +12,10 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-
+/**
+ * This links transit stops to OSM vertices (rather than splitter vertices). It apears to only be
+ * used in org.opentripplanner.graph_builder.linking.SampleStopLinker which is itself unused at this point.
+ */
 public class IntersectionTransitLink extends Edge {
     private static final long serialVersionUID = 1L;
 

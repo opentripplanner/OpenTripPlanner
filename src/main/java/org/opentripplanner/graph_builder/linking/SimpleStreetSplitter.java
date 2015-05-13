@@ -1,15 +1,17 @@
 package org.opentripplanner.graph_builder.linking;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import jersey.repackaged.com.google.common.collect.Lists;
-
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -33,17 +35,26 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-/** A class that links transit stops to streets by splitting the streets */
+/**
+ * This class links transit stops to streets by splitting the streets (unless the stop is extremely close to the street
+ * intersection).
+ *
+ * It is intended to eventually completely replace the existing stop linking code, which had been through so many
+ * revisions and adaptations to different street and turn representations that it was very glitchy. This new code is
+ * also intended to be deterministic in linking to streets, independent of the order in which the JVM decides to
+ * iterate over Maps and even in the presence of points that are exactly halfway between multiple candidate linking
+ * points.
+ *
+ * It would be wise to keep this new incarnation of the linking code relatively simple, considering what happened before.
+ *
+ * See discussion in pull request #1922, follow up issue #1934, and the original issue calling for replacement of
+ * the stop linker, #1305.
+ */
 public class SimpleStreetSplitter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
@@ -111,6 +122,7 @@ public class SimpleStreetSplitter {
         // This should remove any issues with things coming out of the spatial index in different orders
         // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
         // so that we capture back edges and duplicate ways.
+        // TODO all the code below looks like a good candidate for Java 8 streams and lambdas
         List<StreetEdge> candidateEdges = new ArrayList<StreetEdge>(
                 Collections2.filter(idx.query(env), new Predicate<StreetEdge>() {
 

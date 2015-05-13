@@ -7,7 +7,6 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,18 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
+/**
+ * A RaptorWorker carries out RAPTOR searches on a pre-filtered, compacted representation of all the trips running
+ * during a given time window. It originated as a rewrite of our RAPTOR code that would use "thin workers", allowing
+ * computation by a generic function-execution service like AWS Lambda. The gains in efficiency were significant enough
+ * that RaptorWorkers are now used in the context of a full-size OTP server executing spatial analysis tasks.
+ *
+ * We can imagine that someday all OTP searches, including simple point-to-point searches, may be carried out on such
+ * compacted tables, including both the transit and street searches (via a compacted street network in a column store
+ * or struct-like byte array using something like the FastSerialization library).
+ *
+ * This implements the RAPTOR algorithm; see http://research.microsoft.com/pubs/156567/raptor_alenex.pdf
+ */
 public class RaptorWorker {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorker.class);

@@ -1,15 +1,14 @@
 package org.opentripplanner.routing.vertextype;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.opentripplanner.analyst.core.Sample;
+import com.vividsolutions.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
-/** A vertex representing a sample */
+/**
+ * A vertex representing a Sample in the Analyst sense -- a temporary and nondestructive linkage of
+ * a single geographic point into the street network.
+ */
 public class SampleVertex extends StreetVertex implements TemporaryVertex  {
     private static final long serialVersionUID = 1L;
 
@@ -47,4 +46,5 @@ public class SampleVertex extends StreetVertex implements TemporaryVertex  {
     public String getLabel () {
         return "sample-" + getIndex();
     }
+
 }

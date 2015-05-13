@@ -1,50 +1,45 @@
 package org.opentripplanner.profile;
 
-import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.joda.time.DateTimeZone;
-import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.analyst.ResultSet;
-import org.opentripplanner.analyst.ResultSet.RangeSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.algorithm.PathDiscardingRaptorStateStore;
-import org.opentripplanner.routing.algorithm.Raptor;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.TripTimeSubset;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Perform profile routing using repeated RAPTOR searches.
- * 
- * This is conceptually very similar to the work of the Minnesota Accessibility Observatory
+ * Perform one-to-many profile routing using repeated RAPTOR searches. In this context, profile routing means finding
+ * the optimal itinerary for each departure moment in a given window, without trying to reconstruct the exact paths.
+ *
+ * In other contexts (Modeify-style point to point routing) we would want to include suboptimal but resonable paths
+ * and retain enough information to reconstruct all those paths accounting for common trunk frequencies and stop clusters.
+ *
+ * This method is conceptually very similar to the work of the Minnesota Accessibility Observatory
  * (http://www.its.umn.edu/Publications/ResearchReports/pdfdownloadl.pl?id=2504)
- * They run repeated searches. We take advantage of the fact that the street network is static
- * (for the most part, assuming time-dependent turn restrictions and traffic are consistent across the time window)
- * and only run a fast transit search for each minute in the window.
+ * They run repeated searches for each departure time in the window. We take advantage of the fact that the street
+ * network is static (for the most part, assuming time-dependent turn restrictions and traffic are consistent across
+ * the time window) and only run a fast transit search for each minute in the window.
  */
 public class RepeatedRaptorProfileRouter {
 

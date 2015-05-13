@@ -14,12 +14,14 @@
 package org.opentripplanner.analyst.request;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
-
-import org.opentripplanner.analyst.core.GeometryIndex;
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -31,19 +33,12 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
 
 public class SampleFactory implements SampleSource {
 
@@ -168,8 +163,9 @@ public class SampleFactory implements SampleSource {
             // end of the street and back.
 
             // However, linking to splitter vertices means that this sample can only be egressed in one direction,
-            // because the splitter vertex is on one half of a bidirectional edge. Additionally, the splitter vertices and the connected edges
-            // for the two directions are exactly coincident, which means that which one a sample gets linked to is effectively random.
+            // because the splitter vertex is only on one half of a bidirectional edge pair. Additionally, the splitter
+            // vertices and the connected edges for the two directions are exactly coincident, which means that which
+            // one of the two a sample gets linked to is effectively random.
             if (!edge.getFromVertex().getLabel().startsWith("osm:node:") || (edge instanceof StreetEdge && ((StreetEdge) edge).isBack()))
                 continue;
 

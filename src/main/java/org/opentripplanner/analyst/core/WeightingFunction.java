@@ -2,7 +2,13 @@ package org.opentripplanner.analyst.core;
 
 /**
  * A weighting function, expressing how influential something is according to its distance from you.
- * A functional interface (with a single function, so it can be defined using Java 8 shorthand).
+ *
+ * Perhaps this could be a FunctionalInterface so implementations can be defined using Java 8 shorthand, but it
+ * currently has two functions. The separation into two functions was to allow optimizations for simple hard-cutoff
+ * functions, where you can avoid doing a multiplication to determine the final result. I'm not sure eliminating
+ * multiplications by 0 and 1 actually has much of an effect on execution speed, so maybe the functional abstraction
+ * is more important. But then again, maybe we'll always just use the same few functions, in which case the abstraction
+ * is purely to aid comprehension by OTP developers.
  */
 public abstract class WeightingFunction {
 
