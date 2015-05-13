@@ -1,30 +1,23 @@
 package org.opentripplanner.graph_builder.linking;
 
-import java.util.Collection;
-
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
-import org.mapdb.Fun.Tuple2;
-import org.opentripplanner.analyst.core.Sample;
-import org.opentripplanner.analyst.request.SampleFactory;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.edgetype.IntersectionTransitLink;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.analyst.core.Sample;
+import org.opentripplanner.analyst.request.SampleFactory;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.edgetype.IntersectionTransitLink;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
+
+import java.util.Collection;
 
 /**
  * Link transit stops to the street network in a non-destructive manner; i.e. don't
@@ -37,6 +30,9 @@ import com.vividsolutions.jts.geom.LineString;
  * We do this by using the same linking code that is used
  * for Analyst (the SampleFactory code) which additionally means that this code
  * path is used and tested in multiple applications.
+ *
+ * This is not currently used. But it could be very useful for patching temporary transit lines in
+ * interactively generated scenarios.
  */
 public class SampleStopLinker {
     private Graph graph;
