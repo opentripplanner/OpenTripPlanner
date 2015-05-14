@@ -72,7 +72,7 @@ For example, you could do the following:
 
 ```bash
 cd OpenTripPlanner
-git checkout opentripplanner-0.13.0
+git checkout opentripplanner-0.17.0
 git clean -df
 mvn clean package -DskipTests
 ```
@@ -106,19 +106,19 @@ And then specify OpenTripPlanner as a dependency:
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>0.13.0</version>
+  <version>0.17.0</version>
 </dependency>
 ```
 
 After each successful build, our continuous integration (CI) server deploys the final OTP "artifact" (the runnable JAR) 
 to our Maven repository as a "SNAPSHOT" build. This means that a Maven project depending on OTP as a library can 
-always fetch the latest work in progress by specifying the following artifact:
+always fetch the latest work in progress by specifying a snapshot artifact:
  
 ```XML
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>0.18.0-SNAPSHOT</version>
 </dependency>
 ```
  

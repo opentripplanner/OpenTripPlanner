@@ -205,7 +205,7 @@ Maven repository.
 
 Release checklist:
 
-- update docs/Changelog.md, update the download links in docs/Basic-Usage.md, check in changes, and push
+- update docs/Changelog.md, check in changes, and push
 - ssh into ci.opentripplanner.org
 - change to the ~/git/OpenTripPlanner directory
 - check that you are on the master branch with no uncommitted changes (git status; git clean -df)
@@ -220,5 +220,6 @@ Release checklist:
 - mvn release:perform
 - cp target/otp-x.y.0.jar /usr/share/nginx/html/jars/
 - rm /usr/share/nginx/html/jars/otp-x.y.0-SNAPSHOT*
+- update the version numbers that appear in Basic-Usage, Developers-Guide, Getting-OTP, and index.md
 - email the OTP dev and users mailing lists, and send a message on Slack
 
