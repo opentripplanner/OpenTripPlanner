@@ -6,9 +6,9 @@ This page will get you up and running with your own OTP server. If all goes well
 
 OpenTripPlanner is written in Java and distributed as a single runnable JAR file. These JARs are published
 [here](http://dev.opentripplanner.org/jars/). Grab one of these JARs for the
-[latest released version](http://dev.opentripplanner.org/jars/otp-0.13.0.jar)
+[latest released version](http://dev.opentripplanner.org/jars/otp-0.16.0.jar)
 or if you're feeling adventurous try the
-[bleeding edge development code](http://dev.opentripplanner.org/jars/otp-1.0.0-SNAPSHOT.jar).
+[bleeding edge development code](http://dev.opentripplanner.org/jars/otp-0.17.0-SNAPSHOT.jar).
 You may also want to get your own copy of the OTP source code and [build the JAR from scratch](Getting-OTP),
 especially if you plan to do some development yourself.
 

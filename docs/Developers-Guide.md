@@ -205,7 +205,7 @@ Maven repository.
 
 Release checklist:
 
-- update the docs/Changelog.md, check it in, and push
+- update docs/Changelog.md, update the download links in docs/Basic-Usage.md, check in changes, and push
 - ssh into ci.opentripplanner.org
 - change to the ~/git/OpenTripPlanner directory
 - check that you are on the master branch with no uncommitted changes (git status; git clean -df)
