@@ -42,7 +42,6 @@ public abstract class IsochroneGenerator {
      */
     public static ZSampleGrid makeGrid (PointSet pointSet, int[] times, double walkSpeed) {
 
-        ZSampleGrid grid = null;
         // Off-road max distance MUST be APPROX EQUALS to the grid precision
         // TODO: Loosen this restriction (by adding more closing samples).
         // Change the 0.8 magic factor here with caution.
@@ -52,7 +51,7 @@ public abstract class IsochroneGenerator {
         final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));
         double dY = Math.toDegrees(GRID_SIZE_METERS / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
-        grid = new SparseMatrixZSampleGrid<WTWD>(16, times.length, dX, dY, coordinateOrigin);
+        ZSampleGrid grid = new SparseMatrixZSampleGrid<WTWD>(16, times.length, dX, dY, coordinateOrigin);
         AccumulativeGridSampler.AccumulativeMetric<WTWD> metric =
                 new SampleGridRenderer.WTWDAccumulativeMetric(cosLat, D0, V0, GRID_SIZE_METERS);
         AccumulativeGridSampler<WTWD> sampler = new AccumulativeGridSampler<>(grid, metric);

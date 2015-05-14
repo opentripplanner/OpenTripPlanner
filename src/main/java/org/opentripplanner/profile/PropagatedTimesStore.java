@@ -11,13 +11,25 @@ import org.opentripplanner.routing.graph.Vertex;
 import java.util.Arrays;
 
 /**
- * Stores times propagated to the search targets (all vertices in the street network or a set of points of interest)
- * in one-to-many repeated raptor profile routing.
+ * Stores travel times propagated to the search targets (all vertices in the street network or a set of points of
+ * interest) in one-to-many repeated raptor profile routing.
  *
  * Each raptor call finds minimum travel times to each transit stop. Those must be propagated out to the final targets,
  * giving minimum travel times to each street vertex (or each destination opportunity in accessibility analysis).
- * Those results are then merged into the summary statistics per street vertex over the whole time window
+ * Those results are then merged into the summary statistics per target over the whole time window
  * (over many RAPTOR calls). This class handles the storage and merging of those summary statistics.
+ *
+ * Currently this includes minimum, maximum, and average earliest-arrival travel time for each target.
+ * We could conceivably retain all the propagated times for every departure minute instead of collapsing them down into
+ * three numbers. If they were all sorted, we could read off any quantile, including the median travel time.
+ * Leaving them in departure time order would also be interesting, since you could then see visually how the travel time
+ * varies as a function of departure time.
+ * We could also conceivably store travel time histograms per destination, but this entails a loss of information due
+ * to binning into minutes. These binned times could not be used to apply a smooth sigmoid cutoff which we usually
+ * do at one-second resolution.
+ *
+ * When exploring single-point (one-to-many) query results it would be great to have all these stored or produced on
+ * demand for visualization.
  */
 public class PropagatedTimesStore {
 
@@ -65,7 +77,7 @@ public class PropagatedTimesStore {
     }
 
     /**
-     * Merge in min travel times to all vertices from one raptor call, finding minimum-of-min, maximum-of-min, and
+     * Merge in min travel times to all targets from one raptor call, finding minimum-of-min, maximum-of-min, and
      * average-of-min travel times.
      */
     public void mergeIn(int[] news) {
@@ -86,7 +98,7 @@ public class PropagatedTimesStore {
     }
 
     /**
-     * Merge in min travel times to all vertices from one raptor call, finding minimum-of-min, maximum-of-min, and
+     * Merge in min travel times to all targets from one raptor call, finding minimum-of-min, maximum-of-min, and
      * average-of-min travel times.
      */
     public void mergeIn(TIntIntMap news) {
