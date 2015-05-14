@@ -213,13 +213,14 @@ Release checklist:
 - verify that git push succeeds without prompting for a password (i.e. ~/.ssh/id_rsa.pub is known to Github)
 - run a test build: mvn clean package site
 - check that `~/.m2/settings.xml` contains AWS credentials for the repo
-- mvn release:prepare
+- mvn release:prepare (use the default release version and SCM release tag, bump the minor development version number)
 - cp -R target/site/apidocs /usr/share/nginx/html/javadoc/x.y.0
 - cp -R target/site/enunciate /usr/share/nginx/html/apidoc/x.y.0
-- check that permissions are o+r (they should be by default)
+- check that all docs in /usr/share/nginx/html/javadoc/ have o+r permissions (they should be by default)
 - mvn release:perform
-- cp target/otp-x.y.0.jar /usr/share/nginx/html/jars/
+- cp target/checkout/target/otp-x.y.0.jar /usr/share/nginx/html/jars/
 - rm /usr/share/nginx/html/jars/otp-x.y.0-SNAPSHOT*
-- update the version numbers that appear in Basic-Usage, Developers-Guide, Getting-OTP, and index.md
+- check http://dev.opentripplanner.org/jars/ and http://dev.opentripplanner.org/javadoc/ in a browser
+- update the version numbers that appear in Basic-Usage, Developers-Guide, Getting-OTP, and index.md and check them in
 - email the OTP dev and users mailing lists, and send a message on Slack
 
