@@ -146,6 +146,7 @@ public class RepeatedRaptorProfileRouter {
 
         }
 
+        // An array containing the time needed to walk to each target from the origin point.
         int[] walkTimes;
 
         if (sampleSet == null) {

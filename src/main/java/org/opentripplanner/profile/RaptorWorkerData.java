@@ -2,16 +2,12 @@ package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Iterables;
-
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -180,7 +176,7 @@ public class RaptorWorkerData implements Serializable {
                 }
             }
 
-            // iterate over stops, build distances to samples
+            // Iterate over all stops, saving an array of distances to samples from each stop.
             TIntList out = new TIntArrayList();
 
             STOP: for (Stop stop : stopForIndex) {
@@ -209,7 +205,7 @@ public class RaptorWorkerData implements Serializable {
                         out.add(distance);
                     }
                 }
-
+                // Save a flat array of (target, distance) pairs keyed on this transit stops's index in the RAPTOR table.
                 targetsForStop.add(out.toArray());
             }
 

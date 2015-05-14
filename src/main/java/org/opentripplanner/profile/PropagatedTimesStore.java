@@ -11,11 +11,13 @@ import org.opentripplanner.routing.graph.Vertex;
 import java.util.Arrays;
 
 /**
- * Stores times propagated to the street network in one-to-many repeated raptor profile routing.
- * At each raptor call, we find minimum travel times to each transit stop. Those must be propagated out to the street
- * network, giving minimum travel times to each street vertex. Those results are then merged into the summary
- * statistics per street vertex over the whole time window (over many RAPTOR calls).
- * This class handles the storage and merging of those summary statistics.
+ * Stores times propagated to the search targets (all vertices in the street network or a set of points of interest)
+ * in one-to-many repeated raptor profile routing.
+ *
+ * Each raptor call finds minimum travel times to each transit stop. Those must be propagated out to the final targets,
+ * giving minimum travel times to each street vertex (or each destination opportunity in accessibility analysis).
+ * Those results are then merged into the summary statistics per street vertex over the whole time window
+ * (over many RAPTOR calls). This class handles the storage and merging of those summary statistics.
  */
 public class PropagatedTimesStore {
 
