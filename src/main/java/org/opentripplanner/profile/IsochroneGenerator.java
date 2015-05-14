@@ -18,13 +18,12 @@ import java.util.List;
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
- * Make a ZSampleGrid from a PointSet and a parallel array of travel times for that PointSet.
- * Those times could come from a ResultSetWithTimes or directly from a PropagatedTimesStore, which has one
- * such array for each of min, avg, and max travel time over the departure time window it represents.
+ * This class contains a couple of utility methods for making Isochrones when all you have is a PointSet and times to
+ * reach that PointSet. Eventually we may want to just define a standard grid PointSet for each study area in such a way
+ * that all streets within each grid cell contribute to its travel time value, then use that grid directly when making
+ * isolines. This would allow us to drop the separate grid accumulation step.
  *
- * If your PointSet is dense enough (e.g. every block in a city) then this should yield a decent surface and isochrones.
- *
- * The reason why we want to do this is that we are now producing travel time stats directly for pointsets as targets
+ * The reason why we need this functionality is that we are now producing travel time stats directly for pointsets as targets
  * of a repeated RAPTOR search, without saving accompanying travel time values for the street vertices along the way.
  */
 public abstract class IsochroneGenerator {
@@ -32,6 +31,11 @@ public abstract class IsochroneGenerator {
     public static final double GRID_SIZE_METERS = 300;
 
     /**
+     * Make a ZSampleGrid from a PointSet and a parallel array of travel times for that PointSet.
+     * Those times could come from a ResultSetWithTimes or directly from a PropagatedTimesStore, which has one
+     * such array for each of min, avg, and max travel time over the departure time window it represents.
+     * If your PointSet is dense enough (e.g. every block in a city) then this should yield a decent surface and
+     * isochrones.
      * FIXME code duplication, this is ripped off from TimeSurface and should probably replace the version there as it is more generic.
      * @param walkSpeed the walk speed in meters per second
      * @return a grid suitable for making isochrones, based on an arbitrary PointSet and times to reach all those points.
@@ -71,9 +75,8 @@ public abstract class IsochroneGenerator {
 
 
     /**
-     * FIXME code duplication: function ripped off from SurfaceResource
      * Make isochrones from a grid. This more general function should probably be reused by SurfaceResource.
-     *
+     * FIXME code duplication: function ripped off from SurfaceResource
      * @param spacingMinutes the number of minutes between isochrones
      * @return a list of evenly-spaced isochrones
      */
@@ -99,4 +102,5 @@ public abstract class IsochroneGenerator {
 
         return isochrones;
     }
+
 }
