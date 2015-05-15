@@ -361,7 +361,7 @@ otp.widgets.ItinerariesWidget =
                 }
             }
 
-            if(leg.mode === "WALK" || leg.mode === "BICYCLE") {
+            if(leg.mode === "WALK" || leg.mode === "BICYCLE" || leg.mode === "CAR") {
                 headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+leg.to.name;
 
                 if(otp.config.municoderHostname) {
