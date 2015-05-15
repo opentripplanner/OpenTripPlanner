@@ -470,6 +470,13 @@ otp.widgets.ItinerariesWidget =
                 otp.util.Itin.distanceString(bikeDistance) + '</div>')
         }
 
+        var carDistance = itin.getModeDistance("CAR");
+        if(carDistance > 0) {
+            //TRANSLATORS: Total distance in a car for this trip
+            tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Total drive") + '</div><div class="otp-itinTripSummaryText">' +
+                otp.util.Itin.distanceString(carDistance) + '</div>')
+        }
+
         if(itin.hasTransit) {
             //TRANSLATORS: how many public transit transfers in a trip
             tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Transfers") + '</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>')
