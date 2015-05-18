@@ -34,7 +34,6 @@ import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 
 import com.vividsolutions.jts.geom.Envelope;
-import org.opentripplanner.routing.bike_rental.TranslatedBikeRentalStation;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
 @Path("/routers/{routerId}/bike_rental")
@@ -65,11 +64,12 @@ public class BikeRental {
             envelope = new Envelope(-180,180,-90,90); 
         }
         Collection<BikeRentalStation> stations = bikeRentalService.getBikeRentalStations();
-        List<TranslatedBikeRentalStation> out = new ArrayList<TranslatedBikeRentalStation>();
+        List<BikeRentalStation> out = new ArrayList<>();
         for (BikeRentalStation station : stations) {
             if (envelope.contains(station.x, station.y)) {
-                TranslatedBikeRentalStation translatedBikeRentalStation = new TranslatedBikeRentalStation(station, locale);
-                out.add(translatedBikeRentalStation);
+                BikeRentalStation station_localized = station.clone();
+                station_localized.locale = locale;
+                out.add(station_localized);
             }
         }
         BikeRentalStationList brsl = new BikeRentalStationList();
