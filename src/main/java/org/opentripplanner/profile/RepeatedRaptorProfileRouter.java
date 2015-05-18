@@ -131,7 +131,7 @@ public class RepeatedRaptorProfileRouter {
         //        }
 
         int[] timesAtVertices = new int[Vertex.getMaxIndex()];
-        Arrays.fill(timesAtVertices, TimeSurface.UNREACHABLE);
+        Arrays.fill(timesAtVertices, Integer.MAX_VALUE);
 
         for (State state : walkOnlySpt.getAllStates()) {
             // Note that we are using the walk distance divided by speed here in order to be consistent with the
@@ -141,7 +141,7 @@ public class RepeatedRaptorProfileRouter {
             int otime = timesAtVertices[vidx];
 
             // There may be dominated states in the SPT. Make sure we don't include them here.
-            if (otime == TimeSurface.UNREACHABLE || otime > time)
+            if (otime > time)
                 timesAtVertices[vidx] = time;
 
         }
@@ -217,8 +217,14 @@ public class RepeatedRaptorProfileRouter {
         return accessTimes;
     }
 
-    /** Make a result set range set, optionally including times */
+    /**
+     * Make a result set range set, optionally including times
+     * (which only has an effect if there is a pointset/sampleset associated with this router)
+     */
     public ResultSet.RangeSet makeResults (boolean includeTimes) {
-        return propagatedTimesStore.makeResults(sampleSet, includeTimes);
+        if (sampleSet != null)
+            return propagatedTimesStore.makeResults(sampleSet, includeTimes);
+        else
+            return propagatedTimesStore.makeIsochrones(this.timeSurfaceRangeSet);
     }
 }

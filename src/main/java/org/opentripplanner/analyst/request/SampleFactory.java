@@ -84,27 +84,21 @@ public class SampleFactory implements SampleSource {
             distances.put(v.getIndex(), dx * dx + dy * dy);
         }
 
-        Collection<Vertex> osmVertices = Collections2.filter(vertices, new Predicate<Vertex>() {
+        
+        List<Vertex> sorted = new ArrayList<Vertex>();
+        
+        for (Vertex input : vertices) {
+            if (!(input instanceof OsmVertex &&
+                    distances.get(input.getIndex()) < searchRadiusLat * searchRadiusLat))
+                continue;
 
-            @Override
-            public boolean apply(Vertex input) {
-                if (!(input instanceof OsmVertex &&
-                        distances.get(input.getIndex()) < searchRadiusLat * searchRadiusLat))
-                    return false;
-
-                for (StreetEdge e : Iterables.filter(input.getOutgoing(), StreetEdge.class)) {
-                    if (e.canTraverse(new TraverseModeSet(TraverseMode.WALK)))
-                        return true;
-                }
-
-                return false;
+            for (StreetEdge e : Iterables.filter(input.getOutgoing(), StreetEdge.class)) {
+                if (e.canTraverse(new TraverseModeSet(TraverseMode.WALK)))
+                    sorted.add(input);
             }
-
-        });
-
+        }
+        
         // sort list by distance
-        List<Vertex> sorted = new ArrayList<Vertex>(osmVertices);
-
         Collections.sort(sorted, new Comparator<Vertex>() {
 
             @Override
