@@ -93,8 +93,10 @@ public class SampleFactory implements SampleSource {
                 continue;
 
             for (StreetEdge e : Iterables.filter(input.getOutgoing(), StreetEdge.class)) {
-                if (e.canTraverse(new TraverseModeSet(TraverseMode.WALK)))
+                if (e.canTraverse(new TraverseModeSet(TraverseMode.WALK))) {
                     sorted.add(input);
+                    break;
+                }
             }
         }
         
