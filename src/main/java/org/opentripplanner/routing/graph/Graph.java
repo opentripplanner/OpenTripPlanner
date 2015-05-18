@@ -13,6 +13,51 @@
 
 package org.opentripplanner.routing.graph;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Sets;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import org.joda.time.DateTime;
+import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
+import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.analyst.core.GeometryIndex;
+import org.opentripplanner.analyst.request.SampleFactory;
+import org.opentripplanner.api.resource.GraphMetadata;
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.annotation.NoFutureDates;
+import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
+import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -34,53 +79,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.*;
-import org.joda.time.DateTime;
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.analyst.core.GeometryIndex;
-import org.opentripplanner.analyst.request.SampleFactory;
-import org.opentripplanner.api.resource.GraphMetadata;
-import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.geometry.GraphUtils;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.NoFutureDates;
-import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.profile.StopTreeCache;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
-import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.services.notes.StreetNotesService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
@@ -155,7 +157,7 @@ public class Graph implements Serializable {
 
     private transient GraphMetadata graphMetadata = null;
 
-    private transient Geometry hull = null;
+    private transient Geometry hull = null; // FIXME we should be saving this stuff in the graph, why is is transient?
 
     /** The density center of the graph for determining the initial geographic extent in the client. */
     private Coordinate center = null;
@@ -170,7 +172,7 @@ public class Graph implements Serializable {
     public Preferences preferences = null;
 
     /* The time at which the graph was built, for detecting changed inputs and triggering a rebuild. */
-    public DateTime buildTimeJoda = null; // FIXME
+    public DateTime buildTimeJoda = null; // FIXME record this info, null is just a placeholder
 
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
@@ -963,13 +965,13 @@ public class Graph implements Serializable {
     	return this.geomIndex;
     }
 
- // lazy-init sample factor on an as needed basis
+    // lazy-init sample factor on an as needed basis
     public SampleFactory getSampleFactory() {
-    	if(this.sampleFactory == null)
-    		this.sampleFactory = new SampleFactory(this.getGeomIndex());
-    	
-    	return this.sampleFactory;	
+        if(this.sampleFactory == null)
+            this.sampleFactory = new SampleFactory(this);
+
+        return this.sampleFactory;	
     }
-    
+
    
 }

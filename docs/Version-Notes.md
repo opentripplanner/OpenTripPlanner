@@ -1,4 +1,4 @@
-## The *master* branch (Version x.y-SNAPSHOT)
+## The *master* branch (Version 0.x.0-SNAPSHOT)
 This is the most up-to-date branch where all new development occurs and is the basis for an upcoming x.y release of OTP.
 It does not support WAR deployment as it has a built-in HTTP layer, the same one used in the Glassfish application server.
 If you run `target/otp-VERSION.jar` with the `--server` option (use `--help` for a list of available options),
@@ -10,7 +10,7 @@ resources will be available at the following URLs:
 
 For detailed paths of specific resources under these base paths, see the API docs at [[http://dev.opentripplanner.org/apidoc/master/]]
 
-## Versions 0.12, 0.13, 0.14...
+## Versions 0.15, 0.16, 0.17...
 These are point releases as we work toward 1.0. Generally you will want to use the highest-numbered version and
 consult the corresponding [API docs](http://dev.opentripplanner.org/apidoc). Configuration and usage should be close
 to that described on our [main documentation](http://opentripplanner.readthedocs.org).

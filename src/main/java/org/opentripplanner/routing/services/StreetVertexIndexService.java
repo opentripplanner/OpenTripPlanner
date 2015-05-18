@@ -22,6 +22,7 @@ import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
+import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -101,4 +102,8 @@ public interface StreetVertexIndexService {
      * @return The on-street {@link Coordinate} that's closest to the given input {@link Coordinate}
      */
     public Coordinate getClosestPointOnStreet(Coordinate coordinate);
+
+	/** Get a vertex at a given coordinate, using the same logic as in Samples. Used in Analyst
+	 * so that origins and destinations are linked the same way. */
+	public Vertex getSampleVertexAt(Coordinate coordinate);
 }

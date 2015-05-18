@@ -580,7 +580,7 @@ public class ProfileRouter {
                 TransitStop tstop = graph.index.stopVertexForStop.get(stop);
                 // Iterate over street intersections in the vicinity of this particular transit stop.
                 // Shift the time range at this transit stop, merging it into that for all reachable street intersections.
-                TObjectIntMap<Vertex> distanceToVertex = stopTreeCache.getDistancesForStop(tstop);
+                TObjectIntMap<Vertex> distanceToVertex = null; //FIXME stopTreeCache.getDistancesForStop(tstop);
                 for (TObjectIntIterator<Vertex> iter = distanceToVertex.iterator(); iter.hasNext(); ) {
                     iter.advance();
                     Vertex vertex = iter.key();

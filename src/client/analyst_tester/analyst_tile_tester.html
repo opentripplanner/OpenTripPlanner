@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-        <style> body, html { height: 100%; } #map { height: 100%; } </style>
         <title>Profile Analyst Tester</title>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"/>
     </head>
     <body>
         <div id="map"></div>
@@ -55,7 +54,8 @@
         req.onload = function() {
             var resp = JSON.parse(req.responseText);
             console.log(resp);
-            var url = 'http://localhost:8080/otp/surfaces/' + resp['id'] + '/isotiles/{z}/{x}/{y}.png';
+            var surfaceId = resp['id'];
+            var url = 'http://localhost:8080/otp/surfaces/' + surfaceId + '/isotiles/{z}/{x}/{y}.png';
             travelTimeTileLayer.setUrl(url);
         };
         req.send(null);
@@ -63,7 +63,7 @@
 
     fromMarker.on("dragend",function(ev){
         var pos = ev.target.getLatLng();
-        this.bindPopup(pos.toString()).openPopup();
+        // this.bindPopup(pos.toString()).openPopup();
         makeSurface();
     });
 

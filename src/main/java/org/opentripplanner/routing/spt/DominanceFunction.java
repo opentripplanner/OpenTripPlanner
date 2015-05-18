@@ -88,6 +88,21 @@ public abstract class DominanceFunction implements Serializable {
         @Override
         public boolean betterOrEqual (State a, State b) { return a.getElapsedTimeSeconds() <= b.getElapsedTimeSeconds(); }
     }
+    
+    /**
+     * A dominance function that prefers the least walking. This should only be used with walk-only searches because
+     * it does not include any functions of time, and once transit is boarded walk distance is constant.
+     * 
+     * It is used when building stop tree caches for egress from transit stops.
+     */
+    public static class LeastWalk extends DominanceFunction {
+
+        @Override
+        protected boolean betterOrEqual(State a, State b) {
+            return a.getWalkDistance() <= b.getWalkDistance(); 
+        }
+
+    }
 
     /** In this implementation the relation is not symmetric. There are sets of mutually co-dominant states. */
     public static class Pareto extends DominanceFunction {
