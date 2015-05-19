@@ -16,7 +16,7 @@ You may also choose to build OTP from its source code. If you will be modifying 
 
 - Git, a version control system
 
-- Java Development Kit, preferably version 7 (AKA version 1.7)
+- Java Development Kit, preferably version 8 (AKA version 1.8)
 
 - Maven, a build and dependency management system
 
@@ -24,7 +24,7 @@ You may also choose to build OTP from its source code. If you will be modifying 
 You will also need a reliable internet connection so Maven can fetch all of OTP's dependencies (the libraries it uses). 
 To install these software packages on a Debian or Ubuntu system, run:
 
-    sudo apt-get install openjdk-7-jdk maven git
+    sudo apt-get install openjdk-8-jdk maven git
 
 Once you have these packages installed, create and/or switch to the directory where you will keep your Git repositories and make a local copy of the OTP source code:
 
@@ -72,7 +72,7 @@ For example, you could do the following:
 
 ```bash
 cd OpenTripPlanner
-git checkout opentripplanner-0.13.0
+git checkout opentripplanner-0.17.0
 git clean -df
 mvn clean package -DskipTests
 ```
@@ -106,19 +106,19 @@ And then specify OpenTripPlanner as a dependency:
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>0.13.0</version>
+  <version>0.17.0</version>
 </dependency>
 ```
 
 After each successful build, our continuous integration (CI) server deploys the final OTP "artifact" (the runnable JAR) 
 to our Maven repository as a "SNAPSHOT" build. This means that a Maven project depending on OTP as a library can 
-always fetch the latest work in progress by specifying the following artifact:
+always fetch the latest work in progress by specifying a snapshot artifact:
  
 ```XML
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>0.18.0-SNAPSHOT</version>
 </dependency>
 ```
  

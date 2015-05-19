@@ -811,4 +811,9 @@ public class PointSet implements Serializable {
             }
         }
     }
+
+    /** Returns a new coordinate object for the feature at the given index in this set, or its centroid. */
+    public Coordinate getCoordinate(int index) {
+        return new Coordinate(lons[index], lats[index]);
+    }
 }

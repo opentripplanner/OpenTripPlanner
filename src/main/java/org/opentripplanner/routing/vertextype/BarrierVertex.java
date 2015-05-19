@@ -28,7 +28,7 @@ import org.opentripplanner.routing.graph.Graph;
  *
  * Created by mabu on 11.5.2015.
  */
-public class BarrierVertex extends IntersectionVertex {
+public class BarrierVertex extends OsmVertex {
 
     public BarrierVertex(Graph g, String label, double x, double y) {
         super(g, label, x, y);

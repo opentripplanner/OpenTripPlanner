@@ -25,12 +25,20 @@ public class ResultSet implements Serializable{
     /** One histogram for each */
     public Map<String,Histogram> histograms = Maps.newHashMap();
 
+    /** Times to reach every feature, may be null */
+	public int[] times;
+
     public ResultSet() {
         // TODO is this ever used?
     }
 
-    /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points. */
+    /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points, not including times. */
     public ResultSet(SampleSet samples, TimeSurface surface){
+        this(samples, surface, false);
+    }
+    
+    /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points, optionally including times. */
+    public ResultSet(SampleSet samples, TimeSurface surface, boolean includeTimes){
         id = samples.pset.id + "_" + surface.id;
 
         PointSet targets = samples.pset;
@@ -38,6 +46,17 @@ public class ResultSet implements Serializable{
         int[] times = samples.eval(surface);
         buildHistograms(times, targets);
 
+        if (includeTimes)
+            this.times = times;
+
+    }
+    
+    /** Build a new ResultSet directly from times at point features */
+    public ResultSet(int[] times, PointSet targets, boolean includeTimes) {
+        buildHistograms(times, targets);
+
+        if (includeTimes)
+            this.times = times;
     }
 
     /** 
@@ -142,5 +161,14 @@ public class ResultSet implements Serializable{
         } catch (IOException ioex) {
             LOG.info("IOException, connection may have been closed while streaming JSON.");
         }
+    }
+    
+    /** A set of result sets from profile routing: min, avg, max */;
+    public static class RangeSet implements Serializable {
+        public static final long serialVersionUID = 1L;
+
+        public ResultSet min;
+        public ResultSet avg;
+        public ResultSet max;
     }
 }

@@ -13,15 +13,8 @@
 
 package org.opentripplanner.graph_builder.module.ned;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.media.jai.InterpolationBilinear;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
@@ -41,8 +34,13 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import javax.media.jai.InterpolationBilinear;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street data that has already
@@ -99,7 +97,7 @@ public class ElevationModule implements GraphBuilderModule {
         // interpolation internally)
         coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
-        log.info("setting street elevation profiles from NED data...");
+        log.info("Setting street elevation profiles from digital elevation model...");
         List<StreetEdge> edgesWithElevation = new ArrayList<StreetEdge>();
         int nProcessed = 0;
         int nTotal = graph.countEdges();
