@@ -45,6 +45,9 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
 
     private static final Color PARK_AND_RIDE_COLOR_VERTEX = Color.RED;
 
+    private static final Color BARRIER_COLOR_VERTEX = new Color(0.5803922f, 0.21568628f,
+        0.24313726f);
+
     @Override
     public boolean renderEdge(Edge e, EdgeVisualAttributes attrs) {
         if (e instanceof StreetEdge) {
@@ -76,7 +79,7 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
         if (v instanceof IntersectionVertex) {
             attrs.color = STREET_COLOR_VERTEX;
             if (v instanceof BarrierVertex) {
-                attrs.color = PARK_AND_RIDE_COLOR_VERTEX;
+                attrs.color = BARRIER_COLOR_VERTEX;
             }
         } else if (v instanceof TransitStop) {
             attrs.color = TRANSIT_STOP_COLOR_VERTEX;
