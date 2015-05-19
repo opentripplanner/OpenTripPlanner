@@ -254,9 +254,6 @@ public class SurfaceResource extends RoutingResource {
             z0.d = 300; // meters. TODO set dynamically / properly, make sure it matches grid cell size?
             IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
             isochrones.add(isochrone);
-            if (++n >= nMax) {
-                break;
-            }
          }
 
         long t1 = System.currentTimeMillis();
