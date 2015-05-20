@@ -96,11 +96,11 @@ public class GraphMetadata {
         }
 
         Optional<Coordinate> centerOptional = graph.getCenter();
-        centerOptional.ifPresent(center -> {
-            setCenterLongitude(center.x);
-            setCenterLatitude(center.y);
-        });
-        if (!centerOptional.isPresent()) {
+
+        if(centerOptional.isPresent()) {
+            setCenterLongitude(centerOptional.get().x);
+            setCenterLatitude(centerOptional.get().y);
+        } else {
             // Does not work around 180th parallel.
             setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
             setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
