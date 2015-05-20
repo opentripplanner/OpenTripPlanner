@@ -26,6 +26,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
@@ -68,7 +70,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private Graph graph;
 
-    private NetworkLinkerLibrary networkLinkerLibrary;
+    private SimpleStreetSplitter linker;
 
     private BikeRentalStationService service;
 
@@ -121,8 +123,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     @Override
     public void setup() throws InterruptedException, ExecutionException {
         // Creation of network linker library will not modify the graph
-        networkLinkerLibrary = new NetworkLinkerLibrary(graph,
-                Collections.<Class<?>, Object> emptyMap());
+        linker = new SimpleStreetSplitter(graph);
 
         // Adding a bike rental station service needs a graph writer runnable
         updaterManager.executeBlocking(new GraphWriterRunnable() {
@@ -175,7 +176,10 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 BikeRentalStationVertex vertex = verticesByStation.get(station);
                 if (vertex == null) {
                     vertex = new BikeRentalStationVertex(graph, station);
-                    LinkRequest request = networkLinkerLibrary.connectVertexToStreets(vertex);
+                    if (!linker.link(vertex)) {
+                        // the toString includes the text "Bike rental station"
+                        LOG.warn("{} not near any streets; it will not be usable.", station);
+                    }
                     verticesByStation.put(station, vertex);
                     new RentABikeOnEdge(vertex, vertex, station.networks);
                     if (station.allowDropoff)

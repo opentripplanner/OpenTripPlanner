@@ -45,7 +45,6 @@ public class ScenarioResource {
 
     /** Return a list of all scenarios defined for this router. */
     @GET
-    @Path("/")
     public javax.ws.rs.core.Response getScenarioDescriptions () {
         return javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.OK)
                 .entity(scenarioStore.getDescriptions()).build();
@@ -64,7 +63,6 @@ public class ScenarioResource {
     }
 
     @POST
-    @Path("/")
     public javax.ws.rs.core.Response getScenario (
             @QueryParam("coordinates") String coordinates,
             @QueryParam("description") String description) {

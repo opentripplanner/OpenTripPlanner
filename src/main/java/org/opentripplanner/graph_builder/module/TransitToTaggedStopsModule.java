@@ -20,6 +20,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * This module takes advantage of the fact that in some cities, an authoritative linking location for GTFS stops is
+ * provided by tags in the OSM data.
+ *
+ * When OSM data is being loaded, certain OSM nodes that represent transit stops are made into TransitStopStreetVertex
+ * instances. In some cities, these nodes have a ref=* tag which gives the corresponding GFTS stop ID for the stop.
+ * See http://wiki.openstreetmap.org/wiki/Tag:highway%3Dbus_stop
+ *
+ * This module will attempt to link all transit stops to such nodes in the OSM data, based on the stop ID and ref tag.
+ * It is run before the main transit stop linker, and if no linkage was created here, the main linker should create
+ * one based on distance or other heuristics.
+ */
 public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
@@ -78,6 +90,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
         double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
         envelope.expandBy(searchRadiusLat / xscale, searchRadiusLat);
         Collection<Vertex> vertices = index.getVerticesForEnvelope(envelope);
+        // Iterate over all nearby vertices representing transit stops in OSM, linking to them if they have a stop code
+        // in their ref= tag that matches the GTFS stop code of this TransitStop.
         for (Vertex v : vertices){
             if (!(v instanceof TransitStopStreetVertex)){
                 continue;

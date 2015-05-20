@@ -1,8 +1,17 @@
 # Changelog
 
-## 0.17.0-SNAPSHOT
+## 0.18.0-SNAPSHOT
 
 - next release, work in progress on master branch
+
+## 0.17.0 (2015-05-14)
+
+- Allow fetching arrivals/departures over a particular time window
+- Completely new spatial analysis implementation: repeated RAPTOR search at every minute in a departure time window
+- More reproducible spatial analysis results across similar graphs, thanks to more consistent splitting of streets etc.
+- Sigmoidal accessibility metric rolloff (rather than hard-edged cutoff)
+- Correction of equirectangular projection used in spatial analysis
+- Improved, simplified, deterministic linking of stops into the street network
 
 ## 0.16.0 (2015-05-07)
 

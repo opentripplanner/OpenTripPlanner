@@ -2,15 +2,14 @@ package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Maps;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.pathparser.ProfilePropagationPathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -28,35 +27,72 @@ import java.util.Map;
 public class StopTreeCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(StopTreeCache.class);
-    final int timeCutoffMinutes;
-    private final Map<TransitStop, TObjectIntMap<Vertex>> distancesForStop = Maps.newHashMap();
+    final int maxWalkMeters;
+    // Flattened 2D array of (streetVertexIndex, distanceFromStop) for each TransitStop
+    public final Map<TransitStop, int[]> distancesForStop = Maps.newHashMap();
 
-    public StopTreeCache (Graph graph, int timeCutoffMinutes) {
-        this.timeCutoffMinutes = timeCutoffMinutes;
+    public StopTreeCache (Graph graph, int maxWalkMeters) {
+        this.maxWalkMeters = maxWalkMeters;
         LOG.info("Caching distances to nearby street intersections from each transit stop...");
         for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = (true);
             rr.setRoutingContext(graph, tstop, tstop);
-            // RoutingReqeust dateTime defaults to currentTime.
-            // If elapsed time is not capped, searches are very slow.
-            rr.worstTime = (rr.dateTime + timeCutoffMinutes * 60);
+            rr.rctx.pathParsers = new PathParser[] { new ProfilePropagationPathParser() };
             AStar astar = new AStar();
             rr.longDistance = true;
-            rr.dominanceFunction = new DominanceFunction.EarliestArrival();
             rr.setNumItineraries(1);
+
+            // since we're storing distances and later using them to optimize
+            // (in the profile propagation code we optimize on distance / walkSpeed
+            //  not the actual time including turn costs etc.),
+            // we need to optimize on distance here as well.
+            rr.maxWalkDistance = maxWalkMeters;
+            rr.softWalkLimiting = false;
+            rr.dominanceFunction = new DominanceFunction.LeastWalk();
+
             ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
-            TObjectIntMap<Vertex> distanceToVertex = new TObjectIntHashMap<>(1000, 0.5f, Integer.MAX_VALUE);
-            for (State state : spt.getAllStates()) {
-                distanceToVertex.put(state.getVertex(), (int)state.walkDistance);
+            // Copy vertex indices and distances into a flattened 2D array
+            int[] distances = new int[spt.getVertexCount() * 2];
+            int i = 0;
+            for (Vertex vertex : spt.getVertices()) {
+                State state = spt.getState(vertex);
+                
+                if (state == null)
+                    continue;
+                
+                distances[i++] = vertex.getIndex();
+                distances[i++] = (int) state.getWalkDistance();
             }
-            distancesForStop.put(tstop, distanceToVertex);
+            distancesForStop.put(tstop, distances);
             rr.cleanup();
         }
         LOG.info("Done caching distances to nearby street intersections from each transit stop.");
     }
 
-    public TObjectIntMap<Vertex> getDistancesForStop(TransitStop tstop) {
-        return distancesForStop.get(tstop);
+    /**
+     * Given a travel time to a transit stop, fill in the array with minimum travel times to all nearby street vertices.
+     * This function is meant to be called repeatedly on multiple transit stops, accumulating minima
+     * into the same targetArray.
+     */
+    public void propagateStop(TransitStop transitStop, int baseTimeSeconds, double walkSpeed, int[] targetArray) {
+        // Iterate over street intersections in the vicinity of this particular transit stop.
+        // Shift the time range at this transit stop, merging it into that for all reachable street intersections.
+        int[] distances = distancesForStop.get(transitStop);
+        int v = 0;
+        while (v < distances.length) {
+            // Unravel flattened 2D array
+            int vertexIndex = distances[v++];
+            int distance = distances[v++];
+            // distance in meters over walkspeed in meters per second --> seconds
+            int egressWalkTimeSeconds = (int) (distance / walkSpeed);
+            int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
+            int existing_min = targetArray[vertexIndex];
+            if (existing_min == 0 || existing_min > propagated_time) {
+                targetArray[vertexIndex] = propagated_time;
+            }
+        }
+
     }
+
 }
