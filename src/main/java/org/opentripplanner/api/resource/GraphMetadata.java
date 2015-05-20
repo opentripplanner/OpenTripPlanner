@@ -50,14 +50,14 @@ public class GraphMetadata implements Serializable {
     /**
      * This is envelope with all of OSM data and after {@link #updateEnvelope()} is called with all of data.
      */
-    private Envelope envelope;
+    private WorldEnvelope envelope;
 
     /**
      * This envelope starts with from envelope but gets expanded with {@link #expandToInclude(double, double)} for each {@link org.opentripplanner.routing.vertextype.TransitStop}.
      *
      * In {@link #updateEnvelope()} replaces envelope.
      */
-    private transient Envelope newEnvelope;
+    private transient WorldEnvelope newEnvelope;
 
     public GraphMetadata() {
     	// 0-arg constructor avoids com.sun.xml.bind.v2.runtime.IllegalAnnotationsException
@@ -65,19 +65,19 @@ public class GraphMetadata implements Serializable {
 
     public GraphMetadata(Graph graph) {
         /* generate extents */
-        envelope = new Envelope();
+        envelope = new WorldEnvelope();
 
         for (Vertex v : graph.getVertices()) {
             Coordinate c = v.getCoordinate();
             envelope.expandToInclude(c);
         }
 
-        setLowerLeftLongitude(envelope.getMinX());
-        setUpperRightLongitude(envelope.getMaxX());
-        setLowerLeftLatitude(envelope.getMinY());
-        setUpperRightLatitude(envelope.getMaxY());
+        setLowerLeftLongitude(envelope.getLowerLeftLongitude());
+        setUpperRightLongitude(envelope.getUpperRightLongitude());
+        setLowerLeftLatitude(envelope.getLowerLeftLatitude());
+        setUpperRightLatitude(envelope.getUpperRightLatitude());
 
-        newEnvelope = new Envelope(envelope);
+        newEnvelope = new WorldEnvelope(envelope);
 
         // Does not work around 180th parallel.
         // Should be replaced by using k-means center code from TransitIndex, and storing the center directly in the graph.
@@ -243,10 +243,10 @@ public class GraphMetadata implements Serializable {
     public void updateEnvelope() {
         envelope = newEnvelope;
 
-        setLowerLeftLongitude(envelope.getMinX());
-        setUpperRightLongitude(envelope.getMaxX());
-        setLowerLeftLatitude(envelope.getMinY());
-        setUpperRightLatitude(envelope.getMaxY());
+        setLowerLeftLongitude(envelope.getLowerLeftLongitude());
+        setUpperRightLongitude(envelope.getUpperRightLongitude());
+        setLowerLeftLatitude(envelope.getLowerLeftLatitude());
+        setUpperRightLatitude(envelope.getUpperRightLatitude());
     }
 
     /**
@@ -255,5 +255,121 @@ public class GraphMetadata implements Serializable {
      */
     public void addMode(TraverseMode mode) {
         transitModes.add(mode);
+    }
+
+    /**
+     * This class calculates borders of envelopes that can be also on 180th meridian
+     * The same way as it was previously calculated in GraphMetadata constructor
+     *
+     */
+    class WorldEnvelope implements Serializable {
+
+        Envelope leftEnv;
+        Envelope rightEnv;
+
+        double aRightCoordinate;
+
+        private double lowerLeftLongitude;
+        private double lowerLeftLatitude;
+        private double upperRightLongitude;
+        private double upperRightLatitude;
+
+        boolean coordinatesCalculated = false;
+
+        public WorldEnvelope() {
+            this.leftEnv = new Envelope();
+            this.rightEnv = new Envelope();
+            this.aRightCoordinate = 0;
+        }
+
+        public WorldEnvelope(WorldEnvelope envelope) {
+            this.leftEnv = envelope.leftEnv;
+            this.rightEnv = envelope.rightEnv;
+            this.aRightCoordinate = envelope.aRightCoordinate;
+            this.coordinatesCalculated = false;
+        }
+
+        public void expandToInclude(Coordinate c) {
+            this.expandToInclude(c.x, c.y);
+        }
+
+        public void expandToInclude(double x, double y) {
+            if (x < 0) {
+                leftEnv.expandToInclude(x, y);
+            } else {
+                rightEnv.expandToInclude(x, y);
+                aRightCoordinate = x;
+            }
+        }
+
+        /**
+         * Calculates lower/upper right/left latitude and longitude of all the coordintes
+         *
+         * This takes into account that envelope can extends over 180th meridian
+         */
+        private void calculateCoordinates() {
+            if (coordinatesCalculated) {
+                return;
+            }
+
+            if (this.leftEnv.getArea() == 0) {
+                //the entire area is in the eastern hemisphere
+                this.lowerLeftLongitude = rightEnv.getMinX();
+                this.upperRightLongitude = rightEnv.getMaxX();
+                this.lowerLeftLatitude = rightEnv.getMinY();
+                this.upperRightLatitude = rightEnv.getMaxY();
+            } else if (this.rightEnv.getArea() == 0) {
+                //the entire area is in the western hemisphere
+                this.lowerLeftLongitude = leftEnv.getMinX();
+                this.upperRightLongitude = leftEnv.getMaxX();
+                this.lowerLeftLatitude = leftEnv.getMinY();
+                this.upperRightLatitude = leftEnv.getMaxY();
+            } else {
+                //the area spans two hemispheres.  Either it crosses the prime meridian,
+                //or it crosses the 180th meridian (roughly, the international date line).  We'll check a random
+                //coordinate to find out
+
+                if (aRightCoordinate < 90) {
+                    //assume prime meridian
+                    this.lowerLeftLongitude = leftEnv.getMinX();
+                    this.upperRightLongitude = rightEnv.getMaxX();
+                } else {
+                    //assume 180th meridian
+                    this.lowerLeftLongitude = leftEnv.getMaxX();
+                    this.upperRightLongitude = rightEnv.getMinX();
+                }
+                this.upperRightLatitude = Math.max(rightEnv.getMaxY(), leftEnv.getMaxY());
+                this.lowerLeftLatitude = Math.min(rightEnv.getMinY(), leftEnv.getMinY());
+            }
+            coordinatesCalculated = true;
+        }
+
+        public double getLowerLeftLongitude() {
+            calculateCoordinates();
+            return lowerLeftLongitude;
+        }
+
+        public double getLowerLeftLatitude() {
+            calculateCoordinates();
+            return lowerLeftLatitude;
+        }
+
+        public double getUpperRightLongitude() {
+            calculateCoordinates();
+            return upperRightLongitude;
+        }
+
+        public double getUpperRightLatitude() {
+            calculateCoordinates();
+            return upperRightLatitude;
+        }
+
+        public boolean contains(Coordinate c) {
+            if (c.x < 0) {
+                return leftEnv.contains(c);
+            } else {
+                return rightEnv.contains(c);
+            }
+        }
     }
 }
