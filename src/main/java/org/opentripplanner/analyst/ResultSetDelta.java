@@ -2,7 +2,13 @@ package org.opentripplanner.analyst;
 
 import java.util.Map.Entry;
 
-public class ResultSetDelta extends ResultSetWithTimes {
+/**
+ * Represents the difference between two Analyst ResultSets. This expresses the change in travel time from one point to
+ * a whole set of points (improvement or worsening) when switching from one transport network scenario to another.
+ *
+ * TODO since the times2 are pulled out of another ResultSet I'd really expect this class to be a wrapper around two ResultSet instances.
+ */
+public class ResultSetDelta extends ResultSet {
 
     private static final long serialVersionUID = -6723127825189535112L;
 
@@ -22,7 +28,7 @@ public class ResultSetDelta extends ResultSetWithTimes {
     }
     
     /** build a resultsetdelta from two resultsetswithtimes that have already been precalculated */
-    public ResultSetDelta(ResultSetWithTimes result1, ResultSetWithTimes result2) {
+    public ResultSetDelta(ResultSet result1, ResultSet result2) {
         if (result1.times.length != result2.times.length)
             throw new IllegalArgumentException("Result sets do not match when constructing delta!");
         

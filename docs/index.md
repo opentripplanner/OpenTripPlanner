@@ -25,7 +25,7 @@ The code is under active development with a variety of [deployments](Deployments
 ## Status
 
 [![Build Status](http://ci.opentripplanner.org/buildStatus/icon?job=OpenTripPlanner)](http://ci.opentripplanner.org/job/OpenTripPlanner/)
-OpenTripPlanner is presently at **version 0.14.0**. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
+OpenTripPlanner is presently at **version 0.17.0**. See the [changelog](Changelog) and the [version notes](Version-Notes) to decide which branch or tag you want to work with. The software currently:
 
  * Plans multi-modal walking, wheelchair, bicycle and transit trips
  * Takes travel time, road type, safety, and elevation into account, and allows users to customize the weighting of these three factors

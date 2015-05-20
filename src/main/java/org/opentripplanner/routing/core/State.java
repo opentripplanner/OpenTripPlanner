@@ -104,6 +104,14 @@ public class State implements Cloneable {
      * a RoutingContext in TransitIndex, tests, etc.
      */
     public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options) {
+        this(vertex, backEdge, timeSeconds, timeSeconds, options);
+    }
+    
+    /**
+     * Create an initial state, forcing vertex, back edge, time and start time to the specified values. Useful for starting
+     * a multiple initial state search, for example when propagating profile results to the street network in RoundBasedProfileRouter.
+     */
+    public State(Vertex vertex, Edge backEdge, long timeSeconds, long startTime, RoutingRequest options) {
         this.weight = 0;
         this.vertex = vertex;
         this.backEdge = backEdge;
@@ -112,7 +120,7 @@ public class State implements Cloneable {
         // note that here we are breaking the circular reference between rctx and options
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
-        this.stateData.startTime = timeSeconds;
+        this.stateData.startTime = startTime;
         this.stateData.usingRentedBike = false;
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */

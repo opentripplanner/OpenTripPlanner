@@ -6,7 +6,7 @@
     <url>http://opentripplanner.org/</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>0.17.0-SNAPSHOT</version>
+    <version>0.18.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <scm>
@@ -130,6 +130,17 @@
                     <!-- Target Java versions -->
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- This plugin must be configured both here (for attach-javadoc during release)
+                and in "reports" (for site generation), preferably with identical version numbers. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <configuration>
+                    <!-- Turn off Java 8 strict Javadoc checking -->
+                    <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
             <plugin>
@@ -275,6 +286,8 @@
                 </reportSets>
             </plugin>
             <plugin>
+                <!-- This plugin must be configured both here (for site generation) and in "build"
+                (for attach-javadoc during release), preferably with identical version numbers. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.3</version>

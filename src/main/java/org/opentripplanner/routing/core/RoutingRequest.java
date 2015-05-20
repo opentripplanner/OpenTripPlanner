@@ -547,12 +547,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     /** @return the (soft) maximum walk distance */
-    // If transit is not to be used, disable walk limit.
+    // If transit is not to be used and this is a point to point search
+    // or one with soft walk limiting, disable walk limit.
     public double getMaxWalkDistance() {
-        if (!modes.isTransit()) {
-            return Double.MAX_VALUE;
-        } else {
+        if (modes.isTransit() || (batch && !softWalkLimiting)) {
             return maxWalkDistance;
+        } else {
+            return Double.MAX_VALUE;            
         }
     }
     
