@@ -163,19 +163,6 @@ public class StreetEdge extends Edge implements Cloneable {
         }
     }
 
-    public boolean canTraverse(RoutingRequest options) {
-        if (options.wheelchairAccessible) {
-            if (!isWheelchairAccessible()) {
-                return false;
-            }
-            if (getMaxSlope() > options.maxSlope) {
-                return false;
-            }
-        }
-        
-        return canTraverse(options.modes);
-    }
-    
     public boolean canTraverse(TraverseModeSet modes) {
         return getPermission().allows(modes);
     }

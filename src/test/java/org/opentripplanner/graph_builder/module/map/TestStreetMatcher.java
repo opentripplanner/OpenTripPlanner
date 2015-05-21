@@ -205,11 +205,6 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public boolean canTraverse(RoutingRequest options) {
-            return true;
-        }
-
-        @Override
         public boolean canTraverse(TraverseModeSet modes) {
             return true;
         }
