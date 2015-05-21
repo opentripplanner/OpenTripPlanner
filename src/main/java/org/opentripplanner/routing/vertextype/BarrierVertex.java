@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.vertextype;
 
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
@@ -30,7 +31,15 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public class BarrierVertex extends OsmVertex {
 
+    private StreetTraversalPermission barrierPermissions;
+
     public BarrierVertex(Graph g, String label, double x, double y) {
         super(g, label, x, y);
+        //According to OSM default permissions are access=no, foot=yes, bicycle=yes
+        barrierPermissions = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+    }
+
+    public StreetTraversalPermission getBarrierPermissions() {
+        return barrierPermissions;
     }
 }

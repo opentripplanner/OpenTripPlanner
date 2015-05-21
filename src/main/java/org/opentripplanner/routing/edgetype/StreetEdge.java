@@ -163,10 +163,32 @@ public class StreetEdge extends Edge implements Cloneable {
         }
     }
 
+    /**
+     * Checks permissions of the street edge if specified modes are allowed to travel.
+     *
+     * Barriers aren't taken into account. So it can happen that canTraverse returns True.
+     * But doTraverse returns false. Since there are barriers on a street.
+     *
+     * This is because this function is used also on street when searching for start/stop.
+     * Those streets are then split. On splitted streets can be possible to drive with a CAR because
+     * it is only blocked from one way.
+     * @param modes
+     * @return
+     */
     public boolean canTraverse(TraverseModeSet modes) {
         return getPermission().allows(modes);
     }
-    
+
+    /**
+     * Checks if edge is accessible for wheelchair if needed according to tags or if slope is too big.
+     *
+     * Then it checks if street can be traversed according to street permissions and start/end barriers.
+     * This is done with intersection of street and barrier permissions in {@link #canTraverseIncludingBarrier(TraverseMode)}
+     *
+     * @param options
+     * @param mode
+     * @return
+     */
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
             if (!isWheelchairAccessible()) {
@@ -176,7 +198,34 @@ public class StreetEdge extends Edge implements Cloneable {
                 return false;
             }
         }
-        return getPermission().allows(mode);
+        return canTraverseIncludingBarrier(mode);
+    }
+
+    /**
+     * This checks if start or end vertex is bollard
+     * If it is it creates intersection of street edge permissions
+     * and from/to barriers.
+     * Then it checks if mode is allowed to traverse the edge.
+     *
+     * By default CAR isn't allowed to traverse barrier but foot and bicycle are.
+     * This can be changed with different tags
+     *
+     * If start/end isn't bollard it just checks the street permissions.
+     *
+     * It is used in {@link #canTraverse(RoutingRequest, TraverseMode)}
+     * @param mode
+     * @return
+     */
+    public boolean canTraverseIncludingBarrier(TraverseMode mode) {
+        StreetTraversalPermission permission = getPermission();
+        if (fromv instanceof BarrierVertex) {
+            permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
+        }
+        if (tov instanceof BarrierVertex) {
+            permission = permission.intersection(((BarrierVertex) tov).getBarrierPermissions());
+        }
+
+        return permission.allows(mode);
     }
 
     public PackedCoordinateSequence getElevationProfile() {
@@ -262,12 +311,6 @@ public class StreetEdge extends Edge implements Cloneable {
                 return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
             }
             return null;
-        }
-        if (traverseMode == TraverseMode.CAR) {
-            if (fromv instanceof BarrierVertex || tov instanceof BarrierVertex) {
-                LOG.info("Can't traverse over barrier: {}", getName());
-                return null;
-            }
         }
 
         // Automobiles have variable speeds depending on the edge type
