@@ -58,6 +58,10 @@ public class OTPMain {
     /** ENTRY POINT: This is the main method that is called when running otp.jar from the command line. */
     public static void main(String[] args) {
 
+        //This is needed so that conversion from WGS84 to coordinate system of elevation coordinate system is correct
+        //More info:http://docs.geotools.org/latest/userguide/library/referencing/order.html
+        System.setProperty("org.geotools.referencing.forceXY", "true");
+
         /* Parse and validate command line parameters. */
         CommandLineParameters params = new CommandLineParameters();
         try {
