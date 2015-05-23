@@ -91,7 +91,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public static final double MAX_DISTANCE_FROM_STREET_METERS = 1000;
     
     private static final double MAX_DISTANCE_FROM_STREET_DEGREES =
-            MAX_DISTANCE_FROM_STREET_METERS * 180 / Math.PI * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
+            MAX_DISTANCE_FROM_STREET_METERS * 180 / Math.PI / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
