@@ -131,7 +131,7 @@ public class RepeatedRaptorProfileRouter {
         //        }
 
         int[] timesAtVertices = new int[Vertex.getMaxIndex()];
-        Arrays.fill(timesAtVertices, TimeSurface.UNREACHABLE);
+        Arrays.fill(timesAtVertices, Integer.MAX_VALUE);
 
         for (State state : walkOnlySpt.getAllStates()) {
             // Note that we are using the walk distance divided by speed here in order to be consistent with the
@@ -141,7 +141,7 @@ public class RepeatedRaptorProfileRouter {
             int otime = timesAtVertices[vidx];
 
             // There may be dominated states in the SPT. Make sure we don't include them here.
-            if (otime == TimeSurface.UNREACHABLE || otime > time)
+            if (otime > time)
                 timesAtVertices[vidx] = time;
 
         }
@@ -174,9 +174,9 @@ public class RepeatedRaptorProfileRouter {
     private TObjectIntMap<TransitStop> findInitialStops(boolean dest) {
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
-        QualifiedModeSet modes = dest ? request.accessModes : request.egressModes;
+        QualifiedModeSet modes = dest ? request.egressModes : request.accessModes;
 
-        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        RoutingRequest rr = new RoutingRequest(modes);
         rr.batch = true;
         rr.from = new GenericLocation(lat, lon);
         //rr.walkSpeed = request.walkSpeed;
@@ -186,13 +186,20 @@ public class RepeatedRaptorProfileRouter {
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 +
                 request.fromTime;
 
-        // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
-        // which is implemented this way because walk times can change when walk speed changes. Also, walk times are floating
-        // point and can change slightly when streets are split. Street lengths are internally fixed-point ints, which do not
-        // suffer from roundoff. Great care is taken when splitting to preserve sums.
-        rr.maxWalkDistance = 2000;
-        rr.softWalkLimiting = false;
-        rr.dominanceFunction = new DominanceFunction.LeastWalk();
+        if (rr.modes.contains(TraverseMode.BICYCLE)) {
+            rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+            rr.worstTime = rr.dateTime + request.maxBikeTime * 60;
+        } else {
+            // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
+            // which is implemented this way because walk times can change when walk speed changes. Also, walk times are floating
+            // point and can change slightly when streets are split. Street lengths are internally fixed-point ints, which do not
+            // suffer from roundoff. Great care is taken when splitting to preserve sums.
+            // When cycling, this is not an issue; we already have an explicitly asymmetrical search (cycling at the origin, walking at the destination),
+            // so we need not preserve symmetry.
+            rr.maxWalkDistance = 2000;
+            rr.softWalkLimiting = false;
+            rr.dominanceFunction = new DominanceFunction.LeastWalk();
+        }
 
         AStar astar = new AStar();
         rr.longDistance = true;
@@ -217,8 +224,14 @@ public class RepeatedRaptorProfileRouter {
         return accessTimes;
     }
 
-    /** Make a result set range set, optionally including times */
+    /**
+     * Make a result set range set, optionally including times
+     * (which only has an effect if there is a pointset/sampleset associated with this router)
+     */
     public ResultSet.RangeSet makeResults (boolean includeTimes) {
-        return propagatedTimesStore.makeResults(sampleSet, includeTimes);
+        if (sampleSet != null)
+            return propagatedTimesStore.makeResults(sampleSet, includeTimes);
+        else
+            return propagatedTimesStore.makeIsochrones(this.timeSurfaceRangeSet);
     }
 }

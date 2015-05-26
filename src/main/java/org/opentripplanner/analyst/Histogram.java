@@ -48,7 +48,7 @@ public class Histogram implements Serializable {
      * minutes, etc. The features are not weighted by their magnitudes, so values represent (for example) the number of 
      * places of employment that can be reached rather than the total number of jobs in all those places of employment.
      */
-    public final int[] counts;
+    public int[] counts;
 
     /**
      * The weighted sum of all features that can be reached within each one-minute bin.
@@ -56,7 +56,7 @@ public class Histogram implements Serializable {
      * Features are weighted by their magnitudes, so values represent (for example) the total number of jobs in
      * all accessible places of employment, rather than the number of places of employment.
      */
-    public final int[] sums;
+    public int[] sums;
 
     /**
      * Given parallel arrays of travel times and magnitudes for any number of destination features, construct 
@@ -64,7 +64,7 @@ public class Histogram implements Serializable {
      * travel time. The length of the arrays containing these histograms will be equal to the maximum travel time
      * specified in the original search request, in minutes.
      * @param times the time at which each destination is reached. The array will be destructively sorted in place.
-     * @param weights the weight or magnitude of each destination reached. it is parallel to times.
+     * @param weight the weight or magnitude of each destination reached. it is parallel to times.
      */    
     public Histogram (int[] times, int[] weight) {
         int size = weightingFunctions.length;
@@ -121,6 +121,9 @@ public class Histogram implements Serializable {
             sums[i] -= sums[i - 1];
         }
     }
+
+    /** no-arg constructor for serialization/deserialization */
+    public Histogram () {}
 
     /**
      * Serialize this pair of histograms out as a JSON document using the given JsonGenerator. The format is:

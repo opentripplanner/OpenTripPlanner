@@ -4,12 +4,23 @@ import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.geotools.feature.FeatureCollection;
+import org.geotools.geojson.feature.FeatureJSON;
+import org.geotools.geojson.geom.GeometryJSON;
+import org.opentripplanner.analyst.core.IsochroneData;
+import org.opentripplanner.api.resource.LIsochrone;
+import org.opentripplanner.api.resource.SurfaceResource;
+import org.opentripplanner.profile.IsochroneGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -26,7 +37,10 @@ public class ResultSet implements Serializable{
     public Map<String,Histogram> histograms = Maps.newHashMap();
 
     /** Times to reach every feature, may be null */
-	public int[] times;
+    public int[] times;
+
+    /** Isochrones from the origin, may be null */
+    public IsochroneData[] isochrones;
 
     public ResultSet() {
         // TODO is this ever used?
@@ -34,11 +48,11 @@ public class ResultSet implements Serializable{
 
     /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points, not including times. */
     public ResultSet(SampleSet samples, TimeSurface surface){
-        this(samples, surface, false);
+        this(samples, surface, false, false);
     }
     
     /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points, optionally including times. */
-    public ResultSet(SampleSet samples, TimeSurface surface, boolean includeTimes){
+    public ResultSet(SampleSet samples, TimeSurface surface, boolean includeTimes, boolean includeIsochrones){
         id = samples.pset.id + "_" + surface.id;
 
         PointSet targets = samples.pset;
@@ -48,7 +62,21 @@ public class ResultSet implements Serializable{
 
         if (includeTimes)
             this.times = times;
+        
+        if (includeIsochrones)
+            buildIsochrones(surface);
+    }
+    
+    private void buildIsochrones(TimeSurface surface) {
+        List<IsochroneData> id = SurfaceResource.getIsochronesAccumulative(surface, 5, 24);
+        
+        this.isochrones = new IsochroneData[id.size()];
+        id.toArray(this.isochrones);
+    }
 
+    /** Build a new ResultSet that contains only isochrones */
+    public ResultSet (TimeSurface surface) {
+        buildIsochrones(surface);
     }
     
     /** Build a new ResultSet directly from times at point features */
@@ -161,6 +189,21 @@ public class ResultSet implements Serializable{
         } catch (IOException ioex) {
             LOG.info("IOException, connection may have been closed while streaming JSON.");
         }
+    }
+
+    /** Write the isochrones as GeoJSON */
+    public void writeIsochrones(JsonGenerator jgen) throws IOException {
+        if (this.isochrones == null)
+            return;
+        
+        FeatureJSON fj = new FeatureJSON();
+        FeatureCollection fc = LIsochrone.makeContourFeatures(Arrays.asList(isochrones));
+        
+        StringWriter sw = new StringWriter();
+        fj.writeFeatureCollection(fc, sw);
+        // TODO cludge
+        String json = sw.toString();
+        jgen.writeRaw(json.substring(1, json.length() - 1));
     }
     
     /** A set of result sets from profile routing: min, avg, max */;

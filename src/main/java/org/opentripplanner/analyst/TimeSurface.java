@@ -135,7 +135,7 @@ public class TimeSurface implements Serializable {
         id = makeUniqueId();
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
-        cutoffMinutes = 90; // FIXME is there any well-defined cutoff? This is needed for generating isochrone curves.
+        cutoffMinutes = 120; // FIXME is there any well-defined cutoff? This is needed for generating isochrone curves.
     }
 
 	public static TimeSurface.RangeSet makeSurfaces (AnalystProfileRouterPrototype profileRouter) {
