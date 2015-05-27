@@ -1,6 +1,5 @@
 package org.opentripplanner.analyst.scenario;
 
-import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.Agency;
@@ -35,7 +34,7 @@ public class TimetableFilterTest extends TestCase {
     /** test that routes that should be removed are */
     @Test
     public void testRouteRemoval () {
-        RemoveTrips rt = new RemoveTrips();
+        RemoveTrip rt = new RemoveTrip();
         rt.agencyId = agency.getId();
         rt.routeId = Arrays.asList(route.getId().getId());
 
@@ -46,7 +45,7 @@ public class TimetableFilterTest extends TestCase {
     /** test that routes that should not be removed are not */
     @Test
     public void testRoutePreservation () {
-        RemoveTrips rt = new RemoveTrips();
+        RemoveTrip rt = new RemoveTrip();
         rt.agencyId = agency.getId();
         rt.routeId = Arrays.asList("SOMETHING ELSE");
 
@@ -57,7 +56,7 @@ public class TimetableFilterTest extends TestCase {
     /** Test that trips that should be removed are */
     @Test
     public void testTripRemoval () {
-        RemoveTrips rt = new RemoveTrips();
+        RemoveTrip rt = new RemoveTrip();
         rt.agencyId = agency.getId();
         rt.tripId = Arrays.asList(trip.getId().getId());
 
@@ -68,7 +67,7 @@ public class TimetableFilterTest extends TestCase {
     /** test that trips that should not be removed are not */
     @Test
     public void testTripPreservation () {
-        RemoveTrips rt = new RemoveTrips();
+        RemoveTrip rt = new RemoveTrip();
         rt.agencyId = agency.getId();
         rt.tripId = Arrays.asList("SOMETHING ELSE");
 
@@ -86,7 +85,7 @@ public class TimetableFilterTest extends TestCase {
     @Test
     public void testSpecificRemoval () {
         // route ID and trip ID are supposed to combined with a logical and, ensure that they are.
-        RemoveTrips rt = new RemoveTrips();
+        RemoveTrip rt = new RemoveTrip();
         rt.agencyId = agency.getId();
         rt.routeId = Arrays.asList(route.getId().getId());
         rt.tripId = Arrays.asList(trip.getId().getId());

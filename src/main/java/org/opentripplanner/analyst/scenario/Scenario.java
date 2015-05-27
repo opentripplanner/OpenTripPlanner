@@ -1,6 +1,7 @@
 package org.opentripplanner.analyst.scenario;
 
 import com.beust.jcommander.internal.Lists;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,7 +17,7 @@ public class Scenario implements Serializable {
 
     public List<Modification> modifications = Lists.newArrayList();
 
-    public Scenario (int id) {
+    public Scenario (@JsonProperty("id") int id) {
         this.id = id;
     }
 }
