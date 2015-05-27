@@ -33,7 +33,7 @@ public class AdjustDwellTime extends TimetableFilter {
 
         for (int i = 0; i < tt.getNumStops(); i++) {
             // adjust dwell time in place as we loop over the stops
-            if (stopId.contains(tp.getStop(i).getId().getId()))
+            if (stopId == null || stopId.contains(tp.getStop(i).getId().getId()))
                 dwellTimes[i] = dwellTime;
             else
                 dwellTimes[i] = tt.getScheduledDepartureTime(i) - tt.getScheduledArrivalTime(i);
