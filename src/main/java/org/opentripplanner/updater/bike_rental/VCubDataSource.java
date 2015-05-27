@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Bike-rental station data source for the "Communauté d'Agglomération de Bordeaux" (CUB) VCub (aka
@@ -44,7 +45,7 @@ public class VCubDataSource extends GenericXmlBikeRentalDataSource {
         }
         if (brstation.x == 0 || brstation.y == 0)
             return null;
-        brstation.name = attributes.get("ms:NOM");
+        brstation.name = new NonLocalizedString(attributes.get("ms:NOM"));
         boolean connected = "CONNECTEE".equalsIgnoreCase(attributes.get("ms:ETAT"));
         brstation.realTimeData = connected;
         String nbPlaces = attributes.get("ms:NBPLACES");

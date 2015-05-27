@@ -36,6 +36,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class PartialStreetEdgeTest {
     
@@ -114,9 +115,9 @@ public class PartialStreetEdgeTest {
         List<StreetEdge> edges = new ArrayList<StreetEdge>();
         edges.add(e2);
         TemporaryStreetLocation end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(
-                _graph, "middle of e2", "foo", edges, nearestPoint, true);
+                _graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, true);
         TemporaryStreetLocation start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(
-                _graph, "middle of e2", "foo", edges, nearestPoint, false);
+                _graph, "middle of e2", new NonLocalizedString("foo"), edges, nearestPoint, false);
 
         RoutingRequest options = new RoutingRequest();
         options.setMode(TraverseMode.CAR);

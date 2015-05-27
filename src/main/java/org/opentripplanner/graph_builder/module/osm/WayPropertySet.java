@@ -30,6 +30,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc. to edges based on OSM tags.
@@ -177,7 +178,7 @@ public class WayPropertySet {
         result.setSafetyFeatures(new P2<Double>(first, second));
     }
 
-    public String getCreativeNameForWay(OSMWithTags way) {
+    public I18NString getCreativeNameForWay(OSMWithTags way) {
         CreativeNamer bestNamer = null;
         int bestScore = 0;
         for (CreativeNamerPicker picker : creativeNamers) {
