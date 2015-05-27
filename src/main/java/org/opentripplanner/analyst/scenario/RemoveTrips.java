@@ -13,16 +13,16 @@ public class RemoveTrips extends TimetableFilter {
 
     @Override
     public String getType() {
-        return "remove-trips";
+        return "remove-trip";
     }
 
     @Override
-    public TripTimes apply(Trip trip, TripTimes tt) {
+    public TripTimes apply(Trip trip, TripPattern tp, TripTimes tt) {
         return matches(trip) ? null : tt;
     }
 
     @Override
-    public FrequencyEntry apply(Trip trip, FrequencyEntry fe) {
+    public FrequencyEntry apply(Trip trip, TripPattern tp, FrequencyEntry fe) {
         return matches(trip) ? null : fe;
     }
 }
