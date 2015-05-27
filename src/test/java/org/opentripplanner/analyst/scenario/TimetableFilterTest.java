@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst.scenario;
 
+import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.Agency;
@@ -103,7 +104,7 @@ public class TimetableFilterTest extends TestCase {
         assertEquals(frequencyEntry, rt.apply(trip, pattern, frequencyEntry));
     }
 
-    /* DWELL TIMES */
+    /** Test modification of dwell times */
     @Test
     public void testDwellTimes () {
         AdjustDwellTime adt = new AdjustDwellTime();
@@ -114,6 +115,7 @@ public class TimetableFilterTest extends TestCase {
 
         TripTimes tt2 = adt.apply(trip, pattern, times);
         assertNotNull(tt2);
+        assertEquals(times.getArrivalTime(0), tt2.getArrivalTime(0));
         assertEquals(60, tt2.getDepartureTime(0) - tt2.getArrivalTime(0));
         assertEquals(30, tt2.getDepartureTime(1) - tt2.getArrivalTime(1));
         assertEquals(60, tt2.getDepartureTime(2) - tt2.getArrivalTime(2));
@@ -134,6 +136,29 @@ public class TimetableFilterTest extends TestCase {
 
         // make sure we didn't accidentally modify the original times
         assertEquals(30, frequencyEntry.tripTimes.getDepartureTime(2) - frequencyEntry.tripTimes.getArrivalTime(2));
+
+        // wildcard
+        adt.stopId = null;
+
+        tt2 = adt.apply(trip, pattern, times);
+        assertNotNull(tt2);
+        assertEquals(times.getArrivalTime(0), tt2.getArrivalTime(0));
+        assertEquals(60, tt2.getDepartureTime(0) - tt2.getArrivalTime(0));
+        assertEquals(60, tt2.getDepartureTime(1) - tt2.getArrivalTime(1));
+        assertEquals(60, tt2.getDepartureTime(2) - tt2.getArrivalTime(2));
+        assertEquals(60, tt2.getDepartureTime(3) - tt2.getArrivalTime(3));
+
+        // test repeated application
+        adt.stopId = Arrays.asList(stops[2].getId().getId());
+        adt.dwellTime = 17;
+
+        tt2 = adt.apply(trip, pattern, tt2);
+        assertNotNull(tt2);
+        assertEquals(times.getArrivalTime(0), tt2.getArrivalTime(0));
+        assertEquals(60, tt2.getDepartureTime(0) - tt2.getArrivalTime(0));
+        assertEquals(60, tt2.getDepartureTime(1) - tt2.getArrivalTime(1));
+        assertEquals(17, tt2.getDepartureTime(2) - tt2.getArrivalTime(2));
+        assertEquals(60, tt2.getDepartureTime(3) - tt2.getArrivalTime(3));
     }
 
 
