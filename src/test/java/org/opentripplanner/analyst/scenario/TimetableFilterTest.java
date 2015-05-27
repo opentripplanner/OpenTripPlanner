@@ -29,6 +29,7 @@ public class TimetableFilterTest extends TestCase {
     private Agency agency;
     private Route route;
 
+    /* ROUTE REMOVAL (also matching) */
 
     /** test that routes that should be removed are */
     @Test
@@ -101,6 +102,40 @@ public class TimetableFilterTest extends TestCase {
         assertEquals(times, rt.apply(trip, pattern, times));
         assertEquals(frequencyEntry, rt.apply(trip, pattern, frequencyEntry));
     }
+
+    /* DWELL TIMES */
+    @Test
+    public void testDwellTimes () {
+        AdjustDwellTime adt = new AdjustDwellTime();
+        adt.routeId = Arrays.asList(route.getId().getId());
+        adt.agencyId = agency.getId();
+        adt.stopId = Arrays.asList(stops[0].getId().getId(), stops[2].getId().getId());
+        adt.dwellTime = 60;
+
+        TripTimes tt2 = adt.apply(trip, pattern, times);
+        assertNotNull(tt2);
+        assertEquals(60, tt2.getDepartureTime(0) - tt2.getArrivalTime(0));
+        assertEquals(30, tt2.getDepartureTime(1) - tt2.getArrivalTime(1));
+        assertEquals(60, tt2.getDepartureTime(2) - tt2.getArrivalTime(2));
+        assertEquals(30, tt2.getDepartureTime(3) - tt2.getArrivalTime(3));
+
+        // make sure we didn't accidentally modify the orignal times
+        assertEquals(30, times.getDepartureTime(2) - times.getArrivalTime(2));
+
+        FrequencyEntry fe2 = adt.apply(trip, pattern, frequencyEntry);
+        assertNotNull(fe2);
+
+        tt2 = fe2.tripTimes;
+
+        assertEquals(60, tt2.getDepartureTime(0) - tt2.getArrivalTime(0));
+        assertEquals(30, tt2.getDepartureTime(1) - tt2.getArrivalTime(1));
+        assertEquals(60, tt2.getDepartureTime(2) - tt2.getArrivalTime(2));
+        assertEquals(30, tt2.getDepartureTime(3) - tt2.getArrivalTime(3));
+
+        // make sure we didn't accidentally modify the original times
+        assertEquals(30, frequencyEntry.tripTimes.getDepartureTime(2) - frequencyEntry.tripTimes.getArrivalTime(2));
+    }
+
 
     @Override
     protected void setUp () {
