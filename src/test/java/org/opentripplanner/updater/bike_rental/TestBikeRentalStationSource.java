@@ -32,7 +32,7 @@ public class TestBikeRentalStationSource extends TestCase {
             System.out.println(rentalStation);
         }
         BikeRentalStation stSulpice = rentalStations.get(0);
-        assertEquals("ZAC SAINT SULPICE", stSulpice.name);
+        assertEquals("ZAC SAINT SULPICE", stSulpice.name.toString());
         assertEquals("75", stSulpice.id);
         assertEquals(-1.63528, stSulpice.x);
         assertEquals(48.1321, stSulpice.y);

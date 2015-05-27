@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -188,8 +189,9 @@ public class RoutingContext implements Cloneable {
             double lengthRatio = partial.getLength() / parent.getLength();
             double length = streetEdge.getDistance() * lengthRatio;
 
+            //TODO: localize this
             String name = from.getLabel() + " to " + to.getLabel();
-            new TemporaryPartialStreetEdge(streetEdge, from, to, partial, name, length);
+            new TemporaryPartialStreetEdge(streetEdge, from, to, partial, new NonLocalizedString(name), length);
         }
     }
 

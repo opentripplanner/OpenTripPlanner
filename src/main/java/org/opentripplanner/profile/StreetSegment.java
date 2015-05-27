@@ -3,7 +3,6 @@ package org.opentripplanner.profile;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.common.collect.Lists;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -11,17 +10,15 @@ import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 /** 
  * A response object describing a non-transit part of an Option. This is either an access/egress leg of a transit
@@ -54,7 +51,8 @@ public class StreetSegment {
                 }
             }
         }
-        Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false);
+        //TODO: localize
+        Itinerary itin = GraphPathToTripPlanConverter.generateItinerary(path, false, new Locale("en"));
         for (Leg leg : itin.legs) {
             // populate the streetEdges array
             for(WalkStep walkStep : leg.walkSteps) {

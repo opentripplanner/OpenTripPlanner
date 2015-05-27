@@ -17,6 +17,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A vertex for a bike park.
@@ -40,7 +41,8 @@ public class BikeParkVertex extends Vertex {
     private String id;
 
     public BikeParkVertex(Graph g, BikePark bikePark) {
-        super(g, "bike park " + bikePark.id, bikePark.x, bikePark.y, bikePark.name);
+        //TODO: localize bikepark
+        super(g, "bike park " + bikePark.id, bikePark.x, bikePark.y, new NonLocalizedString(bikePark.name));
         this.setId(bikePark.id);
         this.setSpacesAvailable(bikePark.spacesAvailable);
     }
