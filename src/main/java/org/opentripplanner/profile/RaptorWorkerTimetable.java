@@ -139,8 +139,8 @@ public class RaptorWorkerTimetable implements Serializable {
         List<TripTimes> tripTimes = Lists.newArrayList();
         TT: for (TripTimes tt : pattern.scheduledTimetable.tripTimes) {
             if (servicesRunning.get(tt.serviceCode) &&
-                    tt.getScheduledArrivalTime(0) < window.to &&
-                    tt.getScheduledDepartureTime(tt.getNumStops() - 1) >= window.from) {
+                    tt.getArrivalTime(0) < window.to &&
+                    tt.getDepartureTime(tt.getNumStops() - 1) >= window.from) {
 
                 // apply scenario
                 if (scenario != null && scenario.modifications != null) {
@@ -188,7 +188,7 @@ public class RaptorWorkerTimetable implements Serializable {
         Collections.sort(tripTimes, new Comparator<TripTimes>() {
             @Override
             public int compare(TripTimes tt1, TripTimes tt2) {
-                return (tt1.getScheduledArrivalTime(0) - tt2.getScheduledArrivalTime(0));
+                return (tt1.getArrivalTime(0) - tt2.getArrivalTime(0));
             }
         });
 
@@ -198,8 +198,8 @@ public class RaptorWorkerTimetable implements Serializable {
         for (TripTimes tt : tripTimes) {
             int[] times = new int[rwtt.nStops];
             for (int s = 0; s < pattern.getStops().size(); s++) {
-                int arrival = tt.getScheduledArrivalTime(s);
-                int departure = tt.getScheduledDepartureTime(s);
+                int arrival = tt.getArrivalTime(s);
+                int departure = tt.getDepartureTime(s);
                 times[s * 2] = arrival;
                 times[s * 2 + 1] = departure;
             }
@@ -224,11 +224,11 @@ public class RaptorWorkerTimetable implements Serializable {
                 // It's generally considered good practice to have frequency trips start at midnight, however that is
                 // not always the case, and we need to preserve the original times so that we can update them in
                 // real time.
-                int startTime = fe.tripTimes.getScheduledArrivalTime(0);
+                int startTime = fe.tripTimes.getArrivalTime(0);
 
                 for (int s = 0; s < fe.tripTimes.getNumStops(); s++) {
-                    times[s * 2] = fe.tripTimes.getScheduledArrivalTime(s) - startTime;
-                    times[s * 2 + 1] = fe.tripTimes.getScheduledDepartureTime(s) - startTime;
+                    times[s * 2] = fe.tripTimes.getArrivalTime(s) - startTime;
+                    times[s * 2 + 1] = fe.tripTimes.getDepartureTime(s) - startTime;
                 }
 
                 i++;
