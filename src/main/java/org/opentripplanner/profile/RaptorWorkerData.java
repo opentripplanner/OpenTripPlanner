@@ -10,6 +10,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
+import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -55,12 +56,12 @@ public class RaptorWorkerData implements Serializable {
     public transient final List<String> patternNames = new ArrayList<>();
 
     /** Create RaptorWorkerData for the given window and graph, with the specified routes (specified as agencyid_routeid) banned */
-    public RaptorWorkerData (Graph graph, TimeWindow window, Set<String> bannedRoutes) {
-        this(graph, window, bannedRoutes, null);
+    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario) {
+        this(graph, window, scenario, null);
     }
 
     /** Create RaptorWorkerData to be used to build ResultSets directly without creating an intermediate SampleSet */
-    public RaptorWorkerData (Graph graph, TimeWindow window, Set<String> bannedRoutes, SampleSet sampleSet) {
+    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario, SampleSet sampleSet) {
         int totalPatterns = graph.index.patternForId.size();
         int totalStops = graph.index.stopForId.size();
         timetablesForPattern = new ArrayList<RaptorWorkerTimetable>(totalPatterns);
@@ -71,7 +72,7 @@ public class RaptorWorkerData implements Serializable {
 
         /* Make timetables for active trip patterns and record the stops each active pattern uses. */
         for (TripPattern pattern : graph.index.patternForId.values()) {
-            RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forPattern(graph, pattern, window, bannedRoutes);
+            RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forPattern(graph, pattern, window, scenario);
             if (timetable == null) {
                 // Pattern is not running during the time window
                 continue;

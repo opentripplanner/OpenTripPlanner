@@ -66,7 +66,7 @@ public class AddFrequencyRoute extends Modification {
     public String getType() {
         return "add-frequency-route";
     }
-    
+
     // TODO boolean followStreets
 
 }

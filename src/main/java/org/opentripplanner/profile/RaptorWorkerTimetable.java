@@ -1,8 +1,11 @@
 package org.opentripplanner.profile;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.analyst.scenario.Scenario;
+import org.opentripplanner.analyst.scenario.TimetableFilter;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -128,7 +131,7 @@ public class RaptorWorkerTimetable implements Serializable {
      * This is a factory function rather than a constructor to avoid calling the super constructor for rejected patterns.
      * BannedRoutes is formatted as agencyid_routeid.
      */
-    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Set<String> bannedRoutes) {
+    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Scenario scenario) {
 
         // Filter down the trips to only those running during the window
         // This filtering can reduce number of trips and run time by 80 percent
@@ -139,11 +142,15 @@ public class RaptorWorkerTimetable implements Serializable {
                     tt.getScheduledArrivalTime(0) < window.to &&
                     tt.getScheduledDepartureTime(tt.getNumStops() - 1) >= window.from) {
 
-                AgencyAndId routeId = tt.trip.getRoute().getId();
-                if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
-                    continue;
+                // apply scenario
+                if (scenario != null && scenario.modifications != null) {
+                    for (TimetableFilter filter : Iterables.filter(scenario.modifications, TimetableFilter.class)) {
+                        tt = filter.apply(tt.trip, pattern, tt);
+                    }
+                }
 
-                tripTimes.add(tt);
+                if (tt != null)
+                    tripTimes.add(tt);
             }
         }
 
@@ -154,11 +161,6 @@ public class RaptorWorkerTimetable implements Serializable {
                     fe.getMinDeparture() < window.to &&
                     fe.getMaxArrival() > window.from
                     ) {
-
-                AgencyAndId routeId = fe.tripTimes.trip.getRoute().getId();
-                if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
-                    continue;
-
                 // this frequency entry has the potential to be used
 
                 if (fe.exactTimes) {
@@ -166,8 +168,14 @@ public class RaptorWorkerTimetable implements Serializable {
                     continue;
                 }
 
+                if (scenario != null && scenario.modifications != null) {
+                    for (TimetableFilter filter : Iterables.filter(scenario.modifications, TimetableFilter.class)) {
+                        fe = filter.apply(fe.tripTimes.trip, pattern, fe);
+                    }
+                }
 
-                freqs.add(fe);
+                if (fe != null)
+                    freqs.add(fe);
             }
         }
 

@@ -111,13 +111,11 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("Make data...");
         TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date));
 
-        Set<String> bannedRoutes = request.bannedRoutes == null ? null : new HashSet<String>(request.bannedRoutes);
-
         RaptorWorkerData raptorWorkerData;
         if (sampleSet == null)
-            raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes);
+            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario);
         else
-            raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes, sampleSet);
+            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, sampleSet);
         LOG.info("Done.");
         // TEST SERIALIZED SIZE and SPEED
         //        try {
