@@ -66,12 +66,7 @@ public class AddFrequencyRoute extends Modification {
     public String getType() {
         return "add-frequency-route";
     }
-
-    @Override
-    public void applyToData(RaptorWorkerData data) {
-        throw new UnsupportedOperationException();
-    }
-
+    
     // TODO boolean followStreets
 
 }
