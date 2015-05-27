@@ -29,20 +29,26 @@ public class AdjustDwellTime extends TimetableFilter {
         int[] dwellTimes = new int[tt.getNumStops()];
         int[] hopTimes = new int[tt.getNumStops() - 1];
 
-        int startTime = tt.getScheduledArrivalTime(0);
+        int startTime = tt.getArrivalTime(0);
 
         for (int i = 0; i < tt.getNumStops(); i++) {
             // adjust dwell time in place as we loop over the stops
             if (stopId == null || stopId.contains(tp.getStop(i).getId().getId()))
                 dwellTimes[i] = dwellTime;
             else
-                dwellTimes[i] = tt.getScheduledDepartureTime(i) - tt.getScheduledArrivalTime(i);
+                dwellTimes[i] = tt.getDepartureTime(i) - tt.getArrivalTime(i);
 
             if (i < hopTimes.length)
-                hopTimes[i] = tt.getScheduledArrivalTime(i + 1) - tt.getScheduledDepartureTime(i);
+                hopTimes[i] = tt.getArrivalTime(i + 1) - tt.getDepartureTime(i);
         }
 
         // make a new triptimes
+        // Note that this copies the original times, not ones that have been modified by other modifications
+        // (suppose someone set the dwell time at some stops to one value because they have offboard fare collection
+        //  and at other stops to a different value because they don't - this exists, for example, in San Francisco's
+        //  Muni Metro, with offboard fare collection in the subway and onboard fare collection when running as a
+        //  streetcar)
+        // However, this doesn't matter, because we've manually saved the modified times above.
         TripTimes ret = new TripTimes(tt);
 
         // Note: this requires us to use getArrivalTime not getScheduledArrivalTime when constructing the times
