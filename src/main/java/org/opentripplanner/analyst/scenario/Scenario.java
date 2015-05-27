@@ -18,10 +18,4 @@ public class Scenario {
     public Scenario (int id) {
         this.id = id;
     }
-
-    public void applyToGraph() {
-        for (Modification modification : modifications) {
-            modification.applyToGraph();
-        }
-    }
 }

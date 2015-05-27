@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.profile.RaptorWorkerData;
 
 import java.util.BitSet;
 
@@ -61,11 +62,16 @@ public class AddFrequencyRoute extends Modification {
         this.alignment = gf.createLineString(coords);
     }
 
-    // TODO boolean followStreets
+    @Override
+    public String getType() {
+        return "add-frequency-route";
+    }
 
     @Override
-    public void applyToGraph() {
-
+    public void applyToData(RaptorWorkerData data) {
+        throw new UnsupportedOperationException();
     }
+
+    // TODO boolean followStreets
 
 }
