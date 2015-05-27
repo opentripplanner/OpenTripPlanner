@@ -69,7 +69,6 @@ import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.slf4j.Logger;
@@ -134,9 +133,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public boolean staticBikeRental;
 
     /**
-     * Whether we should create car P+R stations from OSM data. (default true)
+     * Whether we should create car P+R stations from OSM data. The default value is true. In normal operation it is
+     * set by the JSON graph builder configuration, but it is also initialized to "true" here to provide the default
+     * behavior in tests.
      */
-    public boolean staticParkAndRide;
+    public boolean staticParkAndRide = true;
 
     /**
      * Whether we should create bike P+R stations from OSM data. (default false)
