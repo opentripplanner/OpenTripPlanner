@@ -17,11 +17,13 @@ package org.opentripplanner.api.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -118,7 +120,8 @@ public class WalkStep {
     public List<P2<Double>> elevation;
 
     @XmlElement
-    public List<Alert> alerts;
+    @JsonSerialize
+    public List<LocalizedAlert> alerts;
 
     public transient double angle;
 
@@ -194,18 +197,20 @@ public class WalkStep {
         absoluteDirection = AbsoluteDirection.values()[octant];
     }
 
-    public void addAlerts(Collection<Alert> newAlerts) {
+    public void addAlerts(Collection<Alert> newAlerts, Locale locale) {
         if (newAlerts == null) {
             return;
         }
         if (alerts == null) {
-            alerts = new ArrayList<Alert>(newAlerts);
-            return;
+            alerts = new ArrayList<>();
         }
-        for (Alert alert : newAlerts) {
-            if (!alerts.contains(alert)) {
-                alerts.add(alert);
+        ALERT: for (Alert newAlert : newAlerts) {
+            for (LocalizedAlert alert : alerts) {
+                if (alert.alert.equals(newAlert)) {
+                    break ALERT;
+                }
             }
+            alerts.add(new LocalizedAlert(newAlert, locale));
         }
     }
 
