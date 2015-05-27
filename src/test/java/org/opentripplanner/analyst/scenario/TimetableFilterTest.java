@@ -74,6 +74,12 @@ public class TimetableFilterTest extends TestCase {
 
         assertEquals(times, rt.apply(trip, pattern, times));
         assertEquals(frequencyEntry, rt.apply(trip, pattern, frequencyEntry));
+
+        rt.agencyId = "NOT THE AGENCY ID";
+        rt.tripId = Arrays.asList(trip.getId().getId());
+
+        assertEquals(times, rt.apply(trip, pattern, times));
+        assertEquals(frequencyEntry, rt.apply(trip, pattern, frequencyEntry));
     }
 
     /** test a highly specific match */
@@ -161,6 +167,23 @@ public class TimetableFilterTest extends TestCase {
         assertEquals(60, tt2.getDepartureTime(3) - tt2.getArrivalTime(3));
     }
 
+    /** test modifying frequencies */
+    @Test
+    public void testAdjustHeadway () {
+        AdjustHeadway ah = new AdjustHeadway();
+        ah.agencyId = agency.getId();
+        ah.routeId = Arrays.asList(route.getId().getId());
+        ah.headway = 120;
+
+        // should have no effect on scheduled trips
+        assertEquals(times, ah.apply(trip, pattern, times));
+
+        FrequencyEntry fe2 = ah.apply(trip, pattern, frequencyEntry);
+        assertNotNull(fe2);
+        assertEquals(120, fe2.headway);
+        // make sure we didn't accidentally modify the entry in the graph
+        assertEquals(600, frequencyEntry.headway);
+    }
 
     @Override
     protected void setUp () {
