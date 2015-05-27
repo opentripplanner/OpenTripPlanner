@@ -561,9 +561,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         createNames(props, "highway=steps", "name.steps");
 
-        createNames(props, "amenity=bicycle_rental;name=*", "name.bicycle_rental_name");
-        createNames(props, "amenity=bicycle_rental", "name.bicycle_rental_station");
-
         createNames(props, "amenity=bicycle_parking;name=*", "name.bicycle_parking_name");
         createNames(props, "amenity=bicycle_parking", "name.bicycle_parking");
 
@@ -579,13 +576,14 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     }
 
     private void createNames(WayPropertySet propset, String spec, String patternKey) {
-        String pattern = localize(patternKey);
+        String pattern = patternKey;
         CreativeNamer namer = new CreativeNamer(pattern);
         propset.addCreativeNamer(new OSMSpecifier(spec), namer);
     }
 
     private void createNotes(WayPropertySet propset, String spec, String patternKey, NoteMatcher matcher) {
-        String pattern = localize(patternKey);
+        String pattern = patternKey;
+        //TODO: notes aren't localized
         NoteProperties properties = new NoteProperties(pattern, matcher);
         propset.addNote(new OSMSpecifier(spec), properties);
     }
@@ -616,24 +614,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         picker.specifier = new OSMSpecifier(spec);
         picker.speed = speed;
         propset.addSpeedPicker(picker);
-    }
-
-    private String localize(String key) {
-        try {
-            String retval = getResourceBundle().getString(key);
-            LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
-            return retval;
-        } catch (MissingResourceException e) {
-            LOG.warn("Missing translation for key: " + key);
-            return key;
-        }
-    }
-
-    private ResourceBundle getResourceBundle() {
-        if (resources == null) {
-            resources = ResourceBundle.getBundle("WayProperties", locale);
-        }
-        return resources;
     }
 
     public void setLocale(Locale locale) {

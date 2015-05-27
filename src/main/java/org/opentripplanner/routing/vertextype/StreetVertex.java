@@ -17,6 +17,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.opentripplanner.util.I18NString;
 
 /**
  * Abstract base class for vertices in the street layer of the graph.
@@ -27,11 +28,11 @@ public abstract class StreetVertex extends Vertex {
 
     private static final long serialVersionUID = 1L;
 
-    public StreetVertex(Graph g, String label, Coordinate coord, String streetName) {
+    public StreetVertex(Graph g, String label, Coordinate coord, I18NString streetName) {
         this(g, label, coord.x, coord.y, streetName);
     }
 
-    public StreetVertex(Graph g, String label, double x, double y, String streetName) {
+    public StreetVertex(Graph g, String label, double x, double y, I18NString streetName) {
         super(g, label, x, y, streetName);
     }
     

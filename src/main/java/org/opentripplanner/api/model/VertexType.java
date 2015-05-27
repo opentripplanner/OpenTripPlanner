@@ -9,19 +9,16 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
+package org.opentripplanner.api.model;
 
-package org.opentripplanner.routing.vertextype;
-
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.util.NonLocalizedString;
-
-public class ElevatorOffboardVertex extends StreetVertex {
-
-    private static final long serialVersionUID = 20120209L;
-
-    public ElevatorOffboardVertex(Graph g, String label, double x, double y, String name) {
-        super(g, label, x, y, new NonLocalizedString(name));
-    }
-
+/**
+ * Represent type of vertex, used in Place aka from, to in API
+ * for easier client side localization
+ *
+ * @author mabu
+ */
+public enum VertexType {
+    NORMAL, BIKESHARE, BIKEPARK, TRANSIT
+    
 }

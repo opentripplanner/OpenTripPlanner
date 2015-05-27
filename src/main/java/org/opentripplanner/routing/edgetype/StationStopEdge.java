@@ -21,6 +21,7 @@ import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * An edge that connects a parent station to a constituent stop. This is not intended to provide
@@ -68,6 +69,11 @@ public class StationStopEdge extends Edge {
 
     @Override
     public String getName() {
+        return null;
+    }
+
+    @Override
+    public String getName(Locale locale) {
         return null;
     }
 

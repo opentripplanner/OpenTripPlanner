@@ -43,7 +43,7 @@ otp.widgets.ItinerariesWidget =
             cssClass : module.itinerariesWidgetCssClass || 'otp-defaultItinsWidget',
             resizable : true,
             closeable : true,
-            persistOnClose : true,
+            persistOnClose : true
         });
         //this.$().addClass('otp-itinsWidget');
         //this.$().resizable();
@@ -361,9 +361,8 @@ otp.widgets.ItinerariesWidget =
                 }
             }
 
-            if(leg.mode === "WALK" || leg.mode === "BICYCLE" || leg.mode === "CAR") {
-                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+leg.to.name;
-
+            if(leg.mode === "WALK" || leg.mode === "BICYCLE") {
+                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
                 if(otp.config.municoderHostname) {
                     var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
                     headerHtml += '<span id="'+spanId+'"></span>';

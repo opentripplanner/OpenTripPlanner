@@ -56,19 +56,16 @@ public class TemplateLibrary {
      *        Tag names between {} are replaced by the OSM tag value, if it is present (or the empty
      *        string if not).
      * @param way The way containing the tag values
-     * @param defaultLang The default lang to apply when no lang suffix are specified in OSM tags
-     *        (usually the language of the country of OSM coverage)
      * @return A map language code -> text, with at least one entry for the default language, and
      *         any other language found in OSM tag.
      */
-    public static Map<String, String> generateI18N(String pattern, OSMWithTags way,
-            String defaultLang) {
+    public static Map<String, String> generateI18N(String pattern, OSMWithTags way) {
 
         if (pattern == null)
             return null;
 
         Map<String, StringBuffer> i18n = new HashMap<String, StringBuffer>();
-        i18n.put(defaultLang, new StringBuffer());
+        i18n.put(null, new StringBuffer());
         Matcher matcher = patternMatcher.matcher(pattern);
 
         int lastEnd = 0;
@@ -86,12 +83,15 @@ public class TemplateLibrary {
                     if (!kv.getKey().equals(defKey)) {
                         String lang = kv.getKey().substring(defKey.length() + 1);
                         if (!i18n.containsKey(lang))
-                            i18n.put(lang, new StringBuffer(i18n.get(defaultLang)));
+                            i18n.put(lang, new StringBuffer(i18n.get(null)));
                     }
                 }
             }
             // get the simple value (eg: description=...)
             String defTag = way.getTag(defKey);
+            if (defTag == null && i18nTags != null && i18nTags.size() != 0) {
+                defTag = i18nTags.values().iterator().next();
+            }
             // get the translated value, if exists
             for (String lang : i18n.keySet()) {
                 String i18nTag = way.getTag(defKey + ":" + lang);

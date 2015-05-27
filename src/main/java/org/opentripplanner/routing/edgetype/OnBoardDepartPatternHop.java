@@ -30,6 +30,7 @@ import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * A transit vehicle's journey (temporary vertex) between departure while onboard a trip and arrival
@@ -89,6 +90,11 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge, Tempor
 
     public String getName() {
         return GtfsLibrary.getRouteName(trip.getRoute());
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
     }
 
     public State optimisticTraverse(State state0) {

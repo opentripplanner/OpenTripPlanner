@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * An edge represents what GTFS calls a timed transfer. This could also be referred to as a
@@ -64,6 +65,11 @@ public class TimedTransferEdge extends Edge {
 
     @Override
     public String getName() {
+        return null;
+    }
+
+    @Override
+    public String getName(Locale locale) {
         return null;
     }
 

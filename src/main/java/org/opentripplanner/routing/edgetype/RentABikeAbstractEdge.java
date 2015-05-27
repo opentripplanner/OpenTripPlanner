@@ -25,6 +25,7 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * Renting or dropping off a rented bike edge.
@@ -109,6 +110,11 @@ public abstract class RentABikeAbstractEdge extends Edge {
     @Override
     public String getName() {
         return getToVertex().getName();
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        return getToVertex().getName(locale);
     }
 
     @Override
