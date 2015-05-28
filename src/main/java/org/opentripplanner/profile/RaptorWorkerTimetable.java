@@ -2,10 +2,7 @@ package org.opentripplanner.profile;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.analyst.scenario.Scenario;
-import org.opentripplanner.analyst.scenario.TimetableFilter;
 import org.opentripplanner.analyst.scenario.TripFilter;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -19,7 +16,6 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A RaptorWorkerTimetable is used by a RaptorWorker to perform large numbers of RAPTOR searches very quickly
@@ -147,17 +143,19 @@ public class RaptorWorkerTimetable implements Serializable {
                 if (scenario != null && scenario.modifications != null) {
                     for (TripFilter filter : Iterables.filter(scenario.modifications, TripFilter.class)) {
                         tt = filter.apply(tt.trip, pattern, tt);
+
+                        if (tt == null)
+                            continue TT;
                     }
                 }
 
-                if (tt != null)
-                    tripTimes.add(tt);
+                tripTimes.add(tt);
             }
         }
 
         // find frequency trips
         List<FrequencyEntry> freqs = Lists.newArrayList();
-        for (FrequencyEntry fe : pattern.scheduledTimetable.frequencyEntries) {
+        FREQUENCIES: for (FrequencyEntry fe : pattern.scheduledTimetable.frequencyEntries) {
             if (servicesRunning.get(fe.tripTimes.serviceCode) &&
                     fe.getMinDeparture() < window.to &&
                     fe.getMaxArrival() > window.from
@@ -172,11 +170,13 @@ public class RaptorWorkerTimetable implements Serializable {
                 if (scenario != null && scenario.modifications != null) {
                     for (TripFilter filter : Iterables.filter(scenario.modifications, TripFilter.class)) {
                         fe = filter.apply(fe.tripTimes.trip, pattern, fe);
+
+                        if (fe == null)
+                            continue FREQUENCIES;
                     }
                 }
 
-                if (fe != null)
-                    freqs.add(fe);
+                freqs.add(fe);
             }
         }
 
