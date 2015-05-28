@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Adjust headways on a route.
  */
-public class AdjustHeadway extends TimetableFilter {
+public class AdjustHeadway extends TripFilter {
     /** The new headway, in seconds */
     public int headway;
 

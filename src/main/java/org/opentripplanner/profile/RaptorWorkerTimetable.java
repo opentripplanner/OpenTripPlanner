@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.analyst.scenario.TimetableFilter;
+import org.opentripplanner.analyst.scenario.TripFilter;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -144,7 +145,7 @@ public class RaptorWorkerTimetable implements Serializable {
 
                 // apply scenario
                 if (scenario != null && scenario.modifications != null) {
-                    for (TimetableFilter filter : Iterables.filter(scenario.modifications, TimetableFilter.class)) {
+                    for (TripFilter filter : Iterables.filter(scenario.modifications, TripFilter.class)) {
                         tt = filter.apply(tt.trip, pattern, tt);
                     }
                 }
@@ -169,7 +170,7 @@ public class RaptorWorkerTimetable implements Serializable {
                 }
 
                 if (scenario != null && scenario.modifications != null) {
-                    for (TimetableFilter filter : Iterables.filter(scenario.modifications, TimetableFilter.class)) {
+                    for (TripFilter filter : Iterables.filter(scenario.modifications, TripFilter.class)) {
                         fe = filter.apply(fe.tripTimes.trip, pattern, fe);
                     }
                 }

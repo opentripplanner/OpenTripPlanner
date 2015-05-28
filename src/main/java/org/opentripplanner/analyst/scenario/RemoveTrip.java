@@ -9,7 +9,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 /**
  * Remove trips from a scenario
  */
-public class RemoveTrip extends TimetableFilter {
+public class RemoveTrip extends TripFilter {
 
     @Override
     public String getType() {

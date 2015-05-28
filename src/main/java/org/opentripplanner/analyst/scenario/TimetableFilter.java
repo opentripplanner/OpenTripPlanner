@@ -50,9 +50,4 @@ public abstract class TimetableFilter extends Modification {
 
         return true;
     }
-
-    /** Apply this modification to a TripPattern. Do not modify the original trip pattern as they are part of the graph! */
-    public abstract TripTimes apply (Trip trip, TripPattern tp, TripTimes tt);
-
-    public abstract FrequencyEntry apply (Trip trip, TripPattern tp, FrequencyEntry fe);
 }

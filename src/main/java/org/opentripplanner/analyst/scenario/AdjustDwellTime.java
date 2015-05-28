@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * Adjust the dwell times on matched trips.
  */
-public class AdjustDwellTime extends TimetableFilter {
+public class AdjustDwellTime extends TripFilter {
     /** Stops for which to set the dwell time */
     public Collection<String> stopId;
 

@@ -1,7 +1,9 @@
 package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntObjectMap;
@@ -11,6 +13,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.scenario.Scenario;
+import org.opentripplanner.analyst.scenario.TripPatternFilter;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -18,9 +21,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class RaptorWorkerData implements Serializable {
 
@@ -71,34 +72,63 @@ public class RaptorWorkerData implements Serializable {
         List<Stop> stopForIndex = new ArrayList<>(totalStops);
 
         /* Make timetables for active trip patterns and record the stops each active pattern uses. */
-        for (TripPattern pattern : graph.index.patternForId.values()) {
-            RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forPattern(graph, pattern, window, scenario);
-            if (timetable == null) {
-                // Pattern is not running during the time window
-                continue;
-            }
-            timetablesForPattern.add(timetable);
-            // Temporary bidirectional mapping between 0-based indexes and patterns
-            indexForPattern.put(pattern, patternForIndex.size());
-            patternForIndex.add(pattern);
-            patternNames.add(pattern.code);
-            TIntList stopIndexesForPattern = new TIntArrayList();
-            for (Stop stop : pattern.getStops()) {
-                int stopIndex = indexForStop.get(stop);
-                if (stopIndex == -1) {
-                    stopIndex = indexForStop.size();
-                    indexForStop.put(stop, stopIndex);
-                    stopForIndex.add(stop);
-                    stopNames.add(stop.getName());
+
+        // we need to make our own local stops for pattern map because we may have new patterns that did not exist before
+        // or removed patterns
+        Multimap<Stop, TripPattern> patternsForStopObject = HashMultimap.create();
+
+        for (TripPattern originalPattern : graph.index.patternForId.values()) {
+            Collection<TripPattern> patterns = Arrays.asList(originalPattern);
+
+            // apply filters. note that a filter can create multiple trip patterns from a single trip pattern
+            // so we need to make sure we handle all of them
+            if (scenario != null && scenario.modifications != null) {
+                for (TripPatternFilter filter : Iterables.filter(scenario.modifications, TripPatternFilter.class)) {
+                    Collection<TripPattern> modifiedPatterns = Lists.newArrayList();
+
+                    for (TripPattern pattern : patterns) {
+                        Collection<TripPattern> result = filter.apply(pattern);
+
+                        if (result != null)
+                            modifiedPatterns.addAll(result);
+                    }
+
+                    // this is the result of this filter for all trip patterns
+                    patterns = modifiedPatterns;
                 }
-                stopIndexesForPattern.add(stopIndex);
             }
-            stopsForPattern.add(stopIndexesForPattern.toArray());
+
+            for (TripPattern pattern : patterns) {
+                RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forPattern(graph, pattern, window, scenario);
+                if (timetable == null) {
+                    // Pattern is not running during the time window
+                    continue;
+                }
+                timetablesForPattern.add(timetable);
+                // Temporary bidirectional mapping between 0-based indexes and patterns
+                indexForPattern.put(pattern, patternForIndex.size());
+                patternForIndex.add(pattern);
+                patternNames.add(pattern.code);
+                TIntList stopIndexesForPattern = new TIntArrayList();
+                for (Stop stop : pattern.getStops()) {
+                    int stopIndex = indexForStop.get(stop);
+                    if (stopIndex == -1) {
+                        stopIndex = indexForStop.size();
+                        indexForStop.put(stop, stopIndex);
+                        stopForIndex.add(stop);
+                        stopNames.add(stop.getName());
+                    }
+                    stopIndexesForPattern.add(stopIndex);
+                    patternsForStopObject.put(stop, pattern);
+                }
+                stopsForPattern.add(stopIndexesForPattern.toArray());
+            }
         }
         /** Fill in used pattern indexes for each used stop. */
         for (Stop stop : stopForIndex) {
             TIntList patterns = new TIntArrayList();
-            for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
+            // use our local patterns for stop maps, see comment above
+            for (TripPattern pattern : patternsForStopObject.get(stop)) {
                 int patternIndex = indexForPattern.get(pattern);
                 if (patternIndex != -1) {
                     patterns.add(patternIndex);
