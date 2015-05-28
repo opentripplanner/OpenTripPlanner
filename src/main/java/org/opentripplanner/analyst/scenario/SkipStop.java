@@ -21,6 +21,9 @@ import java.util.List;
 
 /**
  * Skip stops and associated dwell times.
+ *
+ * Skipped stops are no longer served by the matched trips, and and dwell time at a skipped stop is removed from the schedule.
+ * If stops are skipped at the start of a trip, the start of the trip is simply removed; the remaining times are not shifted.
  */
 public class SkipStop extends TripPatternFilter {
     private static final Logger LOG = LoggerFactory.getLogger(SkipStop.class);
