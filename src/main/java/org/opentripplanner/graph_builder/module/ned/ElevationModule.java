@@ -53,6 +53,7 @@ import java.util.List;
  * point (both in meters).
  */
 public class ElevationModule implements GraphBuilderModule {
+
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
     private ElevationGridCoverageFactory gridCoverageFactory;

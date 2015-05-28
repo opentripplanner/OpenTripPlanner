@@ -13,19 +13,19 @@
 
 package org.opentripplanner.api.resource;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Optional;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Optional;
 
 /**
  * GraphMetada is first created after OSM is build.
@@ -38,6 +38,8 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 @XmlRootElement
 public class GraphMetadata implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GraphMetadata.class);
 
     /** The bounding box of the graph, in decimal degrees. */
     private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
