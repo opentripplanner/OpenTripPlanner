@@ -8,7 +8,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -158,6 +157,8 @@ public class SkipStop extends TripPatternFilter {
             newSts.add(stopTime);
         }
 
-        return new TripTimes(tt.trip, newSts, new Deduplicator());
+        TripTimes newtt = new TripTimes(tt.trip, newSts, new Deduplicator());
+        newtt.serviceCode = tt.serviceCode;
+        return newtt;
     }
 }

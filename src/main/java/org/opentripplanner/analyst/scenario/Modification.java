@@ -16,7 +16,8 @@ import java.util.Set;
 @JsonSubTypes({
         @JsonSubTypes.Type(name = "remove-trip", value = RemoveTrip.class),
         @JsonSubTypes.Type(name = "adjust-headway", value = AdjustHeadway.class),
-        @JsonSubTypes.Type(name = "adjust-dwell-time", value = AdjustDwellTime.class)
+        @JsonSubTypes.Type(name = "adjust-dwell-time", value = AdjustDwellTime.class),
+        @JsonSubTypes.Type(name = "skip-stop", value = SkipStop.class)
 })
 public abstract class Modification implements Serializable {
 
