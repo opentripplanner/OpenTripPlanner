@@ -81,16 +81,8 @@ public class GraphMetadata implements Serializable {
         newEnvelope = new WorldEnvelope(envelope);
 
         Optional<Coordinate> centerOptional = graph.getCenter();
+        addCenter(centerOptional);
 
-        //Transit data was loaded and center was calculated with calculateTransitCenter
-        if(centerOptional.isPresent()) {
-            setCenterLongitude(centerOptional.get().x);
-            setCenterLatitude(centerOptional.get().y);
-        } else {
-            // Does not work around 180th parallel.
-            setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
-            setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
-        }
     }
 
 
@@ -264,6 +256,28 @@ public class GraphMetadata implements Serializable {
      */
     public void addMode(TraverseMode mode) {
         transitModes.add(mode);
+    }
+
+    /**
+     * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used
+     * or as mean coordinate if not
+     *
+     * It is first called when OSM is loaded. Then after transit data is loaded.
+     * So that center is set in all combinations of street and transit loading.
+     * @param center
+     */
+    public void addCenter(Optional<Coordinate> center) {
+        //Transit data was loaded and center was calculated with calculateTransitCenter
+        if(center.isPresent()) {
+            setCenterLongitude(center.get().x);
+            setCenterLatitude(center.get().y);
+            LOG.info("center from transit calculation");
+        } else {
+            // Does not work around 180th parallel.
+            setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
+            setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
+            LOG.info("center from median");
+        }
     }
 
     /**

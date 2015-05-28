@@ -149,6 +149,7 @@ public class GtfsModule implements GraphBuilderModule {
 
         graph.hasTransit = true;
         graph.calculateTransitCenter();
+        graph.getMetadata().addCenter(graph.getCenter());
 
     }
 
