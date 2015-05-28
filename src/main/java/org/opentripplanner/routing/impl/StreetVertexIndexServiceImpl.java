@@ -57,7 +57,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
