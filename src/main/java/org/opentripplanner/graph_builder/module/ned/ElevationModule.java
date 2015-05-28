@@ -18,6 +18,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.coverage.Coverage;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -431,7 +432,7 @@ public class ElevationModule implements GraphBuilderModule {
     private double getElevation(double x, double y) {
         double values[] = new double[1];
         try {
-            coverage.evaluate(new DirectPosition2D(x, y), values);
+            coverage.evaluate(new DirectPosition2D(DefaultGeographicCRS.WGS84, x, y), values);
         } catch (org.opengis.coverage.PointOutsideCoverageException e) {
             // skip this for now
         }
