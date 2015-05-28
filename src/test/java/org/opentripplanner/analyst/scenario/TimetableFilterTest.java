@@ -15,6 +15,8 @@ import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -22,7 +24,7 @@ import java.util.List;
  */
 public class TimetableFilterTest extends TestCase {
     private TripPattern pattern;
-    private Trip trip;
+    private Trip trip, trip2;
     private TripTimes times;
     private FrequencyEntry frequencyEntry;
     private Stop[] stops;
@@ -184,6 +186,144 @@ public class TimetableFilterTest extends TestCase {
         assertEquals(600, frequencyEntry.headway);
     }
 
+    /** test modifying trip patterns */
+    @Test
+    public void testSkipStopInMiddle () {
+        SkipStop ss = new SkipStop();
+        ss.routeId = Arrays.asList(route.getId().getId());
+        ss.agencyId = agency.getId();
+        ss.stopId = Arrays.asList(stops[2].getId().getId());
+
+        Collection<TripPattern> result = ss.apply(pattern);
+
+        assertEquals(1, result.size());
+
+        TripPattern newtp = result.iterator().next();
+
+        assertNotSame(pattern, newtp);
+
+        // TODO getNumScheduledTrips is zero - why?
+        assertEquals(2, newtp.scheduledTimetable.tripTimes.size());
+        assertEquals(2, newtp.scheduledTimetable.frequencyEntries.size());
+
+        assertEquals(3, newtp.stopPattern.size);
+
+        // make sure the times are correct
+        assertEquals(pattern.scheduledTimetable.tripTimes.get(0).getDepartureTime(0),
+                newtp.scheduledTimetable.tripTimes.get(0).getDepartureTime(0));
+        // after the skipped stop: dwell times should be removed
+        assertEquals(pattern.scheduledTimetable.tripTimes.get(0).getDepartureTime(3) - 30,
+                newtp.scheduledTimetable.tripTimes.get(0).getDepartureTime(2));
+
+        assertEquals(pattern.stopPattern.stops[3], newtp.stopPattern.stops[2]);
+
+        // and for the frequency entry
+        // make sure the times are correct
+        assertEquals(pattern.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(0),
+                newtp.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(0));
+        // after the skipped stop: dwell times should be removed
+        assertEquals(pattern.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(3) - 30,
+                newtp.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(2));
+    }
+
+    /** test modifying one trip on a trip pattern */
+    @Test
+    public void testModifySingleTrip  () {
+        SkipStop ss = new SkipStop();
+        ss.routeId = Arrays.asList(route.getId().getId());
+        ss.agencyId = agency.getId();
+        ss.tripId = Arrays.asList(trip.getId().getId());
+        ss.stopId = Arrays.asList(stops[2].getId().getId());
+
+        Collection<TripPattern> result = ss.apply(pattern);
+
+        assertEquals(2, result.size());
+
+        Iterator<TripPattern> tpit = result.iterator();
+        // non-ideal: assuming defined order.
+        TripPattern newtp = tpit.next();
+        TripPattern clone = tpit.next();
+
+        assertNotSame(pattern, newtp);
+        assertNotSame(pattern, clone);
+
+        assertEquals(1, newtp.scheduledTimetable.tripTimes.size());
+        assertEquals(1, newtp.scheduledTimetable.frequencyEntries.size());
+
+        assertEquals(3, newtp.stopPattern.size);
+
+        // make sure the times are correct
+        assertEquals(pattern.scheduledTimetable.tripTimes.get(0).getDepartureTime(0),
+                newtp.scheduledTimetable.tripTimes.get(0).getDepartureTime(0));
+        // after the skipped stop: dwell times should be removed
+        assertEquals(pattern.scheduledTimetable.tripTimes.get(0).getDepartureTime(3) - 30,
+                newtp.scheduledTimetable.tripTimes.get(0).getDepartureTime(2));
+
+        assertEquals(pattern.stopPattern.stops[3], newtp.stopPattern.stops[2]);
+
+        // and for the frequency entry
+        // make sure the times are correct
+        assertEquals(pattern.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(0),
+                newtp.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(0));
+        // after the skipped stop: dwell times should be removed
+        assertEquals(pattern.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(3) - 30,
+                newtp.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(2));
+
+        // make sure the times are correct on the trips that were not modified
+        assertEquals(pattern.scheduledTimetable.tripTimes.get(0).getDepartureTime(0),
+                clone.scheduledTimetable.tripTimes.get(0).getDepartureTime(0));
+        // after the skipped stop: dwell times should be removed
+        assertEquals(pattern.scheduledTimetable.tripTimes.get(0).getDepartureTime(3),
+                clone.scheduledTimetable.tripTimes.get(0).getDepartureTime(3));
+
+        assertEquals(pattern.stopPattern.stops[3], clone.stopPattern.stops[3]);
+
+        // and for the frequency entry
+        // make sure the times are correct
+        assertEquals(pattern.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(0),
+                clone.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(0));
+        // after the skipped stop: dwell times should be removed
+        assertEquals(pattern.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(3),
+                clone.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(3));
+    }
+    @Test
+    public void testSkipStopsAtStart () {
+        SkipStop ss = new SkipStop();
+        ss.routeId = Arrays.asList(route.getId().getId());
+        ss.agencyId = agency.getId();
+        ss.stopId = Arrays.asList(stops[0].getId().getId(), stops[1].getId().getId());
+
+        Collection<TripPattern> result = ss.apply(pattern);
+
+        assertEquals(1, result.size());
+
+        TripPattern newtp = result.iterator().next();
+
+        assertNotSame(pattern, newtp);
+
+        assertEquals(2, newtp.scheduledTimetable.tripTimes.size());
+        assertEquals(2, newtp.scheduledTimetable.frequencyEntries.size());
+
+        assertEquals(2, newtp.stopPattern.size);
+
+        // make sure the times are correct
+        // Note that there should be no dwell compression; the start of the trip should simply be chopped off.
+        assertEquals(pattern.scheduledTimetable.getTripTimes(0).getDepartureTime(2),
+                newtp.scheduledTimetable.getTripTimes(0).getDepartureTime(0));
+        assertEquals(pattern.scheduledTimetable.getTripTimes(0).getDepartureTime(3),
+                newtp.scheduledTimetable.getTripTimes(0).getDepartureTime(1));
+
+        assertEquals(pattern.stopPattern.stops[3], newtp.stopPattern.stops[1]);
+
+        // and for the frequency entry
+        // make sure the times are correct
+        assertEquals(pattern.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(2),
+                newtp.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(0));
+        // after the skipped stop: dwell times should be removed
+        assertEquals(pattern.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(3),
+                newtp.scheduledTimetable.frequencyEntries.get(0).tripTimes.getDepartureTime(1));
+    }
+
     @Override
     protected void setUp () {
         agency = new Agency();
@@ -198,6 +338,11 @@ public class TimetableFilterTest extends TestCase {
         trip.setRoute(route);
         trip.setId(new AgencyAndId(agency.getId(), "TRIP"));
 
+        trip2 = new Trip();
+        trip2.setRoute(route);
+        trip2.setId(new AgencyAndId(agency.getId(), "TRIP2"));
+
+
         stops = new Stop[4];
 
         for (int i = 0; i < stops.length; i++) {
@@ -208,23 +353,27 @@ public class TimetableFilterTest extends TestCase {
             stops[i] = s;
         }
 
-        StopPattern sp = new StopPattern(makeStopTimes());
+        StopPattern sp = new StopPattern(makeStopTimes(trip));
 
         pattern = new TripPattern(route, sp);
 
         // make a triptimes
-        times = makeTripTimes();
+        times = makeTripTimes(trip);
+        pattern.scheduledTimetable.addTripTimes(times);
+        pattern.scheduledTimetable.addTripTimes(makeTripTimes(trip2));
 
         // ten-minute frequency
-        frequencyEntry = new FrequencyEntry(7 * 3600, 12 * 3600, 600, false, makeTripTimes());
+        frequencyEntry = new FrequencyEntry(7 * 3600, 12 * 3600, 600, false, makeTripTimes(trip));
+        pattern.scheduledTimetable.addFrequencyEntry(frequencyEntry);
+        pattern.scheduledTimetable.addFrequencyEntry(new FrequencyEntry(7 * 3600, 12 * 3600, 600, false, makeTripTimes(trip2)));
     }
 
     /** Make up some trip times. Dwell is 30s, hop is 120s */
-    private TripTimes makeTripTimes () {
-        return new TripTimes(trip, makeStopTimes(), new Deduplicator());
+    private TripTimes makeTripTimes (Trip trip) {
+        return new TripTimes(trip, makeStopTimes(trip), new Deduplicator());
     }
 
-    private List<StopTime> makeStopTimes () {
+    private List<StopTime> makeStopTimes (Trip trip) {
         StopTime[] stopTimes = new StopTime[stops.length];
         int cumulativeTime = 7 * 3600;
 
@@ -241,6 +390,9 @@ public class TimetableFilterTest extends TestCase {
 
             st.setPickupType(StopPattern.PICKDROP_SCHEDULED);
             st.setDropOffType(StopPattern.PICKDROP_SCHEDULED);
+
+            st.setTrip(trip);
+
             stopTimes[i] = st;
         }
 

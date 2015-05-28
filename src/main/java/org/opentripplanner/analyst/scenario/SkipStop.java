@@ -56,6 +56,7 @@ public class SkipStop extends TripPatternFilter {
                     stopTime.setStop(stop);
                     stopTime.setPickupType(original.stopPattern.pickups[i]);
                     stopTime.setDropOffType(original.stopPattern.dropoffs[i]);
+                    stopTimes.add(stopTime);
                 }
 
                 i++;
@@ -93,7 +94,7 @@ public class SkipStop extends TripPatternFilter {
             else {
                 // This trip should be modified
                 anyTripsMatched = true;
-                originalClone.scheduledTimetable.addTripTimes(omitStops(tt, skippedStops.toArray()));
+                modified.scheduledTimetable.addTripTimes(omitStops(tt, skippedStops.toArray()));
             }
         }
 
@@ -106,7 +107,7 @@ public class SkipStop extends TripPatternFilter {
                 anyTripsMatched = true;
                 TripTimes newtt = omitStops(fe.tripTimes, skippedStops.toArray());
                 FrequencyEntry newfe = new FrequencyEntry(fe.startTime, fe.endTime, fe.headway, fe.exactTimes, newtt);
-                modified.add(newfe);
+                modified.scheduledTimetable.addFrequencyEntry(newfe);
             }
         }
 
@@ -154,6 +155,7 @@ public class SkipStop extends TripPatternFilter {
 
             stopTime.setStopSequence(tt.getStopSequence(i));
             stopTime.setTimepoint(tt.isTimepoint(i) ? 1 : 0);
+            newSts.add(stopTime);
         }
 
         return new TripTimes(tt.trip, newSts, new Deduplicator());
