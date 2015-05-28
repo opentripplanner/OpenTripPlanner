@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A vertex for an OSM node that represents a transit stop and has a ref=(stop_code) tag.
@@ -12,7 +13,8 @@ public class TransitStopStreetVertex extends OsmVertex {
     public String stopCode;
 
     public TransitStopStreetVertex(Graph g, String label, double x, double y, String name, String stopCode) {
-        super(g, label, x, y, name);
+        //Stop code is always non localized
+        super(g, label, x, y, new NonLocalizedString(name));
         this.stopCode = stopCode;
     }
 

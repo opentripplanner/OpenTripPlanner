@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Locale;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -61,6 +62,11 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         return GtfsLibrary.getRouteName(getPattern().route);
     }
     
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
+    }
+
     public State optimisticTraverse(State state0) {
         RoutingRequest options = state0.getOptions();
         

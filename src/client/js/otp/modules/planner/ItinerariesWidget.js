@@ -43,7 +43,7 @@ otp.widgets.ItinerariesWidget =
             cssClass : module.itinerariesWidgetCssClass || 'otp-defaultItinsWidget',
             resizable : true,
             closeable : true,
-            persistOnClose : true,
+            persistOnClose : true
         });
         //this.$().addClass('otp-itinsWidget');
         //this.$().resizable();
@@ -362,8 +362,7 @@ otp.widgets.ItinerariesWidget =
             }
 
             if(leg.mode === "WALK" || leg.mode === "BICYCLE") {
-                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+leg.to.name;
-
+                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
                 if(otp.config.municoderHostname) {
                     var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
                     headerHtml += '<span id="'+spanId+'"></span>';
@@ -468,6 +467,13 @@ otp.widgets.ItinerariesWidget =
             //TRANSLATORS: Total distance on a bike for this trip
             tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Total Bike") + '</div><div class="otp-itinTripSummaryText">' +
                 otp.util.Itin.distanceString(bikeDistance) + '</div>')
+        }
+
+        var carDistance = itin.getModeDistance("CAR");
+        if(carDistance > 0) {
+            //TRANSLATORS: Total distance in a car for this trip
+            tripSummary.append('<div class="otp-itinTripSummaryLabel">' + _tr("Total drive") + '</div><div class="otp-itinTripSummaryText">' +
+                otp.util.Itin.distanceString(carDistance) + '</div>')
         }
 
         if(itin.hasTransit) {

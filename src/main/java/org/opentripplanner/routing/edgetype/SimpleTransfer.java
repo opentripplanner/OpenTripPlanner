@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * Represents a transfer between stops that does not take the street network into account.
@@ -56,6 +57,12 @@ public class SimpleTransfer extends Edge {
     @Override
     public String getName() {
         return fromv.getName() + " => " + tov.getName();
+    }
+    
+    @Override
+    public String getName(Locale locale) {
+        //TODO: localize
+        return this.getName();
     }
 
     @Override

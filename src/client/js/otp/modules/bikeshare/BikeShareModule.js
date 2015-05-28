@@ -45,6 +45,8 @@ otp.modules.bikeshare.StationCollection =
         if(otp.config.routerId !== undefined) {
             options.data.routerId = otp.config.routerId;
         }
+        //Sends wanted translation to server
+        options.data.locale = otp.config.locale.config.locale_short;
         return Backbone.sync(method, model, options);
     },
     

@@ -69,12 +69,13 @@ import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -129,19 +130,21 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public StreetEdgeFactory edgeFactory = new DefaultStreetEdgeFactory();
 
     /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
+     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs. (default false)
      */
-    public boolean staticBikeRental = false;
+    public boolean staticBikeRental;
 
     /**
-     * Whether we should create car P+R stations from OSM data.
+     * Whether we should create car P+R stations from OSM data. The default value is true. In normal operation it is
+     * set by the JSON graph builder configuration, but it is also initialized to "true" here to provide the default
+     * behavior in tests.
      */
     public boolean staticParkAndRide = true;
 
     /**
-     * Whether we should create bike P+R stations from OSM data.
+     * Whether we should create bike P+R stations from OSM data. (default false)
      */
-    public boolean staticBikeParkAndRide = false;
+    public boolean staticBikeParkAndRide;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -199,6 +202,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         LOG.info("Building street graph from OSM");
         handler.buildGraph(extra);
         graph.hasStreets = true;
+        //Calculates envelope for OSM
+        graph.getMetadata();
     }
 
     /*
@@ -297,7 +302,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             graph.putService(BikeRentalStationService.class, bikeRentalService);
             for (OSMNode node : osmdb.getBikeRentalNodes()) {
                 n++;
-                String creativeName = wayPropertySet.getCreativeNameForWay(node);
+                //Gets name tag and translations if they exists
+                //TODO: use wayPropertySet.getCreativeNameForWay(node)
+                //Currently this names them as platform n
+                I18NString creativeName = node.getAssumedName();
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
@@ -345,12 +353,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     BikeRentalStationService.class, true);
             for (OSMNode node : osmdb.getBikeParkingNodes()) {
                 n++;
-                String creativeName = wayPropertySet.getCreativeNameForWay(node);
+                I18NString creativeName = wayPropertySet.getCreativeNameForWay(node);
+                //TODO: localize
                 if (creativeName == null)
-                    creativeName = "P+R";
+                    creativeName = new NonLocalizedString("P+R");
                 BikePark bikePark = new BikePark();
                 bikePark.id = "" + node.getId();
-                bikePark.name = creativeName;
+                //TODO: localize bikePark name
+                bikePark.name = creativeName.toString();
                 bikePark.x = node.lon;
                 bikePark.y = node.lat;
                 bikeRentalService.addBikePark(bikePark);
@@ -388,7 +398,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     BikeRentalStationService.class, true);
             Envelope envelope = new Envelope();
             long osmId = area.parent.getId();
-            String creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
+            I18NString creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
             for (Ring ring : area.outermostRings) {
                 for (OSMNode node : ring.nodes) {
                     envelope.expandToInclude(new Coordinate(node.lon, node.lat));
@@ -396,7 +406,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             BikePark bikePark = new BikePark();
             bikePark.id = "" + osmId;
-            bikePark.name = creativeName;
+            //TODO: localize 
+            bikePark.name = creativeName.toString();
             bikePark.x = (envelope.getMinX() + envelope.getMaxX()) / 2;
             bikePark.y = (envelope.getMinY() + envelope.getMaxY()) / 2;
             bikeRentalService.addBikePark(bikePark);
@@ -437,7 +448,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             // Process all nodes from outer rings
             // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
             List<OsmVertex> accessVertexes = new ArrayList<OsmVertex>();
-            String creativeName = null;
+            I18NString creativeName = null;
             long osmId = 0L;
             for (Area area : group.areas) {
                 osmId = area.parent.getId();
@@ -486,7 +497,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             if (!walkAccessibleOut || !carAccessibleIn) {
                 // This will prevent the P+R to be useful.
-                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked(creativeName, osmId)));
+                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked(creativeName.toString(), osmId)));
                 return false;
             }
             if (!walkAccessibleIn || !carAccessibleOut) {
@@ -696,9 +707,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
         private void setWayName(OSMWithTags way) {
             if (!way.hasTag("name")) {
-                String creativeName = wayPropertySet.getCreativeNameForWay(way);
+                I18NString creativeName = wayPropertySet.getCreativeNameForWay(way);
                 if (creativeName != null) {
-                    way.addTag("otp:gen_name", creativeName);
+                    //way.addTag("otp:gen_name", creativeName);
+                    way.setCreativeName(creativeName);
                 }
             }
         }
@@ -1023,7 +1035,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             String label = "way " + way.getId() + " from " + index;
             label = unique(label);
-            String name = getNameForWay(way, label);
+            I18NString name = getNameForWay(way, label);
 
             // consider the elevation gain of stairs, roughly
             boolean steps = way.isSteps();
@@ -1082,15 +1094,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         // TODO Set this to private once WalkableAreaBuilder is gone
-        protected String getNameForWay(OSMWithTags way, String id) {
-            String name = way.getAssumedName();
+        protected I18NString getNameForWay(OSMWithTags way, String id) {
+            I18NString name = way.getAssumedName();
 
             if (customNamer != null) {
-                name = customNamer.name(way, name);
+                name = new NonLocalizedString(customNamer.name(way, name.toString()));
             }
 
             if (name == null) {
-                name = id;
+                name = new NonLocalizedString(id);
             }
             return name;
         }
@@ -1116,7 +1128,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 Coordinate coordinate = getCoordinate(node);
                 String label = this.getLevelNodeLabel(node, level);
                 OsmVertex vertex = new OsmVertex(graph, label, coordinate.x,
-                        coordinate.y, label);
+                        coordinate.y, new NonLocalizedString(label));
                 vertices.put(level, vertex);
                 // multilevel nodes should also undergo turn-conversion
                 endpoints.add(vertex);
@@ -1170,7 +1182,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
 
                 if (iv == null) {
-                    iv = new OsmVertex(graph, label, coordinate.x, coordinate.y, label);
+                    iv = new OsmVertex(graph, label, coordinate.x, coordinate.y, new NonLocalizedString(label));
                     if (node.hasTrafficLight()) {
                         iv.trafficLight = (true);
                     }

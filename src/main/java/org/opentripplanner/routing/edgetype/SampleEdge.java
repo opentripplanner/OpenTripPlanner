@@ -6,6 +6,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SampleVertex;
 
+import java.util.Locale;
+
 /**
  * A temporary (single-request scoped) edge that connects a Sample to the street network.
  * Sample is used here in the Analyst sense: a temporary and nondestructive linkage of
@@ -38,6 +40,11 @@ public class SampleEdge extends Edge implements TemporaryEdge {
 
     @Override
     public String getName() {
+        return null;
+    }
+
+    @Override
+    public String getName(Locale locale) {
         return null;
     }
 }

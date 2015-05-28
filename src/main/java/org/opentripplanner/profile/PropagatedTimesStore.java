@@ -160,4 +160,15 @@ public class PropagatedTimesStore {
         ret.max = new ResultSet(maxs, ss.pset, includeTimes);
         return ret;
     }
+    
+    /** Make isochrones */
+    public ResultSet.RangeSet makeIsochrones (TimeSurface.RangeSet rangeSet) {
+        ResultSet.RangeSet ret = new ResultSet.RangeSet();
+        
+        ret.min = new ResultSet(rangeSet.min);
+        ret.avg = new ResultSet(rangeSet.avg);
+        ret.max = new ResultSet(rangeSet.max);
+        
+        return ret;
+    }
 }

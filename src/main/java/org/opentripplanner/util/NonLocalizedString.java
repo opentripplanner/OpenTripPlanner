@@ -11,32 +11,38 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.analyst.core;
+package org.opentripplanner.util;
 
 import java.io.Serializable;
-
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Locale;
 
 /**
- * A conveyor for an isochrone.
- * 
- * @author laurent
+ * This is to support strings which can't be localized.
+ *
+ * It just returns string it is given in constructor.
+ *
+ * @author mabu
  */
-public class IsochroneData implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class NonLocalizedString implements I18NString, Serializable {
+    private String name;
 
-    public int cutoffSec;
-
-    public Geometry geometry;
-
-    public Geometry debugGeometry;
-
-    public IsochroneData(int cutoffSec, Geometry geometry) {
-        this.cutoffSec = cutoffSec;
-        this.geometry = geometry;
+    public NonLocalizedString(String name) {
+        this.name = name;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof NonLocalizedString && this.name.equals(((NonLocalizedString)other).name);
+    }
+
+    @Override
     public String toString() {
-        return String.format("<isochrone %s sec>", cutoffSec);
+        return this.name;
     }
+
+    @Override
+    public String toString(Locale locale) {
+        return this.name;
+    }
+
 }

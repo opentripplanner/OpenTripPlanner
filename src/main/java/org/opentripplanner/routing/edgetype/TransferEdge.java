@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * A transfer directly between two stops without using the street network.
@@ -74,6 +75,12 @@ public class TransferEdge extends Edge {
 
     public String getName() {
         return "Transfer";
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        //TODO: localize
+        return this.getName();
     }
 
     public State traverse(State s0) {

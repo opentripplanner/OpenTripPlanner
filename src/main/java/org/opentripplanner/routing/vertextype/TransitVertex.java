@@ -17,6 +17,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 /** Abstract base class for vertices in the GTFS layer of the graph. */
 public abstract class TransitVertex extends Vertex {
@@ -26,7 +27,7 @@ public abstract class TransitVertex extends Vertex {
     private final Stop stop;
 
     public TransitVertex(Graph graph, String label, Stop stop) {
-        super(graph, label, stop.getLon(), stop.getLat(), stop.getName());
+        super(graph, label, stop.getLon(), stop.getLat(), new NonLocalizedString(stop.getName()));
         this.stop = stop;
     }
 

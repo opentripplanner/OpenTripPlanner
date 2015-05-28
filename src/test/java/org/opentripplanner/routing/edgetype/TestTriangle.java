@@ -28,6 +28,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class TestTriangle extends TestCase {
 
@@ -35,8 +36,8 @@ public class TestTriangle extends TestCase {
         Coordinate c1 = new Coordinate(-122.575033, 45.456773);
         Coordinate c2 = new Coordinate(-122.576668, 45.451426);
 
-        StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, null);
-        StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, null);
+        StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, (NonLocalizedString)null);
+        StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, (NonLocalizedString)null);
 
         GeometryFactory factory = new GeometryFactory();
         LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });

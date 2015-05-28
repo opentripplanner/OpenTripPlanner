@@ -16,6 +16,7 @@ package org.opentripplanner.updater.bike_rental;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class KeolisRennesBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
     public KeolisRennesBikeRentalDataSource() {
@@ -31,7 +32,7 @@ public class KeolisRennesBikeRentalDataSource extends GenericXmlBikeRentalDataSo
         brstation.id = attributes.get("number");
         brstation.x = Double.parseDouble(attributes.get("longitude"));
         brstation.y = Double.parseDouble(attributes.get("latitude"));
-        brstation.name = attributes.get("name");
+        brstation.name = new NonLocalizedString(attributes.get("name"));
         brstation.bikesAvailable = Integer.parseInt(attributes.get("bikesavailable"));
         brstation.spacesAvailable = Integer.parseInt(attributes.get("slotsavailable"));
         return brstation;

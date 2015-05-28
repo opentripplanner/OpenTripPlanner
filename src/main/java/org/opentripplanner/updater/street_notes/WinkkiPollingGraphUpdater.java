@@ -2,7 +2,8 @@ package org.opentripplanner.updater.street_notes;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.TranslatedString;
+import org.opentripplanner.util.NonLocalizedString;
+
 import java.util.Date;
 
 /**
@@ -24,7 +25,7 @@ public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
     protected Alert getNote(SimpleFeature feature) {
         Alert alert = Alert.createSimpleAlerts("winkki:" + feature.getAttribute("licence_type"));
         alert.alertDescriptionText = feature.getAttribute("event_description") == null ?
-                new TranslatedString("") : new TranslatedString(feature.getAttribute("event_description").toString());
+                new NonLocalizedString("") : new NonLocalizedString(feature.getAttribute("event_description").toString());
         alert.effectiveStartDate = feature.getAttribute("licence_startdate") == null ?
                 (Date) feature.getAttribute("event_startdate") : (Date) feature.getAttribute("licence_startdate");
         return alert;

@@ -21,6 +21,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.util.List;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Represents a sub-segment of a StreetEdge.
@@ -38,12 +40,19 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
     private StreetEdge parentEdge;
 
     public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-                             LineString geometry, String name, double length) {
+                             LineString geometry, I18NString name, double length) {
         super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
         setCarSpeed(parentEdge.getCarSpeed());
         this.parentEdge = parentEdge;
     }
     
+
+    //For testing only
+    public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
+            LineString geometry, String name, double length) {
+        this(parentEdge, v1, v2, geometry, new NonLocalizedString(name), length);
+    }
+
     /**
      * Partial edges are always partial.
      */
