@@ -273,15 +273,10 @@ public class GraphBuilder implements Runnable {
             }
         }
         // This module is outside the hasGTFS conditional block because it also links things like bike rental
-        // which need to be done even when there's no transit.
+        // which need to be handled even when there's no transit.
         graphBuilder.addModule(new StreetLinkerModule());
-        if ( hasGTFS ) {
-            // The stops can be linked to each other once they are already linked to the street network.
-            if ( ! builderParams.useTransfersTxt) {
-                // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator());
-            }
-        }
+        // Load elevation data and apply it to the streets.
+        // We want to do run this module after loading the OSM street network but before finding transfers.
         if (builderParams.elevationBucket != null) {
             // Download the elevation tiles from an Amazon S3 bucket
             S3BucketConfig bucketConfig = builderParams.elevationBucket;
@@ -306,6 +301,13 @@ public class GraphBuilder implements Runnable {
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
             graphBuilder.addModule(elevationBuilder);
+        }
+        if ( hasGTFS ) {
+            // The stops can be linked to each other once they are already linked to the street network.
+            if ( ! builderParams.useTransfersTxt) {
+                // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
+                graphBuilder.addModule(new DirectTransferGenerator());
+            }
         }
         graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));
         if (builderParams.htmlAnnotations) {
