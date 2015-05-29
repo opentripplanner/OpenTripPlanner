@@ -57,7 +57,6 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
@@ -322,23 +321,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // Coordinate is at an intersection or street endpoint, and has traversible edges.
                 if (!location.hasName()) {
                     LOG.debug("found intersection {}. not splitting.", intersection);
-                    // generate names for corners when no name was given
-                    Set<String> uniqueNameSet = new HashSet<String>();
-                    for (Edge e : intersection.getOutgoing()) {
-                        if (e instanceof StreetEdge) {
-                            uniqueNameSet.add(e.getName(locale));
-                        }
-                    }
-                    List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
 
-                    if (uniqueNames.size() > 1) {
-                        calculatedName = new LocalizedString("corner", new String[]{uniqueNames.get(0),
-                                uniqueNames.get(1)});
-                    } else if (uniqueNames.size() == 1) {
-                        calculatedName = new NonLocalizedString(uniqueNames.get(0));
-                    } else {
-                        calculatedName = new LocalizedString("unnamedStreet", (String[]) null);
-                    }
+                    calculatedName = intersection.getIntersectionName(locale);
+
                 }
                 TemporaryStreetLocation closest = new TemporaryStreetLocation(
                         "corner " + Math.random(), coord, calculatedName, endVertex);
