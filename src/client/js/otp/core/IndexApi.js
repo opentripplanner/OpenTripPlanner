@@ -195,6 +195,15 @@ otp.core.IndexApi = otp.Class({
 
     loadRoutesForStop : function(agencyId, callbackTarget, callback) {
 
+        //quickfix for #1947
+        //Without this "fix" it requests a server fo routes on bike sharing
+        //station
+        //Proper fix needs to find how and why is this even called on bike
+        //sharing stations
+        if (agencyId == null || agencyId == undefined) {
+            return;
+        }
+
         var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' + agencyId + '/routes';
         $.ajax(url, {
             success: function(data) {
