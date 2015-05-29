@@ -72,7 +72,7 @@ For example, you could do the following:
 
 ```bash
 cd OpenTripPlanner
-git checkout opentripplanner-0.17.0
+git checkout opentripplanner-0.18.0
 git clean -df
 mvn clean package -DskipTests
 ```
@@ -106,7 +106,7 @@ And then specify OpenTripPlanner as a dependency:
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>0.17.0</version>
+  <version>0.18.0</version>
 </dependency>
 ```
 
@@ -118,7 +118,7 @@ always fetch the latest work in progress by specifying a snapshot artifact:
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>0.18.0-SNAPSHOT</version>
+  <version>0.19.0-SNAPSHOT</version>
 </dependency>
 ```
  
