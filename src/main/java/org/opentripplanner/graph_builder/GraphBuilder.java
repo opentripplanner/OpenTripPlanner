@@ -13,14 +13,8 @@
 
 package org.opentripplanner.graph_builder;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
@@ -52,8 +46,13 @@ import org.opentripplanner.standalone.S3BucketConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
@@ -264,14 +263,14 @@ public class GraphBuilder implements Runnable {
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
+            gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
+            graphBuilder.addModule(gtfsModule);
             if ( hasOSM ) {
                 if (builderParams.matchBusRoutesToStreets) {
                     graphBuilder.addModule(new BusRouteStreetMatcher());
                 }
                 graphBuilder.addModule(new TransitToTaggedStopsModule());
             }
-            gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
-            graphBuilder.addModule(gtfsModule);
         }
         // This module is outside the hasGTFS conditional block because it also links things like bike rental
         // which need to be done even when there's no transit.
