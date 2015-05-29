@@ -13,15 +13,14 @@
 
 package org.opentripplanner.api.resource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.*;
-
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import org.junit.Test;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -53,8 +52,28 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
+import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
+import org.opentripplanner.routing.edgetype.PartialStreetEdge;
+import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
@@ -72,17 +91,20 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import org.opentripplanner.util.NonLocalizedString;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GraphPathToTripPlanConverterTest {
     private static final double F_DISTANCE[] = {3, 9996806.8, 3539050.5, 7, 2478638.8, 4, 2, 1, 0};
@@ -1415,7 +1437,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(2, places[8].length);
 
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals("Vertex 0", places[0][0].name);
             assertEquals(0, places[0][0].lon, 0.0);
             assertEquals(0, places[0][0].lat, 0.0);
             assertNull(places[0][0].stopIndex);
@@ -1616,7 +1637,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(53000L, places[6][0].arrival.getTimeInMillis());
         assertEquals(53000L, places[6][0].departure.getTimeInMillis());
 
-        assertEquals("Vertex 50", places[6][1].name);
         assertEquals(90, places[6][1].lon, 0.0);
         assertEquals(90, places[6][1].lat, 0.0);
         assertNull(places[6][1].stopIndex);
@@ -1628,7 +1648,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(55000L, places[6][1].arrival.getTimeInMillis());
         assertEquals(55000L, places[6][1].departure.getTimeInMillis());
 
-        assertEquals("Vertex 52", places[7][0].name);
         assertEquals(90, places[7][0].lon, 0.0);
         assertEquals(90, places[7][0].lat, 0.0);
         assertNull(places[7][0].stopIndex);
@@ -1664,7 +1683,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(57000L, places[8][0].arrival.getTimeInMillis());
         assertEquals(57000L, places[8][0].departure.getTimeInMillis());
 
-        assertEquals("Vertex 60", places[8][1].name);
         assertEquals(0, places[8][1].lon, 0.0);
         assertEquals(90, places[8][1].lat, 0.0);
         assertNull(places[8][1].stopIndex);
