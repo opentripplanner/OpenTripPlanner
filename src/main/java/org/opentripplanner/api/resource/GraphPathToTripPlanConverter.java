@@ -34,6 +34,7 @@ import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -637,7 +638,15 @@ public abstract class GraphPathToTripPlanConverter {
     private static Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, TripTimes tripTimes, Locale requestedLocale) {
         // If no edge was given, it means we're at the end of this leg and need to work around that.
         boolean endOfLeg = (edge == null);
-        Place place = new Place(vertex.getX(), vertex.getY(), vertex.getName(requestedLocale),
+        String name = vertex.getName(requestedLocale);
+
+        //This gets nicer names instead of osm:node:id when changing mode of transport
+        //Names are generated from all the streets in a corner, same as names in origin and destination
+        //We use name in TemporaryStreetLocation since this name generation already happened when temporary location was generated
+        if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
+            name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
+        }
+        Place place = new Place(vertex.getX(), vertex.getY(), name,
                 makeCalendar(state), makeCalendar(state));
 
         if (endOfLeg) edge = state.getBackEdge();

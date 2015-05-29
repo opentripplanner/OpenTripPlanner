@@ -45,7 +45,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     private Graph graph;
 
     /** All tiles for the DEM stitched into a single coverage. */
-    UnifiedGridCoverage coverage = null;
+    UnifiedGridCoverage unifiedCoverage = null;
 
     private File cacheDirectory;
 
@@ -113,26 +113,28 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
             }            
         }
     }
-    
+
+    /** @return a GeoTools grid coverage for the entire area of interest, lazy-creating it on the first call. */
     public Coverage getGridCoverage() {
-        if (coverage == null) {
+        if (unifiedCoverage == null) {
             loadVerticalDatum();
             tileSource.setGraph(graph);
             tileSource.setCacheDirectory(cacheDirectory);
             List<File> paths = tileSource.getNEDTiles();
+            // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
             for (File path : paths) {
-                GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl();
-                factory.setPath(path);
+                GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
+                // TODO might bicubic interpolation give better results?
                 GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(),
                         new InterpolationBilinear());
-                if (coverage == null) {
-                    coverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
+                if (unifiedCoverage == null) {
+                    unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
                 } else {
-                    coverage.add(regionCoverage);
+                    unifiedCoverage.add(regionCoverage);
                 }
             }
         }
-        return coverage;
+        return unifiedCoverage;
     }
 
     /**

@@ -13,18 +13,19 @@
 
 package org.opentripplanner.api.resource;
 
-import java.io.Serializable;
-import java.util.HashSet;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Optional;
 
 /**
  * GraphMetada is first created after OSM is build.
@@ -37,6 +38,8 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 @XmlRootElement
 public class GraphMetadata implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GraphMetadata.class);
 
     /** The bounding box of the graph, in decimal degrees. */
     private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
@@ -79,11 +82,11 @@ public class GraphMetadata implements Serializable {
 
         newEnvelope = new WorldEnvelope(envelope);
 
-        // Does not work around 180th parallel.
-        // Should be replaced by using k-means center code from TransitIndex, and storing the center directly in the graph.
-        setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
-        setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
+        Optional<Coordinate> centerOptional = graph.getCenter();
+        addCenter(centerOptional);
+
     }
+
 
     public void setLowerLeftLatitude(double lowerLeftLatitude) {
         this.lowerLeftLatitude = lowerLeftLatitude;
@@ -255,6 +258,28 @@ public class GraphMetadata implements Serializable {
      */
     public void addMode(TraverseMode mode) {
         transitModes.add(mode);
+    }
+
+    /**
+     * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used
+     * or as mean coordinate if not
+     *
+     * It is first called when OSM is loaded. Then after transit data is loaded.
+     * So that center is set in all combinations of street and transit loading.
+     * @param center
+     */
+    public void addCenter(Optional<Coordinate> center) {
+        //Transit data was loaded and center was calculated with calculateTransitCenter
+        if(center.isPresent()) {
+            setCenterLongitude(center.get().x);
+            setCenterLatitude(center.get().y);
+            LOG.info("center from transit calculation");
+        } else {
+            // Does not work around 180th parallel.
+            setCenterLatitude((upperRightLatitude + lowerLeftLatitude) / 2);
+            setCenterLongitude((upperRightLongitude + lowerLeftLongitude) / 2);
+            LOG.info("center from median");
+        }
     }
 
     /**
