@@ -105,6 +105,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new VCubDataSource();
             } else if (sourceType.equals("citi-bike-nyc")) {
                 source = new CitiBikeNycBikeRentalDataSource();
+            } else if (sourceType.equals("next-bike")) {
+                source = new NextBikeRentalDataSource();
             }
         }
 

@@ -352,8 +352,8 @@ connect to a network resource is the `url` field.
         },
 
         // Polling bike rental updater.
-        // sourceType can be:
-        // jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets, city-bikes, citi-bike-nyc, vcub
+        // sourceType can be: jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets,
+        // city-bikes, citi-bike-nyc, next-bike, vcub
         {
             type: "bike-rental",
             frequencySec: 300,
