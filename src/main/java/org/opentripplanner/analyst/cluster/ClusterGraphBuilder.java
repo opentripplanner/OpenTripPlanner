@@ -7,6 +7,8 @@ import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.standalone.CommandLineParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,6 +20,8 @@ import java.util.zip.ZipInputStream;
  * Builds and caches graphs as well as the inputs they are built from for use in Analyst Cluster workers.
  */
 public class ClusterGraphBuilder {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterGraphBuilder.class);
 
     private AmazonS3Client s3 = new AmazonS3Client();
 
@@ -36,8 +40,10 @@ public class ClusterGraphBuilder {
      */
     public synchronized Graph getGraph(String graphId) {
 
-        // If the graphId hasn't changed since the last call, return the same graph object
+        LOG.info("Finding a graph for ID {}", graphId);
+
         if (graphId.equals(currGraphId)) {
+            LOG.info("GraphID has not changed. Reusing the last graph that was built.");
             return currGraph;
         }
 
@@ -46,6 +52,7 @@ public class ClusterGraphBuilder {
 
         // If we don't have a local copy of the inputs, fetch graph data as a ZIP from S3 and unzip it
         if( ! graphDataDirectory.exists()) {
+            LOG.info("Necessary graph input files were found locally. Using the files from the cache.");
             graphDataDirectory.mkdirs();
             S3Object graphDataZipObject = s3.getObject(graphBucket, graphId + ".zip");
             ZipInputStream zis = new ZipInputStream(graphDataZipObject.getObjectContent());
@@ -67,6 +74,8 @@ public class ClusterGraphBuilder {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        } else {
+            LOG.info("Graph input files were found locally. Using these files from the cache.");
         }
 
         // Now we have a local copy of these graph inputs. Make a graph out of them.
