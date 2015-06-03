@@ -27,7 +27,10 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.traffic.StreetSpeedSource;
 import org.opentripplanner.util.BitSetUtils;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +38,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This represents a street segment.
@@ -91,7 +95,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private int[] compactGeometry;
     
-    private String name;
+    private I18NString name;
 
     private StreetTraversalPermission permission;
 
@@ -116,7 +120,7 @@ public class StreetEdge extends Edge implements Cloneable {
     private byte outAngle;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
-                      String name, double length,
+                      I18NString name, double length,
                       StreetTraversalPermission permission, boolean back) {
         super(v1, v2);
         this.setBack(back);
@@ -153,6 +157,13 @@ public class StreetEdge extends Edge implements Cloneable {
                 outAngle = 0;
             }
         }
+    }
+
+    //For testing only
+    public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
+                      String name, double length,
+                      StreetTraversalPermission permission, boolean back) {
+        this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
     }
 
     public boolean canTraverse(RoutingRequest options) {
@@ -572,10 +583,22 @@ public class StreetEdge extends Edge implements Cloneable {
 
 	@Override
 	public String getName() {
+		return this.name.toString();
+	}
+
+	/**
+	* Gets non-localized I18NString (Used when splitting edges)
+	* @return non-localized Name
+	*/
+	public I18NString getRawName() {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public String getName(Locale locale) {
+		return this.name.toString(locale);
+	}
+
+	public void setName(I18NString name) {
 		this.name = name;
 	}
 

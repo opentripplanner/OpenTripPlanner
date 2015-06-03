@@ -6,7 +6,7 @@ The aim of OTP scripting is to be able to use and automate OTP from within scrip
 
 The available languages right now are *Jython* and *Groovy*; Jython being the most tested and supported. All the examples in this page are using Python. OTP Scripting could easily support in the future any other language that supports BSF (Bean Scripting Framework), such as _Javascript_ or _Ruby_.
 
-_Note_: Jython is a Python-flavor using a Java JVM as runtime. Python and Jython are mostly compatible.
+__Note__: Jython is a Python-flavor using a Java JVM as runtime. Python and Jython are mostly compatible.
 
 ## Usage
 
@@ -18,12 +18,16 @@ There are currently 3 different modes for using scripting:
 
 ### Launching a script from OTP
 
-The main advantage of this method is its simplicity. You don't need to install a Jython interpreter, as one is included by default in OTP itself. The drawback is that you need to start OTP everytime you run a script, which can be slow to startup for large graphs. The second drawback is that you can't import custom packages from within the script, you are limited to the "plain basic" Jython.
+The main advantage of this method is its simplicity. The drawback is that you need to start OTP everytime you run a script, which can be slow to startup for large graphs. The second drawback is that you can't import custom packages from within the script, you are limited to the "plain basic" Jython.
 
-Start OTP as usual with the `--script` option:
+__Note__: The Jython (or Groovy) JAR are *not* included in the OTP.jar. You thus have to add one of them (depending on your script) to the java classpath (see command below). Jython jar can be [downloaded here](http://www.jython.org/downloads.html). Make sure you select the "standalone" version of jython, otherwise some classes will be missing.
+
+__Note__: Due a guava bug, there is an incompatibility between Jython 2.3 / 2.5 and OTP. To solve it, make sure otp.jar is added *before* jython-standalone.jar in the classpath. This bug should be solved in jython starting 2.7.
+
+Start OTP specifying the classpath and adding the `--script` option:
 
 ```Bash
-$ java -jar otp.jar --graphs . --script myscript.py
+$ java -cp otp.jar:jython-standalone.jar org.opentripplanner.standalone.OTPMain --graphs . --script myscript.py
 ```
 
 This will start OTP with a default graph in the current directory and execute the script `myscript.py`.
@@ -36,7 +40,7 @@ The main advantage of this method is that you do not need to start a new OTP ser
 
 Start an OTP server as usual, adding the `--enableScriptingWebService` option:
 ``` Bash
-$ java -jar otp.jar --graphs . --server --enableScriptingWebService
+$ java -cp otp.jar:jython-standalone.jar org.opentripplanner.standalone.OTPMain --graphs . --server --enableScriptingWebService
 ```
 The API end-point `/ws/scripting/run` now accepts script content to be run, posted as multi-part form data.
 
@@ -71,13 +75,11 @@ otp = OtpsEntryPoint.fromArgs([ "--graphs", "." ])
 # ... the rest of your script goes here ...
 ```
 
-*Note*: Due a guava bug, there is an incompatibility between Jython 2.3 / 2.5 and OTP. To solve this bug, you can launch your Jython script using the following (Jython 2.5.2 on Debian Wheezy):
-
 ```Bash
-$ java -cp otp.jar:/usr/share/java/jython.jar:/usr/share/jython/Lib/ org.python/util.jython myscript.py
+$ java -cp otp.jar:jython-standalone.jar org.python.util.jython myscript.py
 ```
 
-Replacing `/usr/share...` directories by the appropriate location.
+Note that contrary to java custom the jython "main" class is all lowercase, this is not a typo.
 
 ## Script tutorial
 

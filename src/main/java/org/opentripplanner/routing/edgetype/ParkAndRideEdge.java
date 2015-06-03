@@ -22,6 +22,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * Parking a car at a park-and-ride station.
@@ -98,6 +99,11 @@ public class ParkAndRideEdge extends Edge {
     @Override
     public String getName() {
         return getToVertex().getName();
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        return getToVertex().getName(locale);
     }
 
     @Override

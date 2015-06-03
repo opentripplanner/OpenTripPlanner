@@ -171,6 +171,13 @@ Simply place the elevation data file in the directory with the other graph build
 Make sure the file has a `.tiff` or `.tif` extension, and the graph builder should detect its presence and apply
 the elevation data to the streets.
 
+OTP should automatically handle DEM GeoTIFFs in most common projections. You may want to check for elevation-related
+error messages during the graph build process to make sure OTP has properly discovered the projection. If you are using
+a DEM in unprojected coordinates make sure that the axis order is (longitude, latitude) rather than
+(latitude, longitude). Unfortunately there is no reliable standard for WGS84 axis order, so OTP uses the same axis
+order as the above-mentioned SRTM data, which is also the default for the popular Proj4 library.
+
+
 ## Fares configuration
 
 By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.

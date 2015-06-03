@@ -13,6 +13,26 @@
 
 package org.opentripplanner.routing.graph;
 
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InvalidClassException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.prefs.Preferences;
+
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.linked.TDoubleLinkedList;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -36,7 +56,7 @@ import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
-import org.opentripplanner.routing.core.StreetSpeedSource;
+import org.opentripplanner.traffic.StreetSpeedSource;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -47,17 +67,24 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.prefs.Preferences;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -129,7 +156,7 @@ public class Graph implements Serializable {
 
     private transient TimeZone timeZone = null;
 
-    private transient GraphMetadata graphMetadata = null;
+    private GraphMetadata graphMetadata = null;
 
     private transient Geometry hull = null; // FIXME we should be saving this stuff in the graph, why is is transient?
 
@@ -924,6 +951,28 @@ public class Graph implements Serializable {
         return graphMetadata;
     }
 
+    /**
+     * @return true if graph has metadata
+     */
+    public boolean hasMetadata() {
+        return graphMetadata != null;
+    }
+
+    /**
+     * This is used in {@link org.opentripplanner.graph_builder.module.StreetLinkerModule} to skip stops
+     * That aren't inside OSM data envelope
+     *
+     * @param c Stop coordinate
+     * @return true if coordinate is in graph envelope
+     */
+    public boolean containsInOSM(Coordinate c) {
+        if (graphMetadata != null) {
+            return graphMetadata.contains(c);
+        } else {
+            return false;
+        }
+    }
+
     public Geometry getHull() {
         // Lazy-initialize the graph hull since it is not serialized.
         if (hull == null) {
@@ -950,5 +999,41 @@ public class Graph implements Serializable {
         return this.sampleFactory;	
     }
 
-   
+    /**
+     * Calculates Transit center from median of coordinates of all transitStops if graph
+     * has transit. If it doesn't it isn't calculated. (mean walue of min, max latitude and longitudes are used)
+     *
+     * Transit center is saved in center variable
+     *
+     * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
+     * in memory, this can become problematic in large installations. It works without a problem on New York State.
+     * @see GraphMetadata
+     */
+    public void calculateTransitCenter() {
+        if (hasTransit) {
+
+            TDoubleList latitudes = new TDoubleLinkedList();
+            TDoubleList longitudes = new TDoubleLinkedList();
+            Median median = new Median();
+
+            getVertices().stream()
+                .filter(v -> v instanceof TransitStop)
+                .forEach(v -> {
+                    latitudes.add(v.getLat());
+                    longitudes.add(v.getLon());
+                });
+
+            median.setData(latitudes.toArray());
+            double medianLatitude = median.evaluate();
+            median = new Median();
+            median.setData(longitudes.toArray());
+            double medianLongitude = median.evaluate();
+
+            this.center = new Coordinate(medianLongitude, medianLatitude);
+        }
+    }
+
+    public Optional<Coordinate> getCenter() {
+        return Optional.ofNullable(center);
+    }
 }

@@ -9,6 +9,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.routing.core.TraverseMode;
+import java.util.Locale;
 
 /* This program is free software: you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public License
@@ -65,6 +66,12 @@ public class PathwayEdge extends Edge {
 
     public String getName() {
         return "pathway";
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        //TODO: localize
+        return this.getName();
     }
 
     public State traverse(State s0) {

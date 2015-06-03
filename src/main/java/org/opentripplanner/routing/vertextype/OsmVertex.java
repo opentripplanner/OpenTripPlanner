@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.I18NString;
 
 /**
  * A vertex coming from OpenStreetMap.
@@ -20,7 +21,7 @@ public class OsmVertex extends IntersectionVertex {
         this.nodeId = nodeId;
     }
 
-    public OsmVertex(Graph g, String label, double x, double y, long nodeId, String name) {
+    public OsmVertex(Graph g, String label, double x, double y, long nodeId, I18NString name) {
         super(g, label, x, y, name);
         this.nodeId = nodeId;
     }

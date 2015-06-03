@@ -248,7 +248,7 @@ otp.modules.planner.Itinerary = otp.Class({
             }
             else { // walk / bike / car
                 //TRANSLATORS: [distance] to [name of destination]
-                html += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+leg.to.name;
+                html += " "+otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ")+otp.util.Itin.getName(leg.to);
             }
             html += '</h4>'
             
@@ -332,7 +332,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 if(leg.headsign) text +=  pgettext("bus_direction", " to ") + leg.headsign;
             }
             else { // walk / bike / car
-                text += ' '+ otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ") +leg.to.name;
+                text += ' '+ otp.util.Itin.distanceString(leg.distance)+ pgettext("direction", " to ") + otp.util.Itin.getName(leg.to);
             }
             text += '\n';
             

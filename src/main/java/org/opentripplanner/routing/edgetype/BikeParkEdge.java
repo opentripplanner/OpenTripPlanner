@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * Parking a bike edge.
@@ -109,6 +110,11 @@ public class BikeParkEdge extends Edge {
     @Override
     public String getName() {
         return getToVertex().getName();
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        return getToVertex().getName(locale);
     }
 
     @Override
