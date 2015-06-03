@@ -13,6 +13,7 @@
 
 package org.opentripplanner.updater.bike_rental;
 
+import java.util.HashSet;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -25,14 +26,28 @@ import org.opentripplanner.util.NonLocalizedString;
  * to use for your data location.
  */
 public class NextBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
-    public NextBikeRentalDataSource() {
+
+    private String networkName;
+
+    public NextBikeRentalDataSource(String networkName) {
         super("//city/place");
         // this feed sets values on place node attributes, rather than in child elements
         this.setReadAttributes(true);
+
+        if (networkName != null && !networkName.isEmpty()) {
+            this.networkName = networkName;
+        } else {
+            this.networkName = "NextBike";
+        }
     }
 
     public BikeRentalStation makeStation(Map<String, String> attributes) {
+
         BikeRentalStation brstation = new BikeRentalStation();
+
+        brstation.networks = new HashSet<String>();
+        brstation.networks.add(this.networkName);
+
         brstation.id = attributes.get("number");
         brstation.x = Double.parseDouble(attributes.get("lng"));
         brstation.y = Double.parseDouble(attributes.get("lat"));

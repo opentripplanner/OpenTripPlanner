@@ -13,6 +13,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.updater.bike_rental;
 
+import java.util.HashSet;
+
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -26,8 +28,15 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
-    public CitiBikeNycBikeRentalDataSource() {
+    private String networkName;
+
+    public CitiBikeNycBikeRentalDataSource(String networkName) {
         super("stationBeanList");
+        if (networkName != null && !networkName.isEmpty()) {
+            this.networkName = networkName;
+        } else {
+            this.networkName = "CitiBike";
+        }
     }
 
     public BikeRentalStation makeStation(JsonNode stationNode) {
@@ -40,8 +49,10 @@ public class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSo
             return null;
         }
 
-
         BikeRentalStation brstation = new BikeRentalStation();
+
+        brstation.networks = new HashSet<String>();
+        brstation.networks.add(this.networkName);
 
         brstation.id = stationNode.path("id").toString();
         brstation.x = stationNode.path("longitude").asDouble();
