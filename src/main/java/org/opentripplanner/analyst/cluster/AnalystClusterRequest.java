@@ -3,11 +3,12 @@ package org.opentripplanner.analyst.cluster;
 import java.io.Serializable;
 
 /**
- * Marker interface for requests sent to an SPTWorker.
+ * Superclass for requests sent to an SPTWorker.
+ * Not abstract, so we can bind JSON to it and discover the subclass to re-parse.
  * @author matthewc
  *
  */
-public abstract class AnalystClusterRequest implements Serializable {
+public class AnalystClusterRequest implements Serializable {
 	/** The ID of the destinations pointset */
 	public String destinationPointsetId;
 	
