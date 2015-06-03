@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.opentripplanner.analyst.cluster.AnalystWorker;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -79,7 +80,7 @@ public class OTPMain {
             System.exit(1);
         }
 
-        if (params.build == null && !params.visualize && !params.server && params.scriptFile == null) {
+        if (params.build == null && !params.visualize && !params.server && !params.worker && params.scriptFile == null) {
             LOG.info("Nothing to do. Use --help to see available tasks.");
             System.exit(-1);
         }
@@ -157,6 +158,17 @@ public class OTPMain {
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
+            }
+        }
+
+        /* Start polling for tasks if this is an Analyst cluster worker. */
+        if (params.worker) {
+            Thread analystWorkerThread = new Thread(new AnalystWorker());
+            analystWorkerThread.start();
+            try {
+                analystWorkerThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
