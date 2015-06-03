@@ -43,6 +43,11 @@ public class NextBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
 
     public BikeRentalStation makeStation(Map<String, String> attributes) {
 
+        // some place entries appear to actually be checked-out bikes, not stations
+        if (attributes.get("bike") != null) {
+            return null;
+        }
+
         BikeRentalStation brstation = new BikeRentalStation();
 
         brstation.networks = new HashSet<String>();
