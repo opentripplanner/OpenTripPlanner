@@ -75,7 +75,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             LOG.debug("Linking stop '{}' {}", ts0.getStop(), ts0);
 
             /* Determine the set of stops that are already reachable via other pathways or transfers */
-            Set<TransitStop> pathwayDestinations = new HashSet<TransitStop>();
+            Set<TransitStop> pathwayDestinations = new HashSet<TransitStop>();cd
             for (Edge e : ts0.getOutgoing()) {
                 if (e instanceof PathwayEdge || e instanceof SimpleTransfer) {
                     if (e.getToVertex() instanceof TransitStop) {

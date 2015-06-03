@@ -12,11 +12,16 @@ import org.opentripplanner.routing.graph.Graph;
 public class OsmVertex extends IntersectionVertex {
     private static final long serialVersionUID = 1L;
 
-    public OsmVertex(Graph g, String label, double x, double y) {
+    /** The OSM node ID from whence this came */
+    public final long nodeId;
+
+    public OsmVertex(Graph g, String label, double x, double y, long nodeId) {
         super(g, label, x, y);
+        this.nodeId = nodeId;
     }
 
-    public OsmVertex(Graph g, String label, double x, double y, String name) {
+    public OsmVertex(Graph g, String label, double x, double y, long nodeId, String name) {
         super(g, label, x, y, name);
+        this.nodeId = nodeId;
     }
 }

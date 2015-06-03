@@ -670,6 +670,13 @@
             <version>2.7.0</version>
         </dependency>
         -->
+
+        <!-- support for OpenTraffic data -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>traffic-engine</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

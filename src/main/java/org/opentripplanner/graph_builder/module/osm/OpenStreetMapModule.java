@@ -44,46 +44,17 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
-import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
-import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.NamedArea;
-import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
-import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
+import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -1078,6 +1049,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 customNamer.nameWithEdge(way, street);
             }
 
+            // save the way ID so we can match with OpenTraffic
+            street.wayId = way.getId();
+
             return street;
         }
 
@@ -1116,7 +1090,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 Coordinate coordinate = getCoordinate(node);
                 String label = this.getLevelNodeLabel(node, level);
                 OsmVertex vertex = new OsmVertex(graph, label, coordinate.x,
-                        coordinate.y, label);
+                         coordinate.y, node.getId(), label);
                 vertices.put(level, vertex);
                 // multilevel nodes should also undergo turn-conversion
                 endpoints.add(vertex);
@@ -1170,7 +1144,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
 
                 if (iv == null) {
-                    iv = new OsmVertex(graph, label, coordinate.x, coordinate.y, label);
+                    iv = new OsmVertex(graph, label, coordinate.x, coordinate.y, node.getId(), label);
                     if (node.hasTrafficLight()) {
                         iv.trafficLight = (true);
                     }
