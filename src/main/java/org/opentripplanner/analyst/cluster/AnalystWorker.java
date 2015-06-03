@@ -190,13 +190,11 @@ public class AnalystWorker implements Runnable {
 
             // Convert the field "options" to a request object
             if (clusterRequest.profile) {
+                // TODO check graph and job ID against queue URL for coherency
                 ProfileRequest profileRequest = objectMapper.readValue(message.getBody(), ProfileRequest.class);
                 RepeatedRaptorProfileRouter router = new RepeatedRaptorProfileRouter(graph, profileRequest);
                 TimeSurface.RangeSet result = router.timeSurfaceRangeSet;
                 Map<String, Integer> idForSurface = Maps.newHashMap();
-                // TODO check graph and job ID against queue URL for coherency
-                // Message was successfully handled, delete it from SQS to avoid re-delivery to another worker.
-                sqs.deleteMessage(lastQueueUrl, message.getReceiptHandle());
             } else {
                 RoutingRequest routingRequest = objectMapper.readValue(message.getBody(), RoutingRequest.class);
                 // TODO finish me
