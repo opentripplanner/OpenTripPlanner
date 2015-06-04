@@ -127,7 +127,7 @@ public class AnalystWorker implements Runnable {
                         // Non-blocking poll would return fast if no messages are available.
                         // However we use long polling just because it polls all servers and gives less false-empties.
                         ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueUrl)
-                                .withVisibilityTimeout(600).withMaxNumberOfMessages(nCores).withWaitTimeSeconds(1);
+                                .withVisibilityTimeout(600).withMaxNumberOfMessages(nCores * 2).withWaitTimeSeconds(1);
                         messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
                         if (!messages.isEmpty()) {
                             lastQueueUrl = queueUrl;
