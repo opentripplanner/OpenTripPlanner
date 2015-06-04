@@ -133,9 +133,12 @@ public class AnalystWorker implements Runnable {
                             lastQueueUrl = queueUrl;
                             break DISCOVER;
                         }
+                        // Delete empty queues, as there is currently no mechanism for this.
+                        // LOG.info("Deleting queue that contained no messages: {}", queueUrl);
+                        // sqs.deleteQueue(queueUrl);
                     }
                     int sleepSeconds = 5;
-                    LOG.info("No work found. Sleeping {} seconds.", sleepSeconds);
+                    LOG.info("Sleeping {} seconds before discovery of new queues.", sleepSeconds);
                     Thread.sleep(sleepSeconds * 1000); // wait a while before re-scanning the queues
                 }
 
@@ -143,7 +146,7 @@ public class AnalystWorker implements Runnable {
                 LOG.info("Received {} messages. ", messages.size());
 
                 // All tasks are known to require the same graph object (they came from the same queue).
-                // Execute all tasks in the default forkJoinPool with as many threads as we have processor cores.
+                // Execute all tasks in the default ForkJoinPool with as many threads as we have processor cores.
                 // This will block until all tasks have completed.
                 messages.parallelStream().forEach(this::handleOneMessage);
 
@@ -152,16 +155,13 @@ public class AnalystWorker implements Runnable {
                     LOG.info("Removing message: {}", m.getBody());
                     sqs.deleteMessage(lastQueueUrl, m.getReceiptHandle());
                 });
+
             } catch (AmazonServiceException ase) {
-                LOG.error("Your request made it to Amazon S3, but was rejected with an error response.");
-                LOG.error("  Error Message:    " + ase.getMessage());
-                LOG.error("  HTTP Status Code: " + ase.getStatusCode());
-                LOG.error("  AWS Error Code:   " + ase.getErrorCode());
-                LOG.error("  Error Type:       " + ase.getErrorType());
-                LOG.error("  Request ID:       " + ase.getRequestId());
+                LOG.error("Error message from server: " + ase.getMessage());
+                continue;
             } catch (AmazonClientException ace) {
-                LOG.error("The AWS S3 client encountered an internal problem.");
-                LOG.error("  Error Message: " + ace.getMessage());
+                LOG.error("Error message from client: " + ace.getMessage());
+                continue;
             } catch (InterruptedException ex) {
                 LOG.warn("The thread was interrupted.");
                 sqs.shutdown();
