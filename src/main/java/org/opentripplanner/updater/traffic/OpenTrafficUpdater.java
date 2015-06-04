@@ -3,10 +3,10 @@ package org.opentripplanner.updater.traffic;
 import com.beust.jcommander.internal.Maps;
 import com.conveyal.traffic.data.ExchangeFormat;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.core.StreetSpeedSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.traffic.Segment;
 import org.opentripplanner.traffic.SpeedSample;
+import org.opentripplanner.traffic.StreetSpeedSource;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
@@ -49,9 +49,9 @@ public class OpenTrafficUpdater extends PollingGraphUpdater {
 
         // search through the tile directory
         for (File z : tileDirectory.listFiles()) {
-            for (File x : tileDirectory.listFiles()) {
-                for (File y : tileDirectory.listFiles()) {
-                    if (!y.getName().endsWith(".pbf")) {
+            for (File x : z.listFiles()) {
+                for (File y : x.listFiles()) {
+                    if (!y.getName().endsWith(".traffic.pbf")) {
                         LOG.warn("Skipping non-traffic file {} in tile directory", y);
                         continue;
                     }
@@ -65,7 +65,12 @@ public class OpenTrafficUpdater extends PollingGraphUpdater {
 
                     for (int i = 0; i < tile.getSegmentsCount(); i++) {
                         ExchangeFormat.BaselineStats stats = tile.getSegments(i);
-                        SpeedSample sample = new SpeedSample(stats);
+                        SpeedSample sample;
+                        try {
+                            sample = new SpeedSample(stats);
+                        } catch (IllegalArgumentException e) {
+                            continue;
+                        }
                         Segment segment = new Segment(stats.getSegment());
                         speedIndex.put(segment, sample);
                     }

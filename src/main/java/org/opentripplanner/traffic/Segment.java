@@ -36,6 +36,12 @@ public class Segment implements Serializable {
         this.startNodeId = edge.getStartOsmNodeId();
     }
 
+    public Segment (long wayId, long startNodeId, long endNodeId) {
+        this.wayId = wayId;
+        this.startNodeId = startNodeId;
+        this.endNodeId = endNodeId;
+    }
+
     // this is used as a hashmap key so needs to have semantic equality and hash
     @Override public boolean equals(Object o) {
         if (this == o)

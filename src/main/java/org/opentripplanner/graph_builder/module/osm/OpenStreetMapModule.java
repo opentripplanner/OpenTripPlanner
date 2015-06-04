@@ -50,36 +50,13 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
-<<<<<<< HEAD
 import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-=======
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
-import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
->>>>>>> origin
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -1163,7 +1140,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 if ("motorway_junction".equals(highway)) {
                     String ref = node.getTag("ref");
                     if (ref != null) {
-                        ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y);
+                        ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y, nid);
                         ev.setExitName(ref);
                         iv = ev;
                     }
@@ -1174,7 +1151,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     String ref = node.getTag("ref");
                     String name = node.getTag("name");
                     if (ref != null) {
-                        TransitStopStreetVertex tsv = new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, name, ref);
+                        TransitStopStreetVertex tsv = new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, nid, name, ref);
                         iv = tsv;
                     }
                 }

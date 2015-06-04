@@ -16,6 +16,8 @@ import java.time.ZoneOffset;
 public class SpeedSample implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(SpeedSample.class);
 
+    private static final double KMH_TO_MS = 1000d / 3600d;
+
     /**
      * the overall average speed on this segment, in centimeters per second, with -32,768 representing 0.
      * This allows representation of speeds up to 2359 kilometers per hour.
@@ -48,7 +50,7 @@ public class SpeedSample implements Serializable {
 
     /** Decode a speed to meters per second from its short representation */
     private double decodeSpeed (short speed) {
-        return (((double) speed) + Short.MIN_VALUE) / 100d;
+        return (((double) speed) - Short.MIN_VALUE) / 100d;
     }
 
     /** Encode a speed stored as meters per second to its short representation. */
@@ -67,7 +69,14 @@ public class SpeedSample implements Serializable {
 
     /** Create a speed sample from an OpenTraffic stats object */
     public SpeedSample(ExchangeFormat.BaselineStats stats) {
-        this.average = encodeSpeed(stats.getAverageSpeed());
+        float avg = stats.getAverageSpeed();
+
+        if (Float.isNaN(avg)) {
+            LOG.error("Invalid speed sample: average speed is NaN");
+            throw new IllegalArgumentException("Overall average speed for a sample is NaN.");
+        }
+
+        this.average = encodeSpeed(avg * KMH_TO_MS);
 
         int count = stats.getHourOfWeekAveragesCount();
 
@@ -77,10 +86,10 @@ public class SpeedSample implements Serializable {
             for (int i = 0; i < count; i++) {
                 float speed = stats.getHourOfWeekAverages(i);
 
-                if (speed != Float.NaN)
-                    hourBins[i] = encodeSpeed(speed);
+                if (!Float.isNaN(speed))
+                    hourBins[i] = encodeSpeed(speed * KMH_TO_MS);
                 else
-                    hourBins[i] = encodeSpeed(average);
+                    hourBins[i] = average;
             }
         }
         else {
@@ -88,6 +97,16 @@ public class SpeedSample implements Serializable {
                 LOG.error("Expected {} hours in speed sample, found {}", 7 * 24, count);
 
             hourBins = null;
+        }
+    }
+
+    /** create a speed sample using a function */
+    public SpeedSample (double averageSpeed, double[] hourBins) {
+        this.average = encodeSpeed(averageSpeed);
+        this.hourBins = new short[hourBins.length];
+
+        for (int i = 0; i < hourBins.length; i++) {
+            this.hourBins[i] = Double.isNaN(hourBins[i]) ? this.average : encodeSpeed(hourBins[i]);
         }
     }
 }

@@ -13,18 +13,19 @@
 
 package org.opentripplanner.graph_builder.module;
 
-import java.util.*;
-
 import com.google.common.collect.Iterables;
 import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit network among themselves. This is necessary for
@@ -75,7 +76,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             LOG.debug("Linking stop '{}' {}", ts0.getStop(), ts0);
 
             /* Determine the set of stops that are already reachable via other pathways or transfers */
-            Set<TransitStop> pathwayDestinations = new HashSet<TransitStop>();cd
+            Set<TransitStop> pathwayDestinations = new HashSet<TransitStop>();
             for (Edge e : ts0.getOutgoing()) {
                 if (e instanceof PathwayEdge || e instanceof SimpleTransfer) {
                     if (e.getToVertex() instanceof TransitStop) {

@@ -224,7 +224,7 @@ public class SimpleStreetSplitter {
         Coordinate splitPoint = ll.getCoordinate(geometry);
 
         // every edge can be split exactly once, so this is a valid label
-        SplitterVertex v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y);
+        SplitterVertex v = new SplitterVertex(graph, "split from " + edge.getId(), splitPoint.x, splitPoint.y, edge);
 
         // make the edges
         // TODO this is using the StreetEdge implementation of split, which will discard elevation information

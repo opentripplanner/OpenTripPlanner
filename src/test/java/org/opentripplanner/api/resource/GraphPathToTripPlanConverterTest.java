@@ -175,7 +175,7 @@ public class GraphPathToTripPlanConverterTest {
 
         // Vertices for leg 0
         ExitVertex v0 = new ExitVertex(
-                graph, "Vertex 0", 0, 0);
+                graph, "Vertex 0", 0, 0, 0);
         IntersectionVertex v2 = new IntersectionVertex(
                 graph, "Vertex 2", 0, 0);
         IntersectionVertex v4 = new IntersectionVertex(

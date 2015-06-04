@@ -1,22 +1,15 @@
 package org.opentripplanner.graph_builder.module.linking;
 
-import static org.junit.Assert.*;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import jersey.repackaged.com.google.common.collect.Iterables;
 import jersey.repackaged.com.google.common.collect.Maps;
-
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
@@ -27,7 +20,6 @@ import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.profile.StopTreeCache;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -36,19 +28,20 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static org.junit.Assert.*;
 
 public class LinkingTest {
     /** maximum difference in walk distance, in meters, that is acceptable between the graphs */
@@ -76,8 +69,8 @@ public class LinkingTest {
             // split it but not too close to the end
             double splitVal = Math.random() * 0.95 + 0.025;
 
-            SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal);
-            SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal);
+            SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s0);
+            SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s1);
 
             P2<StreetEdge> sp0 = s0.split(sv0);
             P2<StreetEdge> sp1 = s1.split(sv1);

@@ -505,7 +505,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (source != null) {
                 double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
 
-                if (congestedSpeed != Double.NaN)
+                if (!Double.isNaN(congestedSpeed))
                     return congestedSpeed;
             }
 
