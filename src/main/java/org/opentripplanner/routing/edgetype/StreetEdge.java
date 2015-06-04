@@ -499,14 +499,16 @@ public class StreetEdge extends Edge implements Cloneable {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
-            // the expected speed based on traffic
-            StreetSpeedSource source = options.getRoutingContext().graph.streetSpeedSource;
+            if (options.useTraffic) {
+                // the expected speed based on traffic
+                StreetSpeedSource source = options.getRoutingContext().graph.streetSpeedSource;
 
-            if (source != null) {
-                double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
+                if (source != null) {
+                    double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
 
-                if (!Double.isNaN(congestedSpeed))
-                    return congestedSpeed;
+                    if (!Double.isNaN(congestedSpeed))
+                        return congestedSpeed;
+                }
             }
 
             return calculateCarSpeed(options);
