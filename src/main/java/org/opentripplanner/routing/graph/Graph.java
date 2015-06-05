@@ -53,7 +53,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
-import org.opentripplanner.api.resource.GraphMetadata;
+import org.opentripplanner.api.resource.GraphEnvelope;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
@@ -63,6 +63,7 @@ import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -161,7 +162,7 @@ public class Graph implements Serializable {
 
     private transient TimeZone timeZone = null;
 
-    private GraphMetadata graphMetadata = null;
+    private GraphEnvelope graphEnvelope = null;
 
     //ConvexHull of all the graph vertices. Generated at Graph build time.
     private Geometry convexHull = null;
@@ -180,6 +181,9 @@ public class Graph implements Serializable {
 
     /* The time at which the graph was built, for detecting changed inputs and triggering a rebuild. */
     public DateTime buildTimeJoda = null; // FIXME record this info, null is just a placeholder
+
+    /** List of transit modes that are availible in GTFS data used in this graph**/
+    private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
 
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
@@ -646,6 +650,18 @@ public class Graph implements Serializable {
         return this.graphBuilderAnnotations;
     }
 
+    /**
+     * Adds mode of transport to transit modes in graph
+     * @param mode
+     */
+    public void addTransitMode(TraverseMode mode) {
+        transitModes.add(mode);
+    }
+
+    public HashSet<TraverseMode> getTransitModes() {
+        return transitModes;
+    }
+
     /* (de) serialization */
 
     public enum LoadLevel {
@@ -946,19 +962,19 @@ public class Graph implements Serializable {
         }
     }
 
-    public GraphMetadata getMetadata() {
+    public GraphEnvelope getMetadata() {
         // Lazy-initialize the graph metadata since it is not serialized.
-        if (graphMetadata == null) {
-            graphMetadata = new GraphMetadata(this);
+        if (graphEnvelope == null) {
+            graphEnvelope = new GraphEnvelope(this);
         }
-        return graphMetadata;
+        return graphEnvelope;
     }
 
     /**
      * @return true if graph has metadata
      */
     public boolean hasMetadata() {
-        return graphMetadata != null;
+        return graphEnvelope != null;
     }
 
     /**
@@ -969,8 +985,8 @@ public class Graph implements Serializable {
      * @return true if coordinate is in graph envelope
      */
     public boolean containsInOSM(Coordinate c) {
-        if (graphMetadata != null) {
-            return graphMetadata.contains(c);
+        if (graphEnvelope != null) {
+            return graphEnvelope.contains(c);
         } else {
             return false;
         }
@@ -1016,7 +1032,7 @@ public class Graph implements Serializable {
      *
      * This speeds up calculation, but problem is that median needs to have all of latitudes/longitudes
      * in memory, this can become problematic in large installations. It works without a problem on New York State.
-     * @see GraphMetadata
+     * @see GraphEnvelope
      */
     public void calculateTransitCenter() {
         if (hasTransit) {

@@ -85,7 +85,6 @@ public class OTPApplication extends Application {
             Routers.class,
             Raster.class,
             LegendResource.class,
-            Metadata.class,
             ProfileResource.class,
             SimpleIsochrone.class,
             ServerInfo.class,

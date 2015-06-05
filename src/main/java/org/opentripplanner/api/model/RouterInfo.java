@@ -15,12 +15,14 @@ package org.opentripplanner.api.model;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.opentripplanner.api.resource.GraphMetadata;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.opentripplanner.api.resource.GraphEnvelope;
 import org.opentripplanner.model.json_serialization.GeoJSONDeserializer;
 import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 
@@ -57,11 +59,30 @@ public class RouterInfo {
         this.routerId = routerId;
         this.polygon = graph.getConvexHull();
         this.buildTime = graph.buildTime;
-        GraphMetadata graphMetadata = graph.getMetadata();
-        this.transitModes = graphMetadata.getTransitModes();
-        this.centerLatitude = graphMetadata.getCenterLatitude();
-        this.centerLongitude = graphMetadata.getCenterLongitude();
-        this.envelope = graphMetadata.getEnvelope();
+        GraphEnvelope graphEnvelope = graph.getMetadata();
+        this.transitModes = graph.getTransitModes();
+        this.envelope = graphEnvelope.getEnvelope();
+        addCenter(graph.getCenter());
+    }
+
+    /**
+     * Set center coordinate from transit center in {@link Graph#calculateTransitCenter()} if transit is used
+     * or as mean coordinate if not
+     *
+     * It is first called when OSM is loaded. Then after transit data is loaded.
+     * So that center is set in all combinations of street and transit loading.
+     * @param center
+     */
+    public void addCenter(Optional<Coordinate> center) {
+        //Transit data was loaded and center was calculated with calculateTransitCenter
+        if(center.isPresent()) {
+            centerLongitude = center.get().x;
+            centerLatitude = center.get().y;
+        } else {
+            // Does not work around 180th parallel.
+            centerLatitude = (getUpperRightLatitude() + getLowerLeftLatitude()) / 2;
+            centerLongitude = (getUpperRightLongitude() + getLowerLeftLongitude()) / 2;
+        }
     }
 
     public double getLowerLeftLatitude() {
