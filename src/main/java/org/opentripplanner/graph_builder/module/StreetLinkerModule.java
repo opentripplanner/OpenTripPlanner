@@ -52,6 +52,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
         }
         //Changes internal envelope from OSM envelope to envelope which also includes GTFS data
         graph.getMetadata().updateEnvelope();
+        //Calculates convex hull of a graph which is shown in routerInfo API point
+        graph.calculateConvexHull();
     }
 
     @Override

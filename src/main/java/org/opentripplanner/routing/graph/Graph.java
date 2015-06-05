@@ -163,7 +163,8 @@ public class Graph implements Serializable {
 
     private GraphMetadata graphMetadata = null;
 
-    private transient Geometry hull = null; // FIXME we should be saving this stuff in the graph, why is is transient?
+    //Convex hull of all the graph vertices. Generated at Graph build time.
+    private Geometry hull = null;
 
     /** The density center of the graph for determining the initial geographic extent in the client. */
     private Coordinate center = null;
@@ -975,11 +976,17 @@ public class Graph implements Serializable {
         }
     }
 
+    /**
+     * Calculates convex hull of all the vertices during build time
+     */
+    public void calculateConvexHull() {
+        hull = GraphUtils.makeConvexHull(this);
+    }
+
+    /**
+     * @return calculated convex hull;
+     */
     public Geometry getHull() {
-        // Lazy-initialize the graph hull since it is not serialized.
-        if (hull == null) {
-            hull = GraphUtils.makeConvexHull(this);
-        }
         return hull;
 
     }

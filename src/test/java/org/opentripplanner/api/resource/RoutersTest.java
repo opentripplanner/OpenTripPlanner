@@ -22,6 +22,8 @@ public class RoutersTest {
         otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "A", 0, 0));
         otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "B", 0, 1));
         otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "C", 1, 1));
+        //this needs to be added since convex hull isn't lazy loaded anymore
+        otpServer.getGraphService().getRouter("A").graph.calculateConvexHull();
 
         Routers routerApi = new Routers();
         routerApi.otpServer = otpServer;
