@@ -406,7 +406,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean longDistance = false;
 
     /** Should traffic congestion be considered when driving? */
-    public boolean useTraffic;
+    public boolean useTraffic = true;
 
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
