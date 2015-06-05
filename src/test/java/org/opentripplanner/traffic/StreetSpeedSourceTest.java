@@ -24,9 +24,9 @@ public class StreetSpeedSourceTest extends TestCase {
         se.wayId = 10;
 
         // create a speed sample
-        SpeedSample s = getSpeedSample();
+        SegmentSpeedSample s = getSpeedSample();
 
-        Map<Segment, SpeedSample> speeds = Maps.newHashMap();
+        Map<Segment, SegmentSpeedSample> speeds = Maps.newHashMap();
         Segment seg = new Segment(10l, 5l, 6l);
         speeds.put(seg, s);
 
@@ -58,7 +58,7 @@ public class StreetSpeedSourceTest extends TestCase {
     }
 
     /** Make a speed sample */
-    private SpeedSample getSpeedSample() {
+    private SegmentSpeedSample getSpeedSample() {
         double[] hourBins = new double[7 * 24];
         for (int i = 0; i < hourBins.length; i++) {
             if (i == 8)
@@ -75,6 +75,6 @@ public class StreetSpeedSourceTest extends TestCase {
         // ~4km/h
         double avg = 1.33;
 
-        return new SpeedSample(avg, hourBins);
+        return new SegmentSpeedSample(avg, hourBins);
     }
 }

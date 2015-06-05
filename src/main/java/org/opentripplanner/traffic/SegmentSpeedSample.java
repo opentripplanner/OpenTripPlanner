@@ -13,8 +13,8 @@ import java.time.ZoneOffset;
 /**
  * Represents speeds at particular times of day.
  */
-public class SpeedSample implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(SpeedSample.class);
+public class SegmentSpeedSample implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(SegmentSpeedSample.class);
 
     private static final double KMH_TO_MS = 1000d / 3600d;
 
@@ -68,7 +68,7 @@ public class SpeedSample implements Serializable {
     }
 
     /** Create a speed sample from an OpenTraffic stats object */
-    public SpeedSample(ExchangeFormat.BaselineStats stats) {
+    public SegmentSpeedSample(ExchangeFormat.BaselineStats stats) {
         float avg = stats.getAverageSpeed();
 
         if (Float.isNaN(avg)) {
@@ -101,7 +101,7 @@ public class SpeedSample implements Serializable {
     }
 
     /** create a speed sample using a function */
-    public SpeedSample (double averageSpeed, double[] hourBins) {
+    public SegmentSpeedSample(double averageSpeed, double[] hourBins) {
         this.average = encodeSpeed(averageSpeed);
         this.hourBins = new short[hourBins.length];
 

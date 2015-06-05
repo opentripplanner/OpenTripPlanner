@@ -5,7 +5,7 @@ import com.conveyal.traffic.data.ExchangeFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.traffic.Segment;
-import org.opentripplanner.traffic.SpeedSample;
+import org.opentripplanner.traffic.SegmentSpeedSample;
 import org.opentripplanner.traffic.StreetSpeedSource;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -45,7 +45,7 @@ public class OpenTrafficUpdater extends PollingGraphUpdater {
 
         // Build a speed index now while we're running in our own thread. We'll swap it out
         // at the appropriate time with a graphwriterrunnable, but no need to synchronize yet.
-        Map<Segment, SpeedSample> speedIndex = Maps.newHashMap();
+        Map<Segment, SegmentSpeedSample> speedIndex = Maps.newHashMap();
 
         // search through the tile directory
         for (File z : tileDirectory.listFiles()) {
@@ -65,9 +65,9 @@ public class OpenTrafficUpdater extends PollingGraphUpdater {
 
                     for (int i = 0; i < tile.getSegmentsCount(); i++) {
                         ExchangeFormat.BaselineStats stats = tile.getSegments(i);
-                        SpeedSample sample;
+                        SegmentSpeedSample sample;
                         try {
-                            sample = new SpeedSample(stats);
+                            sample = new SegmentSpeedSample(stats);
                         } catch (IllegalArgumentException e) {
                             continue;
                         }
