@@ -282,4 +282,8 @@ public class GraphMetadata implements Serializable {
             LOG.info("center from median");
         }
     }
+
+    public WorldEnvelope getEnvelope() {
+        return envelope;
+    }
 }

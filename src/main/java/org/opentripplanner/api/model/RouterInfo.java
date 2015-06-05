@@ -14,18 +14,22 @@
 package org.opentripplanner.api.model;
 
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.opentripplanner.api.resource.GraphMetadata;
 import org.opentripplanner.model.json_serialization.GeoJSONDeserializer;
 import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.WorldEnvelope;
 
 @XmlRootElement(name = "RouterInfo")
 public class RouterInfo {
@@ -40,9 +44,75 @@ public class RouterInfo {
     @XmlElement
     public Date buildTime;
 
+    public HashSet<TraverseMode> transitModes;
+
+    private WorldEnvelope envelope;
+
+    public double centerLatitude;
+
+    public double centerLongitude;
+
+
     public RouterInfo(String routerId, Graph graph) {
         this.routerId = routerId;
         this.polygon = graph.getConvexHull();
         this.buildTime = graph.buildTime;
+        GraphMetadata graphMetadata = graph.getMetadata();
+        this.transitModes = graphMetadata.getTransitModes();
+        this.centerLatitude = graphMetadata.getCenterLatitude();
+        this.centerLongitude = graphMetadata.getCenterLongitude();
+        this.envelope = graphMetadata.getEnvelope();
+    }
+
+    public double getLowerLeftLatitude() {
+        return envelope.getLowerLeftLatitude();
+    }
+
+    public double getLowerLeftLongitude() {
+        return envelope.getLowerLeftLongitude();
+    }
+
+    public double getUpperRightLatitude() {
+        return envelope.getUpperRightLatitude();
+    }
+
+    public double getUpperRightLongitude() {
+        return envelope.getUpperRightLongitude();
+    }
+
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
+    public double getMinLatitude() {
+        return envelope.getLowerLeftLatitude();
+    }
+
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
+    public double getMinLongitude() {
+        return envelope.getLowerLeftLongitude();
+    }
+
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
+    public double getMaxLatitude() {
+        return envelope.getUpperRightLatitude();
+    }
+
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
+    public double getMaxLongitude() {
+        return envelope.getUpperRightLongitude();
     }
 }
