@@ -25,6 +25,7 @@ import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
+import org.opentripplanner.routing.graph.Graph;
 
 @XmlRootElement(name = "RouterInfo")
 public class RouterInfo {
@@ -38,4 +39,10 @@ public class RouterInfo {
 
     @XmlElement
     public Date buildTime;
+
+    public RouterInfo(String routerId, Graph graph) {
+        this.routerId = routerId;
+        this.polygon = graph.getConvexHull();
+        this.buildTime = graph.buildTime;
+    }
 }
