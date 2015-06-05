@@ -163,8 +163,8 @@ public class Graph implements Serializable {
 
     private GraphMetadata graphMetadata = null;
 
-    //Convex hull of all the graph vertices. Generated at Graph build time.
-    private Geometry hull = null;
+    //ConvexHull of all the graph vertices. Generated at Graph build time.
+    private Geometry convexHull = null;
 
     /** The density center of the graph for determining the initial geographic extent in the client. */
     private Coordinate center = null;
@@ -977,17 +977,17 @@ public class Graph implements Serializable {
     }
 
     /**
-     * Calculates convex hull of all the vertices during build time
+     * Calculates convexHull of all the vertices during build time
      */
     public void calculateConvexHull() {
-        hull = GraphUtils.makeConvexHull(this);
+        convexHull = GraphUtils.makeConvexHull(this);
     }
 
     /**
-     * @return calculated convex hull;
+     * @return calculated convexHull;
      */
-    public Geometry getHull() {
-        return hull;
+    public Geometry getConvexHull() {
+        return convexHull;
 
     }
    

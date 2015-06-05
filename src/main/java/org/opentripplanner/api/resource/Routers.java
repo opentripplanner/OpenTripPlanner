@@ -146,7 +146,7 @@ public class Routers {
             Graph graph = router.graph;
             RouterInfo routerInfo = new RouterInfo();
             routerInfo.routerId = routerId;
-            routerInfo.polygon = graph.getHull();
+            routerInfo.polygon = graph.getConvexHull();
             routerInfo.buildTime = graph.buildTime;
             return routerInfo;
         } catch (GraphNotFoundException e) {
