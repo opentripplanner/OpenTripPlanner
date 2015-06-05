@@ -24,7 +24,7 @@ public class StreetSpeedSource {
     }
 
     /** Set the samples. For now this is a simple setter, in the future it may handle concurrency control, etc. */
-    public void setSamples (Map<Segment, SpeedSample> samples) {
+    public synchronized void setSamples (Map<Segment, SpeedSample> samples) {
         this.samples = samples;
     }
 }
