@@ -4,16 +4,19 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
-import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.analyst.TimeSurface;
+import org.opentripplanner.analyst.PointSet;
+import org.opentripplanner.analyst.ResultSet;
+import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.profile.ProfileRequest;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -22,16 +25,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
+import java.util.zip.GZIPOutputStream;
 
 /**
- *
- * TODO subclass or extend pointset cache to use S3
  *
  */
 public class AnalystWorker implements Runnable {
@@ -41,6 +45,7 @@ public class AnalystWorker implements Runnable {
     public static final int nCores = Runtime.getRuntime().availableProcessors();
     public static final String QUEUE_PREFIX = "analyst_t_job_";
 
+    public static final int MIGRATE_PERCENTAGE = 20; // X percent of the time workers will ignore their graph affinity when polling
 
     ObjectMapper objectMapper;
     String lastQueueUrl = null;
@@ -51,7 +56,9 @@ public class AnalystWorker implements Runnable {
     // Of course this will eventually need to be shared between multiple AnalystWorker threads.
     PointSetDatastore pointSetDatastore;
 
+    // Clients for communicating with Amazon web services
     AmazonSQS sqs;
+    AmazonS3 s3;
 
     String graphId = null;
     long startupTime;
@@ -61,30 +68,36 @@ public class AnalystWorker implements Runnable {
 
     boolean isSinglePoint = false;
 
-    String pointsetBucket = "analyst-dev_pointsets";
 
     public AnalystWorker() {
+
         startupTime = System.currentTimeMillis() / 1000; // TODO auto-shutdown
+
         // When creating the S3 and SQS clients use the default credentials chain.
         // This will check environment variables and ~/.aws/credentials first, then fall back on
         // the auto-assigned IAM role if this code is running on an EC2 instance.
         // http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/java-dg-roles.html
         sqs = new AmazonSQSClient();
         sqs.setRegion(awsRegion);
+        s3 = new AmazonS3Client();
+        s3.setRegion(awsRegion);
+
+        /* The ObjectMapper (de)serializes JSON. */
         objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // ignore JSON fields that don't match target type
 
+        /* These serve as lazy-loading caches for graphs and point sets. */
         clusterGraphBuilder = new ClusterGraphBuilder();
-        pointSetDatastore = new PointSetDatastore(10, null, false, pointsetBucket);
+        pointSetDatastore = new PointSetDatastore(10, null, false, "analyst-dev-pointsets");
+
     }
 
     @Override
     public void run() {
 
         // TODO requestMetricCollector, generalProgressListener
-        // S3Object object = s3.getObject(bucketName, objectKey);
 
         // Loop forever, attempting to fetch some messages from a queue and process them.
         while (true) {
@@ -92,8 +105,11 @@ public class AnalystWorker implements Runnable {
             try {
                 // sqs.listQueues().getQueueUrls().stream().forEach(q -> LOG.info(q));
 
+                boolean affinity = random.nextInt(100) >= MIGRATE_PERCENTAGE;
+                LOG.info("This polling attempt will have graph affinity: {}", affinity);
+
                 // Attempt to get messages from the last queue URL from which we successfully received messages.
-                if (lastQueueUrl != null) {
+                if (affinity && lastQueueUrl != null) {
                     int retries = 0;
                     while (messages.isEmpty() && retries++ < 2) {
                         LOG.info("Polling for more messages on the same queue {}", lastQueueUrl);
@@ -110,7 +126,7 @@ public class AnalystWorker implements Runnable {
                     lastQueueUrl = null;
                     // For the first two retries, discover queues for the same graph. After that, all graphs.
                     String queuePrefix = QUEUE_PREFIX;
-                    if (retries++ < 2 && graphId != null) {
+                    if (affinity && retries++ < 2 && graphId != null) {
                         LOG.info("Polling for messages on different queues for the same graph {}", graphId);
                         queuePrefix += graphId;
                     } else {
@@ -149,13 +165,6 @@ public class AnalystWorker implements Runnable {
                 // Execute all tasks in the default ForkJoinPool with as many threads as we have processor cores.
                 // This will block until all tasks have completed.
                 messages.parallelStream().forEach(this::handleOneMessage);
-
-                // Remove messages from queue so they won't be re-delivered to other workers.
-                messages.stream().forEach(m -> {
-                    LOG.info("Removing message: {}", m.getBody());
-                    sqs.deleteMessage(lastQueueUrl, m.getReceiptHandle());
-                });
-
             } catch (AmazonServiceException ase) {
                 LOG.error("Error message from server: " + ase.getMessage());
                 continue;
@@ -188,23 +197,51 @@ public class AnalystWorker implements Runnable {
             Graph graph = clusterGraphBuilder.getGraph(clusterRequest.graphId);
             graphId = clusterRequest.graphId; // Record graphId so we "stick" to this same graph on subsequent polls
 
-            // Convert the field "options" to a request object
+            // This result envelope will hold the result of the profile or single-time one-to-many search.
+            ResultEnvelope envelope = new ResultEnvelope();
             if (clusterRequest.profile) {
                 // TODO check graph and job ID against queue URL for coherency
                 ProfileRequest profileRequest = objectMapper.readValue(message.getBody(), ProfileRequest.class);
-                RepeatedRaptorProfileRouter router = new RepeatedRaptorProfileRouter(graph, profileRequest);
-                TimeSurface.RangeSet result = router.timeSurfaceRangeSet;
-                Map<String, Integer> idForSurface = Maps.newHashMap();
+                SampleSet sampleSet = null;
+                if (clusterRequest.destinationPointsetId != null) {
+                    // A pointset was specified, calculate travel times to the points in the pointset.
+                    // Fetch the set of points we will use as destinations for this one-to-many search
+                    PointSet pointSet = pointSetDatastore.get(clusterRequest.destinationPointsetId);
+                    sampleSet = pointSet.getSampleSet(graph);
+                }
+                // Passing a null SampleSet parameter will properly return only isochrones in the RangeSet
+                RepeatedRaptorProfileRouter router = new RepeatedRaptorProfileRouter(graph, profileRequest, sampleSet);
+                router.route();
+                ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes);
+                // put in constructor?
+                envelope.bestCase  = results.min;
+                envelope.avgCase   = results.avg;
+                envelope.worstCase = results.max;
             } else {
                 RoutingRequest routingRequest = objectMapper.readValue(message.getBody(), RoutingRequest.class);
-                // TODO finish me
+                // TODO finish the non-profile case
             }
 
-            if (clusterRequest.destinationPointsetId == null) {
-                // No pointset specified, produce isochrones.
-            } else {
-                // A pointset was specified, calculate travel times to the points in the pointset.
-                // s3.getObject(pointsetBucket, clusterRequest.destinationPointsetId);
+            if (clusterRequest.outputQueue != null) {
+                // Enqueue a notification that the work is done
+                sqs.sendMessage(clusterRequest.outputQueue, String.format("{ \"jobId\" : \"%s\", \"id\" : \"%s\" }",
+                        clusterRequest.jobId, clusterRequest.id));
+            }
+            if (clusterRequest.outputLocation != null) {
+                // Convert the result envelope and its contents to JSON and gzip it in this thread.
+                // Transfer the results to Amazon S3 in another thread, piping between the two.
+                try {
+                    String s3key = String.join("/", clusterRequest.jobId, clusterRequest.id + ".json.gz");
+                    PipedInputStream inPipe = new PipedInputStream();
+                    PipedOutputStream outPipe = new PipedOutputStream(inPipe);
+                    new Thread(() -> {
+                        s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
+                    }).start();
+                    OutputStream gzipOutputStream = new GZIPOutputStream(outPipe);
+                    objectMapper.writeValue(gzipOutputStream, envelope);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
         } catch (JsonProcessingException e) {
@@ -215,7 +252,16 @@ public class AnalystWorker implements Runnable {
             LOG.error("IO exception while parsing incoming message: {}", e);
             LOG.error("Leaving this message alive for later consumption by another worker.");
             e.printStackTrace();
+            return; // to skip message deletion below.
+        } catch (Exception ex) {
+            LOG.error("An error occurred while routing: " + ex.getMessage());
+            ex.printStackTrace();
         }
+
+        // Remove messages from queue so they won't be re-delivered to other workers.
+        LOG.info("Removing message: {}", message.getBody());
+        sqs.deleteMessage(lastQueueUrl, message.getReceiptHandle());
+
     }
 
 }
