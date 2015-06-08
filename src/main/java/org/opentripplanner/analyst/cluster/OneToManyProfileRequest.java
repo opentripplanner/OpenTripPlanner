@@ -13,8 +13,8 @@ public class OneToManyProfileRequest extends AnalystClusterRequest implements Se
 	public ProfileRequest options;
 
 	/** used in single point mode with origin specified by options */
-	public OneToManyProfileRequest(String to, ProfileRequest options, String graphId) {
-		super(to, graphId, true);
+	public OneToManyProfileRequest(String destPointsetId, ProfileRequest options, String graphId) {
+		super(destPointsetId, graphId, true);
 		try {
 			this.options = options.clone();
 		} catch (CloneNotSupportedException e) {
