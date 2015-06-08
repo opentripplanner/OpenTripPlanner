@@ -21,12 +21,11 @@ import java.util.stream.IntStream;
  */
 public class JobSimulator {
 
-    public static final String QUEUE_PREFIX = "analyst-dev_";
-
     public static void main(String[] args) {
 
         String prefix = args[0];
-        String graphId = args[1];
+        String pointSetId = args[1];
+        String graphId = pointSetId.split("_")[0];
         int nOrigins = Integer.parseInt(args[2]);
 
         String jobId = compactUUID();
@@ -40,17 +39,21 @@ public class JobSimulator {
         sqs.setRegion(awsRegion);
 
         // Create a queue for this job
-        String queueUrl = sqs.createQueue(String.join("_", prefix, "job", graphId, jobId)).getQueueUrl();
+        String taskQueueUrl = sqs.createQueue(String.join("_", prefix, "job", graphId, jobId)).getQueueUrl();
+        String resultQueueUrl = sqs.createQueue(String.join("_", prefix, "job", graphId, jobId)).getQueueUrl();
 
         ObjectMapper objectMapper = new ObjectMapper();
         IntStream.range(0, nOrigins).forEach(i -> {
             // Enqueue one fake origin
             ProfileRequest profileRequest = new ProfileRequest();
-            AnalystClusterRequest clusterRequest = new OneToManyProfileRequest(null, profileRequest, graphId);
+            AnalystClusterRequest clusterRequest = new OneToManyProfileRequest(pointSetId, profileRequest, graphId);
             clusterRequest.id = Integer.toString(i);
             clusterRequest.jobId = jobId;
+            clusterRequest.outputLocation = prefix + "_output";
+            clusterRequest.outputQueue = resultQueueUrl;
+            clusterRequest.destinationPointsetId = pointSetId;
             try {
-                sqs.sendMessage(queueUrl, objectMapper.writeValueAsString(clusterRequest));
+                sqs.sendMessage(taskQueueUrl, objectMapper.writeValueAsString(clusterRequest));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
