@@ -6,7 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.traffic.Segment;
 import org.opentripplanner.traffic.SegmentSpeedSample;
-import org.opentripplanner.traffic.StreetSpeedSource;
+import org.opentripplanner.traffic.StreetSpeedSnapshot;
+import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
@@ -74,7 +75,7 @@ public class OpenTrafficUpdater extends PollingGraphUpdater {
         LOG.info("Indexed {} speed samples", speedIndex.size());
 
         graphUpdaterManager.execute(graph -> {
-            graph.streetSpeedSource.setSamples(speedIndex);
+            graph.streetSpeedSource.setSnapshot(new StreetSpeedSnapshot(speedIndex));
         });
     }
 
@@ -93,7 +94,7 @@ public class OpenTrafficUpdater extends PollingGraphUpdater {
     @Override
     public void setup() throws Exception {
         graphUpdaterManager.execute(graph -> {
-            graph.streetSpeedSource = new StreetSpeedSource();
+            graph.streetSpeedSource = new StreetSpeedSnapshotSource();
         });
     }
 

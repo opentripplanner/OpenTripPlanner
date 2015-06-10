@@ -27,7 +27,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.traffic.StreetSpeedSource;
+import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -501,7 +501,7 @@ public class StreetEdge extends Edge implements Cloneable {
             // NOTE: Automobiles have variable speeds depending on the edge type
             if (options.useTraffic) {
                 // the expected speed based on traffic
-                StreetSpeedSource source = options.getRoutingContext().graph.streetSpeedSource;
+                StreetSpeedSnapshot source = options.getRoutingContext().streetSpeedSnapshot;
 
                 if (source != null) {
                     double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);

@@ -8,8 +8,8 @@ import java.util.Map;
 /**
  * A source of speeds for traversing streets.
  */
-public class StreetSpeedSource {
-    private Map<Segment, SegmentSpeedSample> samples;
+public class StreetSpeedSnapshot {
+    private final Map<Segment, SegmentSpeedSample> samples;
 
     /** Get the speed for traversing the given edge with the given mode at the given time. Returns NaN if there is no speed information available. */
     public double getSpeed (StreetEdge edge, TraverseMode traverseMode, long timeMillis) {
@@ -23,8 +23,7 @@ public class StreetSpeedSource {
         return sample.getSpeed(timeMillis);
     }
 
-    /** Set the samples. For now this is a simple setter, in the future it may handle concurrency control, etc. */
-    public synchronized void setSamples (Map<Segment, SegmentSpeedSample> samples) {
+    public StreetSpeedSnapshot (Map<Segment, SegmentSpeedSample> samples) {
         this.samples = samples;
     }
 }

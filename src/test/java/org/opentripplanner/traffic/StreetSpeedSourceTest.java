@@ -30,30 +30,32 @@ public class StreetSpeedSourceTest extends TestCase {
         Segment seg = new Segment(10l, 5l, 6l);
         speeds.put(seg, s);
 
-        g.streetSpeedSource = new StreetSpeedSource();
-        g.streetSpeedSource.setSamples(speeds);
+        g.streetSpeedSource = new StreetSpeedSnapshotSource();
+        g.streetSpeedSource.setSnapshot(new StreetSpeedSnapshot(speeds));
 
         // confirm that we get the correct speeds.
         // This also implicitly tests encoding/decoding
 
         OffsetDateTime odt = OffsetDateTime.of(2015, 6, 1, 8, 5, 0, 0, ZoneOffset.UTC);
 
-        double monday8am = g.streetSpeedSource.getSpeed(se, TraverseMode.CAR, odt.toInstant().toEpochMilli());
+        StreetSpeedSnapshot snap = g.streetSpeedSource.getSnapshot();
+
+        double monday8am = snap.getSpeed(se, TraverseMode.CAR, odt.toInstant().toEpochMilli());
         // no data: should use average
         assertEquals(1.33, monday8am, 0.1);
 
         odt = odt.plusHours(1);
 
-        double monday9am = g.streetSpeedSource.getSpeed(se, TraverseMode.CAR, odt.toInstant().toEpochMilli());
+        double monday9am = snap.getSpeed(se, TraverseMode.CAR, odt.toInstant().toEpochMilli());
         assertEquals(6.1, monday9am, 0.1);
 
         odt = odt.plusHours(1);
 
-        double monday10am =  g.streetSpeedSource.getSpeed(se, TraverseMode.CAR, odt.toInstant().toEpochMilli());
+        double monday10am =  snap.getSpeed(se, TraverseMode.CAR, odt.toInstant().toEpochMilli());
         assertEquals(33.3, monday10am, 0.1);
 
         se.wayId = 102;
-        double wrongStreet = g.streetSpeedSource.getSpeed(se, TraverseMode.CAR, odt.toInstant().toEpochMilli());
+        double wrongStreet = snap.getSpeed(se, TraverseMode.CAR, odt.toInstant().toEpochMilli());
         assertTrue(Double.isNaN(wrongStreet));
     }
 

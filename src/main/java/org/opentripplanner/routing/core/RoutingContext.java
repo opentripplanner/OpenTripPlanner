@@ -21,7 +21,6 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -40,18 +39,13 @@ import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import org.opentripplanner.util.NonLocalizedString;
+import java.util.*;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -96,6 +90,9 @@ public class RoutingContext implements Cloneable {
 
     /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
     public final TimetableSnapshot timetableSnapshot;
+
+    /** A snapshot of street speeds for looking up real-time or historical traffic data */
+    public final StreetSpeedSnapshot streetSpeedSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
@@ -224,6 +221,13 @@ public class RoutingContext implements Cloneable {
                 timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
             }
         }
+
+        // do the same for traffic
+        if (graph.streetSpeedSource != null)
+            this.streetSpeedSnapshot = graph.streetSpeedSource.getSnapshot();
+        else
+            this.streetSpeedSnapshot = null;
+
         calendarService = graph.getCalendarService();
         setServiceDays();
 

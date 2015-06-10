@@ -14,30 +14,14 @@
 package org.opentripplanner.routing.graph;
 
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.prefs.Preferences;
-
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.linked.TDoubleLinkedList;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.linked.TDoubleLinkedList;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -56,7 +40,6 @@ import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
-import org.opentripplanner.traffic.StreetSpeedSource;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -68,23 +51,17 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.traffic.StreetSpeedSnapshotSource;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -201,7 +178,7 @@ public class Graph implements Serializable {
     public boolean hasScheduledService = false;
 
     /** A speed source for traffic data */
-    public transient StreetSpeedSource streetSpeedSource;
+    public transient StreetSpeedSnapshotSource streetSpeedSource;
 
     public Graph(Graph basedOn) {
         this();
