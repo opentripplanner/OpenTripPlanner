@@ -14,14 +14,20 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.TranslatedString;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
+import org.opentripplanner.util.LocalizedString;
+import org.opentripplanner.util.TranslatedString;
 
+//Currently unused since notes are disabled in DefaultWayPropertySetSource
 public class NoteProperties {
+
+    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
 
     public String notePattern;
 
@@ -33,12 +39,14 @@ public class NoteProperties {
     }
 
     public T2<Alert, NoteMatcher> generateNote(OSMWithTags way) {
-        Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way,
-                Alert.defaultLanguage);
         Alert note = new Alert();
-        note.alertHeaderText = new TranslatedString();
-        for (Map.Entry<String, String> kv : noteText.entrySet()) {
-            note.alertHeaderText.addTranslation(kv.getKey(), kv.getValue());
+        //TODO: this could probably be made without patternMatch for {} since all notes (at least currently) have {note} as notePattern
+        if (patternMatcher.matcher(notePattern).matches()) {
+            //This gets language -> translation of notePattern and all tags (which can have translations name:en for example)
+            Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
+            note.alertHeaderText = TranslatedString.getI18NString(noteText);
+        } else {
+            note.alertHeaderText = new LocalizedString(notePattern, way);
         }
         return new T2<>(note, noteMatcher);
     }

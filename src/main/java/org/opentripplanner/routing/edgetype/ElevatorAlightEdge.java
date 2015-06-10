@@ -23,6 +23,7 @@ import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /**
  * A relatively low cost edge for alighting from an elevator.
@@ -98,5 +99,11 @@ public class ElevatorAlightEdge extends Edge implements ElevatorEdge {
     
     public String toString() {
         return "ElevatorAlightEdge(" + fromv + " -> " + tov + ")";
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        //FIXME: no localization currently
+        return level;
     }
 }

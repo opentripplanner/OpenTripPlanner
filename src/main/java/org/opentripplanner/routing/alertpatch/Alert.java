@@ -13,6 +13,9 @@
 
 package org.opentripplanner.routing.alertpatch;
 
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -24,16 +27,14 @@ import javax.xml.bind.annotation.XmlType;
 public class Alert implements Serializable {
     private static final long serialVersionUID = 8305126586053909836L;
 
-    public static final String defaultLanguage = "en";
+    @XmlElement
+    public I18NString alertHeaderText;
 
     @XmlElement
-    public TranslatedString alertHeaderText;
+    public I18NString alertDescriptionText;
 
     @XmlElement
-    public TranslatedString alertDescriptionText;
-
-    @XmlElement
-    public TranslatedString alertUrl;
+    public I18NString alertUrl;
 
     //null means unknown
     @XmlElement
@@ -48,8 +49,7 @@ public class Alert implements Serializable {
 
     public static Alert createSimpleAlerts(String text) {
         Alert note = new Alert();
-        note.alertHeaderText = new TranslatedString();
-        note.alertHeaderText.addTranslation(defaultLanguage, text);
+        note.alertHeaderText = new NonLocalizedString(text);
         return note;
     }
 
@@ -92,8 +92,8 @@ public class Alert implements Serializable {
     @Override
     public String toString() {
         return "Alert('"
-                + (alertHeaderText != null ? alertHeaderText.getSomeTranslation()
-                        : alertDescriptionText != null ? alertDescriptionText.getSomeTranslation()
+                + (alertHeaderText != null ? alertHeaderText.toString()
+                        : alertDescriptionText != null ? alertDescriptionText.toString()
                                 : "?") + "')";
     }
 }

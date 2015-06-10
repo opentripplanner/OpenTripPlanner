@@ -23,6 +23,7 @@ import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * These rules were developed in consultation with Grant Humphries, PJ Houser, and Mele Sax-Barnett.
@@ -157,11 +158,11 @@ public class PortlandCustomNamer implements CustomNamer {
                 if (name == null) {
                     continue;
                 }
-                e.setName(name);
+                e.setName(new NonLocalizedString(name));
                 return name;
             } else {
                 String name = out.getName();
-                e.setName(name);
+                e.setName(new NonLocalizedString(name));
                 return name;
             }
         }
@@ -179,11 +180,11 @@ public class PortlandCustomNamer implements CustomNamer {
                 if (name == null) {
                     continue;
                 }
-                e.setName(name);
+                e.setName(new NonLocalizedString(name));
                 return name;
             } else {
                 String name = in.getName();
-                e.setName(name);
+                e.setName(new NonLocalizedString(name));
                 return name;
             }
         }

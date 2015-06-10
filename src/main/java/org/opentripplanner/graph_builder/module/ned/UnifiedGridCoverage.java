@@ -13,9 +13,6 @@
 
 package org.opentripplanner.graph_builder.module.ned;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.GeneralEnvelope;
@@ -26,6 +23,9 @@ import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.DirectPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Stitches together multiple elevation maps into a single elevation map,
@@ -44,6 +44,11 @@ public class UnifiedGridCoverage extends AbstractCoverage {
 
     private List<VerticalDatum> datums;
 
+    /**
+     * It would be nice if we could construct this unified coverage with zero sub-coverages and add all sub-coverages
+     * in the same way. However, the superclass constructor (AbstractCoverage) needs a coverage to copy properties from.
+     * So the first sub-coverage needs to be passed in at construction time.
+     */
     protected UnifiedGridCoverage(CharSequence name, Coverage coverage, List<VerticalDatum> datums) {
         super(name, coverage);
         regions = new ArrayList<Coverage>();
@@ -52,9 +57,8 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     }
 
     @Override
-    public Object evaluate(DirectPosition point) throws PointOutsideCoverageException,
-            CannotEvaluateException {
-        /* we don't care about this */
+    public Object evaluate(DirectPosition point) throws PointOutsideCoverageException, CannotEvaluateException {
+        /* we don't use this function, we use evaluate(DirectPosition point, double[] values) */
         return null;
     }
 
@@ -64,13 +68,15 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         for (Coverage region : regions) {
             // GeneralEnvelope has a contains method, OpenGIS Envelope does not
             GeneralEnvelope env = ((GeneralEnvelope)region.getEnvelope());
-            // avoid incurring exception construction overhead when there are many regions
+            // Check envelope to avoid incurring exception construction overhead (PointOutsideCoverageException),
+            // especially important when there are many regions.
             if (env.contains(point)) {
                 double[] result;
                 double x = point.getOrdinate(0);
                 double y = point.getOrdinate(1);
                 try {
                     result = region.evaluate(point, values);
+                    // TODO It might be faster to put all the datums and Coverage regions into a spatial index instead of iterating.
                     for (VerticalDatum datum : datums) {
                         if (datum.covers(x, y)) {
                             result[0] += datum.interpolatedHeight(x, y);

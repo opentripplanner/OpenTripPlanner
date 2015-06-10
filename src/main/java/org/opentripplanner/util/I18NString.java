@@ -11,27 +11,29 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model;
+package org.opentripplanner.util;
 
-import javax.xml.bind.annotation.XmlElement;
+import java.util.Locale;
 
-public class Note {
-	@XmlElement
-	public String text;
+/**
+ *
+ * This interface is used when providing translations on server side.
+ *
+ * @author mabu
+ */
+public interface I18NString {
 
-	public Note() {
-		/* Required by JAXB but unused */
-	}
-	
-	public Note(String note) {
-		text = note;
-	}
-	
-	public boolean equals(Object o) {
-		return (o instanceof Note) && ((Note) o).text.equals(text);
-	}
-	
-	public int hashCode() {
-		return text.hashCode();
-	}
+    /**
+     * Returns default translation (english)
+     * @return 
+     */
+    public String toString();
+    
+    /**
+     * Returns wanted translation
+     * @param locale Wanted locale
+     * @return 
+     */
+    public String toString(Locale locale);
+    
 }

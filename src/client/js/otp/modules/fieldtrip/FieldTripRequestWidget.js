@@ -117,7 +117,11 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 }
             });
         });
-        
+
+        this.content.find('.editTeacherNotesLink').click(function(evt) {
+            this_.showTeacherNotesDialog();
+        });
+
         this.content.find('.printablePlanLink').click(function(evt) {
             evt.preventDefault();
             var req = this_.request;
@@ -214,7 +218,8 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         var this_ = this;
 
         var dialog = ich['otp-fieldtrip-noteDialog']({
-            message : "Note to be attached to this request:"
+            message : "Note to be attached to this request:",
+            showTypeSelection : true
         }).dialog({
             title : "Add Note",
             appendTo: 'body',
@@ -222,7 +227,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             zIndex: 100000,
             height: 180
         });
-        
+
         dialog.find(".okButton").button().click(function() {
             var text = dialog.find(".textarea").val();
             var type = dialog.find('input:radio[name=type]:checked').val();
@@ -233,6 +238,38 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         dialog.find(".cancelButton").button().click(function() {
             dialog.dialog("close");
         });
-    },     
+    },
+
+    showTeacherNotesDialog : function() {
+        var this_ = this;
+
+        var dialog = ich['otp-fieldtrip-noteDialog']({
+            message : "Teacher notes:",
+            showTypeSelection : false,
+            text : this_.request.submitterNotes
+        }).dialog({
+            title : "Edit Teacher Notes",
+            appendTo: 'body',
+            modal: true,
+            zIndex: 100000,
+            height: 180
+        });
+
+        dialog.find(".okButton").button().click(function() {
+            var text = dialog.find(".textarea").val();
+            this_.module.editTeacherNotes(this_.request, text);
+            dialog.dialog("close");
+        });
+
+        dialog.find(".cancelButton").button().click(function() {
+            dialog.dialog("close");
+        });
+    },
+
+    savingTrip : function(requestOrder) {
+        console.log('saving ' + requestOrder);
+        if(requestOrder === 0) this.content.find('.outboundPlanInfo').html('Saving...');
+        if(requestOrder === 1) this.content.find('.inboundPlanInfo').html('Saving...');
+    }
     
 });
