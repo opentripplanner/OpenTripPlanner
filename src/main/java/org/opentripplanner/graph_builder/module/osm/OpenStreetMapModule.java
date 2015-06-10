@@ -469,7 +469,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             if (!walkAccessibleOut || !carAccessibleIn) {
                 // This will prevent the P+R to be useful.
-                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked(creativeName.toString(), osmId)));
+                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked((creativeName != null ? creativeName.toString() : "null"), osmId)));
                 return false;
             }
             if (!walkAccessibleIn || !carAccessibleOut) {
