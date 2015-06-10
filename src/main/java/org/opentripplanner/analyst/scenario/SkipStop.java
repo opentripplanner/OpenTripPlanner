@@ -1,6 +1,6 @@
 package org.opentripplanner.analyst.scenario;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.TIntSet;
