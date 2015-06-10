@@ -59,6 +59,44 @@ public class StreetSpeedSourceTest extends TestCase {
         assertTrue(Double.isNaN(wrongStreet));
     }
 
+    @Test
+    public void testConcurrency () {
+        Graph g = new Graph();
+
+        StreetSpeedSnapshotSource ssss = new StreetSpeedSnapshotSource();
+
+        OsmVertex v1 = new OsmVertex(g, "v1", 0, 0, 5l);
+        OsmVertex v2 = new OsmVertex(g, "v2", 0, 0.01, 6l);
+        StreetEdge se = new StreetEdge(v1, v2, null, "test", 1000, StreetTraversalPermission.CAR, false);
+        se.wayId = 10;
+
+        Map<Segment, SegmentSpeedSample> ss2 = Maps.newHashMap();
+        Segment seg = new Segment(10l, 5l, 6l);
+        ss2.put(seg, getSpeedSample());
+        StreetSpeedSnapshot ssOrig = new StreetSpeedSnapshot(ss2);
+        ssss.setSnapshot(ssOrig);
+        StreetSpeedSnapshot snap = ssss.getSnapshot();
+        assertEquals(ssOrig, snap);
+
+        // should be match
+        assertFalse(Double.isNaN(snap.getSpeed(se, TraverseMode.CAR, System.currentTimeMillis())));
+
+        // should not have changed
+        assertEquals(snap, ssss.getSnapshot());
+
+        Map<Segment, SegmentSpeedSample> ss1 = Maps.newHashMap();
+        seg = new Segment(10l, 4l, 6l);
+        ss1.put(seg, getSpeedSample());
+        StreetSpeedSnapshot ssNew = new StreetSpeedSnapshot(ss1);
+        ssss.setSnapshot(ssNew);
+
+        snap = ssss.getSnapshot();
+        assertEquals(ssNew, snap);
+
+        // should be no match; the segment in the index does not match the street edge
+        assertTrue(Double.isNaN(snap.getSpeed(se, TraverseMode.CAR, System.currentTimeMillis())));
+    }
+
     /** Make a speed sample */
     private SegmentSpeedSample getSpeedSample() {
         double[] hourBins = new double[7 * 24];
