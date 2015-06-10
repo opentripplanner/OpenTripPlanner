@@ -34,17 +34,10 @@ public class OpenTrafficUpdater extends PollingGraphUpdater {
 
     @Override
     protected void runPolling() throws Exception {
-        if (hasAlreadyRun) {
-            LOG.error("Real-time traffic data is not yet supported; refusing to update graph");
-            return;
-        }
-
-        hasAlreadyRun = true;
-
         LOG.info("Loading speed data");
 
         // Build a speed index now while we're running in our own thread. We'll swap it out
-        // at the appropriate time with a graphwriterrunnable, but no need to synchronize yet.
+        // at the appropriate time with a GraphWriterRunnable, but no need to synchronize yet.
         Map<Segment, SegmentSpeedSample> speedIndex = Maps.newHashMap();
 
         // search through the tile directory
