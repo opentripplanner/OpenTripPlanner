@@ -100,40 +100,4 @@ public class RouterInfo {
     public double getUpperRightLongitude() {
         return envelope.getUpperRightLongitude();
     }
-
-    /**
-     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
-     * names; the new names are the lowerLeft/upperRight.
-     *  @deprecated
-     */
-    public double getMinLatitude() {
-        return envelope.getLowerLeftLatitude();
-    }
-
-    /**
-     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
-     * names; the new names are the lowerLeft/upperRight.
-     *  @deprecated
-     */
-    public double getMinLongitude() {
-        return envelope.getLowerLeftLongitude();
-    }
-
-    /**
-     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
-     * names; the new names are the lowerLeft/upperRight.
-     *  @deprecated
-     */
-    public double getMaxLatitude() {
-        return envelope.getUpperRightLatitude();
-    }
-
-    /**
-     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
-     * names; the new names are the lowerLeft/upperRight.
-     *  @deprecated
-     */
-    public double getMaxLongitude() {
-        return envelope.getUpperRightLongitude();
-    }
 }
