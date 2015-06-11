@@ -27,6 +27,7 @@ public class ClusterGraphBuilder {
 
     private static final String GRAPH_DIR = "graph_cache";
 
+    // TODO set prefix
     private static final String graphBucket = "analyst-dev-graphs";
 
     String currGraphId = null;

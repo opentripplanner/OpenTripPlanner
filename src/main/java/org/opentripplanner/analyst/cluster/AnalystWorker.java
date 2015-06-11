@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
-import org.opentripplanner.profile.ProfileRequest;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -43,12 +42,11 @@ public class AnalystWorker implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(AnalystWorker.class);
     public static final Random random = new Random();
     public static final int nCores = Runtime.getRuntime().availableProcessors();
-    public static final String QUEUE_PREFIX = "analyst_t_job_";
-
     public static final int MIGRATE_PERCENTAGE = 20; // X percent of the time workers will ignore their graph affinity when polling
 
     ObjectMapper objectMapper;
     String lastQueueUrl = null;
+    String queuePrefix;
 
     // Of course this will eventually need to be shared between multiple AnalystWorker threads.
     ClusterGraphBuilder clusterGraphBuilder;
@@ -68,8 +66,7 @@ public class AnalystWorker implements Runnable {
 
     boolean isSinglePoint = false;
 
-
-    public AnalystWorker() {
+    public AnalystWorker () {
 
         startupTime = System.currentTimeMillis() / 1000; // TODO auto-shutdown
 
@@ -90,14 +87,12 @@ public class AnalystWorker implements Runnable {
 
         /* These serve as lazy-loading caches for graphs and point sets. */
         clusterGraphBuilder = new ClusterGraphBuilder();
-        pointSetDatastore = new PointSetDatastore(10, null, false, "analyst-dev-pointsets");
+        pointSetDatastore = new PointSetDatastore(10, null, false, queuePrefix + "_pointsets");
 
     }
 
     @Override
     public void run() {
-
-        // TODO requestMetricCollector, generalProgressListener
 
         // Loop forever, attempting to fetch some messages from a queue and process them.
         while (true) {
@@ -125,14 +120,14 @@ public class AnalystWorker implements Runnable {
                 DISCOVER: while (messages.isEmpty()) {
                     lastQueueUrl = null;
                     // For the first two retries, discover queues for the same graph. After that, all graphs.
-                    String queuePrefix = QUEUE_PREFIX;
+                    String jobQueuePrefix = queuePrefix + "_job_";
                     if (affinity && retries++ < 2 && graphId != null) {
                         LOG.info("Polling for messages on different queues for the same graph {}", graphId);
-                        queuePrefix += graphId;
+                        jobQueuePrefix += graphId;
                     } else {
                         LOG.info("Polling for messages on all queues across all graphs.");
                     }
-                    List<String> queueUrls = sqs.listQueues(queuePrefix).getQueueUrls();
+                    List<String> queueUrls = sqs.listQueues(jobQueuePrefix).getQueueUrls();
                     Collections.shuffle(queueUrls);
                     for (String queueUrl : queueUrls) {
                         // Filter out all non-work queues TODO mark work queues with a prefix
@@ -165,6 +160,7 @@ public class AnalystWorker implements Runnable {
                 // Execute all tasks in the default ForkJoinPool with as many threads as we have processor cores.
                 // This will block until all tasks have completed.
                 messages.parallelStream().forEach(this::handleOneMessage);
+
             } catch (AmazonServiceException ase) {
                 LOG.error("Error message from server: " + ase.getMessage());
                 continue;
@@ -187,10 +183,7 @@ public class AnalystWorker implements Runnable {
     private void handleOneMessage(Message message) {
         try {
             LOG.info("Handling message {}", message.getBody());
-            // Parse / bind the cluster request into the shared superclass so we can decide which request subclass
-            // we actually want to bind it to.
-            // TODO there has to be a better way to do this. Maybe by having separate profileRequest and request fields
-            // inside AnalystClusterReqeust
+            // Parse / bind the cluster request from JSON
             AnalystClusterRequest clusterRequest = objectMapper.readValue(message.getBody(), AnalystClusterRequest.class);
 
             // Get the graph object for the ID given in the request, fetching inputs and building as needed.
@@ -199,9 +192,8 @@ public class AnalystWorker implements Runnable {
 
             // This result envelope will hold the result of the profile or single-time one-to-many search.
             ResultEnvelope envelope = new ResultEnvelope();
-            if (clusterRequest.profile) {
+            if (clusterRequest.profileRequest != null) {
                 // TODO check graph and job ID against queue URL for coherency
-                ProfileRequest profileRequest = objectMapper.readValue(message.getBody(), ProfileRequest.class);
                 SampleSet sampleSet = null;
                 if (clusterRequest.destinationPointsetId != null) {
                     // A pointset was specified, calculate travel times to the points in the pointset.
@@ -210,7 +202,8 @@ public class AnalystWorker implements Runnable {
                     sampleSet = pointSet.getSampleSet(graph);
                 }
                 // Passing a null SampleSet parameter will properly return only isochrones in the RangeSet
-                RepeatedRaptorProfileRouter router = new RepeatedRaptorProfileRouter(graph, profileRequest, sampleSet);
+                RepeatedRaptorProfileRouter router =
+                        new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
                 router.route();
                 ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes);
                 // put in constructor?
@@ -218,7 +211,8 @@ public class AnalystWorker implements Runnable {
                 envelope.avgCase   = results.avg;
                 envelope.worstCase = results.max;
             } else {
-                RoutingRequest routingRequest = objectMapper.readValue(message.getBody(), RoutingRequest.class);
+                // No profile request, this must be a plain one to many routing request.
+                RoutingRequest routingRequest = clusterRequest.routingRequest;
                 // TODO finish the non-profile case
             }
 

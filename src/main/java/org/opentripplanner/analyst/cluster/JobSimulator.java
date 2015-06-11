@@ -46,7 +46,7 @@ public class JobSimulator {
         IntStream.range(0, nOrigins).forEach(i -> {
             // Enqueue one fake origin
             ProfileRequest profileRequest = new ProfileRequest();
-            AnalystClusterRequest clusterRequest = new OneToManyProfileRequest(pointSetId, profileRequest, graphId);
+            AnalystClusterRequest clusterRequest = new AnalystClusterRequest(pointSetId, graphId, profileRequest);
             clusterRequest.id = Integer.toString(i);
             clusterRequest.jobId = jobId;
             clusterRequest.outputLocation = prefix + "_output";
