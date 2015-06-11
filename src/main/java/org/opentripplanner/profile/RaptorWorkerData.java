@@ -6,24 +6,37 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
+import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.analyst.scenario.TripPatternFilter;
+import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class RaptorWorkerData implements Serializable {
+    public static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerData.class);
 
     public final int nStops;
 
@@ -52,7 +65,7 @@ public class RaptorWorkerData implements Serializable {
     public final List<int[]> targetsForStop = new ArrayList<>();;
 
     /** Optional debug data: the name of each stop. */
-    public transient final TObjectIntMap<Stop> indexForStop;
+    public transient final TIntIntMap indexForStop;
     public transient final List<String> stopNames = new ArrayList<>();
     public transient final List<String> patternNames = new ArrayList<>();
 
@@ -68,22 +81,18 @@ public class RaptorWorkerData implements Serializable {
         timetablesForPattern = new ArrayList<RaptorWorkerTimetable>(totalPatterns);
         List<TripPattern> patternForIndex = Lists.newArrayList(totalPatterns);
         TObjectIntMap<TripPattern> indexForPattern = new TObjectIntHashMap<>(totalPatterns, 0.75f, -1);
-        indexForStop = new TObjectIntHashMap<>(totalStops, 0.75f, -1);
-        List<Stop> stopForIndex = new ArrayList<>(totalStops);
+        indexForStop = new TIntIntHashMap();
+        TIntList stopForIndex = new TIntArrayList(totalStops);
 
         /* Make timetables for active trip patterns and record the stops each active pattern uses. */
-
-        // we need to make our own local stops for pattern map because we may have new patterns that did not exist before
-        // or removed patterns
-        Multimap<Stop, TripPattern> patternsForStopObject = HashMultimap.create();
-
         for (TripPattern originalPattern : graph.index.patternForId.values()) {
             Collection<TripPattern> patterns = Arrays.asList(originalPattern);
 
             // apply filters. note that a filter can create multiple trip patterns from a single trip pattern
             // so we need to make sure we handle all of them
             if (scenario != null && scenario.modifications != null) {
-                for (TripPatternFilter filter : Iterables.filter(scenario.modifications, TripPatternFilter.class)) {
+                for (TripPatternFilter filter : Iterables
+                        .filter(scenario.modifications, TripPatternFilter.class)) {
                     Collection<TripPattern> modifiedPatterns = Lists.newArrayList();
 
                     for (TripPattern pattern : patterns) {
@@ -99,7 +108,8 @@ public class RaptorWorkerData implements Serializable {
             }
 
             for (TripPattern pattern : patterns) {
-                RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forPattern(graph, pattern, window, scenario);
+                RaptorWorkerTimetable timetable = RaptorWorkerTimetable
+                        .forPattern(graph, pattern, window, scenario);
                 if (timetable == null) {
                     // Pattern is not running during the time window
                     continue;
@@ -111,37 +121,60 @@ public class RaptorWorkerData implements Serializable {
                 patternNames.add(pattern.code);
                 TIntList stopIndexesForPattern = new TIntArrayList();
                 for (Stop stop : pattern.getStops()) {
-                    int stopIndex = indexForStop.get(stop);
+                    int vidx = graph.index.stopVertexForStop.get(stop).getIndex();
+                    int stopIndex = indexForStop.get(vidx);
                     if (stopIndex == -1) {
                         stopIndex = indexForStop.size();
-                        indexForStop.put(stop, stopIndex);
-                        stopForIndex.add(stop);
+                        indexForStop.put(vidx, stopIndex);
+                        stopForIndex.add(vidx);
                         stopNames.add(stop.getName());
                     }
                     stopIndexesForPattern.add(stopIndex);
-                    patternsForStopObject.put(stop, pattern);
                 }
                 stopsForPattern.add(stopIndexesForPattern.toArray());
             }
         }
-        /** Fill in used pattern indexes for each used stop. */
-        for (Stop stop : stopForIndex) {
-            TIntList patterns = new TIntArrayList();
-            // use our local patterns for stop maps, see comment above
-            for (TripPattern pattern : patternsForStopObject.get(stop)) {
-                int patternIndex = indexForPattern.get(pattern);
-                if (patternIndex != -1) {
-                    patterns.add(patternIndex);
-                }
+
+        // and do roughly the same thing for added patterns
+        if (scenario != null && scenario.modifications != null) {
+            for (AddTripPattern atp : Iterables.filter(scenario.modifications, AddTripPattern.class)) {
+                // note that added trip patterns are not affected by modifications
+                RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forAddedPattern(atp, window);
+                if (timetable == null)
+                    continue;
+
+                timetablesForPattern.add(timetable);
+
+                // TODO: patternForIndex, indexForPattern
+
+                patternNames.add(atp.name);
+                stopsForPattern.add(Arrays.asList(atp.temporaryStops).stream()
+                        .mapToInt(t -> t.index)
+                        .toArray());
             }
-            patternsForStop.add(patterns.toArray());
         }
+
+        // create the mapping from stops to patterns
+        TIntObjectMap<TIntList> patternsForStopList = new TIntObjectHashMap<>();
+        for (int pattern = 0; pattern < stopsForPattern.size(); pattern++) {
+            for (int stop : stopsForPattern.get(pattern)) {
+                if (!patternsForStopList.containsKey(stop))
+                    patternsForStopList.put(stop, new TIntArrayList());
+
+                patternsForStopList.get(stop).add(pattern);
+            }
+        }
+
+        for (int stop = 0; stop < stopForIndex.size(); stop++) {
+            patternsForStop.add(patternsForStopList.get(stop).toArray());
+        }
+
         /** Record transfers between all used stops. */
-        for (Stop stop : stopForIndex) {
+        for (int stop : stopForIndex) {
             TIntList transfers = new TIntArrayList();
             TransitStop tstop = graph.index.stopVertexForStop.get(stop);
             for (SimpleTransfer simpleTransfer : Iterables.filter(tstop.getOutgoing(), SimpleTransfer.class)) {
-                int targetStopIndex = indexForStop.get(((TransitStop) simpleTransfer.getToVertex()).getStop());
+                int targetStopIndex = indexForStop.get(simpleTransfer.getToVertex().getIndex());
                 if (targetStopIndex != -1) {
                     transfers.add(targetStopIndex);
                     transfers.add((int)(simpleTransfer.getDistance()));
@@ -245,6 +278,64 @@ public class RaptorWorkerData implements Serializable {
 
         nStops = stopForIndex.size();
         nPatterns = patternForIndex.size();
+    }
+
+    /** find stops near a given location */
+    public static TIntIntMap findStopsNear (RoutingRequest rr, Collection<AddTripPattern.TemporaryStop> additionalStops) {
+        AStar astar = new AStar();
+        rr.longDistance = true;
+        rr.setNumItineraries(1);
+
+        Graph graph = rr.rctx.graph;
+
+        ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
+
+        TIntIntMap accessTimes = new TIntIntHashMap();
+
+        for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
+            State s = spt.getState(tstop);
+            if (s != null) {
+                // note that we calculate the time based on the walk speed here rather than
+                // based on the time. this matches what we do in the stop tree cache.
+                // TODO hardwired walk speed
+                accessTimes.put(tstop.getIndex(), (int) (s.getWalkDistance() / 1.3f));
+            }
+        }
+
+        // and handle the additional stops
+        for (AddTripPattern.TemporaryStop tstop: additionalStops) {
+            if (tstop.sample == null) {
+                LOG.warn("Temporary stop unlinked: {}", tstop);
+                continue;
+            }
+
+            double dist = Double.POSITIVE_INFINITY;
+
+            if (tstop.sample.v0 != null) {
+                State s0 = spt.getState(tstop.sample.v0);
+
+                if (s0 != null) {
+                    dist = s0.getWalkDistance() + tstop.sample.d0;
+                }
+            }
+
+            if (tstop.sample.v1 != null) {
+                State s1 = spt.getState(tstop.sample.v1);
+
+                if (s1 != null) {
+                    dist = Math.min(s1.getWalkDistance() + tstop.sample.d1, dist);
+                }
+            }
+
+            if (Double.isInfinite(dist))
+                continue;
+
+            // TODO hardwired walk speed
+            accessTimes.put(tstop.index, (int) (dist / 1.3f));
+        }
+
+        rr.cleanup();
+        return accessTimes;
     }
 
     /** half a sample: the index in the sample set, and the distance to one of the vertices */

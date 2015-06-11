@@ -1,16 +1,19 @@
 package org.opentripplanner.profile;
 
+import java.time.DayOfWeek;
 import java.util.BitSet;
 
 class TimeWindow {
     int from;
     int to;
     BitSet servicesRunning;
+    DayOfWeek dayOfWeek;
     
-    public TimeWindow(int from, int to, BitSet servicesRunning) {
+    public TimeWindow(int from, int to, BitSet servicesRunning, DayOfWeek dayOfWeek) {
 		this.from = from;
 		this.to = to;
 		this.servicesRunning = servicesRunning;
+        this.dayOfWeek = dayOfWeek;
 	}
     
 	boolean includes (int t) {

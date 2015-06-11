@@ -1,5 +1,8 @@
 package org.opentripplanner.profile;
 
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Iterables;
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -8,9 +11,9 @@ import org.joda.time.DateTimeZone;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
+import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -24,9 +27,10 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.DayOfWeek;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Perform one-to-many profile routing using repeated RAPTOR searches. In this context, profile routing means finding
@@ -101,15 +105,29 @@ public class RepeatedRaptorProfileRouter {
     public void route () {
         long computationStartTime = System.currentTimeMillis();
         LOG.info("Begin profile request");
+
+        // assign indices for added transit stops
+        int i = Vertex.getMaxIndex() + 1;
+        if (request.scenario != null && request.scenario.modifications != null) {
+            for (AddTripPattern atp : Iterables
+                    .filter(request.scenario.modifications, AddTripPattern.class)) {
+                atp.materialize(graph);
+            }
+        }
+
         LOG.info("Finding initial stops");
 
-        TObjectIntMap<TransitStop> accessTimes = findInitialStops(false);
+        TIntIntMap accessTimes = findInitialStops(false);
 
         LOG.info("Found {} initial transit stops", accessTimes.size());
 
         /** THIN WORKERS */
         LOG.info("Make data...");
-        TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date));
+
+        // convert from joda to java - ISO day of week with monday == 1
+        DayOfWeek dayOfWeek = DayOfWeek.of(request.date.getDayOfWeek());
+
+        TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date), dayOfWeek);
 
         RaptorWorkerData raptorWorkerData;
         if (sampleSet == null)
@@ -168,8 +186,7 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
 
-    /** find the boarding stops */
-    private TObjectIntMap<TransitStop> findInitialStops(boolean dest) {
+    private TIntIntMap findInitialStops (boolean dest) {
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
         QualifiedModeSet modes = dest ? request.egressModes : request.accessModes;
@@ -199,27 +216,22 @@ public class RepeatedRaptorProfileRouter {
             rr.dominanceFunction = new DominanceFunction.LeastWalk();
         }
 
-        AStar astar = new AStar();
-        rr.longDistance = true;
-        rr.setNumItineraries(1);
+        // make a list of the stops
+        Collection<AddTripPattern.TemporaryStop> stops;
+        if (request.scenario != null && request.scenario.modifications != null) {
+            stops = Lists.newArrayList();
 
-        ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
-
-        TObjectIntMap<TransitStop> accessTimes = new TObjectIntHashMap<TransitStop>(); 
-
-        for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
-            State s = spt.getState(tstop);
-            if (s != null) {
-                // note that we calculate the time based on the walk speed here rather than
-                // based on the time. this matches what we do in the stop tree cache.
-                accessTimes.put(tstop, (int) (s.getWalkDistance() / request.walkSpeed));
+            for (AddTripPattern atp : Iterables.filter(request.scenario.modifications, AddTripPattern.class)) {
+                for (AddTripPattern.TemporaryStop tstop : atp.temporaryStops) {
+                    stops.add(tstop);
+                }
             }
         }
+        else {
+            stops = Collections.emptyList();
+        }
 
-        this.walkOnlySpt = spt;
-
-        rr.cleanup();
-        return accessTimes;
+        return RaptorWorkerData.findStopsNear(rr, stops);
     }
 
     /**

@@ -2,12 +2,9 @@ package org.opentripplanner.profile;
 
 import com.google.protobuf.CodedOutputStream;
 import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,16 +69,16 @@ public class RaptorWorker {
         //Arrays.fill(bestTimes, UNREACHED);
     }
 
-    public PropagatedTimesStore runRaptor (Graph graph, TObjectIntMap<TransitStop> accessTimes, int[] walkTimes) {
+    public PropagatedTimesStore runRaptor (Graph graph, TIntIntMap accessTimes, int[] walkTimes) {
         long beginCalcTime = System.currentTimeMillis();
         long totalPropagationTime = 0;
         TIntIntMap initialStops = new TIntIntHashMap();
-        TObjectIntIterator<TransitStop> initialIterator = accessTimes.iterator();
+        TIntIntIterator initialIterator = accessTimes.iterator();
         while (initialIterator.hasNext()) {
             initialIterator.advance();
-            TransitStop tstop = initialIterator.key();
+            int tstop = initialIterator.key();
             int accessTime = initialIterator.value();
-            int stopIndex = data.indexForStop.get(tstop.getStop());
+            int stopIndex = data.indexForStop.get(tstop);
             if (stopIndex == -1) {
                 continue; // stop not used;
             }

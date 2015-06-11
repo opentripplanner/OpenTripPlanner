@@ -2,6 +2,7 @@ package org.opentripplanner.profile;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.analyst.scenario.TripFilter;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -12,10 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A RaptorWorkerTimetable is used by a RaptorWorker to perform large numbers of RAPTOR searches very quickly
@@ -140,6 +139,7 @@ public class RaptorWorkerTimetable implements Serializable {
                     tt.getDepartureTime(tt.getNumStops() - 1) >= window.from) {
 
                 // apply scenario
+                // TODO: need to do this before filtering based on window!
                 if (scenario != null && scenario.modifications != null) {
                     for (TripFilter filter : Iterables.filter(scenario.modifications, TripFilter.class)) {
                         tt = filter.apply(tt.trip, pattern, tt);
@@ -237,6 +237,71 @@ public class RaptorWorkerTimetable implements Serializable {
         }
 
         return rwtt;
+    }
+
+    /** Create a raptor worker timetable for an added pattern */
+    public static RaptorWorkerTimetable forAddedPattern(AddTripPattern atp, TimeWindow window) {
+        if (atp.temporaryStops.length < 2 || atp.timetables.isEmpty())
+            return null;
+
+        // filter down the timetable to only those running
+        Collection<AddTripPattern.PatternTimetable> running = atp.timetables.stream()
+                // getValue yields one-based ISO days of week (monday = 1); convert to 0-based format
+                .filter(t -> t.days.get(window.dayOfWeek.getValue() - 1))
+                .collect(Collectors.toList());
+
+        if (running.isEmpty())
+            return null;
+
+        // TODO: filter with timewindow
+        Collection<AddTripPattern.PatternTimetable> frequencies = running.stream()
+                .filter(t -> t.frequency)
+                .collect(Collectors.toList());
+
+        Collection<AddTripPattern.PatternTimetable> timetables = running.stream()
+                .filter(t -> !t.frequency)
+                .sorted((t1, t2) -> t1.startTime - t2.startTime)
+                .collect(Collectors.toList());
+
+        RaptorWorkerTimetable rwtt = new RaptorWorkerTimetable(timetables.size(), atp.temporaryStops.length * 2);
+
+        // create timetabled trips
+        int t = 0;
+        for (AddTripPattern.PatternTimetable pt : timetables) {
+            rwtt.timesPerTrip[t++] = timesForPatternTimetable(atp, pt);
+        }
+
+        // create frequency trips
+        rwtt.frequencyTrips = new int[frequencies.size()][atp.temporaryStops.length * 2];
+        rwtt.endTimes = new int[frequencies.size()];
+        rwtt.startTimes = new int[frequencies.size()];
+        rwtt.headwaySecs = new int[frequencies.size()];
+
+        t = 0;
+        for (AddTripPattern.PatternTimetable pt : frequencies) {
+            rwtt.frequencyTrips[t] = timesForPatternTimetable(atp, pt);
+            rwtt.startTimes[t] = pt.startTime;
+            rwtt.endTimes[t] = pt.endTime;
+            rwtt.headwaySecs[t++] = pt.headwaySecs;
+        }
+
+        return rwtt;
+    }
+
+    private static int[] timesForPatternTimetable (AddTripPattern atp, AddTripPattern.PatternTimetable pt) {
+        int[] times = new int[atp.temporaryStops.length * 2];
+        for (int s = 0; s < atp.temporaryStops.length; s++) {
+            // for a timetable route,
+            // arrival time is start time if it's the first stop, or the previous departure time plus the hop time
+            // For a frequency route the first departure is always 0
+            if (s == 0)
+                times[s * 2] = pt.frequency ? 0 : pt.startTime;
+            else
+                times[s * 2] = times[s * 2 - 1] + pt.hopTimes[s - 1];
+
+            times[s * 2 + 1] = times[s * 2] + pt.dwellTimes[s];
+        }
+        return times;
     }
 
 }
