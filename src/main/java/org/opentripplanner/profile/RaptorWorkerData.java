@@ -54,20 +54,20 @@ public class RaptorWorkerData implements Serializable {
     /** The number of targets (vertices or samples) */
     public final int nTargets;
 
-    /** For every stop, one pair of ints (targetStopIndex, distanceMeters) for each transfer out of that stop. */
+    /** For every stop, one pair of ints (targetStopIndex, distanceMeters) for each transfer out of that stop. This uses 0-based stop indices that are specific to RaptorData */
     public final List<int[]> transfersForStop = new ArrayList<>();
 
-    /** A list of pattern indexes passing through each stop. */
+    /** A list of pattern indexes passing through each stop, again using Raptor indices. */
     public final List<int[]> patternsForStop = new ArrayList<>();
 
-    /** An ordered list of stops visited by each pattern. */
+    /** An ordered list of stops indices (in the Raptor data) visited by each pattern. */
     public final List<int[]> stopsForPattern = new ArrayList<>();
 
     /** For each pattern, a 2D array of stoptimes for each trip on the pattern. */
     public List<RaptorWorkerTimetable> timetablesForPattern = new ArrayList<>();
     
     /**
-     * Map from stops that do not exist in the graph but only for the duration of this search to their stop indices.
+     * Map from stops that do not exist in the graph but only for the duration of this search to their stop indices in the RAPTOR data.
      */
     public TObjectIntMap<AddTripPattern.TemporaryStop> addedStops = new TObjectIntHashMap<AddTripPattern.TemporaryStop>();
 
@@ -78,12 +78,13 @@ public class RaptorWorkerData implements Serializable {
      */
     public final List<int[]> targetsForStop = new ArrayList<>();
 
-    /** Optional debug data: the name of each stop. */
+    /** The 0-based RAPTOR indices of each stop from their vertex IDs */
     public transient final TIntIntMap indexForStop;
+     /** Optional debug data: the name of each stop. */
     public transient final List<String> stopNames = new ArrayList<>();
     public transient final List<String> patternNames = new ArrayList<>();
 
-    /** Create RaptorWorkerData for the given window and graph, with the specified routes (specified as agencyid_routeid) banned */
+    /** Create RaptorWorkerData for the given window and graph */
     public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario) {
         this(graph, window, scenario, null);
     }
@@ -179,9 +180,11 @@ public class RaptorWorkerData implements Serializable {
         }
 
         // for each of the added stops, compute transfers and a stop tree cache
+        // Indexed by vertex ID, not RAPTOR index
         TIntObjectMap<int[]> temporaryStopTreeCache = new TIntObjectHashMap<>();;
 
         // Holds transfer both from _and_ to temporary stops
+        // Indexed by and contains vertex ID, not RAPTOR index
         TIntObjectMap<TIntIntMap> temporaryTransfers = new TIntObjectHashMap<>();
 
         AStar astar = new AStar();
@@ -230,7 +233,6 @@ public class RaptorWorkerData implements Serializable {
 
             for (TIntIntIterator trIt = transfersFromStop.iterator(); trIt.hasNext();) {
                 trIt.advance();
-
                 transfersFromStopWithGraphIndices.put(stopForIndex.get(trIt.key()), trIt.value());
             }
 
@@ -239,6 +241,7 @@ public class RaptorWorkerData implements Serializable {
             rr.cleanup();
 
             // now compute transfers to the stop by doing a batch arrive-by search
+            // necessary to hand-clear routing context so that it is not cached
             rr.rctx = null;
             rr.setArriveBy(true);
 
@@ -340,6 +343,8 @@ public class RaptorWorkerData implements Serializable {
                     // temporary stop
                     targetsForStop.add(temporaryStopTreeCache.get(stop));
             }
+
+            // TODO memory leak when many graphs have been built
             nTargets = Vertex.getMaxIndex();
         }
 
