@@ -14,6 +14,7 @@ import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -107,19 +108,15 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("Begin profile request");
 
         // assign indices for added transit stops
-        int i = Vertex.getMaxIndex() + 1;
+        // note that they only need be unique in the context of this search.
+        // note also that there may be, before this search is over, vertices with higher indices (temp vertices)
+        // but they will not be transit stops.
         if (request.scenario != null && request.scenario.modifications != null) {
             for (AddTripPattern atp : Iterables
                     .filter(request.scenario.modifications, AddTripPattern.class)) {
                 atp.materialize(graph);
             }
         }
-
-        LOG.info("Finding initial stops");
-
-        TIntIntMap accessTimes = findInitialStops(false);
-
-        LOG.info("Found {} initial transit stops", accessTimes.size());
 
         /** THIN WORKERS */
         LOG.info("Make data...");
@@ -145,6 +142,12 @@ public class RepeatedRaptorProfileRouter {
         //        } catch(IOException i) {
         //            i.printStackTrace();
         //        }
+        
+        LOG.info("Finding initial stops");
+
+        TIntIntMap accessTimes = findInitialStops(false, raptorWorkerData);
+
+        LOG.info("Found {} initial transit stops", accessTimes.size());
 
         int[] timesAtVertices = new int[Vertex.getMaxIndex()];
         Arrays.fill(timesAtVertices, Integer.MAX_VALUE);
@@ -186,7 +189,7 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
 
-    private TIntIntMap findInitialStops (boolean dest) {
+    private TIntIntMap findInitialStops (boolean dest, RaptorWorkerData data) {
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
         QualifiedModeSet modes = dest ? request.egressModes : request.accessModes;
@@ -216,6 +219,9 @@ public class RepeatedRaptorProfileRouter {
             rr.dominanceFunction = new DominanceFunction.LeastWalk();
         }
 
+        rr.numItineraries = 1;
+        rr.longDistance = true;
+
         // make a list of the stops
         Collection<AddTripPattern.TemporaryStop> stops;
         if (request.scenario != null && request.scenario.modifications != null) {
@@ -231,7 +237,10 @@ public class RepeatedRaptorProfileRouter {
             stops = Collections.emptyList();
         }
 
-        return RaptorWorkerData.findStopsNear(rr, stops);
+        AStar aStar = new AStar();
+        walkOnlySpt = aStar.getShortestPathTree(rr, 5);
+
+        return data.findStopsNear(walkOnlySpt, graph);
     }
 
     /**

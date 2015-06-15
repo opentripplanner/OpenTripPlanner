@@ -8,7 +8,11 @@ class TimeWindow {
     int to;
     BitSet servicesRunning;
     DayOfWeek dayOfWeek;
-    
+
+    public TimeWindow(int from, int to, BitSet servicesRunning) {
+        this(from, to, servicesRunning, null);
+    }
+
     public TimeWindow(int from, int to, BitSet servicesRunning, DayOfWeek dayOfWeek) {
 		this.from = from;
 		this.to = to;

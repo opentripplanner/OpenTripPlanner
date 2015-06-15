@@ -76,12 +76,8 @@ public class RaptorWorker {
         TIntIntIterator initialIterator = accessTimes.iterator();
         while (initialIterator.hasNext()) {
             initialIterator.advance();
-            int tstop = initialIterator.key();
+            int stopIndex = initialIterator.key();
             int accessTime = initialIterator.value();
-            int stopIndex = data.indexForStop.get(tstop);
-            if (stopIndex == -1) {
-                continue; // stop not used;
-            }
             initialStops.put(stopIndex, accessTime);
         }
 
@@ -115,7 +111,8 @@ public class RaptorWorker {
 
             // We include the walk-only times to access transit in the results so that there are not increases in time
             // to reach blocks around the origin due to being forced to ride transit.
-            System.arraycopy(walkTimes, 0, timesAtTargets, 0, walkTimes.length);
+            // Use timesAtTargets.length not walkTimes.length due to temp vertices
+            System.arraycopy(walkTimes, 0, timesAtTargets, 0, timesAtTargets.length);
 
             for (int s = 0; s < data.nStops; s++) {
                 // it's safe to use the best time at this stop for any number of transfers, even in range-raptor,
