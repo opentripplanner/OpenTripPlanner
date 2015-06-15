@@ -2,7 +2,6 @@ package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Iterables;
-
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TObjectIntIterator;
@@ -14,8 +13,6 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import org.geotools.graph.build.GraphGenerator;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
@@ -288,7 +285,6 @@ public class RaptorWorkerData implements Serializable {
             }
 
             // check for any transfers to/from added stops
-            // TODO how can this be empty
             if (temporaryTransfers.containsKey(stop)) {
                 for (TIntIntIterator tranIt = temporaryTransfers.get(stop).iterator(); tranIt.hasNext();) {
                     tranIt.advance();

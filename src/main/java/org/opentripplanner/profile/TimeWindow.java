@@ -3,7 +3,7 @@ package org.opentripplanner.profile;
 import java.time.DayOfWeek;
 import java.util.BitSet;
 
-class TimeWindow {
+public class TimeWindow {
     int from;
     int to;
     BitSet servicesRunning;
