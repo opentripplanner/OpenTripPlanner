@@ -3,21 +3,26 @@ package org.opentripplanner.analyst.scenario;
 import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.io.WKTReader;
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TIntIntMap;
 import junit.framework.TestCase;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.profile.ProfileRequest;
 import org.opentripplanner.profile.RaptorWorkerData;
+import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.profile.TimeWindow;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import java.time.DayOfWeek;
+import java.util.Arrays;
 import java.util.BitSet;
 
 import static org.opentripplanner.graph_builder.module.FakeGraph.*;
@@ -217,6 +222,55 @@ public class AddTripPatternTest extends TestCase {
         }
 
         assertTrue(foundTx);
+    }
+
+    /** Test the full routing */
+    @Test
+    public void integrationTest () throws Exception {
+        Graph g = buildGraphNoTransit();
+        addTransit(g);
+        link(g);
+
+        ProfileRequest pr1 = new ProfileRequest();
+        pr1.date = new LocalDate(2015, 6, 10);
+        pr1.fromTime = 7 * 3600;
+        pr1.toTime = 9 * 3600;
+        pr1.fromLat = pr1.toLat = 39.9621;
+        pr1.fromLon = pr1.toLon = -83.0007;
+
+        RepeatedRaptorProfileRouter rrpr1 = new RepeatedRaptorProfileRouter(g, pr1);
+        rrpr1.route();
+
+        ProfileRequest pr2 = new ProfileRequest();
+        pr2.date = new LocalDate(2015, 6, 10);
+        pr2.fromTime = 7 * 3600;
+        pr2.toTime = 9 * 3600;
+        pr2.fromLat = pr2.toLat = 39.9621;
+        pr2.fromLon = pr2.toLon = -83.0007;
+
+        AddTripPattern atp = getAddTripPattern(RouteSelector.BROAD_HIGH);
+        atp.timetables.add(getTimetable(true));
+
+        pr2.scenario = new Scenario(0);
+        pr2.scenario.modifications = Arrays.asList(atp);
+
+        RepeatedRaptorProfileRouter rrpr2 = new RepeatedRaptorProfileRouter(g, pr2);
+        rrpr2.route();
+
+        boolean foundDecrease = false;
+
+        // make sure that travel time did not increase
+        for (TObjectIntIterator<Vertex> vit = rrpr1.timeSurfaceRangeSet.min.times.iterator(); vit.hasNext();) {
+            vit.advance();
+
+            int time2 = rrpr2.timeSurfaceRangeSet.min.getTime(vit.key());
+
+            assertTrue(time2 <= vit.value());
+
+            if (time2 < vit.value()) foundDecrease = true;
+        }
+
+        assertTrue("found decreases in travel time due to adding route", foundDecrease);
     }
 
     private AddTripPattern getAddTripPattern (RouteSelector sel) throws Exception {
