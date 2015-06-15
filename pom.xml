@@ -232,8 +232,10 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                            <!-- The shaded JAR will be the main artifact for the project -->
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <!-- The shaded JAR will not be the main artifact for the project, it will be attached
+                              for deployment in the way source and docs are. -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
                             <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
                               We have eliminated most Jersey auto-scanning, but there is still some need for include
                               filters to force-include classes that are dynamically loaded by name/auto-scanned. -->

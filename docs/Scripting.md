@@ -14,20 +14,20 @@ There are currently 3 different modes for using scripting:
 
 - Launching OTP with the `--script` command-line parameter, providing the script filename as an option.
 - Starting an OTP server with the `--enableScriptingWebService` command-line parameter, and posting a script to execute to the `/ws/scripting/run` API end-point.
-- Launching a Jython script with `otp.jar` in the classpath and creating the scripting entry-point bean in the script itself.
+- Launching a Jython script with `otp-x.y.z-shaded.jar` in the classpath and creating the scripting entry-point bean in the script itself.
 
 ### Launching a script from OTP
 
 The main advantage of this method is its simplicity. The drawback is that you need to start OTP everytime you run a script, which can be slow to startup for large graphs. The second drawback is that you can't import custom packages from within the script, you are limited to the "plain basic" Jython.
 
-__Note__: The Jython (or Groovy) JAR are *not* included in the OTP.jar. You thus have to add one of them (depending on your script) to the java classpath (see command below). Jython jar can be [downloaded here](http://www.jython.org/downloads.html). Make sure you select the "standalone" version of jython, otherwise some classes will be missing.
+__Note__: The Jython (or Groovy) JAR are *not* included in the OTP shaded JAR. You thus have to add one of them (depending on your script) to the java classpath (see command below). Jython jar can be [downloaded here](http://www.jython.org/downloads.html). Make sure you select the "standalone" version of jython, otherwise some classes will be missing.
 
 __Note__: Due a guava bug, there is an incompatibility between Jython 2.3 / 2.5 and OTP. To solve it, make sure otp.jar is added *before* jython-standalone.jar in the classpath. This bug should be solved in jython starting 2.7.
 
 Start OTP specifying the classpath and adding the `--script` option:
 
 ```Bash
-$ java -cp otp.jar:jython-standalone.jar org.opentripplanner.standalone.OTPMain --graphs . --script myscript.py
+$ java -cp otp-x.y.z-shaded.jar:jython-standalone.jar org.opentripplanner.standalone.OTPMain --graphs . --script myscript.py
 ```
 
 This will start OTP with a default graph in the current directory and execute the script `myscript.py`.
@@ -40,7 +40,7 @@ The main advantage of this method is that you do not need to start a new OTP ser
 
 Start an OTP server as usual, adding the `--enableScriptingWebService` option:
 ``` Bash
-$ java -cp otp.jar:jython-standalone.jar org.opentripplanner.standalone.OTPMain --graphs . --server --enableScriptingWebService
+$ java -cp otp-x.y.z-shaded.jar:jython-standalone.jar org.opentripplanner.standalone.OTPMain --graphs . --server --enableScriptingWebService
 ```
 The API end-point `/ws/scripting/run` now accepts script content to be run, posted as multi-part form data.
 
@@ -76,7 +76,7 @@ otp = OtpsEntryPoint.fromArgs([ "--graphs", "." ])
 ```
 
 ```Bash
-$ java -cp otp.jar:jython-standalone.jar org.python.util.jython myscript.py
+$ java -cp otp-x.y.z-shaded.jar:jython-standalone.jar org.python.util.jython myscript.py
 ```
 
 Note that contrary to java custom the jython "main" class is all lowercase, this is not a typo.

@@ -130,6 +130,7 @@ otp.modules.fieldtrip.FieldTripModule =
                     for(var gt =0 ; gt < grpItin.trips.length; gt++) {
                         var gtfsTrip = grpItin.trips[gt];
                         // (gtfsTrip already includes fields agencyAndId, fromStopIndex, and toStopIndex)
+                        gtfsTrip.agencyAndId = convertAgencyAndId(gtfsTrip.agencyAndId);
                         gtfsTrip.passengers = grpItin.passengers; 
                         this.tripsInUse.push(gtfsTrip);
                     }
@@ -151,7 +152,7 @@ otp.modules.fieldtrip.FieldTripModule =
         _.each(tripPlan.itineraries, function(itin) {
             _.each(itin.legs, function(leg) {
                 if(leg.agencyId && leg.tripId) {
-                    var agencyAndId = leg.agencyId + '_' + leg.tripId;
+                    var agencyAndId = leg.agencyId + ':' + leg.tripId;
                     if(!(agencyAndId in this.tripHashLookup)) {
                         hashQueryLegs.push(leg);
                     }
@@ -166,10 +167,10 @@ otp.modules.fieldtrip.FieldTripModule =
             var queriesFinished = 0;
             for(var i =0; i < hashQueryLegs.length; i++) {
                 var leg = hashQueryLegs[i];
-                var agencyAndId = leg.agencyId + '_' + leg.tripId;
+                var agencyAndId = leg.agencyId + ':' + leg.tripId;
 
-                this.webapp.transitIndex.getTripHash(agencyAndId, this, _.bind(function(data) {
-                    this.ftmodule.tripHashLookup[this.agencyAndId] = data.hash;
+                this.webapp.indexApi.getTripHash(leg.agencyId, leg.tripId, this, _.bind(function(data) {
+                    this.ftmodule.tripHashLookup[this.agencyAndId] = data;
                     queriesFinished++;
                     if(queriesFinished == hashQueryLegs.length) {
                         callback.call(this);
@@ -206,7 +207,7 @@ otp.modules.fieldtrip.FieldTripModule =
         for(var i = 0; i < transitLegs.length; i++) {
             var leg = transitLegs[i];
             this.bannedSegments.push({
-                agencyAndId : leg.agencyId + "_" + leg.tripId,
+                agencyAndId : leg.agencyId + ':' + leg.tripId,
                 fromStopIndex : leg.from.stopIndex,
                 toStopIndex : leg.to.stopIndex,
             });
@@ -294,7 +295,7 @@ otp.modules.fieldtrip.FieldTripModule =
             for(var l = 0; l < legs.length; l++) {
                 var leg = legs[l];
                 var routeName = (leg.routeShortName !== null ? ('(' + leg.routeShortName + ') ') : '') + (leg.routeLongName || "");
-                var agencyAndId = leg.agencyId + "_" + leg.tripId;
+                var agencyAndId = leg.agencyId + ':' + leg.tripId;
                 var tripHash = this.tripHashLookup[agencyAndId];
 
                 data['gtfsTrips['+i+']['+l+'].depart'] = moment(leg.startTime).format("HH:mm:ss");
@@ -350,7 +351,7 @@ otp.modules.fieldtrip.FieldTripModule =
 
         return true;
     },
-        
+
 
     renderTrip : function(tripData) {
         var queryParams = JSON.parse(tripData.queryParams);
@@ -668,3 +669,6 @@ otp.util.FieldTrip = {
     }
 };
 
+function convertAgencyAndId(agencyAndId) {
+    return agencyAndId.replace('_', ':');
+}
