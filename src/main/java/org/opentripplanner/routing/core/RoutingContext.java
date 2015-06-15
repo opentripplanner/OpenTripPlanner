@@ -21,7 +21,6 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -41,17 +40,11 @@ import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import org.opentripplanner.util.NonLocalizedString;
+import java.util.*;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -237,11 +230,11 @@ public class RoutingContext implements Cloneable {
                 // TODO offset time by distance to nearest OSM node?
                 if (opt.arriveBy) {
                     // TODO what if there is no coordinate but instead a named place?
-                    toVertex = graph.streetIndex.getSampleVertexAt(opt.to.getCoordinate());
+                    toVertex = graph.streetIndex.getSampleVertexAt(opt.to.getCoordinate(), true);
                     fromVertex = null;
                 }
                 else {
-                    fromVertex = graph.streetIndex.getSampleVertexAt(opt.from.getCoordinate());
+                    fromVertex = graph.streetIndex.getSampleVertexAt(opt.from.getCoordinate(), false);
                     toVertex = null;
                 }
             }

@@ -44,6 +44,9 @@ import java.util.List;
 public class RaptorWorkerData implements Serializable {
     public static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerData.class);
 
+    /** we use empty int arrays for various things, e.g. transfers from isolated stops. They're immutable so only use one */
+    public static final int[] EMPTY_INT_ARRAY = new int[0];
+
     public final int nStops;
 
     public final int nPatterns;
@@ -93,7 +96,7 @@ public class RaptorWorkerData implements Serializable {
         List<TripPattern> patternForIndex = Lists.newArrayList(totalPatterns);
         TObjectIntMap<TripPattern> indexForPattern = new TObjectIntHashMap<>(totalPatterns, 0.75f, -1);
         indexForStop = new TIntIntHashMap(totalStops, 0.75f, Integer.MIN_VALUE, -1);
-        TIntList stopForIndex = new TIntArrayList(totalStops);
+        TIntList stopForIndex = new TIntArrayList(totalStops, Integer.MIN_VALUE);
 
         /* Make timetables for active trip patterns and record the stops each active pattern uses. */
         for (TripPattern originalPattern : graph.index.patternForId.values()) {
@@ -186,9 +189,7 @@ public class RaptorWorkerData implements Serializable {
             // forward search: stop tree cache and transfers out
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = true;
-            rr.from = new GenericLocation(t.lat, t.lon);
-            //rr.walkSpeed = request.walkSpeed;
-            rr.to = rr.from;
+            rr.from = rr.to = new GenericLocation(t.lat, t.lon);
             rr.setRoutingContext(graph);
             rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
 
@@ -223,10 +224,27 @@ public class RaptorWorkerData implements Serializable {
             temporaryStopTreeCache.put(t.index, distances);
 
             TIntIntMap transfersFromStop = findStopsNear(spt, graph);
-            temporaryTransfers.put(t.index, transfersFromStop);
+
+            // convert it to use indices in the graph not in the worker data
+            TIntIntMap transfersFromStopWithGraphIndices = new TIntIntHashMap();
+
+            for (TIntIntIterator trIt = transfersFromStop.iterator(); trIt.hasNext();) {
+                trIt.advance();
+
+                transfersFromStopWithGraphIndices.put(stopForIndex.get(trIt.key()), trIt.value());
+            }
+
+            temporaryTransfers.put(t.index, transfersFromStopWithGraphIndices);
+
+            rr.cleanup();
 
             // now compute transfers to the stop by doing a batch arrive-by search
-            rr.arriveBy = true;
+            rr.rctx = null;
+            rr.setArriveBy(true);
+
+            // reset routing context because temporary edges face the wrong way
+            rr.setRoutingContext(graph);
+            rr.rctx.pathParsers = new PathParser[] { new InitialStopSearchPathParser() };
             spt = astar.getShortestPathTree(rr, 5);
 
             TIntIntMap transfersToStop = findStopsNear(spt, graph);
@@ -235,19 +253,23 @@ public class RaptorWorkerData implements Serializable {
             for (TIntIntIterator it = transfersToStop.iterator(); it.hasNext(); ) {
                 it.advance();
 
-                // for absolute determinism we want to ensure that transfers between two added stops is always computed
-                // in the forward direction. Otherwise it would be computed twice, once forwards
+                // index of vertex in graph
+                int graphIndex = stopForIndex.get(it.key());
+
+                // for absolute determinism we want to ensure that transfers between two added stops are always computed
+                // in the forward direction. Otherwise they would be computed twice, once forwards
                 // and once reverse, and which one was saved would depend on iteration order.
                 // OTP should be symmetrical but let's not write code that depends on that property
-                Vertex tstop = graph.getVertexById(it.key());
+                Vertex tstop = graph.getVertexById(graphIndex);
                 if (tstop == null || !TransitStop.class.isInstance(tstop))
                     // this is not a permanent stop - there is no transit stop vertex associated with it
                     continue;
 
-                if (!temporaryTransfers.containsKey(it.key()))
-                    temporaryTransfers.put(it.key(), new TIntIntHashMap());
+                if (!temporaryTransfers.containsKey(graphIndex))
+                    temporaryTransfers.put(graphIndex, new TIntIntHashMap());
 
-                temporaryTransfers.get(it.key()).put(t.index, it.value());
+                // temporary transfers are stored by index in the graph not the worker data
+                temporaryTransfers.get(graphIndex).put(t.index, it.value());
             }
         }
 
@@ -289,13 +311,16 @@ public class RaptorWorkerData implements Serializable {
                 for (TIntIntIterator tranIt = temporaryTransfers.get(stop).iterator(); tranIt.hasNext();) {
                     tranIt.advance();
                     // stop index
-                    transfers.add(tranIt.key());
+                    transfers.add(indexForStop.get(tranIt.key()));
                     // distance
                     transfers.add(tranIt.value());
                 }
             }
 
-            transfersForStop.add(transfers.toArray());
+            if (!transfers.isEmpty())
+                transfersForStop.add(transfers.toArray());
+            else
+                transfersForStop.add(EMPTY_INT_ARRAY);
         }
 
         StopTreeCache stc = graph.index.getStopTreeCache();
@@ -461,7 +486,7 @@ public class RaptorWorkerData implements Serializable {
                 continue;
 
             // TODO hardwired walk speed
-            // NB using the index in the work   er data not the index in the graph!
+            // NB using the index in the worker data not the index in the graph!
             accessTimes.put(it.value(), (int) (dist / 1.3f));
         }
 
