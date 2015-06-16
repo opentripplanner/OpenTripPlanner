@@ -371,7 +371,7 @@
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.9.39</version>
         </dependency>
-`
+
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
