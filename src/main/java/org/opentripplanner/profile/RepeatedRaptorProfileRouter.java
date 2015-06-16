@@ -245,12 +245,8 @@ public class RepeatedRaptorProfileRouter {
 
     /**
      * Make a result set range set, optionally including times
-     * (which only has an effect if there is a pointset/sampleset associated with this router)
      */
-    public ResultSet.RangeSet makeResults (boolean includeTimes) {
-        if (sampleSet != null)
-            return propagatedTimesStore.makeResults(sampleSet, includeTimes);
-        else
-            return propagatedTimesStore.makeIsochrones(this.timeSurfaceRangeSet);
+    public ResultSet.RangeSet makeResults (boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
+        return propagatedTimesStore.makeResults(sampleSet, includeTimes, includeHistograms, includeIsochrones);
     }
 }

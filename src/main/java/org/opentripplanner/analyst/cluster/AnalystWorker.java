@@ -212,7 +212,7 @@ public class AnalystWorker implements Runnable {
                 // Passing a null SampleSet parameter will properly return only isochrones in the RangeSet
                 RepeatedRaptorProfileRouter router = new RepeatedRaptorProfileRouter(graph, profileRequest, sampleSet);
                 router.route();
-                ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes);
+                ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, true, false);
                 // put in constructor?
                 envelope.bestCase  = results.min;
                 envelope.avgCase   = results.avg;

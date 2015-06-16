@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import gnu.trove.map.TObjectIntMap;
@@ -24,6 +25,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.pointset.PropertyMetadata;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
@@ -810,6 +812,35 @@ public class PointSet implements Serializable {
                 }
             }
         }
+    }
+
+    public static PointSet regularGrid (Envelope envelope, double gridSizeMeters) {
+        // non-ideal but for now make a grid in projected space
+        // to see why this is wrong, look at a map of Iowa and note that it leans to the left
+        // This is because they started surveying the township and range system (which is a grid)
+        // from the east, and wound up further west in the north than the south, which led them
+        // to resurvey the baseline every 24 miles, which explains why one is often driving
+        // down a rural road in the midwestern US and comes to a point where the road makes two 90-
+        // degree curves in quick succession to reach the new survey baseline.
+        double gridSizeLat = SphericalDistanceLibrary.metersToDegrees(gridSizeMeters);
+        double gridSizeLon = SphericalDistanceLibrary.metersToLonDegrees(gridSizeMeters, (envelope.getMaxY() + envelope.getMinY()) / 2);
+
+        // how large will it be?
+        int npts = (int) (envelope.getHeight() / gridSizeLat + 1) * (int) (envelope.getWidth() / gridSizeLon + 1);
+
+        PointSet ret = new PointSet(npts);
+
+        int idx = 0;
+        for (double lon = envelope.getMinX(); lon < envelope.getMaxX(); lon += gridSizeLon) {
+            for (double lat = envelope.getMinY(); lat < envelope.getMaxY(); lat += gridSizeLat) {
+                PointFeature pf = new PointFeature("" + idx);
+                pf.setLat(lat);
+                pf.setLon(lon);
+                ret.addFeature(pf, idx++);
+            }
+        }
+
+        return ret;
     }
 
     /** Returns a new coordinate object for the feature at the given index in this set, or its centroid. */
