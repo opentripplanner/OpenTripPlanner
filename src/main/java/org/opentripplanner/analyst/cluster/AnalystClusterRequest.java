@@ -14,10 +14,13 @@ public class AnalystClusterRequest implements Serializable {
 
 	/** The ID of the destinations pointset */
 	public String destinationPointsetId;
-	
+
+	/** The Analyst Cluster user that created this request */
+	public String userId;
+
 	/** The ID of the graph against which to calculate this request */
 	public String graphId;
-	
+
 	/** The job ID this is associated with */
 	public String jobId;
 
