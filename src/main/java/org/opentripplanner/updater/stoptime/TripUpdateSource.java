@@ -31,5 +31,5 @@ public interface TripUpdateSource {
      */
     public boolean getFullDatasetValueOfLastUpdates();
 
-    public String getAgencyId();
+    public String getFeedId();
 }

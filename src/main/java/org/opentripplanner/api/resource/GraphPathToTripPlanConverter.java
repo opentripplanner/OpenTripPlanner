@@ -16,10 +16,7 @@ package org.opentripplanner.api.resource;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.*;
 import org.opentripplanner.api.model.*;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -293,8 +290,6 @@ public abstract class GraphPathToTripPlanConverter {
             leg.distance += edges[i].getDistance();
         }
 
-        addModeAndAlerts(graph, leg, states, requestedLocale);
-
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
@@ -314,6 +309,8 @@ public abstract class GraphPathToTripPlanConverter {
         addFrequencyFields(states, leg);
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
+
+        addModeAndAlerts(graph, leg, states, requestedLocale);
 
         return leg;
     }
@@ -527,7 +524,16 @@ public abstract class GraphPathToTripPlanConverter {
 
             for (AlertPatch alertPatch : graph.getAlertPatches(edge)) {
                 if (alertPatch.displayDuring(state)) {
-                    leg.addAlert(alertPatch.getAlert(), requestedLocale);
+                    if (alertPatch.hasTrip()) {
+                        // If the alert patch contains a trip and that trip match this leg only add the alert for
+                        // this leg.
+                        if (alertPatch.getTrip().equals(new AgencyAndId(alertPatch.getFeedId(), leg.tripId))) {
+                            leg.addAlert(alertPatch.getAlert(), requestedLocale);
+                        }
+                    } else {
+                        // If we are not matching a particular trip add all known alerts for this trip pattern.
+                        leg.addAlert(alertPatch.getAlert(), requestedLocale);
+                    }
                 }
             }
         }

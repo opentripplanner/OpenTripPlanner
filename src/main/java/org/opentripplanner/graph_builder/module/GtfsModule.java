@@ -26,21 +26,12 @@ import java.util.Set;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.FareAttribute;
-import org.onebusaway.gtfs.model.IdentityBean;
-import org.onebusaway.gtfs.model.Pathway;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.ServiceCalendarDate;
-import org.onebusaway.gtfs.model.ShapePoint;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.*;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -106,13 +97,13 @@ public class GtfsModule implements GraphBuilderModule {
         
         try {
             for (GtfsBundle gtfsBundle : gtfsBundles) {
-                // apply global defaults to individual GTFSBundles (if globals have been set) 
+                // apply global defaults to individual GTFSBundles (if globals have been set)
                 if (cacheDirectory != null && gtfsBundle.cacheDirectory == null)
                     gtfsBundle.cacheDirectory = cacheDirectory;
                 if (useCached != null && gtfsBundle.useCached == null)
                     gtfsBundle.useCached = useCached;
                 GtfsMutableRelationalDao dao = new GtfsRelationalDaoImpl();
-                GtfsContext context = GtfsLibrary.createContext(dao, service);
+                GtfsContext context = GtfsLibrary.createContext(gtfsBundle.getFeedId(), dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
                 hf.setStopContext(stopContext);
                 hf.setFareServiceFactory(_fareServiceFactory);
@@ -168,6 +159,7 @@ public class GtfsModule implements GraphBuilderModule {
         reader.setInputSource(gtfsBundle.getCsvInputSource());
         reader.setEntityStore(store);
         reader.setInternStrings(true);
+        reader.setDefaultAgencyId(gtfsBundle.getFeedId().getId());
 
         if (LOG.isDebugEnabled())
             reader.addEntityHandler(counter);
@@ -183,7 +175,6 @@ public class GtfsModule implements GraphBuilderModule {
             // set the agencyId here. Each feed ("bundle") is loaded by a separate reader, so there is no risk of
             // agency mappings accumulating.
             if (entityClass == Agency.class) {
-                String defaultAgencyId = null;
                 for (Agency agency : reader.getAgencies()) {
                     String agencyId = agency.getId();
                     LOG.info("This Agency has the ID {}", agencyId);
@@ -202,9 +193,7 @@ public class GtfsModule implements GraphBuilderModule {
                         agencyId = generatedAgencyId;
                     }
                     if (agencyId != null) agencyIdsSeen.add(agencyId);
-                    if (defaultAgencyId == null) defaultAgencyId = agencyId;
                 }
-                reader.setDefaultAgencyId(defaultAgencyId); // not sure this is a good idea, setting it to the first-of-many IDs.
             }
         }
 

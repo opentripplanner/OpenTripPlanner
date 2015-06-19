@@ -656,10 +656,12 @@ public class GraphPathToTripPlanConverterTest {
         timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, updatedTripTimes, serviceDate);
 
         // Further graph initialization
+        String feedId = "FEED";
+
         graph.putService(CalendarServiceData.class, calendarServiceData);
         graph.putService(FareService.class, fareServiceStub);
-        graph.addAgency(trainAgency);
-        graph.addAgency(ferryAgency);
+        graph.addAgency(feedId, trainAgency);
+        graph.addAgency(feedId, ferryAgency);
         graph.timetableSnapshotSource = (timetableSnapshotSource);
         graph.addAlertPatch(e29, alertPatch);
 

@@ -63,10 +63,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
@@ -98,18 +95,25 @@ public class IndexAPI {
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
    @Context UriInfo uriInfo;
 
+    @GET
+    @Path("/feeds")
+    public Response getFeeds(String feedId) {
+        return Response.status(Status.OK).entity(index.agenciesForFeedId.keySet()).build();
+    }
+
    /** Return a list of all agencies in the graph. */
    @GET
-   @Path("/agencies")
-   public Response getAgencies () {
-       return Response.status(Status.OK).entity(index.agencyForId.values()).build();
+   @Path("/agencies/{feedId}")
+   public Response getAgencies (@PathParam("feedId") String feedId) {
+       return Response.status(Status.OK).entity(
+               index.agenciesForFeedId.getOrDefault(feedId, new HashMap<>()).values()).build();
    }
 
    /** Return specific agency in the graph, by ID. */
    @GET
-   @Path("/agencies/{agencyId}")
-   public Response getAgency (@PathParam("agencyId") String agencyId) {
-       for (Agency agency : index.agencyForId.values()) {
+   @Path("/agencies/{feedId}/{agencyId}")
+   public Response getAgency (@PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId) {
+       for (Agency agency : index.agenciesForFeedId.get(feedId).values()) {
            if (agency.getId().equals(agencyId)) {
                return Response.status(Status.OK).entity(agency).build();
            }
@@ -119,10 +123,10 @@ public class IndexAPI {
 
     /** Return all routes for the specific agency. */
     @GET
-    @Path("/agencies/{agencyId}/routes")
-    public Response getAgencyRoutes (@PathParam("agencyId") String agencyId) {
+    @Path("/agencies/{feedId}/{agencyId}/routes")
+    public Response getAgencyRoutes (@PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId) {
         Collection<Route> routes = index.routeForId.values();
-        Agency agency = index.agencyForId.get(agencyId);
+        Agency agency = index.agenciesForFeedId.get(feedId).get(agencyId);
         if (agency == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         Collection<Route> agencyRoutes = new ArrayList<>();
         for (Route route: routes) {
