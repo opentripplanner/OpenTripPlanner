@@ -12,6 +12,7 @@ import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
 import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.JodaLocalDateSerializer;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,6 +39,7 @@ class BrokerHttpHandler extends HttpHandler {
     // TODO we should really just make one static mapper somewhere and use it throughout OTP
     private ObjectMapper mapper = new ObjectMapper()
             .registerModule(AgencyAndIdSerializer.makeModule())
+            .registerModule(JodaLocalDateSerializer.makeModule())
             .setSerializationInclusion(JsonInclude.Include.NON_NULL);;
 
     private Broker broker;
