@@ -111,7 +111,7 @@ public class AnalystWorker implements Runnable {
         while (true) {
             LOG.info("Long-polling for work ({} second timeout).", POLL_TIMEOUT/1000.0);
             // Long-poll (wait a few seconds for messages to become available)
-            // TODO internal queue that allows async polling whenever queue.size() < N
+            // TODO internal blocking queue feeding work threads, polls whenever queue.size() < nProcessors
             Map<Integer, AnalystClusterRequest> requests = getSomeWork();
             if (requests == null) {
                 LOG.info("Didn't get any work. Retrying.");
