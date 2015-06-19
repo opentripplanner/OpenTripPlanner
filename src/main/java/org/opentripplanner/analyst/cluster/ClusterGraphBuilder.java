@@ -25,13 +25,17 @@ public class ClusterGraphBuilder {
 
     private AmazonS3Client s3 = new AmazonS3Client();
 
-    private static final String GRAPH_DIR = "graph_cache";
+    private static final String GRAPH_CACHE_DIR = "graph_cache";
 
-    private static final String graphBucket = "analyst-dev-graphs";
+    private final String graphBucket;
 
     String currGraphId = null;
 
     Graph currGraph = null;
+
+    public ClusterGraphBuilder (String graphBucket) {
+        this.graphBucket = graphBucket;
+    }
 
     /**
      * Return the graph for the given unique identifier for graph builder inputs on S3.
@@ -48,7 +52,7 @@ public class ClusterGraphBuilder {
         }
 
         // The location of the inputs that will be used to build this graph
-        File graphDataDirectory = new File(GRAPH_DIR, graphId);
+        File graphDataDirectory = new File(GRAPH_CACHE_DIR, graphId);
 
         // If we don't have a local copy of the inputs, fetch graph data as a ZIP from S3 and unzip it
         if( ! graphDataDirectory.exists()) {
@@ -72,6 +76,7 @@ public class ClusterGraphBuilder {
                 }
                 zis.close();
             } catch (Exception e) {
+                // TODO delete graph cache dir which is probably corrupted
                 e.printStackTrace();
             }
         } else {
@@ -80,7 +85,7 @@ public class ClusterGraphBuilder {
 
         // Now we have a local copy of these graph inputs. Make a graph out of them.
         CommandLineParameters params = new CommandLineParameters();
-        params.build = new File(GRAPH_DIR, graphId);
+        params.build = new File(GRAPH_CACHE_DIR, graphId);
         params.inMemory = true;
         GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, params.build);
         graphBuilder.run();

@@ -13,21 +13,20 @@
 
 package org.opentripplanner.api.model;
 
-import java.util.Date;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.vividsolutions.jts.geom.Geometry;
+import org.opentripplanner.model.json_serialization.GeoJSONDeserializer;
+import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.opentripplanner.model.json_serialization.GeoJSONDeserializer;
-import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.Date;
 
 @XmlRootElement(name = "RouterInfo")
 public class RouterInfo {
+
     @XmlElement
     public String routerId;
     
@@ -38,4 +37,5 @@ public class RouterInfo {
 
     @XmlElement
     public Date buildTime;
+
 }
