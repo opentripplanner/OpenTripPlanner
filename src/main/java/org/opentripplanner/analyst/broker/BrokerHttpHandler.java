@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.ByteStreams;
 import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
@@ -48,16 +49,17 @@ class BrokerHttpHandler extends HttpHandler {
     @Override
     public void service(Request request, Response response) throws Exception {
 
-        // request.getRequestURI(); // without protocol or server, only request path
-        // request.getPathInfo(); // without handler base path
-
         response.setContentType("application/json");
 
-        // may be a partially specified QueuePath without job or task ID
-        QueuePath queuePath = new QueuePath(request.getPathInfo());
+        // request.getRequestURI(); // without protocol or server, only request path
+        // request.getPathInfo(); // without handler base path
+        String[] pathComponents = request.getPathInfo().split("/");
+        // Path component 0 is empty since the path always starts with a slash.
+        if (pathComponents.length < 3) {
+            response.setStatus(HttpStatus.BAD_REQUEST_400);
+            response.setDetailMessage("path should have at least one part");
+        }
 
-        // Request body is expected to be JSON. Rather than loading it into a string, we could parse it to a tree
-        // or bind to a type immediately. However binding introduces a dependency on the message type classes.
         try {
             if (request.getMethod() == Method.HEAD) {
                 /* Let the client know server is alive and URI + request are valid. */
@@ -66,33 +68,58 @@ class BrokerHttpHandler extends HttpHandler {
                 return;
             } else if (request.getMethod() == Method.GET) {
                 /* Return a chunk of tasks for a particular graph. */
+                String graphAffinity = pathComponents[1];
                 request.getRequest().getConnection().addCloseListener((closeable, iCloseType) -> {
-                    broker.removeSuspendedResponse(queuePath.graphId, response);
+                    broker.removeSuspendedResponse(graphAffinity, response);
                 });
-                response.suspend(); // This request should survive after the handler function exits.
-                broker.registerSuspendedResponse(queuePath.graphId, response);
+                response.suspend(); // The request should survive after the handler function exits.
+                broker.registerSuspendedResponse(graphAffinity, response);
             } else if (request.getMethod() == Method.POST) {
                 /* Enqueue new messages. */
-                // Text round trip through JSON is done in the HTTP handler thread, does not block the broker thread.
-                List<AnalystClusterRequest> tasks =
-                    mapper.readValue(request.getInputStream(), new TypeReference<List<AnalystClusterRequest>>(){});
-                for (AnalystClusterRequest task : tasks) {
-                    if (!task.graphId.equals(queuePath.graphId)
-                            || !task.userId.equals(queuePath.userId)
-                            || !task.jobId.equals(queuePath.jobId)) {
-                        response.setStatus(HttpStatus.BAD_REQUEST_400);
-                        response.setDetailMessage("Task graph/user/job ID does not match POST path.");
+                String context = pathComponents[1];
+                if ("tasks".equals(context)) {
+                    // Enqueue a single priority task
+                    AnalystClusterRequest task = mapper.readValue(request.getInputStream(), AnalystClusterRequest.class);
+                    response.suspend(); // The request should survive after the handler function exits.
+                    broker.enqueuePriorityTask(task, response);
+                } else if ("jobs".equals(context)) {
+                    // Enqueue a list of tasks that belong to jobs
+                    List<AnalystClusterRequest> tasks = mapper.readValue(request.getInputStream(),
+                            new TypeReference<List<AnalystClusterRequest>>(){});
+                    // Pre-validate tasks checking that they are all on the same job
+                    AnalystClusterRequest exemplar = tasks.get(0);
+                    for (AnalystClusterRequest task : tasks) {
+                        if (task.jobId != exemplar.jobId || task.graphId != exemplar.graphId) {
+                            response.setStatus(HttpStatus.BAD_REQUEST_400);
+                            response.setDetailMessage("All tasks must be for the same graph and job.");
+                        }
+                    }
+                    broker.enqueueTasks(tasks);
+                    response.setStatus(HttpStatus.ACCEPTED_202);
+                }
+            } else if (request.getMethod() == Method.DELETE) {
+                /* Acknowledge completion of a task and remove it from queues, avoiding re-delivery. */
+                if ("tasks".equalsIgnoreCase(pathComponents[1])) {
+                    int taskId = Integer.parseInt(pathComponents[2]);
+                    // First check if this was a priority task, in which case the DELETE should contain a result.
+                    Response suspendedRemoteResponse = broker.deletePriorityTask(taskId);
+                    if (suspendedRemoteResponse != null) {
+                        // Copy the body of this DELETE request back to the connection that was the source of the task.
+                        ByteStreams.copy(request.getInputStream(), suspendedRemoteResponse.getOutputStream());
+                        response.setStatus(HttpStatus.OK_200);
+                        suspendedRemoteResponse.setStatus(HttpStatus.OK_200);
+                        suspendedRemoteResponse.resume();
                         return;
                     }
-                }
-                broker.enqueueTasks(queuePath, tasks);
-                response.setStatus(HttpStatus.ACCEPTED_202);
-            } else if (request.getMethod() == Method.DELETE) {
-                /* Acknowledge completion of a task and remove it from queues. */
-                if (broker.deleteTask(queuePath)) {
-                    response.setStatus(HttpStatus.OK_200);
+                    // This must not have been a priority task. Try to delete it as a normal job task.
+                    if (broker.deleteJobTask(taskId)) {
+                        response.setStatus(HttpStatus.OK_200);
+                    } else {
+                        response.setStatus(HttpStatus.NOT_FOUND_404);
+                    }
                 } else {
-                    response.setStatus(HttpStatus.NOT_FOUND_404);
+                    response.setStatus(HttpStatus.BAD_REQUEST_400);
+                    response.setDetailMessage("Delete is only allowed for tasks.");
                 }
             } else {
                 response.setStatus(HttpStatus.BAD_REQUEST_400);

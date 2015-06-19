@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +59,7 @@ public class Broker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Broker.class);
 
-    private CircularList<User> users = new CircularList<>();
+    public final CircularList<Job> jobs = new CircularList<>();
 
     private int nUndeliveredTasks = 0;
 
@@ -83,7 +82,7 @@ public class Broker implements Runnable {
     private TIntObjectMap<Response> priorityResponses = new TIntObjectHashMap<>();
 
     /** Outstanding requests from workers for tasks, grouped by worker graph affinity. */
-    Map<String, Deque<Response>> connectionsForGraph = new HashMap<>();
+    Map<String, Deque<Response>> consumersByGraph = new HashMap<>();
 
     // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions ?
 
@@ -91,23 +90,23 @@ public class Broker implements Runnable {
      * Enqueue a task for execution ASAP, planning to return the response over the same HTTP connection.
      * Low-reliability, no re-delivery.
      */
-    public synchronized void enqueuePriorityTask (QueuePath queuePath, AnalystClusterRequest task, Response response) {
+    public synchronized void enqueuePriorityTask (AnalystClusterRequest task, Response response) {
         task.taskId = nextTaskId++;
         priorityTasks.add(task);
         priorityResponses.put(task.taskId, response);
     }
 
-    /** Enqueue some tasks for asynchronous execution possibly much later. Results will be saved to S3. */
-    public synchronized void enqueueTasks (QueuePath queuePath, Collection<AnalystClusterRequest> tasks) {
-        LOG.debug("Queue {}", queuePath);
-        // Assumes tasks are pre-validated and are all on the same user/job
-        User user = findUser(queuePath.userId, true);
-        Job job = user.findJob(queuePath.jobId, true);
+    /** Enqueue some tasks for queued execution possibly much later. Results will be saved to S3. */
+    public synchronized void enqueueTasks (List<AnalystClusterRequest> tasks) {
+        Job job = findJob(tasks.get(0)); // creates one if it doesn't exist
         for (AnalystClusterRequest task : tasks) {
             task.taskId = nextTaskId++;
             job.addTask(task);
             nUndeliveredTasks += 1;
             LOG.debug("Enqueued task id {} in job {}", task.taskId, job.jobId);
+            if (task.graphId != job.graphId) {
+                LOG.warn("Task graph ID {} does not match job graph ID {}.", task.graphId, job.graphId);
+            }
         }
         // Wake up the delivery thread if it's waiting on input.
         // This wakes whatever thread called wait() while holding the monitor for this Broker object.
@@ -117,10 +116,10 @@ public class Broker implements Runnable {
     /** Long poll operations are enqueued here. */
     public synchronized void registerSuspendedResponse(String graphId, Response response) {
         // The workers are not allowed to request a specific job or task, just a specific graph and queue type.
-        Deque<Response> deque = connectionsForGraph.get(graphId);
+        Deque<Response> deque = consumersByGraph.get(graphId);
         if (deque == null) {
             deque = new ArrayDeque<>();
-            connectionsForGraph.put(graphId, deque);
+            consumersByGraph.put(graphId, deque);
         }
         deque.addLast(response);
         nWaitingConsumers += 1;
@@ -131,7 +130,7 @@ public class Broker implements Runnable {
 
     /** When we notice that a long poll connection has closed, we remove it here. */
     public synchronized boolean removeSuspendedResponse(String graphId, Response response) {
-        Deque<Response> deque = connectionsForGraph.get(graphId);
+        Deque<Response> deque = consumersByGraph.get(graphId);
         if (deque == null) {
             return false;
         }
@@ -145,7 +144,7 @@ public class Broker implements Runnable {
     }
 
     private void logQueueStatus() {
-        LOG.info("Status {} undelivered, {} consumers waiting.", nUndeliveredTasks, nWaitingConsumers);
+        LOG.info("{} priority, {} undelivered, {} consumers waiting.", priorityTasks.size(), nUndeliveredTasks, nWaitingConsumers);
     }
 
     /**
@@ -164,14 +163,7 @@ public class Broker implements Runnable {
         logQueueStatus();
 
         // Circular lists retain iteration state via their head pointers.
-        Job job = null;
-        while (job == null) {
-            User user = users.advance();
-            if (user == null) {
-                LOG.error("There should always be at least one user here, because there is an undelivered task.");
-            }
-            job = user.jobs.advanceToElement(e -> e.visibleTasks.size() > 0);
-        }
+        Job job = jobs.advanceToElement(e -> e.visibleTasks.size() > 0);
 
         // We have found job with some undelivered tasks. Give them to a consumer,
         // waiting until one is available even if this means ignoring graph affinity.
@@ -185,10 +177,10 @@ public class Broker implements Runnable {
             LOG.debug("Task delivery thread is awake, and some consumers are waiting.");
             logQueueStatus();
 
-            // Here, we know there are some consumer connections waiting, but we don't know if they're still open.
+            // Here, we know there are some consumer connections waiting, but we're not sure they're still open.
             // First try to get a consumer with affinity for this graph
             LOG.debug("Looking for an eligible consumer, respecting graph affinity.");
-            Deque<Response> deque = connectionsForGraph.get(job.graphId);
+            Deque<Response> deque = consumersByGraph.get(job.graphId);
             while (deque != null && !deque.isEmpty()) {
                 Response response = deque.pop();
                 nWaitingConsumers -= 1;
@@ -199,7 +191,7 @@ public class Broker implements Runnable {
 
             // Then try to get a consumer from the graph with the most workers
             LOG.debug("No consumers with the right affinity. Looking for any consumer.");
-            List<Deque<Response>> deques = new ArrayList<>(connectionsForGraph.values());
+            List<Deque<Response>> deques = new ArrayList<>(consumersByGraph.values());
             deques.sort((d1, d2) -> Integer.compare(d2.size(), d1.size()));
             for (Deque<Response> d : deques) {
                 while (!d.isEmpty()) {
@@ -265,29 +257,27 @@ public class Broker implements Runnable {
     }
 
     /**
-     * Take a task out of the job, marking it as completed. The body of this DELETE request...
+     * Take a normal (non-priority) task out of a job queue, marking it as completed so it will not be re-delivered.
      * @return whether the task was found and removed.
      */
-    public synchronized boolean deleteTask (QueuePath queuePath) {
-
-        User user = findUser(queuePath.userId, false);
-        if (user == null) {
-            return false;
-        }
-
-        Job job = user.findJob(queuePath.jobId, false);
-        if (job == null) {
-            return false;
-        }
-
+    public synchronized boolean deleteJobTask (int taskId) {
         // There could be thousands of invisible (delivered) tasks, so we use a hash map.
-        // We only allow removal of invisible tasks for now.
+        // We only allow removal of delivered, invisible tasks for now (not undelivered tasks).
         // Return whether removal call discovered an existing task.
-        return job.invisibleTasks.remove(queuePath.taskId) != null;
-
+        return deliveredTasks.remove(taskId) != null;
     }
 
-    // Todo: occasionally purge closed connections from connectionsForGraph
+    /**
+     * Marks the specified priority request as completed, and returns the suspended Response object for the connection
+     * that submitted the priority request, and is likely still waiting for a result over the same connection.
+     * The HttpHandler thread can then pump data from the DELETE body back to the origin of the request,
+     * without blocking the broker thread.
+     */
+    public synchronized Response deletePriorityTask (int taskId) {
+        return priorityResponses.remove(taskId);
+    }
+
+    // Todo: occasionally purge closed connections from consumersByGraph
 
     @Override
     public void run() {
@@ -301,20 +291,16 @@ public class Broker implements Runnable {
         }
     }
 
-    /** Search through the users to find one with the given ID, without advancing the head of the circular list. */
-    public User findUser (String userId, boolean create) {
-        for (User user : users) {
-            if (user.userId.equals(userId)) {
-                return user;
+    public Job findJob (AnalystClusterRequest task) {
+        for (Job job : jobs) {
+            if (job.jobId.equals(task.jobId)) {
+                return job;
             }
         }
-        if (create) {
-            User user = new User(userId);
-            users.insertAtTail(user);
-            return user;
-        }
-        return null;
+        Job job = new Job(task.jobId);
+        job.graphId = task.graphId;
+        jobs.insertAtTail(job);
+        return job;
     }
-
 
 }

@@ -18,10 +18,10 @@ public class Job {
 
     private int nTasks = 0;
 
+    public final String jobId;
+
     /* Defines cache affinity group for contained tasks. TODO set this when created. */
     String graphId;
-
-    public final String jobId;
 
     /* Tasks awaiting delivery. */
     Queue<AnalystClusterRequest> visibleTasks = new ArrayDeque<>();
