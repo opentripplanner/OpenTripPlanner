@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.qbroker;
+package org.opentripplanner.analyst.broker;
 
 public class QueuePath {
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.qbroker;
+package org.opentripplanner.analyst.broker;
 
 import java.util.Iterator;
 import java.util.Spliterator;

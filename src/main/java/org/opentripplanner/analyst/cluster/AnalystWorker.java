@@ -34,7 +34,7 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.SocketTimeoutException;
-import java.util.Map;
+import java.util.List;
 import java.util.Random;
 import java.util.zip.GZIPOutputStream;
 
@@ -45,11 +45,13 @@ public class AnalystWorker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AnalystWorker.class);
 
-    public static final int POLL_TIMEOUT = 30000;
+    public static final int POLL_TIMEOUT = 10000;
 
     public static final Random random = new Random();
 
     ObjectMapper objectMapper;
+
+    String BROKER_BASE_URL = "http://localhost:9001";
 
     String s3Prefix = "analyst-dev";
 
@@ -112,17 +114,17 @@ public class AnalystWorker implements Runnable {
             LOG.info("Long-polling for work ({} second timeout).", POLL_TIMEOUT/1000.0);
             // Long-poll (wait a few seconds for messages to become available)
             // TODO internal blocking queue feeding work threads, polls whenever queue.size() < nProcessors
-            Map<Integer, AnalystClusterRequest> requests = getSomeWork();
-            if (requests == null) {
+            List<AnalystClusterRequest> tasks = getSomeWork();
+            if (tasks == null) {
                 LOG.info("Didn't get any work. Retrying.");
                 continue;
             }
-            requests.values().parallelStream().forEach(this::handleOneRequest);
+            tasks.parallelStream().forEach(this::handleOneRequest);
             // Remove messages from queue so they won't be re-delivered to other workers.
             LOG.info("Removing requests from broker queue.");
-            for (int taskId : requests.keySet()) {
-                boolean success = deleteRequest(taskId, requests.get(taskId));
-                LOG.info("deleted task {}: {}", taskId, success ? "SUCCESS" : "FAIL");
+            for (AnalystClusterRequest task : tasks) {
+                boolean success = deleteRequest(task);
+                LOG.info("deleted task {}: {}", task.taskId, success ? "SUCCESS" : "FAIL");
             }
         }
     }
@@ -190,11 +192,10 @@ public class AnalystWorker implements Runnable {
 
     }
 
-    public Map<Integer, AnalystClusterRequest> getSomeWork() {
+    public List<AnalystClusterRequest> getSomeWork() {
 
         // Run a GET request (long-polling for work)
-        String url = "http://localhost:9001";
-        url += "/jobs/userA/graphA/jobA";
+        String url = BROKER_BASE_URL + "/jobs/userA/graphA/jobA";
         HttpGet httpGet = new HttpGet(url);
         HttpResponse response = null;
         try {
@@ -206,7 +207,7 @@ public class AnalystWorker implements Runnable {
             if (entity == null) {
                 return null;
             }
-            return objectMapper.readValue(entity.getContent(), new TypeReference<Map<Integer, AnalystClusterRequest>>(){});
+            return objectMapper.readValue(entity.getContent(), new TypeReference<List<AnalystClusterRequest>>(){});
         } catch (JsonProcessingException e) {
             LOG.error("JSON processing exception while getting work: {}", e.getMessage());
         } catch (SocketTimeoutException stex) {
@@ -225,9 +226,8 @@ public class AnalystWorker implements Runnable {
     }
 
     /** DELETE the given message from the broker, indicating that it has been processed by a worker. */
-    public boolean deleteRequest (int taskId, AnalystClusterRequest clusterRequest) {
-        String url = "http://localhost:9001";
-        url += String.format("/jobs/%s/%s/%s/%s", clusterRequest.userId, clusterRequest.graphId, clusterRequest.jobId, taskId);
+    public boolean deleteRequest (AnalystClusterRequest clusterRequest) {
+        String url = BROKER_BASE_URL + String.format("/jobs/%s/%s/%s/%s", clusterRequest.userId, clusterRequest.graphId, clusterRequest.jobId, clusterRequest.taskId);
         HttpDelete httpDelete = new HttpDelete(url);
         try {
             // TODO provide any parse errors etc. that occurred on the worker as the request body.

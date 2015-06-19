@@ -1,7 +1,10 @@
-package org.opentripplanner.analyst.qbroker;
+package org.opentripplanner.analyst.broker;
 
+import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntLongHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -21,28 +24,28 @@ public class Job {
     public final String jobId;
 
     /* Tasks awaiting delivery. */
-    Queue<Task> visibleTasks = new ArrayDeque<>();
+    Queue<AnalystClusterRequest> visibleTasks = new ArrayDeque<>();
 
     /* Tasks that have been delivered to a worker but are awaiting completion. */
-    TIntObjectMap<Task> invisibleTasks = new TIntObjectHashMap<>();
+    TIntObjectMap<AnalystClusterRequest> invisibleTasks = new TIntObjectHashMap<>();
+
+    TIntLongMap invisibleUntil = new TIntLongHashMap();
 
     public Job (String jobId) {
         this.jobId = jobId;
     }
 
     /** Adds a task to this Job, assigning it a task ID number. */
-    public int addTask (String taskBody) {
-        Task task = new Task();
-        task.taskId = nTasks++;
-        task.payload = taskBody;
+    public void addTask (AnalystClusterRequest task) {
+        nTasks++;
         visibleTasks.add(task);
-        return task.taskId;
     }
 
-    public void markTasksDelivered(List<Task> tasks) {
+    public void markTasksDelivered(List<AnalystClusterRequest> tasks) {
         long deliveryTime = System.currentTimeMillis();
-        for (Task task : tasks) {
-            task.invisibleUntil = deliveryTime + 60000;
+        long visibleAt = deliveryTime + 60000; // one minute
+        for (AnalystClusterRequest task : tasks) {
+            invisibleUntil.put(task.taskId, visibleAt);
             invisibleTasks.put(task.taskId, task);
         }
     }

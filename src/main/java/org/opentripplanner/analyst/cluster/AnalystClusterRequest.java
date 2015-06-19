@@ -30,6 +30,9 @@ public class AnalystClusterRequest implements Serializable {
 	/** To where should the result be POSTed */
 	public String directOutputUrl;
 
+	/** A unique identifier for this request assigned by the queue/broker system. */
+	public int taskId;
+
 	/**
 	 * To what queue should the notification of the result be delivered?
 	 */

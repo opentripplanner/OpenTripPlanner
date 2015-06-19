@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.qbroker;
+package org.opentripplanner.analyst.broker;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;

@@ -1,7 +1,9 @@
-package org.opentripplanner.analyst.qbroker;
+package org.opentripplanner.analyst.broker;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
+import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,31 +61,28 @@ public class Broker implements Runnable {
 
     private int nWaitingConsumers = 0; // including some that might be closed
 
+    private int nextTaskId = 0;
+
+    private ObjectMapper mapper = new ObjectMapper();
+
     /** Outstanding requests from workers for tasks, grouped by worker graph affinity. */
     Map<String, Deque<Response>> connectionsForGraph = new HashMap<>();
 
     // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions
 
-    public synchronized void enqueueTasks (QueuePath queuePath, Collection<String> taskBodies) {
+    public synchronized void enqueueTasks (QueuePath queuePath, Collection<AnalystClusterRequest> tasks) {
+        LOG.debug("Queue {}", queuePath);
+        // Assumes tasks are pre-validated and are all on the same user/job
         User user = findUser(queuePath.userId, true);
         Job job = user.findJob(queuePath.jobId, true);
-        if (job.graphId == null) {
-            // New job, set its graph ID
-            job.graphId = queuePath.graphId;
-        } else {
-            // Existing job, check its graph ID
-            if (!job.graphId.equals(queuePath.graphId)) {
-                LOG.warn("Job associated with a different graphId");
-            }
-        }
-        LOG.debug("Queue {}", queuePath);
-        for (String taskBody : taskBodies) {
-            int taskId = job.addTask(taskBody);
+        for (AnalystClusterRequest task : tasks) {
+            task.taskId = nextTaskId++;
+            job.addTask(task);
             nUndeliveredTasks += 1;
-            LOG.debug("Enqueued task id {} with body {}", taskId, taskBody);
+            LOG.debug("Enqueued task id {} in job {}", task.taskId, job.jobId);
         }
         // Wake up the delivery thread if it's waiting on input.
-        // This is whatever thread called wait() while holding the monitor for this QBroker object.
+        // This wakes whatever thread called wait() while holding the monitor for this Broker object.
         notify();
     }
 
@@ -194,8 +193,9 @@ public class Broker implements Runnable {
     }
 
     /**
-     * Attempt to hand some tasks from the given job to the given waiting consumer connection.
-     * This might fail because the consumer has closed the connection.
+     * Attempt to hand some tasks from the given job to a waiting consumer connection.
+     * The write will fail if the consumer has closed the connection but it hasn't been removed from the connection
+     * queue yet because the Broker methods are synchronized (the removal action is waiting to get the monitor).
      * @return whether the handoff succeeded.
      */
     public synchronized boolean deliver (Job job, Response response) {
@@ -207,35 +207,19 @@ public class Broker implements Runnable {
         }
 
         // Get up to N tasks from the visibleTasks deque
-        List<Task> tasks = new ArrayList<>();
+        List<AnalystClusterRequest> tasks = new ArrayList<>();
         while (tasks.size() < 4 && !job.visibleTasks.isEmpty()) {
             tasks.add(job.visibleTasks.poll());
         }
+
         // Attempt to deliver the tasks to the given consumer.
         try {
             response.setStatus(HttpStatus.OK_200);
             OutputStream out = response.getOutputStream();
-            // This is a JSON object of the form {taskId1: request1, taskId2: request2}
-            int n = 0;
-            out.write('{');
-            for (Task task : tasks) {
-                // FIXME we should really not be assembling JSON one character at a time
-                // use tree model
-                if (n++ > 0) {
-                    out.write(',');
-                    out.write('\n');
-                }
-                out.write('"');
-                out.write(Integer.toString(task.taskId).getBytes());
-                out.write('"');
-                out.write(':');
-                out.write(task.payload.getBytes());
-            }
-            out.write('\n');
-            out.write('}');
+            mapper.writeValue(out, tasks);
             response.resume();
         } catch (IOException e) {
-            // Connection was probably closed, but treat it as a server error.
+            // The connection was probably closed by the consumer, but treat it as a server error.
             LOG.debug("Consumer connection caused IO error, it will be removed.");
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
             response.resume();
@@ -243,27 +227,36 @@ public class Broker implements Runnable {
             job.visibleTasks.addAll(tasks);
             return false;
         }
+
         // Delivery succeeded, move tasks from undelivered to delivered status
         LOG.debug("Delivery of {} tasks succeeded.", tasks.size());
         nUndeliveredTasks -= tasks.size();
         job.markTasksDelivered(tasks);
         return true;
+
     }
 
-    /** @return whether the task was found and removed. */
+    /**
+     * Take a task out of the job, marking it as completed. The body of this DELETE request...
+     * @return whether the task was found and removed.
+     */
     public synchronized boolean deleteTask (QueuePath queuePath) {
+
         User user = findUser(queuePath.userId, false);
         if (user == null) {
             return false;
         }
+
         Job job = user.findJob(queuePath.jobId, false);
         if (job == null) {
             return false;
         }
+
         // There could be thousands of invisible (delivered) tasks, so we use a hash map.
         // We only allow removal of invisible tasks for now.
         // Return whether removal call discovered an existing task.
         return job.invisibleTasks.remove(queuePath.taskId) != null;
+
     }
 
     // Todo: occasionally purge closed connections from connectionsForGraph

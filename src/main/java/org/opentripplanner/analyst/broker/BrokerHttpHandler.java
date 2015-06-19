@@ -1,16 +1,18 @@
-package org.opentripplanner.analyst.qbroker;
+package org.opentripplanner.analyst.broker;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
+import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
+import org.opentripplanner.api.model.AgencyAndIdSerializer;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +34,10 @@ import java.util.List;
 */
 class BrokerHttpHandler extends HttpHandler {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    // TODO we should really just make one static mapper somewhere and use it throughout OTP
+    private ObjectMapper mapper = new ObjectMapper()
+            .registerModule(AgencyAndIdSerializer.makeModule())
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);;
 
     private Broker broker;
 
@@ -69,25 +74,18 @@ class BrokerHttpHandler extends HttpHandler {
             } else if (request.getMethod() == Method.POST) {
                 /* Enqueue new messages. */
                 // Text round trip through JSON is done in the HTTP handler thread, does not block the broker thread.
-                JsonNode rootNode = mapper.readTree(request.getInputStream());
-                if (!rootNode.isArray()) {
-                    response.setStatus(HttpStatus.BAD_REQUEST_400);
-                    response.setDetailMessage("Expecting a JSON array of cluster request objects.");
-                    return;
-                } else {
-                    for (JsonNode node : rootNode) {
-                        if (!node.isObject()) {
-                            response.setStatus(HttpStatus.BAD_REQUEST_400);
-                            response.setDetailMessage("Expecting a JSON array of cluster request objects.");
-                            return;
-                        }
+                List<AnalystClusterRequest> tasks =
+                    mapper.readValue(request.getInputStream(), new TypeReference<List<AnalystClusterRequest>>(){});
+                for (AnalystClusterRequest task : tasks) {
+                    if (!task.graphId.equals(queuePath.graphId)
+                            || !task.userId.equals(queuePath.userId)
+                            || !task.jobId.equals(queuePath.jobId)) {
+                        response.setStatus(HttpStatus.BAD_REQUEST_400);
+                        response.setDetailMessage("Task graph/user/job ID does not match POST path.");
+                        return;
                     }
                 }
-                List<String> taskBodies = new ArrayList<>();
-                for (JsonNode node : rootNode) {
-                    taskBodies.add(mapper.writeValueAsString(node));
-                }
-                broker.enqueueTasks(queuePath, taskBodies);
+                broker.enqueueTasks(queuePath, tasks);
                 response.setStatus(HttpStatus.ACCEPTED_202);
             } else if (request.getMethod() == Method.DELETE) {
                 /* Acknowledge completion of a task and remove it from queues. */
