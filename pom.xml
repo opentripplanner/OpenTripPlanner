@@ -17,7 +17,7 @@
 
     <properties>
         <geotools.version>10.5</geotools.version>
-        <jackson.version>2.4.3</jackson.version>
+        <jackson.version>2.5.3</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -362,7 +362,7 @@
         <dependency>
             <groupId>org.mapdb</groupId>
             <artifactId>mapdb</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
 
         <!-- Amazon AWS client libraries -->
@@ -395,7 +395,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>14.0.1</version>
+            <version>18.0</version>
         </dependency>
         <!-- Trove provides optimized map/set collections for native types (int, long...) -->
         <dependency>
@@ -624,7 +624,7 @@
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.27</version>
+            <version>1.30</version>
         </dependency>
         <!-- CSV parser -->
         <dependency>
