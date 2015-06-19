@@ -1,6 +1,10 @@
 package org.opentripplanner.analyst.broker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
@@ -16,6 +20,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * This class watches for incoming requests for work tasks, and attempts to match them to enqueued tasks.
@@ -65,11 +70,34 @@ public class Broker implements Runnable {
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    /** The messages that have already been delivered to a worker. */
+    TIntObjectMap<AnalystClusterRequest> deliveredTasks = new TIntObjectHashMap<>();
+
+    /** The time at which each task was delivered to a worker, to allow re-delivery. */
+    TIntIntMap deliveryTimes = new TIntIntHashMap();
+
+    /** Requests that are not part of a job and can "cut in line" in front of jobs for immediate execution. */
+    private Queue<AnalystClusterRequest> priorityTasks = new ArrayDeque<>();
+
+    /** Priority requests that have already been farmed out to workers, and are awaiting a response. */
+    private TIntObjectMap<Response> priorityResponses = new TIntObjectHashMap<>();
+
     /** Outstanding requests from workers for tasks, grouped by worker graph affinity. */
     Map<String, Deque<Response>> connectionsForGraph = new HashMap<>();
 
-    // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions
+    // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions ?
 
+    /**
+     * Enqueue a task for execution ASAP, planning to return the response over the same HTTP connection.
+     * Low-reliability, no re-delivery.
+     */
+    public synchronized void enqueuePriorityTask (QueuePath queuePath, AnalystClusterRequest task, Response response) {
+        task.taskId = nextTaskId++;
+        priorityTasks.add(task);
+        priorityResponses.put(task.taskId, response);
+    }
+
+    /** Enqueue some tasks for asynchronous execution possibly much later. Results will be saved to S3. */
     public synchronized void enqueueTasks (QueuePath queuePath, Collection<AnalystClusterRequest> tasks) {
         LOG.debug("Queue {}", queuePath);
         // Assumes tasks are pre-validated and are all on the same user/job
