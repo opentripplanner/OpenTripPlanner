@@ -297,8 +297,6 @@ public abstract class GraphPathToTripPlanConverter {
 
         addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
 
-        if (leg.isTransitLeg()) addRealTimeData(leg, states);
-
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
 
@@ -311,6 +309,7 @@ public abstract class GraphPathToTripPlanConverter {
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
         addModeAndAlerts(graph, leg, states, requestedLocale);
+        if (leg.isTransitLeg()) addRealTimeData(leg, states);
 
         return leg;
     }
