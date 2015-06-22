@@ -94,7 +94,7 @@ public abstract class IsochroneGenerator {
             z0.d = GRID_SIZE_METERS;
             IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
             isochrones.add(isochrone);
-            if (++n >= nMax) {
+            if (n + 1 >= nMax) {
                 break;
             }
         }

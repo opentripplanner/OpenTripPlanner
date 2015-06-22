@@ -154,7 +154,7 @@ public class AnalystWorker implements Runnable {
                 RepeatedRaptorProfileRouter router =
                         new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
                 router.route();
-                ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes);
+                ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, true, false);
                 // put in constructor?
                 envelope.bestCase  = results.min;
                 envelope.avgCase   = results.avg;

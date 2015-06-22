@@ -9,6 +9,8 @@ import org.geotools.geojson.feature.FeatureJSON;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.api.resource.LIsochrone;
 import org.opentripplanner.api.resource.SurfaceResource;
+import org.opentripplanner.common.geometry.ZSampleGrid;
+import org.opentripplanner.profile.IsochroneGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,17 +85,29 @@ public class ResultSet implements Serializable{
         id.toArray(this.isochrones);
     }
 
+    private void buildIsochrones(int[] times, PointSet targets) {
+        ZSampleGrid zs = IsochroneGenerator.makeGrid(targets, times, 1.3);
+        List<IsochroneData> id = IsochroneGenerator.getIsochronesAccumulative(zs, 5, 120, 24);
+
+        this.isochrones = new IsochroneData[id.size()];
+        id.toArray(this.isochrones);
+    }
+
     /** Build a new ResultSet that contains only isochrones */
     public ResultSet (TimeSurface surface) {
         buildIsochrones(surface);
     }
     
-    /** Build a new ResultSet directly from times at point features */
-    public ResultSet(int[] times, PointSet targets, boolean includeTimes) {
-        buildHistograms(times, targets);
-
+    /** Build a new ResultSet directly from times at point features, optionally including histograms or interpolating isochrones */
+    public ResultSet(int[] times, PointSet targets, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         if (includeTimes)
             this.times = times;
+
+        if (includeHistograms)
+            buildHistograms(times, targets);
+
+        if (includeIsochrones)
+            buildIsochrones(times, targets);
     }
 
     /** 
