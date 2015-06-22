@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 
@@ -26,6 +26,6 @@ public class JodaLocalDateSerializer extends JsonSerializer<LocalDate> {
 
     @Override public void serialize(LocalDate localDate, JsonGenerator jsonGenerator,
             SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-        jsonGenerator.writeString(localDate.toString(DateTimeFormat.forPattern("YYYY-MM-DD")));
+        jsonGenerator.writeString(localDate.toString(ISODateTimeFormat.date()));
     }
 }
