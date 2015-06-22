@@ -2,9 +2,13 @@ package org.opentripplanner.analyst.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.opentripplanner.profile.ProfileRequest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -22,7 +26,6 @@ import java.util.stream.IntStream;
 public class JobSimulator {
 
     public static String USERID = "userA";
-
 
     public static void main(String[] args) {
 
@@ -52,23 +55,23 @@ public class JobSimulator {
             requests.add(clusterRequest);
         });
 
-        try {
-            objectMapper.writeValue(System.out, requests);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-//        String url = String.format("http://localhost:9001/jobs/%s/%s/%s", USERID, graphId, jobId);
-//        HttpPost httpPost = new HttpPost(url);
-//        ByteArrayOutputStream out = new ByteArrayOutputStream();
 //        try {
-//            objectMapper.writeValue(out, requests);
-//            // System.out.println(out.toString());
-//            httpPost.setEntity(new ByteArrayEntity(out.toByteArray()));
-//            HttpResponse response = httpClient.execute(httpPost);
+//            objectMapper.writeValue(System.out, requests);
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
+
+        String url = String.format("http://localhost:9001/jobs");
+        HttpPost httpPost = new HttpPost(url);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            objectMapper.writeValue(out, requests);
+            // System.out.println(out.toString());
+            httpPost.setEntity(new ByteArrayEntity(out.toByteArray()));
+            HttpResponse response = httpClient.execute(httpPost);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
