@@ -193,8 +193,8 @@ public class AnalystWorker implements Runnable {
 
     public List<AnalystClusterRequest> getSomeWork() {
 
-        // Run a GET request (long-polling for work)
-        String url = BROKER_BASE_URL + "/jobs/userA/graphA/jobA";
+        // Run a GET request (long-polling for work) indicating which graph this worker prefers to work on
+        String url = BROKER_BASE_URL + "/" + graphId;
         HttpGet httpGet = new HttpGet(url);
         HttpResponse response = null;
         try {
