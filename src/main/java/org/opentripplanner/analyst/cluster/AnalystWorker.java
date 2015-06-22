@@ -76,7 +76,7 @@ public class AnalystWorker implements Runnable {
 
     boolean isSinglePoint = false;
 
-    public AnalystWorker () {
+    public AnalystWorker() {
 
         startupTime = System.currentTimeMillis() / 1000; // TODO auto-shutdown
 
@@ -113,7 +113,7 @@ public class AnalystWorker implements Runnable {
     public void run() {
         // Loop forever, attempting to fetch some messages from a queue and process them.
         while (true) {
-            LOG.info("Long-polling for work ({} second timeout).", POLL_TIMEOUT/1000.0);
+            LOG.info("Long-polling for work ({} second timeout).", POLL_TIMEOUT / 1000.0);
             // Long-poll (wait a few seconds for messages to become available)
             // TODO internal blocking queue feeding work threads, polls whenever queue.size() < nProcessors
             List<AnalystClusterRequest> tasks = getSomeWork();
@@ -199,14 +199,16 @@ public class AnalystWorker implements Runnable {
         HttpResponse response = null;
         try {
             response = httpClient.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() != 200) {
-                return null;
-            }
             HttpEntity entity = response.getEntity();
             if (entity == null) {
                 return null;
             }
-            return objectMapper.readValue(entity.getContent(), new TypeReference<List<AnalystClusterRequest>>(){});
+            if (response.getStatusLine().getStatusCode() != 200) {
+                EntityUtils.consumeQuietly(entity);
+                return null;
+            }
+            return objectMapper.readValue(entity.getContent(), new TypeReference<List<AnalystClusterRequest>>() {
+            });
         } catch (JsonProcessingException e) {
             LOG.error("JSON processing exception while getting work: {}", e.getMessage());
         } catch (SocketTimeoutException stex) {
@@ -215,7 +217,8 @@ public class AnalystWorker implements Runnable {
             LOG.error("Broker refused connection. Sleeping before retry.");
             try {
                 Thread.currentThread().sleep(5000);
-            } catch (InterruptedException e) { }
+            } catch (InterruptedException e) {
+            }
         } catch (IOException e) {
             LOG.error("IO exception while getting work.");
             e.printStackTrace();
@@ -227,7 +230,7 @@ public class AnalystWorker implements Runnable {
     /**
      * Signal the broker that the given high-priority task is completed, providing a result.
      */
-    public void finishPriorityTask (AnalystClusterRequest clusterRequest, Object result) {
+    public void finishPriorityTask(AnalystClusterRequest clusterRequest, Object result) {
         String url = BROKER_BASE_URL + String.format("/priority/%s", clusterRequest.taskId);
         HttpPost httpPost = new HttpPost(url);
         try {
@@ -254,7 +257,7 @@ public class AnalystWorker implements Runnable {
     /**
      * DELETE the given message from the broker, indicating that it has been processed by a worker.
      */
-    public void deleteRequest (AnalystClusterRequest clusterRequest) {
+    public void deleteRequest(AnalystClusterRequest clusterRequest) {
         String url = BROKER_BASE_URL + String.format("/tasks/%s", clusterRequest.taskId);
         HttpDelete httpDelete = new HttpDelete(url);
         try {
@@ -270,6 +273,10 @@ public class AnalystWorker implements Runnable {
             e.printStackTrace();
             LOG.info("Failed to delete task {}", clusterRequest.taskId);
         }
+    }
+
+    public static void main(String[] args) {
+        new AnalystWorker().run();
     }
 
 }
