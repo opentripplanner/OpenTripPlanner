@@ -57,7 +57,7 @@ class BrokerHttpHandler extends HttpHandler {
         // request.getPathInfo(); // without handler base path
         String[] pathComponents = request.getPathInfo().split("/");
         // Path component 0 is empty since the path always starts with a slash.
-        if (pathComponents.length < 3) {
+        if (pathComponents.length < 2) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             response.setDetailMessage("path should have at least one part");
         }
@@ -79,11 +79,39 @@ class BrokerHttpHandler extends HttpHandler {
             } else if (request.getMethod() == Method.POST) {
                 /* Enqueue new messages. */
                 String context = pathComponents[1];
-                if ("tasks".equals(context)) {
-                    // Enqueue a single priority task
-                    AnalystClusterRequest task = mapper.readValue(request.getInputStream(), AnalystClusterRequest.class);
-                    response.suspend(); // The request should survive after the handler function exits.
-                    broker.enqueuePriorityTask(task, response);
+                if ("priority".equals(context)) {
+                    if (pathComponents.length == 2) {
+                        // Enqueue a single priority task
+                        AnalystClusterRequest task = mapper.readValue(request.getInputStream(), AnalystClusterRequest.class);
+                        broker.enqueuePriorityTask(task, response);
+                        // Enqueueing the priority task has set its internal taskId.
+                        // TODO move all removal listener registration into the broker functions.
+                        request.getRequest().getConnection().addCloseListener((closeable, iCloseType) -> {
+                            broker.deletePriorityTask(task.taskId);
+                        });
+                        response.suspend(); // The request should survive after the handler function exits.
+                    } else {
+                        // Mark a specific high-priority task as completed, and record its result.
+                        // We were originally planning to do this with a DELETE request that has a body,
+                        // but that is nonstandard enough to anger many libraries including Grizzly.
+                        int taskId = Integer.parseInt(pathComponents[2]);
+                        Response suspendedProducerResponse = broker.deletePriorityTask(taskId);
+                        if (suspendedProducerResponse == null) {
+                            response.setStatus(HttpStatus.NOT_FOUND_404);
+                            return;
+                        }
+                        // Copy the result back to the connection that was the source of the task.
+                        try {
+                            ByteStreams.copy(request.getInputStream(), suspendedProducerResponse.getOutputStream());
+                        } catch (IOException ioex) {
+                            // Apparently the task producer did not wait to retrieve its result. Priority task result delivery
+                            // is not guaranteed, we don't need to retry, this is not considered an error by the worker.
+                        }
+                        response.setStatus(HttpStatus.OK_200);
+                        suspendedProducerResponse.setStatus(HttpStatus.OK_200);
+                        suspendedProducerResponse.resume();
+                        return;
+                    }
                 } else if ("jobs".equals(context)) {
                     // Enqueue a list of tasks that belong to jobs
                     List<AnalystClusterRequest> tasks = mapper.readValue(request.getInputStream(),
@@ -103,16 +131,6 @@ class BrokerHttpHandler extends HttpHandler {
                 /* Acknowledge completion of a task and remove it from queues, avoiding re-delivery. */
                 if ("tasks".equalsIgnoreCase(pathComponents[1])) {
                     int taskId = Integer.parseInt(pathComponents[2]);
-                    // First check if this was a priority task, in which case the DELETE should contain a result.
-                    Response suspendedRemoteResponse = broker.deletePriorityTask(taskId);
-                    if (suspendedRemoteResponse != null) {
-                        // Copy the body of this DELETE request back to the connection that was the source of the task.
-                        ByteStreams.copy(request.getInputStream(), suspendedRemoteResponse.getOutputStream());
-                        response.setStatus(HttpStatus.OK_200);
-                        suspendedRemoteResponse.setStatus(HttpStatus.OK_200);
-                        suspendedRemoteResponse.resume();
-                        return;
-                    }
                     // This must not have been a priority task. Try to delete it as a normal job task.
                     if (broker.deleteJobTask(taskId)) {
                         response.setStatus(HttpStatus.OK_200);

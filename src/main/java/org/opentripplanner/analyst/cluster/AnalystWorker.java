@@ -13,7 +13,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
@@ -120,12 +122,6 @@ public class AnalystWorker implements Runnable {
                 continue;
             }
             tasks.parallelStream().forEach(this::handleOneRequest);
-            // Remove messages from queue so they won't be re-delivered to other workers.
-            LOG.info("Removing requests from broker queue.");
-            for (AnalystClusterRequest task : tasks) {
-                boolean success = deleteRequest(task);
-                LOG.info("deleted task {}: {}", task.taskId, success ? "SUCCESS" : "FAIL");
-            }
         }
     }
 
@@ -142,49 +138,52 @@ public class AnalystWorker implements Runnable {
             // This result envelope will hold the result of the profile or single-time one-to-many search.
             ResultEnvelope envelope = new ResultEnvelope();
             if (clusterRequest.profileRequest != null) {
-                // TODO check graph and job ID against queue URL for coherency
                 SampleSet sampleSet = null;
                 if (clusterRequest.destinationPointsetId != null) {
                     // A pointset was specified, calculate travel times to the points in the pointset.
                     // Fetch the set of points we will use as destinations for this one-to-many search
                     PointSet pointSet = pointSetDatastore.get(clusterRequest.destinationPointsetId);
-                    sampleSet = pointSet.getSampleSet(graph);
+                    sampleSet = pointSet.getOrCreateSampleSet(graph);
                 }
                 // Passing a null SampleSet parameter will properly return only isochrones in the RangeSet
                 RepeatedRaptorProfileRouter router =
                         new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
-                router.route();
-                ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes);
-                // put in constructor?
-                envelope.bestCase  = results.min;
-                envelope.avgCase   = results.avg;
-                envelope.worstCase = results.max;
+                try {
+                    router.route();
+                    ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes);
+                    // put in constructor?
+                    envelope.bestCase = results.min;
+                    envelope.avgCase = results.avg;
+                    envelope.worstCase = results.max;
+                } catch (Exception ex) {
+                    // Leave the envelope empty TODO include error information
+                }
             } else {
                 // No profile request, this must be a plain one to many routing request.
                 RoutingRequest routingRequest = clusterRequest.routingRequest;
                 // TODO finish the non-profile case
             }
 
-            if (clusterRequest.outputQueue != null) {
-                // TODO Enqueue a notification that the work is done
-            }
             if (clusterRequest.outputLocation != null) {
                 // Convert the result envelope and its contents to JSON and gzip it in this thread.
                 // Transfer the results to Amazon S3 in another thread, piping between the two.
-                try {
-                    String s3key = String.join("/", clusterRequest.jobId, clusterRequest.id + ".json.gz");
-                    PipedInputStream inPipe = new PipedInputStream();
-                    PipedOutputStream outPipe = new PipedOutputStream(inPipe);
-                    new Thread(() -> {
-                        s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
-                    }).start();
-                    OutputStream gzipOutputStream = new GZIPOutputStream(outPipe);
-                    objectMapper.writeValue(gzipOutputStream, envelope);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                String s3key = String.join("/", clusterRequest.jobId, clusterRequest.id + ".json.gz");
+                PipedInputStream inPipe = new PipedInputStream();
+                PipedOutputStream outPipe = new PipedOutputStream(inPipe);
+                new Thread(() -> {
+                    s3.putObject(clusterRequest.outputLocation, s3key, inPipe, null);
+                }).start();
+                OutputStream gzipOutputStream = new GZIPOutputStream(outPipe);
+                // We could do the writeValue() in a thread instead, in which case both the DELETE and S3 options
+                // could consume it in the same way.
+                objectMapper.writeValue(gzipOutputStream, envelope);
+                gzipOutputStream.close();
+                // DELETE the task from the broker, confirming it has been handled and should not be re-delivered.
+                deleteRequest(clusterRequest);
+            } else {
+                // No output location on S3 specified, return the result via the broker and mark the task completed.
+                finishPriorityTask(clusterRequest, envelope);
             }
-
         } catch (Exception ex) {
             LOG.error("An error occurred while routing: " + ex.getMessage());
             ex.printStackTrace();
@@ -225,19 +224,51 @@ public class AnalystWorker implements Runnable {
 
     }
 
-    /** DELETE the given message from the broker, indicating that it has been processed by a worker. */
-    public boolean deleteRequest (AnalystClusterRequest clusterRequest) {
-        String url = BROKER_BASE_URL + String.format("/jobs/%s/%s/%s/%s", clusterRequest.userId, clusterRequest.graphId, clusterRequest.jobId, clusterRequest.taskId);
-        HttpDelete httpDelete = new HttpDelete(url);
+    /**
+     * Signal the broker that the given high-priority task is completed, providing a result.
+     */
+    public void finishPriorityTask (AnalystClusterRequest clusterRequest, Object result) {
+        String url = BROKER_BASE_URL + String.format("/priority/%s", clusterRequest.taskId);
+        HttpPost httpPost = new HttpPost(url);
         try {
-            // TODO provide any parse errors etc. that occurred on the worker as the request body.
-            HttpResponse response = httpClient.execute(httpDelete);
-            // Signal the http client that we're done with this response, allowing connection reuse.
+            // TODO reveal any errors etc. that occurred on the worker.
+            // Really this should probably be done with an InputStreamEntity and a JSON writer thread.
+            byte[] serializedResult = objectMapper.writeValueAsBytes(result);
+            httpPost.setEntity(new ByteArrayEntity(serializedResult));
+            HttpResponse response = httpClient.execute(httpPost);
+            // Signal the http client library that we're done with this response object, allowing connection reuse.
             EntityUtils.consumeQuietly(response.getEntity());
-            return (response.getStatusLine().getStatusCode() == 200);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                LOG.info("Successfully marked task {} as completed.", clusterRequest.taskId);
+            } else if (response.getStatusLine().getStatusCode() == 404) {
+                LOG.info("Task {} was not marked as completed because it doesn't exist.", clusterRequest.taskId);
+            } else {
+                LOG.info("Failed to mark task {} as completed.", clusterRequest.taskId);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            LOG.info("Failed to mark task {} as completed.", clusterRequest.taskId);
+        }
+    }
+
+    /**
+     * DELETE the given message from the broker, indicating that it has been processed by a worker.
+     */
+    public void deleteRequest (AnalystClusterRequest clusterRequest) {
+        String url = BROKER_BASE_URL + String.format("/tasks/%s", clusterRequest.taskId);
+        HttpDelete httpDelete = new HttpDelete(url);
+        try {
+            HttpResponse response = httpClient.execute(httpDelete);
+            // Signal the http client library that we're done with this response object, allowing connection reuse.
+            EntityUtils.consumeQuietly(response.getEntity());
+            if (response.getStatusLine().getStatusCode() == 200) {
+                LOG.info("Successfully deleted task {}.", clusterRequest.taskId);
+            } else {
+                LOG.info("Failed to delete task {}.", clusterRequest.taskId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOG.info("Failed to delete task {}", clusterRequest.taskId);
         }
     }
 
