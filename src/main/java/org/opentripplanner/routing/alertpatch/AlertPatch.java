@@ -127,11 +127,8 @@ public class AlertPatch implements Serializable {
             } else if (route != null) {
                tripPatterns = graph.index.patternsForRoute.get(route);
             } else {
-                // Find patterns for the agency.
-                Multimap<Agency, TripPattern> patternsForAgency = graph.index.agencyPatternsForFeedId.get(feedId);
-                if (patternsForAgency != null) {
-                    tripPatterns = patternsForAgency.get(agency);
-                }
+                // Find patterns for the feed.
+                tripPatterns = graph.index.patternsForFeedId.get(feedId);
             }
 
             if (tripPatterns != null) {
@@ -191,11 +188,8 @@ public class AlertPatch implements Serializable {
             } else if (route != null) {
                tripPatterns = graph.index.patternsForRoute.get(route);
             } else {
-                // Find patterns for the agency.
-                Multimap<Agency, TripPattern> patternsForAgency = graph.index.agencyPatternsForFeedId.get(feedId);
-                if (patternsForAgency != null) {
-                    tripPatterns = patternsForAgency.get(agency);
-                }
+                // Find patterns for the feed.
+                tripPatterns = graph.index.patternsForFeedId.get(feedId);
             }
 
             if (tripPatterns != null) {
