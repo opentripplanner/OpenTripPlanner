@@ -96,7 +96,7 @@ public class Broker implements Runnable {
             job.addTask(task);
             nUndeliveredTasks += 1;
             LOG.debug("Enqueued task id {} in job {}", task.taskId, job.jobId);
-            if (task.graphId != job.graphId) {
+            if ( ! task.graphId.equals(job.graphId)) {
                 LOG.warn("Task graph ID {} does not match job graph ID {}.", task.graphId, job.graphId);
             }
         }
