@@ -359,13 +359,14 @@ public class TraverseModeSet implements Cloneable, Serializable {
         return "TraverseMode (" + out + ")";
     }
 
+    /** get this traverse mode as a string that can be fed back into the constructor */
     public String getAsStr() {
         String retVal = null;
         for (TraverseMode m : getModes()) {
             if (retVal == null)
                 retVal = "";
             else
-                retVal += ", ";
+                retVal += ",";
             retVal += m;
         }
         return retVal;
