@@ -20,7 +20,7 @@ public class Job {
 
     public final String jobId;
 
-    /* Defines cache affinity group for contained tasks. TODO set this when created. */
+    /* Defines cache affinity group for contained tasks. */
     String graphId;
 
     /* Tasks awaiting delivery. */

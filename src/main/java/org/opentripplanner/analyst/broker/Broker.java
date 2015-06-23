@@ -22,33 +22,23 @@ import java.util.Map;
 import java.util.Queue;
 
 /**
- * This class watches for incoming requests for work tasks, and attempts to match them to enqueued tasks.
- * It draws tasks fairly from all users, and fairly from all jobs within each user, while attempting to respect the
- * cache affinity of each worker (give it tasks on the same graph it has been working on recently).
+ * This class tracks incoming requests from workers to consume Analyst tasks, and attempts to match those
+ * requests to enqueued tasks. It aims to draw tasks fairly from all users, and fairly from all jobs within each user,
+ * while attempting to respect the graph affinity of each worker (give it tasks that require the same graph it has been
+ * working on recently).
  *
- * When no work is available, the polling functions return immediately. Workers are expected to sleep and re-poll
- * after a few tens of seconds.
+ * When no work is available or no workers are available, the polling functions return immediately, avoiding spin-wait.
+ * When they are receiving no work, workers are expected to disconnect and re-poll occasionally, on the order of 30
+ * seconds. This serves as a signal to the broker that they are still alive and waiting.
  *
- * TODO if there is a backlog of work (the usual case when jobs are lined up) workers will constantly change graphs
- * We need a queue of deferred work: (job, timestamp) when a job would have fairly had its work consumed  if a worker was available.
- * Anything that survives at the head of that queue for more than e.g. one minute gets forced on a non-affinity worker.
- * Any new workers without an affinity preferentially pull work off the deferred queue.
- * Polling worker connections scan the deferred queue before ever going to the main circular queue.
- * When the deferred queue exceeds a certain size, that's when we must start more workers.
+ * TODO if there is a backlog of work (the usual case when jobs are lined up) workers will constantly change graphs.
+ * Because (at least currently) two users never share the same graph, we can get by with pulling tasks cyclically or
+ * randomly from all the jobs, and just actively shaping the number of workers with affinity for each graph by forcing
+ * some of them to accept tasks on graphs other than the one they have declared afffinity for.
  *
- * We should distinguish between two cases:
- * 1. we were waiting for work and woke up because work became available.
- * 2. we were waiting for a consumer and woke up when one arrived.
- *
- * The first case implies that many workers should migrate toward the new work.
- *
- * Two key ideas are:
- * 1. Least recently serviced queue of jobs
- * 2. Affinity Homeostasis
- *
- * If we can constantly keep track of the ideal proportion of workers by graph (based on active queues),
- * and the true proportion of consumers by graph (based on incoming requests) then we can decide when a worker's graph
- * affinity should be ignored.
+ * This could be thought of as "affinity homeostasis". We  will constantly keep track of the ideal proportion of workers
+ * by graph (based on active queues), and the true proportion of consumers by graph (based on incoming requests) then
+ * we can decide when a worker's graph affinity should be ignored and what it should be forced to.
  *
  * It may also be helpful to mark jobs every time they are skipped in the LRU queue. Each time a job is serviced,
  * it is taken out of the queue and put at its end. Jobs that have not been serviced float to the top.
@@ -61,7 +51,7 @@ public class Broker implements Runnable {
 
     public final CircularList<Job> jobs = new CircularList<>();
 
-    private int nUndeliveredTasks = 0;
+    private int nUndeliveredTasks = 0; // Including normal priority jobs and high-priority tasks.
 
     private int nWaitingConsumers = 0; // including some that might be closed
 
@@ -76,10 +66,10 @@ public class Broker implements Runnable {
     TIntIntMap deliveryTimes = new TIntIntHashMap();
 
     /** Requests that are not part of a job and can "cut in line" in front of jobs for immediate execution. */
-    private Queue<AnalystClusterRequest> priorityTasks = new ArrayDeque<>();
+    private Queue<AnalystClusterRequest> highPriorityTasks = new ArrayDeque<>();
 
     /** Priority requests that have already been farmed out to workers, and are awaiting a response. */
-    private TIntObjectMap<Response> priorityResponses = new TIntObjectHashMap<>();
+    private TIntObjectMap<Response> highPriorityResponses = new TIntObjectHashMap<>();
 
     /** Outstanding requests from workers for tasks, grouped by worker graph affinity. */
     Map<String, Deque<Response>> consumersByGraph = new HashMap<>();
@@ -92,8 +82,10 @@ public class Broker implements Runnable {
      */
     public synchronized void enqueuePriorityTask (AnalystClusterRequest task, Response response) {
         task.taskId = nextTaskId++;
-        priorityTasks.add(task);
-        priorityResponses.put(task.taskId, response);
+        highPriorityTasks.add(task);
+        highPriorityResponses.put(task.taskId, response);
+        nUndeliveredTasks += 1;
+        notify();
     }
 
     /** Enqueue some tasks for queued execution possibly much later. Results will be saved to S3. */
@@ -104,7 +96,7 @@ public class Broker implements Runnable {
             job.addTask(task);
             nUndeliveredTasks += 1;
             LOG.debug("Enqueued task id {} in job {}", task.taskId, job.jobId);
-            if (task.graphId != job.graphId) {
+            if ( ! task.graphId.equals(job.graphId)) {
                 LOG.warn("Task graph ID {} does not match job graph ID {}.", task.graphId, job.graphId);
             }
         }
@@ -113,7 +105,7 @@ public class Broker implements Runnable {
         notify();
     }
 
-    /** Long poll operations are enqueued here. */
+    /** Consumer long-poll operations are enqueued here. */
     public synchronized void registerSuspendedResponse(String graphId, Response response) {
         // The workers are not allowed to request a specific job or task, just a specific graph and queue type.
         Deque<Response> deque = consumersByGraph.get(graphId);
@@ -144,14 +136,15 @@ public class Broker implements Runnable {
     }
 
     private void logQueueStatus() {
-        LOG.info("{} priority, {} undelivered, {} consumers waiting.", priorityTasks.size(), nUndeliveredTasks, nWaitingConsumers);
+        LOG.info("{} undelivered, of which {} high-priority", nUndeliveredTasks, highPriorityTasks.size());
+        LOG.info("{} producers waiting, {} consumers waiting", highPriorityResponses.size(), nWaitingConsumers);
     }
 
     /**
-     * Pull the next job queue with undelivered work fairly from users and jobs.
-     * Pass some of that work to a worker, blocking if necessary until there are workers available.
+     * This method checks whether there are any high-priority tasks or normal job tasks and attempts to match them with
+     * waiting workers. It blocks until there are tasks or workers available.
      */
-    public synchronized void deliverTasksForOneJob () throws InterruptedException {
+    public synchronized void deliverTasks() throws InterruptedException {
 
         // Wait until there are some undelivered tasks.
         while (nUndeliveredTasks == 0) {
@@ -162,13 +155,27 @@ public class Broker implements Runnable {
         LOG.debug("Task delivery thread is awake and there are some undelivered tasks.");
         logQueueStatus();
 
-        // Circular lists retain iteration state via their head pointers.
-        Job job = jobs.advanceToElement(e -> e.visibleTasks.size() > 0);
+        // A reference to the job that will be drawn from in this iteration.
+        Job job;
+
+        // Service all high-priority tasks before handling any normal priority jobs.
+        // These tasks are wrapped in a trivial Job so we can re-use delivery code in both high and low priority cases.
+        if (highPriorityTasks.size() > 0) {
+            AnalystClusterRequest task = highPriorityTasks.remove();
+            job = new Job("HIGH PRIORITY");
+            job.graphId = task.graphId;
+            job.addTask(task);
+        } else {
+            // Circular lists retain iteration state via their head pointers.
+            // We know we will find a task here because nUndeliveredTasks > 0.
+            job = jobs.advanceToElement(e -> e.visibleTasks.size() > 0);
+        }
 
         // We have found job with some undelivered tasks. Give them to a consumer,
-        // waiting until one is available even if this means ignoring graph affinity.
+        // waiting until one is available, possibly defying graph affinity.
         LOG.debug("Task delivery thread has found undelivered tasks in job {}.", job.jobId);
         while (true) {
+
             while (nWaitingConsumers == 0) {
                 LOG.debug("Task delivery thread is going to sleep, there are no consumers waiting.");
                 // Thread will be notified when there are new incoming consumer connections.
@@ -203,11 +210,13 @@ public class Broker implements Runnable {
                 }
             }
 
-            // No workers were available to accept the tasks. The thread should wait on the next iteration.
+            // No workers were available to accept the tasks.
+            // Loop back, waiting for a consumer for the tasks in this job (thread should wait on the next iteration).
             LOG.debug("No consumer was available. They all must have closed their connections.");
             if (nWaitingConsumers != 0) {
                 throw new AssertionError("There should be no waiting consumers here, something is wrong.");
             }
+
         }
 
     }
@@ -215,7 +224,8 @@ public class Broker implements Runnable {
     /**
      * Attempt to hand some tasks from the given job to a waiting consumer connection.
      * The write will fail if the consumer has closed the connection but it hasn't been removed from the connection
-     * queue yet because the Broker methods are synchronized (the removal action is waiting to get the monitor).
+     * queue yet. This can happen because the Broker methods are synchronized, and the removal action may be waiting
+     * to get the monitor while we are trying to distribute tasks here.
      * @return whether the handoff succeeded.
      */
     public synchronized boolean deliver (Job job, Response response) {
@@ -269,21 +279,23 @@ public class Broker implements Runnable {
 
     /**
      * Marks the specified priority request as completed, and returns the suspended Response object for the connection
-     * that submitted the priority request, and is likely still waiting for a result over the same connection.
-     * The HttpHandler thread can then pump data from the DELETE body back to the origin of the request,
+     * that submitted the priority request (the UI), which probably still waiting to receive a result back over the
+     * same connection. A HttpHandler thread can then pump data from the DELETE body back to the origin of the request,
      * without blocking the broker thread.
+     * TODO rename to "deregisterSuspendedProducer" and "deregisterSuspendedConsumer" ?
      */
     public synchronized Response deletePriorityTask (int taskId) {
-        return priorityResponses.remove(taskId);
+        return highPriorityResponses.remove(taskId);
     }
 
-    // Todo: occasionally purge closed connections from consumersByGraph
+    // TODO: occasionally purge closed connections from consumersByGraph
+    // TODO: worker catalog and graph affinity homeostasis
 
     @Override
     public void run() {
         while (true) {
             try {
-                deliverTasksForOneJob();
+                deliverTasks();
             } catch (InterruptedException e) {
                 LOG.warn("Task pump thread was interrupted.");
                 return;

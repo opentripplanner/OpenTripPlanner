@@ -20,6 +20,7 @@ Following are known deployments of OTP in an agency-sponsored production capacit
 
 The following OTP-based services are presented as production-quality deployments, but are not backed by an official transportation authority. OTP has also been used by several popular multi-city smartphone applications in their start-up phase before developing proprietary technology.
 
+* [**ViviBus Bologna**](http://bologna.vivibus.it) Bologna, Italy.
 * [**Singapore Nextride**](https://itunes.apple.com/us/app/nextride-singapore-public/id565103559) from [buUuk](http://www.buuuk.com/) is an iOS application, with the default [web-based OTP client](http://map.nextride.sg/) also available.
 * [**BJCTA**](http://www.bjctatripplanner.org) Birmingham-Jefferson Country, Alabama.
 * [**Tel Aviv, Israel**](http://www.tranzmate.co.il) from TranzMate.

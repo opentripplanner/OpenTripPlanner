@@ -27,7 +27,6 @@ public class JobSimulator {
 
     public static String USERID = "userA";
 
-
     public static void main(String[] args) {
 
         DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -56,7 +55,13 @@ public class JobSimulator {
             requests.add(clusterRequest);
         });
 
-        String url = String.format("http://localhost:9001/jobs/%s/%s/%s", USERID, graphId, jobId);
+//        try {
+//            objectMapper.writeValue(System.out, requests);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        String url = String.format("http://localhost:9001/jobs");
         HttpPost httpPost = new HttpPost(url);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {

@@ -36,6 +36,7 @@ public class AnalystClusterRequest implements Serializable {
 	/**
 	 * To what queue should the notification of the result be delivered?
 	 */
+	@Deprecated
 	public String outputQueue;
 
 	/**
