@@ -25,6 +25,7 @@ import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -100,6 +101,9 @@ public class AnalystWorker implements Runnable {
         /* serialize/deserialize qualified mode sets */
         objectMapper.registerModule(QualifiedModeSetSerializer.makeModule());
 
+        /* serialize/deserialize Joda dates */
+        objectMapper.registerModule(JodaLocalDateSerializer.makeModule());
+
         /* These serve as lazy-loading caches for graphs and point sets. */
         clusterGraphBuilder = new ClusterGraphBuilder(s3Prefix + "-graphs");
         pointSetDatastore = new PointSetDatastore(10, null, false, s3Prefix + "-pointsets");
@@ -159,6 +163,8 @@ public class AnalystWorker implements Runnable {
                     envelope.bestCase = results.min;
                     envelope.avgCase = results.avg;
                     envelope.worstCase = results.max;
+                    envelope.id = clusterRequest.id;
+                    envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
                 } catch (Exception ex) {
                     // Leave the envelope empty TODO include error information
                 }

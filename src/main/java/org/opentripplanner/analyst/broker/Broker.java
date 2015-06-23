@@ -9,6 +9,7 @@ import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
 import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class Broker implements Runnable {
     static {
         mapper.registerModule(AgencyAndIdSerializer.makeModule());
         mapper.registerModule(QualifiedModeSetSerializer.makeModule());
+        mapper.registerModule(JodaLocalDateSerializer.makeModule());
     }
 
     /** The messages that have already been delivered to a worker. */
