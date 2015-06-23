@@ -1,7 +1,7 @@
 package org.opentripplanner.traffic;
 
 import com.conveyal.traffic.data.ExchangeFormat;
-import com.conveyal.traffic.stats.BaselineStatistics;
+import com.conveyal.traffic.stats.SummaryStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +102,7 @@ public class SegmentSpeedSample implements Serializable {
     }
 
     /** Create a speed sample from an OpenTraffic stats object directly */
-    public SegmentSpeedSample(BaselineStatistics stats) {
+    public SegmentSpeedSample(SummaryStatistics stats) {
         double avg = stats.getAverageSpeedMS();
 
         if (Double.isNaN(avg)) {
