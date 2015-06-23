@@ -189,7 +189,7 @@ public class TimetableSnapshotSource {
         try {
             if (fullDataset) {
                 // Remove all updates from the buffer
-                buffer.clear();
+                buffer.clear(feedId);
             }
 
             LOG.info("message contains {} trip updates", updates.size());
@@ -340,7 +340,7 @@ public class TimetableSnapshotSource {
             return false;
         }
         
-        boolean success = buffer.update(pattern, updatedTripTimes, serviceDate); 
+        boolean success = buffer.update(feedId, pattern, updatedTripTimes, serviceDate);
         return success;
     }
 
@@ -551,7 +551,7 @@ public class TimetableSnapshotSource {
         // Check whether trip id has been used for previously ADDED trip message and cancel
         // previously created trip
         String tripId = tripUpdate.getTrip().getTripId();
-        cancelPreviouslyAddedTrip(tripId, serviceDate);
+        cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
         
         //
         // Create added trip
@@ -581,7 +581,6 @@ public class TimetableSnapshotSource {
         
         // Create new Trip
         Trip trip = new Trip();
-        // TODO: which Agency ID to use? Currently use feed id.
         trip.setId(new AgencyAndId(feedId, tripUpdate.getTrip().getTripId()));
         trip.setRoute(route);
         
@@ -596,7 +595,7 @@ public class TimetableSnapshotSource {
             trip.setServiceId(serviceIds.iterator().next());
         }
         
-        boolean success = addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate); 
+        boolean success = addTripToGraphAndBuffer(feedId, graph, trip, tripUpdate, stops, serviceDate);
         return success;
     }
 
@@ -610,7 +609,7 @@ public class TimetableSnapshotSource {
      * 
      * @return true iff successful
      */
-    private boolean addTripToGraphAndBuffer(final Graph graph, Trip trip,
+    private boolean addTripToGraphAndBuffer(final String feedId, final Graph graph, Trip trip,
             final TripUpdate tripUpdate, final List<Stop> stops, final ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(stops);
@@ -710,7 +709,7 @@ public class TimetableSnapshotSource {
         newTripTimes.serviceCode = serviceCode;
         
         // Add new trip times to the buffer
-        boolean success = buffer.update(pattern, newTripTimes, serviceDate);
+        boolean success = buffer.update(feedId, pattern, newTripTimes, serviceDate);
         return success;
     }
 
@@ -734,7 +733,7 @@ public class TimetableSnapshotSource {
             } else {
                 TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
                 newTripTimes.cancel();
-                buffer.update(pattern, newTripTimes, serviceDate);
+                buffer.update(feedId, pattern, newTripTimes, serviceDate);
                 success = true;
             }
         }
@@ -745,15 +744,16 @@ public class TimetableSnapshotSource {
     /**
      * Cancel previously added trip from buffer if there is a previously added trip with given trip
      * id (without agency id) on service date
-     * 
+     *
+     * @param feedId feed id the trip id belongs to
      * @param tripId trip id without agency id
      * @param serviceDate service date
      * @return true if a previously added trip was cancelled
      */
-    private boolean cancelPreviouslyAddedTrip(String tripId, final ServiceDate serviceDate) {
+    private boolean cancelPreviouslyAddedTrip(String feedId, String tripId, final ServiceDate serviceDate) {
         boolean success = false;
         
-        TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
+        TripPattern pattern = buffer.getLastAddedTripPattern(feedId, tripId, serviceDate);
         if (pattern != null) {
             // Cancel trip times for this trip in this pattern
             Timetable timetable = buffer.resolve(pattern, serviceDate);
@@ -763,7 +763,7 @@ public class TimetableSnapshotSource {
             } else {
                 TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
                 newTripTimes.cancel();
-                buffer.update(pattern, newTripTimes, serviceDate);
+                buffer.update(feedId, pattern, newTripTimes, serviceDate);
                 success = true;
             }
         }
@@ -872,10 +872,10 @@ public class TimetableSnapshotSource {
         
         // Check whether trip id has been used for previously ADDED/MODIFIED trip message and cancel
         // previously created trip
-        cancelPreviouslyAddedTrip(tripId, serviceDate);
+        cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
         
         // Add new trip
-        boolean success = addTripToGraphAndBuffer(graph, trip, tripUpdate, stops, serviceDate); 
+        boolean success = addTripToGraphAndBuffer(feedId, graph, trip, tripUpdate, stops, serviceDate);
         return success;
     }
 
@@ -887,7 +887,7 @@ public class TimetableSnapshotSource {
             boolean cancelScheduledSuccess = cancelScheduledTrip(feedId, tripId, serviceDate);
             
             // Try to cancel previously added trip
-            boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(tripId, serviceDate);
+            boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
             
             if (cancelScheduledSuccess || cancelPreviouslyAddedSuccess) {
                 success = true;

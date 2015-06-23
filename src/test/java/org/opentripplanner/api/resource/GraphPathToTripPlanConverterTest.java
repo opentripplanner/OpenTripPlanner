@@ -649,7 +649,7 @@ public class GraphPathToTripPlanConverterTest {
 
         TripTimes updatedTripTimes = thirdTripPattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
                 timeZone, serviceDate);
-        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, updatedTripTimes, serviceDate);
+        timetableSnapshotSource.getTimetableSnapshot().update(feedId, thirdTripPattern, updatedTripTimes, serviceDate);
 
         // Further graph initialization
 
