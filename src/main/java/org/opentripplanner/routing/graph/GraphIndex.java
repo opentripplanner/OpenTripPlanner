@@ -127,11 +127,7 @@ public class GraphIndex {
             stopSpatialIndex.insert(envelope, stopVertex);
         }
         for (TripPattern pattern : patternForId.values()) {
-            // The key stored in patternForId is the pattern code that is constructed as.
-            // Agency:RouteId:DirectionId:PatternNumber, the first part is the feed id.
-            String feedId = pattern.code.substring(0, pattern.code.indexOf(':'));
-            patternsForFeedId.put(feedId, pattern);
-
+            patternsForFeedId.put(pattern.getFeedId(), pattern);
             patternsForRoute.put(pattern.route, pattern);
 
             for (Trip trip : pattern.getTrips()) {

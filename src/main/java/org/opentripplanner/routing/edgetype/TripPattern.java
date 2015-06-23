@@ -694,4 +694,18 @@ public class TripPattern implements Serializable {
         return freqs.get(0);
     }
 
+    /**
+     * Get the feed id this trip pattern belongs to.
+     *
+     * @return feed id for this trip pattern
+     */
+    public String getFeedId() {
+        if (code != null && code.length() > 0) {
+            // The key stored in patternForId is the pattern code that is constructed as.
+            // Agency:RouteId:DirectionId:PatternNumber, the first part is the feed id.
+            return code.substring(0, code.indexOf(':'));
+        }
+        // If we cant obtain the feed id from the code, we can get it from the route.
+        return route.getId().getAgencyId();
+    }
 }
