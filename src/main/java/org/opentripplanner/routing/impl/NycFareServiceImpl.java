@@ -13,19 +13,14 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Currency;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.edgetype.DwellEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -33,6 +28,12 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Currency;
+import java.util.LinkedList;
+import java.util.List;
 
 enum NycFareState {
 	INIT, 
@@ -108,6 +109,11 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				}
 				continue;
 			}
+
+			// dwells do not affect fare.
+			if (backEdge instanceof DwellEdge)
+				continue;
+
 			if (!(backEdge instanceof HopEdge)) {
 				newRide = null;
 				continue;
