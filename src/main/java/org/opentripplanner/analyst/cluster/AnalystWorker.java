@@ -25,6 +25,7 @@ import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -95,6 +96,9 @@ public class AnalystWorker implements Runnable {
 
         /* Tell Jackson how to (de)serialize AgencyAndIds, which appear as map keys in routing requests. */
         objectMapper.registerModule(AgencyAndIdSerializer.makeModule());
+
+        /* serialize/deserialize qualified mode sets */
+        objectMapper.registerModule(QualifiedModeSetSerializer.makeModule());
 
         /* These serve as lazy-loading caches for graphs and point sets. */
         clusterGraphBuilder = new ClusterGraphBuilder(s3Prefix + "-graphs");

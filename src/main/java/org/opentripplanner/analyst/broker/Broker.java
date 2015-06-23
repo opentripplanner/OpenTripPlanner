@@ -8,6 +8,8 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
+import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +59,12 @@ public class Broker implements Runnable {
 
     private int nextTaskId = 0;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    static {
+        mapper.registerModule(AgencyAndIdSerializer.makeModule());
+        mapper.registerModule(QualifiedModeSetSerializer.makeModule());
+    }
 
     /** The messages that have already been delivered to a worker. */
     TIntObjectMap<AnalystClusterRequest> deliveredTasks = new TIntObjectHashMap<>();
