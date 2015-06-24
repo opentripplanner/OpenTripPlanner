@@ -273,6 +273,11 @@ public class Broker implements Runnable {
         LOG.debug("Delivery of {} tasks succeeded.", tasks.size());
         nUndeliveredTasks -= tasks.size();
         job.markTasksDelivered(tasks);
+
+        for (AnalystClusterRequest task : tasks) {
+            deliveredTasks.put(task.taskId, task);
+        }
+
         return true;
 
     }
@@ -297,7 +302,7 @@ public class Broker implements Runnable {
             // can this happen?
             return true;
 
-        job.markTasksCompleted(1);
+        job.markTasksCompleted(task);
         return true;
     }
 

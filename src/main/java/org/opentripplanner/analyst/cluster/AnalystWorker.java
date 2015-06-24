@@ -11,14 +11,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.ResultSet;
@@ -59,7 +59,22 @@ public class AnalystWorker implements Runnable {
 
     String s3Prefix = "analyst-dev";
 
-    DefaultHttpClient httpClient = new DefaultHttpClient();
+    static final HttpClient httpClient;
+
+    static {
+        PoolingHttpClientConnectionManager mgr = new PoolingHttpClientConnectionManager();
+        mgr.setDefaultMaxPerRoute(20);
+
+        int timeout = 10 * 1000;
+        SocketConfig cfg = SocketConfig.custom()
+                .setSoTimeout(timeout)
+                .build();
+        mgr.setDefaultSocketConfig(cfg);
+
+        httpClient = HttpClients.custom()
+                .setConnectionManager(mgr)
+                .build();
+    }
 
     // Of course this will eventually need to be shared between multiple AnalystWorker threads.
     ClusterGraphBuilder clusterGraphBuilder;
@@ -111,13 +126,7 @@ public class AnalystWorker implements Runnable {
         clusterGraphBuilder = new ClusterGraphBuilder(s3Prefix + "-graphs");
         pointSetDatastore = new PointSetDatastore(10, null, false, s3Prefix + "-pointsets");
 
-        /* The HTTP Client for talking to the Analyst Broker. */
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, POLL_TIMEOUT);
-        HttpConnectionParams.setSoTimeout(httpParams, POLL_TIMEOUT);
-        HttpConnectionParams.setSoKeepalive(httpParams, true);
-        httpClient.setParams(httpParams);
-
+        int timeout = 10 * 1000;
     }
 
     @Override
@@ -281,7 +290,7 @@ public class AnalystWorker implements Runnable {
             if (response.getStatusLine().getStatusCode() == 200) {
                 LOG.info("Successfully deleted task {}.", clusterRequest.taskId);
             } else {
-                LOG.info("Failed to delete task {}.", clusterRequest.taskId);
+                LOG.info("Failed to delete task {} ({}).", clusterRequest.taskId, response.getStatusLine());
             }
         } catch (Exception e) {
             e.printStackTrace();

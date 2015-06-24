@@ -25,4 +25,7 @@ public class JobStatus {
         this.remaining = job.visibleTasks.size();
         this.jobId = job.jobId;
     }
+
+    /** default constructor for JSON deserialization */
+    public JobStatus () { /* nothing */ }
 }

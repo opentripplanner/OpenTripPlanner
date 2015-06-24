@@ -52,8 +52,13 @@ public class Job {
         }
     }
 
-    public synchronized void markTasksCompleted (int count) {
-        completed += count;
+    public synchronized void markTasksCompleted (AnalystClusterRequest... tasks) {
+        for (AnalystClusterRequest task : tasks) {
+            invisibleTasks.remove(task.taskId);
+            invisibleUntil.remove(task.taskId);
+        }
+
+        completed += tasks.length;
     }
 
     public int getCompleted () {
