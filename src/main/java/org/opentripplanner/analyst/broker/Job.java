@@ -18,6 +18,8 @@ public class Job {
 
     private int nTasks = 0;
 
+    private int completed;
+
     public final String jobId;
 
     /* Defines cache affinity group for contained tasks. */
@@ -48,6 +50,14 @@ public class Job {
             invisibleUntil.put(task.taskId, visibleAt);
             invisibleTasks.put(task.taskId, task);
         }
+    }
+
+    public synchronized void markTasksCompleted (int count) {
+        completed += count;
+    }
+
+    public int getCompleted () {
+        return completed;
     }
 
 }

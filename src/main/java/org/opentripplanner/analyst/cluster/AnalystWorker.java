@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ByteArrayEntity;
@@ -207,12 +206,12 @@ public class AnalystWorker implements Runnable {
 
     public List<AnalystClusterRequest> getSomeWork() {
 
-        // Run a GET request (long-polling for work) indicating which graph this worker prefers to work on
-        String url = BROKER_BASE_URL + "/" + graphId;
-        HttpGet httpGet = new HttpGet(url);
+        // Run a POST request (long-polling for work) indicating which graph this worker prefers to work on
+        String url = BROKER_BASE_URL + "/dequeue/" + graphId;
+        HttpPost httpPost = new HttpPost(url);
         HttpResponse response = null;
         try {
-            response = httpClient.execute(httpGet);
+            response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             if (entity == null) {
                 return null;
@@ -245,7 +244,7 @@ public class AnalystWorker implements Runnable {
      * Signal the broker that the given high-priority task is completed, providing a result.
      */
     public void finishPriorityTask(AnalystClusterRequest clusterRequest, Object result) {
-        String url = BROKER_BASE_URL + String.format("/priority/%s", clusterRequest.taskId);
+        String url = BROKER_BASE_URL + String.format("/complete/priority/%s", clusterRequest.taskId);
         HttpPost httpPost = new HttpPost(url);
         try {
             // TODO reveal any errors etc. that occurred on the worker.
@@ -260,7 +259,8 @@ public class AnalystWorker implements Runnable {
             } else if (response.getStatusLine().getStatusCode() == 404) {
                 LOG.info("Task {} was not marked as completed because it doesn't exist.", clusterRequest.taskId);
             } else {
-                LOG.info("Failed to mark task {} as completed.", clusterRequest.taskId);
+                LOG.info("Failed to mark task {} as completed, ({}).", clusterRequest.taskId,
+                        response.getStatusLine());
             }
         } catch (Exception e) {
             e.printStackTrace();

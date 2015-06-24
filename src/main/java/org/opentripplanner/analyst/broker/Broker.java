@@ -285,7 +285,20 @@ public class Broker implements Runnable {
         // There could be thousands of invisible (delivered) tasks, so we use a hash map.
         // We only allow removal of delivered, invisible tasks for now (not undelivered tasks).
         // Return whether removal call discovered an existing task.
-        return deliveredTasks.remove(taskId) != null;
+        AnalystClusterRequest task = deliveredTasks.remove(taskId);
+
+        if (task == null)
+            return false;
+
+        // using the string form to avoid accidental job creation
+        Job job = findJob(task.jobId);
+
+        if (job == null)
+            // can this happen?
+            return true;
+
+        job.markTasksCompleted(1);
+        return true;
     }
 
     /**
@@ -314,16 +327,27 @@ public class Broker implements Runnable {
         }
     }
 
+    /** find the job for a task, creating it if it does not exist */
     public Job findJob (AnalystClusterRequest task) {
-        for (Job job : jobs) {
-            if (job.jobId.equals(task.jobId)) {
-                return job;
-            }
-        }
-        Job job = new Job(task.jobId);
+        Job job = findJob(task.jobId);
+
+        if (job != null)
+            return job;
+
+        job = new Job(task.jobId);
         job.graphId = task.graphId;
         jobs.insertAtTail(job);
         return job;
+    }
+
+    /** find the job for a jobId, or null if it does not exist */
+    public Job findJob (String jobId) {
+        for (Job job : jobs) {
+            if (job.jobId.equals(jobId)) {
+                return job;
+            }
+        }
+        return null;
     }
 
 }

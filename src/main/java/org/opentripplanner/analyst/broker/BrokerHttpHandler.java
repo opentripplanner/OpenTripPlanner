@@ -15,7 +15,10 @@ import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
 * A Grizzly Async Http Service (uses reponse suspend/resume)
@@ -68,67 +71,103 @@ class BrokerHttpHandler extends HttpHandler {
                 mapper.readTree(request.getInputStream());
                 response.setStatus(HttpStatus.OK_200);
                 return;
-            } else if (request.getMethod() == Method.GET) {
-                /* Return a chunk of tasks for a particular graph. */
-                String graphAffinity = pathComponents[1];
-                request.getRequest().getConnection().addCloseListener((closeable, iCloseType) -> {
-                    broker.removeSuspendedResponse(graphAffinity, response);
-                });
-                response.suspend(); // The request should survive after the handler function exits.
-                broker.registerSuspendedResponse(graphAffinity, response);
+            } else if (request.getMethod() == Method.GET && "status".equals(pathComponents[1])) {
+                /* fetch job status */
+                String[] jobIds = pathComponents[2].split(",");
+
+                List<JobStatus> ret = Arrays.asList(jobIds).stream()
+                        .map(id -> broker.findJob(id))
+                        .filter(job -> job != null)
+                        .map(job -> new JobStatus(job))
+                        .collect(Collectors.toList());
+
+                if (ret.isEmpty()) {
+                    response.setStatus(HttpStatus.NOT_FOUND_404);
+                    response.setDetailMessage("no job IDs were found");
+                }
+                else {
+                    response.setStatus(HttpStatus.OK_200);
+                    OutputStream os = response.getOutputStream();
+                    mapper.writeValue(os, ret);
+                    os.close();
+                }
+                return;
             } else if (request.getMethod() == Method.POST) {
-                /* Enqueue new messages. */
-                String context = pathComponents[1];
-                if ("priority".equals(context)) {
-                    if (pathComponents.length == 2) {
+                /* dequeue messages. */
+                String command = pathComponents[1];
+
+                if ("dequeue".equals(command)) {
+                    String graphAffinity = pathComponents[2];
+                    request.getRequest().getConnection()
+                            .addCloseListener((closeable, iCloseType) -> {
+                                broker.removeSuspendedResponse(graphAffinity, response);
+                            });
+                    response.suspend(); // The request should survive after the handler function exits.
+                    broker.registerSuspendedResponse(graphAffinity, response);
+                }
+
+                /* not dequeueing, enqueuing */
+                else if ("enqueue".equals(command)) {
+                    String context = pathComponents[2];
+                    if ("priority".equals(context)) {
                         // Enqueue a single priority task
-                        AnalystClusterRequest task = mapper.readValue(request.getInputStream(), AnalystClusterRequest.class);
+                        AnalystClusterRequest task = mapper.readValue(request.getInputStream(),
+                                AnalystClusterRequest.class);
                         broker.enqueuePriorityTask(task, response);
                         // Enqueueing the priority task has set its internal taskId.
                         // TODO move all removal listener registration into the broker functions.
-                        request.getRequest().getConnection().addCloseListener((closeable, iCloseType) -> {
-                            broker.deletePriorityTask(task.taskId);
-                        });
+                        request.getRequest().getConnection()
+                                .addCloseListener((closeable, iCloseType) -> {
+                                    broker.deletePriorityTask(task.taskId);
+                                });
                         response.suspend(); // The request should survive after the handler function exits.
+                        return;
+
+                    } else if ("jobs".equals(context)) {
+                        // Enqueue a list of tasks that belong to jobs
+                        List<AnalystClusterRequest> tasks = mapper
+                                .readValue(request.getInputStream(),
+                                        new TypeReference<List<AnalystClusterRequest>>() {
+                                        });
+                        // Pre-validate tasks checking that they are all on the same job
+                        AnalystClusterRequest exemplar = tasks.get(0);
+                        for (AnalystClusterRequest task : tasks) {
+                            if (task.jobId != exemplar.jobId || task.graphId != exemplar.graphId) {
+                                response.setStatus(HttpStatus.BAD_REQUEST_400);
+                                response.setDetailMessage(
+                                        "All tasks must be for the same graph and job.");
+                            }
+                        }
+                        broker.enqueueTasks(tasks);
+                        response.setStatus(HttpStatus.ACCEPTED_202);
                     } else {
-                        // Mark a specific high-priority task as completed, and record its result.
-                        // We were originally planning to do this with a DELETE request that has a body,
-                        // but that is nonstandard enough to anger many libraries including Grizzly.
-                        int taskId = Integer.parseInt(pathComponents[2]);
-                        Response suspendedProducerResponse = broker.deletePriorityTask(taskId);
-                        if (suspendedProducerResponse == null) {
-                            response.setStatus(HttpStatus.NOT_FOUND_404);
-                            return;
-                        }
-                        // Copy the result back to the connection that was the source of the task.
-                        try {
-                            ByteStreams.copy(request.getInputStream(), suspendedProducerResponse.getOutputStream());
-                        } catch (IOException ioex) {
-                            // Apparently the task producer did not wait to retrieve its result. Priority task result delivery
-                            // is not guaranteed, we don't need to retry, this is not considered an error by the worker.
-                        }
-                        response.setStatus(HttpStatus.OK_200);
-                        suspendedProducerResponse.setStatus(HttpStatus.OK_200);
-                        suspendedProducerResponse.resume();
+                        response.setStatus(HttpStatus.NOT_FOUND_404);
+                        response.setDetailMessage(
+                                "Context not found; should be either 'jobs' or 'priority'");
+                    }
+                }
+                else if ("complete".equals(command)) {
+                    // Mark a specific high-priority task as completed, and record its result.
+                    // We were originally planning to do this with a DELETE request that has a body,
+                    // but that is nonstandard enough to anger many libraries including Grizzly.
+                    int taskId = Integer.parseInt(pathComponents[3]);
+                    Response suspendedProducerResponse = broker.deletePriorityTask(taskId);
+                    if (suspendedProducerResponse == null) {
+                        response.setStatus(HttpStatus.NOT_FOUND_404);
                         return;
                     }
-                } else if ("jobs".equals(context)) {
-                    // Enqueue a list of tasks that belong to jobs
-                    List<AnalystClusterRequest> tasks = mapper.readValue(request.getInputStream(),
-                            new TypeReference<List<AnalystClusterRequest>>(){});
-                    // Pre-validate tasks checking that they are all on the same job
-                    AnalystClusterRequest exemplar = tasks.get(0);
-                    for (AnalystClusterRequest task : tasks) {
-                        if (task.jobId != exemplar.jobId || task.graphId != exemplar.graphId) {
-                            response.setStatus(HttpStatus.BAD_REQUEST_400);
-                            response.setDetailMessage("All tasks must be for the same graph and job.");
-                        }
+                    // Copy the result back to the connection that was the source of the task.
+                    try {
+                        ByteStreams.copy(request.getInputStream(),
+                                suspendedProducerResponse.getOutputStream());
+                    } catch (IOException ioex) {
+                        // Apparently the task producer did not wait to retrieve its result. Priority task result delivery
+                        // is not guaranteed, we don't need to retry, this is not considered an error by the worker.
                     }
-                    broker.enqueueTasks(tasks);
-                    response.setStatus(HttpStatus.ACCEPTED_202);
-                } else {
-                    response.setStatus(HttpStatus.NOT_FOUND_404);
-                    response.setDetailMessage("Context not found; should be either 'jobs' or 'priority'");
+                    response.setStatus(HttpStatus.OK_200);
+                    suspendedProducerResponse.setStatus(HttpStatus.OK_200);
+                    suspendedProducerResponse.resume();
+                    return;
                 }
             } else if (request.getMethod() == Method.DELETE) {
                 /* Acknowledge completion of a task and remove it from queues, avoiding re-delivery. */
