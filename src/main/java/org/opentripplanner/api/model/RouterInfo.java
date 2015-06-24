@@ -13,11 +13,11 @@
 
 package org.opentripplanner.api.model;
 
+import com.conveyal.geojson.GeometryDeserializer;
+import com.conveyal.geojson.GeometrySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
-import org.opentripplanner.model.json_serialization.GeoJSONDeserializer;
-import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -30,8 +30,8 @@ public class RouterInfo {
     @XmlElement
     public String routerId;
     
-    @JsonSerialize(using=GeoJSONSerializer.class)
-    @JsonDeserialize(using=GeoJSONDeserializer.class)
+    @JsonSerialize(using=GeometrySerializer.class)
+    @JsonDeserialize(using=GeometryDeserializer.class)
     @XmlJavaTypeAdapter(value=GeometryAdapter.class,type=Geometry.class)
     public Geometry polygon;
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst.broker;
 
+import com.conveyal.geojson.GeoJsonModule;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -43,6 +44,7 @@ class BrokerHttpHandler extends HttpHandler {
     private ObjectMapper mapper = new ObjectMapper()
             .registerModule(AgencyAndIdSerializer.makeModule())
             .registerModule(JodaLocalDateSerializer.makeModule())
+            .registerModule(new GeoJsonModule())
             .setSerializationInclusion(JsonInclude.Include.NON_NULL);;
 
     private Broker broker;

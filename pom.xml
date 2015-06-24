@@ -447,6 +447,8 @@
             <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools.version}</version>
         </dependency>
+
+        <!-- TODO: this should be replaced by Jackson serialization -->
         <dependency>
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
@@ -464,6 +466,12 @@
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>jackson2-geojson</artifactId>
+            <version>0.8</version>
         </dependency>
 
         <!-- TESTING -->

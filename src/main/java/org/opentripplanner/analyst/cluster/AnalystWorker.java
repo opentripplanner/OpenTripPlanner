@@ -4,6 +4,7 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.conveyal.geojson.GeoJsonModule;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,6 +28,7 @@ import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
+import org.opentripplanner.profile.IsochroneGenerator;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -122,6 +124,8 @@ public class AnalystWorker implements Runnable {
         /* serialize/deserialize traversemodesets */
         objectMapper.registerModule(TraverseModeSetSerializer.makeModule());
 
+        objectMapper.registerModule(new GeoJsonModule());
+
         /* These serve as lazy-loading caches for graphs and point sets. */
         clusterGraphBuilder = new ClusterGraphBuilder(s3Prefix + "-graphs");
         pointSetDatastore = new PointSetDatastore(10, null, false, s3Prefix + "-pointsets");
@@ -158,19 +162,26 @@ public class AnalystWorker implements Runnable {
             // This result envelope will hold the result of the profile or single-time one-to-many search.
             ResultEnvelope envelope = new ResultEnvelope();
             if (clusterRequest.profileRequest != null) {
-                SampleSet sampleSet = null;
-                if (clusterRequest.destinationPointsetId != null) {
+                SampleSet sampleSet;
+                boolean isochrone = clusterRequest.destinationPointsetId == null;
+                if (!isochrone) {
                     // A pointset was specified, calculate travel times to the points in the pointset.
                     // Fetch the set of points we will use as destinations for this one-to-many search
                     PointSet pointSet = pointSetDatastore.get(clusterRequest.destinationPointsetId);
+                    // TODO this breaks if graph has been rebuilt
                     sampleSet = pointSet.getOrCreateSampleSet(graph);
+                } else {
+                    // TODO cache
+                    // FIXME this is making a regular grid and then projecting it into another regular
+                    // grid with the same grid size in IsochroneGenerator.
+                    PointSet grid = PointSet.regularGrid(graph.getExtent(), IsochroneGenerator.GRID_SIZE_METERS);
+                    sampleSet = grid.getSampleSet(graph);
                 }
-                // Passing a null SampleSet parameter will properly return only isochrones in the RangeSet
                 RepeatedRaptorProfileRouter router =
                         new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
                 try {
                     router.route();
-                    ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, true, false);
+                    ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, !isochrone, isochrone);
                     // put in constructor?
                     envelope.bestCase = results.min;
                     envelope.avgCase = results.avg;
