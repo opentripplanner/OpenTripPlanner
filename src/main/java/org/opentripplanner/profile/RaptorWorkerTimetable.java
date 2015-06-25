@@ -2,6 +2,7 @@ package org.opentripplanner.profile;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.opentripplanner.analyst.broker.TaskStatistics;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.analyst.scenario.TripFilter;
@@ -127,7 +128,7 @@ public class RaptorWorkerTimetable implements Serializable {
      * This is a factory function rather than a constructor to avoid calling the super constructor for rejected patterns.
      * BannedRoutes is formatted as agencyid_routeid.
      */
-    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Scenario scenario) {
+    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Scenario scenario, TaskStatistics ts) {
 
         // Filter down the trips to only those running during the window
         // This filtering can reduce number of trips and run time by 80 percent
@@ -207,6 +208,8 @@ public class RaptorWorkerTimetable implements Serializable {
             rwtt.timesPerTrip[t++] = times;
         }
 
+        ts.scheduledTripCount += rwtt.timesPerTrip.length;
+
         // save frequency times
         rwtt.frequencyTrips = new int[freqs.size()][pattern.getStops().size() * 2];
         rwtt.endTimes = new int[freqs.size()];
@@ -219,6 +222,8 @@ public class RaptorWorkerTimetable implements Serializable {
                 rwtt.headwaySecs[i] = fe.headway;
                 rwtt.startTimes[i] = fe.startTime;
                 rwtt.endTimes[i] = fe.endTime;
+
+                ts.frequencyTripCount += fe.numTrips();
 
                 int[] times = rwtt.frequencyTrips[i];
 
@@ -236,11 +241,13 @@ public class RaptorWorkerTimetable implements Serializable {
             }
         }
 
+        ts.frequencyEntryCount += rwtt.getFrequencyTripCount();
+
         return rwtt;
     }
 
     /** Create a raptor worker timetable for an added pattern */
-    public static RaptorWorkerTimetable forAddedPattern(AddTripPattern atp, TimeWindow window) {
+    public static RaptorWorkerTimetable forAddedPattern(AddTripPattern atp, TimeWindow window, TaskStatistics ts) {
         if (atp.temporaryStops.length < 2 || atp.timetables.isEmpty())
             return null;
 
@@ -271,6 +278,8 @@ public class RaptorWorkerTimetable implements Serializable {
             rwtt.timesPerTrip[t++] = timesForPatternTimetable(atp, pt);
         }
 
+        ts.scheduledTripCount += rwtt.timesPerTrip.length;
+
         // create frequency trips
         rwtt.frequencyTrips = new int[frequencies.size()][atp.temporaryStops.length * 2];
         rwtt.endTimes = new int[frequencies.size()];
@@ -283,7 +292,11 @@ public class RaptorWorkerTimetable implements Serializable {
             rwtt.startTimes[t] = pt.startTime;
             rwtt.endTimes[t] = pt.endTime;
             rwtt.headwaySecs[t++] = pt.headwaySecs;
+
+            ts.frequencyTripCount += (pt.endTime - pt.startTime) / pt.headwaySecs;
         }
+
+        ts.frequencyEntryCount += frequencies.size();
 
         return rwtt;
     }

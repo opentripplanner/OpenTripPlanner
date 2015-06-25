@@ -4,6 +4,7 @@ import com.google.protobuf.CodedOutputStream;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import org.opentripplanner.analyst.broker.TaskStatistics;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class RaptorWorker {
         //Arrays.fill(bestTimes, UNREACHED);
     }
 
-    public PropagatedTimesStore runRaptor (Graph graph, TIntIntMap accessTimes, int[] walkTimes) {
+    public PropagatedTimesStore runRaptor (Graph graph, TIntIntMap accessTimes, int[] walkTimes, TaskStatistics ts) {
         long beginCalcTime = System.currentTimeMillis();
         long totalPropagationTime = 0;
         TIntIntMap initialStops = new TIntIntHashMap();
@@ -85,9 +86,13 @@ public class RaptorWorker {
 
         int iterations = (req.toTime - req.fromTime - 60) / 60 + 1;
 
+        ts.searchCount = iterations;
+
         // Iterate backward through minutes (range-raptor) taking a snapshot of router state after each call
         int[][] timesAtTargetsEachMinute = new int[iterations][data.nTargets];
 
+        // TODO don't hardwire timestep below
+        ts.timeStep = 60;
         for (int departureTime = req.toTime - 60, n = 0; departureTime >= req.fromTime; departureTime -= 60, n++) {
             if (n % 15 == 0) {
                 LOG.info("minute {}", n);
@@ -140,6 +145,8 @@ public class RaptorWorker {
         LOG.info("calc time {}sec", calcTime / 1000.0);
         LOG.info("  propagation {}sec", totalPropagationTime / 1000.0);
         LOG.info("  raptor {}sec", (calcTime - totalPropagationTime) / 1000.0);
+        ts.propagation = (int) totalPropagationTime;
+        ts.transitSearch = (int) (calcTime - totalPropagationTime);
         //dumpVariableByte(timesAtTargetsEachMinute);
         propagatedTimesStore.setFromArray(timesAtTargetsEachMinute);
         return propagatedTimesStore;

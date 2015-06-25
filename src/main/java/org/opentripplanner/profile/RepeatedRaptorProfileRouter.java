@@ -11,6 +11,7 @@ import org.joda.time.DateTimeZone;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
+import org.opentripplanner.analyst.broker.TaskStatistics;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
@@ -104,6 +105,10 @@ public class RepeatedRaptorProfileRouter {
     }
 
     public void route () {
+        route(new TaskStatistics());
+    }
+
+    public void route (TaskStatistics ts) {
         long computationStartTime = System.currentTimeMillis();
         LOG.info("Begin profile request");
 
@@ -128,9 +133,9 @@ public class RepeatedRaptorProfileRouter {
 
         RaptorWorkerData raptorWorkerData;
         if (sampleSet == null)
-            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario);
+            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, ts);
         else
-            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, sampleSet);
+            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, sampleSet, ts);
         LOG.info("Done.");
         // TEST SERIALIZED SIZE and SPEED
         //        try {
@@ -142,11 +147,10 @@ public class RepeatedRaptorProfileRouter {
         //        } catch(IOException i) {
         //            i.printStackTrace();
         //        }
-        
+
+        long initialStopStart = System.currentTimeMillis();
         LOG.info("Finding initial stops");
-
         TIntIntMap accessTimes = findInitialStops(false, raptorWorkerData);
-
         LOG.info("Found {} initial transit stops", accessTimes.size());
 
         int[] timesAtVertices = new int[Vertex.getMaxIndex()];
@@ -164,7 +168,10 @@ public class RepeatedRaptorProfileRouter {
                 timesAtVertices[vidx] = time;
 
         }
+        ts.initialStopSearch = (int) (System.currentTimeMillis() - initialStopStart);
+        ts.initialStopCount = accessTimes.size();
 
+        long walkSearchStart = System.currentTimeMillis();
         // An array containing the time needed to walk to each target from the origin point.
         int[] walkTimes;
 
@@ -174,9 +181,10 @@ public class RepeatedRaptorProfileRouter {
         else {
             walkTimes = sampleSet.eval(timesAtVertices);
         }
+        ts.walkSearch = (int) (System.currentTimeMillis() - walkSearchStart);
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData, request);
-        propagatedTimesStore = worker.runRaptor(graph, accessTimes, walkTimes);
+        propagatedTimesStore = worker.runRaptor(graph, accessTimes, walkTimes, ts);
 
         if (sampleSet == null) {
             timeSurfaceRangeSet = new TimeSurface.RangeSet();
@@ -185,8 +193,8 @@ public class RepeatedRaptorProfileRouter {
             timeSurfaceRangeSet.max = new TimeSurface(this);
             propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet);
         }
-
-        LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
+        ts.compute = (int) (System.currentTimeMillis() - computationStartTime);
+        LOG.info("Profile request finished in {} seconds", (ts.compute) / 1000.0);
     }
 
     private TIntIntMap findInitialStops (boolean dest, RaptorWorkerData data) {

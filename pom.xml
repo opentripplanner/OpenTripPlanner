@@ -686,6 +686,11 @@
             <artifactId>bsf</artifactId>
             <version>2.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.7.1</version>
+        </dependency>
         <!--
             Scripting language dependencies such as Groovy and Jython can double the size of the OTP JAR.
             Therefore we don't include them by default. You can either update the POM in your fork to include the

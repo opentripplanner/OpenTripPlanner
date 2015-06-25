@@ -13,7 +13,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.HttpHostConnectException;
@@ -24,6 +26,9 @@ import org.apache.http.util.EntityUtils;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
+import org.opentripplanner.analyst.broker.SQSTaskStatisticsStore;
+import org.opentripplanner.analyst.broker.TaskStatistics;
+import org.opentripplanner.analyst.broker.TaskStatisticsStore;
 import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
@@ -35,13 +40,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -54,6 +58,8 @@ public class AnalystWorker implements Runnable {
     public static final int POLL_TIMEOUT = 10000;
 
     public static final Random random = new Random();
+
+    private TaskStatisticsStore statsStore;
 
     ObjectMapper objectMapper;
 
@@ -93,9 +99,15 @@ public class AnalystWorker implements Runnable {
     // Region awsRegion = Region.getRegion(Regions.EU_CENTRAL_1);
     Region awsRegion = Region.getRegion(Regions.US_EAST_1);
 
+    /** aws instance type, or null if not running on AWS */
+    private String instanceType;
+
+    /** worker ID - just a random ID so we can differentiate machines used for computation. Particularly useful to isolate variation coming from Amazon itself */
+    private String machineId = UUID.randomUUID().toString().replaceAll("-", "");
+
     boolean isSinglePoint = false;
 
-    public AnalystWorker() {
+    public AnalystWorker(TaskStatisticsStore statsStore) {
 
         startupTime = System.currentTimeMillis() / 1000; // TODO auto-shutdown
 
@@ -130,7 +142,9 @@ public class AnalystWorker implements Runnable {
         clusterGraphBuilder = new ClusterGraphBuilder(s3Prefix + "-graphs");
         pointSetDatastore = new PointSetDatastore(10, null, false, s3Prefix + "-pointsets");
 
-        int timeout = 10 * 1000;
+        this.statsStore = statsStore;
+
+        instanceType = getInstanceType();
     }
 
     @Override
@@ -151,7 +165,17 @@ public class AnalystWorker implements Runnable {
 
     private void handleOneRequest(AnalystClusterRequest clusterRequest) {
         try {
+            long startTime = System.currentTimeMillis();
             LOG.info("Handling message {}", clusterRequest.toString());
+
+            TaskStatistics ts = new TaskStatistics();
+            ts.pointsetId = clusterRequest.destinationPointsetId;
+            ts.graphId = clusterRequest.graphId;
+            ts.awsInstanceType = instanceType;
+            ts.jobId = clusterRequest.jobId;
+            ts.workerId = machineId;
+
+            long graphStartTime = System.currentTimeMillis();
 
             // Get the graph object for the ID given in the request, fetching inputs and building as needed.
             // All requests handled together are for the same graph, and this call is synchronized so the graph will
@@ -159,11 +183,17 @@ public class AnalystWorker implements Runnable {
             Graph graph = clusterGraphBuilder.getGraph(clusterRequest.graphId);
             graphId = clusterRequest.graphId; // Record graphId so we "stick" to this same graph on subsequent polls
 
+            ts.graphBuild = (int) (System.currentTimeMillis() - graphStartTime);
+
             // This result envelope will hold the result of the profile or single-time one-to-many search.
             ResultEnvelope envelope = new ResultEnvelope();
             if (clusterRequest.profileRequest != null) {
+                ts.lon = clusterRequest.profileRequest.fromLon;
+                ts.lat = clusterRequest.profileRequest.fromLat;
+
                 SampleSet sampleSet;
                 boolean isochrone = clusterRequest.destinationPointsetId == null;
+                ts.isochrone = isochrone;
                 if (!isochrone) {
                     // A pointset was specified, calculate travel times to the points in the pointset.
                     // Fetch the set of points we will use as destinations for this one-to-many search
@@ -180,7 +210,8 @@ public class AnalystWorker implements Runnable {
                 RepeatedRaptorProfileRouter router =
                         new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
                 try {
-                    router.route();
+                    router.route(ts);
+                    long resultSetStart = System.currentTimeMillis();
                     ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, !isochrone, isochrone);
                     // put in constructor?
                     envelope.bestCase = results.min;
@@ -188,8 +219,12 @@ public class AnalystWorker implements Runnable {
                     envelope.worstCase = results.max;
                     envelope.id = clusterRequest.id;
                     envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
+
+                    ts.resultSets = (int) (System.currentTimeMillis() - resultSetStart);
+                    ts.success = true;
                 } catch (Exception ex) {
                     // Leave the envelope empty TODO include error information
+                    ts.success = false;
                 }
             } else {
                 // No profile request, this must be a plain one to many routing request.
@@ -217,6 +252,9 @@ public class AnalystWorker implements Runnable {
                 // No output location on S3 specified, return the result via the broker and mark the task completed.
                 finishPriorityTask(clusterRequest, envelope);
             }
+
+            ts.total = (int) (System.currentTimeMillis() - startTime);
+            statsStore.store(ts);
         } catch (Exception ex) {
             LOG.error("An error occurred while routing: " + ex.getMessage());
             ex.printStackTrace();
@@ -309,8 +347,45 @@ public class AnalystWorker implements Runnable {
         }
     }
 
+    /** Get the AWS instance type if applicable */
+    public String getInstanceType () {
+        try {
+            HttpGet get = new HttpGet();
+            // see http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
+            // This seems very much not EC2-like to hardwire an IP address for getting instance metadata,
+            // but that's how it's done.
+            get.setURI(new URI("http://169.254.169.254/latest/meta-data/instance-type"));
+            get.setConfig(RequestConfig.custom()
+                    .setConnectTimeout(2000)
+                    .setSocketTimeout(2000)
+                    .build()
+            );
+
+            HttpResponse res = httpClient.execute(get);
+
+            InputStream is = res.getEntity().getContent();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            String type = reader.readLine().trim();
+            reader.close();
+            return type;
+        } catch (Exception e) {
+            LOG.info("could not retrieve EC2 instance type, you may be running outside of EC2.");
+            return null;
+        }
+    }
+
     public static void main(String[] args) {
-        new AnalystWorker().run();
+        TaskStatisticsStore tss;
+        if (args.length == 1)
+            tss = new SQSTaskStatisticsStore(args[0]);
+        else
+            tss = new TaskStatisticsStore() {
+                @Override public void store(TaskStatistics ts) {
+                    /** do nothing, quietly */
+                }
+            };
+
+        new AnalystWorker(tss).run();
     }
 
 }

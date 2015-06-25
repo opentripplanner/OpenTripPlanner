@@ -15,6 +15,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
+import org.opentripplanner.analyst.broker.TaskStatistics;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.analyst.scenario.TripPatternFilter;
@@ -85,12 +86,20 @@ public class RaptorWorkerData implements Serializable {
     public transient final List<String> patternNames = new ArrayList<>();
 
     /** Create RaptorWorkerData for the given window and graph */
+    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario, TaskStatistics ts) {
+        this(graph, window, scenario, null, ts);
+    }
+
+    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario, SampleSet sampleSet) {
+        this(graph, window, scenario, sampleSet, new TaskStatistics());
+    }
+
     public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario) {
-        this(graph, window, scenario, null);
+        this (graph, window, scenario, null, new TaskStatistics());
     }
 
     /** Create RaptorWorkerData to be used to build ResultSets directly without creating an intermediate SampleSet */
-    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario, SampleSet sampleSet) {
+    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario, SampleSet sampleSet, TaskStatistics ts) {
         int totalPatterns = graph.index.patternForId.size();
         int totalStops = graph.index.stopForId.size();
         timetablesForPattern = new ArrayList<RaptorWorkerTimetable>(totalPatterns);
@@ -98,6 +107,11 @@ public class RaptorWorkerData implements Serializable {
         TObjectIntMap<TripPattern> indexForPattern = new TObjectIntHashMap<>(totalPatterns, 0.75f, -1);
         indexForStop = new TIntIntHashMap(totalStops, 0.75f, Integer.MIN_VALUE, -1);
         TIntList stopForIndex = new TIntArrayList(totalStops, Integer.MIN_VALUE);
+
+        ts.patternCount = 0;
+        ts.frequencyEntryCount = 0;
+        ts.frequencyTripCount = 0;
+        ts.scheduledTripCount = 0;
 
         /* Make timetables for active trip patterns and record the stops each active pattern uses. */
         for (TripPattern originalPattern : graph.index.patternForId.values()) {
@@ -124,7 +138,7 @@ public class RaptorWorkerData implements Serializable {
 
             for (TripPattern pattern : patterns) {
                 RaptorWorkerTimetable timetable = RaptorWorkerTimetable
-                        .forPattern(graph, pattern, window, scenario);
+                        .forPattern(graph, pattern, window, scenario, ts);
                 if (timetable == null) {
                     // Pattern is not running during the time window
                     continue;
@@ -154,7 +168,7 @@ public class RaptorWorkerData implements Serializable {
         if (scenario != null && scenario.modifications != null) {
             for (AddTripPattern atp : Iterables.filter(scenario.modifications, AddTripPattern.class)) {
                 // note that added trip patterns are not affected by modifications
-                RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forAddedPattern(atp, window);
+                RaptorWorkerTimetable timetable = RaptorWorkerTimetable.forAddedPattern(atp, window, ts);
                 if (timetable == null)
                     continue;
 
@@ -326,7 +340,9 @@ public class RaptorWorkerData implements Serializable {
                 transfersForStop.add(EMPTY_INT_ARRAY);
         }
 
+        long stcStart = System.currentTimeMillis();
         StopTreeCache stc = graph.index.getStopTreeCache();
+        ts.stopTreeCaching = (int) (System.currentTimeMillis() - stcStart);
 
         // Record distances to nearby intersections for all used stops.
         // This is just a copy of StopTreeCache using int indices for stops.
@@ -437,8 +453,9 @@ public class RaptorWorkerData implements Serializable {
             nTargets = sampleSet.pset.capacity;
         }
 
-        nStops = stopForIndex.size();
-        nPatterns = patternForIndex.size();
+        ts.stopCount = nStops = stopForIndex.size();
+        ts.patternCount = nPatterns = patternForIndex.size();
+        ts.targetCount = nTargets;
     }
 
     /** find stops from a given SPT, including temporary stops */
