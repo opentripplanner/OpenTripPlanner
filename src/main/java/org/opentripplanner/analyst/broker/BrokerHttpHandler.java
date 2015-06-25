@@ -181,6 +181,15 @@ class BrokerHttpHandler extends HttpHandler {
                     } else {
                         response.setStatus(HttpStatus.NOT_FOUND_404);
                     }
+                } else if ("jobs".equals((pathComponents[1]))) {
+                    if (broker.deleteJob(pathComponents[2])) {
+                        response.setStatus(HttpStatus.OK_200);
+                        response.setDetailMessage("job deleted");
+                    }
+                    else {
+                        response.setStatus(HttpStatus.NOT_FOUND_404);
+                        response.setDetailMessage("job not found");
+                    }
                 } else {
                     response.setStatus(HttpStatus.BAD_REQUEST_400);
                     response.setDetailMessage("Delete is only allowed for tasks.");

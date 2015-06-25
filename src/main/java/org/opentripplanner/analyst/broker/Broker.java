@@ -355,4 +355,11 @@ public class Broker implements Runnable {
         return null;
     }
 
+    /** delete a job */
+    public synchronized boolean deleteJob (String jobId) {
+        Job job = findJob(jobId);
+        if (job == null) return false;
+        nUndeliveredTasks -= job.visibleTasks.size();
+        return jobs.remove(job);
+    }
 }
