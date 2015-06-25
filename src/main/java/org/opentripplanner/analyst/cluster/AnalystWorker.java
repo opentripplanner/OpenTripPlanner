@@ -17,6 +17,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -38,6 +39,7 @@ import java.io.PipedOutputStream;
 import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -46,6 +48,8 @@ import java.util.zip.GZIPOutputStream;
 public class AnalystWorker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AnalystWorker.class);
+
+    public static final String WORKER_ID_HEADER = "X-Worker-Id";
 
     public static final int POLL_TIMEOUT = 10000;
 
@@ -56,6 +60,8 @@ public class AnalystWorker implements Runnable {
     String BROKER_BASE_URL = "http://localhost:9001";
 
     String s3Prefix = "analyst-dev";
+
+    private final String workerId = UUID.randomUUID().toString().replace("-", ""); // a unique identifier for each worker so the broker can catalog them
 
     DefaultHttpClient httpClient = new DefaultHttpClient();
 
@@ -196,6 +202,7 @@ public class AnalystWorker implements Runnable {
         // Run a GET request (long-polling for work) indicating which graph this worker prefers to work on
         String url = BROKER_BASE_URL + "/" + graphId;
         HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader(new BasicHeader(WORKER_ID_HEADER, workerId));
         HttpResponse response = null;
         try {
             response = httpClient.execute(httpGet);
