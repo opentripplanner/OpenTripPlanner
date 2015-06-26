@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.broker;
+package org.opentripplanner.analyst.cluster;
 
 /**
  * Statistics about running a single task.
@@ -22,7 +22,7 @@ public class TaskStatistics {
     /** milliseconds spent in walk search (this is not a search per se but simply using the SPT from the initial stop search to create walk times to reachable destinations */
     public int walkSearch = -1;
 
-    /** milliseconds spent in propagation */
+    /** milliseconds spent in propagating travel times from transit stops to targets */
     public int propagation = -1;
 
     /** number of discrete times (e.g. minutes) for which a RAPTOR search was performed */
@@ -40,19 +40,19 @@ public class TaskStatistics {
     /** total processing time, including fetching and pushing results, in milliseconds */
     public int total = -1;
 
-    /** number of stops used in search */
+    /** number of stops used in search (i.e. number of stops that had service on this day) */
     public int stopCount = -1;
 
-    /** number of stops found on the first round */
+    /** number of stops found in the initial walk search (stand-in for density/city-ness) */
     public int initialStopCount = -1;
 
-    /** number of patterns used in the search */
+    /** number of patterns used in the search (i.e. those in the RAPTOR worker data) */
     public int patternCount = -1;
 
     /** number of targets of this search */
     public int targetCount = -1;
 
-    /** number of scheduled trips */
+    /** number of scheduled trips in the RAPTOR worker data */
     public int scheduledTripCount = -1;
 
     /** number of frequency trips (the actual number of trips - i.e. a frequency entry running every 10 minutes for an hour is 6 trips */

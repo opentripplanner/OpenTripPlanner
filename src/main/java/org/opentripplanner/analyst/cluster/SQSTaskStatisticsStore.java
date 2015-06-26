@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.broker;
+package org.opentripplanner.analyst.cluster;
 
 import com.amazonaws.handlers.AsyncHandler;
 import com.amazonaws.services.sqs.AmazonSQSAsync;

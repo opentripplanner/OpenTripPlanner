@@ -15,7 +15,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
-import org.opentripplanner.analyst.broker.TaskStatistics;
+import org.opentripplanner.analyst.cluster.TaskStatistics;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.analyst.scenario.TripPatternFilter;

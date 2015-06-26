@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.broker;
+package org.opentripplanner.analyst.cluster;
 
 /**
  * Store task statistics.

@@ -11,7 +11,7 @@ import org.joda.time.DateTimeZone;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
-import org.opentripplanner.analyst.broker.TaskStatistics;
+import org.opentripplanner.analyst.cluster.TaskStatistics;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
