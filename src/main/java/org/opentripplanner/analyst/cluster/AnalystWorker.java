@@ -373,8 +373,8 @@ public class AnalystWorker implements Runnable {
 
     public static void main(String[] args) {
         TaskStatisticsStore tss;
-        if (args.length == 1)
-            tss = new SQSTaskStatisticsStore(args[0]);
+        if (args.length == 2)
+            tss = new SQSTaskStatisticsStore(args[1]);
         else
             tss = new TaskStatisticsStore() {
                 @Override public void store(TaskStatistics ts) {
@@ -382,7 +382,12 @@ public class AnalystWorker implements Runnable {
                 }
             };
 
-        new AnalystWorker(tss).run();
+        AnalystWorker w = new AnalystWorker(tss);
+
+        if (args.length > 0)
+            w.BROKER_BASE_URL = args[0];
+
+        w.run();
     }
 
 }
