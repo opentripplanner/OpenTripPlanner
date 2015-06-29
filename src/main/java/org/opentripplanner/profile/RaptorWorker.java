@@ -45,7 +45,12 @@ public class RaptorWorker {
     int[] transferResults;
     RaptorWorkerData data;
 
+    /** stops touched this round */
     BitSet stopsTouched;
+
+    /** stops touched any round this minute */
+    BitSet allStopsTouched;
+
     BitSet patternsTouched;
 
     private ProfileRequest req;
@@ -54,6 +59,7 @@ public class RaptorWorker {
         this.data = data;
         this.bestTimes = new int[data.nStops];
         this.bestNonTransferTimes = new int[data.nStops];
+        allStopsTouched = new BitSet(data.nStops);
         stopsTouched = new BitSet(data.nStops);
         patternsTouched = new BitSet(data.nPatterns);
         this.req = req; 
@@ -119,7 +125,20 @@ public class RaptorWorker {
             // Use timesAtTargets.length not walkTimes.length due to temp vertices
             System.arraycopy(walkTimes, 0, timesAtTargets, 0, timesAtTargets.length);
 
-            for (int s = 0; s < data.nStops; s++) {
+            // if n > 0, pre-initialize with the times at the targets for the next minute and
+            // only propagate from stops that changed. This is effectively range-raptor for propagation.
+            // note that n runs forward even though time is running backwards.
+            if (n > 0) {
+                int[] timesAtTargetsNextMinute = timesAtTargetsEachMinute[n - 1];
+                for (int i = 0; i < timesAtTargets.length; i++) {
+                    if (timesAtTargetsNextMinute[i] != UNREACHED && timesAtTargetsNextMinute[i] + 60 < timesAtTargets[i]) {
+                        timesAtTargets[i] = timesAtTargetsNextMinute[i] + 60;
+                    }
+                }
+            }
+
+            // only loop over stops that were touched this minute
+            for (int s = allStopsTouched.nextSetBit(0); s >= 0; s = allStopsTouched.nextSetBit(s + 1)) {
                 // it's safe to use the best time at this stop for any number of transfers, even in range-raptor,
                 // because we allow unlimited transfers. this is slightly different from the original RAPTOR implementation:
                 // we do not necessarily compute all pareto-optimal paths on (journey time, number of transfers).
@@ -177,6 +196,7 @@ public class RaptorWorker {
         round = 0;
         advance(); // go to first round
         patternsTouched.clear(); // clear patterns left over from previous calls.
+        allStopsTouched.clear();
         // Copy initial stops over to the first round
         TIntIntIterator iterator = initialStops.iterator();
         while (iterator.hasNext()) {
@@ -252,6 +272,7 @@ public class RaptorWorker {
                         bestNonTransferTimes[stopIndex] = remainOnBoardTime;
 
                         stopsTouched.set(stopIndex);
+                        allStopsTouched.set(stopIndex);
 
                         if (bestTimes[stopIndex] > remainOnBoardTime)
                             bestTimes[stopIndex] = remainOnBoardTime;
@@ -282,6 +303,7 @@ public class RaptorWorker {
                         bestNonTransferTimes[stopIndex] = arrivalTime;
 
                         stopsTouched.set(stopIndex);
+                        allStopsTouched.set(stopIndex);
 
                         if (arrivalTime < bestTimes[stopIndex])
                             bestTimes[stopIndex] = arrivalTime;
