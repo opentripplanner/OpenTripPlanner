@@ -42,8 +42,12 @@
     <div class="otp-fieldTripRequests-listRow">
         <h5>{{schoolName}} Trip on {{formattedDate}} (#{{id}})</h5>
         Submitted by {{teacherName}} on {{timeStamp}}<br>
-        <b>Outbound Trip:</b> {{#outboundDesc}}{{outboundDesc}}{{/outboundDesc}}{{^outboundDesc}}Not Planned{{/outboundDesc}}<br>
-        <b>Inbound Trip:</b> {{#inboundDesc}}{{inboundDesc}}{{/inboundDesc}}{{^inboundDesc}}Not Planned{{/inboundDesc}}
+        <b>Outbound Trip:</b> 
+            {{#outboundTripStatus}}{{outboundTripStatus}}{{/outboundTripStatus}}
+            {{^outboundTripStatus}}Not Planned{{/outboundTripStatus}}<br>
+        <b>Inbound Trip:</b>
+            {{#inboundTripStatus}}{{inboundTripStatus}}{{/inboundTripStatus}}
+            {{^inboundTripStatus}}Not Planned{{/inboundTripStatus}}
     
     </div>
 </script>
@@ -78,7 +82,7 @@
                 {{#classpassId}}{{classpassId}}{{/classpassId}}{{^classpassId}}(None){{/classpassId}}<br>
 
             <b>Teacher Notes:</b>
-                {{#submitterNotes}}{{submitterNotes}}{{/submitterNotes}}{{^submitterNotes}}N/A{{/submitterNotes}}<br>
+                {{#submitterNotes}}{{submitterNotes}}{{/submitterNotes}}{{^submitterNotes}}N/A{{/submitterNotes}}&nbsp;<span style="font-size: .8em">[<a href="#" class="editTeacherNotesLink">Edit</a>]</span><br>
             <i>Request submitted: {{timeStamp}}</i>
             
             <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">User Feedback</div>
@@ -305,12 +309,14 @@
         <div class="otp-dialogContent">
             {{message}}
             <div style="margin-top: 6px;">
-                <textarea class="borderBox textarea" style="z-index: 1000000; width: 100%; height: 3em;" />
+                <textarea class="borderBox textarea" style="z-index: 1000000; width: 100%; height: 3em;">{{text}}</textarea>
             </div>
-            <div style="margin-top: 5px;">Type:&nbsp;
-                <input type="radio" name="type" value="internal" checked> Internal&nbsp;&nbsp;
-                <input type="radio" name="type" value="operational"> Operational
-            </div>
+            {{#showTypeSelection}}
+                <div style="margin-top: 5px;">Type:&nbsp;
+                    <input type="radio" name="type" value="internal" checked> Internal&nbsp;&nbsp;
+                    <input type="radio" name="type" value="operational"> Operational
+                </div>
+            {{/showTypeSelection}}
         </div>
         <div class="otp-dialogButtonRow">
             <button class="okButton">OK</button>

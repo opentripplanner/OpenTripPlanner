@@ -114,10 +114,6 @@ public class CommandLineParameters implements Cloneable {
             description = "Run an OTP API server.")
     public boolean server = false;
 
-    @Parameter(names = {"--worker"},
-            description = "Make this instance an analyst cluster worker.")
-    public boolean worker = false;
-
     @Parameter(names = {"--visualize"},
             description = "Open a graph visualizer window for debugging.")
     public boolean visualize;

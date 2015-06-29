@@ -7,6 +7,8 @@ import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.standalone.CommandLineParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,15 +21,21 @@ import java.util.zip.ZipInputStream;
  */
 public class ClusterGraphBuilder {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterGraphBuilder.class);
+
     private AmazonS3Client s3 = new AmazonS3Client();
 
-    private static final String GRAPH_DIR = "graph_cache";
+    private static final String GRAPH_CACHE_DIR = "graph_cache";
 
-    private static final String graphBucket = "analyst-dev-graphs";
+    private final String graphBucket;
 
     String currGraphId = null;
 
     Graph currGraph = null;
+
+    public ClusterGraphBuilder (String graphBucket) {
+        this.graphBucket = graphBucket;
+    }
 
     /**
      * Return the graph for the given unique identifier for graph builder inputs on S3.
@@ -36,16 +44,19 @@ public class ClusterGraphBuilder {
      */
     public synchronized Graph getGraph(String graphId) {
 
-        // If the graphId hasn't changed since the last call, return the same graph object
+        LOG.info("Finding a graph for ID {}", graphId);
+
         if (graphId.equals(currGraphId)) {
+            LOG.info("GraphID has not changed. Reusing the last graph that was built.");
             return currGraph;
         }
 
         // The location of the inputs that will be used to build this graph
-        File graphDataDirectory = new File(GRAPH_DIR, graphId);
+        File graphDataDirectory = new File(GRAPH_CACHE_DIR, graphId);
 
         // If we don't have a local copy of the inputs, fetch graph data as a ZIP from S3 and unzip it
         if( ! graphDataDirectory.exists()) {
+            LOG.info("Downloading graph input files.");
             graphDataDirectory.mkdirs();
             S3Object graphDataZipObject = s3.getObject(graphBucket, graphId + ".zip");
             ZipInputStream zis = new ZipInputStream(graphDataZipObject.getObjectContent());
@@ -65,13 +76,16 @@ public class ClusterGraphBuilder {
                 }
                 zis.close();
             } catch (Exception e) {
+                // TODO delete graph cache dir which is probably corrupted
                 e.printStackTrace();
             }
+        } else {
+            LOG.info("Graph input files were found locally. Using these files from the cache.");
         }
 
         // Now we have a local copy of these graph inputs. Make a graph out of them.
         CommandLineParameters params = new CommandLineParameters();
-        params.build = new File(GRAPH_DIR, graphId);
+        params.build = new File(GRAPH_CACHE_DIR, graphId);
         params.inMemory = true;
         GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, params.build);
         graphBuilder.run();

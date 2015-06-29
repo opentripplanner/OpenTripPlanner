@@ -26,7 +26,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-
+// TODO does not really need to extend GraphService
 public class ClusterGraphService extends GraphService { 
 
 	static File GRAPH_DIR = new File("cache", "graphs");

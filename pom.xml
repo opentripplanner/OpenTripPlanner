@@ -17,7 +17,7 @@
 
     <properties>
         <geotools.version>10.5</geotools.version>
-        <jackson.version>2.4.3</jackson.version>
+        <jackson.version>2.5.3</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -232,8 +232,10 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                            <!-- The shaded JAR will be the main artifact for the project -->
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <!-- The shaded JAR will not be the main artifact for the project, it will be attached
+                              for deployment in the way source and docs are. -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
                             <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
                               We have eliminated most Jersey auto-scanning, but there is still some need for include
                               filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
@@ -360,18 +362,13 @@
         <dependency>
             <groupId>org.mapdb</groupId>
             <artifactId>mapdb</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
 
         <!-- Amazon AWS client libraries -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.9.39</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-sqs</artifactId>
             <version>1.9.39</version>
         </dependency>
 
@@ -398,7 +395,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>14.0.1</version>
+            <version>18.0</version>
         </dependency>
         <!-- Trove provides optimized map/set collections for native types (int, long...) -->
         <dependency>
@@ -627,7 +624,7 @@
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.27</version>
+            <version>1.30</version>
         </dependency>
         <!-- CSV parser -->
         <dependency>

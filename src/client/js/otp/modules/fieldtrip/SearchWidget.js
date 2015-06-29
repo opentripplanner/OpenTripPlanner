@@ -144,5 +144,20 @@ otp.modules.fieldtrip.SearchWidget =
             });
 
         }, this);
+    },
+
+    onClose : function(requests) {
+        this.mainDiv.find('.schoolInput').val('');
+        this.mainDiv.find('.teacherInput').val('');
+        this.mainDiv.find('.dateInput1').val('');
+        this.mainDiv.find('.dateInput2').val('');
+        this.mainDiv.find('.resultsArea').html('');
+        this.mainDiv.find('.teacherOperatorSelect').val('=');
+        this.mainDiv.find('.schoolOperatorSelect').val('=');
+        this.mainDiv.find('.dateOperatorSelect').val('=');
+        this.mainDiv.find('input:radio[name=andor1]').val(['or']);
+        this.mainDiv.find('input:radio[name=andor2]').val(['or']);
+        this.mainDiv.find('input:radio[name=plannedOnly]').val(['false']);
+        this.mainDiv.find('.searchTabs').tabs('select', 0);
     }
 });

@@ -45,7 +45,17 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+<<<<<<< HEAD
 import java.util.*;
+=======
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+>>>>>>> master
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -208,19 +218,30 @@ public class RoutingContext implements Cloneable {
         this.graph = graph;
         this.debugOutput.startedCalculating();
 
-        // the graph's snapshot may be frequently updated.
-        // Grab a reference to ensure a coherent view of the timetables throughout this search.
-        if (routingRequest.ignoreRealtimeUpdates) {
-            timetableSnapshot = null;
-        } else {
-            TimetableSnapshotSource timetableSnapshotSource = graph.timetableSnapshotSource;
-
-            if (timetableSnapshotSource == null) {
+        // The following block contains potentially resource-intensive things that are only relevant for transit.
+        // In normal searches the impact is low, because the routing context is only constructed once at the beginning
+        // of the search, but when computing transfers or doing large batch jobs, repeatedly re-constructing useless
+        // transit-specific information can have an impact.
+        if (opt.modes.isTransit()) {
+            // the graph's snapshot may be frequently updated.
+            // Grab a reference to ensure a coherent view of the timetables throughout this search.
+            if (routingRequest.ignoreRealtimeUpdates) {
                 timetableSnapshot = null;
             } else {
-                timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
+                TimetableSnapshotSource timetableSnapshotSource = graph.timetableSnapshotSource;
+                if (timetableSnapshotSource == null) {
+                    timetableSnapshot = null;
+                } else {
+                    timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
+                }
             }
+            calendarService = graph.getCalendarService();
+            setServiceDays();
+        } else {
+            timetableSnapshot = null;
+            calendarService = null;
         }
+<<<<<<< HEAD
 
         // do the same for traffic
         if (graph.streetSpeedSource != null)
@@ -230,6 +251,8 @@ public class RoutingContext implements Cloneable {
 
         calendarService = graph.getCalendarService();
         setServiceDays();
+=======
+>>>>>>> master
 
         Edge fromBackEdge = null;
         Edge toBackEdge = null;

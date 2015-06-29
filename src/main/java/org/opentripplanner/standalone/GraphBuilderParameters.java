@@ -118,7 +118,7 @@ public class GraphBuilderParameters {
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
-        stationTransfers = config.path("parentStationTransfers").asBoolean(false);
+        stationTransfers = config.path("stationTransfers").asBoolean(false);
         subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME);
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
