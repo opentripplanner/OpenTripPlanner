@@ -145,9 +145,19 @@ directory:
 You may also want to add the `--cache <directory>` command line parameter to specify a custom NED tile cache location.
 
 NED downloads take quite a long time and slow down the graph building process. The USGS will also deliver the
-whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA).
-OpenTripPlanner contains another module that will then automatically fetch data in this format from an Amazon S3 copy of
-your bulk data.
+whole dataset in bulk if you [send them a hard drive](http://ned.usgs.gov/faq.html#DATA). OpenTripPlanner contains
+another module that will then automatically fetch data in this format from an Amazon S3 copy of your bulk data.
+You can configure it as follows in `build-config.json`:
+
+```JSON
+{
+    "elevationBucket" : {
+        "accessKey" : "your-aws-access-key",
+        "secretKey" : "corresponding-aws-secret-key",
+        "bucketName" : "ned13"
+    }
+}
+```
 
 
 ### Other raster elevation data
@@ -158,11 +168,116 @@ national geographic surveys, or you can always fall back on the worldwide
 (roughly 30 meters horizontally) but it can give acceptable results.
 
 Simply place the elevation data file in the directory with the other graph builder inputs, alongside the GTFS and OSM data.
-Make sure the file has a `.tiff` extension, and the graph builder should detect its presence and apply
+Make sure the file has a `.tiff` or `.tif` extension, and the graph builder should detect its presence and apply
 the elevation data to the streets.
+
+OTP should automatically handle DEM GeoTIFFs in most common projections. You may want to check for elevation-related
+error messages during the graph build process to make sure OTP has properly discovered the projection. If you are using
+a DEM in unprojected coordinates make sure that the axis order is (longitude, latitude) rather than
+(latitude, longitude). Unfortunately there is no reliable standard for WGS84 axis order, so OTP uses the same axis
+order as the above-mentioned SRTM data, which is also the default for the popular Proj4 library.
+
+
+## Fares configuration
+
+By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.
+For more complex scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
+`fares` section in `build-config.json`. You can combine different fares (for example transit and bike-rental)
+by defining a `combinationStrategy` parameter, and a list of sub-fares to combine (all fields starting with `fare`
+are considered to be sub-fares).
+
+```JSON
+// build-config.json
+{
+  // Select the custom fare "seattle"
+  fares: "seattle"
+  // OR this alternative form that could allow additional configuration
+  fares: {
+	type: "seattle"
+  }
+}
+```
+
+```JSON
+// build-config.json
+{
+  fares: {
+    // Combine two fares by simply adding them
+    combinationStrategy: "additive",
+    // First fare to combine
+    fare0: "new-york",
+    // Second fare to combine
+    fare1: {
+      type: "bike-rental-time-based",
+      currency: "USD",
+      prices: {
+          // For trip shorter than 30', $4 fare
+          "30":   4.00,
+          // For trip shorter than 1h, $6 fare
+          "1:00": 6.00
+      }
+    }
+    // We could also add fareFoo, fareBar...
+  }
+}
+```
+
+The current list of custom fare type is:
+
+- `bike-rental-time-based` - accepting the following parameters:
+    - `currency` - the ISO 4217 currency code to use, such as `"EUR"` or `"USD"`,
+    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed time of bike rental is lower than the defined time.
+- `san-francisco` (no parameters)
+- `new-york` (no parameters)
+- `seattle` (no parameters)
+
+The current list of `combinationStrategy` is:
+
+- `additive` - simply adds all sub-fares.
+
+
+## Custom OSM naming
+
+You can define a custom naming scheme for elements drawn from OSM by defining an `osmNaming` field in `build-config.json`,
+such as:
+
+```JSON
+// build-config.json
+{
+  osmNaming: "portland"
+}
+```
+
+There is currently only one custom naming module called `portland` (which has no parameters).
 
 
 # Runtime router configuration
+
+This section covers all options that can be set for each router using the `router-config.json` file.
+These options can be applied by the OTP server without rebuilding the graph.
+
+
+## Routing defaults
+
+There are many trip planning options used in the OTP web API, and more exist
+internally that are not exposed via the API. You may want to change the default value for some of these parameters,
+i.e. the value which will be applied unless it is overridden in a web API request.
+
+A full list of them can be found in the RoutingRequest class
+[in the Javadoc](http://dev.opentripplanner.org/javadoc/master/org/opentripplanner/routing/core/RoutingRequest.html).
+Any public field or setter method in this class can be given a default value using the routingDefaults section of
+`router-config.json` as follows:
+
+```JSON
+{
+    routingDefaults: {
+        walkSpeed: 2.0,
+        stairsReluctance: 4.0,
+        carDropoffTime: 240
+    }
+}
+```
+
 
 ## Timeouts
 
@@ -303,75 +418,3 @@ connect to a network resource is the `url` field.
 }
 ```
 
-## Fares configuration
-
-By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.
-For more complex scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
-`fares` section in `build-config.json`. You can combine different fares (for example transit and bike-rental)
-by defining a `combinationStrategy` parameter, and a list of sub-fares to combine (all fields starting with `fare`
-are considered to be sub-fares).
-
-```JSON
-// build-config.json
-{
-  // Select the custom fare "seattle"
-  fares: "seattle"
-  // OR this alternative form that could allow additional configuration
-  fares: {
-	type: "seattle"
-  }
-}
-```
-
-```JSON
-// build-config.json
-{
-  fares: {
-    // Combine two fares by simply adding them
-    combinationStrategy: "additive",
-    // First fare to combine
-    fare0: "new-york",
-    // Second fare to combine
-    fare1: {
-      type: "bike-rental-time-based",
-      currency: "USD",
-      prices: {
-          // For trip shorter than 30', $4 fare
-          "30":   4.00,
-          // For trip shorter than 1h, $6 fare
-          "1:00": 6.00
-      }
-    }
-    // We could also add fareFoo, fareBar...
-  }
-}
-```
-
-The current list of custom fare type is:
-
-- `bike-rental-time-based` - accepting the following parameters:
-    - `currency` - the ISO 4217 currency code to use, such as `"EUR"` or `"USD"`,
-    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed time of bike rental is lower than the defined time.
-- `san-francisco` (no parameters)
-- `new-york` (no parameters)
-- `seattle` (no parameters)
-
-The current list of `combinationStrategy` is:
-
-- `additive` - simply adds all sub-fares.
-
-## Custom OSM naming
-
-You can define a custom OSM naming scheme by defining `osmNaming` in `build-config.json`,
-such as:
-
-```JSON
-// build-config.json
-{
-  osmNaming: "portland"
-}
-```
-
-The current list of OSM custom naming is:
-
-- `portland` (no parameters)

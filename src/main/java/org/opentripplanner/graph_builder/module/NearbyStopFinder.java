@@ -5,6 +5,7 @@ import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -16,6 +17,7 @@ import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.IntersectionTransitLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -220,7 +222,7 @@ public class NearbyStopFinder {
         public int terminalFor (State state) {
             Edge edge = state.getBackEdge();
             if (edge instanceof StreetEdge) return STREET;
-            if (edge instanceof StreetTransitLink) return LINK;
+            if (edge instanceof StreetTransitLink || edge instanceof IntersectionTransitLink) return LINK;
             return OTHER;
         }
 

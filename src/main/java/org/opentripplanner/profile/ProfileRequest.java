@@ -5,6 +5,7 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * All the modifiable parameters for profile routing.
@@ -99,6 +100,8 @@ public class ProfileRequest implements Serializable, Cloneable {
       alternatives out a bit to account for the fact that they don't always run on schedule.
     */
     public int suboptimalMinutes;
+    
+    public Collection<String> bannedRoutes;
     
     public ProfileRequest clone () throws CloneNotSupportedException {
         return (ProfileRequest) super.clone();

@@ -87,7 +87,7 @@ otp.util.Geo = {
 	distanceStringImperial : function (m) {
 		var ft = m*3.28084;
         if(ft < 528) return Math.round(ft) + ' feet';
-        return Math.round(ft/528)/10+" miles";
+        return Math.round(ft/52.8)/100+" miles";
 	},
 
 	distanceStringMetric : function (m) {

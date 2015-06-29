@@ -13,15 +13,6 @@
 
 package org.opentripplanner.graph_builder.module.ned;
 
-import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.media.jai.InterpolationBilinear;
-
 import com.google.common.io.ByteStreams;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
@@ -31,6 +22,18 @@ import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.media.jai.InterpolationBilinear;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * A coverage factory that works off of the NED caches from {@link NEDDownloader}.
@@ -42,11 +45,11 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     private Graph graph;
 
     /** All tiles for the DEM stitched into a single coverage. */
-    UnifiedGridCoverage coverage = null;
+    UnifiedGridCoverage unifiedCoverage = null;
 
     private File cacheDirectory;
 
-    private NEDTileSource tileSource = new NEDDownloader();
+    public NEDTileSource tileSource = new NEDDownloader();
 
     private List<VerticalDatum> datums;
 
@@ -110,26 +113,28 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
             }            
         }
     }
-    
+
+    /** @return a GeoTools grid coverage for the entire area of interest, lazy-creating it on the first call. */
     public Coverage getGridCoverage() {
-        if (coverage == null) {
+        if (unifiedCoverage == null) {
             loadVerticalDatum();
             tileSource.setGraph(graph);
             tileSource.setCacheDirectory(cacheDirectory);
             List<File> paths = tileSource.getNEDTiles();
+            // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
             for (File path : paths) {
-                GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl();
-                factory.setPath(path);
+                GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
+                // TODO might bicubic interpolation give better results?
                 GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(),
                         new InterpolationBilinear());
-                if (coverage == null) {
-                    coverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
+                if (unifiedCoverage == null) {
+                    unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
                 } else {
-                    coverage.add(regionCoverage);
+                    unifiedCoverage.add(regionCoverage);
                 }
             }
         }
-        return coverage;
+        return unifiedCoverage;
     }
 
     /**

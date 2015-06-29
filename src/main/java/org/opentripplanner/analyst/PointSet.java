@@ -465,6 +465,16 @@ public class PointSet implements Serializable {
         return getSampleSet(g);
     }
 
+    // TODO refactor the other getSampleSet methods in terms of this one.
+    public SampleSet getOrCreateSampleSet(Graph graph) {
+        SampleSet sampleSet = this.samples.get(graph.routerId);
+        if (sampleSet == null) {
+            sampleSet = new SampleSet(this, graph.getSampleFactory());
+            this.samples.put(graph.routerId, sampleSet);
+        }
+        return sampleSet;
+    }
+
     /** 
      * gets a sample set for a graph object -- does not require graph service to be set 
      * @param g a graph objects
@@ -810,5 +820,10 @@ public class PointSet implements Serializable {
                 }
             }
         }
+    }
+
+    /** Returns a new coordinate object for the feature at the given index in this set, or its centroid. */
+    public Coordinate getCoordinate(int index) {
+        return new Coordinate(lons[index], lats[index]);
     }
 }

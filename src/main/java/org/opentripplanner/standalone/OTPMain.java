@@ -130,7 +130,7 @@ public class OTPMain {
             /* Auto-register pre-existing graph on disk, with optional auto-scan. */
             GraphScanner graphScanner = new GraphScanner(graphService, params.graphDirectory, params.autoScan);
             graphScanner.basePath = params.graphDirectory;
-            if (params.routerIds.size() > 0) {
+            if (params.routerIds != null && params.routerIds.size() > 0) {
                 graphScanner.defaultRouterId = params.routerIds.get(0);
             }
             graphScanner.autoRegister = params.routerIds;

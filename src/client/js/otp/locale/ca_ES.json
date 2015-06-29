@@ -141,6 +141,8 @@
     "Cable Car": "PONT PENJANT",
     "Funicular": "FUNICULAR",
     "Aerial Tram": "",
+    "Bicycle rental station": "",
+    "Bicycle rental": "",
     "Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b> exit on <b>%(street_name)s</b>": "",
     "Take roundabout counterclockwise to %(ordinal_exit_number)s exit on %(street_name)s": "",
     "Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit on <b>%(street_name)s</b>": "",

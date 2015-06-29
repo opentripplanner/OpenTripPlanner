@@ -13,19 +13,13 @@
 
 package org.opentripplanner.graph_builder.module.ned;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.media.jai.InterpolationBilinear;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
@@ -41,8 +35,13 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import javax.media.jai.InterpolationBilinear;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street data that has already
@@ -55,11 +54,16 @@ import com.vividsolutions.jts.geom.Geometry;
  * point (both in meters).
  */
 public class ElevationModule implements GraphBuilderModule {
+
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
     private ElevationGridCoverageFactory gridCoverageFactory;
 
     private Coverage coverage;
+
+    // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings.
+    private int nPointsEvaluated = 0;
+    private int nPointsOutsideDEM = 0;
 
     /**
      * The distance between samples in meters. Defaults to 10m, the approximate resolution of 1/3
@@ -99,7 +103,7 @@ public class ElevationModule implements GraphBuilderModule {
         // interpolation internally)
         coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
-        log.info("setting street elevation profiles from NED data...");
+        log.info("Setting street elevation profiles from digital elevation model...");
         List<StreetEdge> edgesWithElevation = new ArrayList<StreetEdge>();
         int nProcessed = 0;
         int nTotal = graph.countEdges();
@@ -112,8 +116,16 @@ public class ElevationModule implements GraphBuilderModule {
                         edgesWithElevation.add(edgeWithElevation);
                     }
                     nProcessed += 1;
-                    if (nProcessed % 50000 == 0)
+                    if (nProcessed % 50000 == 0) {
                         log.info("set elevation on {}/{} edges", nProcessed, nTotal);
+                        double failurePercentage = nPointsOutsideDEM / nPointsEvaluated * 100;
+                        if (failurePercentage > 50) {
+                            log.warn("Fetching elevation failed at {}/{} points ({}%)",
+                                    nPointsOutsideDEM, nPointsEvaluated, failurePercentage);
+                            log.warn("Elevation is missing at a large number of points. DEM may be for the wrong region. " +
+                                    "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
+                        }
+                    }
                 }
             }
         }
@@ -432,10 +444,16 @@ public class ElevationModule implements GraphBuilderModule {
     private double getElevation(double x, double y) {
         double values[] = new double[1];
         try {
-            coverage.evaluate(new DirectPosition2D(x, y), values);
+            // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
+            // That assumption is fine when the coverage happens to be in longitude-first WGS84 but we want to support
+            // GeoTIFFs in various projections. Note that GeoTools defaults to strict EPSG axis ordering of (lat, long)
+            // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes unprojected DEM
+            // rasters to also use (long, lat).
+            coverage.evaluate(new DirectPosition2D(GeometryUtils.WGS84_XY, x, y), values);
         } catch (org.opengis.coverage.PointOutsideCoverageException e) {
-            // skip this for now
+            nPointsOutsideDEM += 1;
         }
+        nPointsEvaluated += 1;
         return values[0];
     }
 

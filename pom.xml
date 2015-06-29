@@ -6,7 +6,7 @@
     <url>http://opentripplanner.org/</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>0.16.0-SNAPSHOT</version>
+    <version>0.19.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <scm>
@@ -17,16 +17,11 @@
 
     <properties>
         <geotools.version>10.5</geotools.version>
-        <jackson.version>2.4.3</jackson.version>
+        <jackson.version>2.5.3</jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <distributionManagement>
-        <site>
-            <id>opentripplanner-docs</id>
-            <name>OpenTripPlanner Documentation</name>
-            <url>s3://docs.opentripplanner.org/</url>
-        </site>
         <repository>
             <!-- Also used as snapshotRepository by default -->
             <id>conveyal-maven-repo</id>
@@ -64,6 +59,13 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+            </resource>
+            <resource>
+                <!-- shell scripts to start up OTP, need to be filtered to get JAR file name -->
+                <directory>src/scripts</directory>
+                <filtering>true</filtering>
+                <!-- Copy the scripts up into the root of the repo, not /target/classes -->
+                <targetPath>../..</targetPath>
             </resource>
             <resource>
                 <directory>src/client</directory>
@@ -126,8 +128,19 @@
                 <version>3.1</version>
                 <configuration>
                     <!-- Target Java versions -->
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- This plugin must be configured both here (for attach-javadoc during release)
+                and in "reports" (for site generation), preferably with identical version numbers. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <configuration>
+                    <!-- Turn off Java 8 strict Javadoc checking -->
+                    <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
             <plugin>
@@ -157,25 +170,6 @@
                     <argLine>-Xmx2G</argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
-                </configuration>
-            </plugin>
-            <plugin>
-                <!-- Generate REST API documentation from Jersey-annotated classes -->
-                <groupId>org.codehaus.enunciate</groupId>
-                <artifactId>maven-enunciate-plugin</artifactId>
-                <version>1.29</version>
-                <executions>
-                    <execution>
-                        <!-- default binding for docs goal is process-sources phase, since enunciate can make a web service -->
-                        <phase>site</phase>
-                        <goals>
-                            <goal>docs</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <!-- change this to wherever you want the docs -->
-                    <docsDir>${project.build.directory}/site/enunciate</docsDir>
                 </configuration>
             </plugin>
             <plugin>
@@ -238,8 +232,10 @@
                                     </excludes>
                                 </filter>
                             </filters>
-                            <!-- The shaded JAR will be the main artifact for the project -->
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <!-- The shaded JAR will not be the main artifact for the project, it will be attached
+                              for deployment in the way source and docs are. -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
                             <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
                               We have eliminated most Jersey auto-scanning, but there is still some need for include
                               filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
@@ -292,9 +288,15 @@
                 </reportSets>
             </plugin>
             <plugin>
+                <!-- This plugin must be configured both here (for site generation) and in "build"
+                (for attach-javadoc during release), preferably with identical version numbers. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.10.3</version>
+                <configuration>
+                    <!-- Turn off Java 8 strict Javadoc checking -->
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -360,26 +362,40 @@
         <dependency>
             <groupId>org.mapdb</groupId>
             <artifactId>mapdb</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
 
-        <!-- Logging library -->
+        <!-- Amazon AWS client libraries -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.9.39</version>
+        </dependency>
+
+        <!-- Logging library, implements slf4j logging API -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
         </dependency>
-        <!-- Jersey uses java.util logging, redirect it via slf4j API to Logback -->
+        <!-- Jersey uses java.util logging, redirect it to slf4j API (we use the Logback implementation) -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
+            <version>1.7.6</version>
+        </dependency>
+        <!-- AWS SDK uses Java commons logging. Redirect it to the slf4j API (we use the Logback implementation) -->
+        <!-- Why does this work? It seems like we'd need to declare JCL "provided" to avoid using the true JCL. -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
             <version>1.7.6</version>
         </dependency>
         <!-- Guava provides improved collections, among other things. -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>14.0.1</version>
+            <version>18.0</version>
         </dependency>
         <!-- Trove provides optimized map/set collections for native types (int, long...) -->
         <dependency>
@@ -460,7 +476,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.0</version>
+            <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
 
@@ -468,18 +484,18 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>2.13</version>
+            <version>2.17</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-multipart</artifactId>
-            <version>2.13</version>
+            <version>2.17</version>
         </dependency>
         <!-- Deploy Jersey apps in stand-alone Grizzly server instead of a servlet container. -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-http</artifactId>
-            <version>2.13</version>
+            <version>2.17</version>
         </dependency>
 
         <!-- Jackson modules. -->
@@ -525,11 +541,6 @@
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
             <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>2.2.2</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -613,7 +624,7 @@
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.27</version>
+            <version>1.30</version>
         </dependency>
         <!-- CSV parser -->
         <dependency>
@@ -656,10 +667,14 @@
 
         <!-- Support for OTP scripting -->
         <dependency>
-	       <groupId>bsf</groupId>
-	       <artifactId>bsf</artifactId>
-	       <version>2.4.0</version>
+            <groupId>bsf</groupId>
+            <artifactId>bsf</artifactId>
+            <version>2.4.0</version>
         </dependency>
+        <!--
+            Scripting language dependencies such as Groovy and Jython can double the size of the OTP JAR.
+            Therefore we don't include them by default. You can either update the POM in your fork to include the
+            scripting dependencies, or simply download them and add them to the classpath on the command line.
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
@@ -668,9 +683,9 @@
         <dependency>
             <groupId>org.python</groupId>
             <artifactId>jython</artifactId>
-            <version>2.5.3</version>
+            <version>2.7.0</version>
         </dependency>
-
+        -->
     </dependencies>
 
 </project>

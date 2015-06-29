@@ -15,4 +15,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-java -Xmx6G -cp `dirname $0`/otp-core/target/otp.jar org.opentripplanner.analyst.batch.BatchProcessor $1
+java -Xmx6G -Xverify:none -cp `dirname $0`/target/${project.build.finalName}-shaded.jar org.opentripplanner.analyst.batch.BatchProcessor $1

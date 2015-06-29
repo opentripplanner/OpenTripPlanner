@@ -13,6 +13,8 @@
 
 package org.opentripplanner.analyst.core;
 
+import java.io.Serializable;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -20,7 +22,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author laurent
  */
-public class IsochroneData {
+public class IsochroneData implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public int cutoffSec;
 

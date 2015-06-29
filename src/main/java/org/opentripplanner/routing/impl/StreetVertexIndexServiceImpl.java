@@ -23,6 +23,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.opentripplanner.analyst.core.Sample;
+import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -32,6 +34,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.SampleEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
@@ -41,6 +44,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -52,6 +56,9 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.strtree.STRtree;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
@@ -75,16 +82,19 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     // private static final double SEARCH_RADIUS_M = 100; // meters
     // private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
 
-    /* all distance constants here are plate-carée Euclidean, 0.001 ~= 100m at equator */
-
-    // Edges will only be found if they are closer than this distance
-    public static final double MAX_DISTANCE_FROM_STREET = 0.01000;
-
-    // Maximum difference in distance for two geometries to be considered coincident
+    // Maximum difference in distance for two geometries to be considered coincident, plate-carée Euclidean
+    // 0.001 ~= 100m at equator
     public static final double DISTANCE_ERROR = 0.000001;
 
     // If a point is within MAX_CORNER_DISTANCE, it is treated as at the corner.
     private static final double MAX_CORNER_DISTANCE_METERS = 10;
+    
+    // Edges will only be found if they are closer than this distance
+    // TODO: this default may be too large?
+    public static final double MAX_DISTANCE_FROM_STREET_METERS = 1000;
+    
+    private static final double MAX_DISTANCE_FROM_STREET_DEGREES =
+            MAX_DISTANCE_FROM_STREET_METERS * 180 / Math.PI / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
 
     static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
@@ -125,7 +135,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @return the new TemporaryStreetLocation
      */
     public static TemporaryStreetLocation createTemporaryStreetLocation(Graph graph, String label,
-            String name, Iterable<StreetEdge> edges, Coordinate nearestPoint, boolean endVertex) {
+            I18NString name, Iterable<StreetEdge> edges, Coordinate nearestPoint, boolean endVertex) {
         boolean wheelchairAccessible = false;
 
         TemporaryStreetLocation location = new TemporaryStreetLocation(label, nearestPoint, name,
@@ -168,7 +178,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     }
 
-    private static void createHalfLocation(TemporaryStreetLocation base, String name,
+    private static void createHalfLocation(TemporaryStreetLocation base, I18NString name,
                 Coordinate nearestPoint, StreetEdge street, boolean endVertex) {
         StreetVertex tov = (StreetVertex) street.getToVertex();
         StreetVertex fromv = (StreetVertex) street.getFromVertex();
@@ -281,7 +291,16 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
         StreetVertex intersection = getIntersectionAt(coord);
-        String calculatedName = location.name;
+        I18NString calculatedName = null;
+        Locale locale;
+        if (options == null) {
+            locale = ResourceBundleSingleton.INSTANCE.getDefaultLocale();
+        } else {
+            locale = options.locale;
+        }
+        if (location.name != null) {
+            calculatedName = new NonLocalizedString(location.name);
+        }
         if (intersection != null) {
             // We have an intersection vertex. Check that this vertex has edges we can traverse.
             boolean canEscape = false;
@@ -302,29 +321,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // Coordinate is at an intersection or street endpoint, and has traversible edges.
                 if (!location.hasName()) {
                     LOG.debug("found intersection {}. not splitting.", intersection);
-                    // generate names for corners when no name was given
-                    Set<String> uniqueNameSet = new HashSet<String>();
-                    for (Edge e : intersection.getOutgoing()) {
-                        if (e instanceof StreetEdge) {
-                            uniqueNameSet.add(e.getName());
-                        }
-                    }
-                    List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
-                    Locale locale;
-                    if (options == null) {
-                        locale = new Locale("en");
-                    } else {
-                        locale = options.locale;
-                    }
-                    ResourceBundle resources = ResourceBundle.getBundle("internals", locale);
-                    String fmt = resources.getString("corner");
-                    if (uniqueNames.size() > 1) {
-                        calculatedName = String.format(fmt, uniqueNames.get(0), uniqueNames.get(1));
-                    } else if (uniqueNames.size() == 1) {
-                        calculatedName = uniqueNames.get(0);
-                    } else {
-                        calculatedName = resources.getString("unnamedStreet");
-                    }
+
+                    calculatedName = intersection.getIntersectionName(locale);
+
                 }
                 TemporaryStreetLocation closest = new TemporaryStreetLocation(
                         "corner " + Math.random(), coord, calculatedName, endVertex);
@@ -367,10 +366,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             Coordinate nearestPoint = candidate.nearestPointOnEdge;
             closestStreetDistance = SphericalDistanceLibrary.distance(coord, nearestPoint);
             LOG.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
-            if (calculatedName == null || "".equals(calculatedName)) {
-                calculatedName = bestStreet.getName();
+            if (calculatedName == null || "".equals(calculatedName.toString(locale))) {
+                calculatedName = new NonLocalizedString(bestStreet.getName(locale));
             }
-            String closestName = String.format("%s_%s", bestStreet.getName(), location.toString());
+            //TODO: Where is this closestName actually used?
+            String closestName = String.format("%s_%s", calculatedName.toString(locale), location.toString());
             closestStreet = createTemporaryStreetLocation(graph, closestName, calculatedName,
                     bundle.toEdgeList(), nearestPoint, endVertex);
         }
@@ -445,14 +445,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Coordinate coordinate = location.getCoordinate();
         Envelope envelope = new Envelope(coordinate);
 
-        double envelopeGrowthAmount = 0.001; // ~= 100 meters
+        double envelopeGrowthAmount = 0.001; // ~= 100 meters at equator
+        
+        // in latitude degrees, converted to longitude degrees as needed
         double radius = 0;
+        
+        double xscale = Math.cos(coordinate.y * Math.PI / 180);
+        
         CandidateEdgeBundle candidateEdges = new CandidateEdgeBundle();
         while (candidateEdges.size() == 0) {
             // expand envelope -- assumes many close searches and occasional far ones
-            envelope.expandBy(envelopeGrowthAmount);
+            // scale the latitude degrees so that longitude is equivalent
+            envelope.expandBy(envelopeGrowthAmount / xscale, envelopeGrowthAmount);
             radius += envelopeGrowthAmount;
-            if (radius > MAX_DISTANCE_FROM_STREET) {
+            if (radius > MAX_DISTANCE_FROM_STREET_DEGREES) {
                 return candidateEdges; // empty list
             }
 
@@ -486,6 +492,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
+                // The distance is represented in latitude degrees regardless of direction because the
+                // coordinate system is scaled
                 if (ce.distance < radius) {
                     candidateEdges.add(ce);
                 }
@@ -550,6 +558,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double bestDistanceMeter = Double.POSITIVE_INFINITY;
         for (Vertex v : nearby) {
             if (v instanceof StreetVertex) {
+                v.getLabel().startsWith("osm:");
                 double distanceMeter = SphericalDistanceLibrary.fastDistance(coordinate, v.getCoordinate());
                 if (distanceMeter < MAX_CORNER_DISTANCE_METERS) {
                     if (distanceMeter < bestDistanceMeter) {
@@ -561,7 +570,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return nearest;
     }
-
+    
     @Override
     public Vertex getVertexForLocation(GenericLocation loc, RoutingRequest options,
                                        boolean endVertex) {
@@ -591,5 +600,25 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public Coordinate getClosestPointOnStreet(Coordinate c) {
         CandidateEdge e = getClosestEdges(new GenericLocation(c), new TraversalRequirements()).best;
         return e != null ? e.nearestPointOnEdge : null;
+    }
+
+    @Override
+    public Vertex getSampleVertexAt(Coordinate coordinate) {
+        SampleFactory sfac = graph.getSampleFactory();
+
+        Sample s = sfac.getSample(coordinate.x, coordinate.y);
+
+        if (s == null)
+            return null;
+
+        // create temp vertex
+        // TODO dest sample vertices for arrive-by
+        SampleVertex v = new SampleVertex(graph, coordinate);
+
+        // create edges
+        new SampleEdge(v, s.v0, s.d0);
+        new SampleEdge(v, s.v1, s.d1);
+
+        return v;
     }
 }

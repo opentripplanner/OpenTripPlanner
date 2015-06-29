@@ -11,14 +11,13 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.graph_builder.linking;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +41,16 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("Linking transit stops to streets...");
-        NetworkLinker linker = new NetworkLinker(graph, extra);
-        linker.createLinkage();
+        // split streets
+        //NetworkLinker linker = new NetworkLinker(graph, extra);
+        //linker.createLinkage();
+        
+        SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
+        splitter.link();
+        
+        // don't split streets
+        //SampleStopLinker linker = new SampleStopLinker(graph);
+        //linker.link(true);
     }
 
     @Override

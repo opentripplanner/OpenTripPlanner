@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.graph;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -37,14 +38,12 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -301,12 +300,9 @@ public class GraphIndex {
     /**
      * Fetch upcoming vehicle departures from a stop.
      * Fetches two departures for each pattern during the next 24 hours as default
-     *
-     * @param stop
-     * @return
      */
     public Collection<StopTimesInPattern> stopTimesForStop(Stop stop) {
-        return getStopTimesForStop(stop, 24 * 60 * 60, 2);
+        return stopTimesForStop(stop, System.currentTimeMillis()/1000, 24 * 60 * 60, 2);
     }
 
     /**
@@ -317,15 +313,17 @@ public class GraphIndex {
      * eg. with sleeper trains.
      *
      * TODO: Add frequency based trips
-     *
-     * @param stop
-     * @param timeRange
-     * @param numberOfDepartures
+     * @param stop Stop object to perform the search for
+     * @param startTime Start time for the search. Seconds from UNIX epoch
+     * @param timeRange Searches forward for timeRange seconds from startTime
+     * @param numberOfDepartures Number of departures to fetch per pattern
      * @return
      */
-    public List<StopTimesInPattern> getStopTimesForStop(Stop stop, int timeRange, int numberOfDepartures) {
+    public List<StopTimesInPattern> stopTimesForStop(Stop stop, long startTime, int timeRange, int numberOfDepartures) {
 
-        long now = System.currentTimeMillis()/1000;
+        if (startTime == 0) {
+            startTime = System.currentTimeMillis() / 1000;
+        }
         List<StopTimesInPattern> ret = new ArrayList<>();
         TimetableSnapshot snapshot = null;
         if (graph.timetableSnapshotSource != null) {
@@ -355,9 +353,9 @@ public class GraphIndex {
                     tt = pattern.scheduledTimetable;
                 }
 
-                if (!tt.temporallyViable(sd, now, timeRange, true)) continue;
+                if (!tt.temporallyViable(sd, startTime, timeRange, true)) continue;
 
-                int secondsSinceMidnight = sd.secondsSinceMidnight(now);
+                int secondsSinceMidnight = sd.secondsSinceMidnight(startTime);
                 int sidx = 0;
                 for (Stop currStop : pattern.stopPattern.stops) {
                     if (currStop == stop) {
@@ -403,8 +401,8 @@ public class GraphIndex {
      * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when creating complete stop
      * timetables for a single day.
      *
-     * @param stop
-     * @param serviceDate
+     * @param stop Stop object to perform the search for
+     * @param serviceDate Return all departures for the specified date
      * @return
      */
     public List<StopTimesInPattern> getStopTimesForStop(Stop stop, ServiceDate serviceDate) {
@@ -440,9 +438,11 @@ public class GraphIndex {
 
     /** Fetch a cache of nearby intersection distances for every transit stop in this graph, lazy-building as needed. */
     public StopTreeCache getStopTreeCache() {
-        synchronized (this) {
-            if (stopTreeCache == null) {
-                stopTreeCache = new StopTreeCache(graph, 20); // TODO make this max-distance variable
+        if (stopTreeCache == null) {
+            synchronized (this) {
+                if (stopTreeCache == null) {
+                    stopTreeCache = new StopTreeCache(graph, 2000); // TODO make this max-distance variable
+                }
             }
         }
         return stopTreeCache;

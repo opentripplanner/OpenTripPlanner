@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.StreetUtils;
+import org.opentripplanner.graph_builder.linking.TransitToStreetNetworkModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.*;
@@ -52,7 +53,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
      */
     private String islandLogFile;
 
-    private TransitToStreetNetworkModule transitToStreetNetwork;
+    private StreetLinkerModule transitToStreetNetwork;
 
     public List<String> provides() {
         return Collections.emptyList();
