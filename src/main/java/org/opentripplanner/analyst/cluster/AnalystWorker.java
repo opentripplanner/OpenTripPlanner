@@ -182,6 +182,9 @@ public class AnalystWorker implements Runnable {
 
             ts.graphBuild = (int) (System.currentTimeMillis() - graphStartTime);
 
+            ts.graphTripCount = graph.index.patternForTrip.size();
+            ts.graphStopCount = graph.index.stopForId.size();
+
             // This result envelope will hold the result of the profile or single-time one-to-many search.
             ResultEnvelope envelope = new ResultEnvelope();
             if (clusterRequest.profileRequest != null) {

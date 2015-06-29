@@ -25,6 +25,9 @@ public class TaskStatistics {
     /** milliseconds spent in propagating travel times from transit stops to targets */
     public int propagation = -1;
 
+    /** time to make raptor data (milliseconds) */
+    public int raptorData;
+
     /** number of discrete times (e.g. minutes) for which a RAPTOR search was performed */
     public int searchCount;
 
@@ -60,6 +63,12 @@ public class TaskStatistics {
 
     /** number of frequency entries */
     public int frequencyEntryCount = -1;
+
+    /** number of stops in the graph */
+    public int graphStopCount;
+
+    /** number of trips in the graph */
+    public int graphTripCount;
 
     /** latitude of origin (note: potentially sensitive, should be stripped from some analyses) */
     public double lat;

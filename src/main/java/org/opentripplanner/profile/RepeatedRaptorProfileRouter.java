@@ -126,6 +126,7 @@ public class RepeatedRaptorProfileRouter {
         /** THIN WORKERS */
         LOG.info("Make data...");
 
+        long startData = System.currentTimeMillis();
         // convert from joda to java - ISO day of week with monday == 1
         DayOfWeek dayOfWeek = DayOfWeek.of(request.date.getDayOfWeek());
 
@@ -136,6 +137,9 @@ public class RepeatedRaptorProfileRouter {
             raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, ts);
         else
             raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, sampleSet, ts);
+
+        ts.raptorData = (int) (System.currentTimeMillis() - startData);
+
         LOG.info("Done.");
         // TEST SERIALIZED SIZE and SPEED
         //        try {
