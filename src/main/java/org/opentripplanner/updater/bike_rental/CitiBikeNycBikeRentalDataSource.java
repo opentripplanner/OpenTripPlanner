@@ -22,26 +22,30 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 
 /**
- * Build a BikeRentalStation object from a B-Cycle data source JsonNode object.
+ * Build a BikeRentalStation object from CitiBike data source JsonNode object.
  *
  * @see GenericJsonBikeRentalDataSource
  */
-public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+public class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
     private String networkName;
 
-    public BCycleBikeRentalDataSource(String apiKey, String networkName) {
-        super("", apiKey);
+    public CitiBikeNycBikeRentalDataSource(String networkName) {
+        super("stationBeanList");
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {
-            this.networkName = "B-Cycle";
+            this.networkName = "CitiBike";
         }
     }
 
-    public BikeRentalStation makeStation(JsonNode kioskNode) {
+    public BikeRentalStation makeStation(JsonNode stationNode) {
 
-        if (!kioskNode.path("Status").asText().equals("Active")) {
+        if (!stationNode.path("statusValue").asText().equals("In Service")) {
+            return null;
+        }
+
+        if (stationNode.path("testStation").asText().equals("true")) {
             return null;
         }
 
@@ -50,12 +54,12 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
         brstation.networks = new HashSet<String>();
         brstation.networks.add(this.networkName);
 
-        brstation.id = kioskNode.path("Id").toString();
-        brstation.x = kioskNode.path("Location").path("Longitude").asDouble();
-        brstation.y = kioskNode.path("Location").path("Latitude").asDouble();
-        brstation.name =  new NonLocalizedString(kioskNode.path("Name").asText());
-        brstation.bikesAvailable = kioskNode.path("BikesAvailable").asInt();
-        brstation.spacesAvailable = kioskNode.path("DocksAvailable").asInt();
+        brstation.id = stationNode.path("id").toString();
+        brstation.x = stationNode.path("longitude").asDouble();
+        brstation.y = stationNode.path("latitude").asDouble();
+        brstation.name =  new NonLocalizedString(stationNode.path("stationName").asText());
+        brstation.bikesAvailable = stationNode.path("availableBikes").asInt();
+        brstation.spacesAvailable = stationNode.path("availableDocks").asInt();
 
         return brstation;
     }
