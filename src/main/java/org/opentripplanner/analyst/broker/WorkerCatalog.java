@@ -77,4 +77,8 @@ public class WorkerCatalog {
         return null;
     }
 
+    public int size () {
+        return workersByGraph.size();
+    }
+
 }
