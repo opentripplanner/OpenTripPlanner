@@ -1,10 +1,16 @@
 package org.opentripplanner.analyst.broker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.TObjectFloatMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectFloatHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
@@ -12,6 +18,7 @@ import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
+import org.opentripplanner.analyst.cluster.AnalystWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +77,8 @@ public class Broker implements Runnable {
         mapper.registerModule(TraverseModeSetSerializer.makeModule());
     }
 
+    private WorkerCatalog workerCatalog = new WorkerCatalog();
+
     /** The messages that have already been delivered to a worker. */
     TIntObjectMap<AnalystClusterRequest> deliveredTasks = new TIntObjectHashMap<>();
 
@@ -118,7 +127,15 @@ public class Broker implements Runnable {
 
     /** Consumer long-poll operations are enqueued here. */
     public synchronized void registerSuspendedResponse(String graphId, Response response) {
-        // The workers are not allowed to request a specific job or task, just a specific graph and queue type.
+        // Add this worker to our catalog, tracking its graph affinity and the last time it was seen.
+        String workerId = response.getRequest().getHeader(AnalystWorker.WORKER_ID_HEADER);
+        if (workerId != null && !workerId.isEmpty()) {
+            workerCatalog.catalog(workerId, graphId);
+        } else {
+            LOG.error("Worker did not supply a unique ID for itself . Ignoring it.");
+            return;
+        }
+        // Shelf this suspended response in a queue grouped by graph affinity.
         Deque<Response> deque = consumersByGraph.get(graphId);
         if (deque == null) {
             deque = new ArrayDeque<>();
@@ -361,5 +378,15 @@ public class Broker implements Runnable {
         if (job == null) return false;
         nUndeliveredTasks -= job.visibleTasks.size();
         return jobs.remove(job);
+    }
+
+    private Multimap<String, String> activeJobsPerGraph = HashMultimap.create();
+
+    void activateJob (Job job) {
+        activeJobsPerGraph.put(job.graphId, job.jobId);
+    }
+
+    void deactivateJob (Job job) {
+        activeJobsPerGraph.remove(job.graphId, job.jobId);
     }
 }

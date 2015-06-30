@@ -22,6 +22,7 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.ResultSet;
@@ -52,6 +53,8 @@ public class AnalystWorker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AnalystWorker.class);
 
+    public static final String WORKER_ID_HEADER = "X-Worker-Id";
+
     public static final int POLL_TIMEOUT = 10000;
 
     public static final Random random = new Random();
@@ -80,6 +83,9 @@ public class AnalystWorker implements Runnable {
                 .setConnectionManager(mgr)
                 .build();
     }
+
+    private final String workerId = UUID.randomUUID().toString().replace("-", ""); // a unique identifier for each worker so the broker can catalog them
+
 
     // Of course this will eventually need to be shared between multiple AnalystWorker threads.
     ClusterGraphBuilder clusterGraphBuilder;
@@ -267,6 +273,7 @@ public class AnalystWorker implements Runnable {
         // Run a POST request (long-polling for work) indicating which graph this worker prefers to work on
         String url = BROKER_BASE_URL + "/dequeue/" + graphId;
         HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader(new BasicHeader(WORKER_ID_HEADER, workerId));
         HttpResponse response = null;
         try {
             response = httpClient.execute(httpPost);
