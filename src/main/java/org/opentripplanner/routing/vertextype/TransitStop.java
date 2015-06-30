@@ -55,8 +55,8 @@ public class TransitStop extends TransitStationStop {
         super(graph, stop);
         this.wheelchairEntrance = stop.getWheelchairBoarding() != 2;
         isEntrance = stop.getLocationType() == 2;
-        //Adds this vertex into graph Metadata so that we don't need to loop over all vertices
-        graph.getMetadata().expandToInclude(stop.getLon(), stop.getLat());
+        //Adds this vertex into graph envelope so that we don't need to loop over all vertices
+        graph.expandToInclude(stop.getLon(), stop.getLat());
     }
 
     public boolean hasWheelchairEntrance() {
