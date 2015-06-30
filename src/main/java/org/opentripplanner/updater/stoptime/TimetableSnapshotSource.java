@@ -192,7 +192,7 @@ public class TimetableSnapshotSource {
                 buffer.clear(feedId);
             }
 
-            LOG.info("message contains {} trip updates", updates.size());
+            LOG.debug("message contains {} trip updates", updates.size());
             int uIndex = 0;
             for (TripUpdate tripUpdate : updates) {
                 if (fuzzyTripMatcher != null && tripUpdate.hasTrip()) {
