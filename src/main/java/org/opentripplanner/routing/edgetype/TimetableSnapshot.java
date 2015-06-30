@@ -15,7 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -291,9 +290,7 @@ public class TimetableSnapshot {
      * @return true if the timetable changed as a result of the call
      */
     protected boolean clearTimetable(String feedId) {
-        return timetables.keySet().removeAll(timetables.keySet().stream()
-                .filter(timeTable -> feedId.equals(timeTable.getFeedId()))
-                .collect(Collectors.toSet()));
+        return timetables.keySet().removeIf(tripPattern -> feedId.equals(tripPattern.getFeedId()));
     }
 
     /**
@@ -303,9 +300,7 @@ public class TimetableSnapshot {
      * @return true if the lastAddedTripPattern changed as a result of the call
      */
     protected boolean clearLastAddedTripPattern(String feedId) {
-        return lastAddedTripPattern.keySet().removeAll(lastAddedTripPattern.keySet().stream()
-                        .filter(lastAddedTripPattern -> feedId.equals(lastAddedTripPattern.getFeedId()))
-                        .collect(Collectors.toSet()));
+        return lastAddedTripPattern.keySet().removeIf(lastAddedTripPattern -> feedId.equals(lastAddedTripPattern.getFeedId()));
     }
 
     /**
