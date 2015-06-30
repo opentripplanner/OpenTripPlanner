@@ -30,7 +30,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.opentripplanner.api.resource.GraphEnvelope;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.WorldEnvelope;
@@ -62,9 +61,8 @@ public class RouterInfo {
         this.routerId = routerId;
         this.polygon = graph.getConvexHull();
         this.buildTime = graph.buildTime;
-        GraphEnvelope graphEnvelope = graph.getMetadata();
         this.transitModes = graph.getTransitModes();
-        this.envelope = graphEnvelope.getEnvelope();
+        this.envelope = graph.getEnvelope();
         addCenter(graph.getCenter());
     }
 

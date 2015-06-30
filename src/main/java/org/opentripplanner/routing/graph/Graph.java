@@ -53,7 +53,6 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
-import org.opentripplanner.api.resource.GraphEnvelope;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
@@ -77,6 +76,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,7 +162,8 @@ public class Graph implements Serializable {
 
     private transient TimeZone timeZone = null;
 
-    private GraphEnvelope graphEnvelope = null;
+    //Envelope of all OSM and transit vertices. Calculated during build time
+    private WorldEnvelope envelope = null;
 
     //ConvexHull of all the graph vertices. Generated at Graph build time.
     private Geometry convexHull = null;
@@ -962,33 +963,17 @@ public class Graph implements Serializable {
         }
     }
 
-    public GraphEnvelope getMetadata() {
-        // Lazy-initialize the graph metadata since it is not serialized.
-        if (graphEnvelope == null) {
-            graphEnvelope = new GraphEnvelope(this);
-        }
-        return graphEnvelope;
-    }
-
     /**
-     * @return true if graph has metadata
-     */
-    public boolean hasMetadata() {
-        return graphEnvelope != null;
-    }
-
-    /**
-     * This is used in {@link org.opentripplanner.graph_builder.module.StreetLinkerModule} to skip stops
-     * That aren't inside OSM data envelope
+     * Calculates envelope out of all OSM coordinates
      *
-     * @param c Stop coordinate
-     * @return true if coordinate is in graph envelope
+     * Transit stops are added to the envelope as they are added to the graph
      */
-    public boolean containsInOSM(Coordinate c) {
-        if (graphEnvelope != null) {
-            return graphEnvelope.contains(c);
-        } else {
-            return false;
+    public void calculateEnvelope() {
+        this.envelope = new WorldEnvelope();
+
+        for (Vertex v : this.getVertices()) {
+            Coordinate c = v.getCoordinate();
+            this.envelope.expandToInclude(c);
         }
     }
 
@@ -1006,7 +991,28 @@ public class Graph implements Serializable {
         return convexHull;
 
     }
-   
+
+    /**
+     * Expands envelope to include given point
+     *
+     * If envelope is empty it creates it (This can happen with a graph without OSM data)
+     * Used when adding stops to OSM envelope
+     *
+     * @param  x  the value to lower the minimum x to or to raise the maximum x to
+     * @param  y  the value to lower the minimum y to or to raise the maximum y to
+     */
+    public void expandToInclude(double x, double y) {
+        //Envelope can be empty if graph building is run without OSM data
+        if (this.envelope == null) {
+            calculateEnvelope();
+        }
+        this.envelope.expandToInclude(x, y);
+    }
+
+    public WorldEnvelope getEnvelope() {
+        return this.envelope;
+    }
+
     // lazy-init geom index on an as needed basis
     public GeometryIndex getGeomIndex() {
     	
