@@ -81,7 +81,16 @@ public class RepeatedRaptorProfileRouter {
 
     /**
      * Make a router to use for making time surfaces only.
+     *
      * If you're building ResultSets, you should use the below method that uses a SampleSet; otherwise you maximum and average may not be correct.
+     *
+     * If you want isochrones, you should use this method, or use a sampleset that is very fine. The
+     * reason for this is that isochrones are interpolated from these points in Euclidean space, so the
+     * points need to be very fine. Consider the case of three roads in an equilateral triangle, the edges
+     * of which each take ten minutes to traverse. If you're standing at one vertex and want to go
+     * halfway down the opposite edge, it is a fifteen minute trip. However, interpolating between the
+     * vertices will not give fifteen minutes, it will give ten. The less granular your representation
+     * is, the worse this problem will be.
      */
     public RepeatedRaptorProfileRouter(Graph graph, ProfileRequest request) {
         this(graph, request, null);

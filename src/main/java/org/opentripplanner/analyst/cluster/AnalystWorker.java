@@ -219,8 +219,8 @@ public class AnalystWorker implements Runnable {
 
                     if (isochrone) {
                         envelope.worstCase = new ResultSet(router.timeSurfaceRangeSet.max);
-                        envelope.bestCase = new ResultSet(router.timeSurfaceRangeSet.max);
-                        envelope.avgCase = new ResultSet(router.timeSurfaceRangeSet.min);
+                        envelope.bestCase = new ResultSet(router.timeSurfaceRangeSet.min);
+                        envelope.avgCase = new ResultSet(router.timeSurfaceRangeSet.avg);
                     } else {
                         ResultSet.RangeSet results = router
                                 .makeResults(clusterRequest.includeTimes, !isochrone, isochrone);
