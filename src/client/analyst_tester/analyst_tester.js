@@ -23,7 +23,7 @@ var fromMarker = L.marker(center, {draggable: true});
 // Find center of default region
 var center;
 var req = new XMLHttpRequest();
-req.open('GET', 'http://localhost:8080/otp/routers/default/metadata', false); // async=false, define center before setting up map
+req.open('GET', 'http://localhost:8080/otp/routers/default', false); // async=false, define center before setting up map
 req.setRequestHeader("Accept", "application/json");
 req.onload = function() {
     var resp = JSON.parse(req.responseText);

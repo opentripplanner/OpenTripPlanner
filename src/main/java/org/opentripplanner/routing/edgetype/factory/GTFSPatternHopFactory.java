@@ -456,7 +456,7 @@ public class GTFSPatternHopFactory {
                 if (mode == TraverseMode.SUBWAY) {
                     tstop.setStreetToStopTime(subwayAccessTime);
                 }
-                graph.getMetadata().addMode(mode);
+                graph.addTransitMode(mode);
             }
 
         }

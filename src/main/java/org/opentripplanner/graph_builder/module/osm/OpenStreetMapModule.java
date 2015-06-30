@@ -203,7 +203,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         handler.buildGraph(extra);
         graph.hasStreets = true;
         //Calculates envelope for OSM
-        graph.getMetadata();
+        graph.calculateEnvelope();
     }
 
     /*
