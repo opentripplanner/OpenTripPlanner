@@ -31,7 +31,6 @@ import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
-import org.opentripplanner.profile.IsochroneGenerator;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -197,7 +196,9 @@ public class AnalystWorker implements Runnable {
                 ts.lon = clusterRequest.profileRequest.fromLon;
                 ts.lat = clusterRequest.profileRequest.fromLat;
 
-                SampleSet sampleSet;
+
+                RepeatedRaptorProfileRouter router;
+
                 boolean isochrone = clusterRequest.destinationPointsetId == null;
                 ts.isochrone = isochrone;
                 if (!isochrone) {
@@ -205,24 +206,29 @@ public class AnalystWorker implements Runnable {
                     // Fetch the set of points we will use as destinations for this one-to-many search
                     PointSet pointSet = pointSetDatastore.get(clusterRequest.destinationPointsetId);
                     // TODO this breaks if graph has been rebuilt
-                    sampleSet = pointSet.getOrCreateSampleSet(graph);
+                    SampleSet sampleSet = pointSet.getOrCreateSampleSet(graph);
+                    router =
+                            new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
                 } else {
-                    // TODO cache
-                    // FIXME this is making a regular grid and then projecting it into another regular
-                    // grid with the same grid size in IsochroneGenerator.
-                    PointSet grid = PointSet.regularGrid(graph.getExtent(), IsochroneGenerator.GRID_SIZE_METERS);
-                    sampleSet = grid.getSampleSet(graph);
+                    router = new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest);
                 }
-                RepeatedRaptorProfileRouter router =
-                        new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
+
                 try {
                     router.route(ts);
                     long resultSetStart = System.currentTimeMillis();
-                    ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, !isochrone, isochrone);
-                    // put in constructor?
-                    envelope.bestCase = results.min;
-                    envelope.avgCase = results.avg;
-                    envelope.worstCase = results.max;
+
+                    if (isochrone) {
+                        envelope.worstCase = new ResultSet(router.timeSurfaceRangeSet.max);
+                        envelope.bestCase = new ResultSet(router.timeSurfaceRangeSet.max);
+                        envelope.avgCase = new ResultSet(router.timeSurfaceRangeSet.min);
+                    } else {
+                        ResultSet.RangeSet results = router
+                                .makeResults(clusterRequest.includeTimes, !isochrone, isochrone);
+                        // put in constructor?
+                        envelope.bestCase = results.min;
+                        envelope.avgCase = results.avg;
+                        envelope.worstCase = results.max;
+                    }
                     envelope.id = clusterRequest.id;
                     envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
 
