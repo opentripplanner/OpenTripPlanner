@@ -74,7 +74,7 @@ public class TimetableSnapshot {
 
         @Override
         public int hashCode() {
-            int result = Objects.hash(tripId, serviceDate);
+            int result = Objects.hash(tripId, serviceDate, feedId);
             return result;
         }
 
