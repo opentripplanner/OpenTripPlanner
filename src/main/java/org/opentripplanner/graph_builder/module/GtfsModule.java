@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.module;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -212,6 +213,7 @@ public class GtfsModule implements GraphBuilderModule {
         }
         for (Route route : store.getAllEntitiesForType(Route.class)) {
             route.getId().setAgencyId(reader.getDefaultAgencyId());
+            generateRouteColor(route);
         }
         for (Stop stop : store.getAllEntitiesForType(Stop.class)) {
             stop.getId().setAgencyId(reader.getDefaultAgencyId());
@@ -234,6 +236,38 @@ public class GtfsModule implements GraphBuilderModule {
 
         store.close();
 
+    }
+
+    private void generateRouteColor(Route route) {
+        String routeColor = route.getColor();
+        if (routeColor == null) {
+            return;
+        }
+        String textColor = route.getTextColor();
+        if (textColor != null) {
+            return;
+        }
+
+        Color routeColorColor = Color.decode("#"+routeColor);
+        //gets float of RED, GREE, BLUE in range 0...1
+        float[] colorComponents = routeColorColor.getRGBColorComponents(null);
+        //Calculates luminance based on https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
+        double newRed = 0.299*Math.pow(colorComponents[0],2.0);
+        double newGreen = 0.587*Math.pow(colorComponents[1],2.0);
+        double newBlue = 0.114*Math.pow(colorComponents[2],2.0);
+        double luminance = Math.sqrt(newRed+newGreen+newBlue);
+
+        //For brighter colors use black text color and reverse for darker
+        if (luminance > 0.5) {
+            textColor = "000000";
+        } else {
+            textColor = "FFFFFF";
+        }
+        if (!textColor.equals(route.getTextColor())) {
+            LOG.error("Generated text color is: {}, previous is: {}", textColor, route.getTextColor());
+        }
+        //TODO: check the contrast
+        route.setTextColor(textColor);
     }
 
     private class StoreImpl implements GenericMutableDao {
