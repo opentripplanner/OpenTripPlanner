@@ -44,6 +44,7 @@ public class GeometryUtils {
         try {
             WGS84_XY = CRS.getAuthorityFactory(true).createCoordinateReferenceSystem("EPSG:4326");
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new RuntimeException("Could not create longitude-first WGS84 coordinate reference system.");
         }
     }

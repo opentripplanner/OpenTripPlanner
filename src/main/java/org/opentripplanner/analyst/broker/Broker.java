@@ -3,17 +3,17 @@ package org.opentripplanner.analyst.broker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.TObjectFloatMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TObjectFloatHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
+import org.opentripplanner.api.model.AgencyAndIdSerializer;
+import org.opentripplanner.api.model.JodaLocalDateSerializer;
+import org.opentripplanner.api.model.QualifiedModeSetSerializer;
+import org.opentripplanner.api.model.TraverseModeSetSerializer;
 import org.opentripplanner.analyst.cluster.AnalystWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +64,14 @@ public class Broker implements Runnable {
 
     private int nextTaskId = 0;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    static {
+        mapper.registerModule(AgencyAndIdSerializer.makeModule());
+        mapper.registerModule(QualifiedModeSetSerializer.makeModule());
+        mapper.registerModule(JodaLocalDateSerializer.makeModule());
+        mapper.registerModule(TraverseModeSetSerializer.makeModule());
+    }
 
     private WorkerCatalog workerCatalog = new WorkerCatalog();
 

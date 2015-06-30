@@ -1,8 +1,10 @@
 package org.opentripplanner.profile;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.analyst.scenario.AddTripPattern;
+import org.opentripplanner.analyst.scenario.Scenario;
+import org.opentripplanner.analyst.scenario.TripFilter;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -11,11 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A RaptorWorkerTimetable is used by a RaptorWorker to perform large numbers of RAPTOR searches very quickly
@@ -128,7 +127,7 @@ public class RaptorWorkerTimetable implements Serializable {
      * This is a factory function rather than a constructor to avoid calling the super constructor for rejected patterns.
      * BannedRoutes is formatted as agencyid_routeid.
      */
-    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Set<String> bannedRoutes) {
+    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Scenario scenario) {
 
         // Filter down the trips to only those running during the window
         // This filtering can reduce number of trips and run time by 80 percent
@@ -136,12 +135,19 @@ public class RaptorWorkerTimetable implements Serializable {
         List<TripTimes> tripTimes = Lists.newArrayList();
         TT: for (TripTimes tt : pattern.scheduledTimetable.tripTimes) {
             if (servicesRunning.get(tt.serviceCode) &&
-                    tt.getScheduledArrivalTime(0) < window.to &&
-                    tt.getScheduledDepartureTime(tt.getNumStops() - 1) >= window.from) {
+                    tt.getArrivalTime(0) < window.to &&
+                    tt.getDepartureTime(tt.getNumStops() - 1) >= window.from) {
 
-                AgencyAndId routeId = tt.trip.getRoute().getId();
-                if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
-                    continue;
+                // apply scenario
+                // TODO: need to do this before filtering based on window!
+                if (scenario != null && scenario.modifications != null) {
+                    for (TripFilter filter : Iterables.filter(scenario.modifications, TripFilter.class)) {
+                        tt = filter.apply(tt.trip, pattern, tt);
+
+                        if (tt == null)
+                            continue TT;
+                    }
+                }
 
                 tripTimes.add(tt);
             }
@@ -149,16 +155,11 @@ public class RaptorWorkerTimetable implements Serializable {
 
         // find frequency trips
         List<FrequencyEntry> freqs = Lists.newArrayList();
-        for (FrequencyEntry fe : pattern.scheduledTimetable.frequencyEntries) {
+        FREQUENCIES: for (FrequencyEntry fe : pattern.scheduledTimetable.frequencyEntries) {
             if (servicesRunning.get(fe.tripTimes.serviceCode) &&
                     fe.getMinDeparture() < window.to &&
                     fe.getMaxArrival() > window.from
                     ) {
-
-                AgencyAndId routeId = fe.tripTimes.trip.getRoute().getId();
-                if (bannedRoutes != null && bannedRoutes.contains(routeId.getAgencyId() + "_" + routeId.getId()))
-                    continue;
-
                 // this frequency entry has the potential to be used
 
                 if (fe.exactTimes) {
@@ -166,6 +167,14 @@ public class RaptorWorkerTimetable implements Serializable {
                     continue;
                 }
 
+                if (scenario != null && scenario.modifications != null) {
+                    for (TripFilter filter : Iterables.filter(scenario.modifications, TripFilter.class)) {
+                        fe = filter.apply(fe.tripTimes.trip, pattern, fe);
+
+                        if (fe == null)
+                            continue FREQUENCIES;
+                    }
+                }
 
                 freqs.add(fe);
             }
@@ -180,7 +189,7 @@ public class RaptorWorkerTimetable implements Serializable {
         Collections.sort(tripTimes, new Comparator<TripTimes>() {
             @Override
             public int compare(TripTimes tt1, TripTimes tt2) {
-                return (tt1.getScheduledArrivalTime(0) - tt2.getScheduledArrivalTime(0));
+                return (tt1.getArrivalTime(0) - tt2.getArrivalTime(0));
             }
         });
 
@@ -190,8 +199,8 @@ public class RaptorWorkerTimetable implements Serializable {
         for (TripTimes tt : tripTimes) {
             int[] times = new int[rwtt.nStops];
             for (int s = 0; s < pattern.getStops().size(); s++) {
-                int arrival = tt.getScheduledArrivalTime(s);
-                int departure = tt.getScheduledDepartureTime(s);
+                int arrival = tt.getArrivalTime(s);
+                int departure = tt.getDepartureTime(s);
                 times[s * 2] = arrival;
                 times[s * 2 + 1] = departure;
             }
@@ -216,11 +225,11 @@ public class RaptorWorkerTimetable implements Serializable {
                 // It's generally considered good practice to have frequency trips start at midnight, however that is
                 // not always the case, and we need to preserve the original times so that we can update them in
                 // real time.
-                int startTime = fe.tripTimes.getScheduledArrivalTime(0);
+                int startTime = fe.tripTimes.getArrivalTime(0);
 
                 for (int s = 0; s < fe.tripTimes.getNumStops(); s++) {
-                    times[s * 2] = fe.tripTimes.getScheduledArrivalTime(s) - startTime;
-                    times[s * 2 + 1] = fe.tripTimes.getScheduledDepartureTime(s) - startTime;
+                    times[s * 2] = fe.tripTimes.getArrivalTime(s) - startTime;
+                    times[s * 2 + 1] = fe.tripTimes.getDepartureTime(s) - startTime;
                 }
 
                 i++;
@@ -228,6 +237,71 @@ public class RaptorWorkerTimetable implements Serializable {
         }
 
         return rwtt;
+    }
+
+    /** Create a raptor worker timetable for an added pattern */
+    public static RaptorWorkerTimetable forAddedPattern(AddTripPattern atp, TimeWindow window) {
+        if (atp.temporaryStops.length < 2 || atp.timetables.isEmpty())
+            return null;
+
+        // filter down the timetable to only those running
+        Collection<AddTripPattern.PatternTimetable> running = atp.timetables.stream()
+                // getValue yields one-based ISO days of week (monday = 1); convert to 0-based format
+                .filter(t -> t.days.get(window.dayOfWeek.getValue() - 1))
+                .collect(Collectors.toList());
+
+        if (running.isEmpty())
+            return null;
+
+        // TODO: filter with timewindow
+        Collection<AddTripPattern.PatternTimetable> frequencies = running.stream()
+                .filter(t -> t.frequency)
+                .collect(Collectors.toList());
+
+        Collection<AddTripPattern.PatternTimetable> timetables = running.stream()
+                .filter(t -> !t.frequency)
+                .sorted((t1, t2) -> t1.startTime - t2.startTime)
+                .collect(Collectors.toList());
+
+        RaptorWorkerTimetable rwtt = new RaptorWorkerTimetable(timetables.size(), atp.temporaryStops.length * 2);
+
+        // create timetabled trips
+        int t = 0;
+        for (AddTripPattern.PatternTimetable pt : timetables) {
+            rwtt.timesPerTrip[t++] = timesForPatternTimetable(atp, pt);
+        }
+
+        // create frequency trips
+        rwtt.frequencyTrips = new int[frequencies.size()][atp.temporaryStops.length * 2];
+        rwtt.endTimes = new int[frequencies.size()];
+        rwtt.startTimes = new int[frequencies.size()];
+        rwtt.headwaySecs = new int[frequencies.size()];
+
+        t = 0;
+        for (AddTripPattern.PatternTimetable pt : frequencies) {
+            rwtt.frequencyTrips[t] = timesForPatternTimetable(atp, pt);
+            rwtt.startTimes[t] = pt.startTime;
+            rwtt.endTimes[t] = pt.endTime;
+            rwtt.headwaySecs[t++] = pt.headwaySecs;
+        }
+
+        return rwtt;
+    }
+
+    private static int[] timesForPatternTimetable (AddTripPattern atp, AddTripPattern.PatternTimetable pt) {
+        int[] times = new int[atp.temporaryStops.length * 2];
+        for (int s = 0; s < atp.temporaryStops.length; s++) {
+            // for a timetable route,
+            // arrival time is start time if it's the first stop, or the previous departure time plus the hop time
+            // For a frequency route the first departure is always 0
+            if (s == 0)
+                times[s * 2] = pt.frequency ? 0 : pt.startTime;
+            else
+                times[s * 2] = times[s * 2 - 1] + pt.hopTimes[s - 1];
+
+            times[s * 2 + 1] = times[s * 2] + pt.dwellTimes[s];
+        }
+        return times;
     }
 
 }
