@@ -63,13 +63,10 @@ public class AccumulativeGridSampler<TZ> {
          * Callback function to handle a "closing" sample (that is a sample post-created to surround
          * existing samples and provide nice and smooth edges for the algorithm).
          * 
-         * @param zUp Sampled value of the up neighbor. Can be null if undefined.
-         * @param zDown Idem
-         * @param zRight Idem
-         * @param zLeft Idem
-         * @return The z value for the closing sample.
+         * @param point The point to set Z.
+         * @return True if the point "close" the set.
          */
-        public TZ closeSample(TZ zUp, TZ zDown, TZ zRight, TZ zLeft);
+        public boolean closeSample(ZSamplePoint<TZ> point);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(AccumulativeGridSampler.class);
@@ -117,42 +114,51 @@ public class AccumulativeGridSampler<TZ> {
         for (ZSamplePoint<TZ> A : sampleGrid) {
             processList.add(A);
         }
+        int round = 0;
         int n = 0;
-        /*
-         * TODO The magic "2" below should be automatically computed according to some return value
-         * from the metric.
-         */
-        for (int i = 0; i < 2; i++) {
+        while (!processList.isEmpty()) {
             List<ZSamplePoint<TZ>> newProcessList = new ArrayList<ZSamplePoint<TZ>>(
                     processList.size());
             for (ZSamplePoint<TZ> A : processList) {
                 if (A.right() == null) {
-                    newProcessList.add(closeSample(A.getX() + 1, A.getY()));
+                    ZSamplePoint<TZ> B = closeSample(A.getX() + 1, A.getY());
+                    if (B != null)
+                        newProcessList.add(B);
                     n++;
                 }
                 if (A.left() == null) {
-                    newProcessList.add(closeSample(A.getX() - 1, A.getY()));
+                    ZSamplePoint<TZ> B = closeSample(A.getX() - 1, A.getY());
+                    if (B != null)
+                        newProcessList.add(B);
                     n++;
                 }
                 if (A.up() == null) {
-                    newProcessList.add(closeSample(A.getX(), A.getY() + 1));
+                    ZSamplePoint<TZ> B = closeSample(A.getX(), A.getY() + 1);
+                    if (B != null)
+                        newProcessList.add(B);
                     n++;
                 }
                 if (A.down() == null) {
-                    newProcessList.add(closeSample(A.getX(), A.getY() - 1));
+                    ZSamplePoint<TZ> B = closeSample(A.getX(), A.getY() - 1);
+                    if (B != null)
+                        newProcessList.add(B);
                     n++;
                 }
             }
             processList = newProcessList;
+            LOG.debug("Round {} : next process list {}", round, processList.size());
+            round++;
         }
         LOG.info("Added {} closing samples to get a total of {}.", n, sampleGrid.size());
     }
 
     private final ZSamplePoint<TZ> closeSample(int x, int y) {
         ZSamplePoint<TZ> A = sampleGrid.getOrCreate(x, y);
-        A.setZ(metric.closeSample(A.up() != null ? A.up().getZ() : null, A.down() != null ? A
-                .down().getZ() : null, A.right() != null ? A.right().getZ() : null,
-                A.left() != null ? A.left().getZ() : null));
-        return A;
+        boolean ok = metric.closeSample(A);
+        if (ok) {
+            return null;
+        } else {
+            return A;
+        }
     }
 }
