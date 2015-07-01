@@ -97,7 +97,7 @@ public class IndexAPI {
 
     @GET
     @Path("/feeds")
-    public Response getFeeds(String feedId) {
+    public Response getFeeds() {
         return Response.status(Status.OK).entity(index.agenciesForFeedId.keySet()).build();
     }
 
