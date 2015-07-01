@@ -43,20 +43,15 @@ public class GtfsLibrary {
     }
 
     public static GtfsContext readGtfs(File path) throws IOException {
-
-        return readGtfs(GtfsFeedId.createFromFile(path), path);
-    }
-
-    public static GtfsContext readGtfs(GtfsFeedId feedId, File path) throws IOException {
-
         GtfsRelationalDaoImpl dao = new GtfsRelationalDaoImpl();
 
         GtfsReader reader = new GtfsReader();
         reader.setInputLocation(path);
         reader.setEntityStore(dao);
 
-        if (feedId != null)
-            reader.setDefaultAgencyId(feedId.getId());
+        GtfsFeedId feedId = new GtfsFeedId.Builder().fromGtfsFeed(reader.getInputSource()).build();
+
+        reader.setDefaultAgencyId(feedId.getId());
 
         reader.run();
 

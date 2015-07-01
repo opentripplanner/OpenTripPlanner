@@ -40,7 +40,7 @@ public class GTFSPatternHopFactoryTest {
         gtfs.putLines("frequencies.txt", "trip_id,start_time,end_time,headway_secs",
                 "t0,09:00:00,17:00:00,300");
 
-        GtfsFeedId feedId = new GtfsFeedId("FEED");
+        GtfsFeedId feedId = new GtfsFeedId.Builder().id("FEED").build();
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(GtfsLibrary.createContext(feedId, gtfs
                 .read()));
         Graph graph = new Graph();

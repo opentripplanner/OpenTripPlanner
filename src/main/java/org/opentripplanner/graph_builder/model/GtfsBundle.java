@@ -73,7 +73,6 @@ public class GtfsBundle {
     
     public GtfsBundle(File gtfsFile) {
         this.setPath(gtfsFile);
-        this.setFeedId(GtfsFeedId.createFromFile(gtfsFile));
     }
 
     public void setPath(File path) {
@@ -132,6 +131,14 @@ public class GtfsBundle {
      * So that we can load multiple gtfs feeds into the same database.
      */
     public GtfsFeedId getFeedId() {
+        if (feedId == null) {
+            try {
+                feedId = new GtfsFeedId.Builder().fromGtfsFeed(getCsvInputSource()).build();
+            } catch (IOException e) {
+                LOG.error("Failed to fetch feedId from feed_info.");
+                throw new RuntimeException(e);
+            }
+        }
         return feedId;
     }
 
