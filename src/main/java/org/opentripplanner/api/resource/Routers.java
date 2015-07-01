@@ -143,12 +143,10 @@ public class Routers {
     private RouterInfo getRouterInfo(String routerId) {
         try {
             Router router = otpServer.getRouter(routerId);
-            Graph graph = router.graph;
-            RouterInfo routerInfo = new RouterInfo();
-            routerInfo.routerId = routerId;
-            routerInfo.polygon = graph.getHull();
-            routerInfo.buildTime = graph.buildTime;
-            return routerInfo;
+            //new router is created here instead of loaded from router
+            //since routerId here isn't always the same as routerId when Router was created
+            //at least this happens in RoutersTest
+            return new RouterInfo(routerId, router.graph);
         } catch (GraphNotFoundException e) {
             return null;
         }

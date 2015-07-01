@@ -13,20 +13,18 @@
 
 package org.opentripplanner.routing.services;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
-import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import java.util.Collection;
+import java.util.List;
 
 public interface StreetVertexIndexService {
 
@@ -105,5 +103,5 @@ public interface StreetVertexIndexService {
 
 	/** Get a vertex at a given coordinate, using the same logic as in Samples. Used in Analyst
 	 * so that origins and destinations are linked the same way. */
-	public Vertex getSampleVertexAt(Coordinate coordinate);
+	public Vertex getSampleVertexAt(Coordinate coordinate, boolean dest);
 }

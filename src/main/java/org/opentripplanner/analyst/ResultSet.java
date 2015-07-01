@@ -4,13 +4,12 @@ import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geojson.feature.FeatureJSON;
-import org.geotools.geojson.geom.GeometryJSON;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.api.resource.LIsochrone;
 import org.opentripplanner.api.resource.SurfaceResource;
+import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.profile.IsochroneGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * This holds the results of a one-to-many search from a single origin point to a whole set of destination points.
+ * This may be either a profile search (capturing variation over a time window of several hours) or a "classic" search
+ * at a single departure time. Those results are expressed as histograms: bins representing how many destinations you
+ * can reach after M minutes of travel. For large point sets (large numbers of origins and destinations), this is
+ * significantly more compact than a full origin-destination travel time matrix. It makes the total size of the results
+ * linear in the number of origins, rather than quadratic.
+ *
+ * Optionally, this can also carry travel times to every point in the target pointset and/or a series vector
+ * isochrones around the origin point.
+ */
 public class ResultSet implements Serializable{
 
     private static final long serialVersionUID = -6723127825189535112L;
@@ -32,9 +42,10 @@ public class ResultSet implements Serializable{
 
     /** An identifier consisting of the ids for the pointset and time surface that were combined. */
     public String id;
-    
-    /** One histogram for each */
+
+    /** One histogram for each category of destination points in the target pointset. */
     public Map<String,Histogram> histograms = Maps.newHashMap();
+    // FIXME aren't the histogram.counts identical for all these histograms?
 
     /** Times to reach every feature, may be null */
     public int[] times;
@@ -74,17 +85,29 @@ public class ResultSet implements Serializable{
         id.toArray(this.isochrones);
     }
 
+    private void buildIsochrones(int[] times, PointSet targets) {
+        ZSampleGrid zs = IsochroneGenerator.makeGrid(targets, times, 1.3);
+        List<IsochroneData> id = IsochroneGenerator.getIsochronesAccumulative(zs, 5, 120, 24);
+
+        this.isochrones = new IsochroneData[id.size()];
+        id.toArray(this.isochrones);
+    }
+
     /** Build a new ResultSet that contains only isochrones */
     public ResultSet (TimeSurface surface) {
         buildIsochrones(surface);
     }
     
-    /** Build a new ResultSet directly from times at point features */
-    public ResultSet(int[] times, PointSet targets, boolean includeTimes) {
-        buildHistograms(times, targets);
-
+    /** Build a new ResultSet directly from times at point features, optionally including histograms or interpolating isochrones */
+    public ResultSet(int[] times, PointSet targets, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         if (includeTimes)
             this.times = times;
+
+        if (includeHistograms)
+            buildHistograms(times, targets);
+
+        if (includeIsochrones)
+            buildIsochrones(times, targets);
     }
 
     /** 
