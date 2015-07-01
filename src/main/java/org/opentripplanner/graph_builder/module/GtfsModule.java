@@ -155,11 +155,13 @@ public class GtfsModule implements GraphBuilderModule {
         store.open();
         LOG.info("reading {}", gtfsBundle.toString());
 
+        GtfsFeedId gtfsFeedId = gtfsBundle.getFeedId();
+
         GtfsReader reader = new GtfsReader();
         reader.setInputSource(gtfsBundle.getCsvInputSource());
         reader.setEntityStore(store);
         reader.setInternStrings(true);
-        reader.setDefaultAgencyId(gtfsBundle.getFeedId().getId());
+        reader.setDefaultAgencyId(gtfsFeedId.getId());
 
         if (LOG.isDebugEnabled())
             reader.addEntityHandler(counter);
@@ -180,7 +182,7 @@ public class GtfsModule implements GraphBuilderModule {
                     LOG.info("This Agency has the ID {}", agencyId);
                     // Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
                     // TODO Figure out how and why this is happening.
-                    if (agencyId == null || agencyIdsSeen.contains(agencyId)) {
+                    if (agencyId == null || agencyIdsSeen.contains(gtfsFeedId.getId() + agencyId)) {
                         // Loop in case generated name is already in use.
                         String generatedAgencyId = null;
                         while (generatedAgencyId == null || agencyIdsSeen.contains(generatedAgencyId)) {
@@ -192,7 +194,7 @@ public class GtfsModule implements GraphBuilderModule {
                         agency.setId(generatedAgencyId);
                         agencyId = generatedAgencyId;
                     }
-                    if (agencyId != null) agencyIdsSeen.add(agencyId);
+                    if (agencyId != null) agencyIdsSeen.add(gtfsFeedId.getId() + agencyId);
                 }
             }
         }
