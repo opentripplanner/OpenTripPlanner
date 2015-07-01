@@ -39,7 +39,7 @@ otp.analyst.Isochrone = otp.Class({
         this.isochrones = null;
         this.onLoadCallbacks = $.Callbacks();
         var routerId = parameters.routerId;
-        if (!routerId || 0 === str.length)
+        if (!routerId || 0 === routerId.length)
             routerId = 'default';
         this.url = '/otp/routers/' + routerId + '/isochrone?' + $.param(parameters, false);
         for (var i = 0; i < cutoffSec.length; i++)
@@ -55,7 +55,10 @@ otp.analyst.Isochrone = otp.Class({
                 success : function(result) {
                     // Index features on cutoff time
                     for (var i = 0; i < result.features.length; i++) {
+                        // Depending on JSON lib it's either time or Time
                         var time = result.features[i].properties.Time;
+                        if (!time)
+                            time = result.features[i].properties.time;
                         thisIso.isoMap[time] = result.features[i];
                     }
                     thisIso.onLoadCallbacks.fire(thisIso);
