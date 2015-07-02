@@ -1,5 +1,7 @@
 package org.opentripplanner.analyst.cluster;
 
+import org.opentripplanner.common.MavenVersion;
+
 /**
  * Statistics about running a single task.
  */
@@ -55,6 +57,9 @@ public class TaskStatistics {
     /** number of targets of this search */
     public int targetCount = -1;
 
+    /** number of targets reached */
+    public int targetsReached = 0;
+
     /** number of scheduled trips in the RAPTOR worker data */
     public int scheduledTripCount = -1;
 
@@ -93,4 +98,11 @@ public class TaskStatistics {
 
     /** was this request successful */
     public boolean success;
+
+    /** OTP commit used for computation */
+    public String otpCommit;
+
+    public TaskStatistics() {
+        otpCommit = MavenVersion.VERSION.commit;
+    }
 }

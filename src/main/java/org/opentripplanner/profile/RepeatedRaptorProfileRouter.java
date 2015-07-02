@@ -183,6 +183,10 @@ public class RepeatedRaptorProfileRouter {
         RaptorWorker worker = new RaptorWorker(raptorWorkerData, request);
         propagatedTimesStore = worker.runRaptor(graph, accessTimes, walkTimes, ts);
 
+        for (int min : propagatedTimesStore.mins) {
+            if (min != RaptorWorker.UNREACHED) ts.targetsReached++;
+        }
+
         if (sampleSet == null) {
             timeSurfaceRangeSet = new TimeSurface.RangeSet();
             timeSurfaceRangeSet.min = new TimeSurface(this);
