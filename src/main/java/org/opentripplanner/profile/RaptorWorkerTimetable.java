@@ -74,17 +74,12 @@ public class RaptorWorkerTimetable implements Serializable {
      * MIN_BOARD_TIME_SECONDS seconds of slack. 
      */
     public int findDepartureAfter(int stop, int time) {
-        int bestDeparture = Integer.MAX_VALUE;
-        int bestTrip = -1;
-
         for (int trip = 0; trip < timesPerTrip.length; trip++) {
-            int departure = getDeparture(trip, stop);
-            if (departure > time + MIN_BOARD_TIME_SECONDS && departure < bestDeparture) {
-                bestDeparture = departure;
-                bestTrip = trip;
+            if (getDeparture(trip, stop) > time + MIN_BOARD_TIME_SECONDS) {
+                return trip;
             }
         }
-        return bestTrip;
+        return -1;
     }
 
     public int getArrival (int trip, int stop) {
