@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -31,6 +33,7 @@ import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
+import org.opentripplanner.profile.RaptorWorkerData;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -67,6 +70,11 @@ public class AnalystWorker implements Runnable {
     String s3Prefix = "analyst-dev";
 
     static final HttpClient httpClient;
+
+    /** Cache RAPTOR data by Job ID */
+    private Cache<String, RaptorWorkerData> workerDataCache = CacheBuilder.newBuilder()
+            .maximumSize(200)
+            .build();
 
     static {
         PoolingHttpClientConnectionManager mgr = new PoolingHttpClientConnectionManager();
@@ -209,8 +217,25 @@ public class AnalystWorker implements Runnable {
                     SampleSet sampleSet = pointSet.getOrCreateSampleSet(graph);
                     router =
                             new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
+
+                    // no reason to cache single-point RaptorWorkerData
+                    if (clusterRequest.outputLocation != null) {
+                        router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, () -> {
+                            return RepeatedRaptorProfileRouter
+                                    .getRaptorWorkerData(clusterRequest.profileRequest, graph,
+                                            sampleSet, ts);
+                        });
+                    }
                 } else {
                     router = new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest);
+
+                    if (clusterRequest.outputLocation == null) {
+                        router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, () -> {
+                            return RepeatedRaptorProfileRouter
+                                    .getRaptorWorkerData(clusterRequest.profileRequest, graph, null,
+                                            ts);
+                        });
+                    }
                 }
 
                 try {
