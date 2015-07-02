@@ -60,7 +60,7 @@ import java.util.*;
  * provide reasonable response times when routing over large graphs (e.g. the entire Netherlands or New York State).
  * In this case it only uses the street network at the first and last legs of the trip, and all other transfers
  * between transit vehicles will occur via SimpleTransfer edges which are pre-computed by the graph builder.
- * 
+ *
  * More information is available on the OTP wiki at:
  * https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs
  *
@@ -182,6 +182,24 @@ public class GraphPathFinder {
                 }
             }
             paths.addAll(newPaths);
+
+             /* Detect and report that most obnoxious of bugs: path reversal asymmetry. */
+            Iterator<GraphPath> gpi = paths.iterator();
+            while (gpi.hasNext()) {
+                GraphPath graphPath = gpi.next();
+                // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
+                if (options.arriveBy) {
+                    if (graphPath.states.getLast().getTimeSeconds() > options.dateTime) {
+                        LOG.warn("A graph path arrives after the requested time. This implies a bug.");
+                        gpi.remove();
+                    }
+                } else {
+                    if (graphPath.states.getFirst().getTimeSeconds() < options.dateTime) {
+                        LOG.warn("A graph path leaves before the requested time. This implies a bug.");
+                        gpi.remove();
+                    }
+                }
+            }
             LOG.debug("we have {} paths", paths.size());
         }
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
@@ -237,19 +255,19 @@ public class GraphPathFinder {
 
             /* An itinerary that includes a ride on public transit. It might begin on- or offboard. 
              * if it begins onboard, it doesn't necessarily have subsequent transit legs. */
-            Nonterminal transitItinerary = choice( 
+            Nonterminal transitItinerary = choice(
                     seq(beginning, middle, end),
                     seq(onboardBeginning, optional(middle), end));
             
             /* A streets-only itinerary, which might begin or end at a stop or its station, 
              * but does not actually ride transit. */
             Nonterminal streetItinerary = choice(TRANSFER, seq(
-                    optional(STATION_STOP), optional(LINK), 
+                    optional(STATION_STOP), optional(LINK),
                     streetLeg,
                     optional(LINK), optional(STOP_STATION)));
-            
+
             Nonterminal itinerary = choice(streetItinerary, transitItinerary);
-            
+
             DFA = itinerary.toDFA().minimize();
             // System.out.println(DFA.toGraphViz());
             // System.out.println(DFA.dumpTable());
@@ -320,23 +338,6 @@ public class GraphPathFinder {
             throw new PathNotFoundException();
         }
 
-        /* Detect and report that most obnoxious of bugs: path reversal asymmetry. */
-        Iterator<GraphPath> gpi = paths.iterator();
-        while (gpi.hasNext()) {
-            GraphPath graphPath = gpi.next();
-            // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
-            if (request.arriveBy) {
-                if (graphPath.states.getLast().getTimeSeconds() > request.dateTime) {
-                    LOG.error("A graph path arrives after the requested time. This implies a bug.");
-                    gpi.remove();
-                }
-            } else {
-                if (graphPath.states.getFirst().getTimeSeconds() < request.dateTime) {
-                    LOG.error("A graph path leaves before the requested time. This implies a bug.");
-                    gpi.remove();
-                }
-            }
-        }
         return paths;
     }
 
