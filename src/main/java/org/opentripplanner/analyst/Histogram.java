@@ -2,12 +2,10 @@ package org.opentripplanner.analyst;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.google.common.primitives.Ints;
+import org.opentripplanner.analyst.core.WeightingFunction;
 
 import java.io.IOException;
 import java.io.Serializable;
-
-import org.opentripplanner.analyst.core.WeightingFunction;
 
 /**
  * A pair of parallel histograms representing how many features are located at each amount of travel time 
@@ -64,44 +62,30 @@ public class Histogram implements Serializable {
      * travel time. The length of the arrays containing these histograms will be equal to the maximum travel time
      * specified in the original search request, in minutes.
      * @param times the time at which each destination is reached. The array will be destructively sorted in place.
-     * @param weight the weight or magnitude of each destination reached. it is parallel to times.
+     * @param weights the weight or magnitude of each destination reached. it is parallel to times.
      */    
-    public Histogram (int[] times, int[] weight) {
+    public Histogram (int[] times, int[] weights) {
         int size = weightingFunctions.length;
-
-        // optimization: bin times and weights by seconds.
-        // there will often be more than one destination in a seconds due to the pigeonhole principle:
-        // there are a lot more destinations than there are seconds
-        int maxSecs = Integer.MIN_VALUE;
-
-        for (int time : times) {
-            if (time == Integer.MAX_VALUE)
-                continue;
-
-            if (time > maxSecs)
-                maxSecs = time;
-        }
-
-        int[] binnedCounts = new int[maxSecs + 1];
-        int[] binnedWeights = new int[maxSecs + 1];
-
-        for (int i = 0; i < times.length; i++) {
-            if (times[i] == Integer.MAX_VALUE)
-                continue;
-
-            binnedCounts[times[i]] += 1;
-            binnedWeights[times[i]] += weight[i];
-        }
 
         // we use logistic rolloff, so we want to compute the counts and sums using floating-point values before truncation
         double[] tmpCounts = new double[size];
         double[] tmpSums = new double[size];
 
-        for (int i = 0; i < binnedCounts.length; i++) {
+        for (int i = 0; i < times.length; i++) {
             for (int j = 0; j < weightingFunctions.length; j++) {
-                double w = weightingFunctions[j].getWeight(i);
-                tmpCounts[j] += w * binnedCounts[i];
-                tmpSums[j] += w * binnedWeights[i];
+                double w = weightingFunctions[j].getWeight(times[i]);
+
+                // optimization: if weight is (effectively) 1 or 0, don't bother to include it.
+                if (w < 1e-10)
+                    continue;
+
+                if (w < 1 - 1e-10) {
+                    tmpCounts[j] += w;
+                    tmpSums[j] += w * weights[i];
+                } else {
+                    tmpCounts[j] += 1;
+                    tmpSums[j] += weights[i];
+                }
             }
         }
 
