@@ -75,7 +75,7 @@ public class Histogram implements Serializable {
             for (int j = 0; j < weightingFunctions.length; j++) {
                 double w = weightingFunctions[j].getWeight(times[i]);
 
-                // optimization: if weight is (effectively) 1 or 0, don't bother to include it.
+                // optimization: if weight is (effectively) 1 or 0, don't bother to multiply it in.
                 if (w < 1e-10)
                     continue;
 
@@ -99,7 +99,7 @@ public class Histogram implements Serializable {
         }
 
         // make density rather than cumulative
-        // note that counts[0] is already a density so we don't touch it
+        // note that counts[0]/sums[0] is already a density so we don't touch it
         for (int i = weightingFunctions.length - 1; i > 0; i--) {
             counts[i] -= counts[i - 1];
             sums[i] -= sums[i - 1];
