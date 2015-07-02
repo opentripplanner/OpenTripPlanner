@@ -145,6 +145,13 @@ public class RaptorWorker {
                 int baseTimeSeconds = bestNonTransferTimes[s];
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
+
+                    if (baseTimeSeconds < 0) {
+                        LOG.error("Arrival at a transit stop before search departure!");
+                        continue;
+                    }
+
+
                     int[] targets = data.targetsForStop.get(s);
                     for (int i = 0; i < targets.length; i++) {
                         int targetIndex = targets[i++]; // increment i after read
@@ -311,15 +318,20 @@ public class RaptorWorker {
                     }
 
                     // Check whether we can back up to an earlier trip. This could be due to an overtaking trip,
-                    // or (more likely) because there was a faster way to get to a stop further down the line. 
-                    while (onTrip > 0) {
-                        int departureOnPreviousTrip = timetable.getDeparture(onTrip - 1, stopPositionInPattern);
-                        // use bestTime not bestNonTransferTimes to allow transferring to this trip later on down the route
-                        if (departureOnPreviousTrip > bestTimes[stopIndex]) {
-                            onTrip--;
-                        } else {
-                            break;
-                        }
+                    // or (more likely) because there was a faster way to get to a stop further down the line.
+                    // bestTimes[stopIndex] may be Integer.MAX_VALUE, in which case bestTimeAtStop will be arrivalTime.
+                    int bestTimeAtStop = Math.min(arrivalTime, bestTimes[stopIndex]);
+                    int alternateTrip = timetable.findDepartureAfter(stopPositionInPattern, bestTimeAtStop);
+
+                    if (alternateTrip != -1) {
+                        int newDeparture = timetable
+                                .getDeparture(alternateTrip, stopPositionInPattern);
+
+                        // only switch if it's actually better. findDepartureAfter includes board slack
+                        // so it will never reboard the same trip, but if we're already on the trip
+                        // we need not worry about board slack
+                        if (newDeparture < timetable.getDeparture(onTrip, stopPositionInPattern))
+                            onTrip = alternateTrip;
                     }
                 }
             }
@@ -336,6 +348,8 @@ public class RaptorWorker {
         patternsTouched.clear();
         for (int stop = stopsTouched.nextSetBit(0); stop >= 0; stop = stopsTouched.nextSetBit(stop + 1)) {
             // TODO this is reboarding every trip at every stop.
+            // However, this is not necessarily bad as it allows the planner to "back up" to a previous
+            // trip that will overtake this one. However it only allow backing up one trip.
             markPatternsForStop(stop);
             int fromTime = bestNonTransferTimes[stop];
             int[] transfers = data.transfersForStop.get(stop);
