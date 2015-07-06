@@ -238,18 +238,31 @@ public class GtfsModule implements GraphBuilderModule {
 
     }
 
+    /**
+     * Generates routeText colors for routes with routeColor and without routeTextColor
+     *
+     * If route doesn't have color or already has routeColor and routeTextColor nothing is done.
+     *
+     * textColor can be black or white. White for dark colors and black for light colors of routeColor.
+     * If color is light or dark is calculated based on luminance formula:
+     * sqrt( 0.299*Red^2 + 0.587*Green^2 + 0.114*Blue^2 )
+     *
+     * @param route
+     */
     private void generateRouteColor(Route route) {
         String routeColor = route.getColor();
+        //No route color - skipping
         if (routeColor == null) {
             return;
         }
         String textColor = route.getTextColor();
+        //Route already has text color skipping
         if (textColor != null) {
             return;
         }
 
         Color routeColorColor = Color.decode("#"+routeColor);
-        //gets float of RED, GREE, BLUE in range 0...1
+        //gets float of RED, GREEN, BLUE in range 0...1
         float[] colorComponents = routeColorColor.getRGBColorComponents(null);
         //Calculates luminance based on https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
         double newRed = 0.299*Math.pow(colorComponents[0],2.0);
@@ -263,10 +276,6 @@ public class GtfsModule implements GraphBuilderModule {
         } else {
             textColor = "FFFFFF";
         }
-        if (!textColor.equals(route.getTextColor())) {
-            LOG.error("Generated text color is: {}, previous is: {}", textColor, route.getTextColor());
-        }
-        //TODO: check the contrast
         route.setTextColor(textColor);
     }
 
