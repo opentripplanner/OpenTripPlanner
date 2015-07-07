@@ -501,4 +501,29 @@ public class GraphIndex {
 //        }
     }
 
+    /** Return a timetable, a map from stop index to departure time in seconds
+     *  after midnight for each timepoint, for every trip on a pattern.
+     */
+    public List<Map<Integer, Integer>> timetableForPattern(TripPattern pattern,
+                                                   ServiceDate date) {
+        Set<AgencyAndId> services = calendarService.getServiceIdsOnDate(date);
+        Timetable table = pattern.scheduledTimetable;
+        List<Map<Integer, Integer>> results = Lists.newArrayList();
+
+        for (Trip trip : pattern.getTrips()) {
+            // Check if the trip operates on given date
+            if (!services.contains(trip.getServiceId())) {
+                continue;
+            }
+            TripTimes triptimes = table.getTripTimes(trip);
+            Map<Integer, Integer> departures = Maps.newHashMap();
+            for (int i = 0; i < triptimes.getNumStops(); i++) {
+                if (triptimes.isTimepoint(i)) {
+                    departures.put(i, triptimes.getScheduledDepartureTime(i));
+                }
+            }
+            results.add(departures);
+        }
+        return results;
+    }
 }
