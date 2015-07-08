@@ -132,10 +132,6 @@ public abstract class GraphPathToTripPlanConverter {
      * @return The generated itinerary
      */
     public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, Locale requestedLocale) {
-        if (path.states.size() < 2) {
-            throw new TrivialPathException();
-        }
-
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
@@ -223,6 +219,21 @@ public abstract class GraphPathToTripPlanConverter {
      * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
      */
     private static State[][] sliceStates(State[] states) {
+        boolean trivial = true;
+
+        for (State state : states) {
+            TraverseMode traverseMode = state.getBackMode();
+
+            if (traverseMode != null && traverseMode != TraverseMode.LEG_SWITCH) {
+                trivial = false;
+                break;
+            }
+        }
+
+        if (trivial) {
+            throw new TrivialPathException();
+        }
+
         int[] legIndexPairs = {0, states.length - 1};
         List<int[]> legsIndexes = new ArrayList<int[]>();
 
