@@ -39,11 +39,11 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
      * previous updates should be disregarded
      */
     private boolean fullDataset = true;
-    
+
     /**
-     * Default agency id that is used for the trip ids in the TripUpdates
+     * Feed id that is used to match trip ids in the TripUpdates
      */
-    private String agencyId;
+    private String feedId;
 
     private String url;
 
@@ -54,7 +54,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
-        this.agencyId = config.path("defaultAgencyId").asText();
+        this.feedId = config.path("feedId").asText();
     }
 
     @Override
@@ -100,7 +100,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
     }
 
     @Override
-    public String getAgencyId() {
-        return this.agencyId;
+    public String getFeedId() {
+        return this.feedId;
     }
 }
