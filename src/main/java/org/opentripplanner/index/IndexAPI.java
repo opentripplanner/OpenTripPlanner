@@ -540,8 +540,12 @@ public class IndexAPI {
             return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
         }
         TripPattern pattern = index.patternForId.get(patternIdString);
-        return Response.status(Status.OK).entity(
+        if (pattern != null) {
+            return Response.status(Status.OK).entity(
                 index.timetableForPattern(pattern, date)).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
     }
 
 
