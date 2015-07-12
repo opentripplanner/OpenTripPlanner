@@ -561,7 +561,7 @@ public class IndexAPI {
         }
     }
 
-    @GET
+    @POST
     @Path("/graphql")
     @Consumes(MediaType.TEXT_PLAIN)
     public Response getGraphQL (String query) {
