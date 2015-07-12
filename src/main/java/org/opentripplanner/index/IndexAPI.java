@@ -20,6 +20,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import graphql.GraphQL;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -51,12 +52,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -564,6 +560,15 @@ public class IndexAPI {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
     }
+
+    @GET
+    @Path("/graphql")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public Response getGraphQL (String query) {
+
+        return Response.status(Status.OK).entity(new GraphQL(index.graphQLSchema, query).execute()).build();
+    }
+
 
     /** Represents a transfer from a stop */
     private static class Transfer {

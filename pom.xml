@@ -665,6 +665,12 @@
             <version>4.7.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>graphql</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <!-- Support for OTP scripting -->
         <dependency>
             <groupId>bsf</groupId>

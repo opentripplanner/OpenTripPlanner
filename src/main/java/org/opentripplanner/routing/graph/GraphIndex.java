@@ -8,6 +8,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import graphql.schema.GraphQLSchema;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -21,6 +22,7 @@ import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.ProfileTransfer;
@@ -95,6 +97,8 @@ public class GraphIndex {
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
 
+    public GraphQLSchema graphQLSchema;
+
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
 
@@ -149,6 +153,7 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
+        graphQLSchema = new IndexGraphQLSchema(this).indexSchema;
         LOG.info("Done indexing graph.");
     }
 

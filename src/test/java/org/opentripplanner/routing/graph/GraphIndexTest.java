@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.graph;
 
+import graphql.GraphQL;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -15,6 +16,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Check that the graph index is created, that GTFS elements can be found in the index, and that
@@ -94,6 +96,36 @@ public class GraphIndexTest extends GtfsTest {
         assertTrue(stops.contains(stopvM));
         assertTrue(stops.size() >= 3); // Query can overselect
     }
+
+    public void testGraphQLSimple() {
+        String query =
+                "query Agency{" +
+                "    agency(id: \"agency\"){" +
+                "        name" +
+                "    }" +
+                "}";
+
+        Object result = new GraphQL(graph.index.graphQLSchema,query).execute();
+        assertEquals("Fake Agency", ((Map)((Map)result).get("agency")).get("name"));
+
+    }
+
+    public void testGraphQLNested() {
+        String query =
+                "query Agency{\n" +
+                        "    agency(id: \"agency\"){\n" +
+                        "        name\n" +
+                        "        routes{\n" +
+                        "            shortName" +
+                        "        }" +
+                        "    }\n" +
+                        "}\n";
+
+        Object result = new GraphQL(graph.index.graphQLSchema,query).execute();
+        assertEquals(18, ((List)((Map)((Map)result).get("agency")).get("routes")).size());
+
+    }
+
 
     public void testParentStations() {
         // graph.index.stopsForParentStation;
