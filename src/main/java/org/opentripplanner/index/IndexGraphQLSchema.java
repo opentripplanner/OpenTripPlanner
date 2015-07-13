@@ -4,7 +4,9 @@ import graphql.Scalars;
 import graphql.schema.*;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -148,6 +150,89 @@ public class IndexGraphQLSchema {
                         .collect(Collectors.toList()))
                 .build())
             .build();
+
+        tripType = GraphQLObjectType.newObject()
+            .name("Trip")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("id")
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("serviceId")
+                .type(Scalars.GraphQLString) //TODO:Should be serviceType
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("tripShortName")
+                .type(Scalars.GraphQLString)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("tripHeadsign")
+                .type(Scalars.GraphQLString)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("routeShortName")
+                .type(Scalars.GraphQLString)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("directionId")
+                .type(Scalars.GraphQLString)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("blockId")
+                .type(Scalars.GraphQLString)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("shapeId")
+                .type(Scalars.GraphQLString) //TODO: should be shapeType or geometryType
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("wheelchairAccessible")
+                .type(Scalars.GraphQLInt) //TODO: enum
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("bikesAllowed")
+                .type(Scalars.GraphQLString) //TODO:enum
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("pattern")
+                .type(patternType)
+                .dataFetcher(environment ->
+                    index.patternForTrip.get((Trip) environment.getSource()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stops")
+                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopType))))
+                .dataFetcher(environment ->
+                    index.patternForTrip.get((Trip) environment.getSource()).getStops())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("semanticHash")
+                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopType))))
+                .dataFetcher(environment ->
+                    index.patternForTrip.get((Trip) environment.getSource())
+                        .semanticHashString((Trip) environment.getSource()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stoptimes")
+                .type(new GraphQLList(stoptimeType))
+                .dataFetcher(environment ->
+                    TripTimeShort.fromTripTimes(
+                        index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable,
+                        (Trip) environment.getSource()))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("geometry")
+                .type(Scalars.GraphQLString) //TODO: Should be geometry
+                .dataFetcher(environment ->
+                    index.patternForTrip.get((Trip) environment.getSource())
+                        .geometry.getCoordinateSequence())
+                .build())
+            .build();
+
 
         patternType = GraphQLObjectType.newObject()
             .name("Pattern")
