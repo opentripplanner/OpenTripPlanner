@@ -2,10 +2,14 @@ package org.opentripplanner.analyst.cluster;
 
 import org.opentripplanner.common.MavenVersion;
 
+import java.io.Serializable;
+
 /**
  * Statistics about running a single task.
  */
-public class TaskStatistics {
+public class TaskStatistics implements Serializable{
+    public static final long serialVersionUID = 1;
+
     /** milliseconds of compute time once the RAPTOR worker was started, exclusive of building result sets */
     public int compute = -1;
 
@@ -99,10 +103,17 @@ public class TaskStatistics {
     /** was this request successful */
     public boolean success;
 
+    /** was this a single-point request */
+    public boolean single;
+
     /** OTP commit used for computation */
     public String otpCommit;
 
+    /** UTC date/time this was computed */
+    public long computeDate;
+
     public TaskStatistics() {
         otpCommit = MavenVersion.VERSION.commit;
+        computeDate = System.currentTimeMillis();
     }
 }

@@ -184,6 +184,7 @@ public class AnalystWorker implements Runnable {
             ts.awsInstanceType = instanceType;
             ts.jobId = clusterRequest.jobId;
             ts.workerId = machineId;
+            ts.single = clusterRequest.outputLocation == null;
 
             long graphStartTime = System.currentTimeMillis();
 
