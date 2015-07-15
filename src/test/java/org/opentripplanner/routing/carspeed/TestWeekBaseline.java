@@ -35,24 +35,24 @@ public class TestWeekBaseline extends TestCase {
         gmtCal.set(Calendar.MINUTE, 0);
         gmtCal.set(Calendar.SECOND, 0);
         gmtCal.set(Calendar.MILLISECOND, 0);
-        
+
         int offset = WeekBaselineCarSpeedProvider.getWeekOffsetSec(gmtCal.getTimeInMillis());
         assertEquals(0, offset);
-        
+
         gmtCal.add(Calendar.SECOND, 1);
         offset = WeekBaselineCarSpeedProvider.getWeekOffsetSec(gmtCal.getTimeInMillis());
         assertEquals(1, offset);
-        
+
         gmtCal.add(Calendar.SECOND, -1);
         gmtCal.add(Calendar.DATE, 1);
         offset = WeekBaselineCarSpeedProvider.getWeekOffsetSec(gmtCal.getTimeInMillis());
         assertEquals(24 * 60 * 60, offset);
-        
+
         gmtCal.add(Calendar.DATE, 6);
         gmtCal.add(Calendar.SECOND, -1);
         offset = WeekBaselineCarSpeedProvider.getWeekOffsetSec(gmtCal.getTimeInMillis());
         assertEquals(7 * 24 * 60 * 60 - 1, offset);
-        
+
         gmtCal.add(Calendar.SECOND, 1);
         offset = WeekBaselineCarSpeedProvider.getWeekOffsetSec(gmtCal.getTimeInMillis());
         assertEquals(0, offset);
