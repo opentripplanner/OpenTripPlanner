@@ -142,6 +142,10 @@ public class AnalystWorker implements Runnable {
                 this.BROKER_BASE_URL = String.format("http://%s", addr);
         }
 
+        // set the initial graph affinity of this worker (if it is not in the config file it will be
+        // set to null, i.e. no graph affinity)
+        this.graphId = config.getProperty("initial-graph-id");
+
         this.pointSetDatastore = new PointSetDatastore(10, null, false, config.getProperty("pointsets-bucket"));
         this.clusterGraphBuilder = new ClusterGraphBuilder(config.getProperty("graphs-bucket"));
 
@@ -465,6 +469,7 @@ public class AnalystWorker implements Runnable {
      * pointsets-bucket             S3 bucket in which pointsets are stored
      * auto-shutdown                Should this worker shut down its machine if it is idle (e.g. on throwaway cloud instances)
      * statistics-queue             SQS queue to which to send statistics (optional)
+     * initial-graph-id             The graph ID for this worker to start on
      */
     public static void main(String[] args) {
         Properties config = new Properties();
