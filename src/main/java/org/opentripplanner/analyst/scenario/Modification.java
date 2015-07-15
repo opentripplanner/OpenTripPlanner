@@ -25,5 +25,10 @@ public abstract class Modification implements Serializable {
     /** Distinguish between modification types when a list of Modifications are serialized out as JSON. */
     public abstract String getType();
 
+    /** Do nothing */
+    public final void setType (String type) {
+        /* do nothing */
+    }
+
     public final Set<String> warnings = new HashSet<String>();
 }
