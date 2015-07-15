@@ -122,6 +122,10 @@ public class CircularList<T> implements Iterable<T> {
      */
     public T advanceToElement (Predicate<T> predicate) {
         Node<T> start = head;
+
+        if (head == null)
+            return null;
+
         do {
             T currElement = advance();
             if (predicate.test(currElement)) {

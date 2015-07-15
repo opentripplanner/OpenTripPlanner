@@ -144,6 +144,8 @@ public class AnalystWorker implements Runnable {
 
         // set the initial graph affinity of this worker (if it is not in the config file it will be
         // set to null, i.e. no graph affinity)
+        // we don't actually build the graph now; this is just a hint to the broker as to what
+        // graph this machine was intended to analyze.
         this.graphId = config.getProperty("initial-graph-id");
 
         this.pointSetDatastore = new PointSetDatastore(10, null, false, config.getProperty("pointsets-bucket"));
