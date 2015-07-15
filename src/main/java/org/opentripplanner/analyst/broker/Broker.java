@@ -197,7 +197,7 @@ public class Broker implements Runnable {
 
             while (nWaitingConsumers == 0) {
                 LOG.debug("Task delivery thread is going to sleep, there are no consumers waiting.");
-                // Thread will be notified when there are new incoming consumer connections.
+                // Thread will be notified when therRoe are new incoming consumer connections.
                 wait();
             }
             LOG.debug("Task delivery thread is awake, and some consumers are waiting.");

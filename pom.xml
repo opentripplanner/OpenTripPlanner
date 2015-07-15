@@ -338,13 +338,6 @@
             <id>conveyal</id>
             <name>Conveyal Maven Repository</name>
             <url>http://maven.conveyal.com/</url>
-            <!-- Avoid downloading OTP snapshots from repo -->
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </repository>
     </repositories>
 
