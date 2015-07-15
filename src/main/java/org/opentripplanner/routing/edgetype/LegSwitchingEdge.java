@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 /* This edge, because it has no mode, initiates another leg.
  */
@@ -54,4 +55,10 @@ public class LegSwitchingEdge extends Edge {
 	public String getName() {
 		return null;
 	}
+
+        @Override
+        public String getName(Locale locale) {
+            return this.getName();
+        }
+
 }

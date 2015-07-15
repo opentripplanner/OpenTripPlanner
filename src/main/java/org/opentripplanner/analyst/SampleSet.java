@@ -12,12 +12,12 @@ public class SampleSet {
     public final PointSet pset;
 
     /* Vertices at the two ends of a road, one per sample. */
-    Vertex[] v0s;
-    Vertex[] v1s;
+    public Vertex[] v0s;
+    public Vertex[] v1s;
 
     /* Distances to the vertices at the two ends of a road, one per sample. */
-    float[] d0s;
-    float[] d1s;
+    public float[] d0s;
+    public float[] d1s;
 
     public SampleSet (PointSet pset, SampleFactory sfac) {
         this.pset = pset;
@@ -34,8 +34,8 @@ public class SampleSet {
             }
             v0s[i] = sample.v0;
             v1s[i] = sample.v1;
-            d0s[i] = sample.t0; // TODO time not distance in samples
-            d1s[i] = sample.t1; // TODO time not distance in samples
+            d0s[i] = sample.d0;
+            d1s[i] = sample.d1;
         }
     }
 
@@ -54,6 +54,30 @@ public class SampleSet {
             if (v1s[i] != null) {
                 int s1 = surf.getTime(v1s[i]);
                 if (s1 != TimeSurface.UNREACHABLE) {
+                    m1 = (int) (s1 + d1s[i] / WALK_SPEED);
+                }
+            }
+            ret[i] = (m0 < m1) ? m0 : m1;
+        }
+        return ret;
+    }
+    
+    /** Evaluate an array of times where indices are keyed to vertex indices, with Integer.MAX_VALUE indicating unreachability both in the inputs and the outputs */
+    public int[] eval(int[] times) {
+        final float WALK_SPEED = 1.3f;
+        int[] ret = new int[pset.capacity];
+        for (int i = 0; i < pset.capacity; i++) {
+            int m0 = Integer.MAX_VALUE;
+            int m1 = Integer.MAX_VALUE;
+            if (v0s[i] != null) {
+                int s0 = times[v0s[i].getIndex()];
+                if (s0 != Integer.MAX_VALUE) {
+                    m0 = (int) (s0 + d0s[i] / WALK_SPEED);
+                }
+            }
+            if (v1s[i] != null) {
+                int s1 = times[v1s[i].getIndex()];
+                if (s1 != Integer.MAX_VALUE) {
                     m1 = (int) (s1 + d1s[i] / WALK_SPEED);
                 }
             }

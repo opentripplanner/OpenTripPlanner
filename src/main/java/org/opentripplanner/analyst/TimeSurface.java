@@ -7,11 +7,15 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
-import org.opentripplanner.common.geometry.*;
+import org.opentripplanner.common.geometry.AccumulativeGridSampler;
+import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.profile.AnalystProfileRouterPrototype;
 import org.opentripplanner.profile.ProfileRequest;
 import org.opentripplanner.profile.ProfileRouter;
+import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
+import org.opentripplanner.profile.RoundBasedProfileRouter;
 import org.opentripplanner.profile.TimeRange;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
@@ -21,18 +25,13 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.font.NumericShaper;
 import java.io.Serializable;
 import java.util.Map;
 
-import static org.apache.commons.math3.util.FastMath.max;
-import static org.apache.commons.math3.util.FastMath.min;
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
  * A travel time surface. Timing information from the leaves of a ShortestPathTree.
- * In Portland, one timesurface takes roughly one MB of memory and is also about that size as JSON.
- * However it is proportionate to the graph size not the time cutoff.
  */
 public class TimeSurface implements Serializable {
 
@@ -44,15 +43,23 @@ public class TimeSurface implements Serializable {
     public final int id;
     public final TObjectIntMap<Vertex> times = new TObjectIntHashMap<Vertex>(500000, 0.5f, UNREACHABLE);
     public final double lat, lon;
-    public int cutoffMinutes;
+    public int cutoffMinutes = 90; // this should really be copied from the data source but the new repeated raptor does not do so
     public long dateTime;
     public Map<String, String> params; // The query params sent by the user, for reference only
     public SparseMatrixZSampleGrid<WTWD> sampleGrid; // another representation on a regular grid with a triangulation
     public String description;
+    public double walkSpeed = 1.33; // meters/sec TODO could we just store the whole routing request instead of params?
 
+    /** Create a time surface with a sample grid */
     public TimeSurface(ShortestPathTree spt) {
+        this(spt, true);
+    }
+    
+    /** Create a time surface, optionally making a sample grid */
+    public TimeSurface(ShortestPathTree spt, boolean makeSampleGrid) {
 
         params = spt.getOptions().parameters;
+        walkSpeed = spt.getOptions().walkSpeed;
 
         String routerId = spt.getOptions().routerId;
         if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
@@ -80,7 +87,9 @@ public class TimeSurface implements Serializable {
         this.dateTime = spt.getOptions().dateTime;
         long t1 = System.currentTimeMillis();
         LOG.info("Made TimeSurface from SPT in {} msec.", (int) (t1 - t0));
-        makeSampleGrid(spt);
+        
+        if (makeSampleGrid)
+            makeSampleGrid(spt);
     }
 
     /** Make a max or min timesurface from propagated times in a ProfileRouter. */
@@ -92,6 +101,7 @@ public class TimeSurface implements Serializable {
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
+        walkSpeed = profileRouter.request.walkSpeed;
     }
 
     /** Make a max or min timesurface from propagated times in a ProfileRouter. */
@@ -105,9 +115,30 @@ public class TimeSurface implements Serializable {
         dateTime = req.fromTime; // FIXME
         routerId = profileRouter.graph.routerId;
         cutoffMinutes = profileRouter.MAX_DURATION / 60;
+        walkSpeed = profileRouter.request.walkSpeed;
+    }
+    
+    /** Make a max or min timesurface from propagated times in a ProfileRouter. */
+    public TimeSurface (RoundBasedProfileRouter profileRouter) {
+        ProfileRequest req = profileRouter.request;
+        lon = req.fromLon;
+        lat = req.fromLat;
+        id = makeUniqueId();
+        dateTime = req.fromTime; // FIXME
+        routerId = profileRouter.graph.routerId;
     }
 
-    public static TimeSurface.RangeSet makeSurfaces (AnalystProfileRouterPrototype profileRouter) {
+    public TimeSurface(RepeatedRaptorProfileRouter profileRouter) {
+        ProfileRequest req = profileRouter.request;
+        lon = req.fromLon;
+        lat = req.fromLat;
+        id = makeUniqueId();
+        dateTime = req.fromTime; // FIXME
+        routerId = profileRouter.graph.routerId;
+        cutoffMinutes = 120; // FIXME is there any well-defined cutoff? This is needed for generating isochrone curves.
+    }
+
+	public static TimeSurface.RangeSet makeSurfaces (AnalystProfileRouterPrototype profileRouter) {
         TimeSurface minSurface = new TimeSurface(profileRouter);
         TimeSurface avgSurface = new TimeSurface(profileRouter);
         TimeSurface maxSurface = new TimeSurface(profileRouter);

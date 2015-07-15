@@ -17,11 +17,12 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.util.I18NString;
 
 final public class TemporaryStreetLocation extends StreetLocation implements TemporaryVertex {
     final private boolean endVertex;
 
-    public TemporaryStreetLocation(String id, Coordinate nearestPoint, String name,
+    public TemporaryStreetLocation(String id, Coordinate nearestPoint, I18NString name,
                                    boolean endVertex) {
         super(id, nearestPoint, name);
         this.endVertex = endVertex;

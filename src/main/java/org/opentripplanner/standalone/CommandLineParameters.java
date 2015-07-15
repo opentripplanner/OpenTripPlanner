@@ -1,18 +1,16 @@
 package org.opentripplanner.standalone;
 
+import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
+import jersey.repackaged.com.google.common.collect.Lists;
+import org.opentripplanner.routing.services.GraphService;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
-
-import jersey.repackaged.com.google.common.collect.Lists;
-
-import org.opentripplanner.routing.services.GraphService;
-
-import com.beust.jcommander.IParameterValidator;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
 /**
  * This is a JCommander-annotated class that holds parameters for OTP stand-alone mode.

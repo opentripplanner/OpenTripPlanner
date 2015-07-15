@@ -92,6 +92,59 @@ $ pip install mkdocs
 $ mkdocs serve
 ```
 
+### Debug layers
+
+OpenTripplanner has option to ease debugging problems with graph. Older option is graph visualizer.
+Which you can enable with `--visualize` parameter instead of `--server` when starting OTP.
+There you can see whole graph. You can click on edges and vertices and see the metadata. It is
+ useful to see if street has expected options. And if connections are where they are expected.
+
+It can be hard to use on large graphs since, whole graph is displayed at once. And it can be hard
+ to search for specific streets since only street graph is shown without the rest of information.
+ 
+ Another option is to use debug layers, which shows extra layers on top of normal map.
+ To enable them you need to add `?debug_layers=true` to URL. For example 
+ [http://localhost:8080/?debug_layers=true](http://localhost:8080/?debug_layers=true).
+  This adds debug layers to layer choosing dialog. Currently you can choose between:
+
+- Wheelchair access (which colors street edges red if they don't allow wheelchair or green otherwise)
+- Bike Safety (colors street edges based on how good are for cycling [smaller is better])
+- Traversal permissions (colors street edges based on what types of transit modes are allowed to
+ travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer also
+ draws links from transit stops/bike rentals and P+R to graph. And also draws transit stops, bike rentals
+  and P+R vertices with different color.
+
+Adding new renderer is very easy. You just need to create new class (preferably in
+`org.opentripplanner.inspector` package) which implements EdgeVertexRenderer. It is best if class
+name ends with Rendered. To implement this interface you need to write three functions `renderEdge`,
+`renderVertex` and `getName`. Both render functions accepts `EdgeVisualAttributes` object in which
+label of edge/vertex and color can be set. And both return `true` if edge/vertex should be rendered
+and `false` otherwise. `getName` function should return short descriptive name of the class and will
+be shown in layer chooser.
+
+For examples how to write renderers you can look into example renderers which are all in `org.opentripplanner.inspector` package.
+
+After your class is written you only need to add it to TileRenderManager:
+```java
+//This is how Wheelchair renderer is added
+renderers.put("wheelchair", new EdgeVertexTileRenderer(new WheelchairEdgeRenderer()));
+```
+`wheelchair` is internal layer key and should consist of a-zA-Z and -.
+
+By default all the tiles have cache headers to cache them for one hour. This can become problematic
+ if you are changing renderers a lot. To disable this change `GraphInspectorTileResource`:
+
+```java
+//This lines
+CacheControl cc = new CacheControl();
+cc.setMaxAge(3600);
+cc.setNoCache(false);
+
+//to this:
+CacheControl cc = new CacheControl();
+cc.setNoCache(true);
+```
+
 
 ### Date format
 
@@ -193,4 +246,34 @@ The OpenTripPlanner project has a [continuous integration (CI) server](http://ci
 is pushed to the main OpenTripPlanner repository on GitHub, this server will compile and test the new code, providing
 feedback on the stability of the build. It is also configured to run a battery of speed tests so that we can track
 improvements due to optimizations and spot drops in performance as an unintended consequence of changes.
+
+## Release Process
+
+This section is intended as a checklist for the person within the OTP development community who is responsible for
+performing releases (currently Andrew Byrd). Releases should be performed on the CI server because documentation and
+release JARs must be published after a release. The CI server serves as the OTP project web server, and also has a
+very fast network connection which makes uploading Maven artifacts to the repository on Amazon S3 less painful.
+Carrying out a release requires CI server login credentials as well as Amazon AWS credentials for deployment to our
+Maven repository.
+
+Release checklist:
+
+- update docs/Changelog.md, check in changes, and push
+- ssh into ci.opentripplanner.org
+- change to the ~/git/OpenTripPlanner directory
+- check that you are on the master branch with no uncommitted changes (git status; git clean -df)
+- pull down the latest master code
+- verify that git push succeeds without prompting for a password (i.e. ~/.ssh/id_rsa.pub is known to Github)
+- run a test build: mvn clean package site
+- check that `~/.m2/settings.xml` contains AWS credentials for the repo
+- mvn release:prepare (use the default release version and SCM release tag, bump the minor development version number)
+- cp -R target/site/apidocs /usr/share/nginx/html/javadoc/x.y.0
+- cp -R target/site/enunciate /usr/share/nginx/html/apidoc/x.y.0
+- check that all docs in /usr/share/nginx/html/javadoc/ have o+r permissions (they should be by default)
+- mvn release:perform
+- cp target/checkout/target/otp-x.y.0-shaded.jar /usr/share/nginx/html/jars/
+- rm /usr/share/nginx/html/jars/otp-x.y.0-SNAPSHOT*
+- check http://dev.opentripplanner.org/jars/ and http://dev.opentripplanner.org/javadoc/ in a browser
+- update the version numbers that appear in Basic-Usage, Developers-Guide, Getting-OTP, and index.md and check them in
+- email the OTP dev and users mailing lists, and send a message on Slack
 

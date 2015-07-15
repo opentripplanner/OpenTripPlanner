@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <style> body, html { height: 100%; } #map { height: 100%; } </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <script>
+
+(function () { // create a context for the purpose of namespacing and applying strict syntax
+    'use strict';
+
+    // Basic test of profile routing served up at http://localhost:8080/profile_tester.html
+    // Or access using a file:// URL to allow modifying this client while using a running OTP server.
+    // When you move the markers, sends a JSON request to OTP profile router and prints the resulting JSON in the JS console.
+
+    var map = L.map('map');
+    var arlington = new L.LatLng(38.868, -77.14);
+    var dc = new L.LatLng(38.896, -77.022);
+    map.setView(dc, 13);
+
+    L.tileLayer('http://otile4.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    var bikesafety = new L.TileLayer('http://localhost:8080/otp/routers/default/inspector/tile/bike-safety/{z}/{x}/{y}.png',
+        { maxZoom : 21 }
+    );
+
+    var traversal = new L.TileLayer('http://localhost:8080/otp/routers/default/inspector/tile/traversal/{z}/{x}/{y}.png',
+        { maxZoom : 21 }
+    );
+
+    L.control.layers(null, { "Bike safety": bikesafety, "Street permissions": traversal }).addTo(map); // first param is radio buttons, second is checkboxes
+
+    var fromMarker = L.marker(center, {draggable: true});
+    var toMarker = L.marker(center, {draggable: true});
+
+    // Find center of default region
+    var center;
+    var req = new XMLHttpRequest();
+    req.open('GET', 'http://localhost:8080/otp/routers/default', false); // async=false, define center before setting up map
+    req.setRequestHeader("Accept", "application/json");
+    req.onload = function() {
+        var resp = JSON.parse(req.responseText);
+        // console.log(resp);
+        var lat = resp['centerLatitude'];
+        var lng = resp['centerLongitude'];
+        var center = new L.LatLng(lat, lng);
+        map.setView(center, 13);
+        fromMarker.setLatLng(center);
+        toMarker.setLatLng(center);
+    };
+    req.send(null);
+
+    function profileRoute() {
+        req.overrideMimeType("application/json");
+        var url = "http://localhost:8080/otp/routers/default/profile";
+        var fromPos = fromMarker.getLatLng();
+        var toPos = toMarker.getLatLng();
+        var qstring = '?from=' + fromPos.lat + ',' + fromPos.lng;
+        qstring += '&to=' + toPos.lat + ',' + toPos.lng;
+        qstring += '&modes=WALK,BICYCLE,TRANSIT'; // note that TRANSIT or specific transit modes must be included
+        // Open directly in new tab
+        window.open(url + qstring, '_blank');
+    }
+
+    fromMarker.on("dragend",function(ev){
+        var pos = ev.target.getLatLng();
+        this.bindPopup(pos.toString()).openPopup();
+        profileRoute();
+    });
+
+    toMarker.on("dragend",function(ev){
+        var pos = ev.target.getLatLng();
+        this.bindPopup(pos.toString()).openPopup();
+        profileRoute();
+    });
+
+    fromMarker.addTo(map);
+    toMarker.addTo(map);
+
+}()); // close namespace and call to execute.
+
+        </script>
+    </body>
+</html>

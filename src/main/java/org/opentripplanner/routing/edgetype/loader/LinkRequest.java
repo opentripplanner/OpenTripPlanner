@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import org.opentripplanner.util.I18NString;
 
 /**
  * This class keeps track of all of the edges created during a particular case of network linking
@@ -203,7 +204,7 @@ public class LinkRequest {
         StreetEdge e1 = bestPair.first;
         StreetEdge e2 = bestPair.second;
 
-        String name = e1.getName();
+        I18NString name = e1.getRawName();
         StreetVertex e1v1 = (StreetVertex) e1.getFromVertex();
         StreetVertex e1v2 = (StreetVertex) e1.getToVertex();
         LineString forwardGeometry = e1.getGeometry();
@@ -255,6 +256,7 @@ public class LinkRequest {
         // Split each edge independently. If a only one splitter vertex is used, routing may take 
         // shortcuts thought the splitter vertex to avoid turn penalties.
         IntersectionVertex e1midpoint = new IntersectionVertex(linker.graph, "split 1 at " + label, midCoord.x, midCoord.y, name);
+        e1midpoint.freeFlowing = true;
         // We are replacing two edges with four edges
         // Note: Always enable elevation. This should not be a big waste of memory.
         StreetWithElevationEdge forward1 = new StreetWithElevationEdge(e1v1, e1midpoint, forward1Geom, name, lengthIn,
@@ -272,6 +274,7 @@ public class LinkRequest {
         IntersectionVertex e2midpoint = null;
         if (e2 != null) {
             e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord.x, midCoord.y, name);
+            e2midpoint.freeFlowing = true;
             backward1 = new StreetWithElevationEdge(e2v1, e2midpoint, backGeometryPair.first,
                     name, lengthOut, e2.getPermission(), e2.isBack());
             backward2 = new StreetWithElevationEdge(e2midpoint, e2v2, backGeometryPair.second,

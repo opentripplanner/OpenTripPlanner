@@ -23,6 +23,7 @@ import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
 
 
 /**
@@ -91,5 +92,11 @@ public class ElevatorBoardEdge extends Edge implements ElevatorEdge {
     
     public String toString() {
         return "ElevatorBoardEdge(" + fromv + " -> " + tov + ")";
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        //TODO: localize
+        return this.getName();
     }
 }

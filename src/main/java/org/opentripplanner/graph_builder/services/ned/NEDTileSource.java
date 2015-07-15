@@ -13,20 +13,18 @@
 
 package org.opentripplanner.graph_builder.services.ned;
 
+import org.opentripplanner.routing.graph.Graph;
+
 import java.io.File;
 import java.util.List;
-
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * A source of NED tiles for NEDGridCoverageFactoryImpl -- maybe the USGS streaming
  * server, maybe one-degree tiles, maybe something else.
  * @author novalis
- *
  */
 public interface NEDTileSource {
 
-    // FIXME replace autowiring
     public abstract void setGraph(Graph graph);
 
     /**

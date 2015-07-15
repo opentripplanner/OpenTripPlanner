@@ -78,6 +78,9 @@ public class GraphBuilderParameters {
      */
     public final boolean fetchElevationUS;
 
+    /** If specified, download NED elevation tiles from the given AWS S3 bucket. */
+    public final S3BucketConfig elevationBucket;
+
     /**
      * A specific fares service to use.
      */
@@ -95,6 +98,21 @@ public class GraphBuilderParameters {
     public final boolean indexEdgeOsmIds;
 
     /**
+     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
+     */
+    public boolean staticBikeRental = false;
+
+    /**
+     * Whether we should create car P+R stations from OSM data.
+     */
+    public boolean staticParkAndRide = true;
+
+    /**
+     * Whether we should create bike P+R stations from OSM data.
+     */
+    public boolean staticBikeParkAndRide = false;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -106,16 +124,20 @@ public class GraphBuilderParameters {
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
-        stationTransfers = config.path("parentStationTransfers").asBoolean(false);
+        stationTransfers = config.path("stationTransfers").asBoolean(false);
         subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME);
         streets = config.path("streets").asBoolean(true);
         embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
         areaVisibility = config.path("areaVisibility").asBoolean(false);
         matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
+        elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
         indexEdgeOsmIds = config.path("indexEdgeOsmIds").asBoolean(false);
+        staticBikeRental = config.path("staticBikeRental").asBoolean(false);
+        staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
+        staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
     }
 
 }

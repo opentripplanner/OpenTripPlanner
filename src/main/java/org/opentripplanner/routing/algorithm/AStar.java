@@ -95,8 +95,15 @@ public class AStar {
         return this.getShortestPathTree(req, relTimeoutSeconds, null);
     }
     
+    /** set up a single-origin search */
     public void startSearch(RoutingRequest options,
             SearchTerminationStrategy terminationStrategy, long abortTime) {
+        startSearch(options, terminationStrategy, abortTime, true);
+    }
+    
+    /** set up the search, optionally not adding the initial state to the queue (for multi-state Dijkstra) */
+    private void startSearch(RoutingRequest options,
+            SearchTerminationStrategy terminationStrategy, long abortTime, boolean addToQueue) {
 
         runState = new RunState( options, terminationStrategy );
         runState.rctx = options.getRoutingContext();
@@ -115,8 +122,6 @@ public class AStar {
             runState = null; // Search timed out
             return;
         }
-        State initialState = new State(options);
-        runState.spt.add(initialState);
 
         // Priority Queue.
         // NOTE(flamholz): the queue is self-resizing, so we initialize it to have 
@@ -126,9 +131,14 @@ public class AStar {
         int initialSize = runState.rctx.graph.getVertices().size();
         initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
         runState.pq = new BinHeap<State>(initialSize);
-        runState.pq.insert(initialState, 0);
         runState.nVisited = 0;
         runState.targetAcceptedStates = Lists.newArrayList();
+        
+        if (addToQueue) {
+            State initialState = new State(options);
+            runState.spt.add(initialState);
+            runState.pq.insert(initialState, 0);
+        }
     }
 
     boolean iterate(){
@@ -298,6 +308,30 @@ public class AStar {
         }
         
         storeMemory();
+        return spt;
+    }
+    
+    /** Get an SPT, starting from a collection of states */
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeoutSeconds,
+            SearchTerminationStrategy terminationStrategy, Collection<State> initialStates) {
+        
+        ShortestPathTree spt = null;
+        long abortTime = DateUtils.absoluteTimeout(relTimeoutSeconds);
+
+        startSearch (options, terminationStrategy, abortTime, false);
+        
+        if (runState != null) {
+            for (State state : initialStates) {
+                runState.spt.add(state);
+                // TODO: hardwired for earliest arrival
+                // TODO: weights are seconds, no?
+                runState.pq.insert(state, state.getElapsedTimeSeconds());
+            }
+            
+            runSearch(abortTime);
+            spt = runState.spt;
+        }
+        
         return spt;
     }
 

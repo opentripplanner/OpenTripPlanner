@@ -13,10 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.FareRule;
@@ -31,7 +28,9 @@ import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implements the default GTFS fare rules as described in
@@ -188,4 +187,6 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
         retval.configure(config);
         return retval;
     }
+
+    public String toString() { return this.getClass().getSimpleName(); }
 }

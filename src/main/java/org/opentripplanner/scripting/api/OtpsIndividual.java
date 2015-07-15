@@ -76,8 +76,8 @@ public class OtpsIndividual {
             if (e.getToVertex().equals(cachedSample.v1) && e.getGeometry() != null) {
                 LineString geom = e.getGeometry();
                 LengthIndexedLine liline = new LengthIndexedLine(geom);
-                int t = cachedSample.t0 + cachedSample.t1;
-                double k = t == 0 ? 0.0 : 1.0 * cachedSample.t0 / t;
+                int d = cachedSample.d0 + cachedSample.d1;
+                double k = d == 0 ? 0.0 : 1.0 * cachedSample.d0 / d;
                 double x = liline.getStartIndex() + (liline.getEndIndex() - liline.getStartIndex())
                         * k;
                 Coordinate p = liline.extractPoint(x);

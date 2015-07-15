@@ -37,6 +37,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class AStarTest {
 
@@ -157,11 +158,11 @@ public class AStarTest {
         options.walkSpeed = 1.0;
 
         TemporaryStreetLocation from = new TemporaryStreetLocation("near_shilshole_22nd",
-                new Coordinate(-122.385050, 47.666620), "near_shilshole_22nd", false);
+                new Coordinate(-122.385050, 47.666620), new NonLocalizedString("near_shilshole_22nd"), false);
         new TemporaryConcreteEdge(from, _graph.getVertex("shilshole_22nd"));
 
         TemporaryStreetLocation to = new TemporaryStreetLocation("near_56th_20th",
-                new Coordinate(-122.382347, 47.669518), "near_56th_20th", true);
+                new Coordinate(-122.382347, 47.669518), new NonLocalizedString("near_56th_20th"), true);
         new TemporaryConcreteEdge(_graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(_graph, from, to);
@@ -193,11 +194,11 @@ public class AStarTest {
         options.setArriveBy(true);
 
         TemporaryStreetLocation from = new TemporaryStreetLocation("near_shilshole_22nd",
-                new Coordinate(-122.385050, 47.666620), "near_shilshole_22nd", false);
+                new Coordinate(-122.385050, 47.666620), new NonLocalizedString("near_shilshole_22nd"), false);
         new TemporaryConcreteEdge(from, _graph.getVertex("shilshole_22nd"));
 
         TemporaryStreetLocation to = new TemporaryStreetLocation("near_56th_20th",
-                new Coordinate(-122.382347, 47.669518), "near_56th_20th", true);
+                new Coordinate(-122.382347, 47.669518), new NonLocalizedString("near_56th_20th"), true);
         new TemporaryConcreteEdge(_graph.getVertex("56th_20th"), to);
 
         options.setRoutingContext(_graph, from, to);

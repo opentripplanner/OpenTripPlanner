@@ -158,6 +158,8 @@
     "Cable Car": "",
     "Funicular": "",
     "Aerial Tram": "Gondola",
+    "Bicycle rental station": "postaje za izposojo koles",
+    "Bicycle rental": "postaje za izposojo koles",
     "Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b> exit on <b>%(street_name)s</b>": "V krožišču vozite v <b>nasprotni smeri urinega kazalca</b> in pri <b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>",
     "Take roundabout counterclockwise to %(ordinal_exit_number)s exit on %(street_name)s": "V krožišču vozite v nasprotni smeri urinega kazalca in pri %(ordinal_exit_number)s izvozu zavijte na %(street_name)s",
     "Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit on <b>%(street_name)s</b>": "V krožišču vozite v <b>smeri urinega kazalca</b> in pri <b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>",

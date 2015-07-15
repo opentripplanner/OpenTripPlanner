@@ -8,7 +8,11 @@ import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.QueryParameter;
 import org.opentripplanner.api.param.YearMonthDay;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.profile.*;
+import org.opentripplanner.profile.Option;
+import org.opentripplanner.profile.ProfileRequest;
+import org.opentripplanner.profile.ProfileResponse;
+import org.opentripplanner.profile.ProfileRouter;
+import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
@@ -16,7 +20,12 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -47,8 +56,8 @@ public class ProfileResource {
             @QueryParam("to")    LatLon to,
             @QueryParam("analyst")      @DefaultValue("false") boolean analyst,
             @QueryParam("date")         @DefaultValue("today") YearMonthDay date,
-            @QueryParam("startTime")    @DefaultValue("07:00") HourMinuteSecond fromTime,
-            @QueryParam("endTime")      @DefaultValue("09:00") HourMinuteSecond toTime,
+            @QueryParam("startTime")    @DefaultValue("07:30") HourMinuteSecond fromTime,
+            @QueryParam("endTime")      @DefaultValue("08:30") HourMinuteSecond toTime,
             @QueryParam("walkSpeed")    @DefaultValue("1.4")   float walkSpeed, // m/sec
             @QueryParam("bikeSpeed")    @DefaultValue("4.1")   float bikeSpeed, // m/sec
             @QueryParam("carSpeed")     @DefaultValue("20")    float carSpeed,  // m/sec
@@ -67,7 +76,8 @@ public class ProfileResource {
             @QueryParam("accessModes")  @DefaultValue("WALK,BICYCLE") QualifiedModeSet accessModes,
             @QueryParam("egressModes")  @DefaultValue("WALK")         QualifiedModeSet egressModes,
             @QueryParam("directModes")  @DefaultValue("WALK,BICYCLE") QualifiedModeSet directModes,
-            @QueryParam("transitModes") @DefaultValue("TRANSIT")      TraverseModeSet transitModes)
+            @QueryParam("transitModes") @DefaultValue("TRANSIT")      TraverseModeSet transitModes,
+            @QueryParam("banAgency") String banAgency)
             throws Exception {
 
         QueryParameter.checkRangeInclusive(limit, 0, Integer.MAX_VALUE);
@@ -123,20 +133,11 @@ public class ProfileResource {
             }
             TimeSurface.RangeSet result;
 
-            if (graph.hasFrequencyService && ! graph.hasScheduledService) {
-                /* Use the new prototype profile-analyst for frequency-only cases. */
-                AnalystProfileRouterPrototype router = new AnalystProfileRouterPrototype(graph, req);
-                result = router.route();
-            } else {
-                /* Use the Modeify profile router for the general case. */
-                ProfileRouter router = new ProfileRouter(graph, req);
-                try {
-                    router.route();
-                    result = router.timeSurfaceRangeSet;
-                } finally {
-                    router.cleanup();
-                }
-            }
+            /* There are rarely frequency-only graphs. Use the Raptor profile router for both freqs and schedules. */
+            RepeatedRaptorProfileRouter router = new RepeatedRaptorProfileRouter(graph, req);
+            router.banAgency = banAgency;
+            router.route();
+            result = router.timeSurfaceRangeSet;
             Map<String, Integer> idForSurface = Maps.newHashMap();
             idForSurface.put("min", surfaceCache.add(result.min)); // requires analyst mode turned on
             idForSurface.put("avg", surfaceCache.add(result.avg));

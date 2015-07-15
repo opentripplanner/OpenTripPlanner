@@ -85,7 +85,6 @@ public class OTPApplication extends Application {
             Routers.class,
             Raster.class,
             LegendResource.class,
-            Metadata.class,
             ProfileResource.class,
             SimpleIsochrone.class,
             ServerInfo.class,
@@ -94,6 +93,8 @@ public class OTPApplication extends Application {
             GraphInspectorTileResource.class,
             ScriptResource.class,
             UpdaterStatusResource.class,
+            ScenarioResource.class,
+            RepeatedRaptorTestResource.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             CorsFilter.class,
             MultiPartFeature.class
