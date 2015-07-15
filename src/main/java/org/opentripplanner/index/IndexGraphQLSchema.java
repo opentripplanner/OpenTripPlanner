@@ -1,7 +1,16 @@
 package org.opentripplanner.index;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import graphql.Scalars;
-import graphql.schema.*;
+import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
+import graphql.schema.GraphQLObjectType;
+import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLSchema;
+import graphql.schema.GraphQLTypeReference;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -13,17 +22,18 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class IndexGraphQLSchema {
 
-    public GraphQLObjectType agencyType;
-    public GraphQLObjectType clusterType;
-    public GraphQLObjectType patternType;
-    public GraphQLObjectType routeType;
-    public GraphQLObjectType stoptimeType;
-    public GraphQLObjectType stopType;
-    public GraphQLObjectType tripType;
+    public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
+    public GraphQLOutputType clusterType = new GraphQLTypeReference("Cluster");
+    public GraphQLOutputType patternType = new GraphQLTypeReference("Pattern");
+    public GraphQLOutputType routeType = new GraphQLTypeReference("Route");
+    public GraphQLOutputType stoptimeType = new GraphQLTypeReference("Stoptime");
+    public GraphQLOutputType stopType = new GraphQLTypeReference("Stop");
+    public GraphQLOutputType tripType = new GraphQLTypeReference("Trip");
     public GraphQLObjectType queryType;
     public GraphQLSchema indexSchema;
 
@@ -53,7 +63,6 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> ((StopCluster) environment.getSource()).children)
                 .build())
             .build();
-
 
         stopType = GraphQLObjectType.newObject()
             .name("Stop")
@@ -148,6 +157,50 @@ public class IndexGraphQLSchema {
                         .filter(edge -> edge instanceof SimpleTransfer)
                         .map(edge -> ((TransitVertex) edge.getToVertex()).getStop())
                         .collect(Collectors.toList()))
+                .build())
+            .build(); //TODO: add stoptimes
+
+        stoptimeType = GraphQLObjectType.newObject()
+            .name("Stoptime")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stopId")
+                .type(stopType)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("scheduledArrival")
+                .type(Scalars.GraphQLInt)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtimeArrival")
+                .type(Scalars.GraphQLInt)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("arrivalDelay")
+                .type(Scalars.GraphQLInt)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("scheduledDeparture")
+                .type(Scalars.GraphQLInt)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtimeDeparture")
+                .type(Scalars.GraphQLInt)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("departureDelay")
+                .type(Scalars.GraphQLInt)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("timepoint")
+                .type(Scalars.GraphQLBoolean)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("realtime")
+                .type(Scalars.GraphQLBoolean)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("serviceDay")
+                .type(Scalars.GraphQLString)
                 .build())
             .build();
 
@@ -318,6 +371,30 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment ->
                     index.patternsForRoute.get((Route) environment.getSource()))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stops")
+                .type(new GraphQLList(stopType))
+                .dataFetcher(environment ->
+                    index.patternsForRoute.get((Route) environment.getSource())
+                    .stream()
+                    .map(TripPattern::getStops)
+                    .flatMap(Collection::stream)
+                    .distinct()
+                    .collect(Collectors.toList())
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("trips")
+                .type(new GraphQLList(tripType))
+                .dataFetcher(environment ->
+                    index.patternsForRoute.get((Route) environment.getSource())
+                    .stream()
+                    .map(TripPattern::getTrips)
+                    .flatMap(Collection::stream)
+                    .distinct()
+                    .collect(Collectors.toList())
+                )
+                .build())
             .build();
 
         agencyType = GraphQLObjectType.newObject()
@@ -364,31 +441,156 @@ public class IndexGraphQLSchema {
         queryType = GraphQLObjectType.newObject()
             .name("QueryType")
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("agency")
-                .type(agencyType)
-                .argument(GraphQLFieldArgument.newFieldArgument()
-                    .name("id")
-                    .type(new GraphQLNonNull(Scalars.GraphQLString))
-                    .build())
-                .dataFetcher(environment ->
-                    index.agencyForId.get((String) environment.getArgument("id")))
-                .build())
-            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agencies")
                 .type(new GraphQLList(agencyType))
                 .dataFetcher(environment ->
                     index.agencyForId.values())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("agency")
+                .type(agencyType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment ->
+                    index.agencyForId.get(environment.getArgument("id")))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stops")
+                .type(new GraphQLList(stopType))
+                .dataFetcher(environment ->
+                    index.stopForId.values())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stopsByBbox")
+                .type(new GraphQLList(stopType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("minLat")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("minLon")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("maxLat")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("maxLon")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .dataFetcher(environment ->
+                        index.graph.streetIndex.getTransitStopForEnvelope(
+                            new Envelope(
+                                new Coordinate(environment.getArgument("minLon"), environment.getArgument("minLat")),
+                                new Coordinate(environment.getArgument("maxLon"), environment.getArgument("maxLat"))
+                            ))
+                            .stream()
+                            .map(transitStop -> transitStop.getStop())
+                            .collect(Collectors.toList())
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stopsByRadius")
+                .type(new GraphQLList(stopType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("lat")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("lon")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("radius")
+                    .type(Scalars.GraphQLFloat)
+                    .build())
+                .dataFetcher(environment ->
+                    index.graph.streetIndex.getNearbyTransitStops(
+                        new Coordinate(
+                            environment.getArgument("lon"),
+                            environment.getArgument("lat")),
+                        environment.getArgument("radius"))
+                        .stream()
+                        .map(transitStop -> transitStop.getStop())
+                        .collect(Collectors.toList())
+                )
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stop")
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment ->
+                    index.routeForId.get(environment.getArgument("id")))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("routes")
+                .type(new GraphQLList(routeType))
+                .dataFetcher(environment ->
+                    index.routeForId.values())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("route")
                 .type(routeType)
-                .argument(GraphQLFieldArgument.newFieldArgument()
+                .argument(GraphQLArgument.newArgument()
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment ->
                     index.routeForId.get(
                         GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("trips")
+                .type(new GraphQLList(tripType))
+                .dataFetcher(environment -> index.tripForId.values())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("trip")
+                .type(tripType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment ->
+                    index.tripForId.get(
+                        GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("patterns")
+                .type(new GraphQLList(patternType))
+                .dataFetcher(environment -> index.patternForId.values())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("pattern")
+                .type(patternType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment ->
+                    index.patternForId.get(
+                        environment.getArgument("id")))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("clusters")
+                .type(new GraphQLList(clusterType))
+                .dataFetcher(environment -> index.stopClusterForId.values())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("cluster")
+                .type(clusterType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("id")
+                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment ->
+                    index.stopClusterForId.get(
+                        environment.getArgument("id")))
                 .build())
             .build();
 
