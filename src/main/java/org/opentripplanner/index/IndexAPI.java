@@ -565,8 +565,19 @@ public class IndexAPI {
     @Path("/graphql")
     @Consumes(MediaType.TEXT_PLAIN)
     public Response getGraphQL (String query) {
-
-        return Response.status(Status.OK).entity(new GraphQL(index.graphQLSchema, query).execute()).build();
+        Object result;
+        Boolean success = false;
+        try {
+            result = new GraphQL(index.graphQLSchema, query).execute().getResult();
+            success = true;
+        } catch (Exception e) {
+            result = e.getMessage();
+        }
+        if (success) {
+            return Response.status(Status.OK).entity(result).build();
+        } else {
+            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(result).build();
+        }
     }
 
 

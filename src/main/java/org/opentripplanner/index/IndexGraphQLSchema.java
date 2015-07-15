@@ -22,6 +22,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -444,7 +445,7 @@ public class IndexGraphQLSchema {
                 .name("agencies")
                 .type(new GraphQLList(agencyType))
                 .dataFetcher(environment ->
-                    index.agencyForId.values())
+                    new ArrayList<>(index.agencyForId.values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("agency")
@@ -460,7 +461,7 @@ public class IndexGraphQLSchema {
                 .name("stops")
                 .type(new GraphQLList(stopType))
                 .dataFetcher(environment ->
-                    index.stopForId.values())
+                    new ArrayList<>(index.stopForId.values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopsByBbox")
@@ -482,14 +483,14 @@ public class IndexGraphQLSchema {
                     .type(Scalars.GraphQLFloat)
                     .build())
                 .dataFetcher(environment ->
-                        index.graph.streetIndex.getTransitStopForEnvelope(
-                            new Envelope(
-                                new Coordinate(environment.getArgument("minLon"), environment.getArgument("minLat")),
-                                new Coordinate(environment.getArgument("maxLon"), environment.getArgument("maxLat"))
-                            ))
-                            .stream()
-                            .map(transitStop -> transitStop.getStop())
-                            .collect(Collectors.toList())
+                    index.graph.streetIndex.getTransitStopForEnvelope(
+                        new Envelope(
+                            new Coordinate((double) (float) environment.getArgument("minLon"), (double) (float) environment.getArgument("minLat")),
+                            new Coordinate((double) (float) environment.getArgument("maxLon"), (double) (float) environment.getArgument("maxLat"))
+                        ))
+                        .stream()
+                        .map(TransitVertex::getStop)
+                        .collect(Collectors.toList())
                 )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -510,28 +511,30 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment ->
                     index.graph.streetIndex.getNearbyTransitStops(
                         new Coordinate(
-                            environment.getArgument("lon"),
-                            environment.getArgument("lat")),
-                        environment.getArgument("radius"))
+                            (double) (float) environment.getArgument("lon"),
+                            (double) (float) environment.getArgument("lat")),
+                        (double) (float) environment.getArgument("radius"))
                         .stream()
-                        .map(transitStop -> transitStop.getStop())
+                        .map(TransitVertex::getStop)
                         .collect(Collectors.toList())
                 )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
+                .type(stopType)
                 .argument(GraphQLArgument.newArgument()
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
                 .dataFetcher(environment ->
-                    index.routeForId.get(environment.getArgument("id")))
+                    index.stopForId.get(
+                        GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routes")
                 .type(new GraphQLList(routeType))
                 .dataFetcher(environment ->
-                    index.routeForId.values())
+                    new ArrayList<>(index.routeForId.values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("route")
@@ -547,7 +550,8 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trips")
                 .type(new GraphQLList(tripType))
-                .dataFetcher(environment -> index.tripForId.values())
+                .dataFetcher(environment ->
+                    new ArrayList<>(index.tripForId.values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trip")
@@ -563,7 +567,8 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("patterns")
                 .type(new GraphQLList(patternType))
-                .dataFetcher(environment -> index.patternForId.values())
+                .dataFetcher(environment ->
+                    new ArrayList<>(index.patternForId.values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pattern")
@@ -579,7 +584,8 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("clusters")
                 .type(new GraphQLList(clusterType))
-                .dataFetcher(environment -> index.stopClusterForId.values())
+                .dataFetcher(environment ->
+                    new ArrayList<>(index.stopClusterForId.values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("cluster")
