@@ -44,6 +44,7 @@ import java.io.*;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
@@ -58,6 +59,9 @@ public class AnalystWorker implements Runnable {
     public static final String WORKER_ID_HEADER = "X-Worker-Id";
 
     public static final int POLL_TIMEOUT = 10 * 1000;
+
+    /** should this worker shut down automatically */
+    public final boolean autoShutdown;
 
     public static final Random random = new Random();
 
@@ -117,7 +121,32 @@ public class AnalystWorker implements Runnable {
 
     boolean isSinglePoint = false;
 
-    public AnalystWorker(TaskStatisticsStore statsStore) {
+    public AnalystWorker(Properties config) {
+
+        // parse the configuration
+        // set up the stats store
+        String statsQueue = config.getProperty("statistics-queue");
+        if (statsQueue != null)
+            this.statsStore = new SQSTaskStatisticsStore(statsQueue);
+        else
+            // a stats store that does nothing.
+            this.statsStore = s -> {};
+
+        String addr = config.getProperty("broker-address");
+        String port = config.getProperty("broker-port");
+
+        if (addr != null) {
+            if (port != null)
+                this.BROKER_BASE_URL = String.format("http://%s:%s", addr, port);
+            else
+                this.BROKER_BASE_URL = String.format("http://%s", addr);
+        }
+
+        this.pointSetDatastore = new PointSetDatastore(10, null, false, config.getProperty("pointsets-bucket"));
+        this.clusterGraphBuilder = new ClusterGraphBuilder(config.getProperty("graphs-bucket"));
+
+        Boolean autoShutdown = Boolean.parseBoolean(config.getProperty("auto-shutdown"));
+        this.autoShutdown = autoShutdown == null ? false : autoShutdown;
 
         // Consider shutting this worker down once per hour, starting 55 minutes after it started up.
         startupTime = System.currentTimeMillis();
@@ -150,12 +179,6 @@ public class AnalystWorker implements Runnable {
 
         objectMapper.registerModule(new GeoJsonModule());
 
-        /* These serve as lazy-loading caches for graphs and point sets. */
-        clusterGraphBuilder = new ClusterGraphBuilder(s3Prefix + "-graphs");
-        pointSetDatastore = new PointSetDatastore(10, null, false, s3Prefix + "-pointsets");
-
-        this.statsStore = statsStore;
-
         instanceType = getInstanceType();
     }
 
@@ -165,7 +188,7 @@ public class AnalystWorker implements Runnable {
         boolean idle = false;
         while (true) {
             // Consider shutting down if enough time has passed
-            if (System.currentTimeMillis() > nextShutdownCheckTime) {
+            if (System.currentTimeMillis() > nextShutdownCheckTime && autoShutdown) {
                 if (idle) {
                     try {
                         Process process = new ProcessBuilder("sudo", "/sbin/shutdown", "-h", "now").start();
@@ -432,23 +455,35 @@ public class AnalystWorker implements Runnable {
         }
     }
 
+    /**
+     * Requires a worker configuration, which is a Java Properties file with the following
+     * attributes.
+     *
+     * broker-address               address of the broker, without protocol or port
+     * broker port                  port broker is running on, default 80.
+     * graphs-bucket                S3 bucket in which graphs are stored.
+     * pointsets-bucket             S3 bucket in which pointsets are stored
+     * auto-shutdown                Should this worker shut down its machine if it is idle (e.g. on throwaway cloud instances)
+     * statistics-queue             SQS queue to which to send statistics (optional)
+     */
     public static void main(String[] args) {
-        TaskStatisticsStore tss;
-        if (args.length == 2)
-            tss = new SQSTaskStatisticsStore(args[1]);
-        else
-            tss = new TaskStatisticsStore() {
-                @Override public void store(TaskStatistics ts) {
-                    /** do nothing, quietly */
-                }
-            };
+        Properties config = new Properties();
 
-        AnalystWorker w = new AnalystWorker(tss);
+        try {
+            File cfg;
+            if (args.length > 0)
+                cfg = new File(args[0]);
+            else
+                cfg = new File("worker.conf");
 
-        if (args.length > 0)
-            w.BROKER_BASE_URL = args[0];
+            InputStream cfgis = new FileInputStream(cfg);
+            config.load(cfgis);
+            cfgis.close();
+        } catch (Exception e) {
+            LOG.info("Error loading worker configuration", e);
+            return;
+        }
 
-        w.run();
+        new AnalystWorker(config).run();
     }
-
 }

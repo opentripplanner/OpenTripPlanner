@@ -24,7 +24,11 @@ public class SQSTaskStatisticsStore implements TaskStatisticsStore {
 
     /** create a task statistics store for the given queue name */
     public SQSTaskStatisticsStore(String queueName) {
-        queueUrl = sqs.getQueueUrl(queueName).getQueueUrl();
+        try {
+            queueUrl = sqs.getQueueUrl(queueName).getQueueUrl();
+        } catch (Exception e) {
+            LOG.error("Unable to initialize statistics store", e);
+        }
         LOG.info("Sending statistics to SQS queue {}", queueName);
     }
 
