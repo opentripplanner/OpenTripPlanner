@@ -9,8 +9,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectLongHashMap;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
@@ -60,6 +62,12 @@ public class Broker implements Runnable {
     /** the most tasks to deliver to a worker at a time */
     public final int MAX_TASKS_PER_WORKER = 8;
 
+    /**
+     * How long to give workers to start up (in ms) before assuming that they have started (and starting more
+     * on a given graph if they haven't.
+     */
+    public static final long WORKER_STARTUP_TIME = 5 * 60 * 1000;
+
     private int nUndeliveredTasks = 0; // Including normal priority jobs and high-priority tasks.
 
     private int nWaitingConsumers = 0; // including some that might be closed
@@ -105,6 +113,12 @@ public class Broker implements Runnable {
     private boolean workOffline;
 
     private AmazonEC2 ec2;
+
+    /**
+     * keep track of which graphs we have launched workers on and how long ago we launched them,
+     * so that we don't re-request workers which have been requested.
+     */
+    private TObjectLongMap<String> recentlyRequestedWorkers = new TObjectLongHashMap<>();
 
     // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions ?
 
@@ -175,7 +189,10 @@ public class Broker implements Runnable {
 
         String clientToken = UUID.randomUUID().toString().replaceAll("-", "");
 
-        if (workerCatalog.workersByGraph.get(graphId).isEmpty() && workerCatalog.observationsByWorkerId.size() < maxWorkers) {
+        if (workerCatalog.workersByGraph.get(graphId).isEmpty() &&
+                workerCatalog.observationsByWorkerId.size() < maxWorkers &&
+                // we have either never requested a worker on this graph, or we requested it long enough ago that it's ok to request another
+                (!recentlyRequestedWorkers.containsKey(graphId) || recentlyRequestedWorkers.get(graphId) < System.currentTimeMillis() - WORKER_STARTUP_TIME)) {
             // TODO: compute
             int nWorkers = 1;
 
