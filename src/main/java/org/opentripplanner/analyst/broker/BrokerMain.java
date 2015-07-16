@@ -46,7 +46,7 @@ public class BrokerMain {
         }
 
         int port = config.getProperty("port") != null ? Integer.parseInt(config.getProperty("port")) : DEFAULT_PORT;
-        String addr = config.getProperty("bindAddress") != null ? config.getProperty("bindAddress") : DEFAULT_BIND_ADDRESS;
+        String addr = config.getProperty("bind-address") != null ? config.getProperty("bind-address") : DEFAULT_BIND_ADDRESS;
 
         LOG.info("Starting qbroker on port {} of interface {}", port, addr);
 
