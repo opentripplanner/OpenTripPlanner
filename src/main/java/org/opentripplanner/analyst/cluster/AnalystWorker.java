@@ -1,6 +1,5 @@
 package org.opentripplanner.analyst.cluster;
 
-import ch.qos.logback.core.PropertyDefinerBase;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -54,6 +53,18 @@ import java.util.zip.GZIPOutputStream;
  *
  */
 public class AnalystWorker implements Runnable {
+    /**
+     * worker ID - just a random ID so we can differentiate machines used for computation.
+     * Useful to isolate the logs from a particular machine, as well as to evaluate any
+     * variation in performance coming from variation in the performance of the underlying
+     * VMs.
+     *
+     * This needs to be static so the logger can access it; see the static member class
+     * WorkerIdDefiner. A side effect is that only one worker can run in a given JVM. It also
+     * needs to be defined before the logger is defined, so that it is initialized before the
+     * logger is.
+     */
+    public static final String machineId = UUID.randomUUID().toString().replaceAll("-", "");
 
     private static final Logger LOG = LoggerFactory.getLogger(AnalystWorker.class);
 
@@ -71,8 +82,6 @@ public class AnalystWorker implements Runnable {
     ObjectMapper objectMapper;
 
     String BROKER_BASE_URL = "http://localhost:9001";
-
-    String s3Prefix = "analyst-dev";
 
     static final HttpClient httpClient;
 
@@ -96,9 +105,6 @@ public class AnalystWorker implements Runnable {
                 .build();
     }
 
-    private final String workerId = UUID.randomUUID().toString().replace("-", ""); // a unique identifier for each worker so the broker can catalog them
-
-
     // Of course this will eventually need to be shared between multiple AnalystWorker threads.
     ClusterGraphBuilder clusterGraphBuilder;
 
@@ -116,17 +122,6 @@ public class AnalystWorker implements Runnable {
 
     /** aws instance type, or null if not running on AWS */
     private String instanceType;
-
-    /**
-     * worker ID - just a random ID so we can differentiate machines used for computation.
-     * Useful to isolate the logs from a particular machine, as well as to evaluate any
-     * variation in performance coming from variation in the performance of the underlying
-     * VMs.
-     *
-     * This needs to be static so the logger can access it; see the static member class
-     * WorkerIdDefiner. A side effect is that only one worker can run in a given JVM.
-     */
-    public static final String machineId = UUID.randomUUID().toString().replaceAll("-", "");
 
     boolean isSinglePoint = false;
 
@@ -362,7 +357,7 @@ public class AnalystWorker implements Runnable {
         // Run a POST request (long-polling for work) indicating which graph this worker prefers to work on
         String url = BROKER_BASE_URL + "/dequeue/" + graphId;
         HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader(new BasicHeader(WORKER_ID_HEADER, workerId));
+        httpPost.setHeader(new BasicHeader(WORKER_ID_HEADER, machineId));
         HttpResponse response = null;
         try {
             response = httpClient.execute(httpPost);
@@ -501,16 +496,5 @@ public class AnalystWorker implements Runnable {
         }
 
         new AnalystWorker(config).run();
-    }
-
-    /**
-     * A class that allows the logging framework to access the worker ID; with a custom logback config
-     * this can be used to print the machine ID with each log message. This is useful if you have multiple
-     * workers logging to the same log aggregation service.
-     */
-    public static class WorkerIdDefiner extends PropertyDefinerBase {
-        @Override public String getPropertyValue() {
-            return AnalystWorker.machineId;
-        }
     }
 }
