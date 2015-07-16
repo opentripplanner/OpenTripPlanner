@@ -69,8 +69,8 @@ otp.widgets.transit.StopFinderWidget =
             var agencyId = this_.agencySelect.val();
             var id = this_.mainDiv.find('.otp-stopFinder-idField').val();
             if(!id || id.length === 0) return;
-            this_.module.webapp.indexApi.loadStopsById(agencyId, id, this, function(data) {
-                this_.updateStops(data.stops);
+            this_.module.webapp.indexApi.loadStopById(agencyId, id, this, function(data) {
+                this_.updateStops(data === null ? [] : [data]);
             });
         });
 
@@ -79,7 +79,7 @@ otp.widgets.transit.StopFinderWidget =
             var name = this_.mainDiv.find('.otp-stopFinder-nameField').val();
             if(!name || name.length === 0) return;
             this_.module.webapp.indexApi.loadStopsByName(agencyId, name, this, function(data) {
-                this_.updateStops(data.stops);
+                this_.updateStops(data);
             });
         });
 
@@ -100,13 +100,13 @@ otp.widgets.transit.StopFinderWidget =
             var stop = stops[i];
             $('<div />')
                 .addClass('otp-stopFinder-stopRow')
-                .html(stop.stopName + " (#" + stop.id.id + ")")
+                .html(stop.name)
                 .appendTo(this.stopList)
                 .data('stop', stop)
                 .click(function() {
                     var s = $(this).data('stop');
                     this_.stopViewer.show();
-                    this_.stopViewer.setStop(s.id, s.stopName);
+                    this_.stopViewer.setStop(s.id, s.name);
                     this_.stopViewer.bringToFront();
                 });
         }
