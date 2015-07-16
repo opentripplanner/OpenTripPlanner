@@ -166,7 +166,7 @@ public class Broker implements Runnable {
     }
 
     /** Create workers for a given job, if need be */
-    public synchronized void createWorkersForGraph(String graphId) {
+    public void createWorkersForGraph(String graphId) {
         if (workOffline)
             LOG.info("Work offline enabled, not creating workers for graph {}", graphId);
 
