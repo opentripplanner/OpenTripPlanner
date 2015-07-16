@@ -203,9 +203,14 @@ public class Broker implements Runnable {
                 throw new RuntimeException(e);
             }
 
+            // send the config as user data
             String userData = Base64.getEncoder().encode(cfg.toByteArray()).toString();
-
             req.setUserData(userData);
+
+            // launch into a VPC if desired
+            if (config.getProperty("subnet") != null)
+                req.setSubnetId(config.getProperty("subnet"));
+
             // allow us to retry request at will
             req.setClientToken(clientToken);
             // allow machine to shut itself completely off
