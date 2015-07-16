@@ -346,8 +346,7 @@ public class AnalystWorker implements Runnable {
             ts.total = (int) (System.currentTimeMillis() - startTime);
             statsStore.store(ts);
         } catch (Exception ex) {
-            LOG.error("An error occurred while routing: " + ex.getMessage());
-            ex.printStackTrace();
+            LOG.error("An error occurred while routing: ", ex);
         }
 
     }
