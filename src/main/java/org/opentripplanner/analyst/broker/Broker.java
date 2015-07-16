@@ -202,7 +202,7 @@ public class Broker implements Runnable {
             }
 
             // send the config as user data
-            String userData = Base64.getEncoder().encode(cfg.toByteArray()).toString();
+            String userData = new String(Base64.getEncoder().encode(cfg.toByteArray()));
             req.setUserData(userData);
 
             if (config.getProperty("worker-iam-role") != null)
