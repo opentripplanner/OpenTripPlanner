@@ -85,6 +85,7 @@ public class OtpsEntryPoint {
             throw new IllegalArgumentException("Vizualizer from script is not supported.");
         if (params.server) // Why not?
             throw new IllegalArgumentException("Server from script is not supported.");
+        otpMain.run();
         return new OtpsEntryPoint(otpMain.otpServer);
     }
 
