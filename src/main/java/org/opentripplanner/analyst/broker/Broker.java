@@ -2,10 +2,7 @@ package org.opentripplanner.analyst.broker;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.InstanceType;
-import com.amazonaws.services.ec2.model.RunInstancesRequest;
-import com.amazonaws.services.ec2.model.RunInstancesResult;
-import com.amazonaws.services.ec2.model.ShutdownBehavior;
+import com.amazonaws.services.ec2.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
@@ -206,6 +203,9 @@ public class Broker implements Runnable {
             // send the config as user data
             String userData = Base64.getEncoder().encode(cfg.toByteArray()).toString();
             req.setUserData(userData);
+
+            if (config.getProperty("worker-iam-role") != null)
+                req.setIamInstanceProfile(new IamInstanceProfileSpecification().withArn(config.getProperty("worker-iam-role")));
 
             // launch into a VPC if desired
             if (config.getProperty("subnet") != null)
