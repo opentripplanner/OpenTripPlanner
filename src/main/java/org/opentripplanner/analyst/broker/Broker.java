@@ -143,13 +143,14 @@ public class Broker implements Runnable {
         highPriorityTasks.put(task.graphId, task);
         highPriorityResponses.put(task.taskId, response);
         nUndeliveredTasks += 1;
+        createWorkersForGraph(task.graphId);
         notify();
     }
 
     /** Enqueue some tasks for queued execution possibly much later. Results will be saved to S3. */
     public synchronized void enqueueTasks (List<AnalystClusterRequest> tasks) {
         Job job = findJob(tasks.get(0)); // creates one if it doesn't exist
-        createWorkersForJob(job);
+        createWorkersForGraph(job.graphId);
         for (AnalystClusterRequest task : tasks) {
             task.taskId = nextTaskId++;
             job.addTask(task);
@@ -165,20 +166,20 @@ public class Broker implements Runnable {
     }
 
     /** Create workers for a given job, if need be */
-    public synchronized void createWorkersForJob(Job job) {
+    public synchronized void createWorkersForGraph(String graphId) {
         if (workOffline)
-            LOG.info("Work offline enabled, not creating workers for job {}", job);
+            LOG.info("Work offline enabled, not creating workers for graph {}", graphId);
 
         // make sure that we don't assign work to dead workers
         workerCatalog.purgeDeadWorkers();
 
         String clientToken = UUID.randomUUID().toString().replaceAll("-", "");
 
-        if (workerCatalog.workersByGraph.get(job.graphId).isEmpty() && workerCatalog.observationsByWorkerId.size() < maxWorkers) {
+        if (workerCatalog.workersByGraph.get(graphId).isEmpty() && workerCatalog.observationsByWorkerId.size() < maxWorkers) {
             // TODO: compute
             int nWorkers = 1;
 
-            LOG.info("Starting {} workers as there are none on graph {}", nWorkers, job.graphId);
+            LOG.info("Starting {} workers as there are none on graph {}", nWorkers, graphId);
             // there are no workers on this graph, start one
             RunInstancesRequest req = new RunInstancesRequest();
             req.setImageId(config.getProperty("ami-id"));
@@ -190,7 +191,7 @@ public class Broker implements Runnable {
             req.setMaxCount(nWorkers);
 
             // it's fine to just modify the worker config as this method is synchronized
-            workerConfig.setProperty("initial-graph-id", job.graphId);
+            workerConfig.setProperty("initial-graph-id", graphId);
 
             ByteArrayOutputStream cfg = new ByteArrayOutputStream();
             try {
@@ -220,11 +221,11 @@ public class Broker implements Runnable {
             LOG.info("Requesting {} workers", nWorkers);
         }
         else if (workerCatalog.observationsByWorkerId.size() >= maxWorkers) {
-            LOG.warn("{} workers already started, not starting more; job {} will not complete", maxWorkers, job);
+            LOG.warn("{} workers already started, not starting more; jobs on graph {} will not complete", maxWorkers, graphId);
             // TODO retry later
         }
         else {
-            LOG.info("Workers exist on graph {}, not starting new workers", job.graphId);
+            LOG.info("Workers exist on graph {}, not starting new workers", graphId);
         }
     }
 
