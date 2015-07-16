@@ -1,8 +1,3 @@
-<!-- 
-Logback currently complains about having multiple configs on the classpath, so we have just
-one in the opentripplanner-routing module. It will be picked up when running anything that 
-depends on otp-routing.
--->
 <configuration>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
