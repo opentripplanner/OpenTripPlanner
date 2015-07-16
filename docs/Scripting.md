@@ -71,12 +71,18 @@ Example of use using python:
 ```Python
 #!/usr/bin/jython
 from org.opentripplanner.scripting.api import *
-otp = OtpsEntryPoint.fromArgs([ "--graphs", "." ])
+otp = OtpsEntryPoint.fromArgs([ "--graphs", "/path/to/graphs", "--router", "amsterdam" ])
 # ... the rest of your script goes here ...
 ```
 
 ```Bash
 $ java -cp otp-x.y.z-shaded.jar:jython-standalone.jar org.python.util.jython myscript.py
+```
+
+Or, simpler:
+
+```Bash
+$ jython -Dpython.path=otp-x.y.z-shaded.jar myscript.py
 ```
 
 Note that contrary to java custom the jython "main" class is all lowercase, this is not a typo.
