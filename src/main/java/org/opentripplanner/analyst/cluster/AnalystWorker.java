@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst.cluster;
 
+import ch.qos.logback.core.PropertyDefinerBase;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -116,8 +117,16 @@ public class AnalystWorker implements Runnable {
     /** aws instance type, or null if not running on AWS */
     private String instanceType;
 
-    /** worker ID - just a random ID so we can differentiate machines used for computation. Particularly useful to isolate variation coming from Amazon itself */
-    private String machineId = UUID.randomUUID().toString().replaceAll("-", "");
+    /**
+     * worker ID - just a random ID so we can differentiate machines used for computation.
+     * Useful to isolate the logs from a particular machine, as well as to evaluate any
+     * variation in performance coming from variation in the performance of the underlying
+     * VMs.
+     *
+     * This needs to be static so the logger can access it; see the static member class
+     * WorkerIdDefiner. A side effect is that only one worker can run in a given JVM.
+     */
+    public static final String machineId = UUID.randomUUID().toString().replaceAll("-", "");
 
     boolean isSinglePoint = false;
 
@@ -492,5 +501,16 @@ public class AnalystWorker implements Runnable {
         }
 
         new AnalystWorker(config).run();
+    }
+
+    /**
+     * A class that allows the logging framework to access the worker ID; with a custom logback config
+     * this can be used to print the machine ID with each log message. This is useful if you have multiple
+     * workers logging to the same log aggregation service.
+     */
+    public static class WorkerIdDefiner extends PropertyDefinerBase {
+        @Override public String getPropertyValue() {
+            return AnalystWorker.machineId;
+        }
     }
 }
