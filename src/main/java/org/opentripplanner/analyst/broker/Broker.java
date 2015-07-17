@@ -182,8 +182,10 @@ public class Broker implements Runnable {
 
     /** Create workers for a given job, if need be */
     public void createWorkersForGraph(String graphId) {
-        if (workOffline)
+        if (workOffline) {
             LOG.info("Work offline enabled, not creating workers for graph {}", graphId);
+            return;
+        }
 
         // make sure that we don't assign work to dead workers
         workerCatalog.purgeDeadWorkers();
@@ -333,13 +335,22 @@ public class Broker implements Runnable {
         // workers on their graph.
 
         // start with high-priority tasks
-        HIGHPRIORITY: for (Map.Entry<String, Collection<AnalystClusterRequest>> e : highPriorityTasks.asMap().entrySet()) {
+        HIGHPRIORITY:
+        for (Map.Entry<String, Collection<AnalystClusterRequest>> e : highPriorityTasks.asMap().entrySet()) {
             // the collection is an arraylist with the most recently added at the end
             String graphId = e.getKey();
             Collection<AnalystClusterRequest> tasks = e.getValue();
 
             // see if there are any consumers for this
-            Deque<Response> consumers = consumersByGraph.get(graphId);
+            // don't respect graph affinity when working offline; we can't arbitrarily start more workers
+            Deque<Response> consumers;
+            if (!workOffline)
+                consumers = consumersByGraph.get(graphId);
+            else {
+                Optional<Deque<Response>> opt = consumersByGraph.values().stream().filter(c -> !c.isEmpty()).findFirst();
+                if (opt.isPresent()) consumers = opt.get();
+                else consumers = null;
+            }
 
             if (consumers == null || consumers.isEmpty()) {
                 LOG.warn("No consumer found for graph {}, needed for {} high-priority tasks", graphId, tasks.size());
@@ -360,6 +371,7 @@ public class Broker implements Runnable {
 
                 // TODO inefficiency here: we should mix single point and multipoint in the same response
                 deliver(job, consumer);
+                nWaitingConsumers--;
             }
         }
 
@@ -370,16 +382,28 @@ public class Broker implements Runnable {
             jobs.advance();
 
             // find a job that both has visible tasks and has available workers
-            Job current = jobs.advanceToElement(e ->
-                    !e.visibleTasks.isEmpty() &&
-                    consumersByGraph.containsKey(e.graphId) &&
-                    !consumersByGraph.get(e.graphId).isEmpty());
+            // We don't respect graph affinity when working offline, because we can't start more workers
+            Job current;
+            if (!workOffline) {
+                current = jobs.advanceToElement(e -> !e.visibleTasks.isEmpty() &&
+                        consumersByGraph.containsKey(e.graphId) &&
+                        !consumersByGraph.get(e.graphId).isEmpty());
+            }
+            else {
+                current = jobs.advanceToElement(e -> !e.visibleTasks.isEmpty());
+            }
 
             // nothing to see here
             if (current == null) break;
 
-            Deque<Response> consumers = consumersByGraph.get(current.graphId);
-
+            Deque<Response> consumers;
+            if (!workOffline)
+                consumers = consumersByGraph.get(current.graphId);
+            else {
+                Optional<Deque<Response>> opt = consumersByGraph.values().stream().filter(c -> !c.isEmpty()).findFirst();
+                if (opt.isPresent()) consumers = opt.get();
+                else consumers = null;
+            }
             // deliver this job to only one consumer
             // This way if there are multiple workers and multiple jobs the jobs will be fairly distributed, more or less
             deliver(current, consumers.pop());
