@@ -320,7 +320,8 @@ public class Broker implements Runnable {
         // workers on their graph.
 
         // start with high-priority tasks
-        HIGHPRIORITY: for (Map.Entry<String, Collection<AnalystClusterRequest>> e : highPriorityTasks.asMap().entrySet()) {
+        HIGHPRIORITY:
+        for (Map.Entry<String, Collection<AnalystClusterRequest>> e : highPriorityTasks.asMap().entrySet()) {
             // the collection is an arraylist with the most recently added at the end
             String graphId = e.getKey();
             Collection<AnalystClusterRequest> tasks = e.getValue();
@@ -355,6 +356,7 @@ public class Broker implements Runnable {
 
                 // TODO inefficiency here: we should mix single point and multipoint in the same response
                 deliver(job, consumer);
+                nWaitingConsumers--;
             }
         }
 
