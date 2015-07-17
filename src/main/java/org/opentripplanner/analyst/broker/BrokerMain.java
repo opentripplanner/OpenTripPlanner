@@ -48,10 +48,9 @@ public class BrokerMain {
         int port = config.getProperty("port") != null ? Integer.parseInt(config.getProperty("port")) : DEFAULT_PORT;
         String addr = config.getProperty("bind-address") != null ? config.getProperty("bind-address") : DEFAULT_BIND_ADDRESS;
 
-        LOG.info("Starting qbroker on port {} of interface {}", port, addr);
-
+        LOG.info("Starting analyst broker on port {} of interface {}", port, addr);
         HttpServer httpServer = new HttpServer();
-        NetworkListener networkListener = new NetworkListener("qbroker", addr, port);
+        NetworkListener networkListener = new NetworkListener("broker", addr, port);
         networkListener.getTransport().setIOStrategy(SameThreadIOStrategy.getInstance()); // we avoid blocking IO, and this allows us to see closed connections.
         httpServer.addListener(networkListener);
         // Bypass Jersey etc. and add a low-level Grizzly handler.
