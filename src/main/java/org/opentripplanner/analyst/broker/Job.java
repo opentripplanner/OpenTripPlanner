@@ -117,4 +117,15 @@ public class Job {
         return completedTasks.size() == tasksById.size();
     }
 
+    public boolean containsTask (int taskId) {
+        AnalystClusterRequest req = tasksById.get(taskId);
+        if (req != null) {
+            if (!req.jobId.equals(this.jobId)) {
+                LOG.error("Task {} has a job ID that does not match the job in which it was discovered.");
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

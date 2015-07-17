@@ -20,8 +20,8 @@ public class JobStatus {
     public String jobId;
 
     public JobStatus (Job job) {
-        this.complete = job.getCompleted();
-        this.inFlight = job.invisibleTasks.size();
+        this.complete = job.getCompletedTaskCount();
+        this.inFlight = job.invisibleUntil.size();
         this.remaining = job.visibleTasks.size();
         this.jobId = job.jobId;
     }

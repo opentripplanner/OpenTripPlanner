@@ -98,13 +98,6 @@ public class Broker implements Runnable {
 
     private WorkerCatalog workerCatalog = new WorkerCatalog();
 
-    /**
-     * The messages that have already been delivered to a worker.
-     * This duplicates information in the Job objects themselves, but is currently necessary to find out what
-     * Job a task belongs to when we have only its task ID.
-     */
-    TIntObjectMap<AnalystClusterRequest> deliveredTasks = new TIntObjectHashMap<>();
-
     /** The time at which each task was delivered to a worker, to allow re-delivery. */
     TIntIntMap deliveryTimes = new TIntIntHashMap();
 
@@ -400,6 +393,20 @@ public class Broker implements Runnable {
     }
 
     /**
+     * This uses a linear search through jobs, which should not be problematic unless there are thousands of
+     * simultaneous jobs.
+     * @return a Job object that contains the given task ID.
+     */
+    public Job getJobForTask (int taskId) {
+        for (Job job : jobs) {
+            if (job.containsTask(taskId)) {
+                return job;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Attempt to hand some tasks from the given job to a waiting consumer connection.
      * The write will fail if the consumer has closed the connection but it hasn't been removed from the connection
      * queue yet. This can happen because the Broker methods are synchronized, and the removal action may be waiting
@@ -441,10 +448,6 @@ public class Broker implements Runnable {
         nUndeliveredTasks -= tasks.size();
         job.markTasksDelivered(tasks);
 
-        for (AnalystClusterRequest task : tasks) {
-            deliveredTasks.put(task.taskId, task);
-        }
-
         return true;
 
     }
@@ -454,23 +457,13 @@ public class Broker implements Runnable {
      * TODO maybe use unique delivery receipts instead of task IDs to handle redelivered tasks independently
      * @return whether the task was found and removed.
      */
-    public synchronized boolean deleteJobTask (int taskId) {
-        // There could be thousands of invisible (delivered) tasks, so we use a hash map.
-        // We only allow removal of delivered, invisible tasks for now (not undelivered tasks).
-        // Return whether removal call discovered an existing task.
-        AnalystClusterRequest task = deliveredTasks.remove(taskId);
-
-        if (task == null)
+    public synchronized boolean markTaskCompleted (int taskId) {
+        Job job = getJobForTask(taskId);
+        if (job == null) {
+            LOG.error("Could not find a job containing task {}, and therefore could not mark the task as completed.");
             return false;
-
-        // using the string form to avoid accidental job creation
-        Job job = findJob(task.jobId);
-
-        if (job == null)
-            // can this happen?
-            return true;
-
-        job.markTaskCompleted(task.taskId);
+        }
+        job.markTaskCompleted(taskId);
         return true;
     }
 
