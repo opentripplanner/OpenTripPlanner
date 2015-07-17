@@ -21,7 +21,7 @@ public class BrokerMain {
 
     public static void main(String[] args) {
 
-        LOG.info("Starting qbroker on port {} of interface {}", PORT, BIND_ADDRESS);
+        LOG.info("Starting analyst broker on port {} of interface {}", PORT, BIND_ADDRESS);
         HttpServer httpServer = new HttpServer();
         NetworkListener networkListener = new NetworkListener("qbroker", BIND_ADDRESS, PORT);
         networkListener.getTransport().setIOStrategy(SameThreadIOStrategy.getInstance()); // we avoid blocking IO, and this allows us to see closed connections.

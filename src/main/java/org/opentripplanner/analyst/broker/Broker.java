@@ -56,6 +56,8 @@ public class Broker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Broker.class);
 
+    private static final int REDELIVERY_INTERVAL_SEC = 30;
+
     public final CircularList<Job> jobs = new CircularList<>();
 
     private int nUndeliveredTasks = 0; // Including normal priority jobs and high-priority tasks.
@@ -65,6 +67,8 @@ public class Broker implements Runnable {
     private int nextTaskId = 0;
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    private long nextRedeliveryCheckTime = System.currentTimeMillis();
 
     static {
         mapper.registerModule(AgencyAndIdSerializer.makeModule());
@@ -140,7 +144,7 @@ public class Broker implements Runnable {
         deque.addLast(response);
         nWaitingConsumers += 1;
         // Wake up the delivery thread if it's waiting on consumers.
-        // This is whatever thread called wait() while holding the monitor for this QBroker object.
+        // This is whatever thread called wait() while holding the monitor for this Broker object.
         notify();
     }
 
@@ -165,6 +169,19 @@ public class Broker implements Runnable {
     }
 
     /**
+     *  Check whether there are any delivered tasks that have reached their invisibility timeout but have not yet been
+     *  marked complete. Enqueue those tasks for redelivery.
+     */
+    private void redeliver () {
+        if (System.currentTimeMillis() > nextRedeliveryCheckTime) {
+            nextRedeliveryCheckTime += REDELIVERY_INTERVAL_SEC * 1000;
+            for (Job job : jobs) {
+                nUndeliveredTasks += job.redeliver();
+            }
+        }
+    }
+
+    /**
      * This method checks whether there are any high-priority tasks or normal job tasks and attempts to match them with
      * waiting workers. It blocks until there are tasks or workers available.
      */
@@ -175,6 +192,7 @@ public class Broker implements Runnable {
             LOG.debug("Task delivery thread is going to sleep, there are no tasks waiting for delivery.");
             logQueueStatus();
             wait();
+            redeliver();
         }
         LOG.debug("Task delivery thread is awake and there are some undelivered tasks.");
         logQueueStatus();
@@ -292,6 +310,7 @@ public class Broker implements Runnable {
 
     /**
      * Take a normal (non-priority) task out of a job queue, marking it as completed so it will not be re-delivered.
+     * TODO maybe use unique delivery receipts instead of task IDs to handle redelivered tasks independently
      * @return whether the task was found and removed.
      */
     public synchronized boolean deleteJobTask (int taskId) {
@@ -321,7 +340,7 @@ public class Broker implements Runnable {
             try {
                 deliverTasks();
             } catch (InterruptedException e) {
-                LOG.warn("Task pump thread was interrupted.");
+                LOG.info("Task pump thread was interrupted.");
                 return;
             }
         }
