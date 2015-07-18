@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.graph;
 
-import graphql.GraphQL;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
