@@ -339,6 +339,15 @@
             <name>Conveyal Maven Repository</name>
             <url>http://maven.conveyal.com/</url>
         </repository>
+        <!-- Needed  for graphql-java-->
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-andimarek-graphql-java</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/andimarek/graphql-java</url>
+        </repository>
     </repositories>
 
     <!-- Enunciate 1.29 is not yet in Maven Central Repository -->
@@ -666,7 +675,7 @@
         </dependency>
 
         <dependency>
-            <groupId>graphql</groupId>
+            <groupId>graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
             <version>1.0</version>
         </dependency>

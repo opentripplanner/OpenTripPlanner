@@ -105,7 +105,7 @@ public class GraphIndexTest extends GtfsTest {
                 "    }" +
                 "}";
 
-        Object result = new GraphQL(graph.index.graphQLSchema,query).execute();
+        Object result = graph.index.graphQL.execute(query);
         assertEquals("Fake Agency", ((Map)((Map)result).get("agency")).get("name"));
 
     }
@@ -121,7 +121,7 @@ public class GraphIndexTest extends GtfsTest {
                         "    }\n" +
                         "}\n";
 
-        Object result = new GraphQL(graph.index.graphQLSchema,query).execute();
+        Object result = graph.index.graphQL.execute(query);
         assertEquals(18, ((List)((Map)((Map)result).get("agency")).get("routes")).size());
 
     }

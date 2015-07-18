@@ -1,5 +1,6 @@
 package org.opentripplanner.index;
 
+import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.Scalars;
@@ -15,6 +16,7 @@ import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
@@ -36,10 +38,23 @@ public class IndexGraphQLSchema {
     public GraphQLOutputType stoptimeType = new GraphQLTypeReference("Stoptime");
     public GraphQLOutputType stopType = new GraphQLTypeReference("Stop");
     public GraphQLOutputType tripType = new GraphQLTypeReference("Trip");
+    public GraphQLOutputType stopAtDistanceType = new GraphQLTypeReference("StopAtDistance");
     public GraphQLObjectType queryType;
     public GraphQLSchema indexSchema;
 
     public IndexGraphQLSchema(GraphIndex index) {
+
+        stopAtDistanceType = GraphQLObjectType.newObject()
+            .name("stopAtDistance")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stop")
+                .type(stopType)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("distance")
+                .type(Scalars.GraphQLFloat)
+                .build())
+            .build();
 
         clusterType = GraphQLObjectType.newObject()
             .name("Cluster")
@@ -90,7 +105,7 @@ public class IndexGraphQLSchema {
                 .name("lat")
                 .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .dataFetcher(environment ->
-                    (float)(((Stop) environment.getSource()).getLat()))
+                    (float) (((Stop) environment.getSource()).getLat()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("lon")
@@ -166,13 +181,17 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("transfers")               //TODO: add max distance as parameter?
-                .type(new GraphQLList(stopType)) //TODO: also distance?
+                .type(new GraphQLList(stopAtDistanceType))
                 .dataFetcher(environment ->
                     index.stopVertexForStop.get((Stop) environment.getSource()).getOutgoing()
                         .stream()
                         .filter(edge -> edge instanceof SimpleTransfer)
-                        .map(edge -> ((TransitVertex) edge.getToVertex()).getStop())
-                        .collect(Collectors.toList()))
+                        .map(edge -> new ImmutableMap.Builder<String, Object>()
+                            .put("stop", ((TransitVertex) edge.getToVertex()).getStop())
+                            .put("distance", edge.getDistance())
+                            .build())
+                        .collect(Collectors.toList())
+                )
                 .build())
             .build(); //TODO: add stoptimes
 
@@ -371,7 +390,7 @@ public class IndexGraphQLSchema {
                 .name("stops")
                 .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopType))))
                 .build())
-            // TODO: add stoptimes
+                // TODO: add stoptimes
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("semanticHash")
                 .type(Scalars.GraphQLString)
@@ -436,11 +455,11 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(stopType))
                 .dataFetcher(environment ->
                     index.patternsForRoute.get((Route) environment.getSource())
-                    .stream()
-                    .map(TripPattern::getStops)
-                    .flatMap(Collection::stream)
-                    .distinct()
-                    .collect(Collectors.toList())
+                        .stream()
+                        .map(TripPattern::getStops)
+                        .flatMap(Collection::stream)
+                        .distinct()
+                        .collect(Collectors.toList())
                 )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -448,11 +467,11 @@ public class IndexGraphQLSchema {
                 .type(new GraphQLList(tripType))
                 .dataFetcher(environment ->
                     index.patternsForRoute.get((Route) environment.getSource())
-                    .stream()
-                    .map(TripPattern::getTrips)
-                    .flatMap(Collection::stream)
-                    .distinct()
-                    .collect(Collectors.toList())
+                        .stream()
+                        .map(TripPattern::getTrips)
+                        .flatMap(Collection::stream)
+                        .distinct()
+                        .collect(Collectors.toList())
                 )
                 .build())
             .build();
@@ -556,7 +575,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopsByRadius")
-                .type(new GraphQLList(stopType))
+                .type(new GraphQLList(stopAtDistanceType)) // Expects a TransitVertex object
                 .argument(GraphQLArgument.newArgument()
                     .name("lat")
                     .type(Scalars.GraphQLFloat)
@@ -569,16 +588,19 @@ public class IndexGraphQLSchema {
                     .name("radius")
                     .type(Scalars.GraphQLFloat)
                     .build())
-                .dataFetcher(environment ->
-                    index.graph.streetIndex.getNearbyTransitStops(
-                        new Coordinate(
-                            (double) (float) environment.getArgument("lon"),
-                            (double) (float) environment.getArgument("lat")),
-                        (double) (float) environment.getArgument("radius"))
+                .dataFetcher(environment -> {
+                    Coordinate coordinate = new Coordinate(
+                        (double) (float) environment.getArgument("lon"),
+                        (double) (float) environment.getArgument("lat")
+                    );
+                    return index.graph.streetIndex.getNearbyTransitStops(coordinate, (double) (float) environment.getArgument("radius"))
                         .stream()
-                        .map(TransitVertex::getStop)
-                        .collect(Collectors.toList())
-                )
+                        .map(vertex -> new ImmutableMap.Builder<String, Object>()
+                            .put("stop", vertex.getStop())
+                            .put("distance", (float) SphericalDistanceLibrary.fastDistance(vertex.getCoordinate(), coordinate))
+                            .build())
+                        .collect(Collectors.toList());
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")

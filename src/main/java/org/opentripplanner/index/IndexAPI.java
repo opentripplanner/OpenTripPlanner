@@ -20,7 +20,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import graphql.GraphQL;
+import graphql.execution.ExecutionResult;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -52,7 +52,14 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -61,6 +68,7 @@ import javax.ws.rs.core.UriInfo;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -565,18 +573,16 @@ public class IndexAPI {
     @Path("/graphql")
     @Consumes(MediaType.TEXT_PLAIN)
     public Response getGraphQL (String query) {
-        Object result;
-        Boolean success = false;
-        try {
-            result = new GraphQL(index.graphQLSchema, query).execute().getResult();
-            success = true;
-        } catch (Exception e) {
-            result = e.getMessage();
-        }
-        if (success) {
-            return Response.status(Status.OK).entity(result).build();
+        ExecutionResult result;
+        if (uriInfo.getQueryParameters().isEmpty()) {
+            result = index.graphQL.execute(query);
         } else {
-            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(result).build();
+            result = index.graphQL.execute(query, null, new HashMap<>(uriInfo.getQueryParameters()));
+        }
+        if (result.getValidationErrors().isEmpty()) {
+            return Response.status(Status.OK).entity(result.getResult()).build();
+        } else {
+            return Response.status(Status.BAD_REQUEST).entity(result.getValidationErrors()).build();
         }
     }
 

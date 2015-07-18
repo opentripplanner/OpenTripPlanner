@@ -6,9 +6,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import graphql.schema.GraphQLSchema;
+import graphql.GraphQL;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
@@ -46,6 +47,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -97,7 +99,7 @@ public class GraphIndex {
     /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
     public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
 
-    public GraphQLSchema graphQLSchema;
+    public GraphQL graphQL;
 
     /** Store distances from each stop to all nearby street intersections. Useful in speeding up analyst requests. */
     private transient StopTreeCache stopTreeCache = null;
@@ -153,7 +155,9 @@ public class GraphIndex {
         calendarService = graph.getCalendarService();
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
-        graphQLSchema = new IndexGraphQLSchema(this).indexSchema;
+        graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema, Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
+        ));
         LOG.info("Done indexing graph.");
     }
 
