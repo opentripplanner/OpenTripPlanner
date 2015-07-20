@@ -102,8 +102,21 @@ public class Histogram implements Serializable {
 
             for (int j = 0; j < weightingFunctions.length; j++) {
                 double w = weightingFunctions[j].getWeight(i);
-                tmpCounts[j] += w * binnedCounts[i];
-                tmpSums[j] += w * binnedWeights[i];
+
+                // the default logistic weighting function has a lookup table so it will return
+                // exactly 0 or 1 when outside the range of that table.
+                if (w == 0)
+                    continue;
+
+                else if (w == 1) {
+                    tmpCounts[j] += binnedCounts[i];
+                    tmpSums[j] += binnedWeights[i];
+                }
+
+                else {
+                    tmpCounts[j] += w * binnedCounts[i];
+                    tmpSums[j] += w * binnedWeights[i];
+                }
             }
         }
 
