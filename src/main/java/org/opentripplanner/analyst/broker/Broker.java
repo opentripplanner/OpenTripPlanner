@@ -369,6 +369,7 @@ public class Broker implements Runnable {
      */
     public synchronized void registerSinglePointChannel (String graphAffinity,WrappedResponse response) {
         singlePointChannels.put(graphAffinity, response);
+        // no need to notify as the side channels are not used by the normal task delivery loop
     }
 
     /**

@@ -48,6 +48,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
@@ -211,10 +212,10 @@ public class AnalystWorker implements Runnable {
     public void run() {
         // create executors with up to one thread per processor
         int nP = Runtime.getRuntime().availableProcessors();
-        highPriorityExecutor = new ThreadPoolExecutor(1, nP, 60,
-                TimeUnit.SECONDS, new ArrayBlockingQueue<>(255));
-        batchExecutor = new ThreadPoolExecutor(1, nP, 60,
-                TimeUnit.SECONDS, new ArrayBlockingQueue<>(nP * 2));
+        highPriorityExecutor = new ThreadPoolExecutor(1, nP, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(255));
+        highPriorityExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        batchExecutor = new ThreadPoolExecutor(1, nP, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(nP * 2));
+        batchExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
         // Start filling the work queues.
         boolean idle = false;
@@ -225,7 +226,8 @@ public class AnalystWorker implements Runnable {
                 if (idle && now > lastHighPriorityRequestProcessed + SINGLE_POINT_KEEPALIVE) {
                     LOG.warn("Machine is idle, shutting down.");
                     try {
-                        Process process = new ProcessBuilder("sudo", "/sbin/shutdown", "-h", "now").start();
+                        Process process = new ProcessBuilder("sudo", "/sbin/shutdown", "-h", "now")
+                                .start();
                         process.waitFor();
                     } catch (Exception ex) {
                         LOG.error("Unable to terminate worker", ex);
@@ -257,7 +259,20 @@ public class AnalystWorker implements Runnable {
 
             // enqueue low-priority tasks; note that this may block anywhere in the process
             tasks.stream().filter(t -> t.outputLocation != null)
-                    .forEach(t -> batchExecutor.execute(() -> this.handleOneRequest(t)));
+                .forEach(t -> {
+                    // attempt to enqueue, waiting if the queue is full
+                    while (true) {
+                        try {
+                            batchExecutor.execute(() -> this.handleOneRequest(t));
+                            break;
+                        } catch (RejectedExecutionException e) {
+                            // queue is full, wait 200ms and try again
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e1) { /* nothing */}
+                        }
+                    }
+                });
 
             logQueueStatus();
 
