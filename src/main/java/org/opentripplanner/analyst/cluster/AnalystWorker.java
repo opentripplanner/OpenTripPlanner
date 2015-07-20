@@ -6,13 +6,10 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.conveyal.geojson.GeoJsonModule;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -20,11 +17,9 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.ResultSet;
@@ -41,9 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.UUID;
@@ -72,7 +65,7 @@ public class AnalystWorker implements Runnable {
 
     public static final int POLL_TIMEOUT = 10 * 1000;
 
-    /** should this worker shut down automatically */
+    /** should this worker shut down automatically? */
     public final boolean autoShutdown;
 
     public static final Random random = new Random();
@@ -123,7 +116,11 @@ public class AnalystWorker implements Runnable {
     /** aws instance type, or null if not running on AWS */
     private String instanceType;
 
-    boolean isSinglePoint = false;
+    /** the last time a single point job was computed, avoiding write tearing */
+    private volatile long lastSinglePointTime = 0;
+
+    /** the task queue. Kept perpetually full */
+    private WorkerTaskDeque tasks;
 
     public AnalystWorker(Properties config) {
 
@@ -190,38 +187,48 @@ public class AnalystWorker implements Runnable {
         objectMapper.registerModule(new GeoJsonModule());
 
         instanceType = getInstanceType();
+
+        this.tasks = new WorkerTaskDeque(this, Runtime.getRuntime().availableProcessors() * 2);
     }
 
     @Override
     public void run() {
-        // Loop forever, attempting to fetch some messages from a queue and process them.
-        boolean idle = false;
-        while (true) {
-            // Consider shutting down if enough time has passed
-            if (System.currentTimeMillis() > nextShutdownCheckTime && autoShutdown) {
-                if (idle) {
+        // create threads to do work
+        for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+            new Thread (() -> {
+                while (true) {
                     try {
-                        Process process = new ProcessBuilder("sudo", "/sbin/shutdown", "-h", "now").start();
-                        process.waitFor();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    } finally {
-                        System.exit(0);
+                        // tasks.pollFirst will block
+                        handleOneRequest(tasks.removeFirst());
+                    } catch (Exception e) {
+                        LOG.error("Exception while handling request", e);
                     }
                 }
-                nextShutdownCheckTime += 60 * 60 * 1000;
+            }).start();
+        }
+
+        if (autoShutdown) {
+            while (true) {
+                try {
+                    Thread.sleep(Math.max(nextShutdownCheckTime - System.currentTimeMillis() + 100, 0));
+                } catch (InterruptedException e) { }
+                // Consider shutting down if enough time has passed
+                if (System.currentTimeMillis() > nextShutdownCheckTime && autoShutdown) {
+                    if (tasks.isEmpty() && System.currentTimeMillis() > lastSinglePointTime) {
+                        try {
+                            LOG.warn("Shutting down worker due to inactivity");
+                            Process process = new ProcessBuilder("sudo", "/sbin/shutdown", "-h",
+                                    "now").start();
+                            process.waitFor();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        } finally {
+                            System.exit(0);
+                        }
+                    }
+                    nextShutdownCheckTime += 60 * 60 * 1000;
+                }
             }
-            LOG.info("Long-polling for work ({} second timeout).", POLL_TIMEOUT / 1000.0);
-            // Long-poll (wait a few seconds for messages to become available)
-            // TODO internal blocking queue feeding work threads, polls whenever queue.size() < nProcessors
-            List<AnalystClusterRequest> tasks = getSomeWork();
-            if (tasks == null) {
-                LOG.info("Didn't get any work. Retrying.");
-                idle = true;
-                continue;
-            }
-            tasks.parallelStream().forEach(this::handleOneRequest);
-            idle = false;
         }
     }
 
@@ -348,43 +355,6 @@ public class AnalystWorker implements Runnable {
         } catch (Exception ex) {
             LOG.error("An error occurred while routing: ", ex);
         }
-
-    }
-
-    public List<AnalystClusterRequest> getSomeWork() {
-
-        // Run a POST request (long-polling for work) indicating which graph this worker prefers to work on
-        String url = BROKER_BASE_URL + "/dequeue/" + graphId;
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader(new BasicHeader(WORKER_ID_HEADER, machineId));
-        HttpResponse response = null;
-        try {
-            response = httpClient.execute(httpPost);
-            HttpEntity entity = response.getEntity();
-            if (entity == null) {
-                return null;
-            }
-            if (response.getStatusLine().getStatusCode() != 200) {
-                EntityUtils.consumeQuietly(entity);
-                return null;
-            }
-            return objectMapper.readValue(entity.getContent(), new TypeReference<List<AnalystClusterRequest>>() {
-            });
-        } catch (JsonProcessingException e) {
-            LOG.error("JSON processing exception while getting work: {}", e.getMessage());
-        } catch (SocketTimeoutException stex) {
-            LOG.error("Socket timeout while waiting to receive work.");
-        } catch (HttpHostConnectException ce) {
-            LOG.error("Broker refused connection. Sleeping before retry.");
-            try {
-                Thread.currentThread().sleep(5000);
-            } catch (InterruptedException e) {
-            }
-        } catch (IOException e) {
-            LOG.error("IO exception while getting work.");
-            e.printStackTrace();
-        }
-        return null;
 
     }
 
