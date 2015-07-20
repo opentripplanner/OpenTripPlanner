@@ -171,16 +171,6 @@ class BrokerHttpHandler extends HttpHandler {
                     suspendedProducerResponse.resume();
                     return;
                 }
-                else if ("single".equals(command)) {
-                    // await single point responses
-                    String graphAffinity = pathComponents[2];
-                    Broker.WrappedResponse wr = new Broker.WrappedResponse(request, response);
-                    request.getRequest().getConnection().addCloseListener((c, i) -> {
-                        broker.removeSinglePointChannel(graphAffinity, wr);
-                    });
-                    response.suspend();
-                    broker.registerSinglePointChannel(graphAffinity, wr);
-                }
             } else if (request.getMethod() == Method.DELETE) {
                 /* Acknowledge completion of a task and remove it from queues, avoiding re-delivery. */
                 if ("tasks".equalsIgnoreCase(pathComponents[1])) {
