@@ -2,12 +2,11 @@ package org.opentripplanner.analyst;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.google.common.primitives.Ints;
+import org.apache.commons.math3.util.FastMath;
+import org.opentripplanner.analyst.core.WeightingFunction;
 
 import java.io.IOException;
 import java.io.Serializable;
-
-import org.opentripplanner.analyst.core.WeightingFunction;
 
 /**
  * A pair of parallel histograms representing how many features are located at each amount of travel time 
@@ -98,6 +97,9 @@ public class Histogram implements Serializable {
         double[] tmpSums = new double[size];
 
         for (int i = 0; i < binnedCounts.length; i++) {
+            if (binnedCounts[i] == 0)
+                continue;
+
             for (int j = 0; j < weightingFunctions.length; j++) {
                 double w = weightingFunctions[j].getWeight(i);
                 tmpCounts[j] += w * binnedCounts[i];
@@ -110,8 +112,8 @@ public class Histogram implements Serializable {
         sums = new int[size];
 
         for (int i = 0; i < weightingFunctions.length; i++) {
-            counts[i] = (int) Math.round(tmpCounts[i]);
-            sums[i] = (int) Math.round(tmpSums[i]);
+            counts[i] = (int) FastMath.round(tmpCounts[i]);
+            sums[i] = (int) FastMath.round(tmpSums[i]);
         }
 
         // make density rather than cumulative
