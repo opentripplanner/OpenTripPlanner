@@ -444,6 +444,7 @@ public class Broker implements Runnable {
 
                 // TODO inefficiency here: we should mix single point and multipoint in the same response
                 deliver(job, consumer);
+                nWaitingConsumers--;
             }
         }
 
