@@ -138,6 +138,8 @@ public class Broker implements Runnable {
 
     private AmazonEC2 ec2;
 
+    private Timer timer = new Timer();
+
     /**
      * keep track of which graphs we have launched workers on and how long ago we launched them,
      * so that we don't re-request workers which have been requested.
@@ -184,17 +186,13 @@ public class Broker implements Runnable {
         createWorkersForGraph(task.graphId);
 
         // wait 100ms to deliver to workers in case another request comes in almost simultaneously
-        new Thread(() -> {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                /* continue */
+        timer.schedule(new TimerTask() {
+            @Override public void run() {
+                deliverHighPriorityTasks(task.graphId);
             }
+        }, 100);
 
-            // this is synchronized so it can only happen once at a time
-            deliverHighPriorityTasks(task.graphId);
-        });
-        notify();
+        // do not notify task delivery thread just yet as we haven't put anything in the task delivery queue yet.
     }
 
     /** attempt to deliver high priority tasks via side channels, or move them into normal channels if need be */
@@ -213,11 +211,13 @@ public class Broker implements Runnable {
             WrappedResponse wr = wrs.iterator().next();
 
             try {
-                wr.response.resume();
                 wr.response.setContentType("application/json");
                 OutputStream os = wr.response.getOutputStream();
                 mapper.writeValue(os, tasks);
                 os.close();
+                wr.response.resume();
+
+                newHighPriorityTasks.removeAll(graphId);
 
                 return;
             } catch (Exception e) {
@@ -230,7 +230,12 @@ public class Broker implements Runnable {
 
         // if we got here we didn't manage to send it via side channel, put it in the rotation for normal channels
         stalledHighPriorityTasks.putAll(graphId, tasks);
-        LOG.info("No side channel available for graph {}, delivering {} tasks via normal channel", graphId, tasks.size());
+        LOG.info("No side channel available for graph {}, delivering {} tasks via normal channel",
+                graphId, tasks.size());
+        nUndeliveredTasks += tasks.size();
+
+        // wake up delivery thread
+        notify();
     }
 
     /** Enqueue some tasks for queued execution possibly much later. Results will be saved to S3. */
