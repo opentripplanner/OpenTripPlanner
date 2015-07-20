@@ -202,7 +202,7 @@ class BrokerHttpHandler extends HttpHandler {
                     }
                 } else {
                     response.setStatus(HttpStatus.BAD_REQUEST_400);
-                    response.setDetailMessage("Delete is only allowed for tasks.");
+                    response.setDetailMessage("Delete is only allowed for tasks and jobs.");
                 }
             } else {
                 response.setStatus(HttpStatus.BAD_REQUEST_400);
