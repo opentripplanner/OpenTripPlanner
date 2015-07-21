@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class VisualTraverseVisitor implements TraverseVisitor {
-    private static final Logger LOG = LoggerFactory.getLogger(VisualTraverseVisitor.class)
+    private static final Logger LOG = LoggerFactory.getLogger(VisualTraverseVisitor.class);
 
     private ShowGraph gui;
 
