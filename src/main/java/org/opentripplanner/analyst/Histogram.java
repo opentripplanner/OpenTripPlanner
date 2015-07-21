@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -97,9 +97,16 @@ public class Histogram implements Serializable {
 
             // use an identity hash map so that lookups are speedy - we only need this in the context of
             // this function
-            Map<String, int[]> binnedProperties = targets.properties.keySet().stream()
+            Map<String, int[]> binnedProperties = new IdentityHashMap<>();
+                    /*
+                    targets.properties.keySet().stream()
                     .collect(Collectors.toMap(k -> k, k -> new int[size], (v1, v2) -> null,
-                            IdentityHashMap::new));
+                            IdentityHashMap::new));*/
+
+            for (String key : targets.properties.keySet()) {
+                binnedProperties.put(key, new int[size]);
+            }
+
             for (int fidx = 0; fidx < times.length; fidx++) {
                 if (times[fidx] == Integer.MAX_VALUE)
                     continue;
@@ -115,12 +122,23 @@ public class Histogram implements Serializable {
             // counts are the same for all histograms
             int[] counts = weightingFunction.apply(binnedCounts);
 
-            return targets.properties.keySet().stream().collect(Collectors.toMap(k -> k, k -> {
+            /*return targets.properties.keySet().stream().collect(Collectors.toMap(k -> k, k -> {
                 Histogram h = new Histogram();
                 h.counts = counts;
                 h.sums = weightingFunction.apply(binnedProperties.get(k));
                 return h;
-            }));
+            }));*/
+
+            Map<String, Histogram   > ret = new HashMap<>();
+
+            for (Map.Entry<String, int[]> e : binnedProperties.entrySet()) {
+                Histogram h = new Histogram();
+                h.counts = counts;
+                h.sums = weightingFunction.apply(e.getValue());
+                ret.put(e.getKey(), h);
+            }
+
+            return ret;
         } catch (Exception e) {
             LOG.error("Error constructing histograms", e);
             return null;
