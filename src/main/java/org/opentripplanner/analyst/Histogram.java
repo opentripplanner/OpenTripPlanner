@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -90,13 +91,15 @@ public class Histogram implements Serializable {
     public static Map<String, Histogram> buildAll (int[] times, PointSet targets) {
         try {
             // bin counts and all properties
-            int size = IntStream.of(times).reduce(0,
-                    (memo, i) -> i != Integer.MAX_VALUE ? Math.max(memo, i) : memo) + 1;
+            int size = IntStream.of(times).reduce(0, (memo, i) -> i != Integer.MAX_VALUE ? Math.max(i, memo) : memo) + 1;
+
             int[] binnedCounts = new int[size];
 
+            // use an identity hash map so that lookups are speedy - we only need this in the context of
+            // this function
             Map<String, int[]> binnedProperties = targets.properties.keySet().stream()
-                    .collect(Collectors.toMap(k -> k, k -> new int[size]));
-
+                    .collect(Collectors.toMap(k -> k, k -> new int[size], (v1, v2) -> null,
+                            IdentityHashMap::new));
             for (int fidx = 0; fidx < times.length; fidx++) {
                 if (times[fidx] == Integer.MAX_VALUE)
                     continue;
@@ -104,7 +107,7 @@ public class Histogram implements Serializable {
                 binnedCounts[times[fidx]] += 1;
 
                 for (Map.Entry<String, int[]> prop : targets.properties.entrySet()) {
-                    binnedProperties.get(prop.getKey())[times[fidx]] += prop.getValue()[fidx];  
+                    binnedProperties.get(prop.getKey())[times[fidx]] += prop.getValue()[fidx];
                 }
             }
 
