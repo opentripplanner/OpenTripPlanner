@@ -21,7 +21,6 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * This holds the results of a one-to-many search from a single origin point to a whole set of destination points.
@@ -116,11 +115,7 @@ public class ResultSet implements Serializable{
      * Each new histogram object will be stored as a part of this result set keyed on its property/category.
      */
     protected void buildHistograms(int[] times, PointSet targets) {
-        for (Entry<String, int[]> entry : targets.properties.entrySet()) {
-            String property = entry.getKey();
-            int[] magnitudes = entry.getValue();
-            this.histograms.put(property, new Histogram(times, magnitudes));
-        }
+        this.histograms = Histogram.buildAll(times, targets);
     }
 
     /**
