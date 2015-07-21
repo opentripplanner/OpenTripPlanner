@@ -115,7 +115,7 @@ public class VanillaExtract {
             } catch (Exception ex) {
                 response.setStatus(HttpStatus.BAD_REQUEST_400);
                 out.write("URI format: /min_lat,min_lon,max_lat,max_lon (all in decimal degrees)\n".getBytes());
-                ex.printStackTrace();
+                LOG.warn("400 bad request", ex);
             } finally {
                 out.close();
             }

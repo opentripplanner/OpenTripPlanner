@@ -63,8 +63,7 @@ public class OSMMain {
                 ps.printf("LINESTRING(%f %f,%f %f))\n", fromNode.getLon(), fromNode.getLat(), toNode.getLon(), toNode.getLat());
             }   
         } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            LOG.error("OSM file not found", e1);
         }
     }
 

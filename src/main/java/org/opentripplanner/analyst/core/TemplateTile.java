@@ -59,8 +59,7 @@ public class TemplateTile extends Tile {
                 }
             }
         } catch (Exception e) {
-            LOG.error(e.toString());
-            e.printStackTrace();
+            LOG.error("Could not create template tile", e);
         }
     }
     

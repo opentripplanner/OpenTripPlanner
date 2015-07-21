@@ -14,6 +14,8 @@ import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
 import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
  *
 */
 class BrokerHttpHandler extends HttpHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(BrokerHttpHandler.class);
 
     // TODO we should really just make one static mapper somewhere and use it throughout OTP
     private ObjectMapper mapper = new ObjectMapper()
@@ -211,11 +214,11 @@ class BrokerHttpHandler extends HttpHandler {
         } catch (JsonProcessingException jpex) {
             response.setStatus(HttpStatus.BAD_REQUEST_400);
             response.setDetailMessage("Could not decode/encode JSON payload. " + jpex.getMessage());
-            jpex.printStackTrace();
+            LOG.info("Error processing JSON from client", jpex);
         } catch (Exception ex) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
             response.setDetailMessage(ex.toString());
-            ex.printStackTrace();
+            LOG.info("Error processing client request", ex);
         }
     }
 

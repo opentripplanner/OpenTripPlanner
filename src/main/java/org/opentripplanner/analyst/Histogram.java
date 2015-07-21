@@ -3,6 +3,8 @@ package org.opentripplanner.analyst;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.opentripplanner.analyst.core.WeightingFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,6 +20,8 @@ import java.util.stream.IntStream;
  * All time values are rounded down into 1-minute bins (0-60 seconds = minute 0, 61-120 = min 1, etc.)
  */
 public class Histogram implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(Histogram.class);
+
     public static final double LOGISTIC_STEEPNESS = -2 / 60.0;
 
     /**
@@ -117,7 +121,7 @@ public class Histogram implements Serializable {
                 return h;
             }));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Error constructing histograms", e);
             return null;
         }
     }

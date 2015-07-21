@@ -168,9 +168,8 @@ public class OTPMain {
                     grizzlyServer.run();
                     return;
                 } catch (Throwable throwable) {
-                    throwable.printStackTrace();
                     LOG.error("An uncaught {} occurred inside OTP. Restarting server.",
-                            throwable.getClass().getSimpleName());
+                            throwable.getClass().getSimpleName(), throwable);
                 }
             }
         }

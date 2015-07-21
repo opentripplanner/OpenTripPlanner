@@ -216,8 +216,7 @@ public class LuceneIndex {
                 result.add(lr);
             }
         } catch (Exception ex) {
-            LOG.error("Error during Lucene search: {}", ex.toString());
-            ex.printStackTrace();
+            LOG.error("Error during Lucene search", ex);
         } finally {
             return result;
         }

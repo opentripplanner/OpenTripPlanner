@@ -463,7 +463,7 @@ public class AnalystWorker implements Runnable {
             return objectMapper.readValue(entity.getContent(), new TypeReference<List<AnalystClusterRequest>>() {
             });
         } catch (JsonProcessingException e) {
-            LOG.error("JSON processing exception while getting work: {}", e.getMessage());
+            LOG.error("JSON processing exception while getting work", e);
         } catch (SocketTimeoutException stex) {
             LOG.error("Socket timeout while waiting to receive work.");
         } catch (HttpHostConnectException ce) {
@@ -473,8 +473,7 @@ public class AnalystWorker implements Runnable {
             } catch (InterruptedException e) {
             }
         } catch (IOException e) {
-            LOG.error("IO exception while getting work.");
-            e.printStackTrace();
+            LOG.error("IO exception while getting work", e);
         }
         return null;
 
@@ -503,8 +502,7 @@ public class AnalystWorker implements Runnable {
                         response.getStatusLine());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.info("Failed to mark task {} as completed.", clusterRequest.taskId);
+            LOG.warn("Failed to mark task {} as completed.", clusterRequest.taskId, e);
         }
     }
 
@@ -524,8 +522,7 @@ public class AnalystWorker implements Runnable {
                 LOG.info("Failed to delete task {} ({}).", clusterRequest.taskId, response.getStatusLine());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.info("Failed to delete task {}", clusterRequest.taskId);
+            LOG.warn("Failed to delete task {}", clusterRequest.taskId, e);
         }
     }
 
