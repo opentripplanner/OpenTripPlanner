@@ -98,11 +98,6 @@ public class Histogram implements Serializable {
             // use an identity hash map so that lookups are speedy - we only need this in the context of
             // this function
             Map<String, int[]> binnedProperties = new IdentityHashMap<>();
-                    /*
-                    targets.properties.keySet().stream()
-                    .collect(Collectors.toMap(k -> k, k -> new int[size], (v1, v2) -> null,
-                            IdentityHashMap::new));*/
-
             for (String key : targets.properties.keySet()) {
                 binnedProperties.put(key, new int[size]);
             }
@@ -122,14 +117,7 @@ public class Histogram implements Serializable {
             // counts are the same for all histograms
             int[] counts = weightingFunction.apply(binnedCounts);
 
-            /*return targets.properties.keySet().stream().collect(Collectors.toMap(k -> k, k -> {
-                Histogram h = new Histogram();
-                h.counts = counts;
-                h.sums = weightingFunction.apply(binnedProperties.get(k));
-                return h;
-            }));*/
-
-            Map<String, Histogram   > ret = new HashMap<>();
+            Map<String, Histogram> ret = new HashMap<>();
 
             for (Map.Entry<String, int[]> e : binnedProperties.entrySet()) {
                 Histogram h = new Histogram();
