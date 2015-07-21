@@ -77,8 +77,18 @@ public class WorkerCatalog {
         return null;
     }
 
-    public int size () {
+    public int nActiveWorkers () {
         return workersByGraph.size();
+    }
+
+    public int nWorkersForGraph (String graphId) {
+        // Note that when containsKey(key) is false, multimap returns an empty collection, not null.
+        return workersByGraph.get(graphId).size();
+    }
+
+    public boolean graphHasNoWorkers (String graphId) {
+        // Note that when containsKey(key) is false, multimap returns an empty collection, not null.
+        return workersByGraph.get(graphId).isEmpty();
     }
 
 }

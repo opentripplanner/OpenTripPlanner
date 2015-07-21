@@ -1,18 +1,13 @@
 package org.opentripplanner.analyst.broker;
 
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TObjectLongHashMap;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
@@ -24,10 +19,18 @@ import org.opentripplanner.api.model.TraverseModeSetSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
 
 /**
  * This class tracks incoming requests from workers to consume Analyst tasks, and attempts to match those
@@ -93,10 +96,9 @@ public class Broker implements Runnable {
     /** broker configuration */
     private final Properties config;
 
-    /** configuration for workers launched by this broker */
-    private final Properties workerConfig;
-
     private WorkerCatalog workerCatalog = new WorkerCatalog();
+
+    private InstanceRequestTracker instanceRequestTracker;
 
     /** The time at which each task was delivered to a worker, to allow re-delivery. */
     TIntIntMap deliveryTimes = new TIntIntHashMap();
@@ -113,40 +115,21 @@ public class Broker implements Runnable {
     /** should we work offline */
     private boolean workOffline;
 
-    private AmazonEC2 ec2;
-
-    /**
-     * keep track of which graphs we have launched workers on and how long ago we launched them,
-     * so that we don't re-request workers which have been requested.
-     */
-    private TObjectLongMap<String> recentlyRequestedWorkers = new TObjectLongHashMap<>();
-
     // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions ?
 
-    public Broker (Properties config, String addr, int port) {
-        this.config = config;
+    public Broker (Properties brokerConfig, String addr, int port) {
 
-        // create a config for the AWS workers
-        workerConfig = new Properties();
-        workerConfig.setProperty("broker-address", addr);
-        workerConfig.setProperty("broker-port", "" + port);
-
-        if (config.getProperty("statistics-queue") != null)
-            workerConfig.setProperty("statistics-queue", config.getProperty("statistics-queue"));
-
-        workerConfig.setProperty("graphs-bucket", config.getProperty("graphs-bucket"));
-        workerConfig.setProperty("pointsets-bucket", config.getProperty("pointsets-bucket"));
-
-        // Tell the workers to shut themselves down automatically
-        workerConfig.setProperty("auto-shutdown", "true");
-
-        Boolean workOffline = Boolean.parseBoolean(config.getProperty("work-offline"));
-        if (workOffline == null) workOffline = true;
+        this.config = brokerConfig;
+        Boolean workOffline = Boolean.parseBoolean(brokerConfig.getProperty("work-offline"));
+        if (workOffline == null) {
+            workOffline = true;
+        }
         this.workOffline = workOffline;
+        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ?
+                Integer.parseInt(brokerConfig.getProperty("max-workers")) : 20;
 
-        this.maxWorkers = config.getProperty("max-workers") != null ? Integer.parseInt(config.getProperty("max-workers")) : 20;
+        instanceRequestTracker = new InstanceRequestTracker(brokerConfig, addr, port);
 
-        ec2 = new AmazonEC2Client();
     }
 
     /**
@@ -180,65 +163,22 @@ public class Broker implements Runnable {
         notify();
     }
 
-    /** Create workers for a given job, if need be */
+    /** Create additional workers for a given job, if there are not already enough running. */
     public void createWorkersForGraph(String graphId) {
+
         if (workOffline) {
             LOG.info("Work offline enabled, not creating workers for graph {}", graphId);
             return;
         }
 
-        // make sure that we don't assign work to dead workers
+        // Clear workers out of the catalog that have not been heard from in a while.
+        // We don't want to assume work will be carried out by dead workers.
         workerCatalog.purgeDeadWorkers();
 
-        String clientToken = UUID.randomUUID().toString().replaceAll("-", "");
-
-        if (workerCatalog.workersByGraph.get(graphId).isEmpty() &&
-                workerCatalog.observationsByWorkerId.size() < maxWorkers &&
-                // we have either never requested a worker on this graph, or we requested it long enough ago that it's ok to request another
-                (!recentlyRequestedWorkers.containsKey(graphId) || recentlyRequestedWorkers.get(graphId) < System.currentTimeMillis() - WORKER_STARTUP_TIME)) {
-            // TODO: compute
-            int nWorkers = 1;
-
-            LOG.info("Starting {} workers as there are none on graph {}", nWorkers, graphId);
-            // there are no workers on this graph, start one
-            RunInstancesRequest req = new RunInstancesRequest();
-            req.setImageId(config.getProperty("ami-id"));
-            req.setInstanceType(InstanceType.valueOf(config.getProperty("worker-type")));
-            req.setSubnetId(config.getProperty("subnet-id"));
-
-            // even if we can't get all the workers we want at least get some
-            req.setMinCount(1);
-            req.setMaxCount(nWorkers);
-
-            // it's fine to just modify the worker config as this method is synchronized
-            workerConfig.setProperty("initial-graph-id", graphId);
-
-            ByteArrayOutputStream cfg = new ByteArrayOutputStream();
-            try {
-                workerConfig.store(cfg, "Worker config");
-                cfg.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            // send the config as user data
-            String userData = new String(Base64.getEncoder().encode(cfg.toByteArray()));
-            req.setUserData(userData);
-
-            if (config.getProperty("worker-iam-role") != null)
-                req.setIamInstanceProfile(new IamInstanceProfileSpecification().withArn(config.getProperty("worker-iam-role")));
-
-            // launch into a VPC if desired
-            if (config.getProperty("subnet") != null)
-                req.setSubnetId(config.getProperty("subnet"));
-
-            // allow us to retry request at will
-            req.setClientToken(clientToken);
-            // allow machine to shut itself completely off
-            req.setInstanceInitiatedShutdownBehavior(ShutdownBehavior.Terminate);
-            RunInstancesResult res = ec2.runInstances(req);
-            res.getReservation().getInstances();
-            LOG.info("Requesting {} workers", nWorkers);
+        if (workerCatalog.graphHasNoWorkers(graphId) &&
+            workerCatalog.nActiveWorkers() < maxWorkers &&
+            instanceRequestTracker.noOutstandingRequests(graphId)) {
+            instanceRequestTracker.requestWorkersForGraph(graphId);
         }
         else if (workerCatalog.observationsByWorkerId.size() >= maxWorkers) {
             LOG.warn("{} workers already started, not starting more; jobs on graph {} will not complete", maxWorkers, graphId);
@@ -290,7 +230,7 @@ public class Broker implements Runnable {
     private void logQueueStatus() {
         LOG.info("{} undelivered, of which {} high-priority", nUndeliveredTasks, highPriorityTasks.size());
         LOG.info("{} producers waiting, {} consumers waiting", highPriorityResponses.size(), nWaitingConsumers);
-        LOG.info("{} total workers", workerCatalog.size());
+        LOG.info("{} total active workers", workerCatalog.nActiveWorkers());
     }
 
     /**
