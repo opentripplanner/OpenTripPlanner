@@ -103,10 +103,8 @@ public class Histogram implements Serializable {
 
                 binnedCounts[times[fidx]] += 1;
 
-                PointFeature pf = targets.getFeature(fidx);
-
-                for (Map.Entry<String, Integer> prop : pf.getProperties().entrySet()) {
-                    binnedProperties.get(prop.getKey())[times[fidx]] += prop.getValue();
+                for (Map.Entry<String, int[]> prop : targets.properties.entrySet()) {
+                    binnedProperties.get(prop.getKey())[times[fidx]] += prop.getValue()[fidx];  
                 }
             }
 
