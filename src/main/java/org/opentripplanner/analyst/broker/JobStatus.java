@@ -22,7 +22,7 @@ public class JobStatus {
     public JobStatus (Job job) {
         this.complete = job.getCompletedTaskCount();
         this.inFlight = job.invisibleUntil.size();
-        this.remaining = job.visibleTasks.size();
+        this.remaining = job.tasksAwaitingDelivery.size();
         this.jobId = job.jobId;
     }
 

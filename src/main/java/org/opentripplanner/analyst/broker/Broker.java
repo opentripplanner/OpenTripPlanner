@@ -513,12 +513,12 @@ public class Broker implements Runnable {
             // We don't respect graph affinity when working offline, because we can't start more workers
             Job current;
             if (!workOffline) {
-                current = jobs.advanceToElement(e -> !e.visibleTasks.isEmpty() &&
+                current = jobs.advanceToElement(e -> !e.tasksAwaitingDelivery.isEmpty() &&
                         consumersByGraph.containsKey(e.graphId) &&
                         !consumersByGraph.get(e.graphId).isEmpty());
             }
             else {
-                current = jobs.advanceToElement(e -> !e.visibleTasks.isEmpty());
+                current = jobs.advanceToElement(e -> !e.tasksAwaitingDelivery.isEmpty());
             }
 
             // nothing to see here
@@ -573,10 +573,10 @@ public class Broker implements Runnable {
             return false;
         }
 
-        // Get up to N tasks from the visibleTasks deque
+        // Get up to N tasks from the tasksAwaitingDelivery deque
         List<AnalystClusterRequest> tasks = new ArrayList<>();
-        while (tasks.size() < MAX_TASKS_PER_WORKER && !job.visibleTasks.isEmpty()) {
-            tasks.add(job.visibleTasks.poll());
+        while (tasks.size() < MAX_TASKS_PER_WORKER && !job.tasksAwaitingDelivery.isEmpty()) {
+            tasks.add(job.tasksAwaitingDelivery.poll());
         }
 
         // Attempt to deliver the tasks to the given consumer.
@@ -591,7 +591,7 @@ public class Broker implements Runnable {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
             response.resume();
             // Delivery failed, put tasks back on (the end of) the queue.
-            job.visibleTasks.addAll(tasks);
+            job.tasksAwaitingDelivery.addAll(tasks);
             return false;
         }
 
@@ -672,7 +672,7 @@ public class Broker implements Runnable {
     public synchronized boolean deleteJob (String jobId) {
         Job job = findJob(jobId);
         if (job == null) return false;
-        nUndeliveredTasks -= job.visibleTasks.size();
+        nUndeliveredTasks -= job.tasksAwaitingDelivery.size();
         return jobs.remove(job);
     }
 
