@@ -290,7 +290,6 @@ public class Broker implements Runnable {
     public void createWorkersForGraph (String graphId) {
         String clientToken = UUID.randomUUID().toString().replaceAll("-", "");
 
-
         if (workOffline) {
             LOG.info("Work offline enabled, not creating workers for graph {}", graphId);
             return;

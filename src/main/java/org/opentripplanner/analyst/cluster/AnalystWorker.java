@@ -225,6 +225,12 @@ public class AnalystWorker implements Runnable {
         batchExecutor = new ThreadPoolExecutor(1, nP, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(nP * 2));
         batchExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
+        // build the graph, iff we know what graph to build
+        if (graphId != null) {
+            LOG.info("Prebuilding graph {}", graphId);
+            clusterGraphBuilder.getGraph(graphId);
+        }
+
         // Start filling the work queues.
         boolean idle = false;
         while (true) {
