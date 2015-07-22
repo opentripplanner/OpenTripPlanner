@@ -433,6 +433,9 @@ public class AnalystWorker implements Runnable {
 
     /** Open a single point channel to the broker to receive high-priority requests immediately */
     private synchronized void openSideChannel () {
+        if (sideChannelOpen)
+            return;
+
         LOG.info("Opening side channel for single point requests.");
         new Thread(() -> {
             sideChannelOpen = true;
