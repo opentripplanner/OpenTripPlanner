@@ -13,14 +13,7 @@
 
 package org.opentripplanner.common.geometry;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.linearref.LengthLocationMap;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
@@ -30,10 +23,13 @@ import org.geotools.referencing.CRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.common.model.P2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class GeometryUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(GeometryUtils.class);
 
     private static CoordinateSequenceFactory csf = new Serializable2DPackedCoordinateSequenceFactory();
     private static GeometryFactory gf = new GeometryFactory(csf);
@@ -44,7 +40,7 @@ public class GeometryUtils {
         try {
             WGS84_XY = CRS.getAuthorityFactory(true).createCoordinateReferenceSystem("EPSG:4326");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.error("Unable to create longitude-first WGS84 CRS", ex);
             throw new RuntimeException("Could not create longitude-first WGS84 coordinate reference system.");
         }
     }

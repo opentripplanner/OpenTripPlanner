@@ -47,6 +47,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -80,12 +84,18 @@ public class AnalystWorker implements Runnable {
      */
     public int dryRunFailureRate = -1;
 
+    /** How long (minimum, in milliseconds) should this worker stay alive after receiving a single point request? */
+    public static final int SINGLE_POINT_KEEPALIVE = 15 * 60 * 1000;
+
     /** should this worker shut down automatically */
     public final boolean autoShutdown;
 
     public static final Random random = new Random();
 
     private TaskStatisticsStore statsStore;
+
+    /** is there currently a channel open to the broker to receive single point jobs? */
+    private volatile boolean sideChannelOpen = false;
 
     ObjectMapper objectMapper;
 
@@ -131,7 +141,13 @@ public class AnalystWorker implements Runnable {
     /** aws instance type, or null if not running on AWS */
     private String instanceType;
 
-    boolean isSinglePoint = false;
+    long lastHighPriorityRequestProcessed = 0;
+
+    /**
+     * Queue for high-priority tasks. Should be plenty long enough to hold all that have come in -
+     * we don't need to block on polling the manager.
+     */
+    private ThreadPoolExecutor highPriorityExecutor, batchExecutor;
 
     public AnalystWorker(Properties config) {
 
@@ -202,17 +218,27 @@ public class AnalystWorker implements Runnable {
 
     @Override
     public void run() {
-        // Loop forever, attempting to fetch some messages from a queue and process them.
+        // create executors with up to one thread per processor
+        int nP = Runtime.getRuntime().availableProcessors();
+        highPriorityExecutor = new ThreadPoolExecutor(1, nP, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(255));
+        highPriorityExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        batchExecutor = new ThreadPoolExecutor(1, nP, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(nP * 2));
+        batchExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+
+        // Start filling the work queues.
         boolean idle = false;
         while (true) {
+            long now = System.currentTimeMillis();
             // Consider shutting down if enough time has passed
-            if (System.currentTimeMillis() > nextShutdownCheckTime && autoShutdown) {
-                if (idle) {
+            if (now > nextShutdownCheckTime && autoShutdown) {
+                if (idle && now > lastHighPriorityRequestProcessed + SINGLE_POINT_KEEPALIVE) {
+                    LOG.warn("Machine is idle, shutting down.");
                     try {
-                        Process process = new ProcessBuilder("sudo", "/sbin/shutdown", "-h", "now").start();
+                        Process process = new ProcessBuilder("sudo", "/sbin/shutdown", "-h", "now")
+                                .start();
                         process.waitFor();
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        LOG.error("Unable to terminate worker", ex);
                     } finally {
                         System.exit(0);
                     }
@@ -221,14 +247,43 @@ public class AnalystWorker implements Runnable {
             }
             LOG.info("Long-polling for work ({} second timeout).", POLL_TIMEOUT / 1000.0);
             // Long-poll (wait a few seconds for messages to become available)
-            // TODO internal blocking queue feeding work threads, polls whenever queue.size() < nProcessors
-            List<AnalystClusterRequest> tasks = getSomeWork();
+            List<AnalystClusterRequest> tasks = getSomeWork(WorkType.BATCH);
             if (tasks == null) {
                 LOG.info("Didn't get any work. Retrying.");
                 idle = true;
                 continue;
             }
-            tasks.parallelStream().forEach(this::handleOneRequest);
+
+            // run through high-priority tasks first to ensure they are enqueued even if the batch
+            // queue blocks.
+            tasks.stream().filter(t -> t.outputLocation == null)
+                    .forEach(t -> highPriorityExecutor.execute(() -> {
+                        LOG.warn(
+                                "Handling single point request via normal channel, side channel should open shortly.");
+                        this.handleOneRequest(t);
+                    }));
+
+            logQueueStatus();
+
+            // enqueue low-priority tasks; note that this may block anywhere in the process
+            tasks.stream().filter(t -> t.outputLocation != null)
+                .forEach(t -> {
+                    // attempt to enqueue, waiting if the queue is full
+                    while (true) {
+                        try {
+                            batchExecutor.execute(() -> this.handleOneRequest(t));
+                            break;
+                        } catch (RejectedExecutionException e) {
+                            // queue is full, wait 200ms and try again
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e1) { /* nothing */}
+                        }
+                    }
+                });
+
+            logQueueStatus();
+
             idle = false;
         }
     }
@@ -249,6 +304,13 @@ public class AnalystWorker implements Runnable {
         try {
             long startTime = System.currentTimeMillis();
             LOG.info("Handling message {}", clusterRequest.toString());
+
+            if (clusterRequest.outputLocation == null) {
+                // high priority
+                lastHighPriorityRequestProcessed = startTime;
+                if (!sideChannelOpen)
+                    openSideChannel();
+            }
 
             TaskStatistics ts = new TaskStatistics();
             ts.pointsetId = clusterRequest.destinationPointsetId;
@@ -302,11 +364,10 @@ public class AnalystWorker implements Runnable {
                     router = new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest);
 
                     if (clusterRequest.outputLocation == null) {
-                        router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, () -> {
-                            return RepeatedRaptorProfileRouter
+                        router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId,
+                                () -> RepeatedRaptorProfileRouter
                                     .getRaptorWorkerData(clusterRequest.profileRequest, graph, null,
-                                            ts);
-                        });
+                                            ts));
                     }
                 }
 
@@ -365,15 +426,46 @@ public class AnalystWorker implements Runnable {
             ts.total = (int) (System.currentTimeMillis() - startTime);
             statsStore.store(ts);
         } catch (Exception ex) {
-            LOG.error("An error occurred while routing: ", ex);
+            LOG.error("An error occurred while routing", ex);
         }
 
     }
 
-    public List<AnalystClusterRequest> getSomeWork() {
+    /** Open a single point channel to the broker to receive high-priority requests immediately */
+    private synchronized void openSideChannel () {
+        LOG.info("Opening side channel for single point requests.");
+        new Thread(() -> {
+            sideChannelOpen = true;
+            // don't keep single point connections alive forever
+            while (System.currentTimeMillis() < lastHighPriorityRequestProcessed + SINGLE_POINT_KEEPALIVE) {
+                LOG.info("Awaiting high-priority work");
+                try {
+                    List<AnalystClusterRequest> tasks = getSomeWork(WorkType.HIGH_PRIORITY);
+
+                    if (tasks != null)
+                        tasks.stream().forEach(t -> highPriorityExecutor.execute(
+                                () -> this.handleOneRequest(t)));
+
+                    logQueueStatus();
+                } catch (Exception e) {
+                    LOG.error("Unexpected exception getting single point work", e);
+                }
+            }
+
+            sideChannelOpen = false;
+        }).start();
+    }
+
+    public List<AnalystClusterRequest> getSomeWork(WorkType type) {
 
         // Run a POST request (long-polling for work) indicating which graph this worker prefers to work on
-        String url = BROKER_BASE_URL + "/dequeue/" + graphId;
+        String url;
+        if (type == WorkType.HIGH_PRIORITY)
+            // this is a side-channel request for single point work
+            url = BROKER_BASE_URL + "/single/" + graphId;
+        else
+            url = BROKER_BASE_URL + "/dequeue/" + graphId;
+
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader(new BasicHeader(WORKER_ID_HEADER, machineId));
         HttpResponse response = null;
@@ -390,7 +482,7 @@ public class AnalystWorker implements Runnable {
             return objectMapper.readValue(entity.getContent(), new TypeReference<List<AnalystClusterRequest>>() {
             });
         } catch (JsonProcessingException e) {
-            LOG.error("JSON processing exception while getting work: {}", e.getMessage());
+            LOG.error("JSON processing exception while getting work", e);
         } catch (SocketTimeoutException stex) {
             LOG.error("Socket timeout while waiting to receive work.");
         } catch (HttpHostConnectException ce) {
@@ -400,8 +492,7 @@ public class AnalystWorker implements Runnable {
             } catch (InterruptedException e) {
             }
         } catch (IOException e) {
-            LOG.error("IO exception while getting work.");
-            e.printStackTrace();
+            LOG.error("IO exception while getting work", e);
         }
         return null;
 
@@ -430,8 +521,7 @@ public class AnalystWorker implements Runnable {
                         response.getStatusLine());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.info("Failed to mark task {} as completed.", clusterRequest.taskId);
+            LOG.warn("Failed to mark task {} as completed.", clusterRequest.taskId, e);
         }
     }
 
@@ -451,8 +541,7 @@ public class AnalystWorker implements Runnable {
                 LOG.info("Failed to delete task {} ({}).", clusterRequest.taskId, response.getStatusLine());
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            LOG.info("Failed to delete task {}", clusterRequest.taskId);
+            LOG.warn("Failed to delete task {}", clusterRequest.taskId, e);
         }
     }
 
@@ -481,6 +570,11 @@ public class AnalystWorker implements Runnable {
             LOG.info("could not retrieve EC2 instance type, you may be running outside of EC2.");
             return null;
         }
+    }
+
+    /** log queue status */
+    private void logQueueStatus() {
+        LOG.info("Wating tasks: high priority: {}, batch: {}", highPriorityExecutor.getQueue().size(), batchExecutor.getQueue().size());
     }
 
     /**
@@ -514,5 +608,9 @@ public class AnalystWorker implements Runnable {
         }
 
         new AnalystWorker(config).run();
+    }
+
+    public static enum WorkType {
+        HIGH_PRIORITY, BATCH;
     }
 }

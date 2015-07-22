@@ -394,8 +394,7 @@ public class PointSet implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LOG.error("GeoJSON parsing failure: {}", ex.toString());
-            ex.printStackTrace();
+            LOG.error("GeoJSON parsing failure", ex);
             return null;
         }
         return ret;

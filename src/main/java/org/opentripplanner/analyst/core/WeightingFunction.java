@@ -1,5 +1,7 @@
 package org.opentripplanner.analyst.core;
 
+import org.apache.commons.math3.util.FastMath;
+
 /**
  * A weighting function, expressing how influential something is according to its distance from you.
  *
@@ -12,11 +14,11 @@ package org.opentripplanner.analyst.core;
  */
 public abstract class WeightingFunction {
 
-    public abstract double getWeight (int seconds);
-
-    public double applyWeight (double n, int seconds) {
-        return n * getWeight(seconds);
-    }
+    /**
+     * Weight the counts (binned by second, so countsPerSecond[i] is destinations reachable in i - i + seconds)
+     * and return the output of this weighting function as a _cumulative distribution_.
+     */
+    public abstract int[] apply (int[] countsPerSecond);
 
     /**
      * The logistic function, a commonly used sigmoid (s-shaped function).
@@ -39,32 +41,65 @@ public abstract class WeightingFunction {
         // lookup table for weights
         double[] weights;
 
-        public Logistic (int cutoff, double steepness) {
-            this.x0 = cutoff;
+        public Logistic (double steepness) {
             this.k = steepness;
 
             // ln(1/epsilon - 1) / -k is the value at which the weight takes on the value epsilon
-            this.rolloffMin = (int) (x0 + Math.log(1 / 0.999 - 1) / -k);
-            this.rolloffMax = (int) (x0 + Math.log(1 / 0.001 - 1) / -k);
+            this.rolloffMin = (int) (Math.log(1 / 0.999 - 1) / -k);
+            this.rolloffMax = (int) (Math.log(1 / 0.001 - 1) / -k);
 
-            // make a lookup table for the weights
+            // make a lookup table for the weights, once everything has been normalized by the cutoff
             weights = new double[rolloffMax - rolloffMin + 1];
             for (int i = rolloffMin; i <= rolloffMax; i++) {
                 weights[i - rolloffMin] = 1 / (1 + Math.exp( -k * (i - x0)));
             }
         }
 
-        @Override
-        public double getWeight (int x) {
-            if (x < rolloffMin)
-                return 1;
+        /**
+         * Apply the logistic weighting function. Uses some slightly clever optimizations.
+         * We have precomputed the weights for the sigmoid centered on 0 and stored them in the weights array,
+         * offset by -rolloffMin. We loop over the values to output and first find the largest
+         * second where the weight is effectively 1. We store a cumulative sum up to that point.
+         * We then run through the next
+         */
+        @Override public int[] apply(int[] countsPerSecond) {
+            int len = countsPerSecond.length / 60;
 
-            if (x > rolloffMax)
-                return 0;
+            // the frontier is the highest index for which the weight is effectively 1
+            // (in seconds)
+            int frontier = 0;
+            // cumulative sum up to the frontier
+            int valueAtFrontier = 0;
 
-            return weights[x - rolloffMin];
+            int[] ret = new int[len];
+
+            for (int i = 0; i < len; i++) {
+                int newFrontier = Math.max(0, (i * 60) + rolloffMin);
+
+                for (int j = frontier; j < newFrontier; j++) {
+                    valueAtFrontier += countsPerSecond[j];
+                }
+
+                double sum = valueAtFrontier;
+
+                for (int k = newFrontier; k < i * 60 + rolloffMax + 1 && k < countsPerSecond.length; k++) {
+                    sum += weights[k - (i * 60) - rolloffMin] * countsPerSecond[k];
+                }
+
+                // cast to int here rather than making a cumulative curve so that int roundoff error is never greater than 1.
+                // if we had a douible array and cast the differences to ints, we could accumulate roundoff error up to the number of minutes.
+                ret[i] = (int) sum;
+
+                frontier = newFrontier;
+            }
+
+            // make cumulative curve
+            for (int i = ret.length - 1; i > 0; i--) {
+                ret[i] -= ret[i - 1];
+            }
+
+            return ret;
         }
-
     }
 
     /**
@@ -78,22 +113,27 @@ public abstract class WeightingFunction {
      */
     public static class SharpCutoff extends WeightingFunction {
 
-        double cutoff; // the cutoff point
+        @Override public int[] apply(int[] countsPerSecond) {
+            int len = countsPerSecond.length / 60;
 
-        public SharpCutoff(int cutoff) {
-            this.cutoff = cutoff;
+            int[] ret = new int[len];
+
+            int cumulative = 0;
+
+            for (int i = 0; i < countsPerSecond.length; i++) {
+                cumulative += countsPerSecond[i];
+
+                if (i % 60 == 59) {
+                    ret[(int) FastMath.floor(i / 60)] = cumulative;
+                }
+            }
+
+            // make cumulative curve
+            for (int i = ret.length - 1; i > 0; i--) {
+                ret[i] -= ret[i - 1];
+            }
+
+            return ret;
         }
-
-        @Override
-        public double getWeight(int seconds) {
-            return (seconds < cutoff) ? 1 : 0;
-        }
-
-        @Override
-        public double applyWeight (double n, int seconds) {
-            return (seconds < cutoff) ? n : 0;
-        }
-
     }
-
 }

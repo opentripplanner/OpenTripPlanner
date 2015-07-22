@@ -1,12 +1,6 @@
 package org.opentripplanner.analyst.batch;
 
-import java.io.File;
-
-import org.geotools.coverage.grid.GridCoordinates2D;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.GridCoverageFactory;
-import org.geotools.coverage.grid.GridEnvelope2D;
-import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.*;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
@@ -22,6 +16,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * Individuals should be in a random-access-friendly List implementation in row-major order
@@ -75,8 +71,7 @@ public class RasterPopulation extends BasicPopulation {
             GeoTiffWriter writer = new GeoTiffWriter(new File(fileName));
             writer.write(coverage, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1]));
         } catch (Exception e) {
-            LOG.error("exception while writing geotiff.");
-            e.printStackTrace();
+            LOG.error("exception while writing geotiff.", e);
         }
         LOG.info("done writing geotiff.");
     }
@@ -112,8 +107,7 @@ public class RasterPopulation extends BasicPopulation {
             final CoordinateReferenceSystem WGS84 = CRS.decode("EPSG:4326", true);
             tr = CRS.findMathTransform(coverageCRS, WGS84);
         } catch (Exception e) {
-            LOG.equals("error creating CRS transform.");
-            e.printStackTrace();
+            LOG.error("error creating CRS transform.", e);
             return;
         }
         // grid coordinate object to be reused for reading each cell in the raster
@@ -142,8 +136,7 @@ public class RasterPopulation extends BasicPopulation {
                     Individual individual = new Individual(label, lon, lat, val[band]);
                     this.addIndividual(individual);
                 } catch (Exception e) {
-                    LOG.error("error creating individuals for raster");
-                    e.printStackTrace();
+                    LOG.error("error creating individuals for raster", e);
                     return;
                 }
             }

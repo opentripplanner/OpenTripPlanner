@@ -13,19 +13,19 @@
 
 package org.opentripplanner.graph_builder.module;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import com.google.common.collect.Iterables;
 import org.opentripplanner.graph_builder.module.stopsAlerts.IStopTester;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * It prints the stops that satisfy certain criteria.
@@ -60,8 +60,7 @@ public class StopsAlerts implements GraphBuilderModule {
             }
             pw.close();            
         } catch (FileNotFoundException e) {
-            LOG.error("Failed to write StopsAlerts log file due to {}", e);
-            e.printStackTrace();
+            LOG.error("Failed to write StopsAlerts log file", e);
         }
     }
 

@@ -184,9 +184,9 @@ public class RaptorWorker {
             }
             fos.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOG.error("File not found for dumping raptor results", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IOException dumping raptor results", e);
         }
     }
 

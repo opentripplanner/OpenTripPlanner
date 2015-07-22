@@ -7,12 +7,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
+import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.opentripplanner.analyst.cluster.AnalystClusterRequest;
@@ -101,8 +103,22 @@ public class Broker implements Runnable {
     /** The time at which each task was delivered to a worker, to allow re-delivery. */
     TIntIntMap deliveryTimes = new TIntIntHashMap();
 
-    /** Requests that are not part of a job and can "cut in line" in front of jobs for immediate execution. */
-    private ArrayListMultimap<String, AnalystClusterRequest> highPriorityTasks = ArrayListMultimap.create();
+    /**
+     * Requests that are not part of a job and can "cut in line" in front of jobs for immediate execution.
+     * When a high priority task is first received, we attempt to send it to a worker right away via
+     * the side channels. If that doesn't work, we put them here to be picked up the next time a worker
+     * is available via normal task distribution channels.
+     */
+    private ArrayListMultimap<String, AnalystClusterRequest> stalledHighPriorityTasks = ArrayListMultimap.create();
+
+    /**
+     * High priority requests that have just come and are about to be sent down a single point channel.
+     * They put here for just 100 ms so that any that arrive together are batched to the same worker.
+     * If we didn't do this, two requests arriving at basically the same time could get fanned out to
+     * two different workers because the second came in in between closing the side channel and the worker
+     * reopening it.
+     */
+    private Multimap<String, AnalystClusterRequest> newHighPriorityTasks = ArrayListMultimap.create();
 
     /** Priority requests that have already been farmed out to workers, and are awaiting a response. */
     private TIntObjectMap<Response> highPriorityResponses = new TIntObjectHashMap<>();
@@ -110,10 +126,20 @@ public class Broker implements Runnable {
     /** Outstanding requests from workers for tasks, grouped by worker graph affinity. */
     Map<String, Deque<Response>> consumersByGraph = new HashMap<>();
 
+    /**
+     * Side channels used to send single point requests to workers, cutting in front of any other work on said workers.
+     * We use a TreeMultimap because it is ordered, and the wrapped response defines an order based on
+     * machine ID. This way, the same machine will tend to get all single point work for a graph,
+     * so multiple machines won't stay alive to do single point work.
+     */
+    private Multimap<String, WrappedResponse> singlePointChannels = TreeMultimap.create();
+
     /** should we work offline */
     private boolean workOffline;
 
     private AmazonEC2 ec2;
+
+    private Timer timer = new Timer();
 
     /**
      * keep track of which graphs we have launched workers on and how long ago we launched them,
@@ -154,18 +180,91 @@ public class Broker implements Runnable {
      * Low-reliability, no re-delivery.
      */
     public synchronized void enqueuePriorityTask (AnalystClusterRequest task, Response response) {
-        task.taskId = nextTaskId++;
-        highPriorityTasks.put(task.graphId, task);
-        highPriorityResponses.put(task.taskId, response);
-        nUndeliveredTasks += 1;
-        createWorkersForGraph(task.graphId);
+        boolean workersAvailable = workersAvailableForGraph(task.graphId);
+
+        if (!workersAvailable) {
+            createWorkersForGraph(task.graphId);
+            // chances are it won't be done in 30 seconds, but we want to poll frequently to avoid issues with phasing
+            try {
+                response.setHeader("Retry-After", "30");
+                response.sendError(503,
+                        "No workers available with this graph affinity, please retry shortly.");
+            } catch (IOException e) {
+                LOG.error("Could not finish high-priority 503 response", e);
+            }
+        }
+
+        // if we're in offline mode, enqueue anyhow to kick the cluster to build the graph
+        // note that this will mean that requests get delivered multiple times in offline mode,
+        // so some unnecessary computation takes place
+        if (workersAvailable || workOffline) {
+            task.taskId = nextTaskId++;
+            newHighPriorityTasks.put(task.graphId, task);
+            highPriorityResponses.put(task.taskId, response);
+
+            // wait 100ms to deliver to workers in case another request comes in almost simultaneously
+            timer.schedule(new TimerTask() {
+                @Override public void run() {
+                    deliverHighPriorityTasks(task.graphId);
+                }
+            }, 100);
+        }
+
+        // do not notify task delivery thread just yet as we haven't put anything in the task delivery queue yet.
+    }
+
+    /** attempt to deliver high priority tasks via side channels, or move them into normal channels if need be */
+    public synchronized void deliverHighPriorityTasks (String graphId) {
+        Collection<AnalystClusterRequest> tasks = newHighPriorityTasks.get(graphId);
+
+        if (tasks.isEmpty())
+            // someone got here first
+            return;
+
+        // try to deliver via side channels
+        Collection<WrappedResponse> wrs = singlePointChannels.get(graphId);
+
+        if (!wrs.isEmpty()) {
+            // there is (probably) a single point machine waiting to receive this
+            WrappedResponse wr = wrs.iterator().next();
+
+            try {
+                wr.response.setContentType("application/json");
+                OutputStream os = wr.response.getOutputStream();
+                mapper.writeValue(os, tasks);
+                os.close();
+                wr.response.resume();
+
+                newHighPriorityTasks.removeAll(graphId);
+
+                return;
+            } catch (Exception e) {
+                LOG.info("Failed to deliver single point job via side channel, reverting to normal channel", e);
+            } finally {
+                // remove responses whether they are dead or alive
+                removeSinglePointChannel(graphId, wr);
+            }
+        }
+
+        // if we got here we didn't manage to send it via side channel, put it in the rotation for normal channels
+        // not using putAll as it retains a link to the original collection and then we get a concurrent modification exception later.
+        tasks.forEach(t -> stalledHighPriorityTasks.put(graphId, t));
+        LOG.info("No side channel available for graph {}, delivering {} tasks via normal channel",
+                graphId, tasks.size());
+        nUndeliveredTasks += tasks.size();
+        newHighPriorityTasks.removeAll(graphId);
+
+        // wake up delivery thread
         notify();
     }
 
     /** Enqueue some tasks for queued execution possibly much later. Results will be saved to S3. */
     public synchronized void enqueueTasks (List<AnalystClusterRequest> tasks) {
         Job job = findJob(tasks.get(0)); // creates one if it doesn't exist
-        createWorkersForGraph(job.graphId);
+
+        if (!workersAvailableForGraph(job.graphId))
+            createWorkersForGraph(job.graphId);
+
         for (AnalystClusterRequest task : tasks) {
             task.taskId = nextTaskId++;
             job.addTask(task);
@@ -180,73 +279,79 @@ public class Broker implements Runnable {
         notify();
     }
 
+    public boolean workersAvailableForGraph (String graphId) {
+        // make sure that we don't assign work to dead workers
+        workerCatalog.purgeDeadWorkers();
+
+        return !workerCatalog.workersByGraph.get(graphId).isEmpty();
+    }
+
     /** Create workers for a given job, if need be */
-    public void createWorkersForGraph(String graphId) {
+    public void createWorkersForGraph (String graphId) {
+        String clientToken = UUID.randomUUID().toString().replaceAll("-", "");
+
+
         if (workOffline) {
             LOG.info("Work offline enabled, not creating workers for graph {}", graphId);
             return;
         }
 
-        // make sure that we don't assign work to dead workers
-        workerCatalog.purgeDeadWorkers();
-
-        String clientToken = UUID.randomUUID().toString().replaceAll("-", "");
-
-        if (workerCatalog.workersByGraph.get(graphId).isEmpty() &&
-                workerCatalog.observationsByWorkerId.size() < maxWorkers &&
-                // we have either never requested a worker on this graph, or we requested it long enough ago that it's ok to request another
-                (!recentlyRequestedWorkers.containsKey(graphId) || recentlyRequestedWorkers.get(graphId) < System.currentTimeMillis() - WORKER_STARTUP_TIME)) {
-            // TODO: compute
-            int nWorkers = 1;
-
-            LOG.info("Starting {} workers as there are none on graph {}", nWorkers, graphId);
-            // there are no workers on this graph, start one
-            RunInstancesRequest req = new RunInstancesRequest();
-            req.setImageId(config.getProperty("ami-id"));
-            req.setInstanceType(InstanceType.valueOf(config.getProperty("worker-type")));
-            req.setSubnetId(config.getProperty("subnet-id"));
-
-            // even if we can't get all the workers we want at least get some
-            req.setMinCount(1);
-            req.setMaxCount(nWorkers);
-
-            // it's fine to just modify the worker config as this method is synchronized
-            workerConfig.setProperty("initial-graph-id", graphId);
-
-            ByteArrayOutputStream cfg = new ByteArrayOutputStream();
-            try {
-                workerConfig.store(cfg, "Worker config");
-                cfg.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            // send the config as user data
-            String userData = new String(Base64.getEncoder().encode(cfg.toByteArray()));
-            req.setUserData(userData);
-
-            if (config.getProperty("worker-iam-role") != null)
-                req.setIamInstanceProfile(new IamInstanceProfileSpecification().withArn(config.getProperty("worker-iam-role")));
-
-            // launch into a VPC if desired
-            if (config.getProperty("subnet") != null)
-                req.setSubnetId(config.getProperty("subnet"));
-
-            // allow us to retry request at will
-            req.setClientToken(clientToken);
-            // allow machine to shut itself completely off
-            req.setInstanceInitiatedShutdownBehavior(ShutdownBehavior.Terminate);
-            RunInstancesResult res = ec2.runInstances(req);
-            res.getReservation().getInstances();
-            LOG.info("Requesting {} workers", nWorkers);
-        }
-        else if (workerCatalog.observationsByWorkerId.size() >= maxWorkers) {
+        if (workerCatalog.observationsByWorkerId.size() >= maxWorkers) {
             LOG.warn("{} workers already started, not starting more; jobs on graph {} will not complete", maxWorkers, graphId);
-            // TODO retry later
+            return;
         }
-        else {
-            LOG.info("Workers exist on graph {}, not starting new workers", graphId);
+
+        // don't re-request workers
+        if (recentlyRequestedWorkers.containsKey(graphId)
+                && recentlyRequestedWorkers.get(graphId) >= System.currentTimeMillis() - WORKER_STARTUP_TIME){
+            LOG.info("workers still starting on graph {}, not starting more", graphId);
+            return;
         }
+
+
+        // TODO: compute
+        int nWorkers = 1;
+
+        LOG.info("Starting {} workers as there are none on graph {}", nWorkers, graphId);
+        // there are no workers on this graph, start one
+        RunInstancesRequest req = new RunInstancesRequest();
+        req.setImageId(config.getProperty("ami-id"));
+        req.setInstanceType(InstanceType.valueOf(config.getProperty("worker-type")));
+        req.setSubnetId(config.getProperty("subnet-id"));
+
+        // even if we can't get all the workers we want at least get some
+        req.setMinCount(1);
+        req.setMaxCount(nWorkers);
+
+        // it's fine to just modify the worker config as this method is synchronized
+        workerConfig.setProperty("initial-graph-id", graphId);
+
+        ByteArrayOutputStream cfg = new ByteArrayOutputStream();
+        try {
+            workerConfig.store(cfg, "Worker config");
+            cfg.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // send the config as user data
+        String userData = new String(Base64.getEncoder().encode(cfg.toByteArray()));
+        req.setUserData(userData);
+
+        if (config.getProperty("worker-iam-role") != null)
+            req.setIamInstanceProfile(new IamInstanceProfileSpecification().withArn(config.getProperty("worker-iam-role")));
+
+        // launch into a VPC if desired
+        if (config.getProperty("subnet") != null)
+            req.setSubnetId(config.getProperty("subnet"));
+
+        // allow us to retry request at will
+        req.setClientToken(clientToken);
+        // allow machine to shut itself completely off
+        req.setInstanceInitiatedShutdownBehavior(ShutdownBehavior.Terminate);
+        RunInstancesResult res = ec2.runInstances(req);
+        res.getReservation().getInstances();
+        LOG.info("Requesting {} workers", nWorkers);
     }
 
     /** Consumer long-poll operations are enqueued here. */
@@ -287,8 +392,25 @@ public class Broker implements Runnable {
         return false;
     }
 
+    /**
+     * Register an HTTP connection that can be used to send single point requests directly to
+     * workers, bypassing normal task distribution channels.
+     */
+    public synchronized void registerSinglePointChannel (String graphAffinity,WrappedResponse response) {
+        singlePointChannels.put(graphAffinity, response);
+        // no need to notify as the side channels are not used by the normal task delivery loop
+    }
+
+    /**
+     * Remove a single point channel because the connection was closed.
+     */
+    public synchronized boolean removeSinglePointChannel (String graphAffinity, WrappedResponse response) {
+        return singlePointChannels.remove(graphAffinity, response);
+    }
+
     private void logQueueStatus() {
-        LOG.info("{} undelivered, of which {} high-priority", nUndeliveredTasks, highPriorityTasks.size());
+        LOG.info("{} undelivered, of which {} high-priority", nUndeliveredTasks,
+                stalledHighPriorityTasks.size());
         LOG.info("{} producers waiting, {} consumers waiting", highPriorityResponses.size(), nWaitingConsumers);
         LOG.info("{} total workers", workerCatalog.size());
     }
@@ -341,8 +463,8 @@ public class Broker implements Runnable {
         // workers on their graph.
 
         // start with high-priority tasks
-        HIGHPRIORITY:
-        for (Map.Entry<String, Collection<AnalystClusterRequest>> e : highPriorityTasks.asMap().entrySet()) {
+        HIGHPRIORITY: for (Map.Entry<String, Collection<AnalystClusterRequest>> e : stalledHighPriorityTasks
+                .asMap().entrySet()) {
             // the collection is an arraylist with the most recently added at the end
             String graphId = e.getKey();
             Collection<AnalystClusterRequest> tasks = e.getValue();
@@ -569,5 +691,25 @@ public class Broker implements Runnable {
 
     void deactivateJob (Job job) {
         activeJobsPerGraph.remove(job.graphId, job.jobId);
+    }
+
+    /**
+     * We wrap responses in a class that has a machine ID, and then put them in a TreeSet so that
+     * the machine with the lowest ID on a given graph always gets single-point work. The reason
+     * for this is so that a single machine will tend to get single-point work and thus we don't
+     * unnecessarily keep multiple multipoint machines alive.
+     */
+    public static class WrappedResponse implements Comparable<WrappedResponse> {
+        public final Response response;
+        public final String machineId;
+
+        public WrappedResponse(Request request, Response response) {
+            this.response = response;
+            this.machineId = request.getHeader(AnalystWorker.WORKER_ID_HEADER);
+        }
+
+        @Override public int compareTo(WrappedResponse wrappedResponse) {
+            return this.machineId.compareTo(wrappedResponse.machineId);
+        }
     }
 }

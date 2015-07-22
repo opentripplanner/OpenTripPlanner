@@ -83,8 +83,7 @@ public abstract class OSMGraphBuilderModule implements GraphBuilderModule {
                 osm.loadFromVexStream(vexInputStream);
                 vexInputStream.close();
             } catch (IOException e) {
-                LOG.error("IO exception reading from VEX server.");
-                e.printStackTrace();
+                LOG.error("IO exception reading from VEX server.", e);
             }
         }
 
