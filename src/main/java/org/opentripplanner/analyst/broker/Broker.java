@@ -350,6 +350,7 @@ public class Broker implements Runnable {
         req.setInstanceInitiatedShutdownBehavior(ShutdownBehavior.Terminate);
         RunInstancesResult res = ec2.runInstances(req);
         res.getReservation().getInstances();
+        recentlyRequestedWorkers.put(graphId, System.currentTimeMillis());
         LOG.info("Requesting {} workers", nWorkers);
     }
 
