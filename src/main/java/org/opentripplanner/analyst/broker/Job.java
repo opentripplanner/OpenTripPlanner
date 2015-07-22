@@ -31,9 +31,9 @@ public class Job {
     /* The graph needed to handle all tasks contained in this job. */
     String graphId;
 
-    /* Tasks awaiting delivery. Change indentifier to tasksAwaitingDelivery. */
-    Queue<AnalystClusterRequest> visibleTasks = new ArrayDeque<>();
+    /* Tasks in this job that have yet to be delivered, or that will be re-delivered due to completion timeout. */
     // maybe this should only be a list of IDs.
+    Queue<AnalystClusterRequest> tasksAwaitingDelivery = new ArrayDeque<>();
 
     /* Tasks that have been delivered to a worker but are awaiting completion. */
     TIntObjectMap<AnalystClusterRequest> tasksById = new TIntObjectHashMap<>();
@@ -55,7 +55,7 @@ public class Job {
     /** Adds a task to this Job, assigning it a task ID number. */
     public void addTask (AnalystClusterRequest task) {
         tasksById.put(task.taskId, task);
-        visibleTasks.add(task);
+        tasksAwaitingDelivery.add(task);
     }
 
     public void markTasksDelivered(List<AnalystClusterRequest> tasks) {
@@ -81,7 +81,7 @@ public class Job {
             long timeout = invisibleIterator.value();
             if (now > timeout) {
                 invisibleIterator.remove();
-                visibleTasks.add(tasksById.get(taskId));
+                tasksAwaitingDelivery.add(tasksById.get(taskId));
                 LOG.warn("Task {} was of job {} was not completed in time, queueing it for re-delivery.", taskId, jobId);
                 nRedelivered += 1;
             }
