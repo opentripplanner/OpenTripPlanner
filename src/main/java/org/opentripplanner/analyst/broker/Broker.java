@@ -44,7 +44,7 @@ import java.util.*;
  * TODO if there is a backlog of work (the usual case when jobs are lined up) workers will constantly change graphs.
  * Because (at least currently) two users never share the same graph, we can get by with pulling tasks cyclically or
  * randomly from all the jobs, and just actively shaping the number of workers with affinity for each graph by forcing
- * some of them to accept tasks on graphs other than the one they have declared afffinity for.
+ * some of them to accept tasks on graphs other than the one they have declared affinity for.
  *
  * This could be thought of as "affinity homeostasis". We  will constantly keep track of the ideal proportion of workers
  * by graph (based on active queues), and the true proportion of consumers by graph (based on incoming requests) then
@@ -58,6 +58,8 @@ public class Broker implements Runnable {
     // TODO catalog of recently seen consumers by affinity with IP: response.getRequest().getRemoteAddr();
 
     private static final Logger LOG = LoggerFactory.getLogger(Broker.class);
+
+    private static final int REDELIVERY_INTERVAL_SEC = 10;
 
     public final CircularList<Job> jobs = new CircularList<>();
 
@@ -81,6 +83,8 @@ public class Broker implements Runnable {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    private long nextRedeliveryCheckTime = System.currentTimeMillis();
+
     static {
         mapper.registerModule(AgencyAndIdSerializer.makeModule());
         mapper.registerModule(QualifiedModeSetSerializer.makeModule());
@@ -95,9 +99,6 @@ public class Broker implements Runnable {
     private final Properties workerConfig;
 
     private WorkerCatalog workerCatalog = new WorkerCatalog();
-
-    /** The messages that have already been delivered to a worker. */
-    TIntObjectMap<AnalystClusterRequest> deliveredTasks = new TIntObjectHashMap<>();
 
     /** The time at which each task was delivered to a worker, to allow re-delivery. */
     TIntIntMap deliveryTimes = new TIntIntHashMap();
@@ -147,7 +148,7 @@ public class Broker implements Runnable {
     private TObjectLongMap<String> recentlyRequestedWorkers = new TObjectLongHashMap<>();
 
     // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions ?
-
+// TODO rename config to brokerConfig
     public Broker (Properties config, String addr, int port) {
         this.config = config;
 
@@ -372,7 +373,7 @@ public class Broker implements Runnable {
         deque.addLast(response);
         nWaitingConsumers += 1;
         // Wake up the delivery thread if it's waiting on consumers.
-        // This is whatever thread called wait() while holding the monitor for this QBroker object.
+        // This is whatever thread called wait() while holding the monitor for this Broker object.
         notify();
     }
 
@@ -415,6 +416,25 @@ public class Broker implements Runnable {
     }
 
     /**
+     *  Check whether there are any delivered tasks that have reached their invisibility timeout but have not yet been
+     *  marked complete. Enqueue those tasks for redelivery.
+     */
+    private void redeliver() {
+        if (System.currentTimeMillis() > nextRedeliveryCheckTime) {
+            nextRedeliveryCheckTime += REDELIVERY_INTERVAL_SEC * 1000;
+            LOG.info("Scanning for redelivery...");
+            int nRedelivered = 0;
+            int nInvisible = 0;
+            for (Job job : jobs) {
+                nInvisible += job.invisibleUntil.size();
+                nRedelivered += job.redeliver();
+            }
+            LOG.info("{} tasks enqueued for redelivery out of {} invisible tasks.", nRedelivered, nInvisible);
+            nUndeliveredTasks += nRedelivered;
+        }
+    }
+
+    /**
      * This method checks whether there are any high-priority tasks or normal job tasks and attempts to match them with
      * waiting workers. It blocks until there are tasks or workers available.
      */
@@ -425,6 +445,7 @@ public class Broker implements Runnable {
             LOG.debug("Task delivery thread is going to sleep, there are no tasks waiting for delivery.");
             logQueueStatus();
             wait();
+            redeliver();
         }
         LOG.debug("Task delivery thread is awake and there are some undelivered tasks.");
         logQueueStatus();
@@ -524,6 +545,20 @@ public class Broker implements Runnable {
     }
 
     /**
+     * This uses a linear search through jobs, which should not be problematic unless there are thousands of
+     * simultaneous jobs.
+     * @return a Job object that contains the given task ID.
+     */
+    public Job getJobForTask (int taskId) {
+        for (Job job : jobs) {
+            if (job.containsTask(taskId)) {
+                return job;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Attempt to hand some tasks from the given job to a waiting consumer connection.
      * The write will fail if the consumer has closed the connection but it hasn't been removed from the connection
      * queue yet. This can happen because the Broker methods are synchronized, and the removal action may be waiting
@@ -565,35 +600,22 @@ public class Broker implements Runnable {
         nUndeliveredTasks -= tasks.size();
         job.markTasksDelivered(tasks);
 
-        for (AnalystClusterRequest task : tasks) {
-            deliveredTasks.put(task.taskId, task);
-        }
-
         return true;
 
     }
 
     /**
      * Take a normal (non-priority) task out of a job queue, marking it as completed so it will not be re-delivered.
+     * TODO maybe use unique delivery receipts instead of task IDs to handle redelivered tasks independently
      * @return whether the task was found and removed.
      */
-    public synchronized boolean deleteJobTask (int taskId) {
-        // There could be thousands of invisible (delivered) tasks, so we use a hash map.
-        // We only allow removal of delivered, invisible tasks for now (not undelivered tasks).
-        // Return whether removal call discovered an existing task.
-        AnalystClusterRequest task = deliveredTasks.remove(taskId);
-
-        if (task == null)
+    public synchronized boolean markTaskCompleted (int taskId) {
+        Job job = getJobForTask(taskId);
+        if (job == null) {
+            LOG.error("Could not find a job containing task {}, and therefore could not mark the task as completed.");
             return false;
-
-        // using the string form to avoid accidental job creation
-        Job job = findJob(task.jobId);
-
-        if (job == null)
-            // can this happen?
-            return true;
-
-        job.markTasksCompleted(task);
+        }
+        job.markTaskCompleted(taskId);
         return true;
     }
 
@@ -617,7 +639,7 @@ public class Broker implements Runnable {
             try {
                 deliverTasks();
             } catch (InterruptedException e) {
-                LOG.warn("Task pump thread was interrupted.");
+                LOG.info("Task pump thread was interrupted.");
                 return;
             }
         }
@@ -655,6 +677,13 @@ public class Broker implements Runnable {
     }
 
     private Multimap<String, String> activeJobsPerGraph = HashMultimap.create();
+
+    public synchronized boolean anyJobsActive() {
+        for (Job job : jobs) {
+            if (!job.isComplete()) return true;
+        }
+        return false;
+    }
 
     void activateJob (Job job) {
         activeJobsPerGraph.put(job.graphId, job.jobId);

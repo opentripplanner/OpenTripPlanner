@@ -189,7 +189,7 @@ class BrokerHttpHandler extends HttpHandler {
                 if ("tasks".equalsIgnoreCase(pathComponents[1])) {
                     int taskId = Integer.parseInt(pathComponents[2]);
                     // This must not have been a priority task. Try to delete it as a normal job task.
-                    if (broker.deleteJobTask(taskId)) {
+                    if (broker.markTaskCompleted(taskId)) {
                         response.setStatus(HttpStatus.OK_200);
                     } else {
                         response.setStatus(HttpStatus.NOT_FOUND_404);

@@ -57,6 +57,7 @@ import java.util.zip.GZIPOutputStream;
  *
  */
 public class AnalystWorker implements Runnable {
+
     /**
      * worker ID - just a random ID so we can differentiate machines used for computation.
      * Useful to isolate the logs from a particular machine, as well as to evaluate any
@@ -75,6 +76,13 @@ public class AnalystWorker implements Runnable {
     public static final String WORKER_ID_HEADER = "X-Worker-Id";
 
     public static final int POLL_TIMEOUT = 10 * 1000;
+
+    /**
+     * If this value is non-negative, the worker will not actually do any work. It will just report all tasks
+     * as completed immediately, but will fail to do so on the given percentage of tasks. This is used in testing task
+     * re-delivery and overall broker sanity.
+     */
+    public int dryRunFailureRate = -1;
 
     /** How long (minimum, in milliseconds) should this worker stay alive after receiving a single point request? */
     public static final int SINGLE_POINT_KEEPALIVE = 15 * 60 * 1000;
@@ -281,6 +289,18 @@ public class AnalystWorker implements Runnable {
     }
 
     private void handleOneRequest(AnalystClusterRequest clusterRequest) {
+        if (dryRunFailureRate >= 0) {
+            // This worker is running in test mode.
+            // It should report all work as completed without actually doing anything,
+            // but will fail a certain percentage of the time.
+            if (random.nextInt(100) >= dryRunFailureRate) {
+                // Pretend to succeed.
+                deleteRequest(clusterRequest);
+            } else {
+                LOG.info("Intentionally failing on task {}", clusterRequest.taskId);
+            }
+            return;
+        }
         try {
             long startTime = System.currentTimeMillis();
             LOG.info("Handling message {}", clusterRequest.toString());
@@ -318,7 +338,6 @@ public class AnalystWorker implements Runnable {
             if (clusterRequest.profileRequest != null) {
                 ts.lon = clusterRequest.profileRequest.fromLon;
                 ts.lat = clusterRequest.profileRequest.fromLat;
-
 
                 RepeatedRaptorProfileRouter router;
 
