@@ -16,8 +16,10 @@ import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -25,8 +27,10 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 public class IndexGraphQLSchema {
@@ -39,6 +43,7 @@ public class IndexGraphQLSchema {
     public GraphQLOutputType stopType = new GraphQLTypeReference("Stop");
     public GraphQLOutputType tripType = new GraphQLTypeReference("Trip");
     public GraphQLOutputType stopAtDistanceType = new GraphQLTypeReference("StopAtDistance");
+    public GraphQLOutputType stoptimesInPatternType = new GraphQLTypeReference("StoptimesInPattern");
     public GraphQLObjectType queryType;
     public GraphQLSchema indexSchema;
 
@@ -53,6 +58,22 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("distance")
                 .type(Scalars.GraphQLFloat)
+                .build())
+            .build();
+
+        stoptimesInPatternType = GraphQLObjectType.newObject()
+            .name("StoptimesInPattern")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("pattern")
+                .type(patternType)
+                .dataFetcher(environment ->
+                    index.patternForId.get(((StopTimesInPattern) environment.getSource()).pattern.id))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stoptimes")
+                .type(new GraphQLList(stoptimeType))
+                .dataFetcher(environment ->
+                    ((StopTimesInPattern) environment.getSource()).times)
                 .build())
             .build();
 
@@ -193,7 +214,81 @@ public class IndexGraphQLSchema {
                         .collect(Collectors.toList())
                 )
                 .build())
-            .build(); //TODO: add stoptimes
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stoptimesForServiceDate")
+                .type(new GraphQLList(stoptimesInPatternType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("date")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .dataFetcher(environment -> {
+                    try {  // TODO: Add our own scalar types for at least serviceDate and AgencyAndId
+                        return index.getStopTimesForStop(
+                            (Stop) environment.getSource(),
+                            ServiceDate.parseString(environment.getArgument("date"))
+                        );
+                    } catch (ParseException e) {
+                        return null;
+                    }
+                })
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stoptimesForPatterns")
+                .type(new GraphQLList(stoptimesInPatternType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("startTime")
+                    .type(Scalars.GraphQLString) // No long exists in GraphQL
+                    .defaultValue("0") // Default value is current time
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("timeRange")
+                    .type(Scalars.GraphQLInt)
+                    .defaultValue(24 * 60 * 60)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("numberOfDepartures")
+                    .type(Scalars.GraphQLInt)
+                    .defaultValue(5)
+                    .build())
+                .dataFetcher(environment ->
+                    index.stopTimesForStop(
+                        (Stop) environment.getSource(),
+                        Long.parseLong(environment.getArgument("startTime")),
+                        (int) environment.getArgument("timeRange"),
+                        (int) environment.getArgument("numberOfDepartures")))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("stoptimesWithoutPatterns")
+                .type(new GraphQLList(stoptimeType))
+                .argument(GraphQLArgument.newArgument()
+                    .name("startTime")
+                    .type(Scalars.GraphQLString) // No long exists in GraphQL
+                    .defaultValue("0") // Default value is current time
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("timeRange")
+                    .type(Scalars.GraphQLInt)
+                    .defaultValue(24 * 60 * 60)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("numberOfDepartures")
+                    .type(Scalars.GraphQLInt)
+                    .defaultValue(5)
+                    .build())
+                .dataFetcher(environment ->
+                    index.stopTimesForStop(
+                        (Stop) environment.getSource(),
+                        Long.parseLong(environment.getArgument("startTime")),
+                        environment.getArgument("timeRange"),
+                        environment.getArgument("numberOfDepartures"))
+                    .stream()
+                    .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
+                    .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
+                    .limit(environment.getArgument("numberOfDepartures"))
+                    .collect(Collectors.toList())
+                )
+                .build())
+            .build();
 
         stoptimeType = GraphQLObjectType.newObject()
             .name("Stoptime")
@@ -255,7 +350,13 @@ public class IndexGraphQLSchema {
                 .name("serviceDay")
                 .type(Scalars.GraphQLString)
                 .dataFetcher(environment ->
-                    new LocalDate((((TripTimeShort) environment.getSource()).serviceDay)).toString())
+                    new LocalDate((((TripTimeShort) environment.getSource()).serviceDay) * 1000).toString())
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("trip")
+                .type(tripType)
+                .dataFetcher(environment ->
+                    index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
                 .build())
             .build();
 

@@ -20,7 +20,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import graphql.execution.ExecutionResult;
+import graphql.ExecutionResult;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -577,12 +577,12 @@ public class IndexAPI {
         if (uriInfo.getQueryParameters().isEmpty()) {
             result = index.graphQL.execute(query);
         } else {
-            result = index.graphQL.execute(query, null, new HashMap<>(uriInfo.getQueryParameters()));
+            result = index.graphQL.execute(query, null, null, new HashMap<>(uriInfo.getQueryParameters()));
         }
-        if (result.getValidationErrors().isEmpty()) {
+        if (result.getErrors().isEmpty()) {
             return Response.status(Status.OK).entity(result.getResult()).build();
         } else {
-            return Response.status(Status.BAD_REQUEST).entity(result.getValidationErrors()).build();
+            return Response.status(Status.BAD_REQUEST).entity(result.getErrors()).build();
         }
     }
 
