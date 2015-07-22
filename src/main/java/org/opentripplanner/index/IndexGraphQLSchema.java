@@ -279,12 +279,12 @@ public class IndexGraphQLSchema {
                     index.stopTimesForStop(
                         (Stop) environment.getSource(),
                         Long.parseLong(environment.getArgument("startTime")),
-                        environment.getArgument("timeRange"),
-                        environment.getArgument("numberOfDepartures"))
+                        (int) environment.getArgument("timeRange"),
+                        (int) environment.getArgument("numberOfDepartures"))
                     .stream()
                     .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
                     .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
-                    .limit(environment.getArgument("numberOfDepartures"))
+                    .limit((long) (int) environment.getArgument("numberOfDepartures"))
                     .collect(Collectors.toList())
                 )
                 .build())
