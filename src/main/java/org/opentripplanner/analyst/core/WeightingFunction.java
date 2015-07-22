@@ -86,6 +86,8 @@ public abstract class WeightingFunction {
                     sum += weights[k - (i * 60) - rolloffMin] * countsPerSecond[k];
                 }
 
+                // cast to int here rather than making a cumulative curve so that int roundoff error is never greater than 1.
+                // if we had a douible array and cast the differences to ints, we could accumulate roundoff error up to the number of minutes.
                 ret[i] = (int) sum;
 
                 frontier = newFrontier;
