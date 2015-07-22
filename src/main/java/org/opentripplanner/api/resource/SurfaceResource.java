@@ -1,6 +1,8 @@
 package org.opentripplanner.api.resource;
 
 import com.google.common.collect.Maps;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geometry.Envelope2D;
@@ -54,7 +56,10 @@ import java.util.Map;
 @Produces({ MediaType.APPLICATION_JSON })
 public class SurfaceResource extends RoutingResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TimeSurface.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SurfaceResource.class);
+
+    /** the tolerance in decimal degrees for the Douglas-Peucker simplification; 0.0001 degrees is about 11 meters at the equator and less elsewhere */
+    public static final double SIMPLIFICATION_TOLERANCE_DEGREES = 0.0005;
 
     @Context
     UriInfo uriInfo;
@@ -252,7 +257,9 @@ public class SurfaceResource extends RoutingResource {
             z0.w = 1.0;
             z0.wTime = seconds;
             z0.d = 300; // meters. TODO set dynamically / properly, make sure it matches grid cell size?
-            IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
+            Geometry geom = isolineBuilder.computeIsoline(z0);
+            geom = DouglasPeuckerSimplifier.simplify(geom, SIMPLIFICATION_TOLERANCE_DEGREES);
+            IsochroneData isochrone = new IsochroneData(seconds, geom);
             isochrones.add(isochrone);
          }
 

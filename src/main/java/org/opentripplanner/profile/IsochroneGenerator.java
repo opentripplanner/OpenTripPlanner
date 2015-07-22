@@ -1,16 +1,15 @@
 package org.opentripplanner.profile;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
-import org.opentripplanner.common.geometry.AccumulativeGridSampler;
-import org.opentripplanner.common.geometry.DelaunayIsolineBuilder;
-import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
+import org.opentripplanner.api.resource.SurfaceResource;
+import org.opentripplanner.common.geometry.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +91,9 @@ public abstract class IsochroneGenerator {
             z0.w = 1.0;
             z0.wTime = seconds;
             z0.d = GRID_SIZE_METERS;
-            IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
+            Geometry geom = isolineBuilder.computeIsoline(z0);
+            geom = DouglasPeuckerSimplifier.simplify(geom, SurfaceResource.SIMPLIFICATION_TOLERANCE_DEGREES);
+            IsochroneData isochrone = new IsochroneData(seconds, geom);
             isochrones.add(isochrone);
             if (n + 1 >= nMax) {
                 break;
