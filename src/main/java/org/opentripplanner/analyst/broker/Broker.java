@@ -169,7 +169,7 @@ public class Broker implements Runnable {
         if (workOffline == null) workOffline = true;
         this.workOffline = workOffline;
 
-        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 20;
+        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 4;
 
         ec2 = new AmazonEC2Client();
     }
