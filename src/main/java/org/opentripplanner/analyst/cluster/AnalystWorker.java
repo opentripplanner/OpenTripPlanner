@@ -33,6 +33,7 @@ import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
 import org.opentripplanner.api.model.QualifiedModeSetSerializer;
 import org.opentripplanner.api.model.TraverseModeSetSerializer;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.profile.RaptorWorkerData;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -599,6 +600,9 @@ public class AnalystWorker implements Runnable {
      * initial-graph-id             The graph ID for this worker to start on
      */
     public static void main(String[] args) {
+        LOG.info("Starting analyst worker");
+        LOG.info("OTP commit is {}", MavenVersion.VERSION.commit);
+
         Properties config = new Properties();
 
         try {
