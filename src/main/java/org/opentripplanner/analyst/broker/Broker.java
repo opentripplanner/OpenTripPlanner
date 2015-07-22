@@ -141,6 +141,8 @@ public class Broker implements Runnable {
 
     private Timer timer = new Timer();
 
+    private String workerName, project;
+
     /**
      * keep track of which graphs we have launched workers on and how long ago we launched them,
      * so that we don't re-request workers which have been requested.
@@ -169,7 +171,10 @@ public class Broker implements Runnable {
         if (workOffline == null) workOffline = true;
         this.workOffline = workOffline;
 
-        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 4;
+        workerName = brokerConfig.getProperty("worker-name") != null ? brokerConfig.getProperty("worker-name") : "analyst-worker";
+        project = brokerConfig.getProperty("project") != null ? brokerConfig.getProperty("project") : "analyst";
+
+        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 4   ;
 
         ec2 = new AmazonEC2Client();
     }
@@ -349,7 +354,13 @@ public class Broker implements Runnable {
         // allow machine to shut itself completely off
         req.setInstanceInitiatedShutdownBehavior(ShutdownBehavior.Terminate);
         RunInstancesResult res = ec2.runInstances(req);
-        res.getReservation().getInstances();
+        res.getReservation().getInstances().forEach(i -> {
+            Collection<Tag> tags = Arrays.asList(
+                    new Tag("name", workerName),
+                    new Tag("project", project)
+            );
+            i.setTags(tags);
+        });
         recentlyRequestedWorkers.put(graphId, System.currentTimeMillis());
         LOG.info("Requesting {} workers", nWorkers);
     }
