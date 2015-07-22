@@ -148,29 +148,28 @@ public class Broker implements Runnable {
     private TObjectLongMap<String> recentlyRequestedWorkers = new TObjectLongHashMap<>();
 
     // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions ?
-// TODO rename config to brokerConfig
-    public Broker (Properties config, String addr, int port) {
-        this.config = config;
+    public Broker (Properties brokerConfig, String addr, int port) {
+        this.config = brokerConfig;
 
         // create a config for the AWS workers
         workerConfig = new Properties();
         workerConfig.setProperty("broker-address", addr);
         workerConfig.setProperty("broker-port", "" + port);
 
-        if (config.getProperty("statistics-queue") != null)
-            workerConfig.setProperty("statistics-queue", config.getProperty("statistics-queue"));
+        if (brokerConfig.getProperty("statistics-queue") != null)
+            workerConfig.setProperty("statistics-queue", brokerConfig.getProperty("statistics-queue"));
 
-        workerConfig.setProperty("graphs-bucket", config.getProperty("graphs-bucket"));
-        workerConfig.setProperty("pointsets-bucket", config.getProperty("pointsets-bucket"));
+        workerConfig.setProperty("graphs-bucket", brokerConfig.getProperty("graphs-bucket"));
+        workerConfig.setProperty("pointsets-bucket", brokerConfig.getProperty("pointsets-bucket"));
 
         // Tell the workers to shut themselves down automatically
         workerConfig.setProperty("auto-shutdown", "true");
 
-        Boolean workOffline = Boolean.parseBoolean(config.getProperty("work-offline"));
+        Boolean workOffline = Boolean.parseBoolean(brokerConfig.getProperty("work-offline"));
         if (workOffline == null) workOffline = true;
         this.workOffline = workOffline;
 
-        this.maxWorkers = config.getProperty("max-workers") != null ? Integer.parseInt(config.getProperty("max-workers")) : 20;
+        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 20;
 
         ec2 = new AmazonEC2Client();
     }
@@ -204,7 +203,8 @@ public class Broker implements Runnable {
 
             // wait 100ms to deliver to workers in case another request comes in almost simultaneously
             timer.schedule(new TimerTask() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     deliverHighPriorityTasks(task.graphId);
                 }
             }, 100);
