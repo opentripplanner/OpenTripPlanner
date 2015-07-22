@@ -35,7 +35,7 @@ public class Job {
     // maybe this should only be a list of IDs.
     Queue<AnalystClusterRequest> tasksAwaitingDelivery = new ArrayDeque<>();
 
-    /* Tasks that have been delivered to a worker but are awaiting completion. */
+    /* The tasks in this job keyed on their task ID. */
     TIntObjectMap<AnalystClusterRequest> tasksById = new TIntObjectHashMap<>();
 
     /*
