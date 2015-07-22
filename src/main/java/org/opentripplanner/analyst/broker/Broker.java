@@ -57,7 +57,7 @@ public class Broker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Broker.class);
 
-    private static final int REDELIVERY_INTERVAL_SEC = 30;
+    private static final int REDELIVERY_INTERVAL_SEC = 10;
 
     public final CircularList<Job> jobs = new CircularList<>();
 
@@ -122,7 +122,7 @@ public class Broker implements Runnable {
     private TObjectLongMap<String> recentlyRequestedWorkers = new TObjectLongHashMap<>();
 
     // Queue of tasks to complete Delete, Enqueue etc. to avoid synchronizing all the functions ?
-
+// TODO rename config to brokerConfig
     public Broker (Properties config, String addr, int port) {
         this.config = config;
 
@@ -297,12 +297,18 @@ public class Broker implements Runnable {
      *  Check whether there are any delivered tasks that have reached their invisibility timeout but have not yet been
      *  marked complete. Enqueue those tasks for redelivery.
      */
-    private void redeliver () {
+    private void redeliver() {
         if (System.currentTimeMillis() > nextRedeliveryCheckTime) {
             nextRedeliveryCheckTime += REDELIVERY_INTERVAL_SEC * 1000;
+            LOG.info("Scanning for redelivery...");
+            int nRedelivered = 0;
+            int nInvisible = 0;
             for (Job job : jobs) {
-                nUndeliveredTasks += job.redeliver();
+                nInvisible += job.invisibleUntil.size();
+                nRedelivered += job.redeliver();
             }
+            LOG.info("{} tasks enqueued for redelivery out of {} invisible tasks.", nRedelivered, nInvisible);
+            nUndeliveredTasks += nRedelivered;
         }
     }
 
@@ -549,6 +555,13 @@ public class Broker implements Runnable {
     }
 
     private Multimap<String, String> activeJobsPerGraph = HashMultimap.create();
+
+    public synchronized boolean anyJobsActive() {
+        for (Job job : jobs) {
+            if (!job.isComplete()) return true;
+        }
+        return false;
+    }
 
     void activateJob (Job job) {
         activeJobsPerGraph.put(job.graphId, job.jobId);

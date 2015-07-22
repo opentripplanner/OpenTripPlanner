@@ -23,6 +23,8 @@ public class Job {
 
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
+    private static final int INVISIBLE_DURATION_SEC = 30; // How long until tasks are eligible for re-delivery.
+
     /* A unique identifier for this job, usually a random UUID. */
     public final String jobId;
 
@@ -58,7 +60,7 @@ public class Job {
 
     public void markTasksDelivered(List<AnalystClusterRequest> tasks) {
         long deliveryTime = System.currentTimeMillis();
-        long visibleAt = deliveryTime + 60 * 1000; // Invisible for one minute
+        long visibleAt = deliveryTime + INVISIBLE_DURATION_SEC * 1000;
         for (AnalystClusterRequest task : tasks) {
             invisibleUntil.put(task.taskId, visibleAt);
         }
@@ -80,7 +82,7 @@ public class Job {
             if (now > timeout) {
                 invisibleIterator.remove();
                 visibleTasks.add(tasksById.get(taskId));
-                LOG.warn("Task {} was not completed in time, queueing it for re-delivery.", taskId);
+                LOG.warn("Task {} was of job {} was not completed in time, queueing it for re-delivery.", taskId, jobId);
                 nRedelivered += 1;
             }
         }

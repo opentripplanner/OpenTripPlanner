@@ -26,15 +26,25 @@ import java.util.stream.IntStream;
 public class JobSimulator {
 
     public static String USERID = "userA";
+    public String s3prefix = "S3PREFIX";
+    public String pointSetId = "POINTSET";
+    public String graphId = "GRAPH";
+    public int nOrigins = 100;
+
+    DefaultHttpClient httpClient = new DefaultHttpClient();
 
     public static void main(String[] args) {
 
-        DefaultHttpClient httpClient = new DefaultHttpClient();
+        JobSimulator js = new JobSimulator();
+        js.s3prefix = args[0];
+        js.pointSetId = args[1];
+        js.graphId = args[2];
+        js.nOrigins = Integer.parseInt(args[3]);
+        js.sendFakeJob();
 
-        String s3prefix = args[0];
-        String pointSetId = args[1];
-        String graphId = args[2];
-        int nOrigins = Integer.parseInt(args[3]);
+    }
+
+    public void sendFakeJob() {
 
         String jobId = compactUUID();
 
@@ -61,7 +71,7 @@ public class JobSimulator {
 //            throw new RuntimeException(e);
 //        }
 
-        String url = String.format("http://localhost:9001/jobs");
+        String url = String.format("http://localhost:9001/enqueue/jobs");
         HttpPost httpPost = new HttpPost(url);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {

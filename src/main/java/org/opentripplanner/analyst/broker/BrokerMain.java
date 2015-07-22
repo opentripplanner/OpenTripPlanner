@@ -14,7 +14,8 @@ import java.util.Properties;
 
 // benchmark: $ ab -n 2000 -k -c 100 http://localhost:9001/
 
-public class BrokerMain {
+// TODO Merge with Broker
+public class BrokerMain implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(BrokerMain.class);
 
@@ -22,9 +23,12 @@ public class BrokerMain {
 
     private static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
 
-    public static final Properties config = new Properties();
+    Properties config = new Properties();
+
+    public Broker broker;
 
     public static void main(String[] args) {
+
         File cfg;
         if (args.length > 0)
             cfg = new File(args[0]);
@@ -36,26 +40,37 @@ public class BrokerMain {
             return;
         }
 
+        Properties brokerConfig = new Properties();
         try {
             FileInputStream is = new FileInputStream(cfg);
-            config.load(is);
+            brokerConfig.load(is);
             is.close();
         } catch (IOException e) {
             LOG.error("Error reading config file {}", e);
             return;
         }
 
+        // Create instance and run in the current thread.
+        new BrokerMain(brokerConfig).run();
+
+    }
+
+    public BrokerMain(Properties brokerConfig) {
+        this.config = brokerConfig;
+    }
+
+    public void run() {
         int port = config.getProperty("port") != null ? Integer.parseInt(config.getProperty("port")) : DEFAULT_PORT;
         String addr = config.getProperty("bind-address") != null ? config.getProperty("bind-address") : DEFAULT_BIND_ADDRESS;
-
         LOG.info("Starting analyst broker on port {} of interface {}", port, addr);
         HttpServer httpServer = new HttpServer();
         NetworkListener networkListener = new NetworkListener("broker", addr, port);
-        networkListener.getTransport().setIOStrategy(SameThreadIOStrategy.getInstance()); // we avoid blocking IO, and this allows us to see closed connections.
+        // We avoid blocking IO, and the following line allows us to see closed connections.
+        networkListener.getTransport().setIOStrategy(SameThreadIOStrategy.getInstance());
         httpServer.addListener(networkListener);
         // Bypass Jersey etc. and add a low-level Grizzly handler.
         // As in servlets, * is needed in base path to identify the "rest" of the path.
-        Broker broker = new Broker(config, addr, port);
+        broker = new Broker(config, addr, port);
         httpServer.getServerConfiguration().addHttpHandler(new BrokerHttpHandler(broker), "/*");
         try {
             httpServer.start();
@@ -70,8 +85,6 @@ public class BrokerMain {
             LOG.info("Interrupted, shutting down.");
         }
         httpServer.shutdown();
-
     }
-
 
 }
