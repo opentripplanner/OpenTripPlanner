@@ -229,7 +229,10 @@ public class AnalystWorker implements Runnable {
         // build the graph, iff we know what graph to build
         if (graphId != null) {
             LOG.info("Prebuilding graph {}", graphId);
-            clusterGraphBuilder.getGraph(graphId);
+            Graph graph = clusterGraphBuilder.getGraph(graphId);
+            // also prebuild the stop tree cache
+            graph.index.getStopTreeCache();
+            LOG.info("Done prebuilding graph {}", graphId);
         }
 
         // Start filling the work queues.
