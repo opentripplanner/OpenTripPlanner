@@ -9,10 +9,7 @@ import junit.framework.TestCase;
 import org.joda.time.LocalDate;
 import org.junit.Test;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.profile.ProfileRequest;
-import org.opentripplanner.profile.RaptorWorkerData;
-import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
-import org.opentripplanner.profile.TimeWindow;
+import org.opentripplanner.profile.*;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -85,7 +82,8 @@ public class AddTripPatternTest extends TestCase {
         // This assumes worst-case departure, and the first worst departure is 10:30 after the service
         // starts running (dwell + headway)
         assertEquals(4 * 3600 + 600 + 30,
-                data.timetablesForPattern.get(0).getFrequencyDeparture(0, 0, 39 * 360, true));
+                data.timetablesForPattern.get(0).getFrequencyDeparture(0, 0, 39 * 360,
+                        RaptorWorkerTimetable.BoardingAssumption.WORST_CASE));
     }
 
     /** Test adding trips with a timetable rather than frequencies */

@@ -94,7 +94,7 @@ public class RaptorWorkerTimetable implements Serializable {
      * Get the departure on frequency trip trip at stop stop after time time,
      * assuming worst-case headway if worstCase is true.
      */
-    public int getFrequencyDeparture (int trip, int stop, int time, boolean worstCase) {
+    public int getFrequencyDeparture (int trip, int stop, int time, BoardingAssumption boardingAssumption) {
         int timeToReachStop = frequencyTrips[trip][stop * 2 + 1];
 
         // move time forward if the frequency has not yet started.
@@ -104,8 +104,17 @@ public class RaptorWorkerTimetable implements Serializable {
         if (time > timeToReachStop + endTimes[trip])
             return -1;
 
-        if (worstCase)
+        switch (boardingAssumption) {
+        case BEST_CASE:
+            // do nothing
+            break;
+        case WORST_CASE:
             time += headwaySecs[trip];
+            break;
+        case HALF_HEADWAY:
+            time += headwaySecs[trip] / 2;
+            break;
+        }
 
         return time;
     }
@@ -317,4 +326,8 @@ public class RaptorWorkerTimetable implements Serializable {
         return times;
     }
 
+    /** The assumptions made when boarding a frequency vehicle: best case (no wait), worst case (full headway) and half headway (in some sense the average). */
+    public static enum BoardingAssumption {
+        BEST_CASE, WORST_CASE, HALF_HEADWAY
+    }
 }

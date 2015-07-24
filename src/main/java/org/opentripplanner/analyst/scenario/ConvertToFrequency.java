@@ -3,10 +3,10 @@ package org.opentripplanner.analyst.scenario;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -124,7 +124,8 @@ public class ConvertToFrequency extends Modification {
             Stop stop = stops.stream().findFirst().get();
 
             // determine the median frequency at this stop
-            TIntList arrivalTimes = new TIntArrayList();
+            // use a set to handle duplicated trips
+            TIntSet arrivalTimes = new TIntHashSet();
 
             for (boolean filter : new boolean[] { true, false }) {
                 for (TripTimes tt : group) {
@@ -146,10 +147,12 @@ public class ConvertToFrequency extends Modification {
             }
 
             // now convert to elapsed times
-            arrivalTimes.sort();
-            int[] headway = new int[arrivalTimes.size() - 1];
-            for (int i = 1; i < arrivalTimes.size(); i++) {
-                headway[i - 1] = arrivalTimes.get(i) - arrivalTimes.get(i - 1);
+            int[] arrivalTimeArray = arrivalTimes.toArray();
+            Arrays.sort(arrivalTimeArray);
+
+            int[] headway = new int[arrivalTimeArray.length - 1];
+            for (int i = 1; i < arrivalTimeArray.length; i++) {
+                headway[i - 1] = arrivalTimeArray[i] - arrivalTimeArray[i - 1];
             }
 
             // now get the median
@@ -167,6 +170,11 @@ public class ConvertToFrequency extends Modification {
                 median = (headway[(headway.length - 1) / 2] + headway[(headway.length - 1) / 2 + 1]) / 2;
             else
                 median = headway[(headway.length - 1) / 2];
+
+            if (median < 60) {
+                LOG.info("Median headway less than 1 minute; setting to one minute");
+                median = 60;
+            }
 
             LOG.info("Headway for route {} ({}) in direction {}: {}min", tripPattern.route.getShortName(), tripPattern.route.getId().getId(), tripPattern.directionId, median / 60);
 

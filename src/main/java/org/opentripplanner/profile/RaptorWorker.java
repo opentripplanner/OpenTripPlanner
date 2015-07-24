@@ -146,6 +146,10 @@ public class RaptorWorker {
                 if (baseTimeSeconds != UNREACHED) {
                     baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
                     int[] targets = data.targetsForStop.get(s);
+
+                    if (targets == null)
+                        continue;
+
                     for (int i = 0; i < targets.length; i++) {
                         int targetIndex = targets[i++]; // increment i after read
                         int distance = targets[i]; // i will be incremented at loop end
@@ -246,7 +250,7 @@ public class RaptorWorker {
                 // the time at this stop if we board a new vehicle
                 if (bestTimes[stopIndex] != UNREACHED) {
                     for (int trip = 0; trip < timetable.getFrequencyTripCount(); trip++) {
-                        int boardTime = timetable.getFrequencyDeparture(trip, stopPositionInPattern, bestTimes[stopIndex], true);
+                        int boardTime = timetable.getFrequencyDeparture(trip, stopPositionInPattern, bestTimes[stopIndex], req.boardingAssumption);
 
                         if (boardTime != -1 && boardTime < remainOnBoardTime) {
                             // make sure we board the best frequency entry at a stop
