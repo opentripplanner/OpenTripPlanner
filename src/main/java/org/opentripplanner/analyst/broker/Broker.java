@@ -59,6 +59,7 @@ public class Broker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Broker.class);
 
+    /* How often we should check for delivered tasks that have timed out. */
     private static final int REDELIVERY_INTERVAL_SEC = 10;
 
     public final CircularList<Job> jobs = new CircularList<>();
