@@ -175,7 +175,7 @@ public class Broker implements Runnable {
         workerName = brokerConfig.getProperty("worker-name") != null ? brokerConfig.getProperty("worker-name") : "analyst-worker";
         project = brokerConfig.getProperty("project") != null ? brokerConfig.getProperty("project") : "analyst";
 
-        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 4   ;
+        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 4;
 
         ec2 = new AmazonEC2Client();
     }
