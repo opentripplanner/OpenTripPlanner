@@ -1,7 +1,9 @@
 package org.opentripplanner.profile;
 
 import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TObjectIntIterator;
@@ -17,6 +19,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.cluster.TaskStatistics;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
+import org.opentripplanner.analyst.scenario.ConvertToFrequency;
 import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.analyst.scenario.TripPatternFilter;
 import org.opentripplanner.common.model.GenericLocation;
@@ -32,6 +35,8 @@ import org.opentripplanner.routing.pathparser.InitialStopSearchPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.FrequencyEntry;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RaptorWorkerData implements Serializable {
     public static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerData.class);
@@ -113,8 +119,63 @@ public class RaptorWorkerData implements Serializable {
         ts.frequencyTripCount = 0;
         ts.scheduledTripCount = 0;
 
+        // first apply any filters that need to be applied to the entire schedule at once
+        Collection<TripPattern> graphPatterns = graph.index.patternForId.values();
+
+        // convert scheduled trips to freuquencies as needed
+        if (scenario != null && scenario.modifications != null) {
+            Collection<ConvertToFrequency> frequencies = scenario.modifications.stream()
+                    .filter(m -> m instanceof ConvertToFrequency)
+                    .map(m -> (ConvertToFrequency) m)
+                    .collect(Collectors.toList());
+
+            if (!frequencies.isEmpty()) {
+                // apply the operations
+                List<TripTimes> scheduled = graphPatterns.stream()
+                        .flatMap(p -> p.scheduledTimetable.tripTimes.stream())
+                        .collect(Collectors.toList());
+
+                List<FrequencyEntry> frequencyEntries = graphPatterns.stream()
+                        .filter(p -> p.getSingleFrequencyEntry() != null)
+                        .map(p -> p.getSingleFrequencyEntry())
+                        .collect(Collectors.toList());
+
+                for (ConvertToFrequency c : frequencies) {
+                    c.apply(frequencyEntries, scheduled, graph, window.servicesRunning);
+                    scheduled = c.scheduledTrips;
+                    frequencyEntries = c.frequencyEntries;
+                }
+
+                // aggregate the modified trips back into patterns
+                // this is so that the patterns have object references to the relevant schedules and frequency entries
+                // group by the original pattern - each entry is still associated with a trip
+                Multimap<TripPattern, TripTimes> newScheduledPatterns = HashMultimap.create();
+                for (TripTimes tt : scheduled) {
+                    newScheduledPatterns.put(graph.index.patternForTrip.get(tt.trip), tt);
+                }
+
+                Multimap<TripPattern, FrequencyEntry> newFreqEntries = HashMultimap.create();
+                for (FrequencyEntry fe : frequencyEntries) {
+                    newFreqEntries.put(graph.index.patternForTrip.get(fe.tripTimes.trip), fe);
+                }
+
+                // filter to just the patterns that are relevant, then replace each pattern with a new pattern
+                // representing its modified trips
+                graphPatterns = graphPatterns.stream()
+                        .filter(p -> newScheduledPatterns.containsKey(p) || newFreqEntries.containsKey(p))
+                        .map(p -> {
+                            TripPattern newp = new TripPattern(p.route, p.stopPattern);
+                            newScheduledPatterns.get(p).stream().forEach(newp.scheduledTimetable::addTripTimes);
+                            newFreqEntries.get(p).stream().forEach(newp.scheduledTimetable::addFrequencyEntry);
+                            return newp;
+                        })
+                        .collect(Collectors.toList());
+
+            }
+        }
+
         /* Make timetables for active trip patterns and record the stops each active pattern uses. */
-        for (TripPattern originalPattern : graph.index.patternForId.values()) {
+        for (TripPattern originalPattern : graphPatterns) {
             Collection<TripPattern> patterns = Arrays.asList(originalPattern);
 
             // apply filters. note that a filter can create multiple trip patterns from a single trip pattern

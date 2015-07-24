@@ -18,7 +18,8 @@ import java.util.Set;
         @JsonSubTypes.Type(name = "adjust-headway", value = AdjustHeadway.class),
         @JsonSubTypes.Type(name = "adjust-dwell-time", value = AdjustDwellTime.class),
         @JsonSubTypes.Type(name = "skip-stop", value = SkipStop.class),
-        @JsonSubTypes.Type(name = "add-trip-pattern", value = AddTripPattern.class)
+        @JsonSubTypes.Type(name = "add-trip-pattern", value = AddTripPattern.class),
+        @JsonSubTypes.Type(name = "convert-to-frequency", value = ConvertToFrequency.class)
 })
 public abstract class Modification implements Serializable {
 
