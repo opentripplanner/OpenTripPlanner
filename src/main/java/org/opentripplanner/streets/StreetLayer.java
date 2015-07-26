@@ -6,18 +6,27 @@ import com.conveyal.osmlib.Way;
 import gnu.trove.iterator.TLongIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import org.nustaq.offheap.bytez.malloc.MallocBytezAllocator;
 import org.nustaq.offheap.structs.FSTStructAllocator;
 import org.nustaq.offheap.structs.structtypes.StructArray;
+import org.nustaq.serialization.FSTObjectInput;
+import org.nustaq.serialization.FSTObjectOutput;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.streets.structs.StreetIntersection;
 import org.opentripplanner.streets.structs.StreetSegment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +37,9 @@ import java.util.Random;
  * This stores the street layer of OTP routing data.
  * It uses FST structs.
  * https://github.com/RuedigerMoeller/fast-serialization/wiki/Structs
- * Usage gleaned from StructArray class.
+ *
+ * Any data that's not used by Analyst workers (street names and geometries for example)
+ * should be optional so we can have fast-loading, small transportation network files to pass around.
  *
  * "Unfortunately, Oracle is removing Unsafe from Java 9 release"
  * "fast serialization does not rely on unsafe. If its present it makes use of it"
@@ -36,18 +47,18 @@ import java.util.Random;
  * There's also https://github.com/RichardWarburton/slab
  * which seems simpler to use.
  */
-public class StreetLayer {
+public class StreetLayer implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreetLayer.class);
 
     private static int DEFAULT_SPEED_KPH = 50;
 
     // Edge lists should be constructed after the fact from edges. This minimizes serialized size too.
-    List<TIntList> outgoingEdges;
-    List<TIntList> incomingEdges;
+    transient List<TIntList> outgoingEdges;
+    transient List<TIntList> incomingEdges;
 
     TLongIntMap vertexIndexForOsmNode = new TLongIntHashMap(100_000, 0.75f, -1, -1);
-    TIntLongMap osmWayForEdgeIndex;
+    // TIntLongMap osmWayForEdgeIndex;
     int nextEdgeIndex = 0; // TODO replace with size of osmWayForEdgeIndex
 
     // TODO use negative IDs for temp vertices and edges.
@@ -196,6 +207,14 @@ public class StreetLayer {
         osm.close();
         // streetLayer.dump();
         streetLayer.buildEdgeLists();
+        try {
+            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("test.out"));
+            streetLayer.write(outputStream);
+            InputStream inputStream = new BufferedInputStream(new FileInputStream("test.out"));
+            streetLayer = StreetLayer.read(inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         streetLayer.testRouting(false);
         streetLayer.testRouting(true);
     }
@@ -261,7 +280,22 @@ public class StreetLayer {
         LOG.info("Done building edge lists.");
     }
 
-    public void save() {
+    public static StreetLayer read (InputStream stream) throws Exception {
+        LOG.info("Reading street layer...");
+        FSTObjectInput in = new FSTObjectInput(stream);
+        StreetLayer result = (StreetLayer) in.readObject(StreetLayer.class);
+        result.buildEdgeLists(); // These are lost when saving.
+        in.close();
+        LOG.info("Done reading.");
+        return result;
+    }
+
+    public void write (OutputStream stream) throws IOException {
+        LOG.info("Writing street layer...");
+        FSTObjectOutput out = new FSTObjectOutput(stream);
+        out.writeObject(this, StreetLayer.class );
+        out.close();
+        LOG.info("Done writing.");
     }
 
 }
