@@ -59,7 +59,9 @@ public class StreetLayer implements Serializable {
 
     TLongIntMap vertexIndexForOsmNode = new TLongIntHashMap(100_000, 0.75f, -1, -1);
     // TIntLongMap osmWayForEdgeIndex;
-    int nextEdgeIndex = 0; // TODO replace with size of osmWayForEdgeIndex
+
+    int nEdges = 0;
+    int nVertices = 0;
 
     // TODO use negative IDs for temp vertices and edges.
     StructArray<StreetSegment> edges;
@@ -71,7 +73,7 @@ public class StreetLayer implements Serializable {
         int vertexIndex = vertexIndexForOsmNode.get(osmNodeId);
         if (vertexIndex == -1) {
             // Register a new vertex, incrementing the index starting from zero.
-            vertexIndex = vertexIndexForOsmNode.size();
+            vertexIndex = nVertices++;
             vertexIndexForOsmNode.put(osmNodeId, vertexIndex);
         }
     }
@@ -112,7 +114,8 @@ public class StreetLayer implements Serializable {
             }
         }
         LOG.info("Done making street edges.");
-        LOG.info("Made {} edges and {} vertices.", nextEdgeIndex, vertexIndexForOsmNode.size());
+        LOG.info("Made {} edges and {} vertices.", nEdges, nVertices);
+        vertexIndexForOsmNode = null; // not needed at this point
     }
 
     /**
@@ -178,7 +181,7 @@ public class StreetLayer implements Serializable {
         }
 
         // Create and store the forward edge
-        int forwardEdgeIndex = nextEdgeIndex++;
+        int forwardEdgeIndex = nEdges++;
         StreetSegment fwdSeg = edges.get(forwardEdgeIndex);
         fwdSeg.setFromVertex(beginVertexIndex);
         fwdSeg.setToVertex(endVertexIndex);
@@ -186,7 +189,7 @@ public class StreetLayer implements Serializable {
         fwdSeg.setSpeed(DEFAULT_SPEED_KPH);
 
         // Create and store the backward edge
-        int backwardEdgeIndex = nextEdgeIndex++;
+        int backwardEdgeIndex = nEdges++;
         StreetSegment backSeg = edges.get(backwardEdgeIndex);
         backSeg.setFromVertex(endVertexIndex);
         backSeg.setToVertex(beginVertexIndex);
@@ -255,14 +258,13 @@ public class StreetLayer implements Serializable {
     }
 
     public void dump () {
-        for (int e = 0; e < nextEdgeIndex; e++) {
+        for (int e = 0; e < nEdges; e++) {
             System.out.println(edges.get(e));
         }
     }
 
     private void buildEdgeLists() {
         LOG.info("Building edge lists from edges...");
-        int nVertices = vertexIndexForOsmNode.size();
         outgoingEdges = new ArrayList<>(nVertices);
         incomingEdges = new ArrayList<>(nVertices);
         for (int v = 0; v < nVertices; v++) {
