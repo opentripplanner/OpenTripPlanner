@@ -351,20 +351,24 @@
     </pluginRepositories>
 
     <dependencies>
-        <!-- MapDB, for GTFS and OSM loading experiments. -->
-        <dependency>
-            <groupId>org.mapdb</groupId>
-            <artifactId>mapdb</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-
         <!-- Amazon AWS client libraries -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.9.39</version>
         </dependency>
-
+        <!-- Conveyal OSM loader library -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>osm-lib</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <!-- Fast drop-in serialization including compound value types (structs) for Java -->
+        <dependency>
+            <groupId>de.ruedigermoeller</groupId>
+            <artifactId>fst</artifactId>
+            <version>2.34</version>
+        </dependency>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
             <groupId>ch.qos.logback</groupId>

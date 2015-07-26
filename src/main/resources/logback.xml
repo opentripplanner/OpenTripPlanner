@@ -18,6 +18,7 @@ depends on otp-routing.
 
   <logger name="com.amazonaws" level="INFO"/>
   <logger name="org.apache.http" level="INFO" />
+  <logger name="com.conveyal" level="INFO"/>
 
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info" />
   <logger name="org.opentripplanner" level="info" />
