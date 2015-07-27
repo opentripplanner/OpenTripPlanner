@@ -18,7 +18,7 @@ public class TransitLayer {
         stops.putAll(gtfs.stops);
     }
 
-    public TransitLayer fromGtfs (String file) {
+    public static TransitLayer fromGtfs (String file) {
         GTFSFeed gtfs = GTFSFeed.fromFile(file);
         TransitLayer transitLayer = new TransitLayer();
         transitLayer.loadFromGtfs(gtfs);

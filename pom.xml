@@ -363,6 +363,12 @@
             <artifactId>osm-lib</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
+        <!-- Conveyal GFTS loader library -->
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>gtfs-lib</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
         <!-- Fast drop-in serialization including compound value types (structs) for Java -->
         <dependency>
             <groupId>de.ruedigermoeller</groupId>

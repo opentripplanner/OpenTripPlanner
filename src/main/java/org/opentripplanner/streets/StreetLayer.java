@@ -3,6 +3,7 @@ package org.opentripplanner.streets;
 import com.conveyal.osmlib.Node;
 import com.conveyal.osmlib.OSM;
 import com.conveyal.osmlib.Way;
+import com.vividsolutions.jts.geom.Envelope;
 import gnu.trove.iterator.TLongIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -16,13 +17,10 @@ import org.nustaq.serialization.FSTObjectOutput;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.streets.structs.StreetIntersection;
 import org.opentripplanner.streets.structs.StreetSegment;
+import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,6 +54,7 @@ public class StreetLayer implements Serializable {
     // Edge lists should be constructed after the fact from edges. This minimizes serialized size too.
     transient List<TIntList> outgoingEdges;
     transient List<TIntList> incomingEdges;
+    transient IntHashGrid spatialIndex = new IntHashGrid();
 
     TLongIntMap vertexIndexForOsmNode = new TLongIntHashMap(100_000, 0.75f, -1, -1);
     // TIntLongMap osmWayForEdgeIndex;
@@ -207,9 +206,21 @@ public class StreetLayer implements Serializable {
 
     }
 
+    public void indexStreets () {
+        LOG.info("Indexing streets...");
+        spatialIndex = new IntHashGrid();
+        for (int v = 0; v < nVertices; v++) {
+            StreetIntersection intersection = vertices.get(v);
+            double x = intersection.getLon();
+            double y = intersection.getLat();
+            Envelope envelope = new Envelope(x, x, y, y);
+            spatialIndex.insert(envelope, v);
+        }
+        LOG.info("Done indexing streets.");
+    }
+
     public static void main (String[] args) {
         String osmSourceFile = args[0];
-        // String streetFile =
         OSM osm = new OSM(null);
         osm.intersectionDetection = true;
         osm.readFromFile(osmSourceFile);
@@ -218,19 +229,27 @@ public class StreetLayer implements Serializable {
         osm.close();
         // streetLayer.dump();
         streetLayer.buildEdgeLists();
-        // Round-trip serialize the street layer
-        try {
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("test.out"));
-            streetLayer.write(outputStream);
-            outputStream.close();
-            InputStream inputStream = new BufferedInputStream(new FileInputStream("test.out"));
-            streetLayer = StreetLayer.read(inputStream);
-            inputStream.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        streetLayer.testRouting(false);
-        streetLayer.testRouting(true);
+        streetLayer.indexStreets();
+
+        // Round-trip serialize the street layer and test its speed
+//        try {
+//            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("test.out"));
+//            streetLayer.write(outputStream);
+//            outputStream.close();
+//            InputStream inputStream = new BufferedInputStream(new FileInputStream("test.out"));
+//            streetLayer = StreetLayer.read(inputStream);
+//            inputStream.close();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//        streetLayer.testRouting(false);
+//        streetLayer.testRouting(true);
+
+
+        // Try linking to transit.
+        String gtfsSourceFile = args[1];
+        TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
+
     }
 
     public void testRouting (boolean withDestinations) {
