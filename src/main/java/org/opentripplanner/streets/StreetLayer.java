@@ -4,11 +4,14 @@ import com.conveyal.osmlib.Node;
 import com.conveyal.osmlib.OSM;
 import com.conveyal.osmlib.Way;
 import com.vividsolutions.jts.geom.Envelope;
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.set.TIntSet;
+import org.apache.commons.math3.util.FastMath;
 import org.nustaq.offheap.bytez.malloc.MallocBytezAllocator;
 import org.nustaq.offheap.structs.FSTStructAllocator;
 import org.nustaq.offheap.structs.structtypes.StructArray;
@@ -249,7 +252,7 @@ public class StreetLayer implements Serializable {
         // Try linking to transit.
         String gtfsSourceFile = args[1];
         TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
-
+        transitLayer.findStreets(streetLayer);
     }
 
     public void testRouting (boolean withDestinations) {
@@ -322,6 +325,35 @@ public class StreetLayer implements Serializable {
         out.writeObject(this, StreetLayer.class );
         out.close();
         LOG.info("Done writing.");
+    }
+
+    public TIntList findNearbyIntersections (double lat, double lon, double radiusMeters) {
+        final double metersPerDegreeLat = 111111.111;
+        double cosLat = FastMath.cos(FastMath.toRadians(lat));
+        double radiusDegreesLat = radiusMeters / metersPerDegreeLat;
+        double radiusDegreesLon = radiusDegreesLat * cosLat;
+        Envelope envelope = new Envelope(lon, lon, lat, lat);
+        envelope.expandBy(radiusDegreesLon, radiusDegreesLat);
+        double squaredRadiusDegreesLat = radiusDegreesLat * radiusDegreesLat;
+
+        // Index query result can include false positives
+        TIntSet candidateVertices = spatialIndex.query(envelope);
+        TIntList nearby = new TIntArrayList();
+        TIntIterator vertexIterator = candidateVertices.iterator();
+        while (vertexIterator.hasNext()) {
+            int v = vertexIterator.next();
+            StreetIntersection intersection = vertices.get(v);
+            double dx = intersection.getLon() - lon;
+            double dy = intersection.getLat() - lat;
+            dx *= cosLat;
+            double squaredDistanceDegreesLat = dx * dx + dy * dy;
+            if (squaredDistanceDegreesLat <= squaredRadiusDegreesLat) {
+                LOG.info("Intersection {} at {} meters.", v,
+                        (int)(FastMath.sqrt(squaredDistanceDegreesLat) * metersPerDegreeLat));
+                nearby.add(v);
+            }
+        }
+        return nearby;
     }
 
 }

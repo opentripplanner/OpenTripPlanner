@@ -8,6 +8,10 @@ import org.opentripplanner.streets.StreetRouter.State;
  */
 public class StreetSegment extends FSTStruct {
 
+    // Maybe reserve the first 4-5 bits (or a whole byte, and 16 bits for flags) for mutually exclusive edge types.
+    // Maybe we should have trunk, secondary, tertiary, residential etc. as types 0...6
+    // SIDEWALK(1),     CROSSING(2),     ROUNDABOUT(3),     ELEVATOR(4),     STAIRS(5),     PLATFORM(6),
+
     public static enum Flag {
         BACKWARD(0), // This edge's geometry should be interpreted backward
         BIKE_PATH(1),
@@ -20,6 +24,8 @@ public class StreetSegment extends FSTStruct {
         BOGUS_NAME(8),
         NO_THRU_TRAFFIC(9),
         SLOPE_OVERRIDE(10),
+        TRANSIT_LINK(11), // This edge is a one-way connection from a street to a transit stop. Target is a transit stop index, not an intersection index.
+        // Permissions
         ALLOWS_PEDESTRIAN(16),
         ALLOWS_BIKE(17),
         ALLOWS_CAR(18),
