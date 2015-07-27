@@ -67,6 +67,9 @@ public class StreetLayer implements Serializable {
     StructArray<StreetSegment> edges;
     StructArray<StreetIntersection> vertices;
 
+    transient Histogram edgesPerWayHistogram = new Histogram("Number of edges per way per direction");
+    transient Histogram pointsPerEdgeHistogram = new Histogram("Number of geometry points per edge");
+
     // We can't record the vertex coordinates here yet because we don't know how many vertices there are
     // and therefore cannot allocate storage for them.
     private void registerIntersection (long osmNodeId) {
@@ -105,16 +108,21 @@ public class StreetLayer implements Serializable {
             if (!way.hasTag("highway")) {
                 continue;
             }
+            int nEdgesCreated = 0;
             int beginIdx = 0;
             for (int n = 1; n < way.nodes.length; n++) {
                 if (osm.intersectionNodes.contains(way.nodes[n]) || n == (way.nodes.length - 1)) {
                     makeEdge(osm, way, beginIdx, n);
+                    nEdgesCreated += 1;
                     beginIdx = n;
                 }
             }
+            edgesPerWayHistogram.add(nEdgesCreated);
         }
         LOG.info("Done making street edges.");
         LOG.info("Made {} edges and {} vertices.", nEdges, nVertices);
+        edgesPerWayHistogram.display();
+        pointsPerEdgeHistogram.display();
         vertexIndexForOsmNode = null; // not needed at this point
     }
 
@@ -161,7 +169,6 @@ public class StreetLayer implements Serializable {
         long beginOsmNodeId = way.nodes[beginIdx];
         long endOsmNodeId = way.nodes[endIdx];
 
-        // Getting a vertex index will create edge lists as needed.
         int beginVertexIndex = vertexIndexForOsmNode.get(beginOsmNodeId);
         int endVertexIndex = vertexIndexForOsmNode.get(endOsmNodeId);
 
@@ -175,6 +182,7 @@ public class StreetLayer implements Serializable {
                     prevNode.getLat(), prevNode.getLon(), node.getLat(), node.getLon());
             prevNode = node;
         }
+        pointsPerEdgeHistogram.add(endIdx - beginIdx + 1);
         if (lengthMeters * 1000 > Integer.MAX_VALUE) {
             LOG.warn("Street segment was too long, skipping.");
             return;
@@ -210,11 +218,14 @@ public class StreetLayer implements Serializable {
         osm.close();
         // streetLayer.dump();
         streetLayer.buildEdgeLists();
+        // Round-trip serialize the street layer
         try {
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("test.out"));
             streetLayer.write(outputStream);
+            outputStream.close();
             InputStream inputStream = new BufferedInputStream(new FileInputStream("test.out"));
             streetLayer = StreetLayer.read(inputStream);
+            inputStream.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -222,23 +233,8 @@ public class StreetLayer implements Serializable {
         streetLayer.testRouting(true);
     }
 
-    private void edgeListHistogram() {
-        int[] histogram = new int[10];
-        for (TIntList edgeList : outgoingEdges) {
-            int nEdges = edgeList.size();
-            if (nEdges >= histogram.length) {
-                continue;
-            }
-            histogram[nEdges] += 1;
-        }
-        LOG.info ("Histogram of edge count per vertex:");
-        for (int i = 0; i < histogram.length; i++) {
-            LOG.info ("{} edges: {}", i, histogram[i]);
-        }
-    }
-
     public void testRouting (boolean withDestinations) {
-        LOG.info("Routing from every vertex in the graph...");
+        LOG.info("Routing from random vertices in the graph...");
         LOG.info("{} goal direction.", withDestinations ? "Using" : "Not using");
         StreetRouter router = new StreetRouter(this);
         long startTime = System.currentTimeMillis();
@@ -280,6 +276,15 @@ public class StreetLayer implements Serializable {
             e += 1;
         }
         LOG.info("Done building edge lists.");
+        // Display histogram of edge list sizes
+        Histogram edgesPerListHistogram = new Histogram("Number of edges per edge list");
+        for (TIntList edgeList : outgoingEdges) {
+            edgesPerListHistogram.add(edgeList.size());
+        }
+        for (TIntList edgeList : incomingEdges) {
+            edgesPerListHistogram.add(edgeList.size());
+        }
+        edgesPerListHistogram.display();
     }
 
     public static StreetLayer read (InputStream stream) throws Exception {
