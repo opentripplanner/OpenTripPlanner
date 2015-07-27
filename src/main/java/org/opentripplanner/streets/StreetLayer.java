@@ -1,5 +1,6 @@
 package org.opentripplanner.streets;
 
+import com.conveyal.gtfs.model.Stop;
 import com.conveyal.osmlib.Node;
 import com.conveyal.osmlib.OSM;
 import com.conveyal.osmlib.Way;
@@ -252,7 +253,15 @@ public class StreetLayer implements Serializable {
         // Try linking to transit.
         String gtfsSourceFile = args[1];
         TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
-        transitLayer.findStreets(streetLayer);
+        streetLayer.findStreets(transitLayer);
+    }
+
+    public void findStreets(TransitLayer transitLayer) {
+        int s = 0;
+        for (Stop stop : transitLayer.stops) {
+            linkNearestIntersection(s, stop.stop_lat, stop.stop_lon, 300);
+            s++;
+        }
     }
 
     public void testRouting (boolean withDestinations) {
@@ -327,7 +336,8 @@ public class StreetLayer implements Serializable {
         LOG.info("Done writing.");
     }
 
-    public TIntList findNearbyIntersections (double lat, double lon, double radiusMeters) {
+    public void linkNearestIntersection (int stopIndex, double lat, double lon, double radiusMeters) {
+
         final double metersPerDegreeLat = 111111.111;
         double cosLat = FastMath.cos(FastMath.toRadians(lat));
         double radiusDegreesLat = radiusMeters / metersPerDegreeLat;
@@ -338,7 +348,8 @@ public class StreetLayer implements Serializable {
 
         // Index query result can include false positives
         TIntSet candidateVertices = spatialIndex.query(envelope);
-        TIntList nearby = new TIntArrayList();
+        int closestVertex = -1;
+        double closestDistance = Double.POSITIVE_INFINITY;
         TIntIterator vertexIterator = candidateVertices.iterator();
         while (vertexIterator.hasNext()) {
             int v = vertexIterator.next();
@@ -348,12 +359,24 @@ public class StreetLayer implements Serializable {
             dx *= cosLat;
             double squaredDistanceDegreesLat = dx * dx + dy * dy;
             if (squaredDistanceDegreesLat <= squaredRadiusDegreesLat) {
-                LOG.info("Intersection {} at {} meters.", v,
-                        (int)(FastMath.sqrt(squaredDistanceDegreesLat) * metersPerDegreeLat));
-                nearby.add(v);
+                if (squaredDistanceDegreesLat < closestDistance) {
+                    closestVertex = v;
+                    closestDistance = squaredDistanceDegreesLat;
+                }
             }
         }
-        return nearby;
+        if (closestVertex >= 0) {
+            closestDistance = FastMath.sqrt(closestDistance) * metersPerDegreeLat;
+            int edgeId = nEdges++;
+            StreetSegment segment = edges.get(edgeId);
+            segment.setFlag(StreetSegment.Flag.TRANSIT_LINK);
+            segment.setFromVertex(closestVertex);
+            segment.setToVertex(stopIndex);
+            // Special edge type:
+            // The same edge is inserted in both incoming and outgoing lists of the source layer (streets).
+            outgoingEdges.get(closestVertex).add(edgeId);
+            incomingEdges.get(closestVertex).add(edgeId);
+        }
     }
 
 }
