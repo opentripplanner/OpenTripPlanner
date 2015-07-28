@@ -7,8 +7,6 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.streets.structs.StreetIntersection;
-import org.opentripplanner.streets.structs.StreetSegment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,19 +30,22 @@ public class StreetRouter {
 
     private StreetLayer streetLayer;
 
-    public int distanceLimitMeters = 1_000;
+    private TransitLayer transitLayer;
+
+    public int distanceLimitMeters = 2_000;
 
     TIntObjectMap<State> bestStates = new TIntObjectHashMap<>();
 
     BinHeap<State> queue = new BinHeap<>();
 
-    public StreetRouter (StreetLayer streetLayer) {
-        this.streetLayer = streetLayer;
-    }
-
     boolean goalDirection = false;
 
     double targetLat, targetLon; // for goal direction heuristic
+
+    public StreetRouter (StreetLayer streetLayer, TransitLayer transitLayer) {
+        this.streetLayer = streetLayer;
+        this.transitLayer = transitLayer;
+    }
 
     public void route (int fromVertex, int toVertex) {
         long startTime = System.currentTimeMillis();
@@ -69,10 +70,11 @@ public class StreetRouter {
 
         if (toVertex > 0) {
             goalDirection = true;
-            StreetIntersection intersection = streetLayer.vertices.get(toVertex);
-            targetLat = intersection.getLat();
-            targetLon = intersection.getLon();
+            VertexStore.Vertex vertex = streetLayer.vertexStore.getCursor(toVertex);
+            targetLat = vertex.getLat();
+            targetLon = vertex.getLon();
         }
+        EdgeStore.Edge edge = streetLayer.edgeStore.getCursor();
         while (!queue.empty()) {
             State s0 = queue.extract_min();
             if (bestStates.get(s0.vertex) != s0) {
@@ -84,24 +86,24 @@ public class StreetRouter {
                 break;
             }
             if (DEBUG_OUTPUT) {
-                StreetIntersection intersection = streetLayer.vertices.get(v0);
-                printStream.printf("%f,%f,%d\n", intersection.getLat(), intersection.getLon(), s0.weight);
+                VertexStore.Vertex vertex = streetLayer.vertexStore.getCursor(v0);
+                printStream.printf("%f,%f,%d\n", vertex.getLat(), vertex.getLon(), s0.weight);
             }
             TIntList edgeList = streetLayer.outgoingEdges.get(v0);
             TIntIterator edgeIterator = edgeList.iterator();
             while (edgeIterator.hasNext()) {
                 int edgeIndex = edgeIterator.next();
-                StreetSegment segment = streetLayer.edges.get(edgeIndex);
-                State s1 = segment.traverse(s0, edgeIndex);
+                edge.seek(edgeIndex);
+                State s1 = edge.traverse(s0);
                 if (!goalDirection && s1.weight > distanceLimitMeters) {
                     continue;
                 }
-                if (segment.getFlag(StreetSegment.Flag.TRANSIT_LINK)) {
+                if (edge.getFlag(EdgeStore.Flag.TRANSIT_LINK)) {
                     // Links are a special case: the toVertex is always a stop index, not a street vertex.
                     // The first time a stop is hit is always the lowest cost.
                     int stopIndex = s1.vertex;
-                    Stop stop = streetLayer.transitLayer.stops.get(stopIndex);
-                    LOG.info("Hit stop {} ({}).", stop.stop_name, stop.stop_code);
+                    Stop stop = transitLayer.stops.get(stopIndex);
+                    // LOG.info("Hit stop {} ({}).", stop.stop_name, stop.stop_code);
                     continue;
                 }
                 State existingBest = bestStates.get(s1.vertex);
@@ -122,9 +124,9 @@ public class StreetRouter {
      * Estimate remaining weight to destination. Must be an underestimate.
      */
     private int heuristic (State s) {
-        StreetIntersection intersection = streetLayer.vertices.get(s.vertex);
-        double lat = intersection.getLat();
-        double lon = intersection.getLon();
+        VertexStore.Vertex vertex = streetLayer.vertexStore.getCursor(s.vertex);
+        double lat = vertex.getLat();
+        double lon = vertex.getLon();
         return (int)SphericalDistanceLibrary.fastDistance(lat, lon, targetLat, targetLon);
     }
 

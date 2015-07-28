@@ -1,4 +1,4 @@
-package org.opentripplanner.transit;
+package org.opentripplanner.streets;
 
 import com.conveyal.gtfs.GTFSFeed;
 import com.conveyal.gtfs.model.Stop;
