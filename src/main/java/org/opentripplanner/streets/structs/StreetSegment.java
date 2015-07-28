@@ -95,9 +95,11 @@ public class StreetSegment extends FSTStruct {
         return sb.toString();
     }
 
-    public State traverse (State s0) {
-        State s1 = new State(toVertex);
-        s1.backState = s0;
+    /**
+     * EdgeIndex is passed in because edges don't store their own index.
+     */
+    public State traverse (State s0, int edgeIndex) {
+        State s1 = new State(toVertex, edgeIndex, s0);
         s1.nextState = null;
         s1.weight = s0.weight + length_mm / 1000;
         return s1;

@@ -48,12 +48,20 @@ import java.util.Random;
  *
  * There's also https://github.com/RichardWarburton/slab
  * which seems simpler to use.
+ *
+ * TODO TRY A COLUMN STORE - is it really any slower? What if it's spatially sorted?
+ * Define a EdgeCursor object that moves to a given location. Cursor.seek() .setFlag() etc.
+ *
+ * TODO Morton-code-sort vertices, then sort edges by from-vertex.
  */
 public class StreetLayer implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreetLayer.class);
 
     private static int DEFAULT_SPEED_KPH = 50;
+
+    // Set this before loading OSM data to reserve space for linking
+    public TransitLayer transitLayer;
 
     // Edge lists should be constructed after the fact from edges. This minimizes serialized size too.
     transient List<TIntList> outgoingEdges;
@@ -134,6 +142,10 @@ public class StreetLayer implements Serializable {
      * You can't embed outgoing edges in the vertices themselves, that doesn't work when looking
      * for incoming edges (unless you duplicate every edge twice). And it's kind of messy for
      * street matching, live updates of speeds etc.
+     *
+     * FST StructArrays are fixed-size, which means at least for now we need to pre-reserve enough space for any
+     * non-OSM edges that will be added. Then again, auto-enlarging them would involve temporarily having 2x the
+     * memory allocated during the copy. We could extend in chunks.
      */
     private void countAndAllocate(OSM osm) {
         LOG.info("Counting edges before allocating storage...");
@@ -158,14 +170,16 @@ public class StreetLayer implements Serializable {
         }
         int nVertices = vertexIndexForOsmNode.size();
         LOG.info("Allocating storage for {} vertices and {} edges.", nVertices, nEdges);
-        // FSTStructAllocator structAllocator = new FSTStructAllocator(1024 * 1024);
-        // Using the off-heap allocator speeds up execution by about 25%.
-        FSTStructAllocator structAllocator = new FSTStructAllocator(1024 * 1024, new MallocBytezAllocator());
-        edges = structAllocator.newArray(nEdges, new StreetSegment());
-        vertices = structAllocator.newArray(nVertices, new StreetIntersection());
-    }
+        // Reserve some space for edge growth during transit linking.
+        int nTransitLinkVertices = transitLayer.stops.size(); // one splitter vertex per transit stop.
+        int nTransitLinkEdges = transitLayer.stops.size() * 3; // one linking edge and two splitter edges per transit stop.
 
-    // TODO Morton-code-sort vertices, then sort edges by from-vertex.
+        // Using the off-heap MallocBytezAllocator allocator speeds up execution by about 25%.
+        // FSTStructAllocator structAllocator = new FSTStructAllocator(1024 * 1024);
+        FSTStructAllocator structAllocator = new FSTStructAllocator(1024 * 1024, new MallocBytezAllocator());
+        edges = structAllocator.newArray(nEdges + nTransitLinkEdges, new StreetSegment());
+        vertices = structAllocator.newArray(nVertices + nTransitLinkVertices, new StreetIntersection());
+    }
 
     private void makeEdge (OSM osm, Way way, int beginIdx, int endIdx) {
 
@@ -224,16 +238,24 @@ public class StreetLayer implements Serializable {
     }
 
     public static void main (String[] args) {
+
+        // Load transit data so we know how much space to reserve for linking.
+        String gtfsSourceFile = args[1];
+        TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
+
+        // Load OSM data
         String osmSourceFile = args[0];
         OSM osm = new OSM(null);
         osm.intersectionDetection = true;
         osm.readFromFile(osmSourceFile);
         StreetLayer streetLayer = new StreetLayer();
+        streetLayer.transitLayer = transitLayer;
         streetLayer.loadFromOsm(osm);
         osm.close();
         // streetLayer.dump();
         streetLayer.buildEdgeLists();
         streetLayer.indexStreets();
+        streetLayer.linkTransitStops();
 
         // Round-trip serialize the street layer and test its speed
 //        try {
@@ -246,22 +268,20 @@ public class StreetLayer implements Serializable {
 //        } catch (Exception e) {
 //            throw new RuntimeException(e);
 //        }
-//        streetLayer.testRouting(false);
+        streetLayer.testRouting(false);
 //        streetLayer.testRouting(true);
 
 
-        // Try linking to transit.
-        String gtfsSourceFile = args[1];
-        TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
-        streetLayer.findStreets(transitLayer);
     }
 
-    public void findStreets(TransitLayer transitLayer) {
+    public void linkTransitStops () {
+        LOG.info("Linking transit stops to streets...");
         int s = 0;
         for (Stop stop : transitLayer.stops) {
             linkNearestIntersection(s, stop.stop_lat, stop.stop_lon, 300);
             s++;
         }
+        LOG.info("Done linking transit stops to streets.");
     }
 
     public void testRouting (boolean withDestinations) {
@@ -269,12 +289,14 @@ public class StreetLayer implements Serializable {
         LOG.info("{} goal direction.", withDestinations ? "Using" : "Not using");
         StreetRouter router = new StreetRouter(this);
         long startTime = System.currentTimeMillis();
-        final int N = 1_000;
+        final int N = 1_500;
         final int nVertices = outgoingEdges.size();
         Random random = new Random();
         for (int n = 0; n < N; n++) {
             int from = random.nextInt(nVertices);
             int to = withDestinations ? random.nextInt(nVertices) : StreetRouter.ALL_VERTICES;
+            StreetIntersection intersection = vertices.get(from);
+            LOG.info("Routing from ({}, {}).", intersection.getLat(), intersection.getLon());
             router.route(from, to);
             if (n != 0 && n % 100 == 0) {
                 LOG.info("    {}/{} searches", n, N);
@@ -372,10 +394,12 @@ public class StreetLayer implements Serializable {
             segment.setFlag(StreetSegment.Flag.TRANSIT_LINK);
             segment.setFromVertex(closestVertex);
             segment.setToVertex(stopIndex);
+            segment.setLength(closestDistance);
             // Special edge type:
             // The same edge is inserted in both incoming and outgoing lists of the source layer (streets).
             outgoingEdges.get(closestVertex).add(edgeId);
             incomingEdges.get(closestVertex).add(edgeId);
+            // LOG.info("Linked stop {} to street vertex {} at {} meters.", stopIndex, closestVertex, (int)closestDistance);
         }
     }
 

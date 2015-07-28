@@ -1,5 +1,6 @@
 package org.opentripplanner.streets;
 
+import com.conveyal.gtfs.model.Stop;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.map.TIntObjectMap;
@@ -31,7 +32,7 @@ public class StreetRouter {
 
     private StreetLayer streetLayer;
 
-    public int distanceLimitMeters = 5_000;
+    public int distanceLimitMeters = 1_000;
 
     TIntObjectMap<State> bestStates = new TIntObjectHashMap<>();
 
@@ -49,7 +50,7 @@ public class StreetRouter {
         long startTime = System.currentTimeMillis();
         bestStates.clear();
         queue.reset();
-        State startState = new State(fromVertex);
+        State startState = new State(fromVertex, -1, null);
         bestStates.put(fromVertex, startState);
         queue.insert(startState, 0);
 
@@ -91,8 +92,16 @@ public class StreetRouter {
             while (edgeIterator.hasNext()) {
                 int edgeIndex = edgeIterator.next();
                 StreetSegment segment = streetLayer.edges.get(edgeIndex);
-                State s1 = segment.traverse(s0);
+                State s1 = segment.traverse(s0, edgeIndex);
                 if (!goalDirection && s1.weight > distanceLimitMeters) {
+                    continue;
+                }
+                if (segment.getFlag(StreetSegment.Flag.TRANSIT_LINK)) {
+                    // Links are a special case: the toVertex is always a stop index, not a street vertex.
+                    // The first time a stop is hit is always the lowest cost.
+                    int stopIndex = s1.vertex;
+                    Stop stop = streetLayer.transitLayer.stops.get(stopIndex);
+                    LOG.info("Hit stop {} ({}).", stop.stop_name, stop.stop_code);
                     continue;
                 }
                 State existingBest = bestStates.get(s1.vertex);
@@ -122,10 +131,13 @@ public class StreetRouter {
     public static class State implements Cloneable {
         public int vertex;
         public int weight;
+        public int backEdge;
         public State backState; // previous state in the path chain
         public State nextState; // for multiple states at the same location
-        public State (int vertex) {
-            this.vertex = vertex;
+        public State (int atVertex, int viaEdge, State backState) {
+            this.vertex = atVertex;
+            this.backEdge = viaEdge;
+            this.backState = backState;
         }
     }
 
