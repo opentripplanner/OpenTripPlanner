@@ -16,6 +16,7 @@ package org.opentripplanner.api.model;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -33,6 +34,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.TravelOption;
+import org.opentripplanner.util.TravelOptionsMaker;
 import org.opentripplanner.util.WorldEnvelope;
 
 @XmlRootElement(name = "RouterInfo")
@@ -61,6 +64,8 @@ public class RouterInfo {
 
     public boolean hasParkRide;
 
+    public List<TravelOption> travelOptions;
+
 
     public RouterInfo(String routerId, Graph graph) {
         this.routerId = routerId;
@@ -71,6 +76,7 @@ public class RouterInfo {
         addCenter(graph.getCenter());
         service = graph.getService(BikeRentalStationService.class, false);
         hasParkRide = graph.hasParkRide;
+        travelOptions = TravelOptionsMaker.makeOptions(graph);
     }
 
     public boolean getHasBikeSharing() {
