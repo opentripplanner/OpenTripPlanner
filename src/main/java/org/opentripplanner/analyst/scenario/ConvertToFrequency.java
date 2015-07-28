@@ -2,12 +2,14 @@ package org.opentripplanner.analyst.scenario;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.primitives.Ints;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.profile.RaptorWorkerTimetable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -24,6 +26,8 @@ import java.util.stream.Stream;
  * Convert scheduled trips to frequencies. Will partition trips by service day.
  */
 public class ConvertToFrequency extends Modification {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOG = LoggerFactory.getLogger(ConvertToFrequency.class);
 
     public List<TripTimes> scheduledTrips = new ArrayList<>();
@@ -44,7 +48,7 @@ public class ConvertToFrequency extends Modification {
     /** How to group trips for conversion to frequencies: by route, route and direction, or by trip pattern. */
     public ConversionGroup groupBy;
 
-    public void apply (List<FrequencyEntry> frequencyEntries, List<TripTimes> scheduledTrips, Graph graph, BitSet servicesRunning) {
+    public void apply (List<FrequencyEntry> frequencyEntries, List<TripTimes> scheduledTrips, Graph graph, BitSet servicesRunning, RaptorWorkerTimetable.BoardingAssumption assumption) {
         // preserve existing frequency entries
         this.frequencyEntries.addAll(frequencyEntries);
 
@@ -161,22 +165,24 @@ public class ConvertToFrequency extends Modification {
             // schools)
             Arrays.sort(headway);
 
-            // median time between vehicles, seconds
-            int median;
-
-            if (headway.length == 1)
-                median = headway[0];
-            else if (headway.length % 2 == 0)
-                median = (headway[(headway.length - 1) / 2] + headway[(headway.length - 1) / 2 + 1]) / 2;
-            else
-                median = headway[(headway.length - 1) / 2];
-
-            if (median < 60) {
-                LOG.info("Median headway less than 1 minute; setting to one minute");
-                median = 60;
+            // the headway that we will use
+            int aggregateHeadway;
+            if (assumption == RaptorWorkerTimetable.BoardingAssumption.WORST_CASE)
+                // simple: worst case analysis should use the worst case headway
+                aggregateHeadway = Ints.max(headway);
+            else {
+                // we want the average headway, but we we want the average of the headways weighted
+                // by themselves as if there is a two minute headway then a twenty-minute headway,
+                // customers are ten times as likely to experience the twenty minute headway
+                // (we want the average from the user's perspective, not the vehicle's perspective)
+                // This is a weighted average where the weight is the same as the headway so it simiplifies
+                // to sum (headway^2) / sum(headway)
+                aggregateHeadway =
+                        IntStream.of(headway).map(h -> h * h).sum() /
+                                IntStream.of(headway).sum();
             }
 
-            LOG.info("Headway for route {} ({}) in direction {}: {}min", tripPattern.route.getShortName(), tripPattern.route.getId().getId(), tripPattern.directionId, median / 60);
+            LOG.info("Headway for route {} ({}) in direction {}: {}min", tripPattern.route.getShortName(), tripPattern.route.getId().getId(), tripPattern.directionId, aggregateHeadway / 60);
 
             // figure out running/dwell times based on the trips on this pattern
             final TripPattern chosenTp = tripPattern;
@@ -227,7 +233,7 @@ public class ConvertToFrequency extends Modification {
                     cumulative += meanHopTimes[i];
             }
 
-            FrequencyEntry fe = new FrequencyEntry(windowStart - 60 * 60 * 3, windowEnd, median, false, tt);
+            FrequencyEntry fe = new FrequencyEntry(windowStart - 60 * 60 * 3, windowEnd, aggregateHeadway, false, tt);
             this.frequencyEntries.add(fe);
         }
     }

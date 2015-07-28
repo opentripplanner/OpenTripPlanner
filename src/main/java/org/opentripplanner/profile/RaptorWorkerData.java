@@ -18,10 +18,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.cluster.TaskStatistics;
-import org.opentripplanner.analyst.scenario.AddTripPattern;
-import org.opentripplanner.analyst.scenario.ConvertToFrequency;
-import org.opentripplanner.analyst.scenario.Scenario;
-import org.opentripplanner.analyst.scenario.TripPatternFilter;
+import org.opentripplanner.analyst.scenario.*;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -78,6 +75,15 @@ public class RaptorWorkerData implements Serializable {
      */
     public TObjectIntMap<AddTripPattern.TemporaryStop> addedStops = new TObjectIntHashMap<AddTripPattern.TemporaryStop>();
 
+    /** Some stops may have special transfer rules. They are stored here. */
+    public TIntObjectMap<List<TransferRule>> transferRules = new TIntObjectHashMap<>();
+
+    /** The transfer rules to be applied in the absence of another transfer rule */
+    public List<TransferRule> baseTransferRules = new ArrayList<>();
+
+    /** The boarding assumption used for initial vehicle boarding, and for when there is no transfer rule defined */
+    public RaptorWorkerTimetable.BoardingAssumption boardingAssumption;
+
     /**
      * For each stop, one pair of ints (targetID, distanceMeters) for each destination near that stop.
      * For generic TimeSurfaces these are street intersections. They could be anything though since the worker doesn't
@@ -92,20 +98,22 @@ public class RaptorWorkerData implements Serializable {
     public transient final List<String> patternNames = new ArrayList<>();
 
     /** Create RaptorWorkerData for the given window and graph */
-    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario, TaskStatistics ts) {
-        this(graph, window, scenario, null, ts);
+    public RaptorWorkerData (Graph graph, TimeWindow window, ProfileRequest request, TaskStatistics ts) {
+        this(graph, window, request, null, ts);
     }
 
-    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario, SampleSet sampleSet) {
-        this(graph, window, scenario, sampleSet, new TaskStatistics());
+    public RaptorWorkerData (Graph graph, TimeWindow window, ProfileRequest request, SampleSet sampleSet) {
+        this(graph, window, request, sampleSet, new TaskStatistics());
     }
 
-    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario) {
-        this (graph, window, scenario, null, new TaskStatistics());
+    public RaptorWorkerData (Graph graph, TimeWindow window, ProfileRequest request) {
+        this (graph, window, request, null, new TaskStatistics());
     }
 
     /** Create RaptorWorkerData to be used to build ResultSets directly without creating an intermediate SampleSet */
-    public RaptorWorkerData (Graph graph, TimeWindow window, Scenario scenario, SampleSet sampleSet, TaskStatistics ts) {
+    public RaptorWorkerData (Graph graph, TimeWindow window, ProfileRequest req, SampleSet sampleSet, TaskStatistics ts) {
+        Scenario scenario = req.scenario;
+
         int totalPatterns = graph.index.patternForId.size();
         int totalStops = graph.index.stopForId.size();
         timetablesForPattern = new ArrayList<RaptorWorkerTimetable>(totalPatterns);
@@ -113,6 +121,8 @@ public class RaptorWorkerData implements Serializable {
         TObjectIntMap<TripPattern> indexForPattern = new TObjectIntHashMap<>(totalPatterns, 0.75f, -1);
         indexForStop = new TIntIntHashMap(totalStops, 0.75f, Integer.MIN_VALUE, -1);
         TIntList stopForIndex = new TIntArrayList(totalStops, Integer.MIN_VALUE);
+
+        this.boardingAssumption = req.boardingAssumption;
 
         ts.patternCount = 0;
         ts.frequencyEntryCount = 0;
@@ -141,7 +151,7 @@ public class RaptorWorkerData implements Serializable {
                         .collect(Collectors.toList());
 
                 for (ConvertToFrequency c : frequencies) {
-                    c.apply(frequencyEntries, scheduled, graph, window.servicesRunning);
+                    c.apply(frequencyEntries, scheduled, graph, window.servicesRunning, req.boardingAssumption);
                     scheduled = c.scheduledTrips;
                     frequencyEntries = c.frequencyEntries;
                 }
@@ -204,6 +214,9 @@ public class RaptorWorkerData implements Serializable {
                     // Pattern is not running during the time window
                     continue;
                 }
+
+                timetable.dataIndex = timetablesForPattern.size();
+                timetable.raptorData = this;
                 timetablesForPattern.add(timetable);
                 // Temporary bidirectional mapping between 0-based indexes and patterns
                 indexForPattern.put(pattern, patternForIndex.size());
@@ -233,6 +246,7 @@ public class RaptorWorkerData implements Serializable {
                 if (timetable == null)
                     continue;
 
+                timetable.dataIndex = timetablesForPattern.size();
                 timetablesForPattern.add(timetable);
 
                 // TODO: patternForIndex, indexForPattern
@@ -512,6 +526,32 @@ public class RaptorWorkerData implements Serializable {
             }
 
             nTargets = sampleSet.pset.capacity;
+        }
+
+        // store transfer rules by stop
+        if (scenario != null && scenario.modifications != null) {
+            for (TransferRule tr : Iterables.filter(scenario.modifications, TransferRule.class)) {
+                if (tr.stop == null) {
+                    this.baseTransferRules.add(tr);
+                }
+                else {
+                    Vertex tstop = graph.getVertex(tr.stop);
+
+                    if (tstop == null || !TransitStop.class.isInstance(tstop))
+                        LOG.warn("Transit stop not found for transfer rule with stop label {}", tr.stop);
+
+                    if (!indexForStop.containsKey(tstop.getIndex()))
+                        // this stop is not used in this time window
+                        continue;
+
+                    int index = indexForStop.get(tstop.getIndex());
+
+                    if (!transferRules.containsKey(index))
+                        transferRules.put(index, new ArrayList<>());
+
+                    transferRules.get(index).add(tr);
+                }
+            }
         }
 
         ts.stopCount = nStops = stopForIndex.size();

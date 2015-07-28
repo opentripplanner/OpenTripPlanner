@@ -40,9 +40,35 @@ public class RaptorWorker {
     int[] timesPerStop;
     int[] bestTimes;
 
+
+    /**
+     * The previous pattern used to get to this stop, parallel to bestTimes. Used to apply transfer rules. This is conceptually
+     * similar to the "parent pointer" used in the RAPTOR paper to allow reconstructing paths. This could
+     * be used to reconstruct a path (although potentially not the one that was used to get to a particular
+     * location, as a later round may have found a faster but more-transfers way to get there). A path
+     * reconstructed this way will tbus be optimal in the earliest-arrival sense but may not have the
+     * fewest transfers; in fact, it will tend not to.
+     *
+     * Consider the case where there is a slower one-seat ride and a quicker route with a transfer
+     * to get to a transit center. At the transit center you board another vehicle. If it turns out
+     * that you still catch that vehicle at the same time regardless of which option you choose,
+     * general utility theory would suggest that you would choose the one seat ride due to a) the
+     * inconvenience of the transfer and b) the fact that most people have a smaller disutility for
+     * in-vehicle time than waiting time, especially if the waiting is exposed to the elements, etc.
+     *
+     * However, this implementation will find the more-transfers trip because it doesn't know where you're
+     * going from the transit center, whereas true RAPTOR would find both. It's not non-optimal in the
+     * earliest arrival sense, but it's also not the only optimal option.
+     *
+     * All of that said, we could reconstruct paths simply by storing one more parallel array with
+     * the index of the stop that you boarded a particular pattern at. Then we can do the typical
+     * reverse-optimization step.
+     */
+    int[] previousPatterns;
+
     /** The best times for reaching stops via transit rather than via a transfer from another stop */
     int[] bestNonTransferTimes;
-    int[] transferResults;
+
     RaptorWorkerData data;
 
     /** stops touched this round */
@@ -59,6 +85,8 @@ public class RaptorWorker {
         this.data = data;
         this.bestTimes = new int[data.nStops];
         this.bestNonTransferTimes = new int[data.nStops];
+        this.previousPatterns = new int[data.nStops];
+        Arrays.fill(previousPatterns, -1);
         allStopsTouched = new BitSet(data.nStops);
         stopsTouched = new BitSet(data.nStops);
         patternsTouched = new BitSet(data.nPatterns);
@@ -250,7 +278,7 @@ public class RaptorWorker {
                 // the time at this stop if we board a new vehicle
                 if (bestTimes[stopIndex] != UNREACHED) {
                     for (int trip = 0; trip < timetable.getFrequencyTripCount(); trip++) {
-                        int boardTime = timetable.getFrequencyDeparture(trip, stopPositionInPattern, bestTimes[stopIndex], req.boardingAssumption);
+                        int boardTime = timetable.getFrequencyDeparture(trip, stopPositionInPattern, bestTimes[stopIndex], previousPatterns[stopIndex]);
 
                         if (boardTime != -1 && boardTime < remainOnBoardTime) {
                             // make sure we board the best frequency entry at a stop
@@ -278,8 +306,10 @@ public class RaptorWorker {
                         stopsTouched.set(stopIndex);
                         allStopsTouched.set(stopIndex);
 
-                        if (bestTimes[stopIndex] > remainOnBoardTime)
+                        if (bestTimes[stopIndex] > remainOnBoardTime) {
                             bestTimes[stopIndex] = remainOnBoardTime;
+                            previousPatterns[stopIndex] = p;
+                        }
                     }
                 }
             }
@@ -309,8 +339,10 @@ public class RaptorWorker {
                         stopsTouched.set(stopIndex);
                         allStopsTouched.set(stopIndex);
 
-                        if (arrivalTime < bestTimes[stopIndex])
+                        if (arrivalTime < bestTimes[stopIndex]) {
                             bestTimes[stopIndex] = arrivalTime;
+                            previousPatterns[stopIndex] = p;
+                        }
 
                     }
 
@@ -349,6 +381,7 @@ public class RaptorWorker {
                 int toTime = fromTime + (int) (distance / req.walkSpeed);
                 if (toTime < max_time && toTime < bestTimes[toStop]) {
                     bestTimes[toStop] = toTime;
+                    previousPatterns[toStop] = previousPatterns[stop];
                     markPatternsForStop(toStop);
                 }
             }

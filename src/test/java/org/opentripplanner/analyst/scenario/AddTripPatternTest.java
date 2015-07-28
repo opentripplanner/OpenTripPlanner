@@ -58,9 +58,11 @@ public class AddTripPatternTest extends TestCase {
 
         Scenario scenario = new Scenario(0);
         scenario.modifications = Lists.newArrayList(atp);
+        ProfileRequest req = new ProfileRequest();
+        req.scenario = scenario;
+        req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
 
-        RaptorWorkerData data = new RaptorWorkerData(g, window, scenario);
-
+        RaptorWorkerData data = new RaptorWorkerData(g, window, req);
         assertEquals(5, data.nStops);
 
         // make sure we can find the stops
@@ -83,7 +85,7 @@ public class AddTripPatternTest extends TestCase {
         // starts running (dwell + headway)
         assertEquals(4 * 3600 + 600 + 30,
                 data.timetablesForPattern.get(0).getFrequencyDeparture(0, 0, 39 * 360,
-                        RaptorWorkerTimetable.BoardingAssumption.WORST_CASE));
+                        -1));
     }
 
     /** Test adding trips with a timetable rather than frequencies */
@@ -116,8 +118,11 @@ public class AddTripPatternTest extends TestCase {
 
         Scenario scenario = new Scenario(0);
         scenario.modifications = Lists.newArrayList(atp);
+        ProfileRequest req = new ProfileRequest();
+        req.scenario = scenario;
+        req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
 
-        RaptorWorkerData data = new RaptorWorkerData(g, window, scenario);
+        RaptorWorkerData data = new RaptorWorkerData(g, window, req);
 
         assertEquals(5, data.nStops);
 
@@ -164,8 +169,11 @@ public class AddTripPatternTest extends TestCase {
 
         Scenario scenario = new Scenario(0);
         scenario.modifications = Lists.newArrayList(atp, atp2);
+        ProfileRequest req = new ProfileRequest();
+        req.scenario = scenario;
+        req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
 
-        RaptorWorkerData data = new RaptorWorkerData(g, window, scenario);
+        RaptorWorkerData data = new RaptorWorkerData(g, window, req);
 
         // make sure that we have transfers a) between the new lines b) from the new lines
         // to the existing lines c) from the existing lines to the new lines
