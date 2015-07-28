@@ -31,12 +31,13 @@ public class VertexStore implements Serializable {
 
         public int index;
 
-        public Vertex (int index) {
-            this.index = index;
+        /** Must call advance() before use, e.g. while (vertex.advance()) {...} */
+        public Vertex () {
+            this (-1);
         }
 
-        public Vertex () {
-            this (-1); // must call advance() before use.
+        public Vertex (int index) {
+            this.index = index;
         }
 
         /** @return whether this cursor is still within the list (there is a vertex to read). */

@@ -204,12 +204,13 @@ public class StreetLayer implements Serializable {
         LOG.info("Done linking transit stops to streets.");
     }
 
+    /** After JIT this appears to scale almost linearly with number of cores. */
     public void testRouting (boolean withDestinations, TransitLayer transitLayer) {
         LOG.info("Routing from random vertices in the graph...");
         LOG.info("{} goal direction.", withDestinations ? "Using" : "Not using");
         StreetRouter router = new StreetRouter(this, transitLayer);
         long startTime = System.currentTimeMillis();
-        final int N = 2_000;
+        final int N = 1_000;
         final int nVertices = outgoingEdges.size();
         Random random = new Random();
         for (int n = 0; n < N; n++) {
