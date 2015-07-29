@@ -41,15 +41,10 @@ import java.util.Random;
  *
  * Any data that's not used by Analyst workers (street names and geometries for example)
  * should be optional so we can have fast-loading, small transportation network files to pass around.
- *
- * "Unfortunately, Oracle is removing Unsafe from Java 9 release"
- * "fast serialization does not rely on unsafe. If its present it makes use of it"
+ * It can even be loaded from the OSM MapDB on demand.
  *
  * There's also https://github.com/RichardWarburton/slab
  * which seems simpler to use.
- *
- * TODO TRY A COLUMN STORE - is it really any slower? What if it's spatially sorted?
- * Define a EdgeCursor object that moves to a given location. Cursor.seek() .setFlag() etc.
  *
  * TODO Morton-code-sort vertices, then sort edges by from-vertex.
  */
@@ -162,16 +157,16 @@ public class StreetLayer implements Serializable {
 
     public static void main (String[] args) {
 
-        // Load transit data and link into graph
+        // Load transit data
         String gtfsSourceFile = args[1];
         TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
 
         // Round-trip serialize the transit layer and test its speed
         try {
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("transit.otp"));
+            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("transit.layer"));
             transitLayer.write(outputStream);
             outputStream.close();
-            InputStream inputStream = new BufferedInputStream(new FileInputStream("transit.otp"));
+            InputStream inputStream = new BufferedInputStream(new FileInputStream("transit.layer"));
             transitLayer = TransitLayer.read(inputStream);
             inputStream.close();
         } catch (Exception e) {
@@ -190,14 +185,15 @@ public class StreetLayer implements Serializable {
         streetLayer.buildEdgeLists();
         streetLayer.indexStreets();
 
+        // Link transit stops to streets
         streetLayer.linkTransitStops(transitLayer);
 
         // Round-trip serialize the street layer and test its speed
         try {
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("test.out"));
+            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("streets.layer"));
             streetLayer.write(outputStream);
             outputStream.close();
-            InputStream inputStream = new BufferedInputStream(new FileInputStream("test.out"));
+            InputStream inputStream = new BufferedInputStream(new FileInputStream("streets.layer"));
             streetLayer = StreetLayer.read(inputStream);
             inputStream.close();
         } catch (Exception e) {

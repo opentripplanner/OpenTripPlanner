@@ -10,6 +10,8 @@ import java.io.Serializable;
  */
 public class VertexStore implements Serializable {
 
+    // TODO direct mm_per_fixed_degree conversion, work entirely in mm and fixed degrees.
+
     public int nVertices = 0;
     public static final double FIXED_FACTOR = 1e7; // we could just reuse the constant from osm-lib Node.
     public TIntList fixedLats;
