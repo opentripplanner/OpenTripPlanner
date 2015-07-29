@@ -1,12 +1,12 @@
 package org.opentripplanner.streets;
 
-import com.conveyal.gtfs.model.Stop;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,8 +102,6 @@ public class StreetRouter {
                     // Links are a special case: the toVertex is always a stop index, not a street vertex.
                     // The first time a stop is hit is always the lowest cost.
                     int stopIndex = s1.vertex;
-                    Stop stop = transitLayer.stops.get(stopIndex);
-                    // LOG.info("Hit stop {} ({}).", stop.stop_name, stop.stop_code);
                     continue;
                 }
                 State existingBest = bestStates.get(s1.vertex);

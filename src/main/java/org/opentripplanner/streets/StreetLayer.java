@@ -1,6 +1,5 @@
 package org.opentripplanner.streets;
 
-import com.conveyal.gtfs.model.Stop;
 import com.conveyal.osmlib.Node;
 import com.conveyal.osmlib.OSM;
 import com.conveyal.osmlib.Way;
@@ -15,6 +14,7 @@ import org.apache.commons.math3.util.FastMath;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +33,11 @@ import java.util.Random;
 
 /**
  * This stores the street layer of OTP routing data.
- * It uses FST structs.
- * https://github.com/RuedigerMoeller/fast-serialization/wiki/Structs
+ *
+ * Is is currently using a column store.
+ * An advantage of disk-backing this (FSTStructs, MapDB optimized for zero-based
+ * integer keys) would be that we can remove any logic about loading/unloading graphs.
+ * We could route over a whole continent without using much memory.
  *
  * Any data that's not used by Analyst workers (street names and geometries for example)
  * should be optional so we can have fast-loading, small transportation network files to pass around.
@@ -159,6 +162,22 @@ public class StreetLayer implements Serializable {
 
     public static void main (String[] args) {
 
+        // Load transit data and link into graph
+        String gtfsSourceFile = args[1];
+        TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
+
+        // Round-trip serialize the transit layer and test its speed
+        try {
+            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("transit.otp"));
+            transitLayer.write(outputStream);
+            outputStream.close();
+            InputStream inputStream = new BufferedInputStream(new FileInputStream("transit.otp"));
+            transitLayer = TransitLayer.read(inputStream);
+            inputStream.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         // Load OSM data
         String osmSourceFile = args[0];
         OSM osm = new OSM(null);
@@ -171,9 +190,6 @@ public class StreetLayer implements Serializable {
         streetLayer.buildEdgeLists();
         streetLayer.indexStreets();
 
-        // Load transit data and link into graph
-        String gtfsSourceFile = args[1];
-        TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
         streetLayer.linkTransitStops(transitLayer);
 
         // Round-trip serialize the street layer and test its speed
@@ -197,10 +213,11 @@ public class StreetLayer implements Serializable {
     public void linkTransitStops (TransitLayer transitLayer) {
         LOG.info("Linking transit stops to streets...");
         int s = 0;
-        for (Stop stop : transitLayer.stops) {
-            linkNearestIntersection(s, stop.stop_lat, stop.stop_lon, 300);
-            s++;
-        }
+        // FIXME
+//        for (Stop stop : transitLayer.stops) {
+//            linkNearestIntersection(s, stop.stop_lat, stop.stop_lon, 300);
+//            s++;
+//        }
         LOG.info("Done linking transit stops to streets.");
     }
 
