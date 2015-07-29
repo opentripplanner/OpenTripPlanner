@@ -159,10 +159,6 @@ public class ConvertToFrequency extends Modification {
                 headway[i - 1] = arrivalTimeArray[i] - arrivalTimeArray[i - 1];
             }
 
-            // now get the median
-            // we use the median not the mean in case there are reliever runs where one bus comes just
-            // a moment after the one before it (common on sharply peaked routes, e.g. those serving
-            // schools)
             Arrays.sort(headway);
 
             // the headway that we will use
@@ -175,7 +171,7 @@ public class ConvertToFrequency extends Modification {
                 // by themselves as if there is a two minute headway then a twenty-minute headway,
                 // customers are ten times as likely to experience the twenty minute headway
                 // (we want the average from the user's perspective, not the vehicle's perspective)
-                // This is a weighted average where the weight is the same as the headway so it simiplifies
+                // This is a weighted average where the weight is the same as the headway so it simplifies
                 // to sum (headway^2) / sum(headway)
                 aggregateHeadway =
                         IntStream.of(headway).map(h -> h * h).sum() /
@@ -233,7 +229,7 @@ public class ConvertToFrequency extends Modification {
                     cumulative += meanHopTimes[i];
             }
 
-            FrequencyEntry fe = new FrequencyEntry(windowStart - 60 * 60 * 3, windowEnd, aggregateHeadway, false, tt);
+            FrequencyEntry fe = new FrequencyEntry(windowStart - 60 * 60 * 3, windowEnd + 60 * 60 * 3, aggregateHeadway, false, tt);
             this.frequencyEntries.add(fe);
         }
     }

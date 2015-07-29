@@ -38,6 +38,8 @@ public class RaptorWorkerTimetable implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerTimetable.class);
 
+    private static final Random random = new Random();
+
     /* Times for schedule-based trips/patterns are stored in a 2D array. */
 
     int nTrips, nStops;
@@ -152,6 +154,8 @@ public class RaptorWorkerTimetable implements Serializable {
             case PROPORTION:
                 time += (int) (transferRule.waitProportion * headwaySecs[trip]);
                 break;
+            case RANDOM:
+                    time += random.nextInt(headwaySecs[trip]);
             }
         }
         else {
@@ -162,6 +166,8 @@ public class RaptorWorkerTimetable implements Serializable {
             case WORST_CASE:
                 time += headwaySecs[trip];
                 break;
+            case RANDOM:
+                time += random.nextInt(headwaySecs[trip]);
             case HALF_HEADWAY:
             default:
                 time += headwaySecs[trip] / 2;
@@ -385,6 +391,6 @@ public class RaptorWorkerTimetable implements Serializable {
 
     /** The assumptions made when boarding a frequency vehicle: best case (no wait), worst case (full headway) and half headway (in some sense the average). */
     public static enum BoardingAssumption {
-        BEST_CASE, WORST_CASE, HALF_HEADWAY, FIXED, PROPORTION
+        BEST_CASE, WORST_CASE, HALF_HEADWAY, FIXED, PROPORTION, RANDOM
     }
 }
