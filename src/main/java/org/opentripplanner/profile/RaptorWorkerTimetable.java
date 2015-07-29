@@ -168,6 +168,7 @@ public class RaptorWorkerTimetable implements Serializable {
                 break;
             case RANDOM:
                 time += random.nextInt(headwaySecs[trip]);
+                break;
             case HALF_HEADWAY:
             default:
                 time += headwaySecs[trip] / 2;
