@@ -49,6 +49,6 @@ Other access tags (such as `access=no` and `access=private` affect routing as we
 
 ### Further information
 * [General information](https://github.com/opentripplanner/OpenTripPlanner/wiki/GraphBuilder#graph-concepts)
-* [Bicylce routing](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Bicycle_routing)
+* [Bicycle routing](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Bicycle_routing)
 * [Indoor mapping](https://github.com/opentripplanner/OpenTripPlanner/wiki/Indoor-mapping)
 * [Elevators](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Elevators)
