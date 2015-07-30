@@ -131,6 +131,10 @@ public class RaptorWorker {
             if (n % 15 == 0) {
                 LOG.info("minute {}", n);
             }
+
+            // randomize all Monte Carlo offsets
+            this.data.randomizeOffsets();
+
             this.runRaptor(initialStops, departureTime);
             long beginPropagationTime = System.currentTimeMillis();
             int[] timesAtTargets = timesAtTargetsEachMinute[n];

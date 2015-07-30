@@ -616,6 +616,11 @@ public class RaptorWorkerData implements Serializable {
         return accessTimes;
     }
 
+    /** Monte Carlo searches use a draw of random offsets, one per frequency entry. Before each monte carlo round they should be randomized */
+    public void randomizeOffsets () {
+        this.timetablesForPattern.forEach(RaptorWorkerTimetable::randomizeOffsets);
+    }
+
     /** half a sample: the index in the sample set, and the distance to one of the vertices */
     private static class HalfSample {
         public HalfSample(int index, float distance) {
