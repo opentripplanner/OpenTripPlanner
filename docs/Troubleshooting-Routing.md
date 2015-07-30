@@ -33,3 +33,22 @@ A sample traversal permissions layer looks like the following
 * Grey dots vertices where edges are connected. If two edges are crossing w/o a vertice at the intersection point, users will not be able to go from one street to the other. But this can be valid in case of over/under pass for 
 example. If it's an error, it's usually caused by improperly connected OSM data (a shared OSM node is required). 
 
+## OpenStreetMap tagging
+
+### Basic Permissions 
+
+Access tags (such as bicycle/foot = yes/no/designated) can be used to override default graph-building parameters. 
+
+As a default, foot and bicycle traffic is ''not'' allowed on `highway=trunk`, `highway=trunk_link`, `highway=motorway`, `highway=motorway_link`, or `highway=construction`. 
+
+Both *are* allowed on `highway=pedestrian`, `highway=cycleway`, and `highway=footway`. 
+
+Finally, bicycles are *not*allowed on *highway=footway* when any of the following tags appear on a footway: `footway=sidewalk`, `public_transport=platform`, or `railway=platform`.
+
+Other access tags (such as `access=no` and `access=private` affect routing as well, and can be overridden similarly. While `access=no` prohibits all traffic, `access=private` disallows through traffic.
+
+### Further information
+* [General information](https://github.com/opentripplanner/OpenTripPlanner/wiki/GraphBuilder#graph-concepts)
+* [Bicylce routing](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Bicycle_routing)
+* [Indoor mapping](https://github.com/opentripplanner/OpenTripPlanner/wiki/Indoor-mapping)
+* [Elevators](http://wiki.openstreetmap.org/wiki/OpenTripPlanner#Elevators)
