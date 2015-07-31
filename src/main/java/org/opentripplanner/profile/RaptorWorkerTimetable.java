@@ -208,6 +208,16 @@ public class RaptorWorkerTimetable implements Serializable {
         return headwaySecs.length;
     }
 
+    /** Does this timetable have any frequency trips? */
+    public boolean hasFrequencyTrips () {
+        return this.headwaySecs != null && this.headwaySecs.length > 0;
+    }
+
+    /** does this timetable have any scheduled trips? */
+    public boolean hasScheduledTrips () {
+        return this.timesPerTrip != null && this.timesPerTrip.length > 0;
+    }
+
     /**
      * This is a factory function rather than a constructor to avoid calling the super constructor for rejected patterns.
      * BannedRoutes is formatted as agencyid_routeid.

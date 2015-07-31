@@ -46,6 +46,9 @@ public class RaptorWorker {
      */
     public static final int MONTE_CARLO_COUNT_PER_MINUTE = 8;
 
+    /** If there are no schedules, the number of Monte Carlo draws to take */
+    public static final int TOTAL_MONTE_CARLO_COUNT = 99;
+
     int max_time = 0;
     int round = 0;
     List<int[]> timesPerStopPerRound;
@@ -133,8 +136,21 @@ public class RaptorWorker {
 
         PropagatedTimesStore propagatedTimesStore = new PropagatedTimesStore(graph, data.nTargets);
 
-        int iterations = (req.toTime - req.fromTime - 60) / 60 + 1;
-        iterations *= MONTE_CARLO_COUNT_PER_MINUTE;
+        // optimization: if no schedules, only run Monte Carlo
+        int fromTime = req.fromTime;
+        int monteCarloDraws = MONTE_CARLO_COUNT_PER_MINUTE;
+        if (!data.hasSchedules) {
+            // only do one iteration
+            fromTime = req.toTime - 60;
+            monteCarloDraws = TOTAL_MONTE_CARLO_COUNT;
+        }
+
+        // if no frequencies, don't run Monte Carlo
+        if (!data.hasFrequencies)
+            monteCarloDraws = 1;
+
+        int iterations = (req.toTime - fromTime - 60) / 60 + 1;
+        iterations *= monteCarloDraws;
 
         ts.searchCount = iterations;
 
@@ -146,15 +162,12 @@ public class RaptorWorker {
 
         // times at targets from scheduled search
         int[] scheduledTimesAtTargets = new int[data.nTargets];
-        // We include the walk-only times to access transit in the results so that there are not increases in time
-        // to reach blocks around the origin due to being forced to ride transit.
-        // Use timesAtTargets.length not walkTimes.length due to temp vertices
-        System.arraycopy(walkTimes, 0, scheduledTimesAtTargets, 0, scheduledTimesAtTargets.length);
+        Arrays.fill(scheduledTimesAtTargets, UNREACHED);
 
         // current iteration
         int iteration = 0;
 
-        for (int departureTime = req.toTime - 60, n = 0; departureTime >= req.fromTime; departureTime -= 60, n++) {
+        for (int departureTime = req.toTime - 60, n = 0; departureTime >= fromTime; departureTime -= 60, n++) {
             if (n % 15 == 0) {
                 LOG.info("minute {}", n);
             }
@@ -163,23 +176,48 @@ public class RaptorWorker {
             this.runRaptorScheduled(initialStops, departureTime);
             this.doPropagation(bestNonTransferTimes, scheduledTimesAtTargets, departureTime);
 
+            // pop in the walk only times; we don't want to force people to ride transit instead of
+            // walking a block
+            for (int i = 0; i < scheduledTimesAtTargets.length; i++) {
+                if (walkTimes[i] != UNREACHED && walkTimes[i] + departureTime < scheduledTimesAtTargets[i])
+                    scheduledTimesAtTargets[i] = walkTimes[i] + departureTime;
+            }
+
             // run the frequency searches
-            for (int i = 0; i < MONTE_CARLO_COUNT_PER_MINUTE; i++) {
-                // use a new Monte Carlo draw each time
-                data.randomizeOffsets();
+            if (data.hasFrequencies) {
+                for (int i = 0; i < monteCarloDraws; i++) {
+                    // use a new Monte Carlo draw each time
+                    data.randomizeOffsets();
 
-                // make copies for just this search. We need copies because we can't use dynamic
-                // programming/range-raptor with randomized schedules
-                int[] bestTimesCopy = Arrays.copyOf(bestTimes, bestTimes.length);
-                int[] bestNonTransferTimesCopy = Arrays.copyOf(bestNonTransferTimes, bestNonTransferTimes.length);
-                int[] previousPatternsCopy = Arrays.copyOf(previousPatterns, previousPatterns.length);
-                this.runRaptorFrequency(departureTime, bestTimesCopy, bestNonTransferTimesCopy, previousPatternsCopy);
+                    // make copies for just this search. We need copies because we can't use dynamic
+                    // programming/range-raptor with randomized schedules
+                    int[] bestTimesCopy = Arrays.copyOf(bestTimes, bestTimes.length);
+                    int[] bestNonTransferTimesCopy = Arrays
+                            .copyOf(bestNonTransferTimes, bestNonTransferTimes.length);
+                    int[] previousPatternsCopy = Arrays
+                            .copyOf(previousPatterns, previousPatterns.length);
+                    this.runRaptorFrequency(departureTime, bestTimesCopy, bestNonTransferTimesCopy,
+                            previousPatternsCopy);
 
-                // do propagation
-                int[] frequencyTimesAtTargets = timesAtTargetsEachIteration[iteration++];
-                System.arraycopy(scheduledTimesAtTargets, 0, frequencyTimesAtTargets, 0, scheduledTimesAtTargets.length);
-                // updates timesAtTargetsEachIteration directly because it has a reference into the array.
-                this.doPropagation(bestNonTransferTimesCopy, frequencyTimesAtTargets, departureTime);
+                    // do propagation
+                    int[] frequencyTimesAtTargets = timesAtTargetsEachIteration[iteration++];
+                    System.arraycopy(scheduledTimesAtTargets, 0, frequencyTimesAtTargets, 0,
+                            scheduledTimesAtTargets.length);
+                    // updates timesAtTargetsEachIteration directly because it has a reference into the array.
+                    this.doPropagation(bestNonTransferTimesCopy, frequencyTimesAtTargets,
+                            departureTime);
+
+                    // convert to elapsed time
+                    for (int t = 0; t < frequencyTimesAtTargets.length; t++) {
+                        if (frequencyTimesAtTargets[t] != UNREACHED)
+                            frequencyTimesAtTargets[t] -= departureTime;
+                    }
+                }
+            } else {
+                final int dt = departureTime;
+                timesAtTargetsEachIteration[iteration++] = IntStream.of(scheduledTimesAtTargets)
+                        .map(i -> i != UNREACHED ? i - dt : i)
+                        .toArray();
             }
         }
         long calcTime = System.currentTimeMillis() - beginCalcTime;
@@ -249,7 +287,8 @@ public class RaptorWorker {
         // we need to mark every reachable stop here, because the network is changing randomly.
         // It is entirely possible that the first trip in an itinerary does not change, but trips
         // further down do.
-        IntStream.range(0, bestTimes.length).filter(i -> bestTimes[i] != UNREACHED).forEach(this::markPatternsForStop);
+        IntStream.range(0, bestTimes.length).filter(i -> bestTimes[i] != UNREACHED).forEach(
+                this::markPatternsForStop);
 
         // Anytime a round updates some stops, move on to another round
         while (doOneRound(bestTimes, bestNonTransferTimes, previousPatterns, true)) {
@@ -435,7 +474,6 @@ public class RaptorWorker {
             // we do not necessarily compute all pareto-optimal paths on (journey time, number of transfers).
             int baseTimeSeconds = timesAtTransitStops[s];
             if (baseTimeSeconds != UNREACHED) {
-                baseTimeSeconds -= departureTime; // convert to travel time rather than clock time
                 int[] targets = data.targetsForStop.get(s);
 
                 if (targets == null)
@@ -447,10 +485,6 @@ public class RaptorWorker {
                     // distance in meters over walk speed in meters per second --> seconds
                     int egressWalkTimeSeconds = (int) (distance / req.walkSpeed);
                     int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
-
-                    if (propagated_time < 0) {
-                        throw new RuntimeException("Reached a destination in negative time, this cannot happen!");
-                    }
 
                     if (timesAtTargets[targetIndex] > propagated_time) {
                         timesAtTargets[targetIndex] = propagated_time;

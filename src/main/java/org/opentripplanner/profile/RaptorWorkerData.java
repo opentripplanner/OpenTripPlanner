@@ -69,6 +69,12 @@ public class RaptorWorkerData implements Serializable {
 
     /** For each pattern, a 2D array of stoptimes for each trip on the pattern. */
     public List<RaptorWorkerTimetable> timetablesForPattern = new ArrayList<>();
+
+    /** does this RaptorData have any scheduled trips? */
+    public boolean hasSchedules = false;
+
+    /** does this RaptorData have any frequency trips? */
+    public boolean hasFrequencies = false;
     
     /**
      * Map from stops that do not exist in the graph but only for the duration of this search to their stop indices in the RAPTOR data.
@@ -218,6 +224,13 @@ public class RaptorWorkerData implements Serializable {
                 timetable.dataIndex = timetablesForPattern.size();
                 timetable.raptorData = this;
                 timetablesForPattern.add(timetable);
+
+                if (timetable.hasFrequencyTrips())
+                    hasFrequencies = true;
+
+                if (timetable.hasScheduledTrips())
+                    hasSchedules = true;
+
                 // Temporary bidirectional mapping between 0-based indexes and patterns
                 indexForPattern.put(pattern, patternForIndex.size());
                 patternForIndex.add(pattern);
