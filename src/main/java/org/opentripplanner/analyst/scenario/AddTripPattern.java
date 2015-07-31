@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /** Add a trip pattern */
 public class AddTripPattern extends Modification {
+    public static final long serialVersionUID = 1L;
+
     /** The name of this pattern */
     public String name;
 
