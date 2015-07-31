@@ -124,7 +124,6 @@ public class RaptorWorker {
 
     public PropagatedTimesStore runRaptor (Graph graph, TIntIntMap accessTimes, int[] walkTimes, TaskStatistics ts) {
         long beginCalcTime = System.currentTimeMillis();
-        long totalPropagationTime = 0;
         TIntIntMap initialStops = new TIntIntHashMap();
         TIntIntIterator initialIterator = accessTimes.iterator();
         while (initialIterator.hasNext()) {
@@ -483,7 +482,7 @@ public class RaptorWorker {
                     int targetIndex = targets[i++]; // increment i after read
                     int distance = targets[i]; // i will be incremented at loop end
                     // distance in meters over walk speed in meters per second --> seconds
-                    int egressWalkTimeSeconds = (int) (distance / req.walkSpeed);
+                    int egressWalkTimeSeconds = distance;//(int) (distance / req.walkSpeed);
                     int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
 
                     if (timesAtTargets[targetIndex] > propagated_time) {

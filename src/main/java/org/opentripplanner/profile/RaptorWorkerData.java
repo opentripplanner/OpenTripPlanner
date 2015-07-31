@@ -531,7 +531,8 @@ public class RaptorWorkerData implements Serializable {
                             continue;
 
                         out.add(s.index);
-                        out.add(distance);
+                        // add the _time_ to get to the stop, to avoid needing to do a floating point divide later
+                        out.add((int) (distance / req.walkSpeed));
                     }
                 }
                 // Save a flat array of (target, distance) pairs keyed on this transit stops's index in the RAPTOR table.
