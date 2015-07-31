@@ -23,7 +23,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -41,13 +43,16 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
     private static Logger LOG = LoggerFactory.getLogger(AnnotationsToHTML.class); 
 
-    //Path to output file
+    //Path to output folder
     private File outPath;
 
-    private HTMLWriter writer;
+    //Key is classname, value is annotation message
+    //Multimap because there are multiple annotations for each classname
+    private Multimap<String, String> annotations;
   
     public AnnotationsToHTML (File outpath) {
         this.outPath = outpath;
+        annotations = ArrayListMultimap.create();
     }
 
 
@@ -59,21 +64,67 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             return;
         }
 
-        try {
-            writer = new HTMLWriter(outPath);
-        } catch (FileNotFoundException ex) {
-            LOG.error("Output folder not found:{} {}", outPath, ex);
-            return;
+
+        for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
+            //writer.println("<p>" + annotation.getHTMLMessage() + "</p>");
+            // writer.println("<small>" + annotation.getClass().getSimpleName()+"</small>");
+            addAnnotation(annotation);
+
+        }
+        LOG.info("Creating Annotations log");
+
+        for (Map.Entry<String, Collection<String>> entry : annotations.asMap().entrySet()) {
+            LOG.info("Key: {} ({})", entry.getKey(), entry.getValue().size());
+
+            try {
+                HTMLWriter file_writer = new HTMLWriter(entry.getKey(), entry.getValue());
+                file_writer.writeFile();
+
+            } catch (FileNotFoundException ex) {
+                LOG.error("Output folder not found:{} {}", outPath, ex);
+                return;
+            }
         }
 
 
-        LOG.info("Creating Annotations log");
-        writer.println("<html><head><title>Graph report for " + outPath.getParentFile() + "Graph.obj</title>");
-        writer.println("\t<meta charset=\"utf-8\">");
-        writer.println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
-        writer.println("<script src='http://code.jquery.com/jquery-1.11.1.js'></script>");
-        writer.println("<link rel='stylesheet' href='http://yui.yahooapis.com/pure/0.5.0/pure-min.css'>");
-        String css = "\t\t<style>\n"
+        LOG.info("Annotated log is in {}", outPath);
+
+
+    }
+
+    @Override
+    public void checkInputs() {
+
+    }
+
+    private void addAnnotation(GraphBuilderAnnotation annotation) {
+        String className = annotation.getClass().getSimpleName();
+        annotations.put(className, annotation.getHTMLMessage());
+
+    }
+
+    class HTMLWriter {
+        private PrintStream out;
+
+        private Multimap<String, String> lannotations;
+
+        public HTMLWriter(String key, Collection<String> annotations) throws FileNotFoundException {
+            File newFile = new File(outPath, key +".html");
+            FileOutputStream fileOutputStream = new FileOutputStream(newFile);
+            this.out = new PrintStream(fileOutputStream);
+            lannotations = ArrayListMultimap.create();
+            lannotations.putAll(key, annotations);
+        }
+
+        private void writeFile() {
+            println("<html><head><title>Graph report for " + outPath.getParentFile()
+                + "Graph.obj</title>");
+            println("\t<meta charset=\"utf-8\">");
+            println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
+            println("<script src='http://code.jquery.com/jquery-1.11.1.js'></script>");
+            println(
+                "<link rel='stylesheet' href='http://yui.yahooapis.com/pure/0.5.0/pure-min.css'>");
+            String css = "\t\t<style>\n"
                 + "\n"
                 + "\t\t\tbutton.pure-button {\n"
                 + "\t\t\t\tmargin:5px;\n"
@@ -109,22 +160,18 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 + "\n"
                 + "\t\t</style>\n"
                 + "";
-        writer.println(css);
-        writer.println("</head><body>");
-        writer.println("<h1>OpenTripPlanner annotations log</h1>");
-        writer.println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
-        writer.println("<div id=\"buttons\"></div><ul id=\"log\"></ul>");
+            println(css);
+            println("</head><body>");
+            println("<h1>OpenTripPlanner annotations log</h1>");
+            println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
+            println("<div id=\"buttons\"></div><ul id=\"log\"></ul>");
 
-        for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
-            //writer.println("<p>" + annotation.getHTMLMessage() + "</p>");
-           // writer.println("<small>" + annotation.getClass().getSimpleName()+"</small>");
-            writer.addAnnotation(annotation);
 
-        }
-        
-        writer.println("\t<script>");
-        writer.writeJson();
-        String js = "\t\tvar selected = {};\n"
+
+            println("\t<script>");
+
+            writeJson();
+            String js = "\t\tvar selected = {};\n"
                 + "\n"
                 + "\t\t//select/deselects filters and correctly styles buttons\n"
                 + "\t\tfunction refilter(item) {\n"
@@ -169,36 +216,12 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 + "\n"
                 + "\t\tresetView();\n"
                 + "";
-        writer.println(js);
-        writer.println("\t</script>");
-        
-        writer.println("</body></html>");
+            println(js);
+            println("\t</script>");
 
-        LOG.info("Annotated log is in {}", outPath);
+            println("</body></html>");
 
-        writer.close();
-    }
-
-    @Override
-    public void checkInputs() {
-
-    }
-
-    class HTMLWriter {
-        private PrintStream out;
-        //Key is classname, value is annotation message
-        //Multimap because there are multiple annotations for each classname
-        private Multimap<String, String> annotations;
-
-        public HTMLWriter(OutputStream out) {
-            this.out = new PrintStream(out);
-            annotations = ArrayListMultimap.create();
-        }
-
-        public HTMLWriter(File filePath) throws FileNotFoundException {
-            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-            this.out = new PrintStream(fileOutputStream);
-            annotations = ArrayListMultimap.create();
+            close();
         }
 
         private void println(String bodyhtml) {
@@ -209,11 +232,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             out.close();
         }
 
-        private void addAnnotation(GraphBuilderAnnotation annotation) {
-            String className = annotation.getClass().getSimpleName();
-            annotations.put(className, annotation.getHTMLMessage());
-            
-        }
+
         
         /**
          * Generates JSON from annotations variable which is used by Javascript
@@ -226,7 +245,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(out);
                 
-                mapper.writeValue(jsonGenerator, annotations.asMap());
+                mapper.writeValue(jsonGenerator, lannotations.asMap());
                 out.println(";");
 
             } catch (IOException ex) {
