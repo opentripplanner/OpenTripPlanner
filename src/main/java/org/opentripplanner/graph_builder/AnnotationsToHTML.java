@@ -26,6 +26,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -73,12 +74,14 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         }
         LOG.info("Creating Annotations log");
 
+        Set<String> classes = annotations.keySet();
+
         for (Map.Entry<String, Collection<String>> entry : annotations.asMap().entrySet()) {
             LOG.info("Key: {} ({})", entry.getKey(), entry.getValue().size());
 
             try {
                 HTMLWriter file_writer = new HTMLWriter(entry.getKey(), entry.getValue());
-                file_writer.writeFile();
+                file_writer.writeFile(classes);
 
             } catch (FileNotFoundException ex) {
                 LOG.error("Output folder not found:{} {}", outPath, ex);
@@ -108,15 +111,18 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
         private Multimap<String, String> lannotations;
 
+        private String current_class;
+
         public HTMLWriter(String key, Collection<String> annotations) throws FileNotFoundException {
             File newFile = new File(outPath, key +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
             lannotations = ArrayListMultimap.create();
             lannotations.putAll(key, annotations);
+            current_class = key;
         }
 
-        private void writeFile() {
+        private void writeFile(Collection<String> classes) {
             println("<html><head><title>Graph report for " + outPath.getParentFile()
                 + "Graph.obj</title>");
             println("\t<meta charset=\"utf-8\">");
@@ -164,6 +170,16 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             println("</head><body>");
             println("<h1>OpenTripPlanner annotations log</h1>");
             println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
+            println("<p>");
+            //adds links to the other HTML files
+            for (String htmlAnnotationClass: classes) {
+                if (htmlAnnotationClass.equals(current_class)) {
+                    println("<span>" + htmlAnnotationClass + "</span><br />");
+                } else {
+                    println("<a href=\"" + htmlAnnotationClass + ".html\">" + htmlAnnotationClass + "</a><br />");
+                }
+            }
+            println("</p>");
             println("<div id=\"buttons\"></div><ul id=\"log\"></ul>");
 
 
