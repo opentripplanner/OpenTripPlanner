@@ -498,7 +498,7 @@ public class RaptorWorkerData implements Serializable {
             }
 
             // Iterate over all stops, saving an array of distances to samples from each stop.
-            TIntList out = new TIntArrayList();
+            TIntIntMap out = new TIntIntHashMap();
 
             for (TIntIterator stopIt = stopForIndex.iterator(); stopIt.hasNext();) {
                 out.clear();
@@ -530,13 +530,22 @@ public class RaptorWorkerData implements Serializable {
                         if (distance > stc.maxWalkMeters)
                             continue;
 
-                        out.add(s.index);
-                        // add the _time_ to get to the stop, to avoid needing to do a floating point divide later
-                        out.add((int) (distance / req.walkSpeed));
+                        int time = (int) (distance / req.walkSpeed);
+                        if (!out.containsKey(s.index) || out.get(s.index) > time)
+                            out.put(s.index, time);
                     }
                 }
                 // Save a flat array of (target, distance) pairs keyed on this transit stops's index in the RAPTOR table.
-                targetsForStop.add(out.toArray());
+                int[] flat = new int[out.size() * 2];
+
+                int pos = 0;
+                for (TIntIntIterator it = out.iterator(); it.hasNext();) {
+                    it.advance();
+                    flat[pos++] = it.key();
+                    flat[pos++] = it.value();
+                }
+
+                targetsForStop.add(flat);
             }
 
             nTargets = sampleSet.pset.capacity;
