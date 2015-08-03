@@ -47,13 +47,16 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     //Path to output folder
     private File outPath;
 
+    private int maxNumberOfAnnotationsPerFile;
+
     //Key is classname, value is annotation message
     //Multimap because there are multiple annotations for each classname
     private Multimap<String, String> annotations;
   
-    public AnnotationsToHTML (File outpath) {
+    public AnnotationsToHTML (File outpath, int maxNumberOfAnnotationsPerFile) {
         this.outPath = outpath;
         annotations = ArrayListMultimap.create();
+        this.maxNumberOfAnnotationsPerFile = maxNumberOfAnnotationsPerFile;
     }
 
 
@@ -89,19 +92,18 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         //from most used to the least
         Collections.sort(counts, (o1, o2) -> Ints.compare(o2.second, o1.second));
 
-        int current_count = 0;
+        int currentNumberOfAnnotationsPerFile = 0;
         Multimap<String, String> current_map = ArrayListMultimap.create();
         String last_added_key = null;
-        int max_count = 100;
 
-        //Annotations are grouped if the count of annotations is less then max_count
+        //Annotations are grouped if the count of annotations is less then maxNumberOfAnnotationsPerFile
         //otherwise each class of annotations is different file.
         List<HTMLWriter> writers = new ArrayList<>(annotationsMap.size());
         for (T2<String, Integer> count : counts) {
             LOG.info("Key: {} ({})", count.first, count.second);
 
-            if (current_count > max_count) {
-                LOG.info("Flush count:{}", current_count);
+            if (currentNumberOfAnnotationsPerFile > maxNumberOfAnnotationsPerFile) {
+                LOG.info("Flush count:{}", currentNumberOfAnnotationsPerFile);
                 try {
                     HTMLWriter file_writer;
                     if (current_map.keySet().size() == 1) {
@@ -121,17 +123,17 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 current_map = ArrayListMultimap.create();
                 current_map.putAll(count.first, annotationsMap.get(count.first));
                 last_added_key = count.first;
-                current_count = count.second;
+                currentNumberOfAnnotationsPerFile = count.second;
             } else {
-                LOG.info("Increasing count: {}+{}={}", current_count, count.second, current_count+count.second);
-                current_count+=count.second;
+                LOG.info("Increasing count: {}+{}={}", currentNumberOfAnnotationsPerFile, count.second, currentNumberOfAnnotationsPerFile+count.second);
+                currentNumberOfAnnotationsPerFile+=count.second;
                 current_map.putAll(count.first, annotationsMap.get(count.first));
                 last_added_key = count.first;
             }
 
         }
 
-        LOG.info("Flush last count:{}", current_count);
+        LOG.info("Flush last count:{}", currentNumberOfAnnotationsPerFile);
         try {
             HTMLWriter file_writer;
             if (current_map.keySet().size() == 1) {
