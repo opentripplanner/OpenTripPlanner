@@ -495,8 +495,11 @@ otp.modules.planner.PlannerModule =
 
             // draw the polyline
             var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
-            var weight = 8;
-            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: weight});
+            polyline.setStyle({ 
+                   color : this.getModeColor(leg.mode), 
+                   weight: otp.config.defaultTripWeight || 8,
+                   opacity: otp.config.defaultTripOpacity || 0.3
+		});
             this.pathLayer.addLayer(polyline);
             polyline.leg = leg;
             polyline.bindPopup("("+leg.routeShortName+") "+leg.routeLongName);
@@ -570,7 +573,11 @@ otp.modules.planner.PlannerModule =
     highlightLeg : function(leg) {
         if(!leg.legGeometry) return;
         var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
-        polyline.setStyle({ color : "yellow", weight: 16, opacity: 0.3 });
+        polyline.setStyle({ 
+			color : otp.config.defaultTripHighlightColor|| "yellow", 
+			weight: otp.config.defaultTripHighlightWeight || 16, 
+			opacity: otp.config.defaultTripHighlightOpacity || 1 
+		});
         this.highlightLayer.addLayer(polyline);
     },
 
@@ -603,14 +610,18 @@ otp.modules.planner.PlannerModule =
     },
 
     getModeColor : function(mode) {
-        if(mode === "WALK") return '#444';
-        if(mode === "BICYCLE") return '#0073e5';
-        if(mode === "SUBWAY") return '#f00';
-        if(mode === "RAIL") return '#b00';
-        if(mode === "BUS") return '#080';
-        if(mode === "TRAM") return '#800';
-        if(mode === "CAR") return '#444';
-        return '#aaa';
+   	if (!otp.config.defaultModeColours){
+		otp.config.defaultModeColours=[];
+	}
+
+        if(mode === "WALK") return otp.config.defaultModeColours.WALK || '#444';
+        if(mode === "BICYCLE") return otp.config.defaultModeColours.BICYCLE || '#0073e5';
+        if(mode === "SUBWAY") return otp.config.defaultModeColours.SUBWAY || '#f00';
+        if(mode === "RAIL") return otp.config.defaultModeColours.RAIL || '#b00';
+        if(mode === "BUS") return otp.config.defaultModeColours.BUS || '#080';
+        if(mode === "TRAM") return otp.config.defaultModeColours.TRAM || '#800';
+        if(mode === "CAR") return otp.config.defaultModeColours.CAR || '#FFA500';
+        return otp.config.defaultModeColours.DEFAULT || '#aaa';
     },
 
     clearTrip : function() {
