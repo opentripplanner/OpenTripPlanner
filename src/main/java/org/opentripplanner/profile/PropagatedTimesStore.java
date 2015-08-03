@@ -1,7 +1,7 @@
 package org.opentripplanner.profile;
 
-import gnu.trove.map.TIntIntMap;
-
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
@@ -9,6 +9,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Stores travel times propagated to the search targets (all vertices in the street network or a set of points of
@@ -39,7 +40,9 @@ public class PropagatedTimesStore {
 
     Graph graph;
     int size;
-    int[] mins, maxs, sums, counts;
+    int[] mins, maxs, avgs;
+
+    private static final Random random = new Random();
 
     public PropagatedTimesStore(Graph graph) {
         this(graph, Vertex.getMaxIndex());
@@ -51,70 +54,60 @@ public class PropagatedTimesStore {
         this.size = size;
         mins = new int[size];
         maxs = new int[size];
-        sums = new int[size];
-        counts = new int[size];
+        avgs = new int[size];
+        Arrays.fill(avgs, Integer.MAX_VALUE);
         Arrays.fill(mins, Integer.MAX_VALUE);
+        Arrays.fill(maxs, Integer.MAX_VALUE);
     }
 
     public void setFromArray(int[][] times) {
-        for (int i = 0; i < times.length; i++) {
-            for (int v = 0; v < times[i].length; v++) {
-                int newValue = times[i][v];
+        if (times.length == 0)
+            // nothing to do
+            return;
 
-                if (newValue == RaptorWorker.UNREACHED)
-                    continue;
+        // assume array is rectangular
+        int stops = times[0].length;
 
-                if (mins[v] > newValue) {
-                    mins[v] = newValue;
+        // loop over stops on the outside so we can bootstrap
+        STOPS: for (int stop = 0; stop < stops; stop++) {
+            // compute the average
+            int sum = 0;
+            int count = 0;
+
+            TIntList timeList = new TIntArrayList();
+
+            ITERATIONS: for (int i = 0; i < times.length; i++) {
+                if (times[i][stop] == RaptorWorker.UNREACHED)
+                    continue ITERATIONS;
+
+                sum += times[i][stop];
+                count++;
+                timeList.add(times[i][stop]);
+            }
+
+            if (count == 0)
+                continue STOPS;
+
+            avgs[stop] = sum / count;
+
+            // now bootstrap out a 95% confidence interval on the time
+            int[] bootMeans = new int[400];
+            for (int boot = 0; boot < 400; boot++) {
+                int bsum = 0;
+
+                // sample from the Monte Carlo distribution with replacement
+                for (int iter = 0; iter < count; iter++) {
+                    bsum += timeList.get(random.nextInt(count));
                 }
-                if (maxs[v] < newValue) {
-                    maxs[v] = newValue;
-                }
-                sums[v] += newValue;
-                counts[v] += 1;
-            }
-        }
-    }
 
-    /**
-     * Merge in min travel times to all targets from one raptor call, finding minimum-of-min, maximum-of-min, and
-     * average-of-min travel times.
-     */
-    public void mergeIn(int[] news) {
-        for (int i = 0; i < size; i++) {
-            int newValue = news[i];
-            if (newValue == 0) {
-                continue;
+                bootMeans[boot] = bsum / count;
             }
-            if (mins[i] > newValue) {
-                mins[i] = newValue;
-            }
-            if (maxs[i] < newValue) {
-                maxs[i] = newValue;
-            }
-            sums[i] += newValue;
-            counts[i] += 1;
-        }
-    }
 
-    /**
-     * Merge in min travel times to all targets from one raptor call, finding minimum-of-min, maximum-of-min, and
-     * average-of-min travel times.
-     */
-    public void mergeIn(TIntIntMap news) {
-        for (int i = 0; i < size; i++) {
-            int newValue = news.get(i);
-            if (newValue == 0) { // Trove default value is 0 like an array
-                continue;
-            }
-            if (mins[i] > newValue) {
-                mins[i] = newValue;
-            }
-            if (maxs[i] < newValue) {
-                maxs[i] = newValue;
-            }
-            sums[i] += newValue;
-            counts[i] += 1;
+            Arrays.sort(bootMeans);
+            // 2.5 percentile of distribution of means
+            mins[stop] = bootMeans[10];
+            // 97.5 percentile of distribution of means
+            maxs[stop] = bootMeans[390];
         }
     }
 
@@ -123,37 +116,20 @@ public class PropagatedTimesStore {
         for (Vertex vertex : graph.index.vertexForId.values()) {
             int min = mins[vertex.getIndex()];
             int max = maxs[vertex.getIndex()];
-            int sum = sums[vertex.getIndex()];
-            int count = counts[vertex.getIndex()];
-            if (count <= 0)
+            int avg = avgs[vertex.getIndex()];
+
+            if (avg == Integer.MAX_VALUE)
                 continue;
             // Count is positive, extrema and sum must also be present
             rangeSet.min.times.put(vertex, min);
             rangeSet.max.times.put(vertex, max);
-            rangeSet.avg.times.put(vertex, sum / count);
+            rangeSet.avg.times.put(vertex, avg);
         }
     }
 
     /** Make a ResultSet directly given a sample set (must have constructed RaptorWorkerData from the same sampleset) */
     public ResultSet.RangeSet makeResults(SampleSet ss, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         ResultSet.RangeSet ret = new ResultSet.RangeSet();
-
-        int[] avgs = new int[sums.length];
-
-        for (int i = 0; i < ss.pset.capacity; i++) {
-            int sum = sums[i];
-            int count = counts[i];
-
-            // Note: this is destructive
-            if (count <= 0) {
-                mins[i] = Integer.MAX_VALUE;
-                maxs[i] = Integer.MAX_VALUE;
-                avgs[i] = Integer.MAX_VALUE;
-            }
-            else {
-                avgs[i] = sum / count;
-            }
-        }
 
         ret.min = new ResultSet(mins, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         ret.avg = new ResultSet(avgs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
