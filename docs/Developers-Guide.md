@@ -94,26 +94,6 @@ $ mkdocs serve
 
 ### Debug layers
 
-OpenTripplanner has option to ease debugging problems with graph. Older option is graph visualizer.
-Which you can enable with `--visualize` parameter instead of `--server` when starting OTP.
-There you can see whole graph. You can click on edges and vertices and see the metadata. It is
- useful to see if street has expected options. And if connections are where they are expected.
-
-It can be hard to use on large graphs since, whole graph is displayed at once. And it can be hard
- to search for specific streets since only street graph is shown without the rest of information.
- 
- Another option is to use debug layers, which shows extra layers on top of normal map.
- To enable them you need to add `?debug_layers=true` to URL. For example 
- [http://localhost:8080/?debug_layers=true](http://localhost:8080/?debug_layers=true).
-  This adds debug layers to layer choosing dialog. Currently you can choose between:
-
-- Wheelchair access (which colors street edges red if they don't allow wheelchair or green otherwise)
-- Bike Safety (colors street edges based on how good are for cycling [smaller is better])
-- Traversal permissions (colors street edges based on what types of transit modes are allowed to
- travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer also
- draws links from transit stops/bike rentals and P+R to graph. And also draws transit stops, bike rentals
-  and P+R vertices with different color.
-
 Adding new renderer is very easy. You just need to create new class (preferably in
 `org.opentripplanner.inspector` package) which implements EdgeVertexRenderer. It is best if class
 name ends with Rendered. To implement this interface you need to write three functions `renderEdge`,
