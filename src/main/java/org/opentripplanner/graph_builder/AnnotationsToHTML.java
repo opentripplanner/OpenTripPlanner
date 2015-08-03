@@ -23,11 +23,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
+
+import com.google.common.primitives.Ints;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -76,11 +76,24 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
         Set<String> classes = annotations.keySet();
 
-        for (Map.Entry<String, Collection<String>> entry : annotations.asMap().entrySet()) {
-            LOG.info("Key: {} ({})", entry.getKey(), entry.getValue().size());
+
+
+        Map<String, Collection<String>> annotationsMap = annotations.asMap();
+        //saves list of annotation classes and counts
+        List<T2<String, Integer>> counts = new ArrayList<>(annotationsMap.size());
+        for (Map.Entry<String, Collection<String>> entry: annotationsMap.entrySet()) {
+            counts.add(new T2<>(entry.getKey(), entry.getValue().size()));
+        }
+
+        //Orders annotations and counts of annotations usages by number of usages
+        //from most used to the least
+        Collections.sort(counts, (o1, o2) -> Ints.compare(o2.second, o1.second));
+
+        for (T2<String, Integer> count : counts) {
+            LOG.info("Key: {} ({})", count.first, count.second);
 
             try {
-                HTMLWriter file_writer = new HTMLWriter(entry.getKey(), entry.getValue());
+                HTMLWriter file_writer = new HTMLWriter(count.first, annotationsMap.get(count.first));
                 file_writer.writeFile(classes);
 
             } catch (FileNotFoundException ex) {
