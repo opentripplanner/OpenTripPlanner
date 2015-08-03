@@ -1,7 +1,7 @@
 ## The *master* branch (Version 0.x.0-SNAPSHOT)
 This is the most up-to-date branch where all new development occurs and is the basis for an upcoming x.y release of OTP.
 It does not support WAR deployment as it has a built-in HTTP layer, the same one used in the Glassfish application server.
-If you run `target/otp-VERSION.jar` with the `--server` option (use `--help` for a list of available options),
+If you run `target/otp-x.y.z-shaded.jar` with the `--server` option (use `--help` for a list of available options),
 resources will be available at the following URLs:
 - The JavaScript map-based trip planner is at [[http://localhost:8080/]]
 - The OTP API base path is [[http://localhost:8080/otp/]]

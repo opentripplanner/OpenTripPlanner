@@ -25,7 +25,11 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit network among themselves. This is necessary for
@@ -72,7 +76,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
             /* Skip stops that are entrances to stations or whose entrances are coded separately */
             if (!ts0.isStreetLinkable()) continue;
-            nLinkableStops += 1;
+            if (++nLinkableStops % 1000 == 0) {
+                LOG.info("Linked {} stops", nLinkableStops);
+            }
             LOG.debug("Linking stop '{}' {}", ts0.getStop(), ts0);
 
             /* Determine the set of stops that are already reachable via other pathways or transfers */

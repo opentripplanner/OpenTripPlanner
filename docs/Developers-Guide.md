@@ -271,7 +271,7 @@ Release checklist:
 - cp -R target/site/enunciate /usr/share/nginx/html/apidoc/x.y.0
 - check that all docs in /usr/share/nginx/html/javadoc/ have o+r permissions (they should be by default)
 - mvn release:perform
-- cp target/checkout/target/otp-x.y.0.jar /usr/share/nginx/html/jars/
+- cp target/checkout/target/otp-x.y.0-shaded.jar /usr/share/nginx/html/jars/
 - rm /usr/share/nginx/html/jars/otp-x.y.0-SNAPSHOT*
 - check http://dev.opentripplanner.org/jars/ and http://dev.opentripplanner.org/javadoc/ in a browser
 - update the version numbers that appear in Basic-Usage, Developers-Guide, Getting-OTP, and index.md and check them in
