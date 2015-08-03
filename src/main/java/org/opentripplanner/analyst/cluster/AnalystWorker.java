@@ -405,6 +405,7 @@ public class AnalystWorker implements Runnable {
                 } catch (Exception ex) {
                     // Leave the envelope empty TODO include error information
                     ts.success = false;
+                    LOG.error("Error occurred in profile request", ex);
                 }
             } else {
                 // No profile request, this must be a plain one to many routing request.

@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
  * Adjust headways on a route.
  */
 public class AdjustHeadway extends TripFilter {
+    public static final long serialVersionUID = 1L;
+
     /** The new headway, in seconds */
     public int headway;
 

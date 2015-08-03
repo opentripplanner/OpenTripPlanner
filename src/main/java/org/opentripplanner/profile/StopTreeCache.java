@@ -64,7 +64,10 @@ public class StopTreeCache {
                 distances[i++] = vertex.getIndex();
                 distances[i++] = (int) state.getWalkDistance();
             }
-            distancesForStop.put(tstop, distances);
+
+            synchronized (distancesForStop) {
+                distancesForStop.put(tstop, distances);
+            }
             rr.cleanup();
         });
         LOG.info("Done caching distances to nearby street intersections from each transit stop.");

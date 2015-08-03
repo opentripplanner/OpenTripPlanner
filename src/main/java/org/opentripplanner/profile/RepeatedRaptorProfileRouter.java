@@ -283,9 +283,9 @@ public class RepeatedRaptorProfileRouter {
 
         RaptorWorkerData raptorWorkerData;
         if (sampleSet == null)
-            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, ts);
+            raptorWorkerData = new RaptorWorkerData(graph, window, request, ts);
         else
-            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, sampleSet,
+            raptorWorkerData = new RaptorWorkerData(graph, window, request, sampleSet,
                     ts);
 
         ts.raptorData = (int) (System.currentTimeMillis() - startData);
