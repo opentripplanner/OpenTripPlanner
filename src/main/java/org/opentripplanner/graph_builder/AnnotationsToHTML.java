@@ -15,9 +15,8 @@ package org.opentripplanner.graph_builder;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,7 +26,6 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
 
-import com.google.common.collect.Multiset;
 import com.google.common.primitives.Ints;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
@@ -147,16 +145,32 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         try {
             HTMLWriter file_writer;
             if (current_map.keySet().size() == 1) {
-                classOccurences.add(last_added_key);
-                int labelCount = classOccurences.count(last_added_key);
-                file_writer =new HTMLWriter(last_added_key+Integer.toString(labelCount), current_map);
+                if (current_map.values().size() > 1.2*maxNumberOfAnnotationsPerFile) {
+                    LOG.info("Number of annotations is very large. Splitting: {}", last_added_key);
+                    List<String> allAnnonations = new ArrayList<>(current_map.values());
+                    List<List<String>> partitions = Lists.partition(allAnnonations, maxNumberOfAnnotationsPerFile);
+                    for (List<String> partition: partitions) {
+                        classOccurences.add(last_added_key);
+                        int labelCount = classOccurences.count(last_added_key);
+                        file_writer =new HTMLWriter(last_added_key+Integer.toString(labelCount), partition);
+                        writers.add(file_writer);
+                    }
+
+                } else {
+                    classOccurences.add(last_added_key);
+                    int labelCount = classOccurences.count(last_added_key);
+                    file_writer = new HTMLWriter(last_added_key + Integer.toString(labelCount),
+                        current_map);
+                    writers.add(file_writer);
+                }
 
             } else {
                 classOccurences.add("rest");
                 int labelCount = classOccurences.count("rest");
                 file_writer = new HTMLWriter("rest" + labelCount, current_map);
+                writers.add(file_writer);
             }
-            writers.add(file_writer);
+
 
         } catch (FileNotFoundException ex) {
             LOG.error("Output folder not found:{} {}", outPath, ex);
@@ -253,11 +267,18 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             println("<p>");
             //adds links to the other HTML files
             for (Multiset.Entry<String> htmlAnnotationClass: classes.entrySet()) {
-                String label = htmlAnnotationClass.getElement() + htmlAnnotationClass.getCount();
-                if (label.equals(current_class)) {
-                    println("<span>" + label + "</span><br />");
-                } else {
-                    println("<a href=\"" + label + ".html\">" + label + "</a><br />");
+                String label_name = htmlAnnotationClass.getElement();
+                String label;
+                int currentCount = 1;
+                //it needs to add link to every file even if they are split
+                while (currentCount <= htmlAnnotationClass.getCount()) {
+                    label = label_name + currentCount;
+                    if (label.equals(current_class)) {
+                        println("<span>" + label + "</span><br />");
+                    } else {
+                        println("<a href=\"" + label + ".html\">" + label + "</a><br />");
+                    }
+                    currentCount++;
                 }
             }
             println("</p>");
