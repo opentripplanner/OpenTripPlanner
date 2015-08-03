@@ -74,7 +74,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         }
         LOG.info("Creating Annotations log");
 
-        Set<String> classes = annotations.keySet();
+        Set<String> classes = new TreeSet<>();
 
 
 
@@ -89,17 +89,70 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         //from most used to the least
         Collections.sort(counts, (o1, o2) -> Ints.compare(o2.second, o1.second));
 
+        int current_count = 0;
+        Multimap<String, String> current_map = ArrayListMultimap.create();
+        String last_added_key = null;
+        int max_count = 100;
+
+        //Annotations are grouped if the count of annotations is less then max_count
+        //otherwise each class of annotations is different file.
+        List<HTMLWriter> writers = new ArrayList<>(annotationsMap.size());
         for (T2<String, Integer> count : counts) {
             LOG.info("Key: {} ({})", count.first, count.second);
 
-            try {
-                HTMLWriter file_writer = new HTMLWriter(count.first, annotationsMap.get(count.first));
-                file_writer.writeFile(classes);
+            if (current_count > max_count) {
+                LOG.info("Flush count:{}", current_count);
+                try {
+                    HTMLWriter file_writer;
+                    if (current_map.keySet().size() == 1) {
+                        file_writer =new HTMLWriter(last_added_key, current_map);
+                        classes.add(last_added_key);
+                    } else {
+                        file_writer = new HTMLWriter("rest", current_map);
+                        classes.add("rest");
+                    }
+                    writers.add(file_writer);
+                    //file_writer.writeFile(classes);
 
-            } catch (FileNotFoundException ex) {
-                LOG.error("Output folder not found:{} {}", outPath, ex);
-                return;
+                } catch (FileNotFoundException ex) {
+                    LOG.error("Output folder not found:{} {}", outPath, ex);
+                    return;
+                }
+                current_map = ArrayListMultimap.create();
+                current_map.putAll(count.first, annotationsMap.get(count.first));
+                last_added_key = count.first;
+                current_count = count.second;
+            } else {
+                LOG.info("Increasing count: {}+{}={}", current_count, count.second, current_count+count.second);
+                current_count+=count.second;
+                current_map.putAll(count.first, annotationsMap.get(count.first));
+                last_added_key = count.first;
             }
+
+        }
+
+        LOG.info("Flush last count:{}", current_count);
+        try {
+            HTMLWriter file_writer;
+            if (current_map.keySet().size() == 1) {
+                file_writer =new HTMLWriter(last_added_key, current_map);
+                classes.add(last_added_key);
+            } else {
+                file_writer = new HTMLWriter("rest", current_map);
+                classes.add("rest");
+            }
+            writers.add(file_writer);
+            //file_writer.writeFile(classes);
+
+        } catch (FileNotFoundException ex) {
+            LOG.error("Output folder not found:{} {}", outPath, ex);
+            return;
+        }
+
+        //Actual writing to the file is made here since
+        // this is the first place where actual number of files is known (because it depends on annotations count)
+        for (HTMLWriter writer : writers) {
+            writer.writeFile(classes);
         }
 
 
@@ -133,6 +186,15 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             lannotations = ArrayListMultimap.create();
             lannotations.putAll(key, annotations);
             current_class = key;
+        }
+
+        public HTMLWriter(String filename, Multimap<String, String> curMap)
+            throws FileNotFoundException {
+            File newFile = new File(outPath, filename +".html");
+            FileOutputStream fileOutputStream = new FileOutputStream(newFile);
+            this.out = new PrintStream(fileOutputStream);
+            lannotations = curMap;
+            current_class = filename;
         }
 
         private void writeFile(Collection<String> classes) {
