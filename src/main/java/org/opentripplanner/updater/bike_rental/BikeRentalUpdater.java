@@ -85,14 +85,15 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     protected void configurePolling (Graph graph, JsonNode config) throws Exception {
 
         // Set data source type from config JSON
-        String sourceType =config.path("sourceType").asText();
-        String apiKey =config.path("apiKey").asText();
+        String sourceType = config.path("sourceType").asText();
+        String apiKey = config.path("apiKey").asText();
+        String networkName = config.path("network").asText();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
             if (sourceType.equals("jcdecaux")) {
                 source = new JCDecauxBikeRentalDataSource();
             } else if (sourceType.equals("b-cycle")) {
-                source = new BCycleBikeRentalDataSource(apiKey);
+                source = new BCycleBikeRentalDataSource(apiKey, networkName);
             } else if (sourceType.equals("bixi")) {
                 source = new BixiBikeRentalDataSource();
             } else if (sourceType.equals("keolis-rennes")) {
@@ -103,6 +104,10 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 source = new CityBikesBikeRentalDataSource();
             } else if (sourceType.equals("vcub")) {
                 source = new VCubDataSource();
+            } else if (sourceType.equals("citi-bike-nyc")) {
+                source = new CitiBikeNycBikeRentalDataSource(networkName);
+            } else if (sourceType.equals("next-bike")) {
+                source = new NextBikeRentalDataSource(networkName);
             }
         }
 

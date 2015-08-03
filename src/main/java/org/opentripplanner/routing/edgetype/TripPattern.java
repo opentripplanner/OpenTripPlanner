@@ -61,7 +61,7 @@ import java.util.*;
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
  * thus TripPattern.
  */
-public class TripPattern implements Serializable {
+public class TripPattern implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
@@ -694,4 +694,12 @@ public class TripPattern implements Serializable {
         return freqs.get(0);
     }
 
+    public TripPattern clone () {
+        try {
+            return (TripPattern) super.clone();
+        } catch (CloneNotSupportedException e) {
+            /* cannot happen */
+            throw new RuntimeException(e);
+        }
+    }
 }

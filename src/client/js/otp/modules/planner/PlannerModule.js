@@ -221,7 +221,7 @@ otp.modules.planner.PlannerModule =
             this.startMarker.bindPopup('<strong>' + pgettext('popup', 'Start') + '</strong>');
             this.startMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
-                this.startLatLng = this.startMarker.getLatLng();
+                this.setStartPoint(this.startMarker.getLatLng(), false);
                 this.invokeHandlers("startChanged", [this.startLatLng]);
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
                 this.planTripFunction.apply(this);//planTrip();
@@ -252,7 +252,7 @@ otp.modules.planner.PlannerModule =
             this.endMarker.bindPopup('<strong>' + _tr('Destination') + '</strong>');
             this.endMarker.on('dragend', $.proxy(function() {
                 this.webapp.hideSplash();
-                this.endLatLng = this.endMarker.getLatLng();
+                this.setEndPoint(this.endMarker.getLatLng(), false);
                 this.invokeHandlers("endChanged", [this.endLatLng]);
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
                 this.planTripFunction.apply(this);//this_.planTrip();

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.module;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -149,7 +150,6 @@ public class GtfsModule implements GraphBuilderModule {
 
         graph.hasTransit = true;
         graph.calculateTransitCenter();
-        graph.getMetadata().addCenter(graph.getCenter());
 
     }
 
@@ -213,6 +213,7 @@ public class GtfsModule implements GraphBuilderModule {
         }
         for (Route route : store.getAllEntitiesForType(Route.class)) {
             route.getId().setAgencyId(reader.getDefaultAgencyId());
+            generateRouteColor(route);
         }
         for (Stop stop : store.getAllEntitiesForType(Stop.class)) {
             stop.getId().setAgencyId(reader.getDefaultAgencyId());
@@ -235,6 +236,47 @@ public class GtfsModule implements GraphBuilderModule {
 
         store.close();
 
+    }
+
+    /**
+     * Generates routeText colors for routes with routeColor and without routeTextColor
+     *
+     * If route doesn't have color or already has routeColor and routeTextColor nothing is done.
+     *
+     * textColor can be black or white. White for dark colors and black for light colors of routeColor.
+     * If color is light or dark is calculated based on luminance formula:
+     * sqrt( 0.299*Red^2 + 0.587*Green^2 + 0.114*Blue^2 )
+     *
+     * @param route
+     */
+    private void generateRouteColor(Route route) {
+        String routeColor = route.getColor();
+        //No route color - skipping
+        if (routeColor == null) {
+            return;
+        }
+        String textColor = route.getTextColor();
+        //Route already has text color skipping
+        if (textColor != null) {
+            return;
+        }
+
+        Color routeColorColor = Color.decode("#"+routeColor);
+        //gets float of RED, GREEN, BLUE in range 0...1
+        float[] colorComponents = routeColorColor.getRGBColorComponents(null);
+        //Calculates luminance based on https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
+        double newRed = 0.299*Math.pow(colorComponents[0],2.0);
+        double newGreen = 0.587*Math.pow(colorComponents[1],2.0);
+        double newBlue = 0.114*Math.pow(colorComponents[2],2.0);
+        double luminance = Math.sqrt(newRed+newGreen+newBlue);
+
+        //For brighter colors use black text color and reverse for darker
+        if (luminance > 0.5) {
+            textColor = "000000";
+        } else {
+            textColor = "FFFFFF";
+        }
+        route.setTextColor(textColor);
     }
 
     private class StoreImpl implements GenericMutableDao {

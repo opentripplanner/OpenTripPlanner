@@ -22,7 +22,9 @@ public class InitialStopSearchPathParser extends PathParser {
     private static DFA dfa;
 
     static {
-        Nonterminal complete = seq(optional(OTHER), star(STREET), TRANSITSTOP);
+        // TRANSITSTOP is optional because we also use this to get the state for OSM vertices
+        // (including splitter vertices) that are used to access temporary transit stops.
+        Nonterminal complete = seq(optional(OTHER), star(STREET), optional(TRANSITSTOP));
         dfa = complete.toDFA().minimize();
     }
 
