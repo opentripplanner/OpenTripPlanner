@@ -42,6 +42,9 @@ public class PropagatedTimesStore {
     int size;
     int[] mins, maxs, avgs;
 
+    // number of times to bootstrap the mean.
+    public final int N_BOOTSTRAPS = 400;
+
     private static final Random random = new Random();
 
     public PropagatedTimesStore(Graph graph) {
@@ -68,6 +71,16 @@ public class PropagatedTimesStore {
         // assume array is rectangular
         int stops = times[0].length;
 
+        // cache random numbers. This should be fine as we're mixing it with the number of minutes
+        // at which each destination is accessible, which is sometimes not 120, as well as the stop
+        // position in the list (note that we have cleverly chosen a number which is a prime
+        // so is not divisible by the number of iterations on the bootstrap). Finally recall that
+        // the maximum number of times we're sampling from is generally 120 and we modulo this,
+        // so the pigeonhole principle applies.
+        // this is effectively a "random number generator" with phase 10007
+        int[] randomNumbers = random.ints().limit(10007).map(Math::abs).toArray();
+        int nextRandom = 0;
+
         // loop over stops on the outside so we can bootstrap
         STOPS: for (int stop = 0; stop < stops; stop++) {
             // compute the average
@@ -91,13 +104,14 @@ public class PropagatedTimesStore {
             avgs[stop] = sum / count;
 
             // now bootstrap out a 95% confidence interval on the time
-            int[] bootMeans = new int[400];
-            for (int boot = 0; boot < 400; boot++) {
+            int[] bootMeans = new int[N_BOOTSTRAPS];
+            for (int boot = 0; boot < N_BOOTSTRAPS; boot++) {
                 int bsum = 0;
 
                 // sample from the Monte Carlo distribution with replacement
                 for (int iter = 0; iter < count; iter++) {
-                    bsum += timeList.get(random.nextInt(count));
+                    bsum += timeList.get(randomNumbers[nextRandom++ % randomNumbers.length] % count);
+                    //bsum += timeList.get(random.nextInt(count));
                 }
 
                 bootMeans[boot] = bsum / count;
@@ -105,9 +119,9 @@ public class PropagatedTimesStore {
 
             Arrays.sort(bootMeans);
             // 2.5 percentile of distribution of means
-            mins[stop] = bootMeans[10];
+            mins[stop] = bootMeans[N_BOOTSTRAPS / 40];
             // 97.5 percentile of distribution of means
-            maxs[stop] = bootMeans[390];
+            maxs[stop] = bootMeans[N_BOOTSTRAPS - N_BOOTSTRAPS / 40];
         }
     }
 
