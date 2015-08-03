@@ -60,6 +60,7 @@ import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.carspeed.CarSpeedSnapshotSource;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -67,6 +68,7 @@ import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.services.EdgesExtra;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -111,6 +113,8 @@ public class Graph implements Serializable {
 
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
+    public final EdgesExtra edgesExtra = new EdgesExtra();
+
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
 
@@ -151,6 +155,8 @@ public class Graph implements Serializable {
     public final Map<AgencyAndId, Integer> serviceCodes = Maps.newHashMap();
 
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
+
+    public transient CarSpeedSnapshotSource carSpeedSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
@@ -262,9 +268,15 @@ public class Graph implements Serializable {
 
             turnRestrictions.remove(e);
             streetNotesService.removeStaticNotes(e);
+            edgesExtra.removeEdge(e);
             edgeById.remove(e.getId());
 
             if (e instanceof EdgeWithCleanup) ((EdgeWithCleanup) e).detach();
+
+            if (e instanceof StreetEdge && carSpeedSnapshotSource != null) {
+                // This should not be necessary, but we provide it for completeness just in case
+                carSpeedSnapshotSource.updateCarSpeedProvider((StreetEdge) e, null);
+            }
 
             if (e.fromv != null) {
                 e.fromv.removeOutgoing(e);

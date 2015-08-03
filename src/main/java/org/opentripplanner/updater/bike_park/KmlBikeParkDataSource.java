@@ -16,7 +16,6 @@ package org.opentripplanner.updater.bike_park;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_park.BikePark;

@@ -11,16 +11,21 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.carspeed;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.graph.Graph;
+import java.util.List;
+
+import org.opentripplanner.common.model.T2;
+import org.opentripplanner.routing.carspeed.StreetEdgeCarSpeedProvider;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 
 /**
- * Interface for a class than can be configured through a Jackson JSON tree.
+ * A (static or dynamic) source of car speeds providers.
+ * 
+ * @author laurent
  */
-public interface JsonConfigurable {
+public interface CarSpeedDataSource {
 
-    public abstract void configure (Graph graph, JsonNode jsonNode) throws Exception;
+    public List<T2<StreetEdge, StreetEdgeCarSpeedProvider>> getUpdatedEntries();
 
 }

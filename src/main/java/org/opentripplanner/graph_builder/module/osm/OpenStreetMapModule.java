@@ -18,6 +18,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -37,6 +38,7 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
+import org.opentripplanner.osm.OSMFromToNodeWayIds;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -68,14 +70,15 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -145,6 +148,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * Whether we should create bike P+R stations from OSM data. (default false)
      */
     public boolean staticBikeParkAndRide;
+
+    /**
+     * Whether we should add extra OSM node/ways ids for edges.
+     */
+    public boolean indexEdgeOsmIds = false;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -657,8 +665,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             elevationData.put(endEndpoint, elevation);
                         }
                     }
-                    P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
-                            way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
+                    P2<StreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint, way, i,
+                            osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
                     StreetEdge street = streets.first;
                     StreetEdge backStreet = streets.second;
@@ -989,8 +997,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * @param endEndpoint
          * @param startEndpoint
          */
-        private P2<StreetEdge> getEdgesForStreet(OsmVertex startEndpoint,
-                                                      OsmVertex endEndpoint, OSMWay way, int index, long startNode, long endNode,
+        private P2<StreetEdge> getEdgesForStreet(IntersectionVertex startEndpoint,
+                                                      IntersectionVertex endEndpoint, OSMWay way, int index, long startNode, long endNode,
                                                       StreetTraversalPermission permissions, LineString geometry) {
             // No point in returning edges that can't be traversed by anyone.
             if (permissions.allowsNothing()) {
@@ -1029,7 +1037,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             return new P2<StreetEdge>(street, backStreet);
         }
 
-        private StreetEdge getEdgeForStreet(OsmVertex startEndpoint, OsmVertex endEndpoint,
+        private StreetEdge getEdgeForStreet(IntersectionVertex startEndpoint, IntersectionVertex endEndpoint,
                                                  OSMWay way, int index, long startNode, long endNode, double length,
                                                  StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
@@ -1048,6 +1056,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             StreetEdge street = edgeFactory.createEdge(startEndpoint, endEndpoint, geometry, name, length,
                     permissions, back);
             street.setCarSpeed(carSpeed);
+
+            if (indexEdgeOsmIds) {
+                graph.edgesExtra.addOsmFromToNodeWayId(street, new OSMFromToNodeWayIds(startNode,
+                        endNode, way.getId()));
+            }
 
             String highway = way.getTag("highway");
             int cls;

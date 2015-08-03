@@ -92,6 +92,12 @@ public class GraphBuilderParameters {
     public final CustomNamer customNamer;
 
     /**
+     * Index edges with their OSM IDs (from-to nodes IDs, way ID). This is used by some car speed
+     * dynamic updaters.
+     */
+    public final boolean indexEdgeOsmIds;
+
+    /**
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
      */
     public boolean staticBikeRental = false;
@@ -128,6 +134,7 @@ public class GraphBuilderParameters {
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
+        indexEdgeOsmIds = config.path("indexEdgeOsmIds").asBoolean(false);
         staticBikeRental = config.path("staticBikeRental").asBoolean(false);
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
