@@ -519,7 +519,11 @@ public class RaptorWorkerData implements Serializable {
                 }
             }
 
-            // Iterate over all stops, saving an array of distances to samples from each stop.
+            // Iterate over all stops, saving the least distance to each reachable sample from
+            // from each transit stop.
+            // We first make a map stops to samples, so we can ensure we save only the shortest
+            // distance from a transit stop to a sample. Most transit stops can reach a given sample two
+            // ways because they can reach both of the vertices the sample is connected to.
             TIntIntMap out = new TIntIntHashMap();
 
             for (TIntIterator stopIt = stopForIndex.iterator(); stopIt.hasNext();) {
@@ -544,14 +548,13 @@ public class RaptorWorkerData implements Serializable {
                     if (!sampleIndex.containsKey(v))
                         continue STREET;
 
-                    // Possible optimization: it's possible (indeed, likely) that the sample
-                    // is reachable two ways from a given stop. We could collapse this array down
-                    // and make propagation faster.
+                    // Build the map
                     SAMPLE: for (HalfSample s : sampleIndex.get(v)) {
                         int distance = Math.round(d + s.distance);
                         if (distance > stc.maxWalkMeters)
                             continue;
 
+                        // only save it if there isn't another shorter walking path that we've already encountered.
                         int time = (int) (distance / req.walkSpeed);
                         if (!out.containsKey(s.index) || out.get(s.index) > time)
                             out.put(s.index, time);
