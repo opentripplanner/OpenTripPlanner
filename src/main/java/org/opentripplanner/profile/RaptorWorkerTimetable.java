@@ -64,6 +64,9 @@ public class RaptorWorkerTimetable implements Serializable {
     /** End times for frequency trips */
     private int[] endTimes;
 
+    /** Indices of stops in parent data */
+    public int[] stopIndices;
+
     /** parent raptorworkerdata of this timetable */
     public RaptorWorkerData raptorData;
 
@@ -117,20 +120,29 @@ public class RaptorWorkerTimetable implements Serializable {
             // this is a transfer
 
             // stop index in Raptor data
-            int stopIndex = raptorData.stopsForPattern.get(dataIndex)[stop];
+            int stopIndex = stopIndices[stop];
 
             // first check for specific rules
-            if (raptorData.transferRules.containsKey(stopIndex)) {
-                transferRule = raptorData.transferRules.get(stopIndex).stream().filter(
-                        tr -> tr.matches(raptorData.timetablesForPattern.get(previousPattern),
-                                this)).findFirst().orElse(null);
+            // calling containsKey can be expensive so first check if list is empty
+            if (!raptorData.transferRules.isEmpty() && raptorData.transferRules.containsKey(stopIndex)) {
+                for (TransferRule tr : raptorData.transferRules.get(stopIndex)) {
+                    if (tr.matches(raptorData.timetablesForPattern.get(previousPattern), this)) {
+                        transferRule = tr;
+                        break;
+                    }
+                }
             }
 
-            if (transferRule == null) {
+            if (transferRule == null && !raptorData.baseTransferRules.isEmpty()) {
                 // look for global rules
-                transferRule = raptorData.baseTransferRules.stream().filter(
-                        tr -> tr.matches(raptorData.timetablesForPattern.get(previousPattern),
-                                this)).findFirst().orElse(null);
+                // using declarative for loop because constructing a stream and doing a filter is
+                // slow.
+                for (TransferRule tr : raptorData.baseTransferRules) {
+                    if (tr.matches(raptorData.timetablesForPattern.get(previousPattern), this)) {
+                        transferRule = tr;
+                        break;
+                    }
+                }
             }
         }
 

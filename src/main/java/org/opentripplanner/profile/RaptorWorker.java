@@ -44,7 +44,7 @@ public class RaptorWorker {
      * (i.e. many minutes look like each other), so several minutes' monte carlo draws are effectively
      * pooled.
      */
-    public static final int MONTE_CARLO_COUNT_PER_MINUTE = 4;
+    public static final int MONTE_CARLO_COUNT_PER_MINUTE = 1;
 
     /** If there are no schedules, the number of Monte Carlo draws to take */
     public static final int TOTAL_MONTE_CARLO_COUNT = 99;
@@ -302,7 +302,6 @@ public class RaptorWorker {
             //LOG.info("pattern {} {}", p, data.patternNames.get(p));
             int onTrip = -1;
             RaptorWorkerTimetable timetable = data.timetablesForPattern.get(p);
-            int[] stops = data.stopsForPattern.get(p);
             int stopPositionInPattern = -1; // first increment will land this at zero
 
             int bestFreqBoardTime = Integer.MAX_VALUE;
@@ -311,7 +310,7 @@ public class RaptorWorker {
 
             // first look for a frequency entry
             if (useFrequencies) {
-                for (int stopIndex : stops) {
+                for (int stopIndex : timetable.stopIndices) {
                     stopPositionInPattern += 1;
 
                     // the time at this stop if we remain on board a vehicle we had already boarded
@@ -375,7 +374,7 @@ public class RaptorWorker {
             // perform scheduled search
             stopPositionInPattern = -1;
 
-            for (int stopIndex : stops) {
+            for (int stopIndex : timetable.stopIndices) {
                 stopPositionInPattern += 1;
                 if (onTrip == -1) {
                     // We haven't boarded yet

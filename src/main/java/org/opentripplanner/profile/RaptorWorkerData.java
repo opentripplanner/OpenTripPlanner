@@ -64,9 +64,6 @@ public class RaptorWorkerData implements Serializable {
     /** A list of pattern indexes passing through each stop, again using Raptor indices. */
     public final List<int[]> patternsForStop = new ArrayList<>();
 
-    /** An ordered list of stops indices (in the Raptor data) visited by each pattern. */
-    public final List<int[]> stopsForPattern = new ArrayList<>();
-
     /** For each pattern, a 2D array of stoptimes for each trip on the pattern. */
     public List<RaptorWorkerTimetable> timetablesForPattern = new ArrayList<>();
 
@@ -153,7 +150,7 @@ public class RaptorWorkerData implements Serializable {
 
                 List<FrequencyEntry> frequencyEntries = graphPatterns.stream()
                         .filter(p -> p.getSingleFrequencyEntry() != null)
-                        .map(p -> p.getSingleFrequencyEntry())
+                        .flatMap(p -> p.scheduledTimetable.frequencyEntries.stream())
                         .collect(Collectors.toList());
 
                 for (ConvertToFrequency c : frequencies) {
@@ -247,7 +244,8 @@ public class RaptorWorkerData implements Serializable {
                     }
                     stopIndexesForPattern.add(stopIndex);
                 }
-                stopsForPattern.add(stopIndexesForPattern.toArray());
+
+                timetable.stopIndices = stopIndexesForPattern.toArray();
             }
         }
 
@@ -259,7 +257,6 @@ public class RaptorWorkerData implements Serializable {
                 if (timetable == null)
                     continue;
 
-                timetable.dataIndex = timetablesForPattern.size();
                 timetablesForPattern.add(timetable);
 
                 // TODO: patternForIndex, indexForPattern
@@ -274,10 +271,10 @@ public class RaptorWorkerData implements Serializable {
                     indexForStop.put(t.index, stopIndex);
                     stopForIndex.add(t.index);
                 }
-                
-                stopsForPattern.add(Arrays.asList(atp.temporaryStops).stream()
+
+                timetable.stopIndices = Arrays.asList(atp.temporaryStops).stream()
                         .mapToInt(t -> indexForStop.get(t.index))
-                        .toArray());
+                        .toArray();
             }
         }
 
@@ -380,8 +377,8 @@ public class RaptorWorkerData implements Serializable {
 
         // create the mapping from stops to patterns
         TIntObjectMap<TIntList> patternsForStopList = new TIntObjectHashMap<>();
-        for (int pattern = 0; pattern < stopsForPattern.size(); pattern++) {
-            for (int stop : stopsForPattern.get(pattern)) {
+        for (int pattern = 0; pattern < timetablesForPattern.size(); pattern++) {
+            for (int stop : timetablesForPattern.get(pattern).stopIndices) {
                 if (!patternsForStopList.containsKey(stop))
                     patternsForStopList.put(stop, new TIntArrayList());
 
