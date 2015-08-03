@@ -480,10 +480,8 @@ public class RaptorWorker {
 
                 for (int i = 0; i < targets.length; i++) {
                     int targetIndex = targets[i++]; // increment i after read
-                    int distance = targets[i]; // i will be incremented at loop end
-                    // distance in meters over walk speed in meters per second --> seconds
-                    int egressWalkTimeSeconds = distance;//(int) (distance / req.walkSpeed);
-                    int propagated_time = baseTimeSeconds + egressWalkTimeSeconds;
+                    // the cache has time in seconds rather than distance, to avoid costly floating-point divides and integer casts here.
+                    int propagated_time = baseTimeSeconds + targets[i];
 
                     if (timesAtTargets[targetIndex] > propagated_time) {
                         timesAtTargets[targetIndex] = propagated_time;

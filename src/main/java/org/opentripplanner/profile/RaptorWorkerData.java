@@ -432,20 +432,42 @@ public class RaptorWorkerData implements Serializable {
         StopTreeCache stc = graph.index.getStopTreeCache();
         ts.stopTreeCaching = (int) (System.currentTimeMillis() - stcStart);
 
-        // Record distances to nearby intersections for all used stops.
-        // This is just a copy of StopTreeCache using int indices for stops.
+        // Record times to nearby intersections for all used stops.
+        // We use times rather than distances to avoid a costly floating-point divide during propagation
         if (sampleSet == null) {
             for (TIntIterator stopIt = stopForIndex.iterator(); stopIt.hasNext();) {
                 int stop = stopIt.next();
 
                 // permanent stop
                 Vertex tstop = graph.getVertexById(stop);
-                if (tstop != null && TransitStop.class.isInstance(tstop))
+                if (tstop != null && TransitStop.class.isInstance(tstop)) {
                     // permanent stop
-                    targetsForStop.add(stc.distancesForStop.get(tstop));
-                else
+                    // convert distance to time
+                    int[] distancesForStop = stc.distancesForStop.get(tstop);
+                    int[] timesForStop = new int[distancesForStop.length];
+
+                    for (int i = 0; i < distancesForStop.length; i++) {
+                        timesForStop[i] = distancesForStop[i];
+                        i++; // advance to distance for stop i
+                        // convert meters to seconds by dividing by meters / second
+                        timesForStop[i] = (int) (distancesForStop[i] / req.walkSpeed);
+                    }
+
+                    targetsForStop.add(timesForStop);
+                }
+                else {
                     // temporary stop
-                    targetsForStop.add(temporaryStopTreeCache.get(stop));
+                    int[] distancesForStop = temporaryStopTreeCache.get(stop);
+                    int[] timesForStop = new int[distancesForStop.length];
+
+                    for (int i = 0; i < distancesForStop.length; i++) {
+                        timesForStop[i] = distancesForStop[i];
+                        i++; // advance to distance for stop i
+                        // convert meters to seconds by dividing by meters / second
+                        timesForStop[i] = (int) (distancesForStop[i] / req.walkSpeed);
+                    }
+
+                    targetsForStop.add(timesForStop);                }
             }
 
             // TODO memory leak when many graphs have been built
