@@ -45,6 +45,8 @@ public class PropagatedTimesStore {
     // number of times to bootstrap the mean.
     public final int N_BOOTSTRAPS = 400;
 
+    public static final ConfidenceCalculationMethod CONFIDENCE_CALCULATION_METHOD = ConfidenceCalculationMethod.PERCENTILE;
+
     private static final Random random = new Random();
 
     public PropagatedTimesStore(Graph graph) {
@@ -103,25 +105,40 @@ public class PropagatedTimesStore {
 
             avgs[stop] = sum / count;
 
-            // now bootstrap out a 95% confidence interval on the time
-            int[] bootMeans = new int[N_BOOTSTRAPS];
-            for (int boot = 0; boot < N_BOOTSTRAPS; boot++) {
-                int bsum = 0;
+            switch (CONFIDENCE_CALCULATION_METHOD) {
+            case BOOTSTRAP:
+                // now bootstrap out a 95% confidence interval on the time
+                int[] bootMeans = new int[N_BOOTSTRAPS];
+                for (int boot = 0; boot < N_BOOTSTRAPS; boot++) {
+                    int bsum = 0;
 
-                // sample from the Monte Carlo distribution with replacement
-                for (int iter = 0; iter < count; iter++) {
-                    bsum += timeList.get(randomNumbers[nextRandom++ % randomNumbers.length] % count);
-                    //bsum += timeList.get(random.nextInt(count));
+                    // sample from the Monte Carlo distribution with replacement
+                    for (int iter = 0; iter < count; iter++) {
+                        bsum += timeList
+                                .get(randomNumbers[nextRandom++ % randomNumbers.length] % count);
+                        //bsum += timeList.get(random.nextInt(count));
+                    }
+
+                    bootMeans[boot] = bsum / count;
                 }
 
-                bootMeans[boot] = bsum / count;
+                Arrays.sort(bootMeans);
+                // 2.5 percentile of distribution of means
+                mins[stop] = bootMeans[N_BOOTSTRAPS / 40];
+                // 97.5 percentile of distribution of means
+                maxs[stop] = bootMeans[N_BOOTSTRAPS - N_BOOTSTRAPS / 40];
+                break;
+            case PERCENTILE:
+                timeList.sort();
+                mins[stop] = timeList.get(timeList.size() / 40);
+                maxs[stop] = timeList.get(39 * timeList.size() / 40);
+                break;
+            default:
+                timeList.sort();
+                mins[stop] = timeList.get(0);
+                maxs[stop] = timeList.get(timeList.size() - 1);
+                break;
             }
-
-            Arrays.sort(bootMeans);
-            // 2.5 percentile of distribution of means
-            mins[stop] = bootMeans[N_BOOTSTRAPS / 40];
-            // 97.5 percentile of distribution of means
-            maxs[stop] = bootMeans[N_BOOTSTRAPS - N_BOOTSTRAPS / 40];
         }
     }
 
@@ -149,5 +166,35 @@ public class PropagatedTimesStore {
         ret.avg = new ResultSet(avgs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         ret.max = new ResultSet(maxs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         return ret;
+    }
+
+    public static enum ConfidenceCalculationMethod {
+        /** Do not calculate confidence intervals */
+        NONE,
+
+        /**
+         * Calculate confidence intervals around the mean using the bootstrap. Note that this calculates
+         * the confidence that the mean is in fact the mean of all possible schedules, not the confidence
+         * that a particular but unknown schedule will behave a certain way.
+         *
+         * This is absolutely the correct approach in systems that are specified as frequencies both
+         * in the model and operationally, because the parameter of interest is the average accessibility
+         * afforded by every realization of transfer and wait time. This yields nice tiny confidence
+         * intervals around the mean, and allows us easily to measure changes in average accessibility.
+         *
+         * However, when you have a system that will eventually be scheduled, you are interested not
+         * in the distribution of the average accessibility over all possible schedules, but rather
+         * the distribution of the accessibility afforded by a particular but unknown schedule. This
+         * does not require bootstrapping; it's just taking percentiles on the output of the Monte
+         * Carlo simulation. Unfortunately this requires a lot more Monte Carlo samples, as of
+         * course the middle of the distribution will stabilize long before the extrema.
+         */
+        BOOTSTRAP,
+
+        /**
+         * Calculate confidence intervals based on percentiles, which is what you want to do when
+         * you have a scheduled network.
+         */
+        PERCENTILE
     }
 }
