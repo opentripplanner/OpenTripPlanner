@@ -588,7 +588,7 @@ public class AnalystWorker implements Runnable {
 
     /** log queue status */
     private void logQueueStatus() {
-        LOG.info("Wating tasks: high priority: {}, batch: {}", highPriorityExecutor.getQueue().size(), batchExecutor.getQueue().size());
+        LOG.info("Waiting tasks: high priority: {}, batch: {}", highPriorityExecutor.getQueue().size(), batchExecutor.getQueue().size());
     }
 
     /**
