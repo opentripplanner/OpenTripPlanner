@@ -1,0 +1,146 @@
+#. extracted from WayProperties.properties, WayProperties_sv.properties
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-04 09:48+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Swedish\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.12.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: note.caution
+msgid "Caution!"
+msgstr "Akta!"
+
+#: note.unpaved_surface
+msgid "Unpaved surface"
+msgstr "Obelagd väg"
+
+#: note.muddy_surface
+msgid "Unpaved surface -- muddy!"
+msgstr "Obelagd väg -- lerigt!"
+
+#: note.toll
+msgid "Toll road"
+msgstr "Vägtull"
+
+#: name.bike_path
+msgid "bike path"
+msgstr "cykelvägen"
+
+#: name.pedestrian_path
+msgctxt "name.pedestrian_path"
+msgid "path"
+msgstr "gångbanan"
+
+#: name.pedestrian_area
+msgid "open area"
+msgstr "torget"
+
+#: name.path
+msgctxt "name.path"
+msgid "path"
+msgstr "stigen"
+
+#: name.bridleway
+msgid "bridleway"
+msgstr "ridvägem"
+
+#: name.otp_route_ref
+msgid "Route {otp:route_ref}"
+msgstr "linje {otp:route_ref}"
+
+#: name.platform_ref
+msgid "Platform {ref}"
+msgstr "plattform {ref}"
+
+#: name.platform
+msgid "platform"
+msgstr "plattformen"
+
+#: name.footbridge
+msgid "footbridge"
+msgstr "gångbron"
+
+#: name.underpass
+msgid "underpass"
+msgstr "undergången"
+
+#: name.road
+msgid "road"
+msgstr "vägen"
+
+#: name.ramp
+msgid "ramp"
+msgstr "rampen"
+
+#: name.link
+msgid "link"
+msgstr "utfarten"
+
+#: name.service_road
+msgid "service road"
+msgstr "vägen"
+
+#: name.alley
+msgid "alley"
+msgstr "gränden"
+
+#: name.parking_aisle
+msgid "parking aisle"
+msgstr "parkeringsområdet"
+
+#: name.byway
+msgid "byway"
+msgstr "vägen"
+
+#: name.track
+msgid "track"
+msgstr "vägen"
+
+#: name.sidewalk
+msgid "sidewalk"
+msgstr "trottoaren"
+
+#: name.steps
+msgid "steps"
+msgstr "trappan"
+
+#: name.bicycle_rental_name
+msgid "Bicycle rental {name}"
+msgstr "cykeluthyrning {name}"
+
+#: name.bicycle_rental_station
+msgid "Bicycle rental station"
+msgstr "cykeluthyrning"
+
+#: name.bicycle_parking_name
+msgid "Bicycle parking {name}"
+msgstr "cykelparkering {name}"
+
+#: name.bicycle_parking
+msgid "Bicycle parking"
+msgstr "cykelparkering"
+
+#: name.park_and_ride_name
+msgid "P+R {name}"
+msgstr "infartsparkering {name}"
+
+#: name.park_and_ride_station
+msgid "P+R"
+msgstr "infartsparkering"
+
+#: corner
+msgid "corner of %s and %s"
+msgstr "hörnet av %s och %s"
+
+#: unnamedStreet
+msgid "unnamed"
+msgstr "namnlös"

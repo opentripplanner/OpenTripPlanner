@@ -1,0 +1,147 @@
+#. extracted from WayProperties.properties, WayProperties_sl.properties
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-04 09:48+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Marko Burjek <mabu@localhost>\n"
+"Language-Team: Slovenian\n"
+"Language: sl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.12.0\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 "
+"|| n%100==4 ? 3 : 0)\n"
+
+#: note.caution
+msgid "Caution!"
+msgstr "Pozor!"
+
+#: note.unpaved_surface
+msgid "Unpaved surface"
+msgstr "Neutrjena površina"
+
+#: note.muddy_surface
+msgid "Unpaved surface -- muddy!"
+msgstr "Blatna neutrjena površina!"
+
+#: note.toll
+msgid "Toll road"
+msgstr "Cestnina"
+
+#: name.bike_path
+msgid "bike path"
+msgstr "kolesarska pot"
+
+#: name.pedestrian_path
+msgctxt "name.pedestrian_path"
+msgid "path"
+msgstr "peš pot"
+
+#: name.pedestrian_area
+msgid "open area"
+msgstr "območje za pešce"
+
+#: name.path
+msgctxt "name.path"
+msgid "path"
+msgstr "pot"
+
+#: name.bridleway
+msgid "bridleway"
+msgstr "Jahalna steza"
+
+#: name.otp_route_ref
+msgid "Route {otp:route_ref}"
+msgstr "Pot {otp:route_ref}"
+
+#: name.platform_ref
+msgid "Platform {ref}"
+msgstr "Platforma {ref}"
+
+#: name.platform
+msgid "platform"
+msgstr "platforma"
+
+#: name.footbridge
+msgid "footbridge"
+msgstr "Most za pešce"
+
+#: name.underpass
+msgid "underpass"
+msgstr "podvoz"
+
+#: name.road
+msgid "road"
+msgstr "cesta"
+
+#: name.ramp
+msgid "ramp"
+msgstr "uvoz/izvoz"
+
+#: name.link
+msgid "link"
+msgstr "povezava"
+
+#: name.service_road
+msgid "service road"
+msgstr "servisna cesta"
+
+#: name.alley
+msgid "alley"
+msgstr "uličica"
+
+#: name.parking_aisle
+msgid "parking aisle"
+msgstr "parkirišče"
+
+#: name.byway
+msgid "byway"
+msgstr "stranska pot"
+
+#: name.track
+msgid "track"
+msgstr "kolovoz"
+
+#: name.sidewalk
+msgid "sidewalk"
+msgstr "pločnik"
+
+#: name.steps
+msgid "steps"
+msgstr "stopnice"
+
+#: name.bicycle_rental_name
+msgid "Bicycle rental {name}"
+msgstr "Izposojevalnica koles {name}"
+
+#: name.bicycle_rental_station
+msgid "Bicycle rental station"
+msgstr "Postaja za izposojo koles"
+
+#: name.bicycle_parking_name
+msgid "Bicycle parking {name}"
+msgstr "Parkirišče za kolesa {name}"
+
+#: name.bicycle_parking
+msgid "Bicycle parking"
+msgstr "Parkirišče za kolesa"
+
+#: name.park_and_ride_name
+msgid "P+R {name}"
+msgstr "P+R {name}"
+
+#: name.park_and_ride_station
+msgid "P+R"
+msgstr "P+R"
+
+#: corner
+msgid "corner of %s and %s"
+msgstr "križišče %s in %s"
+
+#: unnamedStreet
+msgid "unnamed"
+msgstr "neimenovana"

@@ -1,0 +1,146 @@
+#. extracted from WayProperties.properties, WayProperties_fi.properties
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-04 09:48+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Finnish\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.12.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: note.caution
+msgid "Caution!"
+msgstr "Huomio!"
+
+#: note.unpaved_surface
+msgid "Unpaved surface"
+msgstr "Päällystämätön tie"
+
+#: note.muddy_surface
+msgid "Unpaved surface -- muddy!"
+msgstr "Päällystämätön tie -- mutaista!"
+
+#: note.toll
+msgid "Toll road"
+msgstr "Maksullinen tie"
+
+#: name.bike_path
+msgid "bike path"
+msgstr "pyörätie"
+
+#: name.pedestrian_path
+msgctxt "name.pedestrian_path"
+msgid "path"
+msgstr "polku"
+
+#: name.pedestrian_area
+msgid "open area"
+msgstr "aukio"
+
+#: name.path
+msgctxt "name.path"
+msgid "path"
+msgstr "polku"
+
+#: name.bridleway
+msgid "bridleway"
+msgstr "ratsupolku"
+
+#: name.otp_route_ref
+msgid "Route {otp:route_ref}"
+msgstr "linja {otp:route_ref}"
+
+#: name.platform_ref
+msgid "Platform {ref}"
+msgstr "laituri {ref}"
+
+#: name.platform
+msgid "platform"
+msgstr "laituri"
+
+#: name.footbridge
+msgid "footbridge"
+msgstr "kävelysilta"
+
+#: name.underpass
+msgid "underpass"
+msgstr "alikulku"
+
+#: name.road
+msgid "road"
+msgstr "tie"
+
+#: name.ramp
+msgid "ramp"
+msgstr "ramppi"
+
+#: name.link
+msgid "link"
+msgstr "liittymä"
+
+#: name.service_road
+msgid "service road"
+msgstr "tonttitie"
+
+#: name.alley
+msgid "alley"
+msgstr "kuja"
+
+#: name.parking_aisle
+msgid "parking aisle"
+msgstr "pysäköintialue"
+
+#: name.byway
+msgid "byway"
+msgstr "peltotie"
+
+#: name.track
+msgid "track"
+msgstr "ajopolku"
+
+#: name.sidewalk
+msgid "sidewalk"
+msgstr "jalkakäytävä"
+
+#: name.steps
+msgid "steps"
+msgstr "rappuset"
+
+#: name.bicycle_rental_name
+msgid "Bicycle rental {name}"
+msgstr "pyörävuokraamo {name}"
+
+#: name.bicycle_rental_station
+msgid "Bicycle rental station"
+msgstr "pyörävuokraamo"
+
+#: name.bicycle_parking_name
+msgid "Bicycle parking {name}"
+msgstr "polkupyöräpysäköinti {name}"
+
+#: name.bicycle_parking
+msgid "Bicycle parking"
+msgstr "polkupyöräpysäköinti"
+
+#: name.park_and_ride_name
+msgid "P+R {name}"
+msgstr "liityntäpysäköinti {name}"
+
+#: name.park_and_ride_station
+msgid "P+R"
+msgstr "liityntäpysäköinti"
+
+#: corner
+msgid "corner of %s and %s"
+msgstr "katujen %s ja %s kulma"
+
+#: unnamedStreet
+msgid "unnamed"
+msgstr "nimetön"

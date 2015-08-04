@@ -1,0 +1,146 @@
+#. extracted from WayProperties.properties, WayProperties_de.properties
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-04 09:48+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.12.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: note.caution
+msgid "Caution!"
+msgstr "Achtung!"
+
+#: note.unpaved_surface
+msgid "Unpaved surface"
+msgstr "ungepflasterte Oberfläche"
+
+#: note.muddy_surface
+msgid "Unpaved surface -- muddy!"
+msgstr "ungepflasterte Oberfläche -- schlammig!"
+
+#: note.toll
+msgid "Toll road"
+msgstr "Toll road"
+
+#: name.bike_path
+msgid "bike path"
+msgstr "Fahrradweg"
+
+#: name.pedestrian_path
+msgctxt "name.pedestrian_path"
+msgid "path"
+msgstr "Fußweg"
+
+#: name.pedestrian_area
+msgid "open area"
+msgstr "Fußgängerzone"
+
+#: name.path
+msgctxt "name.path"
+msgid "path"
+msgstr "Weg"
+
+#: name.bridleway
+msgid "bridleway"
+msgstr "Reitweg"
+
+#: name.otp_route_ref
+msgid "Route {otp:route_ref}"
+msgstr "Route {otp:route_ref}"
+
+#: name.platform_ref
+msgid "Platform {ref}"
+msgstr "Plattform {ref}"
+
+#: name.platform
+msgid "platform"
+msgstr "Plattform"
+
+#: name.footbridge
+msgid "footbridge"
+msgstr "Fußgängerbrücke"
+
+#: name.underpass
+msgid "underpass"
+msgstr "Fußgängertunnel"
+
+#: name.road
+msgid "road"
+msgstr "Straße"
+
+#: name.ramp
+msgid "ramp"
+msgstr "Auffahrrampe"
+
+#: name.link
+msgid "link"
+msgstr "Verbindung"
+
+#: name.service_road
+msgid "service road"
+msgstr "Anliegerstraße"
+
+#: name.alley
+msgid "alley"
+msgstr "Gasse"
+
+#: name.parking_aisle
+msgid "parking aisle"
+msgstr "Parkplatz"
+
+#: name.byway
+msgid "byway"
+msgstr "Nebenstraße"
+
+#: name.track
+msgid "track"
+msgstr "Fahrweg"
+
+#: name.sidewalk
+msgid "sidewalk"
+msgstr "Bürgersteig"
+
+#: name.steps
+msgid "steps"
+msgstr "Stufen"
+
+#: name.bicycle_rental_name
+msgid "Bicycle rental {name}"
+msgstr "Fahrradverleih {name}"
+
+#: name.bicycle_rental_station
+msgid "Bicycle rental station"
+msgstr "Fahrradverleihstation"
+
+#: name.bicycle_parking_name
+msgid "Bicycle parking {name}"
+msgstr "Fahrradabstellplatz {name}"
+
+#: name.bicycle_parking
+msgid "Bicycle parking"
+msgstr "Fahrradabstellplatz"
+
+#: name.park_and_ride_name
+msgid "P+R {name}"
+msgstr "P+R {name}"
+
+#: name.park_and_ride_station
+msgid "P+R"
+msgstr "P+R"
+
+#: corner
+msgid "corner of %s and %s"
+msgstr "Kreuzung %s mit %s"
+
+#: unnamedStreet
+msgid "unnamed"
+msgstr "unbekannte Strasse"

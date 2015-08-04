@@ -1,0 +1,145 @@
+#. extracted from WayProperties.properties
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-04 09:23+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Hungarian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.12.0\n"
+"Language: hu\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: note.caution
+msgid "Caution!"
+msgstr ""
+
+#: note.unpaved_surface
+msgid "Unpaved surface"
+msgstr ""
+
+#: note.muddy_surface
+msgid "Unpaved surface -- muddy!"
+msgstr ""
+
+#: note.toll
+msgid "Toll road"
+msgstr ""
+
+#: name.bike_path
+msgid "bike path"
+msgstr ""
+
+#: name.pedestrian_path
+msgctxt "name.pedestrian_path"
+msgid "path"
+msgstr ""
+
+#: name.pedestrian_area
+msgid "open area"
+msgstr ""
+
+#: name.path
+msgctxt "name.path"
+msgid "path"
+msgstr ""
+
+#: name.bridleway
+msgid "bridleway"
+msgstr ""
+
+#: name.otp_route_ref
+msgid "Route {otp:route_ref}"
+msgstr ""
+
+#: name.platform_ref
+msgid "Platform {ref}"
+msgstr ""
+
+#: name.platform
+msgid "platform"
+msgstr ""
+
+#: name.footbridge
+msgid "footbridge"
+msgstr ""
+
+#: name.underpass
+msgid "underpass"
+msgstr ""
+
+#: name.road
+msgid "road"
+msgstr ""
+
+#: name.ramp
+msgid "ramp"
+msgstr ""
+
+#: name.link
+msgid "link"
+msgstr ""
+
+#: name.service_road
+msgid "service road"
+msgstr ""
+
+#: name.alley
+msgid "alley"
+msgstr ""
+
+#: name.parking_aisle
+msgid "parking aisle"
+msgstr ""
+
+#: name.byway
+msgid "byway"
+msgstr ""
+
+#: name.track
+msgid "track"
+msgstr ""
+
+#: name.sidewalk
+msgid "sidewalk"
+msgstr ""
+
+#: name.steps
+msgid "steps"
+msgstr ""
+
+#: name.bicycle_rental_name
+msgid "Bicycle rental {name}"
+msgstr ""
+
+#: name.bicycle_rental_station
+msgid "Bicycle rental station"
+msgstr ""
+
+#: name.bicycle_parking_name
+msgid "Bicycle parking {name}"
+msgstr ""
+
+#: name.bicycle_parking
+msgid "Bicycle parking"
+msgstr ""
+
+#: name.park_and_ride_name
+msgid "P+R {name}"
+msgstr ""
+
+#: name.park_and_ride_station
+msgid "P+R"
+msgstr ""
+
+#: corner
+msgid "corner of %s and %s"
+msgstr "%s és %s sarok"
+
+#: unnamedStreet
+msgid "unnamed"
+msgstr "névtelen"

@@ -1,0 +1,146 @@
+#. extracted from WayProperties.properties, WayProperties_nl.properties
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-04 09:48+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Dutch\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Translate Toolkit 1.12.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: note.caution
+msgid "Caution!"
+msgstr "Let op!"
+
+#: note.unpaved_surface
+msgid "Unpaved surface"
+msgstr "onverharde ondergrond"
+
+#: note.muddy_surface
+msgid "Unpaved surface -- muddy!"
+msgstr "onverharde ondergrond - modderige!"
+
+#: note.toll
+msgid "Toll road"
+msgstr "Tolweg"
+
+#: name.bike_path
+msgid "bike path"
+msgstr "fietspad"
+
+#: name.pedestrian_path
+msgctxt "name.pedestrian_path"
+msgid "path"
+msgstr "voetpad"
+
+#: name.pedestrian_area
+msgid "open area"
+msgstr "open ruimte"
+
+#: name.path
+msgctxt "name.path"
+msgid "path"
+msgstr "pad"
+
+#: name.bridleway
+msgid "bridleway"
+msgstr "ruiterpad"
+
+#: name.otp_route_ref
+msgid "Route {otp:route_ref}"
+msgstr "Lijn {otp:route_ref}"
+
+#: name.platform_ref
+msgid "Platform {ref}"
+msgstr "Spoor {ref}"
+
+#: name.platform
+msgid "platform"
+msgstr "spoor"
+
+#: name.footbridge
+msgid "footbridge"
+msgstr "loopbrug"
+
+#: name.underpass
+msgid "underpass"
+msgstr "onderdoorgang"
+
+#: name.road
+msgid "road"
+msgstr "weg"
+
+#: name.ramp
+msgid "ramp"
+msgstr "helling"
+
+#: name.link
+msgid "link"
+msgstr "link"
+
+#: name.service_road
+msgid "service road"
+msgstr "ventweg"
+
+#: name.alley
+msgid "alley"
+msgstr "steegje"
+
+#: name.parking_aisle
+msgid "parking aisle"
+msgstr "parking gangpad"
+
+#: name.byway
+msgid "byway"
+msgstr "byway"
+
+#: name.track
+msgid "track"
+msgstr "track"
+
+#: name.sidewalk
+msgid "sidewalk"
+msgstr "stoep"
+
+#: name.steps
+msgid "steps"
+msgstr "stappen"
+
+#: name.bicycle_rental_name
+msgid "Bicycle rental {name}"
+msgstr "Fietsverhuur {name}"
+
+#: name.bicycle_rental_station
+msgid "Bicycle rental station"
+msgstr "Fietsverhuur station"
+
+#: name.bicycle_parking_name
+msgid "Bicycle parking {name}"
+msgstr "Fietsenstalling {name}"
+
+#: name.bicycle_parking
+msgid "Bicycle parking"
+msgstr "Fietsenstalling"
+
+#: name.park_and_ride_name
+msgid "P+R {name}"
+msgstr "P+R {name}"
+
+#: name.park_and_ride_station
+msgid "P+R"
+msgstr "P+R"
+
+#: corner
+msgid "corner of %s and %s"
+msgstr ""
+
+#: unnamedStreet
+msgid "unnamed"
+msgstr ""

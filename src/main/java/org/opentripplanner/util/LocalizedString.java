@@ -36,20 +36,20 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * @author mabu
  */
 public class LocalizedString implements I18NString, Serializable {
-    private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
+    protected static final Pattern patternMatcher = Pattern.compile("\\{(.*?)\\}");
     
     /**
      * Map which key has which tagNames. Used only when building graph.
      */
-    private transient static ListMultimap<String, String> key_tag_names;
+    protected transient static ListMultimap<String, String> key_tag_names;
     
     static {
         key_tag_names = ArrayListMultimap.create();
     }
     //Key which specifies translation
-    private String key;
+    protected String key;
     //Values with which tagNames are replaced in translations.
-    private String[] params;
+    protected String[] params;
 
     /**
      * Creates String which can be localized
@@ -91,7 +91,10 @@ public class LocalizedString implements I18NString, Serializable {
         }
         this.params = lparams.toArray(new String[lparams.size()]);
     }
-    
+
+    public LocalizedString() {
+    }
+
     /**
      * Finds wanted tag names in name
      * <p>
@@ -103,7 +106,7 @@ public class LocalizedString implements I18NString, Serializable {
      * </p>
      * @return tagName
      */
-    private List<String> getTagNames() {
+    protected List<String> getTagNames() {
         //TODO: after finding all keys for replacements replace strings to normal java strings
         //with https://stackoverflow.com/questions/2286648/named-placeholders-in-string-formatting if it is faster
         //otherwise it's converted only when toString is called

@@ -14,13 +14,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.util.i18n.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -503,69 +503,69 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         /* and some names */
         // Basics
-        createNames(props, "highway=cycleway", "name.bike_path");
-        createNames(props, "cycleway=track", "name.bike_path");
-        createNames(props, "highway=pedestrian", "name.pedestrian_path");
-        createNames(props, "highway=pedestrian;area=yes", "name.pedestrian_area");
-        createNames(props, "highway=path", "name.path");
-        createNames(props, "highway=footway", "name.pedestrian_path");
-        createNames(props, "highway=bridleway", "name.bridleway");
-        createNames(props, "highway=footway;bicycle=no", "name.pedestrian_path");
+        createNames(props, "highway=cycleway", T.tr("bike path"));
+        createNames(props, "cycleway=track", T.tr("bike path"));
+        createNames(props, "highway=pedestrian", T.trc("name.pedestrian_path", "path"));
+        createNames(props, "highway=pedestrian;area=yes", T.tr("open area"));
+        createNames(props, "highway=path", T.trc("name.path", "path"));
+        createNames(props, "highway=footway", T.trc("name.pedestrian_path", "path"));
+        createNames(props, "highway=bridleway", T.tr("bridleway"));
+        createNames(props, "highway=footway;bicycle=no", T.trc("name.pedestrian_path", "path"));
 
         // Platforms
-        createNames(props, "otp:route_ref=*", "name.otp_route_ref");
-        createNames(props, "highway=platform;ref=*", "name.platform_ref");
-        createNames(props, "railway=platform;ref=*", "name.platform_ref");
-        createNames(props, "railway=platform;highway=footway;footway=sidewalk", "name.platform");
-        createNames(props, "railway=platform;highway=path;path=sidewalk", "name.platform");
-        createNames(props, "railway=platform;highway=pedestrian", "name.platform");
-        createNames(props, "railway=platform;highway=path", "name.platform");
-        createNames(props, "railway=platform;highway=footway", "name.platform");
-        createNames(props, "highway=platform", "name.platform");
-        createNames(props, "railway=platform", "name.platform");
-        createNames(props, "railway=platform;highway=footway;bicycle=no", "name.platform");
+        createNames(props, "otp:route_ref=*", T.tr("Route {otp:route_ref}"));
+        createNames(props, "highway=platform;ref=*", T.tr("Platform {ref}"));
+        createNames(props, "railway=platform;ref=*", T.tr("Platform {ref}"));
+        createNames(props, "railway=platform;highway=footway;footway=sidewalk", T.tr("platform"));
+        createNames(props, "railway=platform;highway=path;path=sidewalk", T.tr("platform"));
+        createNames(props, "railway=platform;highway=pedestrian", T.tr("platform"));
+        createNames(props, "railway=platform;highway=path", T.tr("platform"));
+        createNames(props, "railway=platform;highway=footway", T.tr("platform"));
+        createNames(props, "highway=platform", T.tr("platform"));
+        createNames(props, "railway=platform", T.tr("platform"));
+        createNames(props, "railway=platform;highway=footway;bicycle=no", T.tr("platform"));
 
         // Bridges/Tunnels
-        createNames(props, "highway=pedestrian;bridge=*", "name.footbridge");
-        createNames(props, "highway=path;bridge=*", "name.footbridge");
-        createNames(props, "highway=footway;bridge=*", "name.footbridge");
+        createNames(props, "highway=pedestrian;bridge=*", T.tr("footbridge"));
+        createNames(props, "highway=path;bridge=*", T.tr("footbridge"));
+        createNames(props, "highway=footway;bridge=*", T.tr("footbridge"));
 
-        createNames(props, "highway=pedestrian;tunnel=*", "name.underpass");
-        createNames(props, "highway=path;tunnel=*", "name.underpass");
-        createNames(props, "highway=footway;tunnel=*", "name.underpass");
+        createNames(props, "highway=pedestrian;tunnel=*", T.tr("underpass"));
+        createNames(props, "highway=path;tunnel=*", T.tr("underpass"));
+        createNames(props, "highway=footway;tunnel=*", T.tr("underpass"));
 
         // Basic Mappings
-        createNames(props, "highway=motorway", "name.road");
-        createNames(props, "highway=motorway_link", "name.ramp");
-        createNames(props, "highway=trunk", "name.road");
-        createNames(props, "highway=trunk_link", "name.ramp");
+        createNames(props, "highway=motorway", T.tr("road"));
+        createNames(props, "highway=motorway_link", T.tr("ramp"));
+        createNames(props, "highway=trunk", T.tr("road"));
+        createNames(props, "highway=trunk_link", T.tr("ramp"));
 
-        createNames(props, "highway=primary", "name.road");
-        createNames(props, "highway=primary_link", "name.link");
-        createNames(props, "highway=secondary", "name.road");
-        createNames(props, "highway=secondary_link", "name.link");
-        createNames(props, "highway=tertiary", "name.road");
-        createNames(props, "highway=tertiary_link", "name.link");
-        createNames(props, "highway=unclassified", "name.road");
-        createNames(props, "highway=residential", "name.road");
-        createNames(props, "highway=living_street", "name.road");
-        createNames(props, "highway=road", "name.road");
-        createNames(props, "highway=service", "name.service_road");
-        createNames(props, "highway=service;service=alley", "name.alley");
-        createNames(props, "highway=service;service=parking_aisle", "name.parking_aisle");
-        createNames(props, "highway=byway", "name.byway");
-        createNames(props, "highway=track", "name.track");
+        createNames(props, "highway=primary", T.tr("road"));
+        createNames(props, "highway=primary_link", T.tr("link"));
+        createNames(props, "highway=secondary", T.tr("road"));
+        createNames(props, "highway=secondary_link", T.tr("link"));
+        createNames(props, "highway=tertiary", T.tr("road"));
+        createNames(props, "highway=tertiary_link", T.tr("link"));
+        createNames(props, "highway=unclassified", T.tr("road"));
+        createNames(props, "highway=residential", T.tr("road"));
+        createNames(props, "highway=living_street", T.tr("road"));
+        createNames(props, "highway=road", T.tr("road"));
+        createNames(props, "highway=service", T.tr("service road"));
+        createNames(props, "highway=service;service=alley", T.tr("alley"));
+        createNames(props, "highway=service;service=parking_aisle", T.tr("parking aisle"));
+        createNames(props, "highway=byway", T.tr("byway"));
+        createNames(props, "highway=track", T.tr("track"));
 
-        createNames(props, "highway=footway;footway=sidewalk", "name.sidewalk");
-        createNames(props, "highway=path;path=sidewalk", "name.sidewalk");
+        createNames(props, "highway=footway;footway=sidewalk", T.tr("sidewalk"));
+        createNames(props, "highway=path;path=sidewalk", T.tr("sidewalk"));
 
-        createNames(props, "highway=steps", "name.steps");
+        createNames(props, "highway=steps", T.tr("steps"));
 
-        createNames(props, "amenity=bicycle_parking;name=*", "name.bicycle_parking_name");
-        createNames(props, "amenity=bicycle_parking", "name.bicycle_parking");
+        createNames(props, "amenity=bicycle_parking;name=*", T.tr("Bicycle parking {name}"));
+        createNames(props, "amenity=bicycle_parking", T.tr("Bicycle parking"));
 
-        createNames(props, "amenity=parking;name=*", "name.park_and_ride_name");
-        createNames(props, "amenity=parking", "name.park_and_ride_station");
+        createNames(props, "amenity=parking;name=*", T.tr("P+R {name}"));
+        createNames(props, "amenity=parking", T.tr("P+R"));
 
         // slope overrides
         props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
@@ -575,9 +575,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         return props;
     }
 
-    private void createNames(WayPropertySet propset, String spec, String patternKey) {
-        String pattern = patternKey;
-        CreativeNamer namer = new CreativeNamer(pattern);
+    private void createNames(WayPropertySet propset, String spec, T patternKey) {
+        CreativeNamer namer = new GettextCreativeNamer(patternKey);
         propset.addCreativeNamer(new OSMSpecifier(spec), namer);
     }
 
