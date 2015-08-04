@@ -11,20 +11,11 @@ import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import gnu.trove.set.TIntSet;
 import org.apache.commons.math3.util.FastMath;
-import org.nustaq.serialization.FSTObjectInput;
-import org.nustaq.serialization.FSTObjectOutput;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -155,68 +146,6 @@ public class StreetLayer implements Serializable {
         LOG.info("Done indexing streets.");
     }
 
-    public static void main (String[] args) {
-
-        // Load transit data
-        String gtfsSourceFile = args[1];
-        TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
-
-        // Round-trip serialize the transit layer and test its speed
-        try {
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("transit.layer"));
-            transitLayer.write(outputStream);
-            outputStream.close();
-            InputStream inputStream = new BufferedInputStream(new FileInputStream("transit.layer"));
-            transitLayer = TransitLayer.read(inputStream);
-            inputStream.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        // Load OSM data
-        String osmSourceFile = args[0];
-        OSM osm = new OSM(null);
-        osm.intersectionDetection = true;
-        osm.readFromFile(osmSourceFile);
-        StreetLayer streetLayer = new StreetLayer();
-        streetLayer.loadFromOsm(osm);
-        osm.close();
-        // streetLayer.dump();
-        streetLayer.buildEdgeLists();
-        streetLayer.indexStreets();
-
-        // Link transit stops to streets
-        streetLayer.linkTransitStops(transitLayer);
-
-        // Round-trip serialize the street layer and test its speed
-        try {
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("streets.layer"));
-            streetLayer.write(outputStream);
-            outputStream.close();
-            InputStream inputStream = new BufferedInputStream(new FileInputStream("streets.layer"));
-            streetLayer = StreetLayer.read(inputStream);
-            inputStream.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        // Do some routing.
-        streetLayer.testRouting(false, transitLayer);
-        streetLayer.testRouting(true, transitLayer);
-
-    }
-
-    public void linkTransitStops (TransitLayer transitLayer) {
-        LOG.info("Linking transit stops to streets...");
-        int s = 0;
-        // FIXME
-//        for (Stop stop : transitLayer.stops) {
-//            linkNearestIntersection(s, stop.stop_lat, stop.stop_lon, 300);
-//            s++;
-//        }
-        LOG.info("Done linking transit stops to streets.");
-    }
-
     /** After JIT this appears to scale almost linearly with number of cores. */
     public void testRouting (boolean withDestinations, TransitLayer transitLayer) {
         LOG.info("Routing from random vertices in the graph...");
@@ -240,7 +169,7 @@ public class StreetLayer implements Serializable {
         LOG.info("average response time {} msec", eTime / N);
     }
 
-    private void buildEdgeLists() {
+    public void buildEdgeLists() {
         LOG.info("Building edge lists from edges...");
         outgoingEdges = new ArrayList<>(vertexStore.nVertices);
         incomingEdges = new ArrayList<>(vertexStore.nVertices);
@@ -265,25 +194,13 @@ public class StreetLayer implements Serializable {
         edgesPerListHistogram.display();
     }
 
-    public static StreetLayer read (InputStream stream) throws Exception {
-        LOG.info("Reading street layer...");
-        FSTObjectInput in = new FSTObjectInput(stream);
-        StreetLayer result = (StreetLayer) in.readObject(StreetLayer.class);
-        result.buildEdgeLists(); // These are lost when saving.
-        in.close();
-        LOG.info("Done reading.");
-        return result;
-    }
-
-    public void write (OutputStream stream) throws IOException {
-        LOG.info("Writing street layer...");
-        FSTObjectOutput out = new FSTObjectOutput(stream);
-        out.writeObject(this, StreetLayer.class );
-        out.close();
-        LOG.info("Done writing.");
-    }
-
-    public void linkNearestIntersection (int stopIndex, double lat, double lon, double radiusMeters) {
+    /**
+     * Create a street-layer vertex representing a transit stop.
+     * Connect that new vertex to the street network if possible.
+     * The vertex will be created and assigned an index whether or not it is successfully linked.
+     * @return the street vertex index that was created for this stop.
+     */
+    public int linkTransitStop (double lat, double lon, double radiusMeters) {
 
         final double metersPerDegreeLat = 111111.111;
         double cosLat = FastMath.cos(FastMath.toRadians(lat));
@@ -313,16 +230,31 @@ public class StreetLayer implements Serializable {
                 }
             }
         }
+        // Create the new vertex, whether or not it will actually have any edges.
+        int stopVertexIndex = vertexStore.addVertex(lat, lon);
         if (closestVertex >= 0) {
             closestDistance = FastMath.sqrt(closestDistance) * metersPerDegreeLat;
-            int edgeId = edgeStore.addStreetPair(closestVertex, stopIndex, closestDistance);
-            edgeStore.getCursor(edgeId).setFlag(EdgeStore.Flag.TRANSIT_LINK);
-            // Special edge type:
-            // The same edge is inserted in both incoming and outgoing lists of the source layer (streets).
-            outgoingEdges.get(closestVertex).add(edgeId);
-            incomingEdges.get(closestVertex).add(edgeId);
-            // LOG.info("Linked stop {} to street vertex {} at {} meters.", stopIndex, closestVertex, (int)closestDistance);
+            int foreEdgeId = edgeStore.addStreetPair(closestVertex, stopVertexIndex, closestDistance);
+            int backEdgeId = foreEdgeId + 1;
+            edgeStore.getCursor(foreEdgeId).setFlag(EdgeStore.Flag.TRANSIT_LINK);
+            edgeStore.getCursor(backEdgeId).setFlag(EdgeStore.Flag.TRANSIT_LINK);
+            // Edges will be added to (transient) edge lists later.
         }
+        return stopVertexIndex;
+    }
+
+
+    /**
+     * Used to split streets for temporary endpoints and for transit stops.
+     * transit: favor platforms and pedestrian paths, used in linking stops to streets
+     * intoStreetLayer: the edges created by splitting a street are one-way. by default they are one-way out of the street
+     * network, e.g. out to a transit stop or to the destination. When intoStreets is true, the split is performed such that
+     * it leads into the street network instead of out of it. The fact that split edges are uni-directional is important
+     * for a couple of reasons: it avoids using transit stops as shortcuts, and it makes temporary endpoint vertices
+     * harmless to searches happening in other threads.
+     */
+    public void splitStreet(Pointlike where, boolean transit, boolean out) {
+
     }
 
 }

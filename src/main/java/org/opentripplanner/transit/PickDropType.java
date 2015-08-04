@@ -1,8 +1,5 @@
 package org.opentripplanner.transit;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 /**
 *
 */
@@ -14,10 +11,11 @@ public enum PickDropType {
     COORDINATE_WITH_DRIVER(3);
 
     // Will be initialized after constructor is called on all enum values.
-    static TIntObjectMap<PickDropType> forGtfsCode = new TIntObjectHashMap<>();
+    private static PickDropType[] forGtfsCode;
     static {
+        forGtfsCode = new PickDropType[4];
         for (PickDropType pdt : PickDropType.values()) {
-            forGtfsCode.put(pdt.gtfsCode, pdt);
+            forGtfsCode[pdt.gtfsCode] = pdt;
         }
     }
 
@@ -28,7 +26,7 @@ public enum PickDropType {
     }
 
     static PickDropType forGtfsCode (int gtfsCode) {
-        return forGtfsCode.get(gtfsCode);
+        return forGtfsCode[gtfsCode];
     }
 
 }

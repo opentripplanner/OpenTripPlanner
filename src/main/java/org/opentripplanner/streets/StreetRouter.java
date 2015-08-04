@@ -1,9 +1,12 @@
 package org.opentripplanner.streets;
 
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.transit.TransitLayer;
@@ -42,6 +45,20 @@ public class StreetRouter {
 
     double targetLat, targetLon; // for goal direction heuristic
 
+    public TIntSet transitStopVerticesHit = new TIntHashSet();
+
+    public TIntIntMap timesToReachedStops () {
+        TIntIntMap result = new TIntIntHashMap();
+        // Convert stop vertex indexes in street layer to transit layer stop indexes.
+        transitStopVerticesHit.forEach(vertexIndex -> {
+            int weight = bestStates.get(vertexIndex).weight;
+            int stopIndex = transitLayer.stopForStreetVertex.get(vertexIndex);
+            result.put(stopIndex, weight);
+            return true; // continue iteration
+        });
+        return result;
+    }
+
     public StreetRouter (StreetLayer streetLayer, TransitLayer transitLayer) {
         this.streetLayer = streetLayer;
         this.transitLayer = transitLayer;
@@ -51,6 +68,7 @@ public class StreetRouter {
         long startTime = System.currentTimeMillis();
         bestStates.clear();
         queue.reset();
+        transitStopVerticesHit.clear();
         State startState = new State(fromVertex, -1, null);
         bestStates.put(fromVertex, startState);
         queue.insert(startState, 0);
@@ -90,27 +108,25 @@ public class StreetRouter {
                 printStream.printf("%f,%f,%d\n", vertex.getLat(), vertex.getLon(), s0.weight);
             }
             TIntList edgeList = streetLayer.outgoingEdges.get(v0);
-            TIntIterator edgeIterator = edgeList.iterator();
-            while (edgeIterator.hasNext()) {
-                int edgeIndex = edgeIterator.next();
+            edgeList.forEach(edgeIndex -> {
                 edge.seek(edgeIndex);
                 State s1 = edge.traverse(s0);
                 if (!goalDirection && s1.weight > distanceLimitMeters) {
-                    continue;
-                }
-                if (edge.getFlag(EdgeStore.Flag.TRANSIT_LINK)) {
-                    // Links are a special case: the toVertex is always a stop index, not a street vertex.
-                    // The first time a stop is hit is always the lowest cost.
-                    int stopIndex = s1.vertex;
-                    continue;
+                    return true; // iteration should continue
                 }
                 State existingBest = bestStates.get(s1.vertex);
                 if (existingBest == null || existingBest.weight > s1.weight) {
                     bestStates.put(s1.vertex, s1);
-                    int remainingWeight = goalDirection ? heuristic(s1) : 0;
-                    queue.insert(s1, s1.weight + remainingWeight);
+                    if (edge.getFlag(EdgeStore.Flag.TRANSIT_LINK) && !edge.getFlag(EdgeStore.Flag.BACKWARD)) {
+                        transitStopVerticesHit.add(edge.getToVertex());
+                        // Once we go into a transit stop, we don't follow any edges out of it.
+                        return true; // iteration should continue
+                    }
                 }
-            }
+                int remainingWeight = goalDirection ? heuristic(s1) : 0;
+                queue.insert(s1, s1.weight + remainingWeight);
+                return true; // iteration should continue
+            });
         }
         if (DEBUG_OUTPUT) {
             printStream.close();
