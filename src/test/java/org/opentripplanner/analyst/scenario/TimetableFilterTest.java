@@ -23,13 +23,13 @@ import java.util.List;
  * Tests for various timetable filters
  */
 public class TimetableFilterTest extends TestCase {
-    private TripPattern pattern;
-    private Trip trip, trip2;
-    private TripTimes times;
+    private TripPattern pattern, metroPattern;
+    private Trip trip, trip2, metroTrip;
+    private TripTimes times, metroTimes;
     private FrequencyEntry frequencyEntry;
     private Stop[] stops;
     private Agency agency;
-    private Route route;
+    private Route route, metro;
 
     /* ROUTE REMOVAL (also matching) */
 
@@ -42,6 +42,17 @@ public class TimetableFilterTest extends TestCase {
 
         assertNull(rt.apply(trip, pattern, times));
         assertNull(rt.apply(trip, pattern, frequencyEntry));
+    }
+
+    /** test that routes removed by route type work */
+    @Test
+    public void testTripRemovalByRouteType () {
+        RemoveTrip rt = new RemoveTrip();
+        rt.agencyId = agency.getId();
+        rt.routeType = new int[] { com.conveyal.gtfs.model.Route.SUBWAY };
+
+        assertNull(rt.apply(metroTrip, metroPattern, metroTimes));
+        assertNotNull(rt.apply(trip, pattern, times));
     }
 
     /** test that routes that should not be removed are not */
@@ -329,10 +340,18 @@ public class TimetableFilterTest extends TestCase {
         agency = new Agency();
         agency.setId("AGENCY");
         route = new Route();
+        route.setType(com.conveyal.gtfs.model.Route.BUS);
         route.setShortName("T");
         route.setLongName("TEST");
         route.setAgency(agency);
         route.setId(new AgencyAndId(agency.getId(), "TEST"));
+
+        metro = new Route();
+        metro.setType(com.conveyal.gtfs.model.Route.SUBWAY);
+        metro.setShortName("M");
+        metro.setLongName("METRO");
+        metro.setAgency(agency);
+        metro.setId(new AgencyAndId(agency.getId(), "METRO"));
 
         trip = new Trip();
         trip.setRoute(route);
@@ -353,23 +372,35 @@ public class TimetableFilterTest extends TestCase {
             stops[i] = s;
         }
 
-        StopPattern sp = new StopPattern(makeStopTimes(trip));
+        List<StopTime> stopTimes = makeStopTimes(trip);
+        StopPattern sp = new StopPattern(stopTimes);
 
         pattern = new TripPattern(route, sp);
 
         // make a triptimes
-        times = makeTripTimes(trip);
+        times = makeTripTimes(trip, stopTimes);
         pattern.scheduledTimetable.addTripTimes(times);
-        pattern.scheduledTimetable.addTripTimes(makeTripTimes(trip2));
+        pattern.scheduledTimetable.addTripTimes(makeTripTimes(trip2, makeStopTimes(trip2)));
 
         // ten-minute frequency
-        frequencyEntry = new FrequencyEntry(7 * 3600, 12 * 3600, 600, false, makeTripTimes(trip));
+        frequencyEntry = new FrequencyEntry(7 * 3600, 12 * 3600, 600, false, makeTripTimes(trip, makeStopTimes(trip)));
         pattern.scheduledTimetable.addFrequencyEntry(frequencyEntry);
-        pattern.scheduledTimetable.addFrequencyEntry(new FrequencyEntry(7 * 3600, 12 * 3600, 600, false, makeTripTimes(trip2)));
+        pattern.scheduledTimetable.addFrequencyEntry(new FrequencyEntry(7 * 3600, 12 * 3600, 600, false, makeTripTimes(trip2, makeStopTimes(trip2))));
+
+        metroTrip = new Trip();
+        metroTrip.setRoute(metro);
+        metroTrip.setId(new AgencyAndId(agency.getId(), "TRIP"));
+
+        stopTimes = makeStopTimes(metroTrip);
+        sp = new StopPattern(stopTimes);
+
+        metroPattern = new TripPattern(metro, sp);
+        metroTimes = makeTripTimes(metroTrip, stopTimes);
+        metroPattern.scheduledTimetable.addTripTimes(metroTimes);
     }
 
     /** Make up some trip times. Dwell is 30s, hop is 120s */
-    private TripTimes makeTripTimes (Trip trip) {
+    private TripTimes makeTripTimes (Trip trip, List<StopTime> stopTimes) {
         return new TripTimes(trip, makeStopTimes(trip), new Deduplicator());
     }
 
