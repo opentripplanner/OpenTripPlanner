@@ -369,6 +369,10 @@ public abstract class GraphPathToTripPlanConverter {
             } else {
                 previousStep = null;
             }
+	    // TODO: this needs to be optional
+            for (WalkStep walkStep : walkSteps) {
+                walkStep.addDescriptions(requestedLocale);
+            }
         }
     }
 

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.util;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -37,6 +38,20 @@ public enum ResourceBundleSingleton {
 
     public Locale getDefaultLocale() {
         return defaultLocale;
+    }
+
+    /**
+     * Do gettext localization and replace parameters with values from arguments
+     * @param msg
+     * @param locale
+     * @param arguments
+     * @return
+     */
+    public String localizeGettext(T msg, Locale locale, Object[] arguments) {
+        String translation = localizeGettext(msg, locale);
+        MessageFormat format = new MessageFormat("", locale);
+        format.applyPattern(translation);
+        return format.format(arguments);
     }
 
     public String localizeGettext(T msg, Locale locale) {

@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.google.common.collect.ImmutableMap;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
@@ -31,6 +32,8 @@ import org.opentripplanner.routing.graph.Edge;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Lists;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.i18n.T;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -60,6 +63,52 @@ import com.google.common.collect.Lists;
  * </p>
  * */
 public class WalkStep {
+
+    private static final ImmutableMap<String, T> exitNumbers;
+    private static final ImmutableMap<RelativeDirection, T> relativeDirections;
+    private static final ImmutableMap<AbsoluteDirection, T> absoluteDirections;
+
+    static {
+        exitNumbers = ImmutableMap.<String, T>builder()
+            .put("1", T.tr("first"))
+            .put("2", T.tr("second"))
+            .put("3", T.tr("third"))
+            .put("4", T.tr("fourth"))
+            .put("5", T.tr("fifth"))
+            .put("6", T.tr("sixth"))
+            .put("7", T.tr("seventh"))
+            .put("8", T.tr("eight"))
+            .put("9", T.tr("ninth"))
+            .put("10", T.tr("tenth"))
+            .build();
+
+        relativeDirections = ImmutableMap.<RelativeDirection, T>builder()
+            .put(RelativeDirection.DEPART, T.trc("itinerary", "depart"))
+            .put(RelativeDirection.CIRCLE_CLOCKWISE, T.tr("clockwise"))
+            .put(RelativeDirection.CIRCLE_COUNTERCLOCKWISE, T.tr("counter clockwise"))
+            .put(RelativeDirection.HARD_LEFT, T.tr("hard left"))
+            .put(RelativeDirection.LEFT, T.tr("left"))
+            .put(RelativeDirection.SLIGHTLY_LEFT, T.tr("slight left"))
+            .put(RelativeDirection.CONTINUE, T.tr("continue"))
+            .put(RelativeDirection.SLIGHTLY_RIGHT, T.tr("slight right"))
+            .put(RelativeDirection.RIGHT, T.tr("right"))
+            .put(RelativeDirection.HARD_RIGHT, T.tr("hard right"))
+            .put(RelativeDirection.ELEVATOR, T.tr("elevator"))
+            .put(RelativeDirection.UTURN_LEFT, T.tr("U-turn left"))
+            .put(RelativeDirection.UTURN_RIGHT, T.tr("U-turn right"))
+            .build();
+
+        absoluteDirections = ImmutableMap.<AbsoluteDirection, T>builder()
+            .put(AbsoluteDirection.NORTH, T.tr("north"))
+            .put(AbsoluteDirection.NORTHEAST, T.tr("northeast"))
+            .put(AbsoluteDirection.EAST, T.tr("east"))
+            .put(AbsoluteDirection.SOUTHEAST, T.tr("southeast"))
+            .put(AbsoluteDirection.SOUTH, T.tr("south"))
+            .put(AbsoluteDirection.SOUTHWEST, T.tr("southwest"))
+            .put(AbsoluteDirection.WEST, T.tr("west"))
+            .put(AbsoluteDirection.NORTHWEST, T.tr("northwest"))
+            .build();
+    }
 
     /**
      * The distance in meters that this step takes.
@@ -137,6 +186,9 @@ public class WalkStep {
      */
     public transient List<Edge> edges = Lists.newArrayList();
 
+    public String shortDescription;
+
+    public String longDescription;
     /**
      * The bike rental on/off station info.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
@@ -226,6 +278,57 @@ public class WalkStep {
     @JsonSerialize
     public List<P2<Double>> getElevation() {
         return elevation;
+    }
+
+    public void addDescriptions(Locale requestedLocale) {
+        if (relativeDirection == RelativeDirection.CIRCLE_COUNTERCLOCKWISE || relativeDirection == RelativeDirection.CIRCLE_CLOCKWISE) {
+            longDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(
+                T.tr("Take roundabout {0} to {1} exit on {2}"), requestedLocale, new String[]{getLocalizedRelativeDirection(requestedLocale),
+                    getOrdinalExitTranslation(requestedLocale), streetName});
+        } else {
+            if (relativeDirection == RelativeDirection.DEPART) {
+                longDescription = ResourceBundleSingleton.INSTANCE
+                    .localizeGettext(T.tr("Start on {0} heading {1}"), requestedLocale,
+                        new String[] { streetName, getLocalizedAbsoluteDirection(requestedLocale) });
+            } else {
+                if (stayOn) {
+                    longDescription = ResourceBundleSingleton.INSTANCE
+                        .localizeGettext(T.tr("{0} to continue on {1}"), requestedLocale,
+                            new String[] { getLocalizedRelativeDirection(requestedLocale), streetName });
+                } else {
+                    longDescription = ResourceBundleSingleton.INSTANCE
+                        .localizeGettext(T.tr("{0} on to {1}"), requestedLocale,
+                            new String[] { getLocalizedRelativeDirection(requestedLocale), streetName });
+                }
+
+            }
+        }
+        longDescription = longDescription.substring(0, 1).toUpperCase(requestedLocale) + longDescription.substring(1);
+    }
+
+    /**
+     * This returns localized ordinal number 1-10. or number + . for other numbers.
+     *
+     * It is used in localization of roundabout exits
+     * @param requestedLocale
+     * @return
+     */
+    private String getOrdinalExitTranslation(Locale requestedLocale) {
+        if (Integer.valueOf(exit) > 10) {
+            return exit + ".";
+        } else if(exitNumbers.containsKey(exit)) {
+            return ResourceBundleSingleton.INSTANCE.localizeGettext(exitNumbers.get(exit), requestedLocale);
+        } else {
+            return exit;
+        }
+    }
+
+    private String getLocalizedRelativeDirection(Locale requestedLocale) {
+        return ResourceBundleSingleton.INSTANCE.localizeGettext(relativeDirections.get(relativeDirection), requestedLocale);
+    }
+
+    private String getLocalizedAbsoluteDirection(Locale requestedLocale) {
+        return ResourceBundleSingleton.INSTANCE.localizeGettext(absoluteDirections.get(absoluteDirection), requestedLocale);
     }
 
 }
