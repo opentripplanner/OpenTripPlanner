@@ -16,6 +16,9 @@ package org.opentripplanner.util;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import gnu.gettext.GettextResource;
+import org.opentripplanner.util.i18n.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +37,36 @@ public enum ResourceBundleSingleton {
 
     public Locale getDefaultLocale() {
         return defaultLocale;
+    }
+
+    public String localizeGettext(T msg, Locale locale) {
+        if (msg == null) {
+            return null;
+        }
+
+        if (locale == null) {
+            locale = getDefaultLocale();
+        }
+        String translation;
+        if (locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+            translation = msg.msgid;
+        } else {
+            try {
+                ResourceBundle resourceBundle = null;
+                resourceBundle = ResourceBundle
+                    .getBundle("org.opentripplanner.util.i18n.translations.Messages", locale);
+                    if (msg.msgctx != null) {
+                        translation = GettextResource
+                            .pgettext(resourceBundle, msg.msgctx, msg.msgid);
+                    } else {
+                        translation = GettextResource.gettext(resourceBundle, msg.msgid);
+                    }
+            } catch (MissingResourceException e) {
+                LOG.error("Missing resource for key: " + msg, e);
+                translation = msg.msgid;
+            }
+        }
+        return translation;
     }
 
     //in singleton because resurce bundles are cached based on calling class

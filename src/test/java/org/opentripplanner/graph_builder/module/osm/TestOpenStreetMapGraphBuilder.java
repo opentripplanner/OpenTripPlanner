@@ -36,7 +36,9 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.util.GettextLocalizedString;
 import org.opentripplanner.util.LocalizedString;
+import org.opentripplanner.util.i18n.T;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -261,6 +263,16 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         assertEquals("corner of first and second", localizedString.toString());
         assertEquals("Kreuzung first mit second",
                 localizedString.toString(new Locale("de")));
+    }
+
+    @Test
+    public void testGettextLocalizedString() {
+        LocalizedString localizedString = new GettextLocalizedString(T.tr("corner of %s and %s"),
+            new String[]{"first", "second"});
+
+        assertEquals("corner of first and second", localizedString.toString());
+        assertEquals("Kreuzung first mit second",
+            localizedString.toString(new Locale("de")));
     }
 
     // disabled pending discussion with author (AMB)

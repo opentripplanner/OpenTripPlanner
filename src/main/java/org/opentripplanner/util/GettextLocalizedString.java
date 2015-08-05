@@ -1,6 +1,5 @@
 package org.opentripplanner.util;
 
-import gnu.gettext.GettextResource;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.util.i18n.T;
 import org.slf4j.Logger;
@@ -18,26 +17,16 @@ public class GettextLocalizedString extends LocalizedString {
 
     T localizedKey;
 
-
     /**
      * Creates String which can be localized
      *
-     * @param key    key of translation for this way set in {@link DefaultWayPropertySetSource} and translations read from from properties Files
+     * @param translatableObject  object with english text and translation context set in {@link DefaultWayPropertySetSource} and translated with help of gettext.
      * @param params Values with which tagNames are replaced in translations.
      */
-    public GettextLocalizedString(String key, String[] params) {
-        super(key, params);
-    }
-
-    /**
-     * Creates String which can be localized
-     *
-     * @param key    key of translation for this way set in {@link DefaultWayPropertySetSource} and translations read from from properties Files
-     * @param params Values with which tagNames are replaced in translations.
-     */
-    public GettextLocalizedString(T tr, String[] strings) {
-        super(tr.msgid, strings);
+    public GettextLocalizedString(T translatableObject, String[] params) {
+        super(translatableObject.msgid, params);
         //FIXME: this doesn't support context yet
+        localizedKey = translatableObject;
     }
 
     /**
@@ -51,13 +40,9 @@ public class GettextLocalizedString extends LocalizedString {
      * It currently assumes that tag exists in way. (otherwise this namer wouldn't be used)
      * </p>
      *
-     * @param key key of translation for this way set in {@link DefaultWayPropertySetSource} and translations read from from properties Files
+     * @param creativeNameLocalPattern Object with english string and translation context for translations set in {@link DefaultWayPropertySetSource}. Translations are with gettext.
      * @param way OSM way from which tag values are read
      */
-    public GettextLocalizedString(String key, OSMWithTags way) {
-        super(key, way);
-    }
-
     public GettextLocalizedString(T creativeNameLocalPattern, OSMWithTags way) {
         this.localizedKey = creativeNameLocalPattern;
         this.key = creativeNameLocalPattern.msgid;
@@ -116,32 +101,11 @@ public class GettextLocalizedString extends LocalizedString {
      * @return
      */
     @Override public String toString(Locale locale) {
-        if (this.key == null) {
+        if (this.key == null || this.localizedKey == null) {
             return null;
         }
-        String translation;
-        if (locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
-            translation = key;
-        } else {
-            try {
-                ResourceBundle resourceBundle = null;
-                resourceBundle = ResourceBundle
-                    .getBundle("org.opentripplanner.util.i18n.translations.Messages", locale);
-                if (localizedKey != null) {
-                    if (localizedKey.msgctx != null) {
-                        translation = GettextResource
-                            .pgettext(resourceBundle, localizedKey.msgctx, localizedKey.msgid);
-                    } else {
-                        translation = GettextResource.gettext(resourceBundle, localizedKey.msgid);
-                    }
-                } else {
-                    translation = GettextResource.gettext(resourceBundle, key);
-                }
-            } catch (MissingResourceException e) {
-                LOG.error("Missing resource for key: " + key, e);
-                translation = key;
-            }
-        }
+        String translation = ResourceBundleSingleton.INSTANCE.localizeGettext(localizedKey, locale);
+
         if (this.params != null) {
             translation = patternMatcher.matcher(translation).replaceAll("%s");
             return String.format(translation, (Object[]) params);
