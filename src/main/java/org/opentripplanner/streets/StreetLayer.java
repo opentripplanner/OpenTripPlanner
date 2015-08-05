@@ -257,4 +257,8 @@ public class StreetLayer implements Serializable {
 
     }
 
+    public int getVertexCount() {
+        return vertexStore.nVertices;
+    }
+
 }

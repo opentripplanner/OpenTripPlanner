@@ -58,4 +58,21 @@ public class TripPattern implements Serializable {
     // function in gtfs-lib getOrderedStopTimes(string tripId)
     // Test GTFS loading on NL large data set.
 
+    /**
+     * Linear search.
+     * @return null if no departure is possible.
+     */
+    TripSchedule findNextDeparture (int time, int stopOffset) {
+        TripSchedule bestSchedule = null;
+        int bestTime = Integer.MAX_VALUE;
+        for (TripSchedule schedule : tripSchedules) {
+            int departureTime = schedule.departures[stopOffset];
+            if (departureTime > time && departureTime < bestTime) {
+                bestTime = departureTime;
+                bestSchedule = schedule;
+            }
+        }
+        return bestSchedule;
+    }
+
 }

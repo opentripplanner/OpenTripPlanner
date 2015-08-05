@@ -47,6 +47,9 @@ public class StreetRouter {
 
     public TIntSet transitStopVerticesHit = new TIntHashSet();
 
+    /**
+     * @return a map from transit stop indexes to their distances from the origin
+     */
     public TIntIntMap timesToReachedStops () {
         TIntIntMap result = new TIntIntHashMap();
         // Convert stop vertex indexes in street layer to transit layer stop indexes.

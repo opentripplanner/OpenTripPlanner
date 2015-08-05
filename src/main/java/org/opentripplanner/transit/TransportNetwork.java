@@ -4,6 +4,7 @@ import com.conveyal.osmlib.OSM;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
 import org.opentripplanner.streets.StreetLayer;
+import org.opentripplanner.streets.StreetRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Random;
 
 /**
  *
@@ -90,12 +92,44 @@ public class TransportNetwork implements Serializable {
         transportNetwork.transitLayer = transitLayer;
         transportNetwork = roundTripTest(transportNetwork);
 
+
         // Do some routing.
-        transportNetwork.streetLayer.testRouting(false, transitLayer);
-        transportNetwork.streetLayer.testRouting(true, transitLayer);
+        transportNetwork.testRouting();
+        // transportNetwork.streetLayer.testRouting(false, transitLayer);
+        // transportNetwork.streetLayer.testRouting(true, transitLayer);
 
     }
 
+    /**
+     * Test combined street and transit routing.
+     */
+    public void testRouting () {
+        LOG.info("Street and transit routing from random street corners...");
+        StreetRouter streetRouter = new StreetRouter(streetLayer, transitLayer);
+        streetRouter.distanceLimitMeters = 1500;
+        TransitRouter transitRouter = new TransitRouter(transitLayer);
+        long startTime = System.currentTimeMillis();
+        final int N = 1_000;
+        final int nStreetIntersections = streetLayer.getVertexCount();
+        Random random = new Random();
+        for (int n = 0; n < N; n++) {
+            // Do one street search around a random origin and destination, initializing the transit router
+            // with the stops that were reached.
+            int from = random.nextInt(nStreetIntersections);
+            int to = random.nextInt(nStreetIntersections);
+            transitRouter.reset();
+            streetRouter.route(from, StreetRouter.ALL_VERTICES);
+            transitRouter.setOrigins(streetRouter.timesToReachedStops());
+            streetRouter.route(to, StreetRouter.ALL_VERTICES);
+            transitRouter.setTargets(streetRouter.timesToReachedStops().keySet());
+            transitRouter.route();
+            if (n != 0 && n % 100 == 0) {
+                LOG.info("    {}/{} searches", n, N);
+            }
+        }
+        double eTime = System.currentTimeMillis() - startTime;
+        LOG.info("average response time {} msec", eTime / N);
+    }
 
 
 }
