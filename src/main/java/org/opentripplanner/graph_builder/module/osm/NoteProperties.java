@@ -21,8 +21,10 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
+import org.opentripplanner.util.GettextLocalizedString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.util.i18n.T;
 
 //Currently unused since notes are disabled in DefaultWayPropertySetSource
 public class NoteProperties {
@@ -31,13 +33,33 @@ public class NoteProperties {
 
     public String notePattern;
 
+    private T translatablePattern;
+
     public NoteMatcher noteMatcher;
 
+    @Deprecated
     public NoteProperties(String notePattern, NoteMatcher noteMatcher) {
         this.notePattern = notePattern;
         this.noteMatcher = noteMatcher;
     }
 
+    public NoteProperties(T patternKey, NoteMatcher matcher) {
+        this.notePattern = patternKey.msgid;
+        this.noteMatcher = matcher;
+        this.translatablePattern = patternKey;
+    }
+
+    /**
+     *
+     * Note can be generated with  pattern "{tagname}" where all tagname:languages
+     * are also saved as translations. And correct translation is returned on usage if it exits.
+     *
+     * Or pattern can be "text ", "text {tagname}" where gettext translation with
+     * {@link GettextLocalizedString} is used to get the translations of text.
+     * And only default value of tagname is used. No translations are supported currently.
+     * @param way From which tag values are read
+     * @return
+     */
     public T2<Alert, NoteMatcher> generateNote(OSMWithTags way) {
         Alert note = new Alert();
         //TODO: this could probably be made without patternMatch for {} since all notes (at least currently) have {note} as notePattern
@@ -46,7 +68,13 @@ public class NoteProperties {
             Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
             note.alertHeaderText = TranslatedString.getI18NString(noteText);
         } else {
-            note.alertHeaderText = new LocalizedString(notePattern, way);
+            if (translatablePattern != null) {
+                // This uses new Gettext translation
+                note.alertHeaderText = new GettextLocalizedString(translatablePattern, way);
+            } else {
+                // This uses old Java properties translations
+                note.alertHeaderText = new LocalizedString(notePattern, way);
+            }
         }
         return new T2<>(note, noteMatcher);
     }

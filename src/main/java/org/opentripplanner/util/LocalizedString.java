@@ -56,6 +56,7 @@ public class LocalizedString implements I18NString, Serializable {
      * @param key key of translation for this way set in {@link DefaultWayPropertySetSource} and translations read from from properties Files
      * @param params Values with which tagNames are replaced in translations.
      */
+    @Deprecated
     public LocalizedString(String key, String[] params) {
         this.key = key;
         this.params = params;
@@ -74,6 +75,7 @@ public class LocalizedString implements I18NString, Serializable {
      * @param key key of translation for this way set in {@link DefaultWayPropertySetSource} and translations read from from properties Files
      * @param way OSM way from which tag values are read
      */
+    @Deprecated
     public LocalizedString(String key, OSMWithTags way) {
         this.key = key;
         List<String> lparams = new ArrayList<String>(4);
