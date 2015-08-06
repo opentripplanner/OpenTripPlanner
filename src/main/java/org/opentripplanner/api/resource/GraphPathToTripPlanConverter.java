@@ -315,6 +315,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
+        leg.addDescriptions(requestedLocale);
         return leg;
     }
 

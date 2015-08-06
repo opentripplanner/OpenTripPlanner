@@ -26,6 +26,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.opentripplanner.util.i18n.T;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -251,6 +253,30 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public Boolean rentedBike;
+
+    public String textDescription;
+
+     /**
+      * Creates route number route name to headsign/stop name if transit stop
+      *
+      * or just to destination name if not
+      * @param requestedLocale
+      */
+     public void addDescriptions(Locale requestedLocale) {
+         if (isTransitLeg()) {
+             textDescription = "<b>" + routeShortName + "</b>" + " " + routeLongName;
+             if (headsign != null) {
+                 textDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("bus_direction", " to "), requestedLocale);
+                 textDescription += headsign;
+             } else {
+                 textDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+                 textDescription += to.name;
+             }
+         } else {
+             textDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+             textDescription += to.name;
+         }
+     }
 
     /**
      * Whether this leg is a transit leg or not.
