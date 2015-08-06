@@ -26,9 +26,7 @@ import org.opentripplanner.api.model.TraverseModeSetSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -156,6 +154,19 @@ public class Broker implements Runnable {
 
         // create a config for the AWS workers
         workerConfig = new Properties();
+
+        // load the base worker configuration if specified
+        if (config.getProperty("worker-config") != null) {
+            try {
+                File f = new File(config.getProperty("worker-config"));
+                FileInputStream fis = new FileInputStream(f);
+                workerConfig.load(fis);
+                fis.close();
+            } catch (IOException e) {
+                LOG.error("Error loading base worker configuration", e);
+            }
+        }
+
         workerConfig.setProperty("broker-address", addr);
         workerConfig.setProperty("broker-port", "" + port);
 
