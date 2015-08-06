@@ -14,9 +14,7 @@
 package org.opentripplanner.util;
 
 import java.text.MessageFormat;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import gnu.gettext.GettextResource;
 import org.opentripplanner.util.i18n.T;
@@ -52,6 +50,40 @@ public enum ResourceBundleSingleton {
         MessageFormat format = new MessageFormat("", locale);
         format.applyPattern(translation);
         return format.format(arguments);
+    }
+
+    /**
+     * This is temporary function that localizes strings with named sprintf parameters
+     *
+     * It uses {@link #localizeGettext(T, Locale)} for localization.
+     *
+     * It is used since current translations all have sprinf named parameters ("%(streetName)s")
+     * and java doesn't support them
+     *
+     * From http://stackoverflow.com/a/2295004
+     * @param msg
+     * @param locale language of translation
+     * @param values map of keys with values that need to be replaced on those places
+     * @return
+     */
+    public String localizeGettextSprintfFormat(T msg, Locale locale, Map<String, String> values) {
+        String format = localizeGettext(msg, locale);
+        StringBuilder convFormat = new StringBuilder(format);
+        Set<String> keys = values.keySet();
+        List<String> valueList = new ArrayList<>();
+        int currentPos = 1;
+        for(String key: keys) {
+            String formatKey = "%(" + key + ")",
+                formatPos = "%" + Integer.toString(currentPos) + "$";
+            int index = -1;
+            while ((index = convFormat.indexOf(formatKey, index)) != -1) {
+                convFormat.replace(index, index + formatKey.length(), formatPos);
+                index += formatPos.length();
+            }
+            valueList.add(values.get(key));
+            ++currentPos;
+        }
+        return String.format(locale, convFormat.toString(), valueList.toArray());
     }
 
     public String localizeGettext(T msg, Locale locale) {

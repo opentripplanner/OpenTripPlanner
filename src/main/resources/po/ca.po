@@ -1,18 +1,24 @@
-#, fuzzy
+# Catalan (Spain) translations for OpenTripPlanner.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the OpenTripPlanner
+# project.
+#
+# pataquets, 2014.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-28 07:42+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: Finnish\n"
-"Language: fi\n"
+"PO-Revision-Date: 2015-06-29 10:32+0100\n"
+"Last-Translator: \n"
+"Language-Team: ca_ES <LL@li.org>\n"
+"Language: ca_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 1.12.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 1.3\n"
+"X-Generator: Poedit 1.8.1\n"
 
 #: lib/templates/step.html:9
 msgid ""
@@ -25,8 +31,9 @@ msgid "Start on <b>%(streetName)s</b> heading %(absoluteDirection)s"
 msgstr ""
 
 #: lib/templates/step.html:15
+#, fuzzy
 msgid "<b>%(relativeDirection)s</b> to continue on <b>%(streetName)s</b>"
-msgstr ""
+msgstr "<b>%(relativeDirection)s</b> per a continuar a <b>%(streetName)s</b>"
 
 #: lib/templates/step.html:17
 msgid "<b>%(relativeDirection)s</b> on to <b>%(streetName)s</b>"
@@ -77,37 +84,39 @@ msgid "Show Settings"
 msgstr ""
 
 #: lib/templates/request-form.html:31
+#, fuzzy
 msgid "Arrive at"
-msgstr ""
+msgstr "Arribada a"
 
 #: lib/templates/request-form.html:33
+#, fuzzy
 msgid "Depart by"
-msgstr ""
+msgstr "Sortida des de"
 
 #: lib/templates/request-form.html:62
+#, fuzzy
 msgid "Travel by"
-msgstr ""
+msgstr "Mode de viatge"
 
 #: lib/templates/request-form.html:66
 msgid "Transit"
-msgstr ""
+msgstr "Transport públic"
 
 #: lib/templates/request-form.html:68
 msgid "Rail Only"
-msgstr ""
+msgstr "Només tren"
 
 #: lib/templates/request-form.html:70
 msgid "Bus Only"
-msgstr ""
+msgstr "Només bus"
 
 #: lib/templates/request-form.html:72
 msgid "Walk Only"
-msgstr ""
+msgstr "Només a peu"
 
 #: lib/templates/request-form.html:74
-#, fuzzy
 msgid "Bicycle Only"
-msgstr "polkupyöräpysäköinti"
+msgstr "Bicicleta"
 
 #: lib/templates/request-form.html:83
 msgid "Find"
@@ -118,20 +127,24 @@ msgid "Quickest trip"
 msgstr ""
 
 #: lib/templates/request-form.html:89
+#, fuzzy
 msgid "Fewest transfers"
-msgstr ""
+msgstr "transbords"
 
 #: lib/templates/request-form.html:99
+#, fuzzy
 msgid "Wheelchair accessible trip"
-msgstr ""
+msgstr "Viatge amb accessibilitat"
 
 #: lib/templates/request-form.html:107
+#, fuzzy
 msgid "Maximum walk"
-msgstr ""
+msgstr "Màxima distància fins la parada"
 
 #: lib/templates/request-form.html:136
+#, fuzzy
 msgid "Maximum bike"
-msgstr ""
+msgstr "Màxima distància anb bicicleta"
 
 #: lib/templates/request-form.html:171
 msgid "Select language"
@@ -181,9 +194,10 @@ msgid " to "
 msgstr ""
 
 #: lib/templates/transit-leg.html:19
+#, fuzzy
 msgctxt "itinerary"
 msgid "Depart"
-msgstr ""
+msgstr "Sortida des de"
 
 #. TRANSLATORS: "[From] marker location/address" in geocoding input field
 #: lib/request-form.js:101
@@ -294,8 +308,9 @@ msgid "seventh"
 msgstr ""
 
 #: lib/localization.js:135
+#, fuzzy
 msgid "eight"
-msgstr ""
+msgstr "gira a la dreta"
 
 #: lib/localization.js:136
 msgid "ninth"
@@ -307,43 +322,51 @@ msgstr ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: lib/localization.js:149
+#, fuzzy
 msgid "north"
-msgstr ""
+msgstr "nord"
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: lib/localization.js:151
+#, fuzzy
 msgid "northeast"
-msgstr ""
+msgstr "nord-est"
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: lib/localization.js:153
+#, fuzzy
 msgid "east"
-msgstr ""
+msgstr "est"
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: lib/localization.js:155
+#, fuzzy
 msgid "southeast"
-msgstr ""
+msgstr "sud-est"
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: lib/localization.js:157
+#, fuzzy
 msgid "south"
-msgstr ""
+msgstr "sud"
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: lib/localization.js:159
+#, fuzzy
 msgid "southwest"
-msgstr ""
+msgstr "sud-oest"
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: lib/localization.js:161
+#, fuzzy
 msgid "west"
-msgstr ""
+msgstr "oest"
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: lib/localization.js:163
+#, fuzzy
 msgid "northwest"
-msgstr ""
+msgstr "nord-oest"
 
 #. TRANSLATORS: Take roundabout [clockwise] to [ordinal exit number] on
 #. streetname...
@@ -359,178 +382,190 @@ msgstr ""
 #. TRANSLATORS: depart at street name/corner of x y etc. (First instruction in
 #. itinerary)
 #: lib/localization.js:175
+#, fuzzy
 msgctxt "itinerary"
 msgid "depart"
-msgstr ""
+msgstr "Sortida des de"
 
 #. TRANSLATORS: [Relative direction (Hard/Slightly Left/Right...)] to continue
 #. on /on to [streetname]
 #: lib/localization.js:178
+#, fuzzy
 msgid "hard left"
-msgstr ""
+msgstr "gira completament a la esquerra"
 
 #: lib/localization.js:179
+#, fuzzy
 msgid "left"
-msgstr ""
+msgstr "gira a la esquerra"
 
 #: lib/localization.js:180
+#, fuzzy
 msgid "slight left"
-msgstr ""
+msgstr "gira lleugerament a la esquerra"
 
 #: lib/localization.js:181
+#, fuzzy
 msgid "continue"
-msgstr ""
+msgstr "per a continuar a"
 
 #: lib/localization.js:182
+#, fuzzy
 msgid "slight right"
-msgstr ""
+msgstr "gira lleugerament a la dreta"
 
 #: lib/localization.js:183
+#, fuzzy
 msgid "right"
-msgstr ""
+msgstr "gira a la dreta"
 
 #: lib/localization.js:184
+#, fuzzy
 msgid "hard right"
-msgstr ""
+msgstr "gira completament a la dreta"
 
 #: lib/localization.js:187
 msgid "elevator"
 msgstr ""
 
 #: lib/localization.js:188
+#, fuzzy
 msgid "U-turn left"
-msgstr ""
+msgstr "gira completament a la esquerra"
 
 #: lib/localization.js:189
+#, fuzzy
 msgid "U-turn right"
-msgstr ""
+msgstr "gira completament a la dreta"
 
 #: note.caution
 msgid "Caution!"
-msgstr "Huomio!"
+msgstr ""
 
 #: note.unpaved_surface
 msgid "Unpaved surface"
-msgstr "Päällystämätön tie"
+msgstr ""
 
 #: note.muddy_surface
 msgid "Unpaved surface -- muddy!"
-msgstr "Päällystämätön tie -- mutaista!"
+msgstr ""
 
 #: note.toll
 msgid "Toll road"
-msgstr "Maksullinen tie"
+msgstr ""
 
 #: name.bike_path
 msgid "bike path"
-msgstr "pyörätie"
+msgstr ""
 
 #: name.pedestrian_path
 msgctxt "name.pedestrian_path"
 msgid "path"
-msgstr "polku"
+msgstr ""
 
 #: name.pedestrian_area
 msgid "open area"
-msgstr "aukio"
+msgstr ""
 
 #: name.path
 msgctxt "name.path"
 msgid "path"
-msgstr "polku"
+msgstr ""
 
 #: name.bridleway
 msgid "bridleway"
-msgstr "ratsupolku"
+msgstr ""
 
 #: name.otp_route_ref
 msgid "Route {otp:route_ref}"
-msgstr "linja {otp:route_ref}"
+msgstr ""
 
 #: name.platform_ref
 msgid "Platform {ref}"
-msgstr "laituri {ref}"
+msgstr ""
 
 #: name.platform
 msgid "platform"
-msgstr "laituri"
+msgstr ""
 
 #: name.footbridge
 msgid "footbridge"
-msgstr "kävelysilta"
+msgstr ""
 
 #: name.underpass
 msgid "underpass"
-msgstr "alikulku"
+msgstr ""
 
 #: name.road
 msgid "road"
-msgstr "tie"
+msgstr ""
 
 #: name.ramp
 msgid "ramp"
-msgstr "ramppi"
+msgstr ""
 
 #: name.link
 msgid "link"
-msgstr "liittymä"
+msgstr ""
 
 #: name.service_road
 msgid "service road"
-msgstr "tonttitie"
+msgstr ""
 
 #: name.alley
 msgid "alley"
-msgstr "kuja"
+msgstr ""
 
 #: name.parking_aisle
 msgid "parking aisle"
-msgstr "pysäköintialue"
+msgstr ""
 
 #: name.byway
 msgid "byway"
-msgstr "peltotie"
+msgstr ""
 
 #: name.track
 msgid "track"
-msgstr "ajopolku"
+msgstr ""
 
 #: name.sidewalk
 msgid "sidewalk"
-msgstr "jalkakäytävä"
+msgstr ""
 
 #: name.steps
 msgid "steps"
-msgstr "rappuset"
+msgstr ""
 
 #: name.bicycle_rental_name
+#, fuzzy
 msgid "Bicycle rental {name}"
-msgstr "pyörävuokraamo {name}"
+msgstr "Bicicleta"
 
 #: name.bicycle_rental_station
 msgid "Bicycle rental station"
-msgstr "pyörävuokraamo"
+msgstr ""
 
 #: name.bicycle_parking_name
 msgid "Bicycle parking {name}"
-msgstr "polkupyöräpysäköinti {name}"
+msgstr ""
 
 #: name.bicycle_parking
+#, fuzzy
 msgid "Bicycle parking"
-msgstr "polkupyöräpysäköinti"
+msgstr "Bicicleta"
 
 #: name.park_and_ride_name
 msgid "P+R {name}"
-msgstr "liityntäpysäköinti {name}"
+msgstr ""
 
 #: name.park_and_ride_station
 msgid "P+R"
-msgstr "liityntäpysäköinti"
+msgstr ""
 
 #: corner
 msgid "corner of %s and %s"
-msgstr "katujen %s ja %s kulma"
+msgstr ""
 
 #: unnamedStreet
 msgid "unnamed"
-msgstr "nimetön"
+msgstr ""

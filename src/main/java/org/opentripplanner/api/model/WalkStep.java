@@ -14,10 +14,7 @@
 
 package org.opentripplanner.api.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -281,24 +278,31 @@ public class WalkStep {
     }
 
     public void addDescriptions(Locale requestedLocale) {
+        Map<String, String> translations = new HashMap<>(4);
+        translations.put("relativeDirection", getLocalizedRelativeDirection(requestedLocale));
+        translations.put("streetName", streetName);
+        translations.put("absoluteDirection", getLocalizedAbsoluteDirection(requestedLocale));
         if (relativeDirection == RelativeDirection.CIRCLE_COUNTERCLOCKWISE || relativeDirection == RelativeDirection.CIRCLE_CLOCKWISE) {
-            longDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(
-                T.tr("Take roundabout {0} to {1} exit on {2}"), requestedLocale, new String[]{getLocalizedRelativeDirection(requestedLocale),
-                    getOrdinalExitTranslation(requestedLocale), streetName});
+            translations.put("ordinal_exit_number", getOrdinalExitTranslation(requestedLocale));
+            longDescription = ResourceBundleSingleton.INSTANCE.localizeGettextSprintfFormat(T.tr(
+                "Take roundabout %(relativeDirection)s to %(ordinal_exit_number)s exit on %(streetName)s"),
+                requestedLocale, translations);
         } else {
             if (relativeDirection == RelativeDirection.DEPART) {
-                longDescription = ResourceBundleSingleton.INSTANCE
-                    .localizeGettext(T.tr("Start on {0} heading {1}"), requestedLocale,
-                        new String[] { streetName, getLocalizedAbsoluteDirection(requestedLocale) });
+                longDescription = ResourceBundleSingleton.INSTANCE.localizeGettextSprintfFormat(
+                    T.tr("Start on <b>%(streetName)s</b> heading %(absoluteDirection)s"),
+                    requestedLocale, translations);
             } else {
                 if (stayOn) {
                     longDescription = ResourceBundleSingleton.INSTANCE
-                        .localizeGettext(T.tr("{0} to continue on {1}"), requestedLocale,
-                            new String[] { getLocalizedRelativeDirection(requestedLocale), streetName });
+                        .localizeGettextSprintfFormat(T.tr(
+                            "<b>%(relativeDirection)s</b> to continue on <b>%(streetName)s</b>"),
+                            requestedLocale, translations);
                 } else {
                     longDescription = ResourceBundleSingleton.INSTANCE
-                        .localizeGettext(T.tr("{0} on to {1}"), requestedLocale,
-                            new String[] { getLocalizedRelativeDirection(requestedLocale), streetName });
+                        .localizeGettextSprintfFormat(
+                            T.tr("<b>%(relativeDirection)s</b> on to <b>%(streetName)s</b>"),
+                            requestedLocale, translations);
                 }
 
             }
