@@ -1,11 +1,13 @@
 package org.opentripplanner.transit;
 
+import com.conveyal.gtfs.model.Service;
 import gnu.trove.TIntCollection;
 import gnu.trove.list.TIntList;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,8 @@ public class TransitRouter {
     public int maxTransfers = 5;
 
     public int boardSlackSeconds = 60;
+
+    private BitSet servicesActive = new BitSet();
 
     private List<TIntIntMap> roundData = new ArrayList<>();
 
@@ -90,9 +94,15 @@ public class TransitRouter {
         touchedPatterns.clear();
         // For each stop that has been updated in this round,
         currentRound.keySet().forEach(stopIndex -> {
-            // Mark every pattern that passes through that stop.
+            // Mark every pattern that passes through that stop,
             transitLayer.patternsForStop.get(stopIndex).forEach(patternIndex -> {
-                touchedPatterns.set(patternIndex);
+                // As long as the pattern has any active trips on it.
+                TripPattern pattern = transitLayer.tripPatterns.get(patternIndex);
+                boolean active = pattern.servicesActive.intersects(servicesActive);
+                // LOG.info("Pattern {} has active services: {}", patternIndex, active);
+                if (active) {
+                    touchedPatterns.set(patternIndex);
+                }
                 return true;
             });
             return true;
@@ -100,9 +110,14 @@ public class TransitRouter {
     }
 
 
+    // Add time/date parameter
     public void route () {
 
         LOG.debug("Begin raptor routing. Initial state: {}", currentRound);
+
+        // Determine which services are active to avoid exploring those that are not running on this day.
+        LocalDate searchDate = new LocalDate(2015, 8, 6);
+        markServicesForDate(searchDate);
 
         while (true) {
             newRound();
@@ -170,5 +185,17 @@ public class TransitRouter {
             }
             return true;
         });
+    }
+
+    // Mark all services that are active on the given day. Trips on inactive services will not be used in the search.
+    private void markServicesForDate (LocalDate date) {
+        servicesActive.clear();
+        int s = 0;
+        for (Service service : transitLayer.services) {
+            if (service.activeOn(date)) {
+                servicesActive.set(s);
+            }
+            s++;
+        }
     }
 }

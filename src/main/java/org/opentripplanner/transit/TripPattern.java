@@ -22,8 +22,11 @@ public class TripPattern implements Serializable {
     // Could be compacted into 2 bits each or a bunch of flags, but is it even worth it?
     PickDropType[] pickups;
     PickDropType[] dropoffs;
-    BitSet wheelchairAccessible;
+    BitSet wheelchairAccessible; // One bit per stop
     List<TripSchedule> tripSchedules = new ArrayList<>();
+
+    // This set includes the numeric codes for all services on which at least one trip in this pattern is active.
+    BitSet servicesActive = new BitSet();
 
     public TripPattern (TripPatternKey tripPatternKey) {
         int nStops = tripPatternKey.stops.size();
@@ -41,6 +44,7 @@ public class TripPattern implements Serializable {
 
     public void addTrip (TripSchedule tripSchedule) {
         tripSchedules.add(tripSchedule);
+        servicesActive.set(tripSchedule.serviceCode);
     }
 
     public void setOrVerifyDirection (int directionId) {
@@ -66,10 +70,14 @@ public class TripPattern implements Serializable {
         TripSchedule bestSchedule = null;
         int bestTime = Integer.MAX_VALUE;
         for (TripSchedule schedule : tripSchedules) {
-            int departureTime = schedule.departures[stopOffset];
-            if (departureTime > time && departureTime < bestTime) {
-                bestTime = departureTime;
-                bestSchedule = schedule;
+            boolean active = servicesActive.get(schedule.serviceCode);
+            // LOG.info("Trip with service {} active: {}.", schedule.serviceCode, active);
+            if (servicesActive.get(schedule.serviceCode)) {
+                int departureTime = schedule.departures[stopOffset];
+                if (departureTime > time && departureTime < bestTime) {
+                    bestTime = departureTime;
+                    bestSchedule = schedule;
+                }
             }
         }
         return bestSchedule;

@@ -1,6 +1,7 @@
 package org.opentripplanner.transit;
 
 import com.conveyal.gtfs.GTFSFeed;
+import com.conveyal.gtfs.model.Service;
 import com.conveyal.gtfs.model.Stop;
 import com.conveyal.gtfs.model.StopTime;
 import com.conveyal.gtfs.model.Trip;
@@ -46,6 +47,8 @@ public class TransitLayer implements Serializable {
 
     public List<TIntList> patternsForStop;
 
+    public List<Service> services = new ArrayList<>();
+
     // Seems kind of hackish to pass the street layer in.
     // Maybe there should not even be separate street and transit layer classes.
     // Should we have separate stop objects in the transit layer and stop vertices in the street layer?
@@ -64,6 +67,15 @@ public class TransitLayer implements Serializable {
             }
         }
 
+        // Load service periods, assigning integer codes which will be referenced by trips and patterns.
+        TObjectIntMap<String> serviceCodeNumber = new TObjectIntHashMap<>(20, 0.5f, -1);
+        gtfs.services.forEach((serviceId, service) -> {
+            int serviceIndex = services.size();
+            services.add(service);
+            serviceCodeNumber.put(serviceId, serviceIndex);
+            LOG.info("Service {} has ID {}", serviceIndex, serviceId);
+        });
+
         // Group trips by stop pattern (including pickup/dropoff type) and fill stop times into patterns.
         LOG.info("Grouping trips by stop pattern and creating trip schedules.");
         Map<TripPatternKey, TripPattern> tripPatternForStopSequence = new HashMap<>();
@@ -77,7 +89,6 @@ public class TransitLayer implements Serializable {
             TIntList arrivals = new TIntArrayList(TYPICAL_NUMBER_OF_STOPS_PER_TRIP);
             TIntList departures = new TIntArrayList(TYPICAL_NUMBER_OF_STOPS_PER_TRIP);
             for (StopTime st : gtfs.getOrderedStopTimesForTrip(tripId)) {
-                int stopIndex = indexForStopId.get(st.stop_id);
                 tripPatternKey.addStopTime(st, indexForStopId);
                 arrivals.add(st.arrival_time);
                 departures.add(st.departure_time);
@@ -89,7 +100,8 @@ public class TransitLayer implements Serializable {
                 tripPatterns.add(tripPattern);
             }
             tripPattern.setOrVerifyDirection(trip.direction_id);
-            tripPattern.addTrip(new TripSchedule(trip, arrivals.toArray(), departures.toArray()));
+            int serviceCode = serviceCodeNumber.get(trip.service.service_id);
+            tripPattern.addTrip(new TripSchedule(trip, arrivals.toArray(), departures.toArray(), serviceCode));
             nTripsAdded += 1;
         }
         LOG.info("Done creating {} trips on {} patterns.", nTripsAdded, tripPatternForStopSequence.size());
