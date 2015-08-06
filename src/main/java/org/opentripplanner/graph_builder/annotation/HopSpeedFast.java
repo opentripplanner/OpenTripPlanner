@@ -19,7 +19,7 @@ public class HopSpeedFast extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Excessive speed of %f kph over %fm on route %s trip %s " +
+    public static final String FMT = "Excessive speed of %d kph over %.1fm on route %s trip %s " +
     		"stop sequence %d.";
     
     final float metersPerSecond;
@@ -40,7 +40,7 @@ public class HopSpeedFast extends GraphBuilderAnnotation {
     @Override
     public String getMessage() {
         int kph = (int)(3.6 * metersPerSecond); // convert meters per second to kph
-        return String.format(FMT, kph, distance, trip.getRoute(), trip, seq);
+        return String.format(FMT, kph, distance, trip.getRoute().getId(), trip.getId(), seq);
     }
 
 }
