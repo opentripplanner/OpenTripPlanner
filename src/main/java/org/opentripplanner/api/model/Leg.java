@@ -254,7 +254,9 @@ public class Leg {
     @JsonSerialize
     public Boolean rentedBike;
 
-    public String textDescription;
+    public String longDescription;
+
+    public String shortDescription;
 
      /**
       * Creates route number route name to headsign/stop name if transit stop
@@ -264,17 +266,32 @@ public class Leg {
       */
      public void addDescriptions(Locale requestedLocale) {
          if (isTransitLeg()) {
-             textDescription = "<b>" + routeShortName + "</b>" + " " + routeLongName;
+             longDescription = agencyName + ",<b>" + routeShortName + "</b>" + " " + routeLongName;
              if (headsign != null) {
-                 textDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("bus_direction", " to "), requestedLocale);
-                 textDescription += headsign;
+                 //should be towards
+                 longDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("bus_direction", " to "), requestedLocale);
+                 longDescription += headsign;
              } else {
-                 textDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
-                 textDescription += to.name;
+                 longDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+                 longDescription += to.name;
              }
          } else {
-             textDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
-             textDescription += to.name;
+             T trans;
+             if (mode.equals(TraverseMode.WALK.toString())) {
+                  trans = T.tr("Walk");
+             } else if (mode.equals(TraverseMode.BICYCLE.toString())) {
+                 trans = T.tr("Cycle");
+             } else if (mode.equals(TraverseMode.CAR.toString())) {
+                 trans = T.tr("Car");
+             } else {
+                 trans = T.tr("");
+             }
+             //TODO: if this is used we need some distance humanizing and correct unit choser
+             longDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(trans, requestedLocale) + ": " + distance/1000 + "m " +  ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+             longDescription += to.name;
+
+             shortDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+             shortDescription += to.name;
          }
      }
 
