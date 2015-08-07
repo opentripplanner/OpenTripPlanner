@@ -126,6 +126,9 @@ class BrokerHttpHandler extends HttpHandler {
                     }
                     broker.enqueueTasks(tasks);
                     response.setStatus(HttpStatus.ACCEPTED_202);
+                } else {
+                    response.setStatus(HttpStatus.NOT_FOUND_404);
+                    response.setDetailMessage("Context not found; should be either 'jobs' or 'priority'");
                 }
             } else if (request.getMethod() == Method.DELETE) {
                 /* Acknowledge completion of a task and remove it from queues, avoiding re-delivery. */

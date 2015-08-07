@@ -13,6 +13,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.updater.bike_rental;
 
+import java.util.HashSet;
+
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -26,26 +28,35 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
-    public BCycleBikeRentalDataSource(String apiKey) {
-       super("", apiKey);
-   }
+    private String networkName;
 
-   public BikeRentalStation makeStation(JsonNode kioskNode) {
+    public BCycleBikeRentalDataSource(String apiKey, String networkName) {
+        super("", apiKey);
+        if (networkName != null && !networkName.isEmpty()) {
+            this.networkName = networkName;
+        } else {
+            this.networkName = "B-Cycle";
+        }
+    }
 
-       if (!kioskNode.path("Status").asText().equals("Active")) {
-           return null;
-       }
+    public BikeRentalStation makeStation(JsonNode kioskNode) {
 
+        if (!kioskNode.path("Status").asText().equals("Active")) {
+            return null;
+        }
 
-       BikeRentalStation brstation = new BikeRentalStation();
+        BikeRentalStation brstation = new BikeRentalStation();
 
-       brstation.id = kioskNode.path("Id").toString();
-       brstation.x = kioskNode.path("Location").path("Longitude").asDouble();
-       brstation.y = kioskNode.path("Location").path("Latitude").asDouble();
-       brstation.name =  new NonLocalizedString(kioskNode.path("Name").asText());
-       brstation.bikesAvailable = kioskNode.path("BikesAvailable").asInt();
-       brstation.spacesAvailable = kioskNode.path("DocksAvailable").asInt();
+        brstation.networks = new HashSet<String>();
+        brstation.networks.add(this.networkName);
 
-       return brstation;
-   }
+        brstation.id = kioskNode.path("Id").toString();
+        brstation.x = kioskNode.path("Location").path("Longitude").asDouble();
+        brstation.y = kioskNode.path("Location").path("Latitude").asDouble();
+        brstation.name =  new NonLocalizedString(kioskNode.path("Name").asText());
+        brstation.bikesAvailable = kioskNode.path("BikesAvailable").asInt();
+        brstation.spacesAvailable = kioskNode.path("DocksAvailable").asInt();
+
+        return brstation;
+    }
 }

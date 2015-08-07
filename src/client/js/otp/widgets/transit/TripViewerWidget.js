@@ -165,7 +165,7 @@ otp.widgets.transit.TripViewerWidget =
         var html = "";
         if(url) html += 'Link to: <a href="' + url + '" target="_blank">Route Info</a>';
 
-        // temporary TriMet-specific code
+        // TriMet-specific code
         if(url.indexOf('http://trimet.org') === 0) {
             var day = "w";
             if(this.activeLeg) {
@@ -174,7 +174,8 @@ otp.widgets.transit.TripViewerWidget =
                 if(dow === 6) day = "s";
             }
             var rte = url.substring(29, 32);
-            html += ' | <a href="http://trimet.org/schedules/' + day + '/t1' + rte + '_' + variantData.direction + '.htm" target="_blank">Timetable</a>';
+            var direction = variantData.id.split(':')[2];
+            html += ' | <a href="http://trimet.org/schedules/' + day + '/t1' + rte + '_' + direction + '.htm" target="_blank">Timetable</a>';
         }
 
         this.scheduleLink.html(html);

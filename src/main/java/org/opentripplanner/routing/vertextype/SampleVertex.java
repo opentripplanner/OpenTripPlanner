@@ -19,7 +19,11 @@ public class SampleVertex extends StreetVertex implements TemporaryVertex  {
 
     @Override
     public void addIncoming(Edge e) {
-        throw new UnsupportedOperationException("Tried to add incoming edges to origin sample vertex");
+        if (!(e instanceof TemporaryEdge)) {
+            throw new UnsupportedOperationException("Can't add permanent edge to temporary sample vertex.");
+        }
+
+        super.addIncoming(e);
     }
 
     @Override

@@ -180,7 +180,7 @@ otp.core.IndexApi = otp.Class({
             maxLat : bounds.getNorthWest().lat,
             minLon : bounds.getNorthWest().lng,
             minLat : bounds.getSouthEast().lat,
-            maxLon : bounds.getSouthEast().lng,
+            maxLon : bounds.getSouthEast().lng
         };
 
         var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops';
@@ -191,6 +191,7 @@ otp.core.IndexApi = otp.Class({
                 callback.call(callbackTarget, data);
             }
         });
+
     },
 
     loadRoutesForStop : function(agencyId, callbackTarget, callback) {
@@ -226,53 +227,49 @@ otp.core.IndexApi = otp.Class({
         });
     },
 
-
-/* to be implemented
-    loadStopsById : function(agencyId, id, callbackTarget, callback) {
-        var params = {
-            id : id,
-            extended : true
-        };
-        if(agencyId !== null) {
-            params.agency = agencyId;
-        }
-        if(typeof otp.config.routerId !== 'undefined') {
-            params.routerId = otp.config.routerId;
-        }
-
-        var url = otp.config.hostname + '/' + otp.config.restService + '/transit/stopData';
-        $.ajax(url, {
-            data:       params,
-            dataType:   'jsonp',
-
-            success: function(data) {
-                callback.call(callbackTarget, data);
-            }
-        });
-    },
-
+    // interim? implementation using geocoder API
     loadStopsByName : function(agencyId, name, callbackTarget, callback) {
         var params = {
-            name: name,
-            extended : true
+            query: name,
+            stops: true,
+            clusters: false,
+            corners: false
         };
-        if(agencyId !== null) {
-            params.agency = agencyId;
-        }
-        if(typeof otp.config.routerId !== 'undefined') {
-            params.routerId = otp.config.routerId;
-        }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/transit/stopsByName';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/geocode';
         $.ajax(url, {
-            data:       params,
-            dataType:   'jsonp',
-
+            data: params,
             success: function(data) {
-                callback.call(callbackTarget, data);
+                // filter by agency ID and convert to the expected format
+                var filtered = [];
+                for(var i = 0; i < data.length; i++) {
+                    var stop = data[i];
+                    var id = stop.id.replace('_', ':');
+                    var stopAgencyId = id.split(':')[0];
+                    if(stopAgencyId !== agencyId) continue;
+                    filtered.push({
+                        id : id,
+                        name : stop.description.slice(5),
+                        lat: stop.lat,
+                        lon: stop.lng
+                    });
+                }
+                callback.call(callbackTarget, filtered);
             }
         });
     },
-    */
+
+    loadStopById : function(agencyId, stopId, callbackTarget, callback) {
+
+        var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops/' + agencyId + ':' + stopId;
+        $.ajax(url, {
+            success: function(data) {
+                callback.call(callbackTarget, data);
+            },
+            error: function() {
+                callback.call(callbackTarget, null);
+            }
+        });
+    },
 
 });

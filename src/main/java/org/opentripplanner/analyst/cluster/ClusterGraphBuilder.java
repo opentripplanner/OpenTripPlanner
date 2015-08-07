@@ -55,7 +55,7 @@ public class ClusterGraphBuilder {
         File graphDataDirectory = new File(GRAPH_CACHE_DIR, graphId);
 
         // If we don't have a local copy of the inputs, fetch graph data as a ZIP from S3 and unzip it
-        if( ! graphDataDirectory.exists()) {
+        if( ! graphDataDirectory.exists() || graphDataDirectory.list().length == 0) {
             LOG.info("Downloading graph input files.");
             graphDataDirectory.mkdirs();
             S3Object graphDataZipObject = s3.getObject(graphBucket, graphId + ".zip");
