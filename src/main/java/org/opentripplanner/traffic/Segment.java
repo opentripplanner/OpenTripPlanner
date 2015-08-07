@@ -1,6 +1,6 @@
 package org.opentripplanner.traffic;
 
-import com.conveyal.traffic.data.ExchangeFormat;
+import io.opentraffic.engine.data.pbf.ExchangeFormat;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 import java.io.Serializable;

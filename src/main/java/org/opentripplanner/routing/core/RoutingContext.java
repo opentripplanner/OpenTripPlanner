@@ -45,9 +45,6 @@ import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-<<<<<<< HEAD
-import java.util.*;
-=======
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -55,7 +52,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
->>>>>>> master
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -241,7 +237,6 @@ public class RoutingContext implements Cloneable {
             timetableSnapshot = null;
             calendarService = null;
         }
-<<<<<<< HEAD
 
         // do the same for traffic
         if (graph.streetSpeedSource != null)
@@ -249,10 +244,6 @@ public class RoutingContext implements Cloneable {
         else
             this.streetSpeedSnapshot = null;
 
-        calendarService = graph.getCalendarService();
-        setServiceDays();
-=======
->>>>>>> master
 
         Edge fromBackEdge = null;
         Edge toBackEdge = null;

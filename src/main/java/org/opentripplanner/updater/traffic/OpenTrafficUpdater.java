@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.traffic;
 
 import com.beust.jcommander.internal.Maps;
-import com.conveyal.traffic.data.ExchangeFormat;
+import io.opentraffic.engine.data.pbf.ExchangeFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.traffic.Segment;

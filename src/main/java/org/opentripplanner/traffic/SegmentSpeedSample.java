@@ -1,7 +1,7 @@
 package org.opentripplanner.traffic;
 
-import com.conveyal.traffic.data.ExchangeFormat;
-import com.conveyal.traffic.stats.SummaryStatistics;
+import io.opentraffic.engine.data.pbf.ExchangeFormat;
+import io.opentraffic.engine.data.stats.SummaryStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +103,7 @@ public class SegmentSpeedSample implements Serializable {
 
     /** Create a speed sample from an OpenTraffic stats object directly */
     public SegmentSpeedSample(SummaryStatistics stats) {
-        double avg = stats.getAverageSpeedMS();
+        double avg = stats.getMean();
 
         if (Double.isNaN(avg)) {
             LOG.error("Invalid speed sample: average speed is NaN");
@@ -115,7 +115,7 @@ public class SegmentSpeedSample implements Serializable {
         hourBins = new short[7 * 24];
 
         for (int i = 0; i < 7 * 24; i++) {
-            double speed = stats.getSpeedByHourOfWeekMS(i);
+            double speed = stats.getMean(); //TODO make it possible to grab summary by hour
 
             if (!Double.isNaN(speed))
                 hourBins[i] = encodeSpeed(speed);

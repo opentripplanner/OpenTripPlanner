@@ -689,9 +689,9 @@
 
         <!-- support for OpenTraffic data -->
         <dependency>
-            <groupId>com.conveyal</groupId>
+            <groupId>io.opentraffic</groupId>
             <artifactId>traffic-engine</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.2</version>
         </dependency>
     </dependencies>
 
