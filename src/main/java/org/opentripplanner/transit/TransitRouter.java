@@ -24,7 +24,7 @@ public class TransitRouter {
 
     private TransitLayer transitLayer;
 
-    public int maxTransfers = 5;
+    public int maxTransfers = 4;
 
     public int boardSlackSeconds = 60;
 
