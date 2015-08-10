@@ -263,8 +263,9 @@ public class Leg {
       *
       * or just to destination name if not
       * @param requestedLocale
+      * @param removeTagsFromLocalizations If true it removes all tags from step and leg localizations (long and short descriptions)
       */
-     public void addDescriptions(Locale requestedLocale) {
+     public void addDescriptions(Locale requestedLocale, boolean removeTagsFromLocalizations) {
          if (isTransitLeg()) {
              longDescription = agencyName + ",<b>" + routeShortName + "</b>" + " " + routeLongName;
              if (headsign != null) {
@@ -292,6 +293,11 @@ public class Leg {
 
              shortDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
              shortDescription += to.name;
+
+             if (removeTagsFromLocalizations) {
+                 longDescription = ResourceBundleSingleton.removeHTMLTags(longDescription);
+                 shortDescription = ResourceBundleSingleton.removeHTMLTags(shortDescription);
+             }
          }
      }
 

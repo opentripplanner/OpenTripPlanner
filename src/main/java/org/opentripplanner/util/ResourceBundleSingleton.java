@@ -172,4 +172,12 @@ public enum ResourceBundleSingleton {
         }
         return locale;
     }
+
+    public static String removeHTMLTags(String s) {
+        if (s == null) {
+            return s;
+        }
+
+        return s.replaceAll("\\<.*?>","");
+    }
 }

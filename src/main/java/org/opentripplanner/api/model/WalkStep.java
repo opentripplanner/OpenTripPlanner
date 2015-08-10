@@ -277,7 +277,7 @@ public class WalkStep {
         return elevation;
     }
 
-    public void addDescriptions(Locale requestedLocale) {
+    public void addDescriptions(Locale requestedLocale, boolean removeTagsFromLocalizations) {
         Map<String, String> translations = new HashMap<>(4);
         translations.put("relativeDirection", getLocalizedRelativeDirection(requestedLocale));
         translations.put("streetName", streetName);
@@ -308,6 +308,11 @@ public class WalkStep {
             }
         }
         longDescription = longDescription.substring(0, 1).toUpperCase(requestedLocale) + longDescription.substring(1);
+
+        if (removeTagsFromLocalizations) {
+            longDescription = ResourceBundleSingleton.removeHTMLTags(longDescription);
+            shortDescription = ResourceBundleSingleton.removeHTMLTags(shortDescription);
+        }
     }
 
     /**
