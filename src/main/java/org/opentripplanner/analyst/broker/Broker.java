@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst.broker;
 
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
@@ -189,6 +190,12 @@ public class Broker implements Runnable {
         this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 4;
 
         ec2 = new AmazonEC2Client();
+
+        // default to current region when running in EC2
+        com.amazonaws.regions.Region r = Regions.getCurrentRegion();
+
+        if (r != null)
+            ec2.setRegion(r);
     }
 
     /**
