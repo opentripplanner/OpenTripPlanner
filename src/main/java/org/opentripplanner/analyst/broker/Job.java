@@ -23,7 +23,8 @@ public class Job {
 
     private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
-    private static final int INVISIBLE_DURATION_SEC = 30; // How long until tasks are eligible for re-delivery.
+    /* How long until tasks are eligible for re-delivery. */
+    private static final int INVISIBLE_DURATION_SEC = 30;
 
     /* A unique identifier for this job, usually a random UUID. */
     public final String jobId;

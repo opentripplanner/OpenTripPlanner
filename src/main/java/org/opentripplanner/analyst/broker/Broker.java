@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst.broker;
 
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.*;
@@ -26,9 +27,7 @@ import org.opentripplanner.api.model.TraverseModeSetSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -59,6 +58,7 @@ public class Broker implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Broker.class);
 
+    /* How often we should check for delivered tasks that have timed out. */
     private static final int REDELIVERY_INTERVAL_SEC = 10;
 
     public final CircularList<Job> jobs = new CircularList<>();
@@ -155,6 +155,19 @@ public class Broker implements Runnable {
 
         // create a config for the AWS workers
         workerConfig = new Properties();
+
+        // load the base worker configuration if specified
+        if (config.getProperty("worker-config") != null) {
+            try {
+                File f = new File(config.getProperty("worker-config"));
+                FileInputStream fis = new FileInputStream(f);
+                workerConfig.load(fis);
+                fis.close();
+            } catch (IOException e) {
+                LOG.error("Error loading base worker configuration", e);
+            }
+        }
+
         workerConfig.setProperty("broker-address", addr);
         workerConfig.setProperty("broker-port", "" + port);
 
@@ -174,9 +187,15 @@ public class Broker implements Runnable {
         workerName = brokerConfig.getProperty("worker-name") != null ? brokerConfig.getProperty("worker-name") : "analyst-worker";
         project = brokerConfig.getProperty("project") != null ? brokerConfig.getProperty("project") : "analyst";
 
-        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 4   ;
+        this.maxWorkers = brokerConfig.getProperty("max-workers") != null ? Integer.parseInt(brokerConfig.getProperty("max-workers")) : 4;
 
         ec2 = new AmazonEC2Client();
+
+        // default to current region when running in EC2
+        com.amazonaws.regions.Region r = Regions.getCurrentRegion();
+
+        if (r != null)
+            ec2.setRegion(r);
     }
 
     /**
