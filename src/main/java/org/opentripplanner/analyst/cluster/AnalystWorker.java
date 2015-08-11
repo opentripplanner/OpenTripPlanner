@@ -624,7 +624,12 @@ public class AnalystWorker implements Runnable {
             return;
         }
 
-        new AnalystWorker(config).run();
+        try {
+            new AnalystWorker(config).run();
+        } catch (Exception e) {
+            LOG.error("Error in analyst worker", e);
+            return;
+        }
     }
 
     public static enum WorkType {
