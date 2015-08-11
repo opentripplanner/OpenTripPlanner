@@ -27,9 +27,11 @@ public class SQSTaskStatisticsStore implements TaskStatisticsStore {
     /** create a task statistics store for the given queue name */
     public SQSTaskStatisticsStore(String queueName) {
         Region current = Regions.getCurrentRegion();
-
-        if (current != null)
+        
+        if (current != null) {
+            LOG.info("Assuming statistics queue is in region {}", current);
             sqs.setRegion(current);
+        }
 
         try {
             queueUrl = sqs.getQueueUrl(queueName).getQueueUrl();
