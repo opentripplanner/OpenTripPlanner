@@ -1,6 +1,8 @@
 package org.opentripplanner.analyst.cluster;
 
 import com.amazonaws.handlers.AsyncHandler;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClient;
 import com.amazonaws.services.sqs.buffered.AmazonSQSBufferedAsyncClient;
@@ -24,6 +26,11 @@ public class SQSTaskStatisticsStore implements TaskStatisticsStore {
 
     /** create a task statistics store for the given queue name */
     public SQSTaskStatisticsStore(String queueName) {
+        Region current = Regions.getCurrentRegion();
+
+        if (current != null)
+            sqs.setRegion(current);
+
         try {
             queueUrl = sqs.getQueueUrl(queueName).getQueueUrl();
         } catch (Exception e) {
