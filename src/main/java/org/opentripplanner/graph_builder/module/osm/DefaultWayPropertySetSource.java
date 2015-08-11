@@ -576,7 +576,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     }
 
     private void createNames(WayPropertySet propset, String spec, T patternKey) {
-        CreativeNamer namer = new GettextCreativeNamer(patternKey);
+        CreativeNamer namer = new CreativeNamer(patternKey);
         propset.addCreativeNamer(new OSMSpecifier(spec), namer);
     }
 
@@ -586,10 +586,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         propset.addNote(new OSMSpecifier(spec), properties);
     }
 
-    // Currently used only in notes matching
-    //TODO: It needs to be decided how to do those kind of thinkgs (notes and wheelchair descriptions)
+    // Currently used only in OSM notes and wheelchair description matching ({note}, {notes}, {wheelchair:description}
     private void createNotes(WayPropertySet propset, String spec, String patternKey, NoteMatcher matcher) {
-        //TODO: notes aren't localized
         NoteProperties properties = new NoteProperties(patternKey, matcher);
         propset.addNote(new OSMSpecifier(spec), properties);
     }

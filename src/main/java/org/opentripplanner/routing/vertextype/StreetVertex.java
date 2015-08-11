@@ -19,7 +19,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.opentripplanner.util.GettextLocalizedString;
+import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.i18n.T;
@@ -66,12 +66,12 @@ public abstract class StreetVertex extends Vertex {
         List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
 
         if (uniqueNames.size() > 1) {
-            calculatedName = new GettextLocalizedString(T.tr("corner of %s and %s"), new String[]{uniqueNames.get(0),
+            calculatedName = new LocalizedString(T.tr("corner of %s and %s"), new String[]{uniqueNames.get(0),
                 uniqueNames.get(1)});
         } else if (uniqueNames.size() == 1) {
             calculatedName = new NonLocalizedString(uniqueNames.get(0));
         } else {
-            calculatedName = new GettextLocalizedString(T.tr("unnamed"), (String[]) null);
+            calculatedName = new LocalizedString(T.tr("unnamed"), (String[]) null);
         }
         return calculatedName;
     }

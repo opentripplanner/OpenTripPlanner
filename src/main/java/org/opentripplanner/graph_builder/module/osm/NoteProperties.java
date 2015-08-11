@@ -14,17 +14,16 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
-import org.opentripplanner.util.GettextLocalizedString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.i18n.T;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 //Currently unused since notes are disabled in DefaultWayPropertySetSource
 public class NoteProperties {
@@ -37,7 +36,13 @@ public class NoteProperties {
 
     public NoteMatcher noteMatcher;
 
-    @Deprecated
+    /**
+     * Used only if String is "{tag}" for other uses use {@link #NoteProperties(T, NoteMatcher)} constructor
+     *
+     * Values in {} are tag values. Translations for this values are also extracted from OSM if they exist.
+     * @param notePattern "{note}", "{notes}", "{wheelchair:description}
+     * @param noteMatcher When to match a note
+     */
     public NoteProperties(String notePattern, NoteMatcher noteMatcher) {
         this.notePattern = notePattern;
         this.noteMatcher = noteMatcher;
@@ -55,7 +60,7 @@ public class NoteProperties {
      * are also saved as translations. And correct translation is returned on usage if it exits.
      *
      * Or pattern can be "text ", "text {tagname}" where gettext translation with
-     * {@link GettextLocalizedString} is used to get the translations of text.
+     * {@link LocalizedString} is used to get the translations of text.
      * And only default value of tagname is used. No translations are supported currently.
      * @param way From which tag values are read
      * @return
@@ -70,10 +75,12 @@ public class NoteProperties {
         } else {
             if (translatablePattern != null) {
                 // This uses new Gettext translation
-                note.alertHeaderText = new GettextLocalizedString(translatablePattern, way);
+                note.alertHeaderText = new LocalizedString(translatablePattern, way);
             } else {
-                // This uses old Java properties translations
-                note.alertHeaderText = new LocalizedString(notePattern, way);
+                //This is used for Notepatterns like "text {tag}" which shouldn't happen
+                throw new NotImplementedException();
+                //"Note pattern: " + notePattern + " should use Gettext translation instead of text");
+
             }
         }
         return new T2<>(note, noteMatcher);
