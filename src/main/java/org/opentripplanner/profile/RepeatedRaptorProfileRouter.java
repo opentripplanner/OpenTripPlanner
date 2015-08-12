@@ -128,8 +128,11 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("Begin profile request");
 
         /** THIN WORKERS */
-        if (raptorWorkerData == null)
+        if (raptorWorkerData == null) {
+            long dataStart = System.currentTimeMillis();
             raptorWorkerData = getRaptorWorkerData(request, graph, sampleSet, ts);
+            ts.raptorData = (int) (System.currentTimeMillis() - dataStart);
+        }
         else
             ts.raptorData = 0;
 
