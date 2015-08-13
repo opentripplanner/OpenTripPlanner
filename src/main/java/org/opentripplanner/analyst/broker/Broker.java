@@ -70,7 +70,7 @@ public class Broker implements Runnable {
      * How long to give workers to start up (in ms) before assuming that they have started (and starting more
      * on a given graph if they haven't.
      */
-    public static final long WORKER_STARTUP_TIME = 5 * 60 * 1000;
+    public static final long WORKER_STARTUP_TIME = 60 * 60 * 1000;
 
     private int nUndeliveredTasks = 0; // Including normal priority jobs and high-priority tasks.
 
