@@ -526,8 +526,8 @@ msgid "P+R"
 msgstr ""
 
 #: corner
-msgid "corner of %s and %s"
-msgstr "%s és %s sarok"
+msgid "corner of %(first_street)s and %(second_street)s"
+msgstr "%(first_street)s és %(second_street)s sarok"
 
 #: unnamedStreet
 msgid "unnamed"

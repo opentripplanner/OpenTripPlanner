@@ -528,8 +528,8 @@ msgid "P+R"
 msgstr "infartsparkering"
 
 #: corner
-msgid "corner of %s and %s"
-msgstr "hörnet av %s och %s"
+msgid "corner of %(first_street)s and %(second_street)s"
+msgstr "hörnet av %(first_street)s och %(second_street)s"
 
 #: unnamedStreet
 msgid "unnamed"

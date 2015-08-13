@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.net.URLDecoder;
 
+import com.google.common.collect.ImmutableMap;
 import junit.framework.TestCase;
 
 import org.junit.Before;
@@ -255,8 +256,8 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
     @Test
     public void testGettextLocalizedString() {
-        LocalizedString localizedString = new LocalizedString(T.tr("corner of %s and %s"),
-            new String[]{"first", "second"});
+        LocalizedString localizedString = new LocalizedString(T.tr("corner of %(first_street)s and %(second_street)s"),
+            ImmutableMap.of("first_street", "first", "second_street", "second"));
 
         assertEquals("corner of first and second", localizedString.toString());
         assertEquals("Kreuzung first mit second",

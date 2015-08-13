@@ -14,6 +14,7 @@
 package org.opentripplanner.util;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.util.i18n.T;
@@ -57,15 +58,16 @@ public class LocalizedString implements I18NString, Serializable {
     //Values with which tagNames are replaced in translations.
     protected String[] params;
 
+    private ImmutableMap<String, String> map_params;
+
     /**
      * Creates String which can be localized
-     *
-     * @param translatableObject  object with english text and translation context set in {@link DefaultWayPropertySetSource} and translated with help of gettext.
-     * @param params Values with which tagNames are replaced in translations.
+     *  @param translatableObject  object with english text and translation context set in {@link DefaultWayPropertySetSource} and translated with help of gettext.
+     * @param params Map with key->values keys are names of parameters in string values are what they are replaced with
      */
-    public LocalizedString(T translatableObject, String[] params) {
+    public LocalizedString(T translatableObject, ImmutableMap<String, String> params) {
         this.key = translatableObject.msgid;
-        this.params = params;
+        this.map_params = params;
         //FIXME: this doesn't support context yet
         localizedKey = translatableObject;
     }
@@ -102,6 +104,16 @@ public class LocalizedString implements I18NString, Serializable {
             this.params = lparams.toArray(new String[lparams.size()]);
         }
 
+    }
+
+    /**
+     * Creates LocalizedString without parameters
+     *
+     * @param translatableObject object with english text and translation context and translated with help of gettext
+     */
+    public LocalizedString(T translatableObject) {
+        this.key = translatableObject.msgid;
+        this.localizedKey = translatableObject;
     }
 
     /**
@@ -163,6 +175,9 @@ public class LocalizedString implements I18NString, Serializable {
     @Override public String toString(Locale locale) {
         if (this.key == null || this.localizedKey == null) {
             return null;
+        }
+        if (map_params != null) {
+            return ResourceBundleSingleton.INSTANCE.localizeGettextSprintfFormat(localizedKey, locale, map_params);
         }
         String translation = ResourceBundleSingleton.INSTANCE.localizeGettext(localizedKey, locale);
 

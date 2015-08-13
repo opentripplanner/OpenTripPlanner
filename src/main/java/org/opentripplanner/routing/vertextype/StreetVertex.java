@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.vertextype;
 
+import com.google.common.collect.ImmutableMap;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -66,12 +67,12 @@ public abstract class StreetVertex extends Vertex {
         List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
 
         if (uniqueNames.size() > 1) {
-            calculatedName = new LocalizedString(T.tr("corner of %s and %s"), new String[]{uniqueNames.get(0),
-                uniqueNames.get(1)});
+            calculatedName = new LocalizedString(T.tr("corner of %(first_street)s and %(second_street)s"),
+                ImmutableMap.of("first_street", uniqueNames.get(0), "second_street", uniqueNames.get(1)));
         } else if (uniqueNames.size() == 1) {
             calculatedName = new NonLocalizedString(uniqueNames.get(0));
         } else {
-            calculatedName = new LocalizedString(T.tr("unnamed"), (String[]) null);
+            calculatedName = new LocalizedString(T.tr("unnamed"));
         }
         return calculatedName;
     }

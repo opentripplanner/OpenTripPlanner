@@ -530,7 +530,7 @@ msgid "P+R"
 msgstr ""
 
 #: corner
-msgid "corner of %s and %s"
+msgid "corner of %(first_street)s and %(second_street)s"
 msgstr ""
 
 #: unnamedStreet
