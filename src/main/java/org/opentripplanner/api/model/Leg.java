@@ -28,6 +28,7 @@ import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.i18n.T;
+import org.opentripplanner.util.i18n.translations.Units;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -287,8 +288,7 @@ public class Leg {
              } else {
                  trans = T.tr("");
              }
-             //TODO: if this is used we need some distance humanizing and correct unit choser
-             longDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(trans, requestedLocale) + ": " + distance/1000 + "m " +  ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+             longDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(trans, requestedLocale) + ": " + getDistanceString(requestedLocale) +  ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
              longDescription += to.name;
 
              shortDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
@@ -297,6 +297,45 @@ public class Leg {
              if (removeTagsFromLocalizations) {
                  longDescription = ResourceBundleSingleton.removeHTMLTags(longDescription);
                  shortDescription = ResourceBundleSingleton.removeHTMLTags(shortDescription);
+             }
+         }
+     }
+
+     /**
+      * Returns string with humanized distance
+      *
+      * Units are based on Locale in {@link ResourceBundleSingleton#getUnits(Locale)}
+      *
+      * Humanized units look like this:
+      * - if less then 528 feet: 123 feet
+      * - else 0.45 miles
+      * - if more then 100 km: 856 km
+      * - if more then 1 km: 5.26 km
+      * - else: 565 m
+      * @param requestedLocale
+      * @return
+      */
+     public String getDistanceString(Locale requestedLocale) {
+         Units units = ResourceBundleSingleton.INSTANCE.getUnits(requestedLocale);
+         if (units == Units.IMPERIAL) {
+             double ft = distance*3.28084;
+             if (ft < 528) {
+                 return String.format(requestedLocale, "%.0f feet", ft);
+             } else {
+                 ft = ft/52.8/100;
+                 return String.format(requestedLocale, "%.2f miles", ft);
+             }
+         } else {
+             double km = distance/1000;
+             if (km > 100) {
+                 //100 km => 99999999 km
+                 return String.format(requestedLocale, "%.0f km", km);
+             } else if(km > 1) {
+                 //1.11 km => 99.99 km
+                 return String.format(requestedLocale, "%.2f km", km);
+             } else {
+                 //1m => 999 m
+                 return String.format(requestedLocale, "%.0f m", distance);
              }
          }
      }

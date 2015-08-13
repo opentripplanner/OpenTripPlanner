@@ -18,6 +18,7 @@ import java.util.*;
 
 import gnu.gettext.GettextResource;
 import org.opentripplanner.util.i18n.T;
+import org.opentripplanner.util.i18n.translations.Units;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,23 @@ public enum ResourceBundleSingleton {
 
     public Locale getDefaultLocale() {
         return defaultLocale;
+    }
+
+    /**
+     * Specifies which locale uses which distance unit.
+     *
+     * Currently English - imperial and everything else metric
+     *
+     * @param locale
+     * @return
+     */
+    public Units getUnits(Locale locale) {
+            if (locale.getLanguage().equals("en")) {
+                return Units.IMPERIAL;
+            } else {
+                return Units.METRIC;
+            }
+
     }
 
     /**
