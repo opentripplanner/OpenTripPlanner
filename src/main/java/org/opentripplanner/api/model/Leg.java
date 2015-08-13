@@ -286,7 +286,7 @@ public class Leg {
              } else if (mode.equals(TraverseMode.CAR.toString())) {
                  trans = T.tr("Car");
              } else {
-                 trans = T.tr("");
+                 trans = T.tr("Unknown mode");
              }
              longDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(trans, requestedLocale) + ": " + getDistanceString(requestedLocale) +  ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
              longDescription += to.name;
