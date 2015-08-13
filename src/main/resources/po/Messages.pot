@@ -7,7 +7,7 @@
 msgid   ""
 msgstr  "Project-Id-Version: PACKAGE VERSION\n"
         "Report-Msgid-Bugs-To: \n"
-        "POT-Creation-Date: 2015-08-13 14:01+0200\n"
+        "POT-Creation-Date: 2015-08-13 18:15+0200\n"
         "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
         "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
         "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,84 +16,99 @@ msgstr  "Project-Id-Version: PACKAGE VERSION\n"
         "Content-Type: text/plain; charset=utf-8\n"
         "Content-Transfer-Encoding: 8bit\n"
 
-#: src/main/java/org/opentripplanner/api/model/Leg.java:274
-#: lib/templates/transit-leg.html:6
-msgctxt "bus_direction"
-msgid   " to "
+#: src/main/java/org/opentripplanner/api/model/Leg.java:273
+msgid   " towards "
 msgstr  ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:276
+#: src/main/java/org/opentripplanner/api/model/Leg.java:290
+#: src/main/java/org/opentripplanner/api/model/Leg.java:293
+#: lib/templates/access-leg.html:5 lib/templates/generic-leg.html:4
+#: lib/templates/transit-leg.html:6
 #: src/main/java/org/opentripplanner/api/model/Leg.java:277
 #: src/main/java/org/opentripplanner/api/model/Leg.java:291
 #: src/main/java/org/opentripplanner/api/model/Leg.java:294
-#: lib/templates/access-leg.html:5 lib/templates/generic-leg.html:4
-#: lib/templates/transit-leg.html:6
 msgctxt "direction"
 msgid   " to "
 msgstr  ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:282
 #: src/main/java/org/opentripplanner/api/model/Leg.java:283
 msgid   "Walk"
 msgstr  ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:284
 #: src/main/java/org/opentripplanner/api/model/Leg.java:285
 msgid   "Cycle"
 msgstr  ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:286
 #: src/main/java/org/opentripplanner/api/model/Leg.java:287
 msgid   "Car"
 msgstr  ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:288
 #: src/main/java/org/opentripplanner/api/model/Leg.java:289
 msgid   "Unknown mode"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:70
 #: lib/localization.js:128
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:70
 msgid   "first"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:71
 #: lib/localization.js:129
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:71
 msgid   "second"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:72
 #: lib/localization.js:130
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:72
 msgid   "third"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:73
 #: lib/localization.js:131
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:73
 msgid   "fourth"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:74
 #: lib/localization.js:132
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:74
 msgid   "fifth"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:75
 #: lib/localization.js:133
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:75
 msgid   "sixth"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:76
 #: lib/localization.js:134
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:76
 msgid   "seventh"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:77
 #: lib/localization.js:135
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:77
 msgid   "eight"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:78
 #: lib/localization.js:136
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:78
 msgid   "ninth"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:79
 #: lib/localization.js:137
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:79
 msgid   "tenth"
 msgstr  ""
 
@@ -101,6 +116,7 @@ msgstr  ""
 #. itinerary)
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:83
 #: lib/localization.js:175
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:83
 msgctxt "itinerary"
 msgid   "depart"
 msgstr  ""
@@ -109,12 +125,14 @@ msgstr  ""
 #. streetname...
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:84
 #: lib/localization.js:170
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:84
 msgid   "clockwise"
 msgstr  ""
 
 #. TRANSLATORS: Take roundabout [counter clockwise] to [ordinal exit number] on streetname...
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:85
 #: lib/localization.js:172
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:85
 msgid   "counter clockwise"
 msgstr  ""
 
@@ -122,125 +140,149 @@ msgstr  ""
 #. on /on to [streetname]
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:86
 #: lib/localization.js:178
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:86
 msgid   "hard left"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:87
 #: lib/localization.js:179
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:87
 msgid   "left"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:88
 #: lib/localization.js:180
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:88
 msgid   "slight left"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:89
 #: lib/localization.js:181
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:89
 msgid   "continue"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:90
 #: lib/localization.js:182
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:90
 msgid   "slight right"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:91
 #: lib/localization.js:183
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:91
 msgid   "right"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:92
 #: lib/localization.js:184
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:92
 msgid   "hard right"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:93
 #: lib/localization.js:187
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:93
 msgid   "elevator"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:94
 #: lib/localization.js:188
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:94
 msgid   "U-turn left"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:95
 #: lib/localization.js:189
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:95
 msgid   "U-turn right"
 msgstr  ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:99
 #: lib/localization.js:149
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:99
 msgid   "north"
 msgstr  ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:100
 #: lib/localization.js:151
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:100
 msgid   "northeast"
 msgstr  ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:101
 #: lib/localization.js:153
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:101
 msgid   "east"
 msgstr  ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:102
 #: lib/localization.js:155
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:102
 msgid   "southeast"
 msgstr  ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:103
 #: lib/localization.js:157
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:103
 msgid   "south"
 msgstr  ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:104
 #: lib/localization.js:159
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:104
 msgid   "southwest"
 msgstr  ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:105
 #: lib/localization.js:161
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:105
 msgid   "west"
 msgstr  ""
 
 #. TRANSLATORS: Start on [street name] heading [Absolute direction] used in travel plan generation
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:106
 #: lib/localization.js:163
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:106
 msgid   "northwest"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:288
 #: lib/templates/step.html:9
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:288
 msgid   "Take roundabout %(relativeDirection)s to %(ordinal_exit_number)s exit on %(streetName)s"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:293
 #: lib/templates/step.html:12
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:293
 msgid   "Start on <b>%(streetName)s</b> heading %(absoluteDirection)s"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:299
 #: lib/templates/step.html:15
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:299
 msgid   "<b>%(relativeDirection)s</b> to continue on <b>%(streetName)s</b>"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/api/model/WalkStep.java:304
 #: lib/templates/step.html:17
+#: src/main/java/org/opentripplanner/api/model/WalkStep.java:304
 msgid   "<b>%(relativeDirection)s</b> on to <b>%(streetName)s</b>"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:491
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:492
 #: note.caution
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:491
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:492
 msgid   "Caution!"
 msgstr  ""
 
@@ -251,23 +293,34 @@ msgstr  ""
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:498
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:499
 #: note.unpaved_surface
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:494
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:495
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:496
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:497
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:498
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:499
 msgid   "Unpaved surface"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:500
 #: note.muddy_surface
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:500
 msgid   "Unpaved surface -- muddy!"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:501
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:502
 #: note.toll
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:501
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:502
 msgid   "Toll road"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:506
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:507
 #: name.bike_path
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:506
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:507
 msgid   "bike path"
 msgstr  ""
 
@@ -275,34 +328,43 @@ msgstr  ""
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:511
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:513
 #: name.pedestrian_path
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:508
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:511
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:513
 msgctxt "name.pedestrian_path"
 msgid   "path"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:509
 #: name.pedestrian_area
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:509
 msgid   "open area"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:510
 #: name.path
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:510
 msgctxt "name.path"
 msgid   "path"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:512
 #: name.bridleway
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:512
 msgid   "bridleway"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:516
 #: name.otp_route_ref
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:516
 msgid   "Route {otp:route_ref}"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:517
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:518
 #: name.platform_ref
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:517
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:518
 msgid   "Platform {ref}"
 msgstr  ""
 
@@ -315,6 +377,14 @@ msgstr  ""
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:525
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:526
 #: name.platform
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:519
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:520
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:521
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:522
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:523
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:524
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:525
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:526
 msgid   "platform"
 msgstr  ""
 
@@ -322,6 +392,9 @@ msgstr  ""
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:530
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:531
 #: name.footbridge
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:529
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:530
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:531
 msgid   "footbridge"
 msgstr  ""
 
@@ -329,6 +402,9 @@ msgstr  ""
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:534
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:535
 #: name.underpass
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:533
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:534
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:535
 msgid   "underpass"
 msgstr  ""
 
@@ -342,12 +418,23 @@ msgstr  ""
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:551
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:552
 #: name.road
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:538
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:540
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:543
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:545
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:547
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:549
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:550
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:551
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:552
 msgid   "road"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:539
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:541
 #: name.ramp
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:539
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:541
 msgid   "ramp"
 msgstr  ""
 
@@ -355,71 +442,89 @@ msgstr  ""
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:546
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:548
 #: name.link
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:544
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:546
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:548
 msgid   "link"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:553
 #: name.service_road
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:553
 msgid   "service road"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:554
 #: name.alley
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:554
 msgid   "alley"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:555
 #: name.parking_aisle
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:555
 msgid   "parking aisle"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:556
 #: name.byway
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:556
 msgid   "byway"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:557
 #: name.track
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:557
 msgid   "track"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:559
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:560
 #: name.sidewalk
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:559
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:560
 msgid   "sidewalk"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:562
 #: name.steps
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:562
 msgid   "steps"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:564
 #: name.bicycle_parking_name
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:564
 msgid   "Bicycle parking {name}"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:565
 #: name.bicycle_parking
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:565
 msgid   "Bicycle parking"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:567
 #: name.park_and_ride_name
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:567
 msgid   "P+R {name}"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:568
 #: name.park_and_ride_station
+#: src/main/java/org/opentripplanner/graph_builder/module/osm/DefaultWayPropertySetSource.java:568
 msgid   "P+R"
 msgstr  ""
 
 #: src/main/java/org/opentripplanner/routing/vertextype/StreetVertex.java:70
 #: src/test/java/org/opentripplanner/graph_builder/module/osm/TestOpenStreetMapGraphBuilder.java:259
 #: corner
+#: src/main/java/org/opentripplanner/routing/vertextype/StreetVertex.java:70
+#: src/test/java/org/opentripplanner/graph_builder/module/osm/TestOpenStreetMapGraphBuilder.java:259
 msgid   "corner of %(first_street)s and %(second_street)s"
 msgstr  ""
 
+#: src/main/java/org/opentripplanner/routing/vertextype/StreetVertex.java:75
 #: src/main/java/org/opentripplanner/routing/vertextype/StreetVertex.java:75
 #: unnamedStreet
 msgid   "unnamed"
@@ -622,6 +727,12 @@ msgstr  ""
 
 #: lib/templates/request-form.html:197
 msgid   "Last"
+msgstr  ""
+
+#: lib/templates/transit-leg.html:6
+#: src/main/java/org/opentripplanner/api/model/Leg.java:274
+msgctxt "bus_direction"
+msgid   " to "
 msgstr  ""
 
 #: lib/templates/transit-leg.html:19

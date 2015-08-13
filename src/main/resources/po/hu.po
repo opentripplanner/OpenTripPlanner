@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-13 14:01+0200\n"
+"POT-Creation-Date: 2015-08-13 18:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Hungarian\n"
@@ -13,33 +13,38 @@ msgstr ""
 "X-Generator: Translate Toolkit 1.12.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/main/java/org/opentripplanner/api/model/Leg.java:274
-#: lib/templates/transit-leg.html:6
-msgctxt "bus_direction"
-msgid " to "
+#: src/main/java/org/opentripplanner/api/model/Leg.java:273
+msgid " towards "
 msgstr ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:276
+#: src/main/java/org/opentripplanner/api/model/Leg.java:290
+#: src/main/java/org/opentripplanner/api/model/Leg.java:293
+#: lib/templates/access-leg.html:5 lib/templates/generic-leg.html:4
+#: lib/templates/transit-leg.html:6
 #: src/main/java/org/opentripplanner/api/model/Leg.java:277
 #: src/main/java/org/opentripplanner/api/model/Leg.java:291
 #: src/main/java/org/opentripplanner/api/model/Leg.java:294
-#: lib/templates/access-leg.html:5 lib/templates/generic-leg.html:4
-#: lib/templates/transit-leg.html:6
 msgctxt "direction"
 msgid " to "
 msgstr ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:282
 #: src/main/java/org/opentripplanner/api/model/Leg.java:283
 msgid "Walk"
 msgstr ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:284
 #: src/main/java/org/opentripplanner/api/model/Leg.java:285
 msgid "Cycle"
 msgstr ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:286
 #: src/main/java/org/opentripplanner/api/model/Leg.java:287
 msgid "Car"
 msgstr ""
 
+#: src/main/java/org/opentripplanner/api/model/Leg.java:288
 #: src/main/java/org/opentripplanner/api/model/Leg.java:289
 msgid "Unknown mode"
 msgstr ""
@@ -630,6 +635,12 @@ msgstr ""
 
 #: lib/templates/request-form.html:197
 msgid "Last"
+msgstr ""
+
+#: lib/templates/transit-leg.html:6
+#: src/main/java/org/opentripplanner/api/model/Leg.java:274
+msgctxt "bus_direction"
+msgid " to "
 msgstr ""
 
 #: lib/templates/transit-leg.html:19

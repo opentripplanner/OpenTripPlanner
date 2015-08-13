@@ -270,8 +270,7 @@ public class Leg {
          if (isTransitLeg()) {
              longDescription = agencyName + ",<b>" + routeShortName + "</b>" + " " + routeLongName;
              if (headsign != null) {
-                 //should be towards
-                 longDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("bus_direction", " to "), requestedLocale);
+                 longDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.tr(" towards "), requestedLocale);
                  longDescription += headsign;
              } else {
                  longDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
