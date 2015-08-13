@@ -3,6 +3,7 @@ package org.opentripplanner.util.i18n;
 import org.opentripplanner.util.LocalizedString;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * This class is used so that translation extraction extracts strings to po files.
@@ -38,5 +39,18 @@ public final class T implements Serializable {
      */
     public static T tt(String msg) {
         return T.tr(msg);
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        T t = (T) o;
+        return Objects.equals(msgid, t.msgid) && Objects.equals(msgctx, t.msgctx);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(msgid, msgctx);
     }
 }

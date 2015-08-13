@@ -43,21 +43,24 @@ public class LocalizedString implements I18NString, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalizedString.class);
 
-    T localizedKey;
+    /**
+     * This specifies translations it has english text and context if needed
+     */
+    T localizableKey;
 
     /**
-     * Map which key has which tagNames. Used only when building graph.
+     * Map which key has which tagNames. Used only when building graph. Cache for {@link #getTagNames()}
      */
-    protected transient static ListMultimap<String, String> key_tag_names;
+    protected transient static ListMultimap<T, String> key_tag_names;
 
     static {
         key_tag_names = ArrayListMultimap.create();
     }
-    //Key which specifies translation
-    protected String key;
+
     //Values with which tagNames are replaced in translations.
     protected String[] params;
 
+    //Used if translation has parameters. Map which parameter is replaced with which value
     private ImmutableMap<String, String> map_params;
 
     /**
@@ -66,10 +69,8 @@ public class LocalizedString implements I18NString, Serializable {
      * @param params Map with key->values keys are names of parameters in string values are what they are replaced with
      */
     public LocalizedString(T translatableObject, ImmutableMap<String, String> params) {
-        this.key = translatableObject.msgid;
         this.map_params = params;
-        //FIXME: this doesn't support context yet
-        localizedKey = translatableObject;
+        localizableKey = translatableObject;
     }
 
     /**
@@ -87,8 +88,7 @@ public class LocalizedString implements I18NString, Serializable {
      * @param way OSM way from which tag values are read
      */
     public LocalizedString(T creativeNameLocalPattern, OSMWithTags way) {
-        this.localizedKey = creativeNameLocalPattern;
-        this.key = creativeNameLocalPattern.msgid;
+        this.localizableKey = creativeNameLocalPattern;
         List<String> lparams = new ArrayList<String>(4);
         //Which tags do we want from way
         List<String> tag_names = getTagNames();
@@ -112,8 +112,7 @@ public class LocalizedString implements I18NString, Serializable {
      * @param translatableObject object with english text and translation context and translated with help of gettext
      */
     public LocalizedString(T translatableObject) {
-        this.key = translatableObject.msgid;
-        this.localizedKey = translatableObject;
+        this.localizableKey = translatableObject;
     }
 
     /**
@@ -131,26 +130,34 @@ public class LocalizedString implements I18NString, Serializable {
         //TODO: after finding all keys for replacements replace strings to normal java strings
         //with https://stackoverflow.com/questions/2286648/named-placeholders-in-string-formatting if it is faster
         //otherwise it's converted only when toString is called
-        if( key_tag_names.containsKey(key)) {
-            return key_tag_names.get(key);
+        if( key_tag_names.containsKey(localizableKey)) {
+            return key_tag_names.get(localizableKey);
         }
         List<String> tag_names = new ArrayList<String>(4);
-        String english_trans = this.key;
+        String english_trans = ResourceBundleSingleton.INSTANCE.localizeGettext(localizableKey, Locale.ENGLISH);
 
         Matcher matcher = patternMatcher.matcher(english_trans);
         while (matcher.find()) {
             String tag_name = matcher.group(1);
-            key_tag_names.put(key, tag_name);
+            key_tag_names.put(localizableKey, tag_name);
             tag_names.add(tag_name);
         }
         return tag_names;
     }
 
-    @Override
-    public boolean equals(Object other){
-        return other instanceof LocalizedString &&
-            key.equals(((LocalizedString) other).key) &&
-            Arrays.equals(params, ((LocalizedString) other).params);
+    @Override public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        LocalizedString that = (LocalizedString) o;
+        return Objects.equals(localizableKey, that.localizableKey) &&
+            Objects.equals(params, that.params) &&
+            Objects.equals(map_params, that.map_params);
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(localizableKey, params, map_params);
     }
 
     /**
@@ -173,13 +180,13 @@ public class LocalizedString implements I18NString, Serializable {
      * @return
      */
     @Override public String toString(Locale locale) {
-        if (this.key == null || this.localizedKey == null) {
+        if (this.localizableKey == null) {
             return null;
         }
         if (map_params != null) {
-            return ResourceBundleSingleton.INSTANCE.localizeGettextSprintfFormat(localizedKey, locale, map_params);
+            return ResourceBundleSingleton.INSTANCE.localizeGettextSprintfFormat(localizableKey, locale, map_params);
         }
-        String translation = ResourceBundleSingleton.INSTANCE.localizeGettext(localizedKey, locale);
+        String translation = ResourceBundleSingleton.INSTANCE.localizeGettext(localizableKey, locale);
 
         if (this.params != null && this.params.length > 0) {
             translation = patternMatcher.matcher(translation).replaceAll("%s");
