@@ -5,6 +5,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
@@ -13,6 +14,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import org.joda.time.LocalDate;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
@@ -46,6 +48,40 @@ public class IndexGraphQLSchema {
     public GraphQLOutputType stoptimesInPatternType = new GraphQLTypeReference("StoptimesInPattern");
     public GraphQLObjectType queryType;
     public GraphQLSchema indexSchema;
+
+    public static GraphQLEnumType locationTypeEnum = GraphQLEnumType.newEnum()
+            .name("LocationType")
+            .description("Identifies whether this stop represents a stop or station.")
+            .value("STOP", 0, "A location where passengers board or disembark from a transit vehicle.")
+            .value("STATION", 1, "A physical structure or area that contains one or more stop.")
+            .value("ENTRANCE", 2)
+            .build();
+
+    public static GraphQLEnumType wheelchairBoardingEnum = GraphQLEnumType.newEnum()
+            .name("WheelchairBoarding")
+            .value("NO_INFORMATION", 0, "There is no accessibility information for the stop.")
+            .value("POSSIBLE", 1, "At least some vehicles at this stop can be boarded by a rider in a wheelchair.")
+            .value("NOT_POSSIBLE", 2, "Wheelchair boarding is not possible at this stop.")
+            .build();
+
+    public static GraphQLEnumType routeTypeEnum = GraphQLEnumType.newEnum()
+            .name("TransportationType")
+            .value("TRAM", 0, "Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.")
+            .value("SUBWAY", 1, "Subway, Metro. Any underground rail system within a metropolitan area.")
+            .value("RAIL", 2, "Rail. Used for intercity or long-distance travel.")
+            .value("BUS", 3, "Bus. Used for short- and long-distance bus routes.")
+            .value("FERRY", 4, "Ferry. Used for short- and long-distance boat service.")
+            .value("CABLE_CAR", 5, "Cable car. Used for street-level cable cars where the cable runs beneath the car.")
+            .value("GONDOLA", 6, "Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.")
+            .value("FUNICULAR", 7, "Funicular. Any rail system designed for steep inclines.")
+            .build();
+
+    public static GraphQLEnumType bikesAllowedEnum = GraphQLEnumType.newEnum()
+            .name("BikesAllowed")
+            .value("NO_INFORMATION", 0, "There is no bike information for the trip.")
+            .value("ALLOWED", 1, "The vehicle being used on this particular trip can accommodate at least one bicycle.")
+            .value("NOT_ALLOWED", 2, "No bicycles are allowed on this trip.")
+            .build();
 
     public IndexGraphQLSchema(GraphIndex index) {
 
@@ -152,15 +188,23 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("locationType")
-                .type(Scalars.GraphQLInt) //TODO:enum
+                .type(locationTypeEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
-                .type(Scalars.GraphQLString) //TODO: get actual station type
+                .type(stopType)
+                .dataFetcher(environment ->
+                    index.stopForId.get(
+                            new AgencyAndId(
+                                    ((Stop) environment.getSource()).getId().getAgencyId(),
+                                    ((Stop) environment.getSource()).getParentStation()
+                            )
+                    )
+                )
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
-                .name("wheelchairBoarding") //TODO:enum
-                .type(Scalars.GraphQLInt)
+                .name("wheelchairBoarding")
+                .type(wheelchairBoardingEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("direction")
@@ -172,7 +216,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("vehicleType")
-                .type(Scalars.GraphQLInt) //TODO:enum
+                .type(routeTypeEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("platformCode")
@@ -402,17 +446,17 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("shapeId")
-                .type(Scalars.GraphQLString) //TODO: should be shapeType or geometryType
+                .type(Scalars.GraphQLString)
                 .dataFetcher(environment ->
                     GtfsLibrary.convertIdToString(((Trip) environment.getSource()).getShapeId()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("wheelchairAccessible")
-                .type(Scalars.GraphQLInt) //TODO: enum
+                .type(wheelchairBoardingEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikesAllowed")
-                .type(Scalars.GraphQLString) //TODO:enum
+                .type(bikesAllowedEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("pattern")
@@ -523,7 +567,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("type")
-                .type(Scalars.GraphQLInt) // TODO:Replace with enum
+                .type(routeTypeEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("desc")
@@ -543,7 +587,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("bikesAllowed")
-                .type(Scalars.GraphQLInt) // TODO:Replace with enum
+                .type(bikesAllowedEnum)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("patterns")

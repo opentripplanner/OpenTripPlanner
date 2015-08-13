@@ -675,9 +675,9 @@
         </dependency>
 
         <dependency>
-            <groupId>graphql-java</groupId>
+            <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
 
         <!-- Support for OTP scripting -->

@@ -580,7 +580,7 @@ public class IndexAPI {
             result = index.graphQL.execute(query, null, null, new HashMap<>(uriInfo.getQueryParameters()));
         }
         if (result.getErrors().isEmpty()) {
-            return Response.status(Status.OK).entity(result.getResult()).build();
+            return Response.status(Status.OK).entity(result.getData()).build();
         } else {
             return Response.status(Status.BAD_REQUEST).entity(result.getErrors()).build();
         }
