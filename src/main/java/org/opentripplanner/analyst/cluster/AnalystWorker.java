@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -345,73 +346,80 @@ public class AnalystWorker implements Runnable {
 
             // This result envelope will hold the result of the profile or single-time one-to-many search.
             ResultEnvelope envelope = new ResultEnvelope();
-            if (clusterRequest.profileRequest != null) {
-                ts.lon = clusterRequest.profileRequest.fromLon;
-                ts.lat = clusterRequest.profileRequest.fromLat;
 
-                RepeatedRaptorProfileRouter router;
+/////////////////////
 
-                boolean isochrone = clusterRequest.destinationPointsetId == null;
-                ts.isochrone = isochrone;
-                if (!isochrone) {
-                    // A pointset was specified, calculate travel times to the points in the pointset.
-                    // Fetch the set of points we will use as destinations for this one-to-many search
-                    PointSet pointSet = pointSetDatastore.get(clusterRequest.destinationPointsetId);
-                    // TODO this breaks if graph has been rebuilt
-                    SampleSet sampleSet = pointSet.getOrCreateSampleSet(graph);
-                    router =
-                            new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
+            // Set up search parameters based on the ProfileRequest that is embedded in the ClusterRequest
 
-                    // no reason to cache single-point RaptorWorkerData
-                    if (clusterRequest.outputLocation != null) {
-                        router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, () -> {
-                            return RepeatedRaptorProfileRouter
-                                    .getRaptorWorkerData(clusterRequest.profileRequest, graph,
-                                            sampleSet, ts);
-                        });
-                    }
-                } else {
-                    router = new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest);
+            ts.lon = clusterRequest.profileRequest.fromLon;
+            ts.lat = clusterRequest.profileRequest.fromLat;
 
-                    if (clusterRequest.outputLocation == null) {
-                        router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId,
-                                () -> RepeatedRaptorProfileRouter
-                                    .getRaptorWorkerData(clusterRequest.profileRequest, graph, null,
-                                            ts));
-                    }
+            // We need to distinguish between and handle four different types of requests here:
+            // Either vector isochrones or accessibility to a pointset,
+            // as either a single-origin priority request (where the result is returned immediately)
+            // or a job task (where the result is saved to output location on S3).
+            boolean isochrone = (clusterRequest.destinationPointsetId == null);
+            boolean singlePoint = (clusterRequest.outputLocation == null);
+            boolean transit = (clusterRequest.profileRequest.transitModes.isTransit());
+
+            RepeatedRaptorProfileRouter router;
+            // TODO can we refactor to eliminate this big conditional,
+            // and simply pass null in as the sampleset parameter to the RepeatedRaptorProfileRouter constructor?
+            if (isochrone) {
+                router = new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest);
+                if (singlePoint) {
+                    // Only difference here (when doing isochrones) is that sampleSet is null
+                    // And raptorWorkerData is only pulled from cache when output location is null
+                    router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, ()->RepeatedRaptorProfileRouter
+                        .getRaptorWorkerData(clusterRequest.profileRequest, graph, null, ts));
                 }
-
-                try {
-                    router.route(ts);
-                    long resultSetStart = System.currentTimeMillis();
-
-                    if (isochrone) {
-                        envelope.worstCase = new ResultSet(router.timeSurfaceRangeSet.max);
-                        envelope.bestCase = new ResultSet(router.timeSurfaceRangeSet.min);
-                        envelope.avgCase = new ResultSet(router.timeSurfaceRangeSet.avg);
-                    } else {
-                        ResultSet.RangeSet results = router
-                                .makeResults(clusterRequest.includeTimes, !isochrone, isochrone);
-                        // put in constructor?
-                        envelope.bestCase = results.min;
-                        envelope.avgCase = results.avg;
-                        envelope.worstCase = results.max;
-                    }
-                    envelope.id = clusterRequest.id;
-                    envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
-
-                    ts.resultSets = (int) (System.currentTimeMillis() - resultSetStart);
-                    ts.success = true;
-                } catch (Exception ex) {
-                    // Leave the envelope empty TODO include error information
-                    ts.success = false;
-                    LOG.error("Error occurred in profile request", ex);
-                }
+                // TODO why is there a conditional above? Explain what happens if we're not in single point mode.
             } else {
-                // No profile request, this must be a plain one to many routing request.
-                RoutingRequest routingRequest = clusterRequest.routingRequest;
-                // TODO finish the non-profile case
+                // This request is for accessibility information based on travel times to a pointset.
+                // Fetch the set of points we will use as destinations for this one-to-many search
+                PointSet pointSet = pointSetDatastore.get(clusterRequest.destinationPointsetId);
+                // TODO this breaks if graph has been rebuilt
+                SampleSet sampleSet = pointSet.getOrCreateSampleSet(graph);
+                router = new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
+                if (singlePoint) {
+                    // There is no reason to cache RaptorWorkerData for such a single-point request. TODO explain why.
+                    // By leaving it blank, the router will create a single-use table.
+                    router.raptorWorkerData = null;
+                } else {
+                    router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, ()->RepeatedRaptorProfileRouter
+                            .getRaptorWorkerData(clusterRequest.profileRequest, graph, sampleSet, ts));
+                }
             }
+
+            try {
+                router.route(ts);
+                long resultSetStart = System.currentTimeMillis();
+
+                if (isochrone) {
+                    envelope.worstCase = new ResultSet(router.timeSurfaceRangeSet.max);
+                    envelope.bestCase = new ResultSet(router.timeSurfaceRangeSet.min);
+                    envelope.avgCase = new ResultSet(router.timeSurfaceRangeSet.avg);
+                } else {
+                    ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, !isochrone, isochrone);
+                    // put in constructor?
+                    envelope.bestCase = results.min;
+                    envelope.avgCase = results.avg;
+                    envelope.worstCase = results.max;
+                }
+                envelope.id = clusterRequest.id;
+                envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
+
+                ts.resultSets = (int) (System.currentTimeMillis() - resultSetStart);
+                ts.success = true;
+            } catch (Exception ex) {
+                // Leave the envelope empty TODO include error information
+                ts.success = false;
+                LOG.error("Error occurred in profile request", ex);
+            }
+
+
+//////////////////////
+
 
             if (clusterRequest.outputLocation != null) {
                 // Convert the result envelope and its contents to JSON and gzip it in this thread.
@@ -427,10 +435,11 @@ public class AnalystWorker implements Runnable {
                 // could consume it in the same way.
                 objectMapper.writeValue(gzipOutputStream, envelope);
                 gzipOutputStream.close();
-                // DELETE the task from the broker, confirming it has been handled and should not be re-delivered.
+                // Tell the broker the task has been handled and should not be re-delivered to another worker.
                 deleteRequest(clusterRequest);
             } else {
-                // No output location on S3 specified, return the result via the broker and mark the task completed.
+                // No output location was provided. Instead of saving the result on S3,
+                // return the result immediately via a connection held open by the broker and mark the task completed.
                 finishPriorityTask(clusterRequest, envelope);
             }
 

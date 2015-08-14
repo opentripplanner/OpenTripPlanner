@@ -88,7 +88,8 @@ public class RepeatedRaptorProfileRouter {
     /**
      * Make a router to use for making time surfaces only.
      *
-     * If you're building ResultSets, you should use the below method that uses a SampleSet; otherwise you maximum and average may not be correct.
+     * If you're building ResultSets, you should use the below method that uses a SampleSet;
+     * otherwise you maximum and average may not be correct.
      *
      * If you want isochrones, you should use this method, or use a sampleset that is very fine. The
      * reason for this is that isochrones are interpolated from these points in Euclidean space, so the
@@ -97,6 +98,8 @@ public class RepeatedRaptorProfileRouter {
      * halfway down the opposite edge, it is a fifteen minute trip. However, interpolating between the
      * vertices will not give fifteen minutes, it will give ten. The less granular your representation
      * is, the worse this problem will be.
+     * TODO merge this with the 3-arg constructor, and just specify what happens when you have a null pointset.
+     * This should allow us to get rid of some conditionals in the calling code.
      */
     public RepeatedRaptorProfileRouter(Graph graph, ProfileRequest request) {
         this(graph, request, null);
@@ -132,64 +135,55 @@ public class RepeatedRaptorProfileRouter {
             long dataStart = System.currentTimeMillis();
             raptorWorkerData = getRaptorWorkerData(request, graph, sampleSet, ts);
             ts.raptorData = (int) (System.currentTimeMillis() - dataStart);
-        }
-        else
+        } else {
             ts.raptorData = 0;
+        }
 
         LOG.info("Done.");
-        // TEST SERIALIZED SIZE and SPEED
-        //        try {
-        //            LOG.info("serializing...");
-        //            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("/Users/abyrd/worker.data"));
-        //            out.writeObject(raptorWorkerData);
-        //            out.close();
-        //            LOG.info("done");
-        //        } catch(IOException i) {
-        //            i.printStackTrace();
-        //        }
 
-        long initialStopStart = System.currentTimeMillis();
+        long initialStopStart = System.currentTimeMillis(); // TODO replace with named functions on stats object like "beginInitialStopSearch"
         LOG.info("Finding initial stops");
         TIntIntMap accessTimes = findInitialStops(false, raptorWorkerData);
+        // UP TO HERE IS ALL WE NEED TO DO IN NONTRANSIT CASE
         LOG.info("Found {} initial transit stops", accessTimes.size());
 
-        int[] timesAtVertices = new int[Vertex.getMaxIndex()];
-        Arrays.fill(timesAtVertices, Integer.MAX_VALUE);
+        // An array containing the travel time in seconds to each vertex in the graph when using no transit
+        int[] nonTransitTimes = new int[Vertex.getMaxIndex()];
+        Arrays.fill(nonTransitTimes, Integer.MAX_VALUE);
 
         for (State state : walkOnlySpt.getAllStates()) {
             // Note that we are using the walk distance divided by speed here in order to be consistent with the
             // least-walk optimization in the initial stop search (and the stop tree cache which is used at egress)
             int time = (int) (state.getWalkDistance() / request.walkSpeed);
             int vidx = state.getVertex().getIndex();
-            int otime = timesAtVertices[vidx];
+            int otime = nonTransitTimes[vidx];
 
             // There may be dominated states in the SPT. Make sure we don't include them here.
             if (otime > time)
-                timesAtVertices[vidx] = time;
+                nonTransitTimes[vidx] = time;
 
         }
         ts.initialStopSearch = (int) (System.currentTimeMillis() - initialStopStart);
         ts.initialStopCount = accessTimes.size();
 
         long walkSearchStart = System.currentTimeMillis();
-        // An array containing the time needed to walk to each target from the origin point.
-        int[] walkTimes;
 
-        if (sampleSet == null) {
-            walkTimes = timesAtVertices;
-        }
-        else {
-            walkTimes = sampleSet.eval(timesAtVertices);
+        // At this point we have an array of the travel times in seconds to each vertex in the graph without transit.
+        // In the event that a pointset was supplied, our real targets are the points in the pointset, not the vertices
+        // in the graph. Therefore we must replace the vertex-indexed array with a new point-indexed array.
+        if (sampleSet != null) {
+            nonTransitTimes = sampleSet.eval(nonTransitTimes);
         }
         ts.walkSearch = (int) (System.currentTimeMillis() - walkSearchStart);
 
         RaptorWorker worker = new RaptorWorker(raptorWorkerData, request);
-        propagatedTimesStore = worker.runRaptor(graph, accessTimes, walkTimes, ts);
+        propagatedTimesStore = worker.runRaptor(graph, accessTimes, nonTransitTimes, ts);
 
         for (int min : propagatedTimesStore.mins) {
             if (min != RaptorWorker.UNREACHED) ts.targetsReached++;
         }
 
+        // TODO Only if sampleset is null? What is going on here?
         if (sampleSet == null) {
             timeSurfaceRangeSet = new TimeSurface.RangeSet();
             timeSurfaceRangeSet.min = new TimeSurface(this);

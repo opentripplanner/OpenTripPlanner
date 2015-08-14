@@ -8,7 +8,9 @@ import java.util.Map;
 
 /**
  * This is a class that stores several result sets: an upper bound, a lower bound, and a central tendency.
- * TODO consider renaming to something more specific. "Envelope" has a geometric meaning, but here we mean "the thing you put a letter in".
+ * This is an "Envelope" in the sense that the results it contains enclose an area on a map or a chart:
+ * either the space between the minimum and maximum extent of an N-minute isochrone, or the space between the minimum
+ * and maximum accessibility curves on the cumulative access chart.
  *
  * @author mattwigway
  */
