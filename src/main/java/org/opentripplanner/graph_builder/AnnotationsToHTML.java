@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
@@ -76,6 +75,13 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             LOG.error("Saving folder is empty!");
             return;
         }
+
+        outPath = new File(outPath, "report");
+        if (!outPath.mkdir()) {
+            LOG.error("Failed to create HTML report directory: {}. HTML report won't be generated!", outPath.toString());
+            return;
+        }
+
 
 
         for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
@@ -132,9 +138,15 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         //Actual writing to the file is made here since
         // this is the first place where actual number of files is known (because it depends on annotations count)
         for (HTMLWriter writer : writers) {
-            writer.writeFile(classOccurences);
+            writer.writeFile(classOccurences, false);
         }
 
+        try {
+            HTMLWriter indexFileWriter = new HTMLWriter("index", (Multimap<String, String>)null);
+            indexFileWriter.writeFile(classOccurences, true);
+        } catch (FileNotFoundException e) {
+            LOG.error("Index file coudn't be created:{}", e);
+        }
 
         LOG.info("Annotated log is in {}", outPath);
 
@@ -216,7 +228,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             current_class = filename;
         }
 
-        private void writeFile(Multiset<String> classes) {
+        private void writeFile(Multiset<String> classes, boolean isIndexFile) {
             println("<html><head><title>Graph report for " + outPath.getParentFile()
                 + "Graph.obj</title>");
             println("\t<meta charset=\"utf-8\">");
@@ -266,7 +278,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
             println("<p>");
             //adds links to the other HTML files
-            for (Multiset.Entry<String> htmlAnnotationClass: classes.entrySet()) {
+            for (Multiset.Entry<String> htmlAnnotationClass : classes.entrySet()) {
                 String label_name = htmlAnnotationClass.getElement();
                 String label;
                 int currentCount = 1;
@@ -284,58 +296,58 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             println("</p>");
             println("<div id=\"buttons\"></div><ul id=\"log\"></ul>");
 
+            if (!isIndexFile) {
+                println("\t<script>");
 
-
-            println("\t<script>");
-
-            writeJson();
-            String js = "\t\tvar selected = {};\n"
-                + "\n"
-                + "\t\t//select/deselects filters and correctly styles buttons\n"
-                + "\t\tfunction refilter(item) {\n"
-                + "\t\t\tconsole.debug(item.data.name);\n"
-                + "\t\t\tvar annotation = item.data.name;\n"
-                + "\t\t\tvar keyLower = \"button-\"+annotation.toLowerCase();\n"
-                + "\t\t\tif (annotation in selected) {\n"
-                + "\t\t   \t\tdelete selected[annotation];\t\n"
-                + "\t\t\t\t$(\"button.\"+keyLower).removeClass(keyLower);\n"
-                + "\t\t\t} else {\n"
-                + "\t\t\t\tselected[annotation] = true;\n"
-                + "\t\t\t\t$(\"button:contains('\"+annotation+\"')\").addClass(keyLower);\n"
-                + "\t\t\t}\n"
-                + "\t\t\tresetView();\n"
-                + "\n"
-                + "\t\t}\n"
-                + "\n"
-                + "\t\t//draws list based on selected buttons\n"
-                + "\t\tfunction resetView() {\n"
-                + "\t\t\t$(\"#log\").empty();\n"
-                + "\t\t\t$.each(data, function(key, value) {\n"
-                + "\t\t\t\t//console.log(key);\n"
-                + "\t\t\t\tif (key in selected) {\n"
-                + "\t\t\t\t\tvar keyLower = \"button-\"+key.toLowerCase();\n"
-                + "\t\t\t\t\t$.each(value, function(index, log) {\n"
-                + "\t\t\t\t\t$(\"#log\").append(\"<li>\"+ \"<span class='pure-button \" + keyLower + \"'>\"+ key + \"</span>\" + log+\"</li>\");\n"
-                + "\t\t\t\t\t});\n"
-                + "\t\t\t\t}\n"
-                + "\t\t\t});\n"
-                + "\t\t}\n"
-                + "\n"
-                + "\t\t//creates buttons\n"
-                + "\t\t$.each(data, function(key, value) {\n"
-                + "\t\t\t//console.info(key);\n"
-                + "\t\t\t//console.info(value);\n"
-                + "\t\t\tvar keyLower = \"button-\"+key.toLowerCase();\n"
-                + "\t\t\tselected[key] = true;\n"
-                + "\t\t\tlen = value.length;\n"
-                + "\t\t\t$(\"#buttons\").append(\"<button class='pure-button \" + keyLower + \"'>\"+key+ \" (\" + len + \")</button>\");\n"
-                + "\t\t\t$(\".\"+keyLower).on(\"click\", {name: key}, refilter);\n"
-                + "\t\t});\n"
-                + "\n"
-                + "\t\tresetView();\n"
-                + "";
-            println(js);
-            println("\t</script>");
+                writeJson();
+                String js = "\t\tvar selected = {};\n"
+                        + "\n"
+                        + "\t\t//select/deselects filters and correctly styles buttons\n"
+                        + "\t\tfunction refilter(item) {\n"
+                        + "\t\t\tconsole.debug(item.data.name);\n"
+                        + "\t\t\tvar annotation = item.data.name;\n"
+                        + "\t\t\tvar keyLower = \"button-\"+annotation.toLowerCase();\n"
+                        + "\t\t\tif (annotation in selected) {\n"
+                        + "\t\t   \t\tdelete selected[annotation];\t\n"
+                        + "\t\t\t\t$(\"button.\"+keyLower).removeClass(keyLower);\n"
+                        + "\t\t\t} else {\n"
+                        + "\t\t\t\tselected[annotation] = true;\n"
+                        + "\t\t\t\t$(\"button:contains('\"+annotation+\"')\").addClass(keyLower);\n"
+                        + "\t\t\t}\n"
+                        + "\t\t\tresetView();\n"
+                        + "\n"
+                        + "\t\t}\n"
+                        + "\n"
+                        + "\t\t//draws list based on selected buttons\n"
+                        + "\t\tfunction resetView() {\n"
+                        + "\t\t\t$(\"#log\").empty();\n"
+                        + "\t\t\t$.each(data, function(key, value) {\n"
+                        + "\t\t\t\t//console.log(key);\n"
+                        + "\t\t\t\tif (key in selected) {\n"
+                        + "\t\t\t\t\tvar keyLower = \"button-\"+key.toLowerCase();\n"
+                        + "\t\t\t\t\t$.each(value, function(index, log) {\n"
+                        + "\t\t\t\t\t$(\"#log\").append(\"<li>\"+ \"<span class='pure-button \" + keyLower + \"'>\"+ key + \"</span>\" + log+\"</li>\");\n"
+                        + "\t\t\t\t\t});\n"
+                        + "\t\t\t\t}\n"
+                        + "\t\t\t});\n"
+                        + "\t\t}\n"
+                        + "\n"
+                        + "\t\t//creates buttons\n"
+                        + "\t\t$.each(data, function(key, value) {\n"
+                        + "\t\t\t//console.info(key);\n"
+                        + "\t\t\t//console.info(value);\n"
+                        + "\t\t\tvar keyLower = \"button-\"+key.toLowerCase();\n"
+                        + "\t\t\tselected[key] = true;\n"
+                        + "\t\t\tlen = value.length;\n"
+                        + "\t\t\t$(\"#buttons\").append(\"<button class='pure-button \" + keyLower + \"'>\"+key+ \" (\" + len + \")</button>\");\n"
+                        + "\t\t\t$(\".\"+keyLower).on(\"click\", {name: key}, refilter);\n"
+                        + "\t\t});\n"
+                        + "\n"
+                        + "\t\tresetView();\n"
+                        + "";
+                println(js);
+                println("\t</script>");
+            }
 
             println("</body></html>");
 
