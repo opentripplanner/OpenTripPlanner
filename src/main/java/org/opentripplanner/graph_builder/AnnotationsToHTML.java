@@ -107,48 +107,16 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         }
         LOG.info("Creating Annotations log");
 
-        Map<String, Collection<String>> annotationsMap = annotations.asMap();
-        //saves list of annotation classes and counts
-        List<T2<String, Integer>> counts = new ArrayList<>(annotationsMap.size());
-        for (Map.Entry<String, Collection<String>> entry: annotationsMap.entrySet()) {
-            counts.add(new T2<>(entry.getKey(), entry.getValue().size()));
-        }
 
-        //Orders annotations and counts of annotations usages by number of usages
-        //from most used to the least
-        Collections.sort(counts, (o1, o2) -> Ints.compare(o2.second, o1.second));
-
-        int currentNumberOfAnnotationsPerFile = 0;
-        Multimap<String, String> current_map = ArrayListMultimap.create();
-        String last_added_key = null;
-
-        //Annotations are grouped until the count of annotations is less then maxNumberOfAnnotationsPerFile
-        //otherwise each class of annotations is different file.
-        for (T2<String, Integer> count : counts) {
-            LOG.info("Key: {} ({})", count.first, count.second);
-
-            if ((currentNumberOfAnnotationsPerFile + count.second) <= maxNumberOfAnnotationsPerFile) {
-                LOG.info("Increasing count: {}+{}={}", currentNumberOfAnnotationsPerFile, count.second, currentNumberOfAnnotationsPerFile+count.second);
-                currentNumberOfAnnotationsPerFile+=count.second;
-                current_map.putAll(count.first, annotationsMap.get(count.first));
-                last_added_key = count.first;
+        for (Map.Entry<String, Collection<String>> entry: annotations.asMap().entrySet()) {
+            List<String> annotationsList;
+            if (entry.getValue() instanceof List) {
+                annotationsList = (List<String>) entry.getValue();
             } else {
-                LOG.info("Flush count:{}", currentNumberOfAnnotationsPerFile);
-                if (currentNumberOfAnnotationsPerFile > 0) {
-                    addAnnotations(last_added_key, current_map);
-                }
-
-                current_map = ArrayListMultimap.create();
-                current_map.putAll(count.first, annotationsMap.get(count.first));
-                last_added_key = count.first;
-                currentNumberOfAnnotationsPerFile = count.second;
+                annotationsList = new ArrayList<>(entry.getValue());
             }
-
+            addAnnotations(entry.getKey(), annotationsList);
         }
-
-        LOG.info("Flush last count:{}", currentNumberOfAnnotationsPerFile);
-        addAnnotations(last_added_key, current_map);
-
 
         //Actual writing to the file is made here since
         // this is the first place where actual number of files is known (because it depends on annotations count)
@@ -168,37 +136,26 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
     }
 
-    private void addAnnotations(String last_added_key, Multimap<String, String> current_map) {
+    private void addAnnotations(String annotationClassName, List<String> annotations) {
         try {
             HTMLWriter file_writer;
-            if (current_map.keySet().size() == 1) {
-                if (current_map.values().size() > 1.2*maxNumberOfAnnotationsPerFile) {
-                    LOG.info("Number of annotations is very large. Splitting: {}", last_added_key);
-                    List<String> allAnnonations = new ArrayList<>(current_map.values());
-                    List<List<String>> partitions = Lists.partition(allAnnonations, maxNumberOfAnnotationsPerFile);
-                    for (List<String> partition: partitions) {
-                        classOccurences.add(last_added_key);
-                        int labelCount = classOccurences.count(last_added_key);
-                        file_writer =new HTMLWriter(last_added_key+Integer.toString(labelCount), partition);
-                        writers.add(file_writer);
-                    }
-
-                } else {
-                    classOccurences.add(last_added_key);
-                    int labelCount = classOccurences.count(last_added_key);
-                    file_writer = new HTMLWriter(last_added_key + Integer.toString(labelCount),
-                        current_map);
+            if (annotations.size() > 1.2*maxNumberOfAnnotationsPerFile) {
+                LOG.info("Number of annotations is very large. Splitting: {}", annotationClassName);
+                List<List<String>> partitions = Lists.partition(annotations, maxNumberOfAnnotationsPerFile);
+                for (List<String> partition: partitions) {
+                    classOccurences.add(annotationClassName);
+                    int labelCount = classOccurences.count(annotationClassName);
+                    file_writer =new HTMLWriter(annotationClassName+Integer.toString(labelCount), partition);
                     writers.add(file_writer);
                 }
 
             } else {
-                classOccurences.add("rest");
-                int labelCount = classOccurences.count("rest");
-                file_writer = new HTMLWriter("rest" + labelCount, current_map);
+                classOccurences.add(annotationClassName);
+                int labelCount = classOccurences.count(annotationClassName);
+                file_writer = new HTMLWriter(annotationClassName + Integer.toString(labelCount),
+                    annotations);
                 writers.add(file_writer);
             }
-
-
         } catch (FileNotFoundException ex) {
             LOG.error("Output folder not found:{} {}", outPath, ex);
             return;
