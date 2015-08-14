@@ -25,9 +25,7 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
 
-import com.google.common.primitives.Ints;
 import org.apache.commons.io.FileUtils;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -99,6 +97,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
 
 
+        //Groups annotations in multimap according to annotation class
         for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
             //writer.println("<p>" + annotation.getHTMLMessage() + "</p>");
             // writer.println("<small>" + annotation.getClass().getSimpleName()+"</small>");
@@ -108,6 +107,9 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         LOG.info("Creating Annotations log");
 
 
+        //Creates list of HTML writers. Each writer has whole class of HTML annotations
+        //Or multiple HTML writers can have parts of one class of HTML annotations if number
+        // of annotations is larger than maxNumberOfAnnotationsPerFile
         for (Map.Entry<String, Collection<String>> entry: annotations.asMap().entrySet()) {
             List<String> annotationsList;
             if (entry.getValue() instanceof List) {
@@ -136,6 +138,15 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
     }
 
+    /**
+     * Creates file with given class of annotations
+     *
+     * If number of annotations is larger then maxNumberOfAnnotationsPerFile multiple files are generated.
+     * And named annotationClassName1,2,3 etc.
+     *
+     * @param annotationClassName name of annotation class and then also filename
+     * @param annotations list of all annotations with that class
+     */
     private void addAnnotations(String annotationClassName, List<String> annotations) {
         try {
             HTMLWriter file_writer;
@@ -167,6 +178,13 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
     }
 
+    /**
+     * Groups annotations according to annotation class name
+     *
+     * All annotations are saved together in multimap where key is annotation classname
+     * and values are list of annotations with that class
+     * @param annotation
+     */
     private void addAnnotation(GraphBuilderAnnotation annotation) {
         String className = annotation.getClass().getSimpleName();
         annotations.put(className, annotation.getHTMLMessage());
@@ -176,18 +194,18 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     class HTMLWriter {
         private PrintStream out;
 
-        private Multimap<String, String> lannotations;
+        private Multimap<String, String> writerAnnotations;
 
-        private String current_class;
+        private String annotationClassName;
 
         public HTMLWriter(String key, Collection<String> annotations) throws FileNotFoundException {
             LOG.info("Making file: {}", key);
             File newFile = new File(outPath, key +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
-            lannotations = ArrayListMultimap.create();
-            lannotations.putAll(key, annotations);
-            current_class = key;
+            writerAnnotations = ArrayListMultimap.create();
+            writerAnnotations.putAll(key, annotations);
+            annotationClassName = key;
         }
 
         public HTMLWriter(String filename, Multimap<String, String> curMap)
@@ -196,8 +214,8 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             File newFile = new File(outPath, filename +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
-            lannotations = curMap;
-            current_class = filename;
+            writerAnnotations = curMap;
+            annotationClassName = filename;
         }
 
         private void writeFile(Multiset<String> classes, boolean isIndexFile) {
@@ -257,7 +275,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 //it needs to add link to every file even if they are split
                 while (currentCount <= htmlAnnotationClass.getCount()) {
                     label = label_name + currentCount;
-                    if (label.equals(current_class)) {
+                    if (label.equals(annotationClassName)) {
                         println("<span>" + label + "</span><br />");
                     } else {
                         println("<a href=\"" + label + ".html\">" + label + "</a><br />");
@@ -347,7 +365,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(out);
                 
-                mapper.writeValue(jsonGenerator, lannotations.asMap());
+                mapper.writeValue(jsonGenerator, writerAnnotations.asMap());
                 out.println(";");
 
             } catch (IOException ex) {
