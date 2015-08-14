@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 import com.google.common.primitives.Ints;
+import org.apache.commons.io.FileUtils;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -77,9 +78,23 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         }
 
         outPath = new File(outPath, "report");
-        if (!outPath.mkdir()) {
-            LOG.error("Failed to create HTML report directory: {}. HTML report won't be generated!", outPath.toString());
-            return;
+        if (outPath.exists()) {
+            //Removes all files from report directory
+            try {
+                FileUtils.cleanDirectory(outPath);
+            } catch (IOException e) {
+                LOG.error("Failed to clean HTML report directory: " + outPath.toString() + ". HTML report won't be generated!", e);
+                return;
+            }
+        } else {
+            //Creates report directory if it doesn't exist yet
+            try {
+                FileUtils.forceMkdir(outPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+                LOG.error("Failed to create HTML report directory: " + outPath.toString() + ". HTML report won't be generated!", e);
+                return;
+            }
         }
 
 
