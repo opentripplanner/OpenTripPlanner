@@ -276,21 +276,29 @@ public class Leg {
                  longDescription += ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
                  longDescription += to.name;
              }
+             //TODO: what if short name is missing
+             shortDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(T.tr("Route"), requestedLocale) + " " + routeShortName + ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " from "), requestedLocale);
+             shortDescription += from.name;
          } else {
              T trans;
+             T short_trans;
              if (mode.equals(TraverseMode.WALK.toString())) {
                   trans = T.tr("Walk");
+                  short_trans = trans;
              } else if (mode.equals(TraverseMode.BICYCLE.toString())) {
                  trans = T.tr("Cycle");
+                 short_trans = T.tr("Ride");
              } else if (mode.equals(TraverseMode.CAR.toString())) {
                  trans = T.tr("Car");
+                 short_trans = T.tr("Drive");
              } else {
                  trans = T.tr("Unknown mode");
+                 short_trans = trans;
              }
              longDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(trans, requestedLocale) + ": " + getDistanceString(requestedLocale) +  ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
              longDescription += to.name;
 
-             shortDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
+             shortDescription = ResourceBundleSingleton.INSTANCE.localizeGettext(short_trans, requestedLocale) + ResourceBundleSingleton.INSTANCE.localizeGettext(T.trc("direction", " to "), requestedLocale);
              shortDescription += to.name;
 
              if (removeTagsFromLocalizations) {
