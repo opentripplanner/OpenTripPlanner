@@ -175,6 +175,14 @@ public class RaptorWorkerTimetable implements Serializable {
         }
 
         else {
+            // move time forward if the frequency has not yet started.
+            // we do this before we add the wait time, because this is the earliest possible
+            // time a vehicle could reach the stop. The assumption is that the vehicle leaves
+            // the terminal between zero and headway_seconds seconds after the start_time of the
+            // frequency.
+            if (timeToReachStop + startTimes[trip] > time)
+                time = timeToReachStop + startTimes[trip];
+
             switch (assumption) {
             case BEST_CASE:
                 // do nothing
@@ -194,10 +202,6 @@ public class RaptorWorkerTimetable implements Serializable {
                 time += (int) (transferRule.waitProportion * headwaySecs[trip]);
                 break;
             }
-
-            // move time forward if the frequency has not yet started.
-            if (timeToReachStop + startTimes[trip] > time)
-                time = timeToReachStop + startTimes[trip];
         }
 
         if (time > timeToReachStop + endTimes[trip])

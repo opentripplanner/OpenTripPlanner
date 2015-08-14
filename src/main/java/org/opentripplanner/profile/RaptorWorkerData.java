@@ -258,6 +258,7 @@ public class RaptorWorkerData implements Serializable {
                     continue;
 
                 timetablesForPattern.add(timetable);
+                timetable.raptorData = this;
 
                 // TODO: patternForIndex, indexForPattern
 
