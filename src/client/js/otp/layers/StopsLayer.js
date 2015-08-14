@@ -40,13 +40,6 @@ otp.layers.StopsLayer =
 
         this.module.addLayer("stops", this);
         this.module.webapp.map.lmap.on('dragend zoomend', $.proxy(this.refresh, this));
-        this.module.webapp.map.lmap.on('popupopen', function (e) {
-            this_.module.webapp.indexApi.loadRoutesForStop(e.popup._source._stopId, this_, function(data) {
-                _.each(data, function(route) {
-                    ich['otp-stopsLayer-popupRoute'](route).appendTo($('.routeList'));
-                });
-            });
-        });
     },
 
     refresh : function() {
@@ -84,10 +77,16 @@ otp.layers.StopsLayer =
             m.addTo(this)
              .bindPopup('')
              .on('click', function() {
-                var stopIdArr = this._stopId.split(':');
+                var stopId = this._stopId;
+                var stopIdArr = stopId.split(':');
                 var marker = this;
                 this_.module.webapp.indexApi.loadStopById(stopIdArr[0], stopIdArr[1], this_, function(detailedStop) {
                     marker.setPopupContent(this_.getPopupContent(detailedStop));
+                    this_.module.webapp.indexApi.loadRoutesForStop(stopId, this_, function(data) {
+                        _.each(data, function(route) {
+                            ich['otp-stopsLayer-popupRoute'](route).appendTo($('.routeList'));
+                        });
+                    });
                 });
              });
 

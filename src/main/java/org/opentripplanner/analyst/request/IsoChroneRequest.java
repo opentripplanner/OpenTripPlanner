@@ -31,6 +31,8 @@ public class IsoChroneRequest {
 
     public int precisionMeters = 200;
 
+    public int offRoadDistanceMeters = 150;
+
     public int maxTimeSec = 0;
 
     public Coordinate coordinateOrigin;

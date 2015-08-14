@@ -50,12 +50,13 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
     public List<IsochroneData> getIsochrones(IsoChroneRequest isoChroneRequest,
             RoutingRequest sptRequest) {
 
-        final double D0 = sampleGridRenderer.getOffRoadDistanceMeters(isoChroneRequest.precisionMeters);
+        final double offRoadDistanceMeters = isoChroneRequest.offRoadDistanceMeters;
 
         // 1. Create a sample grid from the SPT, using the TimeGridRenderer
         SampleGridRequest tgRequest = new SampleGridRequest();
         tgRequest.maxTimeSec = isoChroneRequest.maxTimeSec;
         tgRequest.precisionMeters = isoChroneRequest.precisionMeters;
+        tgRequest.offRoadDistanceMeters = isoChroneRequest.offRoadDistanceMeters;
         tgRequest.coordinateOrigin = isoChroneRequest.coordinateOrigin;
         ZSampleGrid<WTWD> sampleGrid = sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
 
@@ -101,7 +102,7 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
             WTWD z0 = new WTWD();
             z0.w = 1.0;
             z0.wTime = cutoffSec;
-            z0.d = D0;
+            z0.d = offRoadDistanceMeters;
             IsochroneData isochrone = new IsochroneData(cutoffSec,
                     isolineBuilder.computeIsoline(z0));
             if (isoChroneRequest.includeDebugGeometry)

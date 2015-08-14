@@ -70,6 +70,10 @@ public class TimeGridWs extends RoutingResource {
     @DefaultValue("200")
     private Integer precisionMeters;
 
+    @QueryParam("offRoadDistanceMeters")
+    @DefaultValue("150")
+    private Integer offRoadDistanceMeters;
+
     @QueryParam("coordinateOrigin")
     private String coordinateOrigin;
 
@@ -92,12 +96,15 @@ public class TimeGridWs extends RoutingResource {
 
         if (precisionMeters < 10)
             throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
+        if (offRoadDistanceMeters < 10)
+            throw new IllegalArgumentException("Too small offRoadDistanceMeters: " + offRoadDistanceMeters);
 
         // Build the request
         RoutingRequest sptRequest = buildRequest();
         SampleGridRequest tgRequest = new SampleGridRequest();
         tgRequest.maxTimeSec = maxTimeSec;
         tgRequest.precisionMeters = precisionMeters;
+        tgRequest.offRoadDistanceMeters = offRoadDistanceMeters;
         if (coordinateOrigin != null)
             tgRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin).getCoordinate();
 
@@ -129,9 +136,7 @@ public class TimeGridWs extends RoutingResource {
                 + sampleGrid.getXMin() * sampleGrid.getCellSize().x);
         String gridCellSzStr = String.format(Locale.US, "%.12f,%.12f", sampleGrid.getCellSize().y,
                 sampleGrid.getCellSize().x);
-
-        String offRoadDistStr = String.format(Locale.US, "%f",
-                router.sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));
+        String offRoadDistStr = String.format(Locale.US, "%d", offRoadDistanceMeters);
 
         PngChunkTEXT gridCornerChunk = new PngChunkTEXT(imgInfo);
         gridCornerChunk.setKeyVal(OTPA_GRID_CORNER, gridCornerStr);
