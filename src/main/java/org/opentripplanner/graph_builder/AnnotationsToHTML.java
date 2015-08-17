@@ -264,7 +264,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 + "";
             println(css);
             println("</head><body>");
-            println("<h1>OpenTripPlanner annotations log</h1>");
+            println(String.format("<h1>OpenTripPlanner annotations log for %s</h1>", annotationClassName));
             println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
             println("<p>");
             //adds links to the other HTML files
