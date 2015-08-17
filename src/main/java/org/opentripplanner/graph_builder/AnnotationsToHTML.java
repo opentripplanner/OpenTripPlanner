@@ -45,12 +45,17 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     //Path to output folder
     private File outPath;
 
+    //If there are more then this number annotations are split into multiple files
+    //This is because browsers aren't made for giant HTML files which can be made with 500k annotations
     private int maxNumberOfAnnotationsPerFile;
 
-    Set<String> classes;
 
-    Multiset<String> classOccurences;
+    //This counts all occurrences of HTML annotations classes
+    //If one annotation class is split into two files it has two entries in this Multiset
+    //IT is used to show numbers in HTML files name and links
+    Multiset<String> annotationClassOccurences;
 
+    //List of writers which are used for actual writing annotations to HTML
     List<HTMLWriter> writers;
 
     //Key is classname, value is annotation message
@@ -61,9 +66,8 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         this.outPath = outpath;
         annotations = ArrayListMultimap.create();
         this.maxNumberOfAnnotationsPerFile = maxNumberOfAnnotationsPerFile;
-        this.classes = new TreeSet<>();
         this.writers = new ArrayList<>();
-        this.classOccurences = HashMultiset.create();
+        this.annotationClassOccurences = HashMultiset.create();
     }
 
 
@@ -123,12 +127,12 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         //Actual writing to the file is made here since
         // this is the first place where actual number of files is known (because it depends on annotations count)
         for (HTMLWriter writer : writers) {
-            writer.writeFile(classOccurences, false);
+            writer.writeFile(annotationClassOccurences, false);
         }
 
         try {
             HTMLWriter indexFileWriter = new HTMLWriter("index", (Multimap<String, String>)null);
-            indexFileWriter.writeFile(classOccurences, true);
+            indexFileWriter.writeFile(annotationClassOccurences, true);
         } catch (FileNotFoundException e) {
             LOG.error("Index file coudn't be created:{}", e);
         }
@@ -154,22 +158,21 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 LOG.debug("Number of annotations is very large. Splitting: {}", annotationClassName);
                 List<List<String>> partitions = Lists.partition(annotations, maxNumberOfAnnotationsPerFile);
                 for (List<String> partition: partitions) {
-                    classOccurences.add(annotationClassName);
-                    int labelCount = classOccurences.count(annotationClassName);
+                    annotationClassOccurences.add(annotationClassName);
+                    int labelCount = annotationClassOccurences.count(annotationClassName);
                     file_writer =new HTMLWriter(annotationClassName+Integer.toString(labelCount), partition);
                     writers.add(file_writer);
                 }
 
             } else {
-                classOccurences.add(annotationClassName);
-                int labelCount = classOccurences.count(annotationClassName);
+                annotationClassOccurences.add(annotationClassName);
+                int labelCount = annotationClassOccurences.count(annotationClassName);
                 file_writer = new HTMLWriter(annotationClassName + Integer.toString(labelCount),
                     annotations);
                 writers.add(file_writer);
             }
         } catch (FileNotFoundException ex) {
             LOG.error("Output folder not found:{} {}", outPath, ex);
-            return;
         }
     }
 
