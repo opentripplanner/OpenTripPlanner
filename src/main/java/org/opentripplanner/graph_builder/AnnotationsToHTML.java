@@ -276,9 +276,11 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 while (currentCount <= htmlAnnotationClass.getCount()) {
                     label = label_name + currentCount;
                     if (label.equals(annotationClassName)) {
-                        println("<span>" + label + "</span><br />");
+                        println(String.format("<button class='pure-button pure-button-disabled button-%s'>%s</button>",
+                            label_name.toLowerCase(), label));
                     } else {
-                        println("<a href=\"" + label + ".html\">" + label + "</a><br />");
+                        println(String.format("<a class='pure-button button-%s' href=\"%s.html\">%s</a>",
+                            label_name.toLowerCase(), label, label));
                     }
                     currentCount++;
                 }
