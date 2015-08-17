@@ -284,59 +284,10 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 }
             }
             println("</p>");
-            println("<div id=\"buttons\"></div><ul id=\"log\"></ul>");
-
             if (!isIndexFile) {
-                println("\t<script>");
-
-                writeJson();
-                String js = "\t\tvar selected = {};\n"
-                        + "\n"
-                        + "\t\t//select/deselects filters and correctly styles buttons\n"
-                        + "\t\tfunction refilter(item) {\n"
-                        + "\t\t\tconsole.debug(item.data.name);\n"
-                        + "\t\t\tvar annotation = item.data.name;\n"
-                        + "\t\t\tvar keyLower = \"button-\"+annotation.toLowerCase();\n"
-                        + "\t\t\tif (annotation in selected) {\n"
-                        + "\t\t   \t\tdelete selected[annotation];\t\n"
-                        + "\t\t\t\t$(\"button.\"+keyLower).removeClass(keyLower);\n"
-                        + "\t\t\t} else {\n"
-                        + "\t\t\t\tselected[annotation] = true;\n"
-                        + "\t\t\t\t$(\"button:contains('\"+annotation+\"')\").addClass(keyLower);\n"
-                        + "\t\t\t}\n"
-                        + "\t\t\tresetView();\n"
-                        + "\n"
-                        + "\t\t}\n"
-                        + "\n"
-                        + "\t\t//draws list based on selected buttons\n"
-                        + "\t\tfunction resetView() {\n"
-                        + "\t\t\t$(\"#log\").empty();\n"
-                        + "\t\t\t$.each(data, function(key, value) {\n"
-                        + "\t\t\t\t//console.log(key);\n"
-                        + "\t\t\t\tif (key in selected) {\n"
-                        + "\t\t\t\t\tvar keyLower = \"button-\"+key.toLowerCase();\n"
-                        + "\t\t\t\t\t$.each(value, function(index, log) {\n"
-                        + "\t\t\t\t\t$(\"#log\").append(\"<li>\"+ \"<span class='pure-button \" + keyLower + \"'>\"+ key + \"</span>\" + log+\"</li>\");\n"
-                        + "\t\t\t\t\t});\n"
-                        + "\t\t\t\t}\n"
-                        + "\t\t\t});\n"
-                        + "\t\t}\n"
-                        + "\n"
-                        + "\t\t//creates buttons\n"
-                        + "\t\t$.each(data, function(key, value) {\n"
-                        + "\t\t\t//console.info(key);\n"
-                        + "\t\t\t//console.info(value);\n"
-                        + "\t\t\tvar keyLower = \"button-\"+key.toLowerCase();\n"
-                        + "\t\t\tselected[key] = true;\n"
-                        + "\t\t\tlen = value.length;\n"
-                        + "\t\t\t$(\"#buttons\").append(\"<button class='pure-button \" + keyLower + \"'>\"+key+ \" (\" + len + \")</button>\");\n"
-                        + "\t\t\t$(\".\"+keyLower).on(\"click\", {name: key}, refilter);\n"
-                        + "\t\t});\n"
-                        + "\n"
-                        + "\t\tresetView();\n"
-                        + "";
-                println(js);
-                println("\t</script>");
+                println("<ul id=\"log\">");
+                writeAnnotations();
+                println("</ul>");
             }
 
             println("</body></html>");
@@ -344,8 +295,22 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             close();
         }
 
+        /**
+         * Writes annotations as LI html elements
+         */
+        private void writeAnnotations() {
+            String annotationFMT = "<li>%s</li>";
+            for (Map.Entry<String, String> annotation: writerAnnotations.entries()) {
+                print(String.format(annotationFMT, annotation.getValue()));
+            }
+        }
+
         private void println(String bodyhtml) {
             out.println(bodyhtml);
+        }
+
+        private void print(String bodyhtml) {
+            out.print(bodyhtml);
         }
 
         private void close() {
