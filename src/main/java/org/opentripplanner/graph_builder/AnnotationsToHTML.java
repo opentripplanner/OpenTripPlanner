@@ -133,7 +133,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             LOG.error("Index file coudn't be created:{}", e);
         }
 
-        LOG.info("Annotated log is in {}", outPath);
+        LOG.info("Annotated logs are in {}", outPath);
 
 
     }
@@ -151,7 +151,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         try {
             HTMLWriter file_writer;
             if (annotations.size() > 1.2*maxNumberOfAnnotationsPerFile) {
-                LOG.info("Number of annotations is very large. Splitting: {}", annotationClassName);
+                LOG.debug("Number of annotations is very large. Splitting: {}", annotationClassName);
                 List<List<String>> partitions = Lists.partition(annotations, maxNumberOfAnnotationsPerFile);
                 for (List<String> partition: partitions) {
                     classOccurences.add(annotationClassName);
@@ -199,7 +199,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         private String annotationClassName;
 
         public HTMLWriter(String key, Collection<String> annotations) throws FileNotFoundException {
-            LOG.info("Making file: {}", key);
+            LOG.debug("Making file: {}", key);
             File newFile = new File(outPath, key +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
@@ -210,7 +210,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
         public HTMLWriter(String filename, Multimap<String, String> curMap)
             throws FileNotFoundException {
-            LOG.info("Making file: {}", filename);
+            LOG.debug("Making file: {}", filename);
             File newFile = new File(outPath, filename +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
