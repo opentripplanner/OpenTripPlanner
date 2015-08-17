@@ -85,7 +85,7 @@ public class AddTripPatternTest extends TestCase {
         // starts running (dwell + headway)
         assertEquals(4 * 3600 + 600 + 30,
                 data.timetablesForPattern.get(0).getFrequencyDeparture(0, 0, 39 * 360,
-                        -1));
+                        -1, null));
     }
 
     /** Test adding trips with a timetable rather than frequencies */

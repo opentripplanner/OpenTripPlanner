@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * A RaptorWorkerTimetable is used by a RaptorWorker to perform large numbers of RAPTOR searches very quickly
@@ -45,24 +44,21 @@ public class RaptorWorkerTimetable implements Serializable {
 
     int nTrips, nStops;
 
-    private int[][] timesPerTrip;
+    int[][] timesPerTrip;
 
     /* Times for frequency-based trips are stored in parallel arrays (a column store). */
 
     /** Times (0-based) for frequency trips */
-    private int[][] frequencyTrips;
-
-    /** Random offsets (updated on each monte carlo iteration) for trips */
-    private int[] randomOffsets;
+    int[][] frequencyTrips;
 
     /** Headways (seconds) for frequency trips, parallel to above. Note that frequency trips are unsorted. */
-    private int[] headwaySecs;
+    int[] headwaySecs;
 
     /** Start times (seconds since noon - 12h) for frequency trips */
-    private int[] startTimes;
+    int[] startTimes;
 
     /** End times for frequency trips */
-    private int[] endTimes;
+    int[] endTimes;
 
     /** Indices of stops in parent data */
     public int[] stopIndices;
@@ -110,7 +106,7 @@ public class RaptorWorkerTimetable implements Serializable {
      * Get the departure on frequency trip trip at stop stop after time time,
      * assuming worst-case headway if worstCase is true.
      */
-    public int getFrequencyDeparture (int trip, int stop, int time, int previousPattern) {
+    public int getFrequencyDeparture (int trip, int stop, int time, int previousPattern, FrequencyRandomOffsets offsets) {
         int timeToReachStop = frequencyTrips[trip][stop * 2 + 1];
 
         // figure out if there is an applicable transfer rule
@@ -160,7 +156,7 @@ public class RaptorWorkerTimetable implements Serializable {
             // lines on the Virginia Railway Express, at Alexandria. These are two diesel heavy-rail
             // lines that share trackage. Thus the minimum transfer time between them is always at least
             // 5 minutes or so as that's as close as you can run diesel trains to each other.
-            int minTime = startTimes[trip] + timeToReachStop + randomOffsets[trip];
+            int minTime = startTimes[trip] + timeToReachStop + offsets.offsets.get(this.dataIndex)[trip];
 
 
             // move time forward to an integer multiple of headway after the minTime
@@ -179,7 +175,7 @@ public class RaptorWorkerTimetable implements Serializable {
             // we do this before we add the wait time, because this is the earliest possible
             // time a vehicle could reach the stop. The assumption is that the vehicle leaves
             // the terminal between zero and headway_seconds seconds after the start_time of the
-            // frequency.
+            // frequency
             if (timeToReachStop + startTimes[trip] > time)
                 time = timeToReachStop + startTimes[trip];
 
@@ -218,7 +214,7 @@ public class RaptorWorkerTimetable implements Serializable {
     }
 
     /**
-     * Get the number of frequency trips on this pattern.
+     * Get the number of frequency trips on this pattern (i.e. the number of trips in trips.txt, not the number of trips by vehicles)
      */
     public int getFrequencyTripCount () {
         return headwaySecs.length;
@@ -430,13 +426,7 @@ public class RaptorWorkerTimetable implements Serializable {
         }
         return times;
     }
-
-    /** Monte Carlo searches use a draw of random offsets, one per frequency entry. Before each monte carlo round they should be randomized */
-    public void randomizeOffsets () {
-        // set each random offset to a number between 0 and the headway of that trip
-        this.randomOffsets = IntStream.of(headwaySecs).map(random::nextInt).toArray();
-    }
-
+    
     /** The assumptions made when boarding a frequency vehicle: best case (no wait), worst case (full headway) and half headway (in some sense the average). */
     public static enum BoardingAssumption {
         BEST_CASE, WORST_CASE, HALF_HEADWAY, FIXED, PROPORTION, RANDOM;

@@ -98,6 +98,8 @@ public class RaptorWorker {
 
     private long totalPropagationTime = 0;
 
+    private FrequencyRandomOffsets offsets;
+
     public RaptorWorker(RaptorWorkerData data, ProfileRequest req) {
         this.data = data;
         // these should only reflect the results of the (deterministic) scheduled search
@@ -111,6 +113,7 @@ public class RaptorWorker {
         this.req = req; 
         Arrays.fill(bestTimes, UNREACHED); // initialize once here and reuse on subsequent iterations.
         Arrays.fill(bestNonTransferTimes, UNREACHED);
+        offsets = new FrequencyRandomOffsets(data);
     }
 
     public void advance () {
@@ -186,7 +189,7 @@ public class RaptorWorker {
             if (data.hasFrequencies) {
                 for (int i = 0; i < monteCarloDraws; i++) {
                     // use a new Monte Carlo draw each time
-                    data.randomizeOffsets();
+                    offsets.randomize();
 
                     // make copies for just this search. We need copies because we can't use dynamic
                     // programming/range-raptor with randomized schedules
@@ -330,7 +333,7 @@ public class RaptorWorker {
                         for (int trip = 0; trip < timetable.getFrequencyTripCount(); trip++) {
                             int boardTime = timetable
                                     .getFrequencyDeparture(trip, stopPositionInPattern,
-                                            bestTimes[stopIndex], previousPatterns[stopIndex]);
+                                            bestTimes[stopIndex], previousPatterns[stopIndex], offsets);
 
                             if (boardTime != -1 && boardTime < remainOnBoardTime) {
                                 // make sure we board the best frequency entry at a stop

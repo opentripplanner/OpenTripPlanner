@@ -45,7 +45,7 @@ public class PropagatedTimesStore {
     // number of times to bootstrap the mean.
     public final int N_BOOTSTRAPS = 400;
 
-    public static final ConfidenceCalculationMethod CONFIDENCE_CALCULATION_METHOD = ConfidenceCalculationMethod.PERCENTILE;
+    public static final ConfidenceCalculationMethod CONFIDENCE_CALCULATION_METHOD = ConfidenceCalculationMethod.NONE;
 
     private static final Random random = new Random();
 
@@ -132,6 +132,9 @@ public class PropagatedTimesStore {
                 timeList.sort();
                 mins[stop] = timeList.get(timeList.size() / 40);
                 maxs[stop] = timeList.get(39 * timeList.size() / 40);
+                break;
+            case NONE:
+                mins[stop] = maxs[stop] = avgs[stop];
                 break;
             default:
                 timeList.sort();
