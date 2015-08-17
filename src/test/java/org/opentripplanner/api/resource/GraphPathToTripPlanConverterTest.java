@@ -74,6 +74,7 @@ import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
@@ -151,6 +152,46 @@ public class GraphPathToTripPlanConverterTest {
 
         assertEquals(1, itinerary.legs.size());
         assertEquals("WALK", itinerary.legs.get(0).mode);
+    }
+
+    /**
+     * Test that empty graph paths throw a TrivialPathException
+     */
+    @Test(expected = TrivialPathException.class)
+    public void testEmptyGraphPath() {
+        RoutingRequest options = new RoutingRequest();
+        Graph graph = new Graph();
+        ExitVertex vertex = new ExitVertex(graph, "Vertex", 0, 0);
+
+        options.rctx = new RoutingContext(options, graph, vertex, vertex);
+
+        GraphPath graphPath = new GraphPath(new State(options), false);
+
+        GraphPathToTripPlanConverter.generateItinerary(graphPath, false, locale);
+    }
+
+    /**
+     * Test that graph paths with only null and LEG_SWITCH modes throw a TrivialPathException
+     */
+    @Test(expected = TrivialPathException.class)
+    public void testLegSwitchOnlyGraphPath() {
+        RoutingRequest options = new RoutingRequest();
+        Graph graph = new Graph();
+
+        ExitVertex start = new ExitVertex(graph, "Start", 0, -90);
+        ExitVertex middle = new ExitVertex(graph, "Middle", 0, 0);
+        ExitVertex end = new ExitVertex(graph, "End", 0, 90);
+
+        FreeEdge depart = new FreeEdge(start, middle);
+        LegSwitchingEdge arrive = new LegSwitchingEdge(middle, end);
+
+        options.rctx = new RoutingContext(options, graph, start, end);
+
+        State intermediate = depart.traverse(new State(options));
+
+        GraphPath graphPath = new GraphPath(arrive.traverse(intermediate), false);
+
+        GraphPathToTripPlanConverter.generateItinerary(graphPath, false, locale);
     }
 
     /**
