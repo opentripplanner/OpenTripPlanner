@@ -1172,6 +1172,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
                 if (node.isBollard()) {
                     BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y);
+                    bv.setBarrierPermissions(OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions));
                     iv = bv;
                 }
 
