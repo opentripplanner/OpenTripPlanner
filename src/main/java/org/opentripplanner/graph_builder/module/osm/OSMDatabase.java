@@ -809,7 +809,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         } else if (relation.isTag("restriction", "only_u_turn")) {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U);
         } else {
-            LOG.warn(addBuilderAnnotation(new TurnRestrictionUnknown(relation.getTag("restriction"))));
+            LOG.warn(addBuilderAnnotation(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction"))));
             return;
         }
         tag.modes = modes.clone();
