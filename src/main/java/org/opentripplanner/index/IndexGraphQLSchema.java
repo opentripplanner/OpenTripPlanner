@@ -915,6 +915,7 @@ public class IndexGraphQLSchema {
 
         indexSchema = GraphQLSchema.newSchema()
             .query(queryType)
+            .mutation(GraphQLObjectType.newObject().name("MutationType").build()) //Empty mutation type
             .build();
     }
 }
