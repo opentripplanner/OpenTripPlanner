@@ -127,7 +127,7 @@ public class RepeatedRaptorProfileRouter {
     public void route (TaskStatistics ts) {
 
         boolean isochrone = (sampleSet == null); // When no sample set is provided, we're making isochrones.
-        boolean transit = (request.transitModes.isTransit()); // Does the search involve transit at all?
+        boolean transit = (request.transitModes != null && request.transitModes.isTransit()); // Does the search involve transit at all?
 
         long computationStartTime = System.currentTimeMillis();
         LOG.info("Begin profile request");
