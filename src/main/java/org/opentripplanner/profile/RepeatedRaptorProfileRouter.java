@@ -149,7 +149,7 @@ public class RepeatedRaptorProfileRouter {
         long initialStopStartTime = System.currentTimeMillis(); // TODO replace with named functions on stats object like "beginInitialStopSearch"
         // This will return null if we have no transit data, but will leave behind a pre-transit SPT.
         TIntIntMap transitStopAccessTimes = findInitialStops(false, raptorWorkerData);
-        // Create an array containing the travel time in seconds to each vertex in the graph when using no transit.
+        // Create an array containing the best travel time in seconds to each vertex in the graph when not using transit.
         int[] nonTransitTimes = new int[Vertex.getMaxIndex()];
         Arrays.fill(nonTransitTimes, Integer.MAX_VALUE);
         for (State state : preTransitSpt.getAllStates()) {

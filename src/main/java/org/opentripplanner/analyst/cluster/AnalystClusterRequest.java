@@ -35,12 +35,6 @@ public class AnalystClusterRequest implements Serializable {
 	public int taskId;
 
 	/**
-	 * To what queue should the notification of the result be delivered?
-	 */
-	@Deprecated
-	public String outputQueue;
-
-	/**
 	 * Where should the job be saved?
 	 */
 	public String outputLocation;
@@ -63,7 +57,8 @@ public class AnalystClusterRequest implements Serializable {
 	}
 
 	/**
-	 * An AnalystClusterRequest is a wrapper around a ProfileRequest with some additional context.
+	 * We're now using ProfileRequests for everything (no RoutingRequests for non-transit searches).
+	 * An AnalystClusterRequest is a wrapper around a ProfileRequest with some additional settings and context.
 	 */
 	 public AnalystClusterRequest(String destinationPointsetId, String graphId, ProfileRequest req) {
 		this(destinationPointsetId, graphId);
@@ -77,16 +72,7 @@ public class AnalystClusterRequest implements Serializable {
 		profileRequest.toLon = profileRequest.fromLon;
 	}
 
-	/**
-	 * We're now using ProfileRequests for everything,
-	 * an AnalystClusterRequest is a wrapper around a ProfileRequest with some additional context.
-	 */
-	@Deprecated
-	public AnalystClusterRequest(String destinationPointsetId, String graphId, RoutingRequest req) {
-		throw new UnsupportedOperationException("Deprecated constructor.");
-	}
-
-
 	/** Used for deserialization from JSON */
 	public AnalystClusterRequest () { /* do nothing */ }
+
 }

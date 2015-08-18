@@ -170,6 +170,7 @@ public class RaptorWorker {
         // current iteration
         int iteration = 0;
 
+        // FIXME this should be changed to tolerate a zero-width time range
         for (int departureTime = req.toTime - 60, n = 0; departureTime >= fromTime; departureTime -= 60, n++) {
             if (n % 15 == 0) {
                 LOG.info("minute {}", n);
