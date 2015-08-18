@@ -152,12 +152,12 @@ public class RaptorWorker {
         }
 
         // if no frequencies, don't run Monte Carlo
-        if (!data.hasFrequencies)
-            monteCarloDraws = 1;
-
         int iterations = (req.toTime - fromTime - 60) / 60 + 1;
-        // we add 2 because we do two "fake" draws where we do min or max instead of a monte carlo draw
-        iterations *= (monteCarloDraws + 2);
+        if (data.hasFrequencies)
+            // we add 2 because we do two "fake" draws where we do min or max instead of a monte carlo draw
+            iterations *= (monteCarloDraws + 2);
+        else
+            monteCarloDraws = 1;
 
         ts.searchCount = iterations;
 
