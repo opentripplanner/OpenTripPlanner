@@ -33,8 +33,13 @@ public class ResultEnvelope implements Serializable {
 	public ResultSet avgCase;
 	
 	/**
-	 * The point estimate of the accessibility. If profile = false, this is the journey
-	 * time returned by OTP.
+	 * A point estimate of accessibility, in the statistical sense: a single result that serves as a representative point
+	 * in a distribution. When we are not doing profile routing (when we are not varying the departure time or other
+	 * characteristics such as frequency board delays or schedule pulsing) we get only a single set of travel
+	 * times out of a search. This is only one draw out of a distribution, and we don't know how much the values
+	 * can vary around this single example.
+	 *
+	 * Note that this is not a single travel time, but a single set of travel times to all targets (points/vertices).
 	 */
 	public ResultSet pointEstimate;
 	

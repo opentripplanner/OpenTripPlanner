@@ -122,7 +122,11 @@ public class RaptorWorker {
         //Arrays.fill(bestTimes, UNREACHED);
     }
 
-    public PropagatedTimesStore runRaptor (Graph graph, TIntIntMap accessTimes, int[] walkTimes, TaskStatistics ts) {
+    /**
+     * @param accessTimes a map from transit stops to the time it takes to reach those stops
+     * @param nonTransitTimes the time to reach all targets without transit. Targets can be vertices or points/samples.
+     */
+    public PropagatedTimesStore runRaptor (Graph graph, TIntIntMap accessTimes, int[] nonTransitTimes, TaskStatistics ts) {
         long beginCalcTime = System.currentTimeMillis();
         TIntIntMap initialStops = new TIntIntHashMap();
         TIntIntIterator initialIterator = accessTimes.iterator();
@@ -178,8 +182,8 @@ public class RaptorWorker {
             // pop in the walk only times; we don't want to force people to ride transit instead of
             // walking a block
             for (int i = 0; i < scheduledTimesAtTargets.length; i++) {
-                if (walkTimes[i] != UNREACHED && walkTimes[i] + departureTime < scheduledTimesAtTargets[i])
-                    scheduledTimesAtTargets[i] = walkTimes[i] + departureTime;
+                if (nonTransitTimes[i] != UNREACHED && nonTransitTimes[i] + departureTime < scheduledTimesAtTargets[i])
+                    scheduledTimesAtTargets[i] = nonTransitTimes[i] + departureTime;
             }
 
             // run the frequency searches

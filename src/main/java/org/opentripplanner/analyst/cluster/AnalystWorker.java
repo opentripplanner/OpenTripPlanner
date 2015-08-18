@@ -300,6 +300,7 @@ public class AnalystWorker implements Runnable {
     }
 
     private void handleOneRequest(AnalystClusterRequest clusterRequest) {
+
         if (dryRunFailureRate >= 0) {
             // This worker is running in test mode.
             // It should report all work as completed without actually doing anything,
@@ -312,47 +313,10 @@ public class AnalystWorker implements Runnable {
             }
             return;
         }
+
         try {
             long startTime = System.currentTimeMillis();
             LOG.info("Handling message {}", clusterRequest.toString());
-
-            if (clusterRequest.outputLocation == null) {
-                // high priority
-                lastHighPriorityRequestProcessed = startTime;
-                if (!sideChannelOpen)
-                    openSideChannel();
-            }
-
-            TaskStatistics ts = new TaskStatistics();
-            ts.pointsetId = clusterRequest.destinationPointsetId;
-            ts.graphId = clusterRequest.graphId;
-            ts.awsInstanceType = instanceType;
-            ts.jobId = clusterRequest.jobId;
-            ts.workerId = machineId;
-            ts.single = clusterRequest.outputLocation == null;
-
-            long graphStartTime = System.currentTimeMillis();
-
-            // Get the graph object for the ID given in the request, fetching inputs and building as needed.
-            // All requests handled together are for the same graph, and this call is synchronized so the graph will
-            // only be built once.
-            Graph graph = clusterGraphBuilder.getGraph(clusterRequest.graphId);
-            graphId = clusterRequest.graphId; // Record graphId so we "stick" to this same graph on subsequent polls
-
-            ts.graphBuild = (int) (System.currentTimeMillis() - graphStartTime);
-
-            ts.graphTripCount = graph.index.patternForTrip.size();
-            ts.graphStopCount = graph.index.stopForId.size();
-
-            // This result envelope will hold the result of the profile or single-time one-to-many search.
-            ResultEnvelope envelope = new ResultEnvelope();
-
-/////////////////////
-
-            // Set up search parameters based on the ProfileRequest that is embedded in the ClusterRequest
-
-            ts.lon = clusterRequest.profileRequest.fromLon;
-            ts.lat = clusterRequest.profileRequest.fromLat;
 
             // We need to distinguish between and handle four different types of requests here:
             // Either vector isochrones or accessibility to a pointset,
@@ -362,46 +326,85 @@ public class AnalystWorker implements Runnable {
             boolean singlePoint = (clusterRequest.outputLocation == null);
             boolean transit = (clusterRequest.profileRequest.transitModes.isTransit());
 
-            RepeatedRaptorProfileRouter router;
-            // TODO can we refactor to eliminate this big conditional,
-            // and simply pass null in as the sampleset parameter to the RepeatedRaptorProfileRouter constructor?
-            if (isochrone) {
-                router = new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest);
-                if (singlePoint) {
-                    // Only difference here (when doing isochrones) is that sampleSet is null
-                    // And raptorWorkerData is only pulled from cache when output location is null
-                    router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, ()->RepeatedRaptorProfileRouter
-                        .getRaptorWorkerData(clusterRequest.profileRequest, graph, null, ts));
-                }
-                // TODO why is there a conditional above? Explain what happens if we're not in single point mode.
-            } else {
-                // This request is for accessibility information based on travel times to a pointset.
-                // Fetch the set of points we will use as destinations for this one-to-many search
-                PointSet pointSet = pointSetDatastore.get(clusterRequest.destinationPointsetId);
-                // TODO this breaks if graph has been rebuilt
-                SampleSet sampleSet = pointSet.getOrCreateSampleSet(graph);
-                router = new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
-                if (singlePoint) {
-                    // There is no reason to cache RaptorWorkerData for such a single-point request. TODO explain why.
-                    // By leaving it blank, the router will create a single-use table.
-                    router.raptorWorkerData = null;
-                } else {
-                    router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, ()->RepeatedRaptorProfileRouter
-                            .getRaptorWorkerData(clusterRequest.profileRequest, graph, sampleSet, ts));
+            if (singlePoint) {
+                lastHighPriorityRequestProcessed = startTime;
+                if (!sideChannelOpen) {
+                    openSideChannel();
                 }
             }
 
+            TaskStatistics ts = new TaskStatistics();
+            ts.pointsetId = clusterRequest.destinationPointsetId;
+            ts.graphId = clusterRequest.graphId;
+            ts.awsInstanceType = instanceType;
+            ts.jobId = clusterRequest.jobId;
+            ts.workerId = machineId;
+            ts.single = singlePoint;
+
+            // Get the graph object for the ID given in the request, fetching inputs and building as needed.
+            // All requests handled together are for the same graph, and this call is synchronized so the graph will
+            // only be built once.
+            long graphStartTime = System.currentTimeMillis();
+            Graph graph = clusterGraphBuilder.getGraph(clusterRequest.graphId);
+            graphId = clusterRequest.graphId; // Record graphId so we "stick" to this same graph on subsequent polls
+            ts.graphBuild = (int) (System.currentTimeMillis() - graphStartTime);
+            ts.graphTripCount = graph.index.patternForTrip.size();
+            ts.graphStopCount = graph.index.stopForId.size();
+            ts.lon = clusterRequest.profileRequest.fromLon;
+            ts.lat = clusterRequest.profileRequest.fromLat;
+
+            final SampleSet sampleSet;
+
+            // If this one-to-many request is for accessibility information based on travel times to a pointset,
+            // fetch the set of points we will use as destinations.
+            if (isochrone) {
+                // This is an isochrone request, tell the RepeatedRaptorProfileRouter there are no targets.
+                sampleSet = null;
+            } else {
+                // This is not an isochrone request. There is necessarily a destination point set supplied.
+                PointSet pointSet = pointSetDatastore.get(clusterRequest.destinationPointsetId);
+                sampleSet = pointSet.getOrCreateSampleSet(graph); // TODO this breaks if graph has been rebuilt
+            }
+
+            // Note that all parameters to create the Raptor worker data are passed in the constructor except ts.
+            // Why not pass in ts as well since this is a throwaway calculator?
+            RepeatedRaptorProfileRouter router =
+                    new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
+
+            // Produce RAPTOR data tables, going through a cache where relevant.
+            // This is only used for multi-point requests. Single-point requests are assumed to be continually
+            // changing, so we create throw-away RAPTOR tables for them.
+            // Ideally we'd want this cacheing to happen transparently inside the RepeatedRaptorProfileRouter,
+            // but the RepeatedRaptorProfileRouter doesn't know the job ID or other information from the cluster request.
+            // It would be possible to just supply the cache _key_ as a way of saying that the cache should be used.
+            // But then we'd need to pass in both the cache and the key, which is weird.
+            if (transit && !singlePoint) {
+                long dataStart = System.currentTimeMillis();
+                router.raptorWorkerData = workerDataCache.get(clusterRequest.jobId, () -> RepeatedRaptorProfileRouter
+                        .getRaptorWorkerData(clusterRequest.profileRequest, graph, sampleSet, ts));
+                ts.raptorData = (int) (System.currentTimeMillis() - dataStart);
+            } else {
+                // The worker will generate a one-time throw-away table.
+                router.raptorWorkerData = null;
+            }
+
+            // This result envelope will hold the results of the one-to-many profile or single-departure-time search.
+            ResultEnvelope envelope = new ResultEnvelope();
             try {
+                // TODO when router runs, if there are no transit modes defined it should just skip the transit work.
                 router.route(ts);
                 long resultSetStart = System.currentTimeMillis();
 
                 if (isochrone) {
+                    // Currently we are building the isochrones from the times at street vertices rather
+                    // than the times at the targets. We should ideally make a grid of targets that exactly coincides
+                    // with the accumulator grid used to build the isochrones.
                     envelope.worstCase = new ResultSet(router.timeSurfaceRangeSet.max);
                     envelope.bestCase = new ResultSet(router.timeSurfaceRangeSet.min);
                     envelope.avgCase = new ResultSet(router.timeSurfaceRangeSet.avg);
                 } else {
-                    ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, !isochrone, isochrone);
-                    // put in constructor?
+                    ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, true, false);
+                    // TODO Set min/avg/max in constructor?
                     envelope.bestCase = results.min;
                     envelope.avgCase = results.avg;
                     envelope.worstCase = results.max;
@@ -412,14 +415,10 @@ public class AnalystWorker implements Runnable {
                 ts.resultSets = (int) (System.currentTimeMillis() - resultSetStart);
                 ts.success = true;
             } catch (Exception ex) {
-                // Leave the envelope empty TODO include error information
+                // An error occurred. Leave the envelope empty and TODO include error information.
                 ts.success = false;
                 LOG.error("Error occurred in profile request", ex);
             }
-
-
-//////////////////////
-
 
             if (clusterRequest.outputLocation != null) {
                 // Convert the result envelope and its contents to JSON and gzip it in this thread.
@@ -453,9 +452,9 @@ public class AnalystWorker implements Runnable {
 
     /** Open a single point channel to the broker to receive high-priority requests immediately */
     private synchronized void openSideChannel () {
-        if (sideChannelOpen)
+        if (sideChannelOpen) {
             return;
-
+        }
         LOG.info("Opening side channel for single point requests.");
         new Thread(() -> {
             sideChannelOpen = true;
@@ -474,7 +473,6 @@ public class AnalystWorker implements Runnable {
                     LOG.error("Unexpected exception getting single point work", e);
                 }
             }
-
             sideChannelOpen = false;
         }).start();
     }
@@ -483,12 +481,12 @@ public class AnalystWorker implements Runnable {
 
         // Run a POST request (long-polling for work) indicating which graph this worker prefers to work on
         String url;
-        if (type == WorkType.HIGH_PRIORITY)
+        if (type == WorkType.HIGH_PRIORITY) {
             // this is a side-channel request for single point work
             url = BROKER_BASE_URL + "/single/" + graphId;
-        else
+        } else {
             url = BROKER_BASE_URL + "/dequeue/" + graphId;
-
+        }
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader(new BasicHeader(WORKER_ID_HEADER, machineId));
         HttpResponse response = null;

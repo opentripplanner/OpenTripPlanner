@@ -62,8 +62,10 @@ public class AnalystClusterRequest implements Serializable {
 		this.graphId = graphId;
 	}
 
-	/** Create a cluster request that wraps a ProfileRequest, and has no RoutingRequest. */
-	public AnalystClusterRequest(String destinationPointsetId, String graphId, ProfileRequest req) {
+	/**
+	 * An AnalystClusterRequest is a wrapper around a ProfileRequest with some additional context.
+	 */
+	 public AnalystClusterRequest(String destinationPointsetId, String graphId, ProfileRequest req) {
 		this(destinationPointsetId, graphId);
 		try {
 			profileRequest = req.clone();
@@ -74,6 +76,16 @@ public class AnalystClusterRequest implements Serializable {
 		profileRequest.toLat = profileRequest.fromLat;
 		profileRequest.toLon = profileRequest.fromLon;
 	}
+
+	/**
+	 * We're now using ProfileRequests for everything,
+	 * an AnalystClusterRequest is a wrapper around a ProfileRequest with some additional context.
+	 */
+	@Deprecated
+	public AnalystClusterRequest(String destinationPointsetId, String graphId, RoutingRequest req) {
+		throw new UnsupportedOperationException("Deprecated constructor.");
+	}
+
 
 	/** Used for deserialization from JSON */
 	public AnalystClusterRequest () { /* do nothing */ }
