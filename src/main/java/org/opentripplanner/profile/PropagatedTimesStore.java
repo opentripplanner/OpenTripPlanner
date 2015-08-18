@@ -45,8 +45,6 @@ public class PropagatedTimesStore {
     // number of times to bootstrap the mean.
     public final int N_BOOTSTRAPS = 400;
 
-    public static final ConfidenceCalculationMethod CONFIDENCE_CALCULATION_METHOD = ConfidenceCalculationMethod.NONE;
-
     private static final Random random = new Random();
 
     public PropagatedTimesStore(Graph graph) {
@@ -65,7 +63,7 @@ public class PropagatedTimesStore {
         Arrays.fill(maxs, Integer.MAX_VALUE);
     }
 
-    public void setFromArray(int[][] times) {
+    public void setFromArray(int[][] times, ConfidenceCalculationMethod confidenceCalculationMethod) {
         if (times.length == 0)
             // nothing to do
             return;
@@ -105,7 +103,7 @@ public class PropagatedTimesStore {
 
             avgs[stop] = sum / count;
 
-            switch (CONFIDENCE_CALCULATION_METHOD) {
+            switch (confidenceCalculationMethod) {
             case BOOTSTRAP:
                 // now bootstrap out a 95% confidence interval on the time
                 int[] bootMeans = new int[N_BOOTSTRAPS];
@@ -136,10 +134,10 @@ public class PropagatedTimesStore {
             case NONE:
                 mins[stop] = maxs[stop] = avgs[stop];
                 break;
+            case MIN_MAX:
             default:
-                timeList.sort();
-                mins[stop] = timeList.get(0);
-                maxs[stop] = timeList.get(timeList.size() - 1);
+                mins[stop] = timeList.min();
+                maxs[stop] = timeList.max();
                 break;
             }
         }
@@ -198,6 +196,9 @@ public class PropagatedTimesStore {
          * Calculate confidence intervals based on percentiles, which is what you want to do when
          * you have a scheduled network.
          */
-        PERCENTILE
+        PERCENTILE,
+
+        /** Take the min and the max of the experienced of the experienced times. Only valid for scheduled services. */
+        MIN_MAX
     }
 }

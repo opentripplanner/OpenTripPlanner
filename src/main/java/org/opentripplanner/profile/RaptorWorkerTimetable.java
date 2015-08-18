@@ -38,8 +38,6 @@ public class RaptorWorkerTimetable implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerTimetable.class);
 
-    private static final Random random = new Random();
-
     /* Times for schedule-based trips/patterns are stored in a 2D array. */
 
     int nTrips, nStops;
@@ -102,11 +100,16 @@ public class RaptorWorkerTimetable implements Serializable {
         return timesPerTrip[trip][stop * 2 + 1];
     }
 
+    public int getFrequencyDeparture (int trip, int stop, int time, int previousPattern, FrequencyRandomOffsets offsets) {
+        return getFrequencyDeparture(trip, stop, time, previousPattern, offsets, null);
+    }
+
     /**
      * Get the departure on frequency trip trip at stop stop after time time,
-     * assuming worst-case headway if worstCase is true.
+     * with the given boarding assumption. (Note that the boarding assumption specified may be overridden
+     * by transfer rules).
      */
-    public int getFrequencyDeparture (int trip, int stop, int time, int previousPattern, FrequencyRandomOffsets offsets) {
+    public int getFrequencyDeparture (int trip, int stop, int time, int previousPattern, FrequencyRandomOffsets offsets, BoardingAssumption assumption) {
         int timeToReachStop = frequencyTrips[trip][stop * 2 + 1];
 
         // figure out if there is an applicable transfer rule
@@ -142,7 +145,12 @@ public class RaptorWorkerTimetable implements Serializable {
             }
         }
 
-        BoardingAssumption assumption = transferRule != null ? transferRule.assumption : raptorData.boardingAssumption;
+        if (assumption == null)
+            assumption = raptorData.boardingAssumption;
+
+        // if there is an applicable transfer rule, override anything that was specified elsewhere
+        if (transferRule != null)
+            assumption = transferRule.assumption;
 
         if (assumption == BoardingAssumption.RANDOM) {
             // We treat every frequency-based trip as a scheduled trip on each iteration of the Monte Carlo
@@ -157,7 +165,6 @@ public class RaptorWorkerTimetable implements Serializable {
             // lines that share trackage. Thus the minimum transfer time between them is always at least
             // 5 minutes or so as that's as close as you can run diesel trains to each other.
             int minTime = startTimes[trip] + timeToReachStop + offsets.offsets.get(this.dataIndex)[trip];
-
 
             // move time forward to an integer multiple of headway after the minTime
             if (time < minTime)
@@ -426,7 +433,7 @@ public class RaptorWorkerTimetable implements Serializable {
         }
         return times;
     }
-    
+
     /** The assumptions made when boarding a frequency vehicle: best case (no wait), worst case (full headway) and half headway (in some sense the average). */
     public static enum BoardingAssumption {
         BEST_CASE, WORST_CASE, HALF_HEADWAY, FIXED, PROPORTION, RANDOM;

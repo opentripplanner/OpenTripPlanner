@@ -152,7 +152,8 @@ public class RaptorWorker {
             monteCarloDraws = 1;
 
         int iterations = (req.toTime - fromTime - 60) / 60 + 1;
-        iterations *= monteCarloDraws;
+        // we add 2 because we do two "fake" draws where we do min or max instead of a monte carlo draw
+        iterations *= (monteCarloDraws + 2);
 
         ts.searchCount = iterations;
 
@@ -187,10 +188,7 @@ public class RaptorWorker {
 
             // run the frequency searches
             if (data.hasFrequencies) {
-                for (int i = 0; i < monteCarloDraws; i++) {
-                    // use a new Monte Carlo draw each time
-                    offsets.randomize();
-
+                for (int i = 0; i < monteCarloDraws + 2; i++) {
                     // make copies for just this search. We need copies because we can't use dynamic
                     // programming/range-raptor with randomized schedules
                     int[] bestTimesCopy = Arrays.copyOf(bestTimes, bestTimes.length);
@@ -198,8 +196,24 @@ public class RaptorWorker {
                             .copyOf(bestNonTransferTimes, bestNonTransferTimes.length);
                     int[] previousPatternsCopy = Arrays
                             .copyOf(previousPatterns, previousPatterns.length);
+
+                    // special cases: calculate the best and the worst cases as well
+                    // Note that this (intentionally) does not affect searches where the user has requested
+                    // an assumption other than RANDOM, or stops with transfer rules.
+                    RaptorWorkerTimetable.BoardingAssumption requestedBoardingAssumption = req.boardingAssumption;
+
+                    if (i == 0 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
+                        req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
+                    else if (i == 1 && req.boardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
+                        req.boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.BEST_CASE;
+                    else if (requestedBoardingAssumption == RaptorWorkerTimetable.BoardingAssumption.RANDOM)
+                        // use a new Monte Carlo draw each time
+                        offsets.randomize();
+
                     this.runRaptorFrequency(departureTime, bestTimesCopy, bestNonTransferTimesCopy,
                             previousPatternsCopy);
+
+                    req.boardingAssumption = requestedBoardingAssumption;
 
                     // do propagation
                     int[] frequencyTimesAtTargets = timesAtTargetsEachIteration[iteration++];
@@ -229,7 +243,10 @@ public class RaptorWorker {
         ts.propagation = (int) totalPropagationTime;
         ts.transitSearch = (int) (calcTime - totalPropagationTime);
         //dumpVariableByte(timesAtTargetsEachMinute);
-        propagatedTimesStore.setFromArray(timesAtTargetsEachIteration);
+        // we can use min_max here as we've also run it once with best case and worst case board,
+        // so the best and worst cases are meaningful.
+        propagatedTimesStore.setFromArray(timesAtTargetsEachIteration,
+                PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
         return propagatedTimesStore;
     }
 
@@ -333,7 +350,7 @@ public class RaptorWorker {
                         for (int trip = 0; trip < timetable.getFrequencyTripCount(); trip++) {
                             int boardTime = timetable
                                     .getFrequencyDeparture(trip, stopPositionInPattern,
-                                            bestTimes[stopIndex], previousPatterns[stopIndex], offsets);
+                                            bestTimes[stopIndex], previousPatterns[stopIndex], offsets, req.boardingAssumption);
 
                             if (boardTime != -1 && boardTime < remainOnBoardTime) {
                                 // make sure we board the best frequency entry at a stop
