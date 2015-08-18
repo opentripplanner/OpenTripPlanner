@@ -92,7 +92,10 @@ public class ResultSet implements Serializable{
         id.toArray(this.isochrones);
     }
 
-    /** Build a new ResultSet that contains only isochrones */
+    /**
+     * Build a new ResultSet that contains only isochrones, built by accumulating the times at all street vertices
+     * into a regular grid without an intermediate pointSet.
+     */
     public ResultSet (TimeSurface surface) {
         buildIsochrones(surface);
     }
