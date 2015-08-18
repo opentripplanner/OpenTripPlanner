@@ -153,11 +153,14 @@ public class RaptorWorker {
 
         // if no frequencies, don't run Monte Carlo
         int iterations = (req.toTime - fromTime - 60) / 60 + 1;
+
+        // if we do Monte Carlo, we do more iterations. But we only do monte carlo when we have frequencies.
+        // So only update the number of iterations when we're actually going to use all of them, to
+        // avoid uninitialized arrays.
+        // if we multiply when we're not doing monte carlo, we'll end up with too many iterations.
         if (data.hasFrequencies)
             // we add 2 because we do two "fake" draws where we do min or max instead of a monte carlo draw
             iterations *= (monteCarloDraws + 2);
-        else
-            monteCarloDraws = 1;
 
         ts.searchCount = iterations;
 
@@ -241,6 +244,14 @@ public class RaptorWorker {
                         .toArray();
             }
         }
+
+        // make sure we filled the array, otherwise results are garbage.
+        // This implies a bug in OTP, but it has happened in the past when we did
+        // not set the number of iterations correctly.
+        // iteration should be incremented past end of array by ++ in assignment above
+        if (iteration != iterations)
+            throw new IllegalStateException("Iterations did not completely fill output array");
+
         long calcTime = System.currentTimeMillis() - beginCalcTime;
         LOG.info("calc time {}sec", calcTime / 1000.0);
         LOG.info("  propagation {}sec", totalPropagationTime / 1000.0);
