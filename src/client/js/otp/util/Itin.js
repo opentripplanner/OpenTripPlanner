@@ -203,6 +203,42 @@ otp.util.Itin = {
         return mode;
     },
 
+    vertexTypeStrings : {
+        //TRANSLATORS: WALK/CYCLE distance to [Bicycle rental station]
+        'BIKESHARE_EMPTY': _tr('Bicycle rental station'),
+        //TRANSLATORS: WALK/CYCLE distance to [Bicycle rental] {name}
+        'BIKESHARE': _tr('Bicycle rental'),
+    },
+
+    /**
+     * Returns localized place name
+     *
+     * based on vertexType and place name
+     *
+     * Currently only bike sharing is supported
+     * @param {string} place
+     * @return {string} localized place name
+     */
+    getName : function(place) {
+        if ('vertexType' in place) {
+            var vertexType = place.vertexType;
+            if (place.name === null) {
+                vertexType += "_EMPTY";
+            }
+            if (vertexType in this.vertexTypeStrings) {
+                return this.vertexTypeStrings[vertexType] +  " " + place.name;
+            } else {
+                if (vertexType !== "NORMAL") {
+                    console.log(vertexType + " not found in strings!");
+                }
+                return place.name;
+            }
+        } else {
+            console.log("vertexType missing in place");
+            return place.name;
+        }
+    },
+
     getLegStepText : function(step, asHtml) {
         asHtml = (typeof asHtml === "undefined") ? true : asHtml;
         var text = '';
@@ -229,7 +265,9 @@ otp.util.Itin = {
         else {
             //TODO: Absolute direction translation
             //TRANSLATORS: Start on [stret name] heading [compas direction]
-            if(!step.relativeDirection) text += _tr("Start on") + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + _tr(" heading ") + (asHtml ? "<b>" : "") + this.getLocalizedAbsoluteDirectionString(step.absoluteDirection) + (asHtml ? "</b>" : "");
+            if(!step.relativeDirection || step.relativeDirection === "DEPART") {
+                text += _tr("Start on") + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + _tr(" heading ") + (asHtml ? "<b>" : "") + this.getLocalizedAbsoluteDirectionString(step.absoluteDirection) + (asHtml ? "</b>" : "");
+            }
             else {
                 text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.getLocalizedRelativeDirectionString(step.relativeDirection)) +
                             (asHtml ? "</b>" : "") + ' ' +

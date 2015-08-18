@@ -125,7 +125,7 @@ public class SurfaceResource extends RoutingResource {
         Router router = otpServer.getRouter(surf.routerId);
         // TODO cache this sampleset
         SampleSet samples = pset.getSampleSet(router.graph);
-        final ResultSet indicator = new ResultSet(samples, surf, detail);
+        final ResultSet indicator = new ResultSet(samples, surf, detail, detail);
         if (indicator == null) return badServer("Could not compute indicator as requested.");
 
         return Response.ok().entity(new StreamingOutput() {
@@ -235,7 +235,7 @@ public class SurfaceResource extends RoutingResource {
      * @param spacing the number of minutes between isochrones
      * @return a list of evenly-spaced isochrones up to the timesurface's cutoff point
      */
-    private List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing, int nMax) {
+    public static List<IsochroneData> getIsochronesAccumulative(TimeSurface surf, int spacing, int nMax) {
 
         long t0 = System.currentTimeMillis();
         if (surf.sampleGrid == null) {
@@ -254,9 +254,6 @@ public class SurfaceResource extends RoutingResource {
             z0.d = 300; // meters. TODO set dynamically / properly, make sure it matches grid cell size?
             IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
             isochrones.add(isochrone);
-            if (++n >= nMax) {
-                break;
-            }
          }
 
         long t1 = System.currentTimeMillis();

@@ -18,6 +18,11 @@ package org.opentripplanner.openstreetmap.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.TranslatedString;
+
 /**
  * A base class for OSM entities containing common methods.
  */
@@ -28,6 +33,8 @@ public class OSMWithTags {
     private Map<String, String> _tags;
 
     protected long id;
+
+    protected I18NString creativeName;
 
     /**
      * Gets the id.
@@ -140,21 +147,21 @@ public class OSMWithTags {
      * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created by
      * {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule#processRelations processRelations}
      */
-    public String getAssumedName() {
+    public I18NString getAssumedName() {
         if (_tags.containsKey("name"))
-            return _tags.get("name");
+            return TranslatedString.getI18NString(TemplateLibrary.generateI18N("{name}", this));
 
         if (_tags.containsKey("otp:route_name"))
-            return _tags.get("otp:route_name");
+            return new NonLocalizedString(_tags.get("otp:route_name"));
 
-        if (_tags.containsKey("otp:gen_name"))
-            return _tags.get("otp:gen_name");
+        if (this.creativeName != null)
+            return this.creativeName;
 
         if (_tags.containsKey("otp:route_ref"))
-            return _tags.get("otp:route_ref");
+            return new NonLocalizedString(_tags.get("otp:route_ref"));
 
         if (_tags.containsKey("ref"))
-            return _tags.get("ref");
+            return new NonLocalizedString(_tags.get("ref"));
 
         return null;
     }
@@ -316,5 +323,9 @@ public class OSMWithTags {
     public boolean isBikeParking() {
         return isTag("amenity", "bicycle_parking") && !isTag("access", "private")
                 && !isTag("access", "no");
+    }
+
+    public void setCreativeName(I18NString creativeName) {
+        this.creativeName = creativeName;
     }
 }

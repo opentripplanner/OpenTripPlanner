@@ -170,7 +170,7 @@ public abstract class GtfsTest extends TestCase {
         if (alert != null) {
             assertNotNull(leg.alerts);
             assertEquals(1, leg.alerts.size());
-            assertEquals(alert, leg.alerts.get(0).alertHeaderText.getSomeTranslation());
+            assertEquals(alert, leg.alerts.get(0).getAlertHeaderText());
         } else {
             assertNull(leg.alerts);
         }

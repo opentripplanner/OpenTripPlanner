@@ -36,6 +36,9 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 public class TestStreetMatcher {
     static GeometryFactory gf = new GeometryFactory();
@@ -160,7 +163,7 @@ public class TestStreetMatcher {
         private static final long serialVersionUID = 1L;
 
         public SimpleVertex(Graph g, String label, double lat, double lon) {
-            super(g, label, lon, lat, label);
+            super(g, label, lon, lat, new NonLocalizedString(label));
         }
     }
 
@@ -169,7 +172,7 @@ public class TestStreetMatcher {
         private static final long serialVersionUID = 1L;
 
         public SimpleEdge(StreetVertex v1, StreetVertex v2) {
-            super(v1, v2, null, null, 0, null, false);
+            super(v1, v2, null, (NonLocalizedString)null, 0, null, false);
         }
         
         @Override
@@ -185,6 +188,16 @@ public class TestStreetMatcher {
 
         @Override
         public String getName() {
+            return null;
+        }
+
+        @Override
+        public I18NString getRawName() {
+            return null;
+        }
+
+        @Override
+        public String getName(Locale locale) {
             return null;
         }
 

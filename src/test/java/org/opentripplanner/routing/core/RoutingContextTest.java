@@ -36,6 +36,10 @@ public class RoutingContextTest {
         RoutingRequest routingRequest = mock(RoutingRequest.class);
         CalendarService calendarService = mock(CalendarService.class);
 
+        // You're probably not supposed to do this to mocks (access their fields directly)
+        // But I know of no other way to do this since the mock object has only action-free stub methods.
+        routingRequest.modes = new TraverseModeSet("WALK,TRANSIT");
+
         when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("Europe/Budapest"));
         when(graph.getCalendarService()).thenReturn(calendarService);
         when(graph.getAgencyIds()).thenReturn(Collections.<String>singletonList(agencyId));

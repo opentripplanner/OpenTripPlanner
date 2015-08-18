@@ -36,6 +36,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
 
     private XmlDataListDownloader<BikeRentalStation> xmlDownloader;
 
+
     public GenericXmlBikeRentalDataSource(String path) {
         xmlDownloader = new XmlDataListDownloader<BikeRentalStation>();
         xmlDownloader.setPath(path);
@@ -66,6 +67,11 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     @Override
     public synchronized List<BikeRentalStation> getStations() {
         return stations;
+    }
+
+    public void setReadAttributes(boolean readAttributes) {
+        // if readAttributes is true, read XML attributes of selected elements, instead of children
+        xmlDownloader.setReadAttributes(readAttributes);
     }
 
     public void setUrl(String url) {

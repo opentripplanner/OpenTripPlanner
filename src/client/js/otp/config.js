@@ -95,7 +95,7 @@ otp.config = {
 
     /**
      * Map start location and zoom settings: by default, the client uses the
-     * OTP metadata API call to center and zoom the map. The following
+     * OTP routerInfo API call to center and zoom the map. The following
      * properties, when set, override that behavioir.
      */
      

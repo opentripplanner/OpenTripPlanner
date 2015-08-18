@@ -19,10 +19,10 @@ public class HopSpeedSlow extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Very slow speed of %f m/sec over %fm on route %s trip %s " +
+    public static final String FMT = "Very slow speed of %.2f kph over %.1fm on route %s trip %s " +
     		"stop sequence %d.";
     
-    final float speed;
+    final float metersPerSecond;
 
     final float distance;
     
@@ -30,8 +30,8 @@ public class HopSpeedSlow extends GraphBuilderAnnotation {
     
     final int seq;
     
-    public HopSpeedSlow(float speed, float distance, Trip trip, int seq){
-    	this.speed = speed;
+    public HopSpeedSlow(float metersPerSecond, float distance, Trip trip, int seq){
+    	this.metersPerSecond = metersPerSecond;
     	this.distance = distance;
     	this.trip = trip;
     	this.seq = seq;
@@ -39,7 +39,8 @@ public class HopSpeedSlow extends GraphBuilderAnnotation {
     
     @Override
     public String getMessage() {
-        return String.format(FMT, speed, distance, trip.getRoute().getId(), trip.getId(), seq);
+        double kph = metersPerSecond * 3.6;
+        return String.format(FMT, kph, distance, trip.getRoute().getId(), trip.getId(), seq);
     }
 
 }

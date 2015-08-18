@@ -21,7 +21,6 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -41,6 +40,7 @@ import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,8 +188,9 @@ public class RoutingContext implements Cloneable {
             double lengthRatio = partial.getLength() / parent.getLength();
             double length = streetEdge.getDistance() * lengthRatio;
 
+            //TODO: localize this
             String name = from.getLabel() + " to " + to.getLabel();
-            new TemporaryPartialStreetEdge(streetEdge, from, to, partial, name, length);
+            new TemporaryPartialStreetEdge(streetEdge, from, to, partial, new NonLocalizedString(name), length);
         }
     }
 
@@ -209,21 +210,29 @@ public class RoutingContext implements Cloneable {
         this.graph = graph;
         this.debugOutput.startedCalculating();
 
-        // the graph's snapshot may be frequently updated.
-        // Grab a reference to ensure a coherent view of the timetables throughout this search.
-        if (routingRequest.ignoreRealtimeUpdates) {
-            timetableSnapshot = null;
-        } else {
-            TimetableSnapshotSource timetableSnapshotSource = graph.timetableSnapshotSource;
-
-            if (timetableSnapshotSource == null) {
+        // The following block contains potentially resource-intensive things that are only relevant for transit.
+        // In normal searches the impact is low, because the routing context is only constructed once at the beginning
+        // of the search, but when computing transfers or doing large batch jobs, repeatedly re-constructing useless
+        // transit-specific information can have an impact.
+        if (opt.modes.isTransit()) {
+            // the graph's snapshot may be frequently updated.
+            // Grab a reference to ensure a coherent view of the timetables throughout this search.
+            if (routingRequest.ignoreRealtimeUpdates) {
                 timetableSnapshot = null;
             } else {
-                timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
+                TimetableSnapshotSource timetableSnapshotSource = graph.timetableSnapshotSource;
+                if (timetableSnapshotSource == null) {
+                    timetableSnapshot = null;
+                } else {
+                    timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
+                }
             }
+            calendarService = graph.getCalendarService();
+            setServiceDays();
+        } else {
+            timetableSnapshot = null;
+            calendarService = null;
         }
-        calendarService = graph.getCalendarService();
-        setServiceDays();
 
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
@@ -235,11 +244,11 @@ public class RoutingContext implements Cloneable {
                 // TODO offset time by distance to nearest OSM node?
                 if (opt.arriveBy) {
                     // TODO what if there is no coordinate but instead a named place?
-                    toVertex = graph.streetIndex.getSampleVertexAt(opt.to.getCoordinate());
+                    toVertex = graph.streetIndex.getSampleVertexAt(opt.to.getCoordinate(), true);
                     fromVertex = null;
                 }
                 else {
-                    fromVertex = graph.streetIndex.getSampleVertexAt(opt.from.getCoordinate());
+                    fromVertex = graph.streetIndex.getSampleVertexAt(opt.from.getCoordinate(), false);
                     toVertex = null;
                 }
             }

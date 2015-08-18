@@ -12,6 +12,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
+import java.util.Locale;
+
 /**
  * This links transit stops to OSM vertices (rather than splitter vertices). It apears to only be
  * used in org.opentripplanner.graph_builder.linking.SampleStopLinker which is itself unused at this point.
@@ -62,4 +64,9 @@ public class IntersectionTransitLink extends Edge {
         return gf.createLineString(new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()});
     }
 
+
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
+    }
 }

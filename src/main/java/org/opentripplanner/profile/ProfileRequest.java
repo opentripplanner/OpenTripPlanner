@@ -1,6 +1,7 @@
 package org.opentripplanner.profile;
 
 import org.joda.time.LocalDate;
+import org.opentripplanner.analyst.scenario.Scenario;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
@@ -100,8 +101,9 @@ public class ProfileRequest implements Serializable, Cloneable {
       alternatives out a bit to account for the fact that they don't always run on schedule.
     */
     public int suboptimalMinutes;
-    
-    public Collection<String> bannedRoutes;
+
+    /** A non-destructive scenario to apply when executing this request */
+    public Scenario scenario;
     
     public ProfileRequest clone () throws CloneNotSupportedException {
         return (ProfileRequest) super.clone();

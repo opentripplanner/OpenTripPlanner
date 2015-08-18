@@ -1,18 +1,16 @@
 package org.opentripplanner.standalone;
 
+import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
+import jersey.repackaged.com.google.common.collect.Lists;
+import org.opentripplanner.routing.services.GraphService;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
-
-import jersey.repackaged.com.google.common.collect.Lists;
-
-import org.opentripplanner.routing.services.GraphService;
-
-import com.beust.jcommander.IParameterValidator;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 
 /**
  * This is a JCommander-annotated class that holds parameters for OTP stand-alone mode.
@@ -107,6 +105,9 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--clientFiles"}, validateWith = ReadableDirectory.class,
             description = "Path to directory containing local client files to serve.")
     public File clientDirectory = null;
+
+    @Parameter(names = {"--disableFileCache"}, description = "Disable http server static file cache. Handy for development.")
+    public boolean disableFileCache = false;
 
     @Parameter(names = {"--router"}, validateWith = RouterId.class,
             description = "One or more router IDs to build and/or serve, first one being the default.")

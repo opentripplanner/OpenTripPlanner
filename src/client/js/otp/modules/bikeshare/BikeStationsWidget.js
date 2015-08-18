@@ -50,14 +50,14 @@ otp.widgets.BikeStationsWidget =
 			this.end_button.empty();
                         //TRANSLATORS: Recommended Pick Up: bike sharing
                         //station name
-			this.start_button.html("<strong>" + _tr("Recommended Pick Up:") + "</strong><br /> " + start.name + "<br />" +
+			this.start_button.html("<strong>" + _tr("Recommended Pick Up:") + "</strong><br /> " + _tr('Bicycle rental') + " " + start.name + "<br />" +
                                                 //TRANSLATORS: number of bikes
                                                //availible in a bike sharing
                                                //station
                                                ngettext("<strong>%d</strong> bike available", "<strong>%d</strong> bikes available", start.bikesAvailable));
                         //TRANSLATORS: Recommended Drop Off: bike sharing
                         //station name
-			this.end_button.html("<strong>" + _tr("Recommended Drop Off:") + "</strong><br /> " + end.name + "<br />" +
+			this.end_button.html("<strong>" + _tr("Recommended Drop Off:") + "</strong><br /> " + _tr('Bicycle rental') + " " + end.name + "<br />" +
                                                //TRANSLATORS: number of free
                                                //places to put bikes
                                                //in a bike sharing
@@ -65,9 +65,9 @@ otp.widgets.BikeStationsWidget =
                                                ngettext("<strong>%d</strong> dock available", "<strong>%d</strong> docks available", end.spacesAvailable));
 
 		} else {
-			this.start_button = $("<div id='pickup_btn'><strong>" + _tr("Recommended Pick Up:") + "</strong><br /> " + start.name + "<br />" +
+			this.start_button = $("<div id='pickup_btn'><strong>" + _tr("Recommended Pick Up:") + "</strong><br /> " + _tr('Bicycle rental') + " " + start.name + "<br />" +
                                               ngettext("<strong>%d</strong> bike available", "<strong>%d</strong> bikes available", start.bikesAvailable) + "</div>");
-			this.end_button = $("<div id='dropoff_btn'><strong>" + _tr("Recommended Drop Off:") + "</strong><br /> " + end.name + "<br />" +
+			this.end_button = $("<div id='dropoff_btn'><strong>" + _tr("Recommended Drop Off:") + "</strong><br /> " + _tr('Bicycle rental') + " " + end.name + "<br />" +
                                             ngettext("<strong>%d</strong> dock available", "<strong>%d</strong> docks available", end.spacesAvailable) + "</div>");
 			
 			this.$().append($("<div class='otp-bikeshare-stationsWidget-left'></div>").append(this.start_button))

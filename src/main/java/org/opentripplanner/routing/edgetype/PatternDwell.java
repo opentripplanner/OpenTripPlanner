@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Locale;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -54,6 +55,11 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
 
     public String getName() {
         return GtfsLibrary.getRouteName(getPattern().route);
+    }
+
+    @Override
+    public String getName(Locale locale) {
+        return this.getName();
     }
 
     public State traverse(State state0) {

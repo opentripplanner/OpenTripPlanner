@@ -92,6 +92,39 @@ $ pip install mkdocs
 $ mkdocs serve
 ```
 
+### Debug layers
+
+Adding new renderer is very easy. You just need to create new class (preferably in
+`org.opentripplanner.inspector` package) which implements EdgeVertexRenderer. It is best if class
+name ends with Rendered. To implement this interface you need to write three functions `renderEdge`,
+`renderVertex` and `getName`. Both render functions accepts `EdgeVisualAttributes` object in which
+label of edge/vertex and color can be set. And both return `true` if edge/vertex should be rendered
+and `false` otherwise. `getName` function should return short descriptive name of the class and will
+be shown in layer chooser.
+
+For examples how to write renderers you can look into example renderers which are all in `org.opentripplanner.inspector` package.
+
+After your class is written you only need to add it to TileRenderManager:
+```java
+//This is how Wheelchair renderer is added
+renderers.put("wheelchair", new EdgeVertexTileRenderer(new WheelchairEdgeRenderer()));
+```
+`wheelchair` is internal layer key and should consist of a-zA-Z and -.
+
+By default all the tiles have cache headers to cache them for one hour. This can become problematic
+ if you are changing renderers a lot. To disable this change `GraphInspectorTileResource`:
+
+```java
+//This lines
+CacheControl cc = new CacheControl();
+cc.setMaxAge(3600);
+cc.setNoCache(false);
+
+//to this:
+CacheControl cc = new CacheControl();
+cc.setNoCache(true);
+```
+
 
 ### Date format
 
@@ -218,7 +251,7 @@ Release checklist:
 - cp -R target/site/enunciate /usr/share/nginx/html/apidoc/x.y.0
 - check that all docs in /usr/share/nginx/html/javadoc/ have o+r permissions (they should be by default)
 - mvn release:perform
-- cp target/checkout/target/otp-x.y.0.jar /usr/share/nginx/html/jars/
+- cp target/checkout/target/otp-x.y.0-shaded.jar /usr/share/nginx/html/jars/
 - rm /usr/share/nginx/html/jars/otp-x.y.0-SNAPSHOT*
 - check http://dev.opentripplanner.org/jars/ and http://dev.opentripplanner.org/javadoc/ in a browser
 - update the version numbers that appear in Basic-Usage, Developers-Guide, Getting-OTP, and index.md and check them in

@@ -1,0 +1,13 @@
+# This file configures the generation of static documentation by MkDocs
+# which is then served via readthedocs.org
+
+site_name: OpenTripPlanner
+site_url: http://docs.opentripplanner.org
+repo_url: http://github.com/opentripplanner/OpenTripPlanner
+docs_dir: ../docs
+site_dir: ../target/mkdocs
+theme: readthedocs
+
+# MkDocs will automatically discover pages if you don't list them here.
+# In that case subdirectories can be used to organize pages.
+# This list organizes them into categories and controls the order.

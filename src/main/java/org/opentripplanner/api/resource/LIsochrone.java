@@ -84,6 +84,10 @@ public class LIsochrone extends RoutingResource {
     @DefaultValue("200")
     private Integer precisionMeters;
 
+    @QueryParam("offRoadDistanceMeters")
+    @DefaultValue("150")
+    private Integer offRoadDistanceMeters;
+
     @QueryParam("coordinateOrigin")
     private String coordinateOrigin = null;
 
@@ -170,10 +174,13 @@ public class LIsochrone extends RoutingResource {
             debug = false;
         if (precisionMeters < 10)
             throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
+        if (offRoadDistanceMeters < 10)
+            throw new IllegalArgumentException("Too small offRoadDistanceMeters: " + offRoadDistanceMeters);
 
         IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
         isoChroneRequest.includeDebugGeometry = debug;
         isoChroneRequest.precisionMeters = precisionMeters;
+        isoChroneRequest.offRoadDistanceMeters = offRoadDistanceMeters;
         if (coordinateOrigin != null)
             isoChroneRequest.coordinateOrigin = new GenericLocation(null, coordinateOrigin)
                     .getCoordinate();

@@ -13,14 +13,8 @@
 
 package org.opentripplanner.graph_builder;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
@@ -52,8 +46,13 @@ import org.opentripplanner.standalone.S3BucketConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * This makes a Graph out of various inputs like GTFS and OSM.
@@ -245,6 +244,9 @@ public class GraphBuilder implements Runnable {
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
             osmModule.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
             osmModule.skipVisibility = !builderParams.areaVisibility;
+            osmModule.staticBikeRental = builderParams.staticBikeRental;
+            osmModule.staticBikeParkAndRide = builderParams.staticBikeParkAndRide;
+            osmModule.staticParkAndRide = builderParams.staticParkAndRide;
             graphBuilder.addModule(osmModule);
             graphBuilder.addModule(new PruneFloatingIslands());
         }
@@ -261,25 +263,20 @@ public class GraphBuilder implements Runnable {
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
+            gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
+            graphBuilder.addModule(gtfsModule);
             if ( hasOSM ) {
                 if (builderParams.matchBusRoutesToStreets) {
                     graphBuilder.addModule(new BusRouteStreetMatcher());
                 }
                 graphBuilder.addModule(new TransitToTaggedStopsModule());
             }
-            gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
-            graphBuilder.addModule(gtfsModule);
         }
         // This module is outside the hasGTFS conditional block because it also links things like bike rental
-        // which need to be done even when there's no transit.
+        // which need to be handled even when there's no transit.
         graphBuilder.addModule(new StreetLinkerModule());
-        if ( hasGTFS ) {
-            // The stops can be linked to each other once they are already linked to the street network.
-            if ( ! builderParams.useTransfersTxt) {
-                // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-                graphBuilder.addModule(new DirectTransferGenerator());
-            }
-        }
+        // Load elevation data and apply it to the streets.
+        // We want to do run this module after loading the OSM street network but before finding transfers.
         if (builderParams.elevationBucket != null) {
             // Download the elevation tiles from an Amazon S3 bucket
             S3BucketConfig bucketConfig = builderParams.elevationBucket;
@@ -305,9 +302,16 @@ public class GraphBuilder implements Runnable {
             GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
             graphBuilder.addModule(elevationBuilder);
         }
+        if ( hasGTFS ) {
+            // The stops can be linked to each other once they are already linked to the street network.
+            if ( ! builderParams.useTransfersTxt) {
+                // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
+                graphBuilder.addModule(new DirectTransferGenerator());
+            }
+        }
         graphBuilder.addModule(new EmbedConfig(builderConfig, routerConfig));
         if (builderParams.htmlAnnotations) {
-            graphBuilder.addModule(new AnnotationsToHTML(new File(params.build, "report.html")));
+            graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
         return graphBuilder;

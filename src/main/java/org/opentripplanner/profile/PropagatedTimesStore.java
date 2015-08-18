@@ -135,7 +135,7 @@ public class PropagatedTimesStore {
     }
 
     /** Make a ResultSet directly given a sample set (must have constructed RaptorWorkerData from the same sampleset) */
-    public ResultSet.RangeSet makeResults(SampleSet ss, boolean includeTimes) {
+    public ResultSet.RangeSet makeResults(SampleSet ss, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         ResultSet.RangeSet ret = new ResultSet.RangeSet();
 
         int[] avgs = new int[sums.length];
@@ -155,9 +155,9 @@ public class PropagatedTimesStore {
             }
         }
 
-        ret.min = new ResultSet(mins, ss.pset, includeTimes);
-        ret.avg = new ResultSet(avgs, ss.pset, includeTimes);
-        ret.max = new ResultSet(maxs, ss.pset, includeTimes);
+        ret.min = new ResultSet(mins, ss.pset, includeTimes, includeHistograms, includeIsochrones);
+        ret.avg = new ResultSet(avgs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
+        ret.max = new ResultSet(maxs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         return ret;
     }
 }

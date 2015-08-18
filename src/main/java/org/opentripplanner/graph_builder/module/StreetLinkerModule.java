@@ -50,6 +50,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
             SimpleStreetSplitter linker = new SimpleStreetSplitter(graph);
             linker.link();
         }
+        //Calculates convex hull of a graph which is shown in routerInfo API point
+        graph.calculateConvexHull();
     }
 
     @Override

@@ -171,6 +171,13 @@ Simply place the elevation data file in the directory with the other graph build
 Make sure the file has a `.tiff` or `.tif` extension, and the graph builder should detect its presence and apply
 the elevation data to the streets.
 
+OTP should automatically handle DEM GeoTIFFs in most common projections. You may want to check for elevation-related
+error messages during the graph build process to make sure OTP has properly discovered the projection. If you are using
+a DEM in unprojected coordinates make sure that the axis order is (longitude, latitude) rather than
+(latitude, longitude). Unfortunately there is no reliable standard for WGS84 axis order, so OTP uses the same axis
+order as the above-mentioned SRTM data, which is also the default for the popular Proj4 library.
+
+
 ## Fares configuration
 
 By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.
@@ -228,9 +235,10 @@ The current list of `combinationStrategy` is:
 
 - `additive` - simply adds all sub-fares.
 
+
 ## Custom OSM naming
 
-You can define a custom OSM naming scheme by defining `osmNaming` in `build-config.json`,
+You can define a custom naming scheme for elements drawn from OSM by defining an `osmNaming` field in `build-config.json`,
 such as:
 
 ```JSON
@@ -240,11 +248,36 @@ such as:
 }
 ```
 
-The current list of OSM custom naming is:
+There is currently only one custom naming module called `portland` (which has no parameters).
 
-- `portland` (no parameters)
 
 # Runtime router configuration
+
+This section covers all options that can be set for each router using the `router-config.json` file.
+These options can be applied by the OTP server without rebuilding the graph.
+
+
+## Routing defaults
+
+There are many trip planning options used in the OTP web API, and more exist
+internally that are not exposed via the API. You may want to change the default value for some of these parameters,
+i.e. the value which will be applied unless it is overridden in a web API request.
+
+A full list of them can be found in the RoutingRequest class
+[in the Javadoc](http://dev.opentripplanner.org/javadoc/master/org/opentripplanner/routing/core/RoutingRequest.html).
+Any public field or setter method in this class can be given a default value using the routingDefaults section of
+`router-config.json` as follows:
+
+```JSON
+{
+    routingDefaults: {
+        walkSpeed: 2.0,
+        stairsReluctance: 4.0,
+        carDropoffTime: 240
+    }
+}
+```
+
 
 ## Timeouts
 
@@ -345,7 +378,8 @@ connect to a network resource is the `url` field.
         },
 
         // Polling bike rental updater.
-        // sourceType can be jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets, city-bikes, vcub
+        // sourceType can be: jcdecaux, b-cycle, bixi, keolis-rennes, ov-fiets,
+        // city-bikes, citi-bike-nyc, next-bike, vcub
         {
             type: "bike-rental",
             frequencySec: 300,

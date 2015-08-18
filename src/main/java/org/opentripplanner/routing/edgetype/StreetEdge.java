@@ -46,6 +46,9 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import java.util.Locale;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * This represents a street segment.
@@ -102,7 +105,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     private int[] compactGeometry;
     
-    private String name;
+    private I18NString name;
 
     private StreetTraversalPermission permission;
 
@@ -124,7 +127,7 @@ public class StreetEdge extends Edge implements Cloneable {
     private byte outAngle;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
-                      String name, double length,
+                      I18NString name, double length,
                       StreetTraversalPermission permission, boolean back) {
         super(v1, v2);
         this.setBack(back);
@@ -162,6 +165,15 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
     }
+
+
+    //For testing only
+    public StreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
+                      String name, double length,
+                      StreetTraversalPermission permission, boolean back) {
+        this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
+    }
+
 
     /**
      * Checks permissions of the street edge if specified modes are allowed to travel.
@@ -603,10 +615,22 @@ public class StreetEdge extends Edge implements Cloneable {
 
 	@Override
 	public String getName() {
+		return this.name.toString();
+	}
+
+	/**
+	* Gets non-localized I18NString (Used when splitting edges)
+	* @return non-localized Name
+	*/
+	public I18NString getRawName() {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public String getName(Locale locale) {
+		return this.name.toString(locale);
+	}
+
+	public void setName(I18NString name) {
 		this.name = name;
 	}
 

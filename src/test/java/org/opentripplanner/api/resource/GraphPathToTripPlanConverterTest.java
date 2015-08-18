@@ -13,20 +13,14 @@
 
 package org.opentripplanner.api.resource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
-
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import org.junit.Test;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -58,8 +52,29 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
+import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
+import org.opentripplanner.routing.edgetype.PartialStreetEdge;
+import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
@@ -77,16 +92,20 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GraphPathToTripPlanConverterTest {
     private static final double F_DISTANCE[] = {3, 9996806.8, 3539050.5, 7, 2478638.8, 4, 2, 1, 0};
@@ -104,6 +123,8 @@ public class GraphPathToTripPlanConverterTest {
     private static final String alertsExample =
             "Mine is the last voice that you will ever hear. Do not be alarmed.";
 
+    private static final Locale locale = new Locale("en");
+
     /**
      * Test the generateItinerary() method. This test is intended to be comprehensive but fast.
      * Any future changes to the generateItinerary() method should be accompanied by changes in this
@@ -113,9 +134,9 @@ public class GraphPathToTripPlanConverterTest {
     public void testGenerateItinerary() {
         GraphPath[] graphPaths = buildPaths();
 
-        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[0], true), Type.FORWARD);
-        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[1], true), Type.BACKWARD);
-        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[2], true), Type.ONBOARD);
+        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[0], true, locale), Type.FORWARD);
+        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[1], true, locale), Type.BACKWARD);
+        compare(GraphPathToTripPlanConverter.generateItinerary(graphPaths[2], true, locale), Type.ONBOARD);
     }
 
     /**
@@ -127,10 +148,50 @@ public class GraphPathToTripPlanConverterTest {
         // Reuse testGenerateItinerary()'s graph path, but shorten it
         GraphPath graphPath = new GraphPath(buildPaths()[0].states.get(3), false);
 
-        Itinerary itinerary = GraphPathToTripPlanConverter.generateItinerary(graphPath, false);
+        Itinerary itinerary = GraphPathToTripPlanConverter.generateItinerary(graphPath, false, locale);
 
         assertEquals(1, itinerary.legs.size());
         assertEquals("WALK", itinerary.legs.get(0).mode);
+    }
+
+    /**
+     * Test that empty graph paths throw a TrivialPathException
+     */
+    @Test(expected = TrivialPathException.class)
+    public void testEmptyGraphPath() {
+        RoutingRequest options = new RoutingRequest();
+        Graph graph = new Graph();
+        ExitVertex vertex = new ExitVertex(graph, "Vertex", 0, 0);
+
+        options.rctx = new RoutingContext(options, graph, vertex, vertex);
+
+        GraphPath graphPath = new GraphPath(new State(options), false);
+
+        GraphPathToTripPlanConverter.generateItinerary(graphPath, false, locale);
+    }
+
+    /**
+     * Test that graph paths with only null and LEG_SWITCH modes throw a TrivialPathException
+     */
+    @Test(expected = TrivialPathException.class)
+    public void testLegSwitchOnlyGraphPath() {
+        RoutingRequest options = new RoutingRequest();
+        Graph graph = new Graph();
+
+        ExitVertex start = new ExitVertex(graph, "Start", 0, -90);
+        ExitVertex middle = new ExitVertex(graph, "Middle", 0, 0);
+        ExitVertex end = new ExitVertex(graph, "End", 0, 90);
+
+        FreeEdge depart = new FreeEdge(start, middle);
+        LegSwitchingEdge arrive = new LegSwitchingEdge(middle, end);
+
+        options.rctx = new RoutingContext(options, graph, start, end);
+
+        State intermediate = depart.traverse(new State(options));
+
+        GraphPath graphPath = new GraphPath(arrive.traverse(intermediate), false);
+
+        GraphPathToTripPlanConverter.generateItinerary(graphPath, false, locale);
     }
 
     /**
@@ -391,19 +452,19 @@ public class GraphPathToTripPlanConverterTest {
         BikeRentalStation exitDropoffStation = new BikeRentalStation();
 
         enterPickupStation.id = "Enter pickup";
-        enterPickupStation.name = "Enter pickup station";
+        enterPickupStation.name = new NonLocalizedString("Enter pickup station");
         enterPickupStation.x = 180;
         enterPickupStation.y = 90;
         exitPickupStation.id = "Exit pickup";
-        exitPickupStation.name = "Exit pickup station";
+        exitPickupStation.name = new NonLocalizedString("Exit pickup station");
         exitPickupStation.x = 180;
         exitPickupStation.y = 90;
         enterDropoffStation.id = "Enter dropoff";
-        enterDropoffStation.name = "Enter dropoff station";
+        enterDropoffStation.name = new NonLocalizedString("Enter dropoff station");
         enterDropoffStation.x = 0;
         enterDropoffStation.y = 90;
         exitDropoffStation.id = "Exit dropoff";
-        exitDropoffStation.name = "Exit dropoff station";
+        exitDropoffStation.name = new NonLocalizedString("Exit dropoff station");
         exitDropoffStation.x = 0;
         exitDropoffStation.y = 90;
 
@@ -936,7 +997,6 @@ public class GraphPathToTripPlanConverterTest {
             assertNull(legs[0].agencyName);
             assertNull(legs[0].agencyUrl);
             assertEquals(2, legs[0].agencyTimeZoneOffset);
-            assertNull(legs[0].notes);
             assertNull(legs[0].alerts);
             assertEquals("", legs[0].route);
             assertNull(legs[0].routeId);
@@ -974,7 +1034,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals("John Train", legs[1].agencyName);
         assertEquals("http://www.train.org/", legs[1].agencyUrl);
         assertEquals(2, legs[1].agencyTimeZoneOffset);
-        assertNull(legs[1].notes);
         assertNull(legs[1].alerts);
         assertEquals("A", legs[1].route);
         assertEquals("A", legs[1].routeId);
@@ -1022,7 +1081,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals("John Train", legs[2].agencyName);
         assertEquals("http://www.train.org/", legs[2].agencyUrl);
         assertEquals(2, legs[2].agencyTimeZoneOffset);
-        assertNull(legs[2].notes);
         assertNull(legs[2].alerts);
         assertEquals("B", legs[2].route);
         assertEquals("B", legs[2].routeId);
@@ -1057,7 +1115,6 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[3].agencyName);
         assertNull(legs[3].agencyUrl);
         assertEquals(2, legs[3].agencyTimeZoneOffset);
-        assertNull(legs[3].notes);
         assertNull(legs[3].alerts);
         assertEquals("", legs[3].route);
         assertNull(legs[3].routeId);
@@ -1097,10 +1154,8 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals("Brian Ferry", legs[4].agencyName);
         assertEquals("http://www.ferry.org/", legs[4].agencyUrl);
         assertEquals(2, legs[4].agencyTimeZoneOffset);
-        assertEquals(1, legs[4].notes.size());
-        assertEquals(alertsExample, legs[4].notes.get(0).text);
         assertEquals(1, legs[4].alerts.size());
-        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[4].alerts.get(0));
+        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[4].alerts.get(0).alert);
         assertEquals("C", legs[4].route);
         assertEquals("C", legs[4].routeId);
         assertEquals("C", legs[4].routeShortName);
@@ -1134,7 +1189,6 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[5].agencyName);
         assertNull(legs[5].agencyUrl);
         assertEquals(2, legs[5].agencyTimeZoneOffset);
-        assertNull(legs[5].notes);
         assertNull(legs[5].alerts);
         assertEquals("", legs[5].route);
         assertNull(legs[5].routeId);
@@ -1169,7 +1223,6 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[6].agencyName);
         assertNull(legs[6].agencyUrl);
         assertEquals(2, legs[6].agencyTimeZoneOffset);
-        assertNull(legs[6].notes);
         assertNull(legs[6].alerts);
         assertEquals("", legs[6].route);
         assertNull(legs[6].routeId);
@@ -1204,10 +1257,8 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[7].agencyName);
         assertNull(legs[7].agencyUrl);
         assertEquals(2, legs[7].agencyTimeZoneOffset);
-        assertEquals(1, legs[7].notes.size());
-        assertEquals(alertsExample, legs[7].notes.get(0).text);
         assertEquals(1, legs[7].alerts.size());
-        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[7].alerts.get(0));
+        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[7].alerts.get(0).alert);
         assertEquals("", legs[7].route);
         assertNull(legs[7].routeId);
         assertNull(legs[7].routeShortName);
@@ -1241,7 +1292,6 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[8].agencyName);
         assertNull(legs[8].agencyUrl);
         assertEquals(2, legs[8].agencyTimeZoneOffset);
-        assertNull(legs[8].notes);
         assertNull(legs[8].alerts);
         assertEquals("", legs[8].route);
         assertNull(legs[8].routeId);
@@ -1362,7 +1412,7 @@ public class GraphPathToTripPlanConverterTest {
          * the arctic regions. Of course, longitude becomes meaningless at the poles themselves, but
          * walking towards the pole, past it, and then back again will now yield correct results.
          */
-        assertEquals(alertsExample, steps[7][0].alerts.get(0).alertHeaderText.getSomeTranslation());
+        assertEquals(alertsExample, steps[7][0].alerts.get(0).getAlertHeaderText());
         assertEquals(AbsoluteDirection.SOUTH, steps[7][0].absoluteDirection);
         assertEquals(RelativeDirection.CONTINUE, steps[7][0].relativeDirection);
         assertEquals(SOUTH, steps[7][0].angle, EPSILON);
@@ -1428,7 +1478,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(2, places[8].length);
 
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals("Vertex 0", places[0][0].name);
             assertEquals(0, places[0][0].lon, 0.0);
             assertEquals(0, places[0][0].lat, 0.0);
             assertNull(places[0][0].stopIndex);
@@ -1629,7 +1678,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(53000L, places[6][0].arrival.getTimeInMillis());
         assertEquals(53000L, places[6][0].departure.getTimeInMillis());
 
-        assertEquals("Vertex 50", places[6][1].name);
         assertEquals(90, places[6][1].lon, 0.0);
         assertEquals(90, places[6][1].lat, 0.0);
         assertNull(places[6][1].stopIndex);
@@ -1641,7 +1689,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(55000L, places[6][1].arrival.getTimeInMillis());
         assertEquals(55000L, places[6][1].departure.getTimeInMillis());
 
-        assertEquals("Vertex 52", places[7][0].name);
         assertEquals(90, places[7][0].lon, 0.0);
         assertEquals(90, places[7][0].lat, 0.0);
         assertNull(places[7][0].stopIndex);
@@ -1677,7 +1724,6 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(57000L, places[8][0].arrival.getTimeInMillis());
         assertEquals(57000L, places[8][0].departure.getTimeInMillis());
 
-        assertEquals("Vertex 60", places[8][1].name);
         assertEquals(0, places[8][1].lon, 0.0);
         assertEquals(90, places[8][1].lat, 0.0);
         assertNull(places[8][1].stopIndex);

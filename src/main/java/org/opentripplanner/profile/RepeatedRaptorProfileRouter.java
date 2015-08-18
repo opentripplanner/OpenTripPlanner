@@ -1,5 +1,8 @@
 package org.opentripplanner.profile;
 
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Iterables;
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -8,6 +11,7 @@ import org.joda.time.DateTimeZone;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
+import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
@@ -24,9 +28,10 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.DayOfWeek;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Perform one-to-many profile routing using repeated RAPTOR searches. In this context, profile routing means finding
@@ -101,23 +106,31 @@ public class RepeatedRaptorProfileRouter {
     public void route () {
         long computationStartTime = System.currentTimeMillis();
         LOG.info("Begin profile request");
-        LOG.info("Finding initial stops");
 
-        TObjectIntMap<TransitStop> accessTimes = findInitialStops(false);
-
-        LOG.info("Found {} initial transit stops", accessTimes.size());
+        // assign indices for added transit stops
+        // note that they only need be unique in the context of this search.
+        // note also that there may be, before this search is over, vertices with higher indices (temp vertices)
+        // but they will not be transit stops.
+        if (request.scenario != null && request.scenario.modifications != null) {
+            for (AddTripPattern atp : Iterables
+                    .filter(request.scenario.modifications, AddTripPattern.class)) {
+                atp.materialize(graph);
+            }
+        }
 
         /** THIN WORKERS */
         LOG.info("Make data...");
-        TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date));
 
-        Set<String> bannedRoutes = request.bannedRoutes == null ? null : new HashSet<String>(request.bannedRoutes);
+        // convert from joda to java - ISO day of week with monday == 1
+        DayOfWeek dayOfWeek = DayOfWeek.of(request.date.getDayOfWeek());
+
+        TimeWindow window = new TimeWindow(request.fromTime, request.toTime + RaptorWorker.MAX_DURATION, graph.index.servicesRunning(request.date), dayOfWeek);
 
         RaptorWorkerData raptorWorkerData;
         if (sampleSet == null)
-            raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes);
+            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario);
         else
-            raptorWorkerData = new RaptorWorkerData(graph, window, bannedRoutes, sampleSet);
+            raptorWorkerData = new RaptorWorkerData(graph, window, request.scenario, sampleSet);
         LOG.info("Done.");
         // TEST SERIALIZED SIZE and SPEED
         //        try {
@@ -129,9 +142,15 @@ public class RepeatedRaptorProfileRouter {
         //        } catch(IOException i) {
         //            i.printStackTrace();
         //        }
+        
+        LOG.info("Finding initial stops");
+
+        TIntIntMap accessTimes = findInitialStops(false, raptorWorkerData);
+
+        LOG.info("Found {} initial transit stops", accessTimes.size());
 
         int[] timesAtVertices = new int[Vertex.getMaxIndex()];
-        Arrays.fill(timesAtVertices, TimeSurface.UNREACHABLE);
+        Arrays.fill(timesAtVertices, Integer.MAX_VALUE);
 
         for (State state : walkOnlySpt.getAllStates()) {
             // Note that we are using the walk distance divided by speed here in order to be consistent with the
@@ -141,7 +160,7 @@ public class RepeatedRaptorProfileRouter {
             int otime = timesAtVertices[vidx];
 
             // There may be dominated states in the SPT. Make sure we don't include them here.
-            if (otime == TimeSurface.UNREACHABLE || otime > time)
+            if (otime > time)
                 timesAtVertices[vidx] = time;
 
         }
@@ -170,13 +189,12 @@ public class RepeatedRaptorProfileRouter {
         LOG.info("Profile request finished in {} seconds", (System.currentTimeMillis() - computationStartTime) / 1000.0);
     }
 
-    /** find the boarding stops */
-    private TObjectIntMap<TransitStop> findInitialStops(boolean dest) {
+    private TIntIntMap findInitialStops (boolean dest, RaptorWorkerData data) {
         double lat = dest ? request.toLat : request.fromLat;
         double lon = dest ? request.toLon : request.fromLon;
-        QualifiedModeSet modes = dest ? request.accessModes : request.egressModes;
+        QualifiedModeSet modes = dest ? request.egressModes : request.accessModes;
 
-        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
+        RoutingRequest rr = new RoutingRequest(modes);
         rr.batch = true;
         rr.from = new GenericLocation(lat, lon);
         //rr.walkSpeed = request.walkSpeed;
@@ -186,39 +204,49 @@ public class RepeatedRaptorProfileRouter {
         rr.dateTime = request.date.toDateMidnight(DateTimeZone.forTimeZone(graph.getTimeZone())).getMillis() / 1000 +
                 request.fromTime;
 
-        // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
-        // which is implemented this way because walk times can change when walk speed changes. Also, walk times are floating
-        // point and can change slightly when streets are split. Street lengths are internally fixed-point ints, which do not
-        // suffer from roundoff. Great care is taken when splitting to preserve sums.
-        rr.maxWalkDistance = 2000;
-        rr.softWalkLimiting = false;
-        rr.dominanceFunction = new DominanceFunction.LeastWalk();
-
-        AStar astar = new AStar();
-        rr.longDistance = true;
-        rr.setNumItineraries(1);
-
-        ShortestPathTree spt = astar.getShortestPathTree(rr, 5); // timeout in seconds
-
-        TObjectIntMap<TransitStop> accessTimes = new TObjectIntHashMap<TransitStop>(); 
-
-        for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
-            State s = spt.getState(tstop);
-            if (s != null) {
-                // note that we calculate the time based on the walk speed here rather than
-                // based on the time. this matches what we do in the stop tree cache.
-                accessTimes.put(tstop, (int) (s.getWalkDistance() / request.walkSpeed));
-            }
+        if (rr.modes.contains(TraverseMode.BICYCLE)) {
+            rr.dominanceFunction = new DominanceFunction.EarliestArrival();
+            rr.worstTime = rr.dateTime + request.maxBikeTime * 60;
+        } else {
+            // We use walk-distance limiting and a least-walk dominance function in order to be consistent with egress walking
+            // which is implemented this way because walk times can change when walk speed changes. Also, walk times are floating
+            // point and can change slightly when streets are split. Street lengths are internally fixed-point ints, which do not
+            // suffer from roundoff. Great care is taken when splitting to preserve sums.
+            // When cycling, this is not an issue; we already have an explicitly asymmetrical search (cycling at the origin, walking at the destination),
+            // so we need not preserve symmetry.
+            rr.maxWalkDistance = 2000;
+            rr.softWalkLimiting = false;
+            rr.dominanceFunction = new DominanceFunction.LeastWalk();
         }
 
-        this.walkOnlySpt = spt;
+        rr.numItineraries = 1;
+        rr.longDistance = true;
 
-        rr.cleanup();
-        return accessTimes;
+        // make a list of the stops
+        Collection<AddTripPattern.TemporaryStop> stops;
+        if (request.scenario != null && request.scenario.modifications != null) {
+            stops = Lists.newArrayList();
+
+            for (AddTripPattern atp : Iterables.filter(request.scenario.modifications, AddTripPattern.class)) {
+                for (AddTripPattern.TemporaryStop tstop : atp.temporaryStops) {
+                    stops.add(tstop);
+                }
+            }
+        }
+        else {
+            stops = Collections.emptyList();
+        }
+
+        AStar aStar = new AStar();
+        walkOnlySpt = aStar.getShortestPathTree(rr, 5);
+
+        return data.findStopsNear(walkOnlySpt, graph);
     }
 
-    /** Make a result set range set, optionally including times */
-    public ResultSet.RangeSet makeResults (boolean includeTimes) {
-        return propagatedTimesStore.makeResults(sampleSet, includeTimes);
+    /**
+     * Make a result set range set, optionally including times
+     */
+    public ResultSet.RangeSet makeResults (boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
+        return propagatedTimesStore.makeResults(sampleSet, includeTimes, includeHistograms, includeIsochrones);
     }
 }

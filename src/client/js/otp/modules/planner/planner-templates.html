@@ -6,17 +6,17 @@
             <div class="otp-itin-alert-header">
                 <div class="otp-itin-alert-toggleButton">&#x25BC;</div>
 
-                {{#alert.alertUrl.someTranslation}}<a href="{{alert.alertUrl.someTranslation}}" target="_blank">{{/alert.alertUrl.someTranslation}}
+                {{#alert.alertUrl}}<a href="{{alert.alertUrl}}" target="_blank">{{/alert.alertUrl}}
                 Alert for Route {{leg.route}}
-                {{#alert.alertUrl.someTranslation}}</a>{{/alert.alertUrl.someTranslation}}
+                {{#alert.alertUrl}}</a>{{/alert.alertUrl}}
 
-                {{#alert.alertHeaderText.someTranslation}}: {{alert.alertHeaderText.someTranslation}}{{/alert.alertHeaderText.someTranslation}}
+                {{#alert.alertHeaderText}}: {{alert.alertHeaderText}}{{/alert.alertHeaderText}}
                 
             </div>
             
-            {{#alert.alertDescriptionText.someTranslation}}
-                <div class="otp-itin-alert-description">{{alert.alertDescriptionText.someTranslation}}</div>
-            {{/alert.alertDescriptionText.someTranslation}}
+            {{#alert.alertDescriptionText}}
+                <div class="otp-itin-alert-description">{{alert.alertDescriptionText}}</div>
+            {{/alert.alertDescriptionText}}
         </div>
     </div>
 </script>
