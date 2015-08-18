@@ -1,7 +1,5 @@
 package org.opentripplanner.profile;
 
-import com.beust.jcommander.internal.Lists;
-import com.google.common.cache.Cache;
 import com.google.common.collect.Iterables;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
@@ -32,8 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Perform one-to-many profile routing using repeated RAPTOR searches. In this context, profile routing means finding
@@ -185,7 +181,8 @@ public class RepeatedRaptorProfileRouter {
             propagatedTimesStore = new PropagatedTimesStore(graph, nonTransitTimes.length);
             int[][] singleRoundResults = new int[1][];
             singleRoundResults[0] = nonTransitTimes;
-            propagatedTimesStore.setFromArray(singleRoundResults);
+            propagatedTimesStore.setFromArray(singleRoundResults,
+                    PropagatedTimesStore.ConfidenceCalculationMethod.MIN_MAX);
         }
         for (int min : propagatedTimesStore.mins) {
             if (min != RaptorWorker.UNREACHED) ts.targetsReached++;
