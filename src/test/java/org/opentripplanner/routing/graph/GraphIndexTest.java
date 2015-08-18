@@ -114,17 +114,18 @@ public class GraphIndexTest extends GtfsTest {
     public void testGraphQLNested() {
         String query =
                 "query Agency{\n" +
+                        "    viewer {" +
                         "    agency(id: \"agency\"){\n" +
                         "        name\n" +
                         "        routes{\n" +
                         "            shortName" +
                         "        }" +
-                        "    }\n" +
+                        "    }}\n" +
                         "}\n";
 
         ExecutionResult result = graph.index.graphQL.execute(query);
         assertTrue(result.getErrors().isEmpty());
-        assertEquals(18, ((List) ((Map) result.getData().get("agency")).get("routes")).size());
+        assertEquals(18, ((List) ((Map) ((Map) result.getData().get("viewer")).get("agency")).get("routes")).size());
 
     }
 

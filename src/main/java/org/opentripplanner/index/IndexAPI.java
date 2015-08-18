@@ -20,7 +20,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import graphql.ExecutionResult;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -70,6 +69,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
@@ -571,21 +571,30 @@ public class IndexAPI {
 
     @POST
     @Path("/graphql")
-    @Consumes(MediaType.TEXT_PLAIN)
-    public Response getGraphQL (String query) {
-        ExecutionResult result;
-        if (uriInfo.getQueryParameters().isEmpty()) {
-            result = index.graphQL.execute(query);
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getGraphQL (HashMap<String, Object> query) {
+        Map<String, Object> variables;
+        if (query.get("variables") instanceof Map) {
+            variables = (Map) query.get("variables");
         } else {
-            result = index.graphQL.execute(query, null, null, new HashMap<>(uriInfo.getQueryParameters()));
+            variables = new HashMap<>();
         }
-        if (result.getErrors().isEmpty()) {
-            return Response.status(Status.OK).entity(result.getData()).build();
-        } else {
-            return Response.status(Status.BAD_REQUEST).entity(result.getErrors()).build();
-        }
+        return index.getGraphQLResponse((String) query.get("query"), variables);
     }
 
+    @POST
+    @Path("/graphql")
+    @Consumes("application/graphql")
+    public Response getGraphQL (String query) {
+        return index.getGraphQLResponse(query, new HashMap<>());
+    }
+
+//    @GET
+//    @Path("/graphql")
+//    public Response getGraphQL (@QueryParam("query") String query,
+//                                @QueryParam("variables") HashMap<String, Object> variables) {
+//        return index.getGraphQLResponse(query, variables == null ? new HashMap<>() : variables);
+//    }
 
     /** Represents a transfer from a stop */
     private static class Transfer {

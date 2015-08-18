@@ -704,7 +704,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>2015-08-16T21-37-10</version>
+            <version>2015-09-06T17-27-38</version>
         </dependency>
 
         <!-- Support for OTP scripting -->

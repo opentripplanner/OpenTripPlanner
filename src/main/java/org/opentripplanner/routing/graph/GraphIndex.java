@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import graphql.ExecutionResult;
 import graphql.GraphQL;
 import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
@@ -41,9 +42,11 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -510,4 +513,17 @@ public class GraphIndex {
 //        }
     }
 
+    public Response getGraphQLResponse(String query, Map<String, Object> variables) {
+        ExecutionResult executionResult = graphQL.execute(query, null, null, variables);
+        Response.ResponseBuilder res = Response.status(Response.Status.OK);
+        HashMap<String, Object> content = new HashMap<>();
+        if (!executionResult.getErrors().isEmpty()) {
+            res = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
+            content.put("errors", executionResult.getErrors());
+        }
+        if (executionResult.getData() != null && !executionResult.getData().isEmpty()) {
+            content.put("data", executionResult.getData());
+        }
+        return res.entity(content).build();
+    }
 }

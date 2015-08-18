@@ -3,8 +3,11 @@ package org.opentripplanner.index;
 import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 import graphql.Scalars;
 import graphql.relay.Relay;
+import graphql.relay.SimpleListConnection;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
@@ -16,7 +19,6 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import graphql.schema.TypeResolver;
-import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -32,11 +34,10 @@ import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class IndexGraphQLSchema {
@@ -56,24 +57,14 @@ public class IndexGraphQLSchema {
         .value("NOT_POSSIBLE", 2, "Wheelchair boarding is not possible at this stop.")
         .build();
 
-    public static GraphQLEnumType routeTypeEnum = GraphQLEnumType.newEnum()
-        .name("TransportationType")
-        .value("TRAM", 0, "Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.")
-        .value("SUBWAY", 1, "Subway, Metro. Any underground rail system within a metropolitan area.")
-        .value("RAIL", 2, "Rail. Used for intercity or long-distance travel.")
-        .value("BUS", 3, "Bus. Used for short- and long-distance bus routes.")
-        .value("FERRY", 4, "Ferry. Used for short- and long-distance boat service.")
-        .value("CABLE_CAR", 5, "Cable car. Used for street-level cable cars where the cable runs beneath the car.")
-        .value("GONDOLA", 6, "Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.")
-        .value("FUNICULAR", 7, "Funicular. Any rail system designed for steep inclines.")
-        .build();
-
     public static GraphQLEnumType bikesAllowedEnum = GraphQLEnumType.newEnum()
         .name("BikesAllowed")
         .value("NO_INFORMATION", 0, "There is no bike information for the trip.")
         .value("ALLOWED", 1, "The vehicle being used on this particular trip can accommodate at least one bicycle.")
         .value("NOT_ALLOWED", 2, "No bicycles are allowed on this trip.")
         .build();
+
+    private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public GraphQLOutputType agencyType = new GraphQLTypeReference("Agency");
 
@@ -124,6 +115,8 @@ public class IndexGraphQLSchema {
     });
 
     public IndexGraphQLSchema(GraphIndex index) {
+
+        fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
 
         stopAtDistanceType = GraphQLObjectType.newObject()
             .name("stopAtDistance")
@@ -259,7 +252,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("vehicleType")
-                .type(routeTypeEnum)
+                .type(Scalars.GraphQLInt)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("platformCode")
@@ -366,11 +359,11 @@ public class IndexGraphQLSchema {
                         Long.parseLong(environment.getArgument("startTime")),
                         (int) environment.getArgument("timeRange"),
                         (int) environment.getArgument("numberOfDepartures"))
-                        .stream()
-                        .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
-                        .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
-                        .limit((long) (int) environment.getArgument("numberOfDepartures"))
-                        .collect(Collectors.toList()))
+                    .stream()
+                    .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
+                    .sorted(Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture))
+                    .limit((long) (int) environment.getArgument("numberOfDepartures"))
+                    .collect(Collectors.toList()))
                 .build())
             .build();
 
@@ -429,9 +422,8 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("serviceDay")
-                .type(Scalars.GraphQLString)
-                .dataFetcher(environment -> new LocalDate(
-                    (((TripTimeShort) environment.getSource()).serviceDay) * 1000).toString())
+                .type(Scalars.GraphQLLong)
+                .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).serviceDay)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trip")
@@ -567,7 +559,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("headsign")
-                .type(new GraphQLNonNull(Scalars.GraphQLString))
+                .type(Scalars.GraphQLString)
                 .dataFetcher(environment -> ((TripPattern) environment.getSource()).getDirection())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -576,7 +568,33 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
-                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopType))))
+                .type(new GraphQLList(new GraphQLNonNull(stopType)))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("geometry")
+                .type(new GraphQLList(GraphQLObjectType.newObject()
+                    .name("coordinates")
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("lat")
+                        .type(Scalars.GraphQLFloat)
+                        .dataFetcher(
+                            environment -> (float) ((Coordinate) environment.getSource()).y)
+                        .build())
+                    .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("lon")
+                        .type(Scalars.GraphQLFloat)
+                        .dataFetcher(
+                            environment -> (float) ((Coordinate) environment.getSource()).x)
+                        .build())
+                    .build()))
+                .dataFetcher(environment -> {
+                    LineString geometry = ((TripPattern) environment.getSource()).geometry;
+                    if (geometry == null) {
+                        return null;
+                    } else {
+                        return Arrays.asList(geometry.getCoordinates());
+                    }
+                })
                 .build())
                 // TODO: add stoptimes
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -618,7 +636,9 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("type")
-                .type(routeTypeEnum)
+                .type(Scalars.GraphQLString)
+                .dataFetcher(environment -> GtfsLibrary.getTraverseMode(
+                    (Route) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("desc")
@@ -724,22 +744,22 @@ public class IndexGraphQLSchema {
             .name("QueryType")
             .field(relay.nodeField(nodeInterface, environment -> {
                 Relay.ResolvedGlobalId id = relay.fromGlobalId(environment.getArgument("id"));
-                if (id.type.equals(clusterType.getName())){
+                if (id.type.equals(clusterType.getName())) {
                     return index.stopClusterForId.get(id.id);
                 }
-                if (id.type.equals(stopType.getName())){
+                if (id.type.equals(stopType.getName())) {
                     return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
                 }
-                if (id.type.equals(tripType.getName())){
+                if (id.type.equals(tripType.getName())) {
                     return index.tripForId.get(GtfsLibrary.convertIdFromString(id.id));
                 }
-                if (id.type.equals(routeType.getName())){
+                if (id.type.equals(routeType.getName())) {
                     return index.routeForId.get(GtfsLibrary.convertIdFromString(id.id));
                 }
-                if (id.type.equals(patternType.getName())){
+                if (id.type.equals(patternType.getName())) {
                     return index.patternForId.get(id.id);
                 }
-                if (id.type.equals(agencyType.getName())){
+                if (id.type.equals(agencyType.getName())) {
                     return index.agencyForId.get(id.id);
                 }
                 return null;
@@ -787,6 +807,10 @@ public class IndexGraphQLSchema {
                     .name("maxLon")
                     .type(Scalars.GraphQLFloat)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("agency")
+                    .type(Scalars.GraphQLString)
+                    .build())
                 .dataFetcher(environment -> index.graph.streetIndex
                     .getTransitStopForEnvelope(new Envelope(
                         new Coordinate((double) (float) environment.getArgument("minLon"),
@@ -795,13 +819,17 @@ public class IndexGraphQLSchema {
                             (double) (float) environment.getArgument("maxLat"))))
                     .stream()
                     .map(TransitVertex::getStop)
+                    .filter(stop -> environment.getArgument("agency") == null || stop.getId()
+                        .getAgencyId().equalsIgnoreCase(environment.getArgument("agency")))
                     .collect(Collectors.toList()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stopsByRadius")
                 .description(
                     "Get all stops within the specified radius from a location. The returned type has two fields stop and distance")
-                .type(new GraphQLList(stopAtDistanceType)) // Expects a TransitVertex object
+                .type(relay.connectionType("stopAtDistance",
+                    relay.edgeType("stopAtDistance", stopAtDistanceType, null, new ArrayList<>()),
+                    new ArrayList<>()))
                 .argument(GraphQLArgument.newArgument()
                     .name("lat")
                     .description("Latitude of the location")
@@ -817,20 +845,30 @@ public class IndexGraphQLSchema {
                     .description("Radius (in meters) to search for from the specidied location")
                     .type(Scalars.GraphQLFloat)
                     .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("agency")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .argument(relay.getConnectionFieldArguments())
                 .dataFetcher(environment -> {
                     Coordinate coordinate = new Coordinate(
                         (double) (float) environment.getArgument("lon"),
                         (double) (float) environment.getArgument("lat"));
-                    return index.graph.streetIndex
+                    return new SimpleListConnection(index.graph.streetIndex
                         .getNearbyTransitStops(coordinate,
                             (double) (float) environment.getArgument("radius"))
                         .stream()
+                        .filter(vertex -> environment.getArgument("agency") == null || vertex
+                            .getStop().getId().getAgencyId()
+                            .equalsIgnoreCase(environment.getArgument("agency")))
                         .map(vertex -> new ImmutableMap.Builder<String, Object>()
                             .put("stop", vertex.getStop())
                             .put("distance", (float) SphericalDistanceLibrary
                                 .fastDistance(vertex.getCoordinate(), coordinate))
                             .build())
-                        .collect(Collectors.toList());
+                        .sorted(Comparator.comparing(s -> (float) s.get("distance")))
+                        .collect(Collectors.toList()))
+                        .get(environment);
                 })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -848,7 +886,20 @@ public class IndexGraphQLSchema {
                 .name("routes")
                 .description("Get all routes for the specified graph")
                 .type(new GraphQLList(routeType))
-                .dataFetcher(environment -> new ArrayList<>(index.routeForId.values()))
+                .argument(GraphQLArgument.newArgument()
+                    .name("ids")
+                    .type(new GraphQLList(Scalars.GraphQLString))
+                    .build())
+                .dataFetcher(environment -> {
+                    if (!(environment.getArgument("ids") instanceof List)) {
+                        return new ArrayList<>(index.routeForId.values());
+                    } else {
+                        return ((List<String>) environment.getArgument("ids"))
+                            .stream()
+                            .map(id -> index.routeForId.get(GtfsLibrary.convertIdFromString(id)))
+                            .collect(Collectors.toList());
+                    }
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("route")
@@ -877,6 +928,39 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(environment -> index.tripForId
                     .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("fuzzyTrip")
+                .type(tripType)
+                .argument(GraphQLArgument.newArgument()
+                    .name("route")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("direction")
+                    .type(Scalars.GraphQLInt)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("date")
+                    .type(Scalars.GraphQLString)
+                    .build())
+                .argument(GraphQLArgument.newArgument()
+                    .name("time")
+                    .type(Scalars.GraphQLInt)
+                    .build())
+                .dataFetcher(environment -> {
+                    try {
+                        return fuzzyTripMatcher.getTrip(
+                            index.routeForId.get(
+                                GtfsLibrary.convertIdFromString(environment.getArgument("route"))),
+                            environment.getArgument("direction"),
+                            environment.getArgument("time"),
+                            ServiceDate.parseString(environment.getArgument("date"))
+                        );
+                    } catch (ParseException e) {
+                        return null; // Invalid date format
+                    }
+                })
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("patterns")
@@ -911,11 +995,17 @@ public class IndexGraphQLSchema {
                 .dataFetcher(
                     environment -> index.stopClusterForId.get(environment.getArgument("id")))
                 .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("viewer")
+                .description(
+                    "Needed until https://github.com/facebook/relay/issues/112 is resolved")
+                .type(new GraphQLTypeReference("QueryType"))
+                .dataFetcher(DataFetchingEnvironment::getParentType)
+                .build())
             .build();
 
         indexSchema = GraphQLSchema.newSchema()
             .query(queryType)
-            .mutation(GraphQLObjectType.newObject().name("MutationType").build()) //Empty mutation type
             .build();
     }
 }
