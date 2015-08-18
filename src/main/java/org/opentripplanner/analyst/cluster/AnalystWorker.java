@@ -399,6 +399,7 @@ public class AnalystWorker implements Runnable {
                     // Currently we are building the isochrones from the times at street vertices rather
                     // than the times at the targets. We should ideally make a grid of targets that exactly coincides
                     // with the accumulator grid used to build the isochrones.
+                    // This ResultSet constructor creates isochrones, as no targets are supplied.
                     envelope.worstCase = new ResultSet(router.timeSurfaceRangeSet.max);
                     envelope.bestCase = new ResultSet(router.timeSurfaceRangeSet.min);
                     envelope.avgCase = new ResultSet(router.timeSurfaceRangeSet.avg);

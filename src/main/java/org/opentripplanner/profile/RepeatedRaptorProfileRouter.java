@@ -155,7 +155,8 @@ public class RepeatedRaptorProfileRouter {
         for (State state : preTransitSpt.getAllStates()) {
             // Note that we are using the walk distance divided by speed here in order to be consistent with the
             // least-walk optimization in the initial stop search (and the stop tree cache which is used at egress)
-            int time = (int) (state.getWalkDistance() / request.walkSpeed);
+            // TODO consider why this matters, I'm using reported travel time from the states
+            int time = (int) state.getElapsedTimeSeconds();
             int vidx = state.getVertex().getIndex();
             int otime = nonTransitTimes[vidx];
             // There may be dominated states in the SPT. Make sure we don't include them here.
@@ -228,10 +229,11 @@ public class RepeatedRaptorProfileRouter {
         rr.walkSpeed = request.walkSpeed;
         rr.bikeSpeed = request.bikeSpeed;
 
-        rr.modes.setWalk(true);
+        //rr.modes.setWalk(true);
 
         if (data == null) {
-            // Non-transit mode (should really use directModes)
+            // Non-transit mode. Search out to the full 120 minutes.
+            // Should really use directModes.
             rr.worstTime = rr.dateTime + 120 * 60;
             rr.dominanceFunction = new DominanceFunction.EarliestArrival();
         } else {
