@@ -689,7 +689,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.10.10</version>
+            <version>1.9.40</version>
         </dependency>
         <!--
             Scripting language dependencies such as Groovy and Jython can double the size of the OTP JAR.
