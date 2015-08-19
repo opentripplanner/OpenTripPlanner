@@ -11,6 +11,8 @@ import java.util.Collection;
  * Adjust the dwell times on matched trips.
  */
 public class AdjustDwellTime extends TripFilter {
+    public static final long serialVersionUID = 1L;
+
     /** Stops for which to set the dwell time */
     public Collection<String> stopId;
 

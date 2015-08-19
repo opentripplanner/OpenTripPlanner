@@ -28,8 +28,10 @@ public class SQSTaskStatisticsStore implements TaskStatisticsStore {
     public SQSTaskStatisticsStore(String queueName) {
         Region current = Regions.getCurrentRegion();
 
-        if (current != null)
-            sqs.setRegion(current);
+        if (current != null) {
+            LOG.info("Assuming statistics queue is in region {}", current);
+            sqs.setEndpoint("sqs." + current.toString() + ".amazonaws.com");
+        }
 
         try {
             queueUrl = sqs.getQueueUrl(queueName).getQueueUrl();

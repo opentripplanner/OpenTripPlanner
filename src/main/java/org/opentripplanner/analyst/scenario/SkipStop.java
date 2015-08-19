@@ -26,6 +26,8 @@ import java.util.List;
  * If stops are skipped at the start of a trip, the start of the trip is simply removed; the remaining times are not shifted.
  */
 public class SkipStop extends TripPatternFilter {
+    public static final long serialVersionUID = 1L;
+
     private static final Logger LOG = LoggerFactory.getLogger(SkipStop.class);
 
     /** Stops to skip. Note that setting this to null as a wildcard is not supported, obviously */
