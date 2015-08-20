@@ -82,7 +82,7 @@ public class ProfileRequest implements Serializable, Cloneable {
     public boolean analyst = false;
 
     /** What assumption should be used when boarding frequency vehicles? */
-    public RaptorWorkerTimetable.BoardingAssumption boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.WORST_CASE;
+    public RaptorWorkerTimetable.BoardingAssumption boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.RANDOM;
 
     /* The relative importance of different factors when biking */
     /** The relative importance of maximizing safety when cycling */

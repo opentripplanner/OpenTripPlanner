@@ -4,6 +4,9 @@ import com.google.common.base.Strings;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import org.apache.commons.math3.random.MersenneTwister;
+
+import java.util.stream.IntStream;
 
 /**
  * For design and debugging purposes, a simple class that tracks the frequency of different numbers.
@@ -83,7 +86,7 @@ public class Histogram {
         for (int i = 0; i < 30; i++) {
             StringBuilder row = new StringBuilder(maxBin - minBin + 1);
 
-            int minValToDisplayThisRow = (int) (i / vscale);
+            int minValToDisplayThisRow = (int) ((30 - i) / vscale);
             for (int j = minBin; j <= maxBin; j++) {
                 if (bins.get(j) > minValToDisplayThisRow)
                     row.append('#');
@@ -111,7 +114,7 @@ public class Histogram {
         String start = new Integer(minBin).toString();
         row.replace(0, start.length(), start);
         String end = new Integer(maxBin).toString();
-        row.replace(row.length() - end.length(), end.length(), end);
+        row.replace(row.length() - end.length(), row.length(), end);
         System.out.println(row);
     }
 
@@ -124,5 +127,17 @@ public class Histogram {
         }
 
         return (int) (sum / count);
+    }
+
+    public static void main (String... args) {
+        System.out.println("Testing histogram store with normal distribution, mean 0");
+        Histogram h = new Histogram("Normal");
+
+        MersenneTwister mt = new MersenneTwister();
+
+        IntStream.range(0, 1000000).map(i -> (int) Math.round(mt.nextGaussian() * 20 + 2.5)).forEach(h::add);
+
+        h.displayHorizontal();
+        System.out.println("mean: " + h.mean());
     }
 }
