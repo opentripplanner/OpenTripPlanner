@@ -315,6 +315,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
                 new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
             }
+            if (n > 1) {
+                graph.hasBikeSharing = true;
+            }
             LOG.info("Created " + n + " bike rental stations.");
         }
 
@@ -351,6 +354,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     buildBikeParkAndRideForArea(area);
                     n++;
                 }
+            }
+            if (n > 0) {
+                graph.hasBikeRide = true;
             }
             LOG.info("Created {} bike P+R areas.", n);
         }
@@ -411,6 +417,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             for (AreaGroup group : areaGroups) {
                 if (buildParkAndRideAreasForGroup(group))
                     n++;
+            }
+            if (n > 0) {
+                graph.hasParkRide = true;
             }
             LOG.info("Created {} P+R.", n);
         }

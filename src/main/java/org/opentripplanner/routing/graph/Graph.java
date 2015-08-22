@@ -158,6 +158,12 @@ public class Graph implements Serializable {
     /** List of transit modes that are availible in GTFS data used in this graph**/
     private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
 
+    public boolean hasBikeSharing = false;
+
+    public boolean hasParkRide = false;
+
+    public boolean hasBikeRide = false;
+
     /**
      * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
      * graph updaters defined in the configuration.

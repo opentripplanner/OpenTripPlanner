@@ -18,6 +18,7 @@ import com.conveyal.geojson.GeometrySerializer;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -30,12 +31,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.TravelOption;
+import org.opentripplanner.util.TravelOptionsMaker;
 import org.opentripplanner.util.WorldEnvelope;
 
 @XmlRootElement(name = "RouterInfo")
 public class RouterInfo {
+
+    private final BikeRentalStationService service;
 
     @XmlElement
     public String routerId;
@@ -56,6 +62,10 @@ public class RouterInfo {
 
     public double centerLongitude;
 
+    public boolean hasParkRide;
+
+    public List<TravelOption> travelOptions;
+
 
     public RouterInfo(String routerId, Graph graph) {
         this.routerId = routerId;
@@ -64,6 +74,26 @@ public class RouterInfo {
         this.transitModes = graph.getTransitModes();
         this.envelope = graph.getEnvelope();
         addCenter(graph.getCenter());
+        service = graph.getService(BikeRentalStationService.class, false);
+        hasParkRide = graph.hasParkRide;
+        travelOptions = TravelOptionsMaker.makeOptions(graph);
+    }
+
+    public boolean getHasBikeSharing() {
+        if (service == null) {
+            return false;
+        }
+
+        //at least 2 bike sharing stations are needed for useful bike sharing
+        return service.getBikeRentalStations().size() > 1;
+    }
+
+    public boolean getHasBikePark() {
+        if (service == null) {
+            return false;
+        }
+
+        return !service.getBikeParks().isEmpty();
     }
 
     /**
