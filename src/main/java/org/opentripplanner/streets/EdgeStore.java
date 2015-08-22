@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Column store might be better because 1. it is less fancy 2. it is auto-resizing (not fixed size).
+ * Column store is better than struct simulation because 1. it is less fancy, 2. it is auto-resizing (not fixed size),
+ * 3. I've tried both and they're the same speed.
  *
  * Edges come in pairs that have the same origin and destination vertices and the same geometries, but reversed.
  * Therefore many of the arrays are only half as big as the number of edges. All even numbered edges are forward, all
@@ -20,6 +21,13 @@ import java.util.List;
  * Typically, somewhat more than half of street segment edges have intermediate points (other than the two intersection
  * endpoints). Therefore it's more efficient to add a complete dense column for the intermediate point arrays, instead
  * of using a sparse hashmap to store values only for edges with intermediate points.
+ *
+ * For geometry storage I tried several methods. Full Netherlands load in 4GB of heap:
+ * Build time is around 8 minutes. 2.5-3GB was actually in use.
+ * List of int arrays: 246MB serialized, 5.2 sec write, 6.3 sec read.
+ * List of int arrays, full lists (not only intermediates): 261MB, 6.1 sec write, 6.2 sec read.
+ * Indexes into single contiguous int array: 259MB, 5 sec write, 7.5 sec read.
+ * Currently I am using the first option as it is both readable and efficient.
  */
 public class EdgeStore implements Serializable {
 
