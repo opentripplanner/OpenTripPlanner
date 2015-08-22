@@ -13,15 +13,14 @@
 
 package org.opentripplanner.util;
 
-import static org.junit.Assert.assertEquals;
-
-
 import org.junit.Test;
 import org.opentripplanner.routing.core.TraverseMode;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by mabu on 28.7.2015.
@@ -39,7 +38,7 @@ public class TravelOptionsMakerTest {
 
         List<TravelOption> options = TravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
 
-        List<TravelOption> expected = new ArrayList<>();
+        Set<TravelOption> expected = new HashSet<>();
         expected.add(new TravelOption("TRANSIT,WALK", "TRANSIT"));
         expected.add(new TravelOption("BUS,WALK", "BUS"));
         expected.add(new TravelOption("WALK", "WALK"));
@@ -47,14 +46,14 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("CAR", "CAR"));
         expected.add(new TravelOption("TRANSIT,BICYCLE", "TRANSIT_BICYCLE"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
-        assertEquals(expected, options);
+        assertEquals(expected, new HashSet<>(options));
 
         transitModes.add(TraverseMode.RAIL);
 
         hasBikeRide = true;
 
         options = TravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
-        expected = new ArrayList<>();
+        expected = new HashSet<>();
         expected.add(new TravelOption("TRANSIT,WALK", "TRANSIT"));
         expected.add(new TravelOption("BUS,WALK", "BUS"));
         expected.add(new TravelOption("RAIL,WALK", "RAIL"));
@@ -65,14 +64,14 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("BICYCLE_PARK,WALK,TRANSIT", "BIKERIDE"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
 
-        assertEquals(expected, options);
+        assertEquals(expected, new HashSet<>(options));
 
         hasBikeRide = false;
 
         hasBikeShare = true;
 
         options = TravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
-        expected = new ArrayList<>();
+        expected = new HashSet<>();
         expected.add(new TravelOption("TRANSIT,WALK", "TRANSIT"));
         expected.add(new TravelOption("BUS,WALK", "BUS"));
         expected.add(new TravelOption("RAIL,WALK", "RAIL"));
@@ -84,13 +83,13 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("TRANSIT,WALK,BICYCLE_RENT", "TRANSIT_BICYCLERENT"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
 
-        assertEquals(expected, options);
+        assertEquals(expected, new HashSet<>(options));
 
         hasBikeShare = false;
         hasParkRide = true;
 
         options = TravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
-        expected = new ArrayList<>();
+        expected = new HashSet<>();
         expected.add(new TravelOption("TRANSIT,WALK", "TRANSIT"));
         expected.add(new TravelOption("BUS,WALK", "BUS"));
         expected.add(new TravelOption("RAIL,WALK", "RAIL"));
@@ -101,14 +100,14 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("CAR_PARK,WALK,TRANSIT", "PARKRIDE"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
 
-        assertEquals(expected, options);
+        assertEquals(expected, new HashSet<>(options));
 
         hasBikeShare = true;
         hasParkRide = true;
         hasBikeRide = true;
 
         options = TravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
-        expected = new ArrayList<>();
+        expected = new HashSet<>();
         expected.add(new TravelOption("TRANSIT,WALK", "TRANSIT"));
         expected.add(new TravelOption("BUS,WALK", "BUS"));
         expected.add(new TravelOption("RAIL,WALK", "RAIL"));
@@ -122,31 +121,30 @@ public class TravelOptionsMakerTest {
         expected.add(new TravelOption("BICYCLE_PARK,WALK,TRANSIT", "BIKERIDE"));
         expected.add(new TravelOption("CAR,WALK,TRANSIT", "KISSRIDE"));
 
-        assertEquals(expected, options);
+        assertEquals(expected, new HashSet<>(options));
 
         transitModes = new HashSet<>();
 
         options = TravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
-        expected = new ArrayList<>();
+        expected = new HashSet<>();
         expected.add(new TravelOption("WALK", "WALK"));
         expected.add(new TravelOption("BICYCLE", "BICYCLE"));
         expected.add(new TravelOption("CAR", "CAR"));
         expected.add(new TravelOption("WALK,BICYCLE_RENT", "BICYCLERENT"));
 
-        assertEquals(expected, options);
+        assertEquals(expected, new HashSet<>(options));
 
         hasBikeRide = false;
         hasParkRide = false;
         hasBikeShare = false;
 
         options = TravelOptionsMaker.makeOptions(transitModes, hasBikeShare, hasBikeRide, hasParkRide);
-        expected = new ArrayList<>();
+        expected = new HashSet<>();
         expected.add(new TravelOption("WALK", "WALK"));
         expected.add(new TravelOption("BICYCLE", "BICYCLE"));
         expected.add(new TravelOption("CAR", "CAR"));
 
-        assertEquals(expected, options);
-
+        assertEquals(expected, new HashSet<>(options));
 
     }
 }
