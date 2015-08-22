@@ -6,7 +6,7 @@ jdk:
 
 # Do all stages up through verify, install, deploy
 script:
-	  mvn clean deploy
+  mvn clean deploy
 
 env:
   global:
