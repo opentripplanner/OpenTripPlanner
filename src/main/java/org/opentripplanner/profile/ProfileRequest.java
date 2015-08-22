@@ -6,7 +6,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 /**
  * All the modifiable parameters for profile routing.
@@ -81,6 +80,9 @@ public class ProfileRequest implements Serializable, Cloneable {
     
     /** If true, disable all goal direction and propagate results to the street network */
     public boolean analyst = false;
+
+    /** What assumption should be used when boarding frequency vehicles? */
+    public RaptorWorkerTimetable.BoardingAssumption boardingAssumption = RaptorWorkerTimetable.BoardingAssumption.RANDOM;
 
     /* The relative importance of different factors when biking */
     /** The relative importance of maximizing safety when cycling */

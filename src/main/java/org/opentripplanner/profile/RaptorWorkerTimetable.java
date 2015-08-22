@@ -2,8 +2,10 @@ package org.opentripplanner.profile;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.opentripplanner.analyst.cluster.TaskStatistics;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.analyst.scenario.Scenario;
+import org.opentripplanner.analyst.scenario.TransferRule;
 import org.opentripplanner.analyst.scenario.TripFilter;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
@@ -36,28 +38,37 @@ public class RaptorWorkerTimetable implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorWorkerTimetable.class);
 
-    // TODO put stop indexes in array here
-    // TODO serialize using deltas and variable-width from Protobuf libs ?
-
     /* Times for schedule-based trips/patterns are stored in a 2D array. */
 
     int nTrips, nStops;
 
-    private int[][] timesPerTrip;
+    int[][] timesPerTrip;
 
     /* Times for frequency-based trips are stored in parallel arrays (a column store). */
 
     /** Times (0-based) for frequency trips */
-    private int[][] frequencyTrips;
+    int[][] frequencyTrips;
 
     /** Headways (seconds) for frequency trips, parallel to above. Note that frequency trips are unsorted. */
-    private int[] headwaySecs;
+    int[] headwaySecs;
 
     /** Start times (seconds since noon - 12h) for frequency trips */
-    private int[] startTimes;
+    int[] startTimes;
 
     /** End times for frequency trips */
-    private int[] endTimes;
+    int[] endTimes;
+
+    /** Indices of stops in parent data */
+    public int[] stopIndices;
+
+    /** parent raptorworkerdata of this timetable */
+    public RaptorWorkerData raptorData;
+
+    /** Mode of this pattern, see constants in com.conveyal.gtfs.model.Route */
+    public int mode;
+
+    /** Index of this pattern in RaptorData */
+    public int dataIndex;
 
     /** slack required when boarding a transit vehicle */
     public static final int MIN_BOARD_TIME_SECONDS = 60;
@@ -89,24 +100,117 @@ public class RaptorWorkerTimetable implements Serializable {
         return timesPerTrip[trip][stop * 2 + 1];
     }
 
+    public int getFrequencyDeparture (int trip, int stop, int time, int previousPattern, FrequencyRandomOffsets offsets) {
+        return getFrequencyDeparture(trip, stop, time, previousPattern, offsets, null);
+    }
+
     /**
      * Get the departure on frequency trip trip at stop stop after time time,
-     * assuming worst-case headway if worstCase is true.
+     * with the given boarding assumption. (Note that the boarding assumption specified may be overridden
+     * by transfer rules).
      */
-    public int getFrequencyDeparture (int trip, int stop, int time, boolean worstCase) {
+    public int getFrequencyDeparture (int trip, int stop, int time, int previousPattern, FrequencyRandomOffsets offsets, BoardingAssumption assumption) {
         int timeToReachStop = frequencyTrips[trip][stop * 2 + 1];
 
-        // move time forward if the frequency has not yet started.
-        if (timeToReachStop + startTimes[trip] > time)
-            time = timeToReachStop + startTimes[trip];
+        // figure out if there is an applicable transfer rule
+        TransferRule transferRule = null;
+
+        if (previousPattern != -1) {
+            // this is a transfer
+
+            // stop index in Raptor data
+            int stopIndex = stopIndices[stop];
+
+            // first check for specific rules
+            // calling containsKey can be expensive so first check if list is empty
+            if (!raptorData.transferRules.isEmpty() && raptorData.transferRules.containsKey(stopIndex)) {
+                for (TransferRule tr : raptorData.transferRules.get(stopIndex)) {
+                    if (tr.matches(raptorData.timetablesForPattern.get(previousPattern), this)) {
+                        transferRule = tr;
+                        break;
+                    }
+                }
+            }
+
+            if (transferRule == null && !raptorData.baseTransferRules.isEmpty()) {
+                // look for global rules
+                // using declarative for loop because constructing a stream and doing a filter is
+                // slow.
+                for (TransferRule tr : raptorData.baseTransferRules) {
+                    if (tr.matches(raptorData.timetablesForPattern.get(previousPattern), this)) {
+                        transferRule = tr;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (assumption == null)
+            assumption = raptorData.boardingAssumption;
+
+        // if there is an applicable transfer rule, override anything that was specified elsewhere
+        if (transferRule != null)
+            assumption = transferRule.assumption;
+
+        if (assumption == BoardingAssumption.RANDOM) {
+            // We treat every frequency-based trip as a scheduled trip on each iteration of the Monte Carlo
+            // algorithm. The reason for this is thus: consider something like the Portland Transit Mall.
+            // There are many opportunities to transfer between vehicles. The transfer times between
+            // Line A and Line B are not independently random at each stop but rather are correlated
+            // along each line. Thus we randomize each pattern independently, not each boarding.
+
+            // Keep in mind that there could also be correlation between patterns, especially for rail
+            // vehicles that share trackage. Consider, for example, the Fredericksburg and Manassus
+            // lines on the Virginia Railway Express, at Alexandria. These are two diesel heavy-rail
+            // lines that share trackage. Thus the minimum transfer time between them is always at least
+            // 5 minutes or so as that's as close as you can run diesel trains to each other.
+            int minTime = startTimes[trip] + timeToReachStop + offsets.offsets.get(this.dataIndex)[trip];
+
+            // move time forward to an integer multiple of headway after the minTime
+            if (time < minTime)
+                time = minTime;
+            else
+                // add enough to time to make time - minTime an integer multiple of headway
+                // if the bus comes every 30 minutes and you arrive at the stop 35 minutes
+                // after it first came, you have to wait 25 minutes, or headway - time already elapsed
+                // time already elapsed is 35 % 30 = 5 minutes in this case.
+                time += headwaySecs[trip] - (time - minTime) % headwaySecs[trip];
+        }
+
+        else {
+            // move time forward if the frequency has not yet started.
+            // we do this before we add the wait time, because this is the earliest possible
+            // time a vehicle could reach the stop. The assumption is that the vehicle leaves
+            // the terminal between zero and headway_seconds seconds after the start_time of the
+            // frequency
+            if (timeToReachStop + startTimes[trip] > time)
+                time = timeToReachStop + startTimes[trip];
+
+            switch (assumption) {
+            case BEST_CASE:
+                // do nothing
+                break;
+            case WORST_CASE:
+                time += headwaySecs[trip];
+                break;
+            case HALF_HEADWAY:
+                time += headwaySecs[trip] / 2;
+                break;
+            case FIXED:
+                if (transferRule == null) throw new IllegalArgumentException("Cannot use boarding assumption FIXED without a transfer rule");
+                time += transferRule.transferTimeSeconds;
+                break;
+            case PROPORTION:
+                if (transferRule == null) throw new IllegalArgumentException("Cannot use boarding assumption PROPORTION without a transfer rule");
+                time += (int) (transferRule.waitProportion * headwaySecs[trip]);
+                break;
+            }
+        }
 
         if (time > timeToReachStop + endTimes[trip])
             return -1;
-
-        if (worstCase)
-            time += headwaySecs[trip];
-
-        return time;
+        else
+            return time;
     }
 
     /**
@@ -117,17 +221,27 @@ public class RaptorWorkerTimetable implements Serializable {
     }
 
     /**
-     * Get the number of frequency trips on this pattern.
+     * Get the number of frequency trips on this pattern (i.e. the number of trips in trips.txt, not the number of trips by vehicles)
      */
     public int getFrequencyTripCount () {
         return headwaySecs.length;
+    }
+
+    /** Does this timetable have any frequency trips? */
+    public boolean hasFrequencyTrips () {
+        return this.headwaySecs != null && this.headwaySecs.length > 0;
+    }
+
+    /** does this timetable have any scheduled trips? */
+    public boolean hasScheduledTrips () {
+        return this.timesPerTrip != null && this.timesPerTrip.length > 0;
     }
 
     /**
      * This is a factory function rather than a constructor to avoid calling the super constructor for rejected patterns.
      * BannedRoutes is formatted as agencyid_routeid.
      */
-    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Scenario scenario) {
+    public static RaptorWorkerTimetable forPattern (Graph graph, TripPattern pattern, TimeWindow window, Scenario scenario, TaskStatistics ts) {
 
         // Filter down the trips to only those running during the window
         // This filtering can reduce number of trips and run time by 80 percent
@@ -207,6 +321,8 @@ public class RaptorWorkerTimetable implements Serializable {
             rwtt.timesPerTrip[t++] = times;
         }
 
+        ts.scheduledTripCount += rwtt.timesPerTrip.length;
+
         // save frequency times
         rwtt.frequencyTrips = new int[freqs.size()][pattern.getStops().size() * 2];
         rwtt.endTimes = new int[freqs.size()];
@@ -219,6 +335,8 @@ public class RaptorWorkerTimetable implements Serializable {
                 rwtt.headwaySecs[i] = fe.headway;
                 rwtt.startTimes[i] = fe.startTime;
                 rwtt.endTimes[i] = fe.endTime;
+
+                ts.frequencyTripCount += fe.numTrips();
 
                 int[] times = rwtt.frequencyTrips[i];
 
@@ -236,11 +354,15 @@ public class RaptorWorkerTimetable implements Serializable {
             }
         }
 
+        ts.frequencyEntryCount += rwtt.getFrequencyTripCount();
+
+        rwtt.mode = pattern.route.getType();
+
         return rwtt;
     }
 
     /** Create a raptor worker timetable for an added pattern */
-    public static RaptorWorkerTimetable forAddedPattern(AddTripPattern atp, TimeWindow window) {
+    public static RaptorWorkerTimetable forAddedPattern(AddTripPattern atp, TimeWindow window, TaskStatistics ts) {
         if (atp.temporaryStops.length < 2 || atp.timetables.isEmpty())
             return null;
 
@@ -271,6 +393,8 @@ public class RaptorWorkerTimetable implements Serializable {
             rwtt.timesPerTrip[t++] = timesForPatternTimetable(atp, pt);
         }
 
+        ts.scheduledTripCount += rwtt.timesPerTrip.length;
+
         // create frequency trips
         rwtt.frequencyTrips = new int[frequencies.size()][atp.temporaryStops.length * 2];
         rwtt.endTimes = new int[frequencies.size()];
@@ -283,7 +407,13 @@ public class RaptorWorkerTimetable implements Serializable {
             rwtt.startTimes[t] = pt.startTime;
             rwtt.endTimes[t] = pt.endTime;
             rwtt.headwaySecs[t++] = pt.headwaySecs;
+
+            ts.frequencyTripCount += (pt.endTime - pt.startTime) / pt.headwaySecs;
         }
+
+        ts.frequencyEntryCount += frequencies.size();
+
+        rwtt.mode = atp.mode;
 
         return rwtt;
     }
@@ -304,4 +434,10 @@ public class RaptorWorkerTimetable implements Serializable {
         return times;
     }
 
+    /** The assumptions made when boarding a frequency vehicle: best case (no wait), worst case (full headway) and half headway (in some sense the average). */
+    public static enum BoardingAssumption {
+        BEST_CASE, WORST_CASE, HALF_HEADWAY, FIXED, PROPORTION, RANDOM;
+
+        public static final long serialVersionUID = 1;
+    }
 }

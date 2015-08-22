@@ -604,12 +604,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // create edges
         if (dest) {
-            new SampleEdge(s.v0, v, s.d0);
-            new SampleEdge(s.v1, v, s.d1);
+            if (s.v0 != null)
+                new SampleEdge(s.v0, v, s.d0);
+
+            if (s.v1 != null)
+                new SampleEdge(s.v1, v, s.d1);
         }
         else {
-            new SampleEdge(v, s.v0, s.d0);
-            new SampleEdge(v, s.v1, s.d1);
+            if (s.v0 != null)
+                new SampleEdge(v, s.v0, s.d0);
+
+            if (s.v1 != null)
+                new SampleEdge(v, s.v1, s.d1);
         }
 
         return v;

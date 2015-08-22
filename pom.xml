@@ -442,6 +442,8 @@
             <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools.version}</version>
         </dependency>
+
+        <!-- TODO: this should be replaced by Jackson serialization -->
         <dependency>
             <groupId>de.grundid.opendatalab</groupId>
             <artifactId>geojson-jackson</artifactId>
@@ -459,6 +461,12 @@
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.conveyal</groupId>
+            <artifactId>jackson2-geojson</artifactId>
+            <version>0.8</version>
         </dependency>
 
         <!-- TESTING -->
@@ -554,6 +562,13 @@
             <artifactId>gtfs-lib</artifactId>
             <!-- TODO: we set above to not download snapshots from the Conveyal Maven repo -->
             <version>0.1-SNAPSHOT</version>
+
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -637,7 +652,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.2</version>
+            <version>4.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -672,6 +687,11 @@
             <groupId>bsf</groupId>
             <artifactId>bsf</artifactId>
             <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.9.40</version>
         </dependency>
         <!--
             Scripting language dependencies such as Groovy and Jython can double the size of the OTP JAR.
