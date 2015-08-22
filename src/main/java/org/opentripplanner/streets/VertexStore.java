@@ -83,4 +83,12 @@ public class VertexStore implements Serializable {
         return new Vertex(index);
     }
 
+    public static int degreesToFixedInt (double degrees) {
+        return (int)(degrees * FIXED_FACTOR);
+    }
+
+    public static double fixedIntToDegrees (int fixed) {
+        return fixed / FIXED_FACTOR;
+    }
+
 }

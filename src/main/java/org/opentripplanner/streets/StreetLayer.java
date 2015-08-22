@@ -1,5 +1,6 @@
 package org.opentripplanner.streets;
 
+import com.conveyal.gtfs.model.Stop;
 import com.conveyal.osmlib.Node;
 import com.conveyal.osmlib.OSM;
 import com.conveyal.osmlib.Way;
@@ -104,6 +105,24 @@ public class StreetLayer implements Serializable {
         return vertexIndex;
     }
 
+    /**
+     * Calculate length from a list of nodes. This is done in advance of creating an edge pair because we need to catch
+     * potential length overflows before we ever reserve space for the edges.
+     */
+    private int getEdgeLengthMillimeters (List<Node> nodes) {
+        double lengthMeters = 0;
+        Node prevNode = nodes.get(0);
+        for (Node node : nodes.subList(1, nodes.size())) {
+            lengthMeters += SphericalDistanceLibrary
+                    .fastDistance(prevNode.getLat(), prevNode.getLon(), node.getLat(), node.getLon());
+            prevNode = node;
+        }
+        if (lengthMeters * 1000 > Integer.MAX_VALUE) {
+            return -1;
+        }
+        return (int)(lengthMeters * 1000);
+    }
+
     private void makeEdge (Way way, int beginIdx, int endIdx) {
 
         long beginOsmNodeId = way.nodes[beginIdx];
@@ -113,24 +132,26 @@ public class StreetLayer implements Serializable {
         int beginVertexIndex = getVertexIndexForOsmNode(beginOsmNodeId);
         int endVertexIndex = getVertexIndexForOsmNode(endOsmNodeId);
 
-        // Determine geometry and length of this edge
-        Node prevNode = osm.nodes.get(beginOsmNodeId);
-        double lengthMeters = 0;
+        // Fetch the OSM node objects for this subsection of the OSM way.
+        int nNodes = endIdx - beginIdx + 1;
+        List<Node> nodes = new ArrayList<>(nNodes);
         for (int n = beginIdx; n <= endIdx; n++) {
             long nodeId = way.nodes[n];
             Node node = osm.nodes.get(nodeId);
-            lengthMeters += SphericalDistanceLibrary.fastDistance(
-                    prevNode.getLat(), prevNode.getLon(), node.getLat(), node.getLon());
-            prevNode = node;
+            nodes.add(node);
         }
-        pointsPerEdgeHistogram.add(endIdx - beginIdx + 1);
-        if (lengthMeters * 1000 > Integer.MAX_VALUE) {
-            LOG.warn("Street segment was too long, skipping.");
+
+        // Compute edge length and check that it can be properly represented.
+        int edgeLengthMillimeters = getEdgeLengthMillimeters(nodes);
+        if (edgeLengthMillimeters < 0) {
+            LOG.warn("Street segment was too long to be represented, skipping.");
             return;
         }
 
         // Create and store the forward and backward edge
-        edgeStore.addStreetPair(beginVertexIndex, endVertexIndex, lengthMeters);
+        EdgeStore.Edge newForwardEdge = edgeStore.addStreetPair(beginVertexIndex, endVertexIndex, edgeLengthMillimeters);
+        newForwardEdge.setGeometry(nodes);
+        pointsPerEdgeHistogram.add(nNodes);
 
     }
 
@@ -179,8 +200,8 @@ public class StreetLayer implements Serializable {
         }
         EdgeStore.Edge edge = edgeStore.getCursor();
         while (edge.advance()) {
-            outgoingEdges.get(edge.getFromVertex()).add(edge.index);
-            incomingEdges.get(edge.getToVertex()).add(edge.index);
+            outgoingEdges.get(edge.getFromVertex()).add(edge.edgeIndex);
+            incomingEdges.get(edge.getToVertex()).add(edge.edgeIndex);
         }
         LOG.info("Done building edge lists.");
         // Display histogram of edge list sizes
@@ -234,15 +255,22 @@ public class StreetLayer implements Serializable {
         int stopVertexIndex = vertexStore.addVertex(lat, lon);
         if (closestVertex >= 0) {
             closestDistance = FastMath.sqrt(closestDistance) * metersPerDegreeLat;
-            int foreEdgeId = edgeStore.addStreetPair(closestVertex, stopVertexIndex, closestDistance);
-            int backEdgeId = foreEdgeId + 1;
-            edgeStore.getCursor(foreEdgeId).setFlag(EdgeStore.Flag.TRANSIT_LINK);
-            edgeStore.getCursor(backEdgeId).setFlag(EdgeStore.Flag.TRANSIT_LINK);
-            // Edges will be added to (transient) edge lists later.
+            EdgeStore.Edge edge = edgeStore.addStreetPair(closestVertex, stopVertexIndex, (int)(closestDistance * 1000));
+            edge.setFlag(EdgeStore.Flag.TRANSIT_LINK);
+            edge.advance();
+            edge.setFlag(EdgeStore.Flag.TRANSIT_LINK);
+            // New edges will be added to edge lists later (the edge list is a transient index).
         }
         return stopVertexIndex;
     }
 
+    public void linkStops (TransitLayer transitLayer) {
+        for (Stop stop : transitLayer.stopForIndex) {
+            int streetVertexIndex = linkTransitStop(stop.stop_lat, stop.stop_lon, 300);
+            transitLayer.streetVertexForStop.add(streetVertexIndex);
+            // The inverse stopForStreetVertex map is a transient, derived index and will be built from streetVertexForStop.
+        }
+    }
 
     /**
      * Used to split streets for temporary endpoints and for transit stops.
@@ -253,7 +281,7 @@ public class StreetLayer implements Serializable {
      * for a couple of reasons: it avoids using transit stops as shortcuts, and it makes temporary endpoint vertices
      * harmless to searches happening in other threads.
      */
-    public void splitStreet(Pointlike where, boolean transit, boolean out) {
+    public void splitStreet(int fixedLon, int fixedLat, boolean transit, boolean out) {
 
     }
 

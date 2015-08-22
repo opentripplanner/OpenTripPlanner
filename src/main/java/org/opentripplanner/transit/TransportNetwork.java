@@ -28,6 +28,9 @@ public class TransportNetwork implements Serializable {
     StreetLayer streetLayer;
     TransitLayer transitLayer;
 
+    /**
+     * Serialize the transport network to disk and re-load it to make sure serialiation works right.
+     */
     public static TransportNetwork roundTripTest (TransportNetwork original) {
         // Round-trip serialize the transit layer and test its speed
         try {
@@ -64,22 +67,40 @@ public class TransportNetwork implements Serializable {
     }
 
     public static void main (String[] args) {
+        TransportNetwork transportNetwork = TransportNetwork.fromFiles(args[0], args[1]);
+        transportNetwork = roundTripTest(transportNetwork);
+        transportNetwork.testRouting();
+        // transportNetwork.streetLayer.testRouting(false, transitLayer);
+        // transportNetwork.streetLayer.testRouting(true, transitLayer);
+    }
 
-        // Load OSM data
-        String osmSourceFile = args[0];
+    /**
+     * OSM PBF files are fragments of a single global database with a single namespace. Therefore it is valid to load
+     * more than one PBF file into a single OSM storage object. However they might be from different points in time,
+     * so it may be cleaner to just map one PBF file to one OSM object.
+     *
+     * On the other hand, GTFS feeds each have their own namespace. Each GTFS object is for one specific feed, and this
+     * distinction should be maintained for various reasons.
+     */
+    public static TransportNetwork fromFiles (String osmSourceFile, String gtfsSourceFile) {
+
+        // Load OSM data into MapDB
         OSM osm = new OSM(null);
         osm.intersectionDetection = true;
         osm.readFromFile(osmSourceFile);
+
+        // Make street layer from OSM data in MapDB
         StreetLayer streetLayer = new StreetLayer();
         streetLayer.loadFromOsm(osm);
         osm.close();
-        streetLayer.indexStreets(); // needed for linking transit stops
 
-        // Load transit data
-        String gtfsSourceFile = args[1];
-        TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile, streetLayer);
+        // Load transit data TODO remove need to supply street layer at this stage
+        TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
 
-        // Must build edge lists after all inter-layer linking has occurred.
+        // The street index is needed for linking transit stops to the street network.
+        streetLayer.indexStreets();
+        streetLayer.linkStops(transitLayer);
+        // Edge lists must be built after all inter-layer linking has occurred.
         streetLayer.buildEdgeLists();
         transitLayer.rebuildTransientIndexes();
 
@@ -90,14 +111,8 @@ public class TransportNetwork implements Serializable {
         TransportNetwork transportNetwork = new TransportNetwork();
         transportNetwork.streetLayer = streetLayer;
         transportNetwork.transitLayer = transitLayer;
-        transportNetwork = roundTripTest(transportNetwork);
 
-
-        // Do some routing.
-        transportNetwork.testRouting();
-        // transportNetwork.streetLayer.testRouting(false, transitLayer);
-        // transportNetwork.streetLayer.testRouting(true, transitLayer);
-
+        return transportNetwork;
     }
 
     /**

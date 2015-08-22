@@ -120,7 +120,7 @@ public class StreetRouter {
                 State existingBest = bestStates.get(s1.vertex);
                 if (existingBest == null || existingBest.weight > s1.weight) {
                     bestStates.put(s1.vertex, s1);
-                    if (edge.getFlag(EdgeStore.Flag.TRANSIT_LINK) && !edge.getFlag(EdgeStore.Flag.BACKWARD)) {
+                    if (edge.getFlag(EdgeStore.Flag.TRANSIT_LINK) && edge.isForward()) {
                         transitStopVerticesHit.add(edge.getToVertex());
                         // Once we go into a transit stop, we don't follow any edges out of it.
                         return true; // iteration should continue

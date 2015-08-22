@@ -14,7 +14,6 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import org.opentripplanner.streets.StreetLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +52,9 @@ public class TransitLayer implements Serializable {
 
     public List<Service> services = new ArrayList<>();
 
+    // TODO there is probably a better way to do this, but for now we need to retain stop object for linking to streets
+    public transient List<Stop> stopForIndex = new ArrayList<>();
+
     /**
      * Seems kind of hackish to pass the street layer in.
      * Maybe there should not even be separate street and transit layer classes.
@@ -68,7 +70,7 @@ public class TransitLayer implements Serializable {
      * with multiple GtfsFeed objects. All maps/lists would need to be initialized with empty objects at construction,
      * and all methods would have to be designed to be called multiple times in successtion.
      */
-    public void loadFromGtfs (GTFSFeed gtfs, StreetLayer streetLayer) {
+    public void loadFromGtfs (GTFSFeed gtfs) {
 
         // Load stops.
         // ID is the GTFS string ID, stopIndex is the zero-based index, stopVertexIndex is the index in the street layer.
@@ -77,10 +79,7 @@ public class TransitLayer implements Serializable {
             int stopIndex = stopIdForIndex.size();
             indexForStopId.put(stop.stop_id, stopIndex);
             stopIdForIndex.add(stop.stop_id);
-            if (streetLayer != null) {
-                int streetVertexIndex = streetLayer.linkTransitStop(stop.stop_lat, stop.stop_lon, 300);
-                streetVertexForStop.add(streetVertexIndex);
-            }
+            stopForIndex.add(stop);
         }
 
         // Load service periods, assigning integer codes which will be referenced by trips and patterns.
@@ -183,10 +182,10 @@ public class TransitLayer implements Serializable {
         }
     }
 
-    public static TransitLayer fromGtfs (String file, StreetLayer streetLayer) {
+    public static TransitLayer fromGtfs (String file) {
         GTFSFeed gtfs = GTFSFeed.fromFile(file);
         TransitLayer transitLayer = new TransitLayer();
-        transitLayer.loadFromGtfs(gtfs, streetLayer);
+        transitLayer.loadFromGtfs(gtfs);
         return transitLayer;
     }
 
