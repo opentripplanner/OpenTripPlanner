@@ -25,3 +25,8 @@ sudo: false
 cache:
   directories:
     - "$HOME/.m2/repository"
+
+# Notify us of the build status on the Slack channel     
+notifications:
+  slack: conveyal:RQuTZBfE7FBjVtYkKwdnNRjY
+
