@@ -13,41 +13,32 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.CompactLineString;
-import org.opentripplanner.common.geometry.DirectionUtils;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.geometry.*;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * This represents a street segment.
@@ -107,6 +98,9 @@ public class StreetEdge extends Edge implements Cloneable {
     private I18NString name;
 
     private StreetTraversalPermission permission;
+
+    /** The OSM way ID from whence this came - needed to reference traffic data */
+    public long wayId;
 
     private int streetClass = CLASS_OTHERPATH;
     
@@ -287,7 +281,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         // Automobiles have variable speeds depending on the edge type
-        double speed = calculateSpeed(options, traverseMode);
+        double speed = calculateSpeed(options, traverseMode, s0.getTimeInMillis());
         
         double time = getDistance() / speed;
         double weight;
@@ -369,7 +363,7 @@ public class StreetEdge extends Edge implements Cloneable {
             backPSE = (StreetEdge) backEdge;
             RoutingRequest backOptions = backWalkingBike ?
                     s0.getOptions().bikeWalkingOptions : s0.getOptions();
-            double backSpeed = backPSE.calculateSpeed(backOptions, backMode);
+            double backSpeed = backPSE.calculateSpeed(backOptions, backMode, s0.getTimeInMillis());
             final double realTurnCost;  // Units are seconds.
 
             // Apply turn restrictions
@@ -495,13 +489,28 @@ public class StreetEdge extends Edge implements Cloneable {
     }
     
     /**
-     * Calculate the speed appropriately given the RoutingRequest and traverseMode.
+     * Calculate the speed appropriately given the RoutingRequest and traverseMode and the current wall clock time.
+     * Note: this is not strictly symmetrical, because in a forward search we get the speed based on the
+     * time we enter this edge, whereas in a reverse search we get the speed based on the time we exit
+     * the edge.
      */
-    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode) {
+    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, long timeMillis) {
         if (traverseMode == null) {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
+            if (options.useTraffic) {
+                // the expected speed based on traffic
+                StreetSpeedSnapshot source = options.getRoutingContext().streetSpeedSnapshot;
+
+                if (source != null) {
+                    double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
+
+                    if (!Double.isNaN(congestedSpeed))
+                        return congestedSpeed;
+                }
+            }
+
             return calculateCarSpeed(options);
         }
         return options.getSpeed(traverseMode);
@@ -772,5 +781,35 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         return new P2<StreetEdge>(e1, e2);
+    }
+
+    /**
+     * Get the starting OSM node ID of this edge. Note that this information is preserved when an
+     * edge is split, so both edges will have the same starting and ending nodes.
+     */
+    public long getStartOsmNodeId () {
+        if (fromv instanceof OsmVertex)
+            return ((OsmVertex) fromv).nodeId;
+        // get information from the splitter vertex so this edge gets the same traffic information it got before
+        // it was split.
+        else if (fromv instanceof SplitterVertex)
+            return ((SplitterVertex) fromv).previousNodeId;
+        else
+            return -1;
+    }
+
+    /**
+     * Get the ending OSM node ID of this edge. Note that this information is preserved when an
+     * edge is split, so both edges will have the same starting and ending nodes.
+     */
+    public long getEndOsmNodeId () {
+        if (tov instanceof OsmVertex)
+            return ((OsmVertex) tov).nodeId;
+            // get information from the splitter vertex so this edge gets the same traffic information it got before
+            // it was split.
+        else if (tov instanceof SplitterVertex)
+            return ((SplitterVertex) tov).nextNodeId;
+        else
+            return -1;
     }
 }

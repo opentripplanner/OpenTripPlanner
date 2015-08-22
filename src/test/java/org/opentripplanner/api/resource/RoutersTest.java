@@ -1,8 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
@@ -13,15 +10,18 @@ import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPServer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class RoutersTest {
     @Test
     public void testRouters() {
         OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
         otpServer.getGraphService().registerGraph("", new MemoryGraphSource(null, new Graph()));
         otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("", new Graph()));
-        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "A", 0, 0));
-        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "B", 0, 1));
-        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "C", 1, 1));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "A", 0, 0, 0));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "B", 0, 1, 0));
+        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "C", 1, 1, 0));
         //this needs to be added since convex hull isn't lazy loaded anymore
         otpServer.getGraphService().getRouter("A").graph.calculateConvexHull();
         otpServer.getGraphService().getRouter("").graph.calculateConvexHull();

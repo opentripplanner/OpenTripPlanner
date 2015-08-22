@@ -708,6 +708,13 @@
             <version>2.7.0</version>
         </dependency>
         -->
+
+        <!-- support for OpenTraffic data -->
+        <dependency>
+            <groupId>io.opentraffic</groupId>
+            <artifactId>traffic-engine</artifactId>
+            <version>0.2</version>
+        </dependency>
     </dependencies>
 
 </project>

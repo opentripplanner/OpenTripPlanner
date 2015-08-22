@@ -39,6 +39,7 @@ import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -95,6 +96,9 @@ public class RoutingContext implements Cloneable {
 
     /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
     public final TimetableSnapshot timetableSnapshot;
+
+    /** A snapshot of street speeds for looking up real-time or historical traffic data */
+    public final StreetSpeedSnapshot streetSpeedSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
@@ -234,6 +238,13 @@ public class RoutingContext implements Cloneable {
             calendarService = null;
         }
 
+        // do the same for traffic
+        if (graph.streetSpeedSource != null)
+            this.streetSpeedSnapshot = graph.streetSpeedSource.getSnapshot();
+        else
+            this.streetSpeedSnapshot = null;
+
+
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
@@ -244,11 +255,11 @@ public class RoutingContext implements Cloneable {
                 // TODO offset time by distance to nearest OSM node?
                 if (opt.arriveBy) {
                     // TODO what if there is no coordinate but instead a named place?
-                    toVertex = graph.streetIndex.getSampleVertexAt(opt.to.getCoordinate(), true);
+                    toVertex = graph.streetIndex.getSampleVertexAt(opt.to.getCoordinate());
                     fromVertex = null;
                 }
                 else {
-                    fromVertex = graph.streetIndex.getSampleVertexAt(opt.from.getCoordinate(), false);
+                    fromVertex = graph.streetIndex.getSampleVertexAt(opt.from.getCoordinate());
                     toVertex = null;
                 }
             }
