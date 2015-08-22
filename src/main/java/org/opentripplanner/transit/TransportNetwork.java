@@ -28,24 +28,6 @@ public class TransportNetwork implements Serializable {
     StreetLayer streetLayer;
     TransitLayer transitLayer;
 
-    /**
-     * Serialize the transport network to disk and re-load it to make sure serialiation works right.
-     */
-    public static TransportNetwork roundTripTest (TransportNetwork original) {
-        // Round-trip serialize the transit layer and test its speed
-        try {
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("network.dat"));
-            original.write(outputStream);
-            outputStream.close();
-            InputStream inputStream = new BufferedInputStream(new FileInputStream("network.dat"));
-            TransportNetwork copy = TransportNetwork.read(inputStream);
-            inputStream.close();
-            return copy;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void write (OutputStream stream) throws IOException {
         LOG.info("Writing transport network...");
         FSTObjectOutput out = new FSTObjectOutput(stream);
@@ -67,8 +49,20 @@ public class TransportNetwork implements Serializable {
     }
 
     public static void main (String[] args) {
+        // Round-trip serialize the transit layer and test its speed after deserialization.
         TransportNetwork transportNetwork = TransportNetwork.fromFiles(args[0], args[1]);
-        transportNetwork = roundTripTest(transportNetwork);
+        try {
+            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("network.dat"));
+            transportNetwork.write(outputStream);
+            outputStream.close();
+            // Be careful to release the original reference to be sure to have heap space
+            transportNetwork = null;
+            InputStream inputStream = new BufferedInputStream(new FileInputStream("network.dat"));
+            transportNetwork = TransportNetwork.read(inputStream);
+            inputStream.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         transportNetwork.testRouting();
         // transportNetwork.streetLayer.testRouting(false, transitLayer);
         // transportNetwork.streetLayer.testRouting(true, transitLayer);
