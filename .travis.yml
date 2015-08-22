@@ -4,8 +4,12 @@ language: java
 jdk:
   - oraclejdk8
 
-# Replace default build step.
-# Run all Maven phases up through verify, install, deploy.
+# Replace Travis's default Maven installation step with a no-op.
+# This avoids redundantly pre-running 'mvn install -DskipTests' every time.
+install: true
+
+# Replace Travis's default build step.
+# Run all Maven phases at once up through verify, install, and deploy.
 script: mvn clean deploy
 
 env:
