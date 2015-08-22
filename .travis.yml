@@ -1,0 +1,25 @@
+language: java
+
+# OpenTripPlanner requires Java 8 and Travis doesn't (yet) support OpenJDK 8
+jdk:
+  - oraclejdk8
+
+env:
+  global:
+    # encrypted AWS access/secret keys to allow automated deployment to the Conveyal Maven repo on S3
+    - secure: "R6SnAYfz5QmN+zvcxTK30Y0oRpN5M7FVlgCfyIgj8OBpv8tvaIdrN+pzvw+DOWgWGEVNw3b2yJYgt1feIUQ4AwQmcLW9O4AAZFSMDxJ/tT8wn3K+jzdmbssZygd6lyvBJkmOkxQJX5n83F5B9LCIrg4cmXMPBuaFaIhMu9EOnyQ="
+    - secure: "ZYusBtEa4yG2rdJHx58SUSynpLPaZKseIwCaBx+vp/EP7qRzvhSo63RK7hhB1GCpMprao5Qym+oGR9DSHnKaYnFSqzCWHG0R1DoiCUr58cjsogaCPiupo713DSH/Dy+SYEhgGVhLFbvErR3eKFgurL+X8cYDJEAu+4JoqYl5GWs="
+
+# If sudo is disabled, CI runs on container based infrastructure (allows caching &c.)
+sudo: false
+
+# Deploy maven artifacts from master iff this is not a pull request.
+after_success: |
+  if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
+    \# no need to run tests again
+    mvn deploy --settings settings.xml -DskipTests
+  fi
+# Retain the local Maven repository to speed up builds.
+cache:
+  directories:
+    - "$HOME/.m2/repository"
