@@ -4,6 +4,10 @@ language: java
 jdk:
   - oraclejdk8
 
+# Do all stages up through verify, install, deploy
+script:
+	  mvn clean deploy
+
 env:
   global:
     # encrypted AWS access/secret keys to allow automated deployment to the Conveyal Maven repo on S3
@@ -13,12 +17,6 @@ env:
 # If sudo is disabled, CI runs on container based infrastructure (allows caching &c.)
 sudo: false
 
-# Deploy maven artifacts from master iff this is not a pull request.
-after_success: |
-  if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-    \# no need to run tests again
-    mvn deploy -DskipTests
-  fi
 # Retain the local Maven repository to speed up builds.
 cache:
   directories:
