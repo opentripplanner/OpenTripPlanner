@@ -4,9 +4,9 @@ language: java
 jdk:
   - oraclejdk8
 
-# Do all stages up through verify, install, deploy
-script:
-  mvn clean deploy
+# Replace default build step.
+# Run all Maven phases up through verify, install, deploy.
+script: mvn clean deploy
 
 env:
   global:
