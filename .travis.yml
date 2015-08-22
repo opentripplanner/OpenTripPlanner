@@ -17,7 +17,7 @@ sudo: false
 after_success: |
   if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
     \# no need to run tests again
-    mvn deploy --settings settings.xml -DskipTests
+    mvn deploy -DskipTests
   fi
 # Retain the local Maven repository to speed up builds.
 cache:
