@@ -55,7 +55,7 @@ public abstract class GraphBuilderAnnotation implements Serializable {
     public abstract String getMessage();
 
     public String getHTMLMessage() {
-        return this.getMessage();
+        return this.getMessage().replace("<", "&lt;").replace(">", "&gt;");
     }
 
     public Edge getReferencedEdge() {
