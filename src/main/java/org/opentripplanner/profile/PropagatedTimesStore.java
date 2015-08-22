@@ -1,7 +1,7 @@
 package org.opentripplanner.profile;
 
-import gnu.trove.map.TIntIntMap;
-
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
@@ -9,6 +9,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Stores travel times propagated to the search targets (all vertices in the street network or a set of points of
@@ -39,7 +40,12 @@ public class PropagatedTimesStore {
 
     Graph graph;
     int size;
-    int[] mins, maxs, sums, counts;
+    int[] mins, maxs, avgs;
+
+    // number of times to bootstrap the mean.
+    public final int N_BOOTSTRAPS = 400;
+
+    private static final Random random = new Random();
 
     public PropagatedTimesStore(Graph graph) {
         this(graph, Vertex.getMaxIndex());
@@ -51,70 +57,89 @@ public class PropagatedTimesStore {
         this.size = size;
         mins = new int[size];
         maxs = new int[size];
-        sums = new int[size];
-        counts = new int[size];
+        avgs = new int[size];
+        Arrays.fill(avgs, Integer.MAX_VALUE);
         Arrays.fill(mins, Integer.MAX_VALUE);
+        Arrays.fill(maxs, Integer.MAX_VALUE);
     }
 
-    public void setFromArray(int[][] times) {
-        for (int i = 0; i < times.length; i++) {
-            for (int v = 0; v < times[i].length; v++) {
-                int newValue = times[i][v];
+    public void setFromArray(int[][] times, ConfidenceCalculationMethod confidenceCalculationMethod) {
+        if (times.length == 0)
+            // nothing to do
+            return;
 
-                if (newValue == RaptorWorker.UNREACHED)
-                    continue;
+        // assume array is rectangular
+        int stops = times[0].length;
 
-                if (mins[v] > newValue) {
-                    mins[v] = newValue;
+        // cache random numbers. This should be fine as we're mixing it with the number of minutes
+        // at which each destination is accessible, which is sometimes not 120, as well as the stop
+        // position in the list (note that we have cleverly chosen a number which is a prime
+        // so is not divisible by the number of iterations on the bootstrap). Finally recall that
+        // the maximum number of times we're sampling from is generally 120 and we modulo this,
+        // so the pigeonhole principle applies.
+        // this is effectively a "random number generator" with phase 10007
+        int[] randomNumbers = random.ints().limit(10007).map(Math::abs).toArray();
+        int nextRandom = 0;
+
+        // loop over stops on the outside so we can bootstrap
+        STOPS: for (int stop = 0; stop < stops; stop++) {
+            // compute the average
+            int sum = 0;
+            int count = 0;
+
+            TIntList timeList = new TIntArrayList();
+
+            ITERATIONS: for (int i = 0; i < times.length; i++) {
+                if (times[i][stop] == RaptorWorker.UNREACHED)
+                    continue ITERATIONS;
+
+                sum += times[i][stop];
+                count++;
+                timeList.add(times[i][stop]);
+            }
+
+            if (count == 0)
+                continue STOPS;
+
+            avgs[stop] = sum / count;
+
+            switch (confidenceCalculationMethod) {
+            case BOOTSTRAP:
+                // now bootstrap out a 95% confidence interval on the time
+                int[] bootMeans = new int[N_BOOTSTRAPS];
+                for (int boot = 0; boot < N_BOOTSTRAPS; boot++) {
+                    int bsum = 0;
+
+                    // sample from the Monte Carlo distribution with replacement
+                    for (int iter = 0; iter < count; iter++) {
+                        bsum += timeList
+                                .get(randomNumbers[nextRandom++ % randomNumbers.length] % count);
+                        //bsum += timeList.get(random.nextInt(count));
+                    }
+
+                    bootMeans[boot] = bsum / count;
                 }
-                if (maxs[v] < newValue) {
-                    maxs[v] = newValue;
-                }
-                sums[v] += newValue;
-                counts[v] += 1;
-            }
-        }
-    }
 
-    /**
-     * Merge in min travel times to all targets from one raptor call, finding minimum-of-min, maximum-of-min, and
-     * average-of-min travel times.
-     */
-    public void mergeIn(int[] news) {
-        for (int i = 0; i < size; i++) {
-            int newValue = news[i];
-            if (newValue == 0) {
-                continue;
+                Arrays.sort(bootMeans);
+                // 2.5 percentile of distribution of means
+                mins[stop] = bootMeans[N_BOOTSTRAPS / 40];
+                // 97.5 percentile of distribution of means
+                maxs[stop] = bootMeans[N_BOOTSTRAPS - N_BOOTSTRAPS / 40];
+                break;
+            case PERCENTILE:
+                timeList.sort();
+                mins[stop] = timeList.get(timeList.size() / 40);
+                maxs[stop] = timeList.get(39 * timeList.size() / 40);
+                break;
+            case NONE:
+                mins[stop] = maxs[stop] = avgs[stop];
+                break;
+            case MIN_MAX:
+            default:
+                mins[stop] = timeList.min();
+                maxs[stop] = timeList.max();
+                break;
             }
-            if (mins[i] > newValue) {
-                mins[i] = newValue;
-            }
-            if (maxs[i] < newValue) {
-                maxs[i] = newValue;
-            }
-            sums[i] += newValue;
-            counts[i] += 1;
-        }
-    }
-
-    /**
-     * Merge in min travel times to all targets from one raptor call, finding minimum-of-min, maximum-of-min, and
-     * average-of-min travel times.
-     */
-    public void mergeIn(TIntIntMap news) {
-        for (int i = 0; i < size; i++) {
-            int newValue = news.get(i);
-            if (newValue == 0) { // Trove default value is 0 like an array
-                continue;
-            }
-            if (mins[i] > newValue) {
-                mins[i] = newValue;
-            }
-            if (maxs[i] < newValue) {
-                maxs[i] = newValue;
-            }
-            sums[i] += newValue;
-            counts[i] += 1;
         }
     }
 
@@ -123,14 +148,14 @@ public class PropagatedTimesStore {
         for (Vertex vertex : graph.index.vertexForId.values()) {
             int min = mins[vertex.getIndex()];
             int max = maxs[vertex.getIndex()];
-            int sum = sums[vertex.getIndex()];
-            int count = counts[vertex.getIndex()];
-            if (count <= 0)
+            int avg = avgs[vertex.getIndex()];
+
+            if (avg == Integer.MAX_VALUE)
                 continue;
             // Count is positive, extrema and sum must also be present
             rangeSet.min.times.put(vertex, min);
             rangeSet.max.times.put(vertex, max);
-            rangeSet.avg.times.put(vertex, sum / count);
+            rangeSet.avg.times.put(vertex, avg);
         }
     }
 
@@ -138,26 +163,42 @@ public class PropagatedTimesStore {
     public ResultSet.RangeSet makeResults(SampleSet ss, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         ResultSet.RangeSet ret = new ResultSet.RangeSet();
 
-        int[] avgs = new int[sums.length];
-
-        for (int i = 0; i < ss.pset.capacity; i++) {
-            int sum = sums[i];
-            int count = counts[i];
-
-            // Note: this is destructive
-            if (count <= 0) {
-                mins[i] = Integer.MAX_VALUE;
-                maxs[i] = Integer.MAX_VALUE;
-                avgs[i] = Integer.MAX_VALUE;
-            }
-            else {
-                avgs[i] = sum / count;
-            }
-        }
-
         ret.min = new ResultSet(mins, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         ret.avg = new ResultSet(avgs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         ret.max = new ResultSet(maxs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         return ret;
+    }
+
+    public static enum ConfidenceCalculationMethod {
+        /** Do not calculate confidence intervals */
+        NONE,
+
+        /**
+         * Calculate confidence intervals around the mean using the bootstrap. Note that this calculates
+         * the confidence that the mean is in fact the mean of all possible schedules, not the confidence
+         * that a particular but unknown schedule will behave a certain way.
+         *
+         * This is absolutely the correct approach in systems that are specified as frequencies both
+         * in the model and operationally, because the parameter of interest is the average accessibility
+         * afforded by every realization of transfer and wait time. This yields nice tiny confidence
+         * intervals around the mean, and allows us easily to measure changes in average accessibility.
+         *
+         * However, when you have a system that will eventually be scheduled, you are interested not
+         * in the distribution of the average accessibility over all possible schedules, but rather
+         * the distribution of the accessibility afforded by a particular but unknown schedule. This
+         * does not require bootstrapping; it's just taking percentiles on the output of the Monte
+         * Carlo simulation. Unfortunately this requires a lot more Monte Carlo samples, as of
+         * course the middle of the distribution will stabilize long before the extrema.
+         */
+        BOOTSTRAP,
+
+        /**
+         * Calculate confidence intervals based on percentiles, which is what you want to do when
+         * you have a scheduled network.
+         */
+        PERCENTILE,
+
+        /** Take the min and the max of the experienced of the experienced times. Only valid for scheduled services. */
+        MIN_MAX
     }
 }

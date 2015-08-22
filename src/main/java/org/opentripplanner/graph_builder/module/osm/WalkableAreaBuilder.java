@@ -223,7 +223,7 @@ public class WalkableAreaBuilder {
                             endEndpoint.getCoordinate() };
                     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
                     LineString line = geometryFactory.createLineString(coordinates);
-                    if (poly.contains(line)) {
+                    if (poly != null && poly.contains(line)) {
 
                         createSegments(nodeI, nodeJ, startEndpoint, endEndpoint, group.areas,
                                 edgeList, edges);
@@ -313,6 +313,9 @@ public class WalkableAreaBuilder {
     }
 
     private Polygon toJTSPolygon(VLPolygon visibilityPolygon) {
+        if (visibilityPolygon.vertices.isEmpty()) {
+            return null;
+        }
         // incomprehensibly, visilibity's routines for figuring out point-polygon containment are
         // too broken
         // to use here, so we have to fall back to JTS.

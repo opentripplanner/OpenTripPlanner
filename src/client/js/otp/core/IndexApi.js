@@ -180,7 +180,7 @@ otp.core.IndexApi = otp.Class({
             maxLat : bounds.getNorthWest().lat,
             minLon : bounds.getNorthWest().lng,
             minLat : bounds.getSouthEast().lat,
-            maxLon : bounds.getSouthEast().lng,
+            maxLon : bounds.getSouthEast().lng
         };
 
         var url = otp.config.hostname + '/' + otp.config.restService + '/index/stops';
@@ -188,8 +188,6 @@ otp.core.IndexApi = otp.Class({
             data:       params,
 
             success: function(data) {
-                console.log(' *** loadStopsInRectangle ' + name);
-                console.log(data);
                 callback.call(callbackTarget, data);
             }
         });

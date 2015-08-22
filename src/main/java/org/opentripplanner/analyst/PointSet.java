@@ -394,8 +394,7 @@ public class PointSet implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LOG.error("GeoJSON parsing failure: {}", ex.toString());
-            ex.printStackTrace();
+            LOG.error("GeoJSON parsing failure", ex);
             return null;
         }
         return ret;
@@ -809,7 +808,8 @@ public class PointSet implements Serializable {
         // we check again if the map has been built. It's possible that it would have been built
         // by this method in another thread while this instantiation was blocked.
         if (idIndexMap == null) {
-            idIndexMap = new TObjectIntHashMap<String>(this.capacity, 1f, -1);
+            // make a local object, don't expose to public view until it's built
+            TObjectIntMap idIndexMap = new TObjectIntHashMap<String>(this.capacity, 1f, -1);
             
             for (int i = 0; i < this.capacity; i++) {
                 if (ids[i] != null) {
@@ -821,6 +821,9 @@ public class PointSet implements Serializable {
                     }
                 }
             }
+
+            // now expose to public view; reference assignment is an atomic operation
+            this.idIndexMap = idIndexMap;
         }
     }
 

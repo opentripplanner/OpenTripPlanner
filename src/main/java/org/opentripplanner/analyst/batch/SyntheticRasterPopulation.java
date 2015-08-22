@@ -34,8 +34,7 @@ public class SyntheticRasterPopulation extends RasterPopulation {
         try {
             coverageCRS = CRS.decode(crsCode, true);
         } catch (Exception e) {
-            LOG.error("error decoding coordinate reference system code.");
-            e.printStackTrace();
+            LOG.error("error decoding coordinate reference system code.", e);
             return;
         }
         if (boundsFromGraph) {

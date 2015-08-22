@@ -13,17 +13,11 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import com.google.common.io.ByteStreams;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphSource;
@@ -32,7 +26,7 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.ByteStreams;
+import java.io.*;
 
 /**
  * The primary implementation of the GraphSource interface. The graph is loaded from a serialized
@@ -215,8 +209,7 @@ public class InputStreamGraphSource implements GraphSource {
                 newGraph = Graph.load(new ObjectInputStream(is), loadLevel,
                         streetVertexIndexFactory);
             } catch (Exception ex) {
-                LOG.error("Exception while loading graph '{}'.", routerId);
-                ex.printStackTrace();
+                LOG.error("Exception while loading graph '{}'.", routerId, ex);
                 return null;
             }
 
@@ -387,8 +380,7 @@ public class InputStreamGraphSource implements GraphSource {
                 }
 
             } catch (Exception ex) {
-                LOG.error("Exception while storing graph to {}.", sourceFile.getPath());
-                ex.printStackTrace();
+                LOG.error("Exception while storing graph to {}.", sourceFile.getPath(), ex);
                 return false;
             }
 

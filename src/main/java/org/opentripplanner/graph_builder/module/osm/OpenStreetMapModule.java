@@ -44,47 +44,19 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.BikeParkEdge;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
-import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
-import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.NamedArea;
-import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
-import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.vertextype.BikeParkVertex;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
-import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
-import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
+import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -343,6 +315,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
                 new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
             }
+            if (n > 1) {
+                graph.hasBikeSharing = true;
+            }
             LOG.info("Created " + n + " bike rental stations.");
         }
 
@@ -379,6 +354,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     buildBikeParkAndRideForArea(area);
                     n++;
                 }
+            }
+            if (n > 0) {
+                graph.hasBikeRide = true;
             }
             LOG.info("Created {} bike P+R areas.", n);
         }
@@ -440,6 +418,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 if (buildParkAndRideAreasForGroup(group))
                     n++;
             }
+            if (n > 0) {
+                graph.hasParkRide = true;
+            }
             LOG.info("Created {} P+R.", n);
         }
 
@@ -497,7 +478,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             if (!walkAccessibleOut || !carAccessibleIn) {
                 // This will prevent the P+R to be useful.
-                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked(creativeName.toString(), osmId)));
+                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked((creativeName != null ? creativeName.toString() : "null"), osmId)));
                 return false;
             }
             if (!walkAccessibleIn || !carAccessibleOut) {
@@ -1090,6 +1071,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 customNamer.nameWithEdge(way, street);
             }
 
+            // save the way ID so we can match with OpenTraffic
+            street.wayId = way.getId();
+
             return street;
         }
 
@@ -1128,7 +1112,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 Coordinate coordinate = getCoordinate(node);
                 String label = this.getLevelNodeLabel(node, level);
                 OsmVertex vertex = new OsmVertex(graph, label, coordinate.x,
-                        coordinate.y, new NonLocalizedString(label));
+                         coordinate.y, node.getId(), new NonLocalizedString(label));
                 vertices.put(level, vertex);
                 // multilevel nodes should also undergo turn-conversion
                 endpoints.add(vertex);
@@ -1165,7 +1149,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 if ("motorway_junction".equals(highway)) {
                     String ref = node.getTag("ref");
                     if (ref != null) {
-                        ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y);
+                        ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y, nid);
                         ev.setExitName(ref);
                         iv = ev;
                     }
@@ -1176,13 +1160,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     String ref = node.getTag("ref");
                     String name = node.getTag("name");
                     if (ref != null) {
-                        TransitStopStreetVertex tsv = new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, name, ref);
+                        TransitStopStreetVertex tsv = new TransitStopStreetVertex(graph, label, coordinate.x, coordinate.y, nid, name, ref);
                         iv = tsv;
                     }
                 }
 
                 if (iv == null) {
-                    iv = new OsmVertex(graph, label, coordinate.x, coordinate.y, new NonLocalizedString(label));
+                    iv = new OsmVertex(graph, label, coordinate.x, coordinate.y, node.getId(), new NonLocalizedString(label));
                     if (node.hasTrafficLight()) {
                         iv.trafficLight = (true);
                     }

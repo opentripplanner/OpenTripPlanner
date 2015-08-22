@@ -34,7 +34,7 @@ public class StopTreeCache {
     public StopTreeCache (Graph graph, int maxWalkMeters) {
         this.maxWalkMeters = maxWalkMeters;
         LOG.info("Caching distances to nearby street intersections from each transit stop...");
-        for (TransitStop tstop : graph.index.stopVertexForStop.values()) {
+        graph.index.stopVertexForStop.values().parallelStream().forEach(tstop -> {
             RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
             rr.batch = (true);
             rr.setRoutingContext(graph, tstop, tstop);
@@ -64,9 +64,13 @@ public class StopTreeCache {
                 distances[i++] = vertex.getIndex();
                 distances[i++] = (int) state.getWalkDistance();
             }
-            distancesForStop.put(tstop, distances);
+
             rr.cleanup();
-        }
+
+            synchronized (distancesForStop) {
+                distancesForStop.put(tstop, distances);
+            }
+        });
         LOG.info("Done caching distances to nearby street intersections from each transit stop.");
     }
 

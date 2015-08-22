@@ -13,16 +13,9 @@
 
 package org.opentripplanner.geocoder.bano;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.UriBuilder;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vividsolutions.jts.geom.Envelope;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.GeoJsonObject;
@@ -30,10 +23,17 @@ import org.geojson.Point;
 import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResult;
 import org.opentripplanner.geocoder.GeocoderResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vividsolutions.jts.geom.Envelope;
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A geocoder using the data.gouv.fr API of BANO (Base Nationale d'Adresse Ouverte), the official
@@ -46,6 +46,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author laurent
  */
 public class BanoGeocoder implements Geocoder {
+    private static final Logger LOG = LoggerFactory.getLogger(BanoGeocoder.class);
 
     private static final String BANO_URL = "http://api.adresse.data.gouv.fr/search/";
 
@@ -91,7 +92,7 @@ public class BanoGeocoder implements Geocoder {
             return new GeocoderResults(geocoderResults);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Error processing BANO geocoder results", e);
             return new GeocoderResults(e.getLocalizedMessage());
         }
     }

@@ -61,8 +61,8 @@ public class LinkingTest {
             // split it but not too close to the end
             double splitVal = Math.random() * 0.95 + 0.025;
 
-            SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal);
-            SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal);
+            SplitterVertex sv0 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s0);
+            SplitterVertex sv1 = new SplitterVertex(null, "split", x + delta * splitVal, y + delta * splitVal, s1);
 
             P2<StreetEdge> sp0 = s0.split(sv0);
             P2<StreetEdge> sp1 = s1.split(sv1);
