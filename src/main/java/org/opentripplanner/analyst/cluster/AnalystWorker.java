@@ -410,7 +410,6 @@ public class AnalystWorker implements Runnable {
                 router.includeTimes = clusterRequest.includeTimes;
                 envelope = router.route();
                 envelope.id = clusterRequest.id;
-                envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
                 ts.success = true;
             } catch (Exception ex) {
                 // An error occurred. Leave the envelope empty and TODO include error information.
@@ -421,6 +420,9 @@ public class AnalystWorker implements Runnable {
             // Send the ResultEnvelope back to the user.
             // The results are either stored on S3 (for multi-origin jobs) or sent back through the broker (for
             // immediate interactive display of isochrones).
+            envelope.id = clusterRequest.id;
+            envelope.jobId = clusterRequest.jobId;
+            envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
             if (clusterRequest.outputLocation != null) {
                 // Convert the result envelope and its contents to JSON and gzip it in this thread.
                 // Transfer the results to Amazon S3 in another thread, piping between the two.
