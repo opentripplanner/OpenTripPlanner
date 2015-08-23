@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +18,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Random;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  *
@@ -50,7 +53,8 @@ public class TransportNetwork implements Serializable {
 
     public static void main (String[] args) {
         // Round-trip serialize the transit layer and test its speed after deserialization.
-        TransportNetwork transportNetwork = TransportNetwork.fromFiles(args[0], args[1]);
+        // TransportNetwork transportNetwork = TransportNetwork.fromFiles(args[0], args[1]);
+        TransportNetwork transportNetwork = TransportNetwork.fromDirectory(new File("."));
         try {
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("network.dat"));
             transportNetwork.write(outputStream);
@@ -91,9 +95,9 @@ public class TransportNetwork implements Serializable {
         // Load transit data TODO remove need to supply street layer at this stage
         TransitLayer transitLayer = TransitLayer.fromGtfs(gtfsSourceFile);
 
-        // The street index is needed for linking transit stops to the street network.
+        // The street index is needed for associating transit stops with the street network.
         streetLayer.indexStreets();
-        streetLayer.linkStops(transitLayer);
+        streetLayer.associateStops(transitLayer);
         // Edge lists must be built after all inter-layer linking has occurred.
         streetLayer.buildEdgeLists();
         transitLayer.rebuildTransientIndexes();
@@ -109,12 +113,67 @@ public class TransportNetwork implements Serializable {
         return transportNetwork;
     }
 
+    public static TransportNetwork fromDirectory (File directory) {
+        File osmFile = null;
+        File gtfsFile = null;
+        for (File file : directory.listFiles()) {
+            switch (InputFileType.forFile(file)) {
+                case GTFS:
+                    LOG.info("Found GTFS file {}", file);
+                    if (gtfsFile == null) {
+                        gtfsFile = file;
+                    } else {
+                        LOG.warn("Can only load one GTFS file at a time.");
+                    }
+                    break;
+                case OSM:
+                    LOG.info("Found OSM file {}", file);
+                    if (osmFile == null) {
+                        osmFile = file;
+                    } else {
+                        LOG.warn("Can only load one OSM file at a time.");
+                    }
+                    break;
+                case DEM:
+                    LOG.warn("DEM file '{}' not yet supported.", file);
+                    break;
+                case OTHER:
+                    LOG.warn("Skipping non-input file '{}'", file);
+            }
+        }
+        return fromFiles(osmFile.getAbsolutePath(), gtfsFile.getAbsolutePath());
+    }
+
+    /**
+     * Represents the different types of files that might be present in a router / graph build directory.
+     * We want to detect even those that are not graph builder inputs so we can effectively warn when unrecognized file
+     * types are present. This helps point out when config files have been misnamed.
+     */
+    private static enum InputFileType {
+        GTFS, OSM, DEM, CONFIG, OUTPUT, OTHER;
+        public static InputFileType forFile(File file) {
+            String name = file.getName();
+            if (name.endsWith(".zip")) {
+                try {
+                    ZipFile zip = new ZipFile(file);
+                    ZipEntry stopTimesEntry = zip.getEntry("stop_times.txt");
+                    zip.close();
+                    if (stopTimesEntry != null) return GTFS;
+                } catch (Exception e) { /* fall through */ }
+            }
+            if (name.endsWith(".pbf")) return OSM;
+            if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
+            if (name.endsWith("network.dat")) return OUTPUT;
+            return OTHER;
+        }
+    }
+
     /**
      * Test combined street and transit routing.
      */
     public void testRouting () {
         LOG.info("Street and transit routing from random street corners...");
-        StreetRouter streetRouter = new StreetRouter(streetLayer, transitLayer);
+        StreetRouter streetRouter = new StreetRouter(streetLayer);
         streetRouter.distanceLimitMeters = 1500;
         TransitRouter transitRouter = new TransitRouter(transitLayer);
         long startTime = System.currentTimeMillis();
@@ -128,9 +187,9 @@ public class TransportNetwork implements Serializable {
             int to = random.nextInt(nStreetIntersections);
             transitRouter.reset();
             streetRouter.route(from, StreetRouter.ALL_VERTICES);
-            transitRouter.setOrigins(streetRouter.timesToReachedStops());
+            transitRouter.setOrigins(streetRouter.timesToReachedStops(transitLayer));
             streetRouter.route(to, StreetRouter.ALL_VERTICES);
-            transitRouter.setTargets(streetRouter.timesToReachedStops().keySet());
+            transitRouter.setTargets(streetRouter.timesToReachedStops(transitLayer).keySet());
             transitRouter.route();
             if (n != 0 && n % 100 == 0) {
                 LOG.info("    {}/{} searches", n, N);
