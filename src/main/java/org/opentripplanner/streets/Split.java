@@ -15,18 +15,18 @@ public class Split {
 
     private static final Logger LOG = LoggerFactory.getLogger(Split.class);
 
-    int edge = -1;
-    int seg = 0; // the segment within the edge that is closest to the search point
-    double frac = 0; // the fraction along that segment where a link should occur
-    double fLon; // the x coordinate of the link point along the edge
-    double fLat; // the y coordinate of the link point along the edge
+    public int edge = -1;
+    public int seg = 0; // the segment within the edge that is closest to the search point
+    public double frac = 0; // the fraction along that segment where a link should occur
+    public double fLon; // the x coordinate of the link point along the edge
+    public double fLat; // the y coordinate of the link point along the edge
     // by virtue of having twice as many digits, a long could always hold the square of an int, but would it be faster than float math?
-    double distSquared = Double.POSITIVE_INFINITY;
+    public double distSquared = Double.POSITIVE_INFINITY;
 
     // The following fields require more calculations and are only set once a best edge is found.
-    int lengthBefore_mm = 0; // the accumulated distance along the edge geometry up to the split point
-    int lengthAfter_mm = 0; // the accumulated distance along the edge geometry up to the split point
-    int distance_mm = 0; // the distance from the search point to the split point on the street
+    public int lengthBefore_mm = 0; // the accumulated distance along the edge geometry up to the split point
+    public int lengthAfter_mm = 0; // the accumulated distance along the edge geometry up to the split point
+    public int distance_mm = 0; // the distance from the search point to the split point on the street
 
     public void setFrom (Split other) {
         edge = other.edge;

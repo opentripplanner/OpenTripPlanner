@@ -1,6 +1,7 @@
 package org.opentripplanner.streets;
 
 import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -57,6 +58,21 @@ public class StreetRouter {
             return true; // continue iteration
         });
         return result;
+    }
+
+    /**
+     * A packed list of (vertex, distance).
+     * This is currently returning the weight, which is the distance in meters.
+     */
+    public int[] getStopTree () {
+        TIntList result = new TIntArrayList(bestStates.size() * 2);
+        // Convert stop vertex indexes in street layer to transit layer stop indexes.
+        bestStates.forEachEntry((vertexIndex, state) -> {
+            result.add(vertexIndex);
+            result.add(state.weight);
+            return true; // continue iteration
+        });
+        return result.toArray();
     }
 
     public StreetRouter (StreetLayer streetLayer) {

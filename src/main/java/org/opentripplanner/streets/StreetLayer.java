@@ -57,8 +57,8 @@ public class StreetLayer implements Serializable {
     transient OSM osm;
 
     // Initialize these when we have an estimate of the number of expected edges.
-    VertexStore vertexStore = new VertexStore(100_000);
-    EdgeStore edgeStore = new EdgeStore(vertexStore, 200_000);
+    public VertexStore vertexStore = new VertexStore(100_000);
+    public EdgeStore edgeStore = new EdgeStore(vertexStore, 200_000);
 
     transient Histogram edgesPerWayHistogram = new Histogram("Number of edges per way per direction");
     transient Histogram pointsPerEdgeHistogram = new Histogram("Number of geometry points per edge");
@@ -73,6 +73,7 @@ public class StreetLayer implements Serializable {
             }
             int nEdgesCreated = 0;
             int beginIdx = 0;
+            // Break each OSM way into topological segments between intersections, and make one edge per segment.
             for (int n = 1; n < way.nodes.length; n++) {
                 if (osm.intersectionNodes.contains(way.nodes[n]) || n == (way.nodes.length - 1)) {
                     makeEdge(way, beginIdx, n);
@@ -91,7 +92,9 @@ public class StreetLayer implements Serializable {
         osm = null;
     }
 
-    // Get or create mapping
+    /**
+     * Get or create mapping from a global long OSM ID to an internal street vertex ID, creating the vertex as needed.
+     */
     private int getVertexIndexForOsmNode(long osmNodeId) {
         int vertexIndex = vertexIndexForOsmNode.get(osmNodeId);
         if (vertexIndex == -1) {
@@ -122,6 +125,9 @@ public class StreetLayer implements Serializable {
         return (int)(lengthMeters * 1000);
     }
 
+    /**
+     * Make an edge for a sub-section of an OSM way, typically between two intersections or dead ends.
+     */
     private void makeEdge (Way way, int beginIdx, int endIdx) {
 
         long beginOsmNodeId = way.nodes[beginIdx];
@@ -157,7 +163,7 @@ public class StreetLayer implements Serializable {
     public void indexStreets () {
         LOG.info("Indexing streets...");
         spatialIndex = new IntHashGrid();
-        // Skip by twos, we only need to index forward (even) edges.
+        // Skip by twos, we only need to index forward (even) edges. Their odd companions have the same geometry.
         EdgeStore.Edge edge = edgeStore.getCursor();
         for (int e = 0; e < edgeStore.nEdges; e += 2) {
             edge.seek(e);
@@ -213,7 +219,6 @@ public class StreetLayer implements Serializable {
         }
         edgesPerListHistogram.display();
     }
-
 
     /**
      * Create a street-layer vertex representing a transit stop.
@@ -281,9 +286,9 @@ public class StreetLayer implements Serializable {
      * For every stop in a TransitLayer, find or create a nearby vertex in the street layer and record the connection
      * between the two.
      */
-    public void associateStops(TransitLayer transitLayer) {
+    public void associateStops (TransitLayer transitLayer, int radiusMeters) {
         for (Stop stop : transitLayer.stopForIndex) {
-            int streetVertexIndex = getOrCreateVertexNear(stop.stop_lat, stop.stop_lon, 300);
+            int streetVertexIndex = getOrCreateVertexNear(stop.stop_lat, stop.stop_lon, radiusMeters);
             transitLayer.streetVertexForStop.add(streetVertexIndex); // -1 means no link
             // The inverse stopForStreetVertex map is a transient, derived index and will be built later.
         }

@@ -14,6 +14,8 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.opentripplanner.streets.StreetLayer;
+import org.opentripplanner.streets.StreetRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +28,7 @@ import java.util.Map;
 
 
 /**
- *
+ * A key simplifying factor is that we don't handle overnight trips. This is fine for analysis at usual times of day.
  */
 public class TransitLayer implements Serializable {
 
@@ -54,6 +56,10 @@ public class TransitLayer implements Serializable {
 
     // TODO there is probably a better way to do this, but for now we need to retain stop object for linking to streets
     public transient List<Stop> stopForIndex = new ArrayList<>();
+
+    // For each transit stop, the distances to nearby streets as packed (vertex, distance) pairs.
+    // Making these non-transient triples the serialized file size.
+    public List<int[]> stopTrees;
 
     /**
      * Seems kind of hackish to pass the street layer in.
@@ -193,4 +199,32 @@ public class TransitLayer implements Serializable {
         return stopIdForIndex.size();
     }
 
+    /**
+     * This transit network must already be linked to streets.
+     * TODO maybe handle this in TransferFinder and serialize the trees.
+     * The packed format does not make the serialized size any smaller (the Trove serializers are already smart).
+     * However the packed representation uses less live memory: 665 vs 409 MB (including all other data) on Portland.
+     */
+    public void buildStopTrees (StreetLayer streetLayer) {
+        LOG.info("Creating travel distance trees from each transit stop...");
+        final int[] EMPTY_INT_ARRAY = new int[0];
+        stopTrees = new ArrayList<>();
+        StreetRouter streetRouter = new StreetRouter(streetLayer);
+        streetRouter.distanceLimitMeters = 2000;
+        for (int s = 0; s < getStopCount(); s++) {
+            int originStreetVertex = streetVertexForStop.get(s);
+            if (originStreetVertex == -1) {
+                LOG.warn("Stop {} is not connected to the street network.", s);
+                // Every iteration must add a map to stopTrees to maintain the right length.
+                stopTrees.add(EMPTY_INT_ARRAY);
+                continue;
+            }
+            streetRouter.route(originStreetVertex, StreetRouter.ALL_VERTICES);
+            stopTrees.add(streetRouter.getStopTree());
+        }
+        LOG.info("Done creating travel distance trees.");
+    }
+
+
+    // TODO setStreetLayer which automatically links and records the streetLayer ID in a field for use elsewhere?
 }

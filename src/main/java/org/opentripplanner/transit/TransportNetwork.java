@@ -97,13 +97,14 @@ public class TransportNetwork implements Serializable {
 
         // The street index is needed for associating transit stops with the street network.
         streetLayer.indexStreets();
-        streetLayer.associateStops(transitLayer);
+        streetLayer.associateStops(transitLayer, 500);
         // Edge lists must be built after all inter-layer linking has occurred.
         streetLayer.buildEdgeLists();
         transitLayer.rebuildTransientIndexes();
+        transitLayer.buildStopTrees(streetLayer);
 
         // Create transfers
-        new TransferFinder(transitLayer, streetLayer, 1500).findTransfers();
+        new TransferFinder(transitLayer, streetLayer, 1000).findTransfers();
 
         // Create and serialize a transport network
         TransportNetwork transportNetwork = new TransportNetwork();
@@ -198,6 +199,5 @@ public class TransportNetwork implements Serializable {
         double eTime = System.currentTimeMillis() - startTime;
         LOG.info("average response time {} msec", eTime / N);
     }
-
 
 }

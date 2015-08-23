@@ -1,7 +1,11 @@
 package org.opentripplanner.analyst;
 
 import com.csvreader.CsvReader;
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,12 +32,25 @@ import org.opentripplanner.analyst.pointset.PropertyMetadata;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.streets.StreetLayer;
+import org.opentripplanner.streets.TempVertexList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -860,4 +877,18 @@ public class PointSet implements Serializable {
     public Coordinate getCoordinate(int index) {
         return new Coordinate(lons[index], lats[index]);
     }
+
+    /**
+     * Creates an object similar to a SampleSet but for the new TransitNetwork representation.
+     * This is a somewhat slow operation involving a lot of geometry calculations.
+     * The resulting object should be cached.
+     */
+    public TempVertexList makeTempVertexList (StreetLayer streetLayer) {
+        TempVertexList tempVertexSet = new TempVertexList(streetLayer);
+        for (int i = 0; i < capacity; i++) {
+            tempVertexSet.addTempVertex(lats[i], lons[i]);
+        }
+        return tempVertexSet;
+    }
+
 }
