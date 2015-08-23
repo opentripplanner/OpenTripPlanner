@@ -1,5 +1,6 @@
 package org.opentripplanner.transit;
 
+import org.opentripplanner.profile.RaptorWorkerTimetable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +82,37 @@ public class TripPattern implements Serializable {
             }
         }
         return bestSchedule;
+    }
+
+    /**
+     * Convert a new-style TransitNetwork TripPattern to a RaptorWorkerTimetable as a stopgap measure, to allow
+     * making RaptorWorkerData from the new TransitNetwork.
+     */
+    public RaptorWorkerTimetable toRaptorWorkerTimetable (BitSet servicesActive) {
+        List<TripSchedule> activeSchedules = new ArrayList<>();
+        for (TripSchedule schedule: tripSchedules) {
+            if (servicesActive.get(schedule.serviceCode)) {
+                activeSchedules.add(schedule);
+            }
+        }
+        RaptorWorkerTimetable timetable = new RaptorWorkerTimetable(activeSchedules.size(), stops.length);
+        int i = 0;
+        for (TripSchedule schedule : activeSchedules) {
+            // FIXME we're losing information here. The other Raptor worker does not support different arrival and departure times.
+            timetable.timesPerTrip[i] = schedule.departures;
+        }
+
+        timetable.stopIndices = this.stops;
+
+// TODO: more fields in timetable
+//        /** parent raptorworkerdata of this timetable */
+//        public RaptorWorkerData raptorData;
+//        /** Mode of this pattern, see constants in com.conveyal.gtfs.model.Route */
+//        public int mode;
+//        /** Index of this pattern in RaptorData */
+//        public int dataIndex;
+
+        return timetable;
     }
 
 }

@@ -15,7 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +46,7 @@ public class RaptorWorkerTimetable implements Serializable {
 
     int nTrips, nStops;
 
-    int[][] timesPerTrip;
+    public int[][] timesPerTrip;
 
     /* Times for frequency-based trips are stored in parallel arrays (a column store). */
 
@@ -73,7 +77,7 @@ public class RaptorWorkerTimetable implements Serializable {
     /** slack required when boarding a transit vehicle */
     public static final int MIN_BOARD_TIME_SECONDS = 60;
 
-    private RaptorWorkerTimetable(int nTrips, int nStops) {
+    public RaptorWorkerTimetable(int nTrips, int nStops) {
         this.nTrips = nTrips;
         this.nStops = nStops;
         timesPerTrip = new int[nTrips][];
@@ -440,4 +444,5 @@ public class RaptorWorkerTimetable implements Serializable {
 
         public static final long serialVersionUID = 1;
     }
+
 }

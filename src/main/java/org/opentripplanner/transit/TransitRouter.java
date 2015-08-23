@@ -1,6 +1,5 @@
 package org.opentripplanner.transit;
 
-import com.conveyal.gtfs.model.Service;
 import gnu.trove.TIntCollection;
 import gnu.trove.list.TIntList;
 import gnu.trove.map.TIntIntMap;
@@ -117,7 +116,7 @@ public class TransitRouter {
 
         // Determine which services are active to avoid exploring those that are not running on this day.
         LocalDate searchDate = new LocalDate(2015, 8, 6);
-        markServicesForDate(searchDate);
+        servicesActive = transitLayer.getActiveServicesForDate(searchDate);
 
         while (true) {
             newRound();
@@ -187,15 +186,5 @@ public class TransitRouter {
         });
     }
 
-    // Mark all services that are active on the given day. Trips on inactive services will not be used in the search.
-    private void markServicesForDate (LocalDate date) {
-        servicesActive.clear();
-        int s = 0;
-        for (Service service : transitLayer.services) {
-            if (service.activeOn(date)) {
-                servicesActive.set(s);
-            }
-            s++;
-        }
-    }
+
 }

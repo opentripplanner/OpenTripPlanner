@@ -1,8 +1,10 @@
 package org.opentripplanner.transit;
 
 import com.conveyal.osmlib.OSM;
+import org.joda.time.LocalDate;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
+import org.opentripplanner.profile.RaptorWorkerData;
 import org.opentripplanner.streets.StreetLayer;
 import org.opentripplanner.streets.StreetRouter;
 import org.slf4j.Logger;
@@ -22,13 +24,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- *
+ * This is a completely new replacement for Graph, Router etc.
+ * It uses a lot less object pointers and can be built, read, and written orders of magnitude faster.
+ * @author abyrd
  */
 public class TransportNetwork implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransportNetwork.class);
 
     StreetLayer streetLayer;
+
     TransitLayer transitLayer;
 
     public void write (OutputStream stream) throws IOException {
@@ -55,6 +60,10 @@ public class TransportNetwork implements Serializable {
         // Round-trip serialize the transit layer and test its speed after deserialization.
         // TransportNetwork transportNetwork = TransportNetwork.fromFiles(args[0], args[1]);
         TransportNetwork transportNetwork = TransportNetwork.fromDirectory(new File("."));
+
+        // Try out constructing older raptor data format
+        RaptorWorkerData raptorWorkerData = new RaptorWorkerData(transportNetwork.transitLayer, new LocalDate());
+
         try {
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream("network.dat"));
             transportNetwork.write(outputStream);

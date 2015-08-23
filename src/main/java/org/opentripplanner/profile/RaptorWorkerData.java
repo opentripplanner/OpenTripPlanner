@@ -15,10 +15,15 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.cluster.TaskStatistics;
-import org.opentripplanner.analyst.scenario.*;
+import org.opentripplanner.analyst.scenario.AddTripPattern;
+import org.opentripplanner.analyst.scenario.ConvertToFrequency;
+import org.opentripplanner.analyst.scenario.Scenario;
+import org.opentripplanner.analyst.scenario.TransferRule;
+import org.opentripplanner.analyst.scenario.TripPatternFilter;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -35,12 +40,14 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,7 +83,7 @@ public class RaptorWorkerData implements Serializable {
     /**
      * Map from stops that do not exist in the graph but only for the duration of this search to their stop indices in the RAPTOR data.
      */
-    public TObjectIntMap<AddTripPattern.TemporaryStop> addedStops = new TObjectIntHashMap<AddTripPattern.TemporaryStop>();
+    public TObjectIntMap<AddTripPattern.TemporaryStop> addedStops = new TObjectIntHashMap<>();
 
     /** Some stops may have special transfer rules. They are stored here. */
     public TIntObjectMap<List<TransferRule>> transferRules = new TIntObjectHashMap<>();
@@ -654,7 +661,7 @@ public class RaptorWorkerData implements Serializable {
             if (Double.isInfinite(dist))
                 continue;
 
-            // TODO hardwired walk speed
+            // FIXME hardwired walk speed
             // NB using the index in the worker data not the index in the graph!
             accessTimes.put(it.value(), (int) (dist / 1.3f));
         }
@@ -672,4 +679,41 @@ public class RaptorWorkerData implements Serializable {
         int index;
         float distance;
     }
+
+    /**
+     * This is an adapter constructor, which makes Analyst cluster worker data from a new-style TransportNetwork.
+     * RaptorWorkers are (intentionally) very similar to the TransitLayer of TransportNetworks.
+     * For now we'll just perform a copy, filtering out any unused patterns and trips.
+     */
+    public RaptorWorkerData (TransitLayer transitLayer, LocalDate date) {
+        // The RaptorWorkerData is a single-job throwaway item. It includes travel times (not distances, to avoid divides)
+        // to a specific PointSet+SampleSet of interest in the task at hand, or to all the street vertices.
+        nStops = transitLayer.getStopCount();
+        nTargets = 0; // FIXME
+        nPatterns = transitLayer.tripPatterns.size();
+        transitLayer.transfersForStop.forEach(t -> transfersForStop.add(t.toArray()));
+        transitLayer.patternsForStop.forEach(p -> patternsForStop.add(p.toArray()));
+        // Copy contiguous zero-based array into a sparse map.
+        indexForStop = new TIntIntHashMap();
+        for (int s = 0; s < transitLayer.streetVertexForStop.size(); s++) {
+            indexForStop.put(s, transitLayer.streetVertexForStop.get(s));
+        }
+        targetsForStop.addAll(transitLayer.stopTrees);
+        // Copy new-style TransportNetwork TripPatterns to RaptorWorkerTimetables
+        BitSet servicesActive = transitLayer.getActiveServicesForDate(date);
+        for (org.opentripplanner.transit.TripPattern tripPattern : transitLayer.tripPatterns) {
+            // NOTE this is leaving all patterns with zero active trips in the list.
+            // Otherwise we have to re-number all the patterns.
+            RaptorWorkerTimetable timetable = tripPattern.toRaptorWorkerTimetable(servicesActive);
+            timetablesForPattern.add(timetable);
+        }
+        hasSchedules = true;
+        hasFrequencies = false;
+    }
+
+    // TODO targets rather than street vertices.
+    // At first we're going to use the street vertices as targets and try to just do isochrones.
+    // TODO set targets on TransitLayer-derived RaptorWorkerData from PointSet
+
+
 }

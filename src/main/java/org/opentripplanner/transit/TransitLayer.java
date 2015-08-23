@@ -14,6 +14,7 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.joda.time.LocalDate;
 import org.opentripplanner.streets.StreetLayer;
 import org.opentripplanner.streets.StreetRouter;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -225,6 +227,18 @@ public class TransitLayer implements Serializable {
         LOG.info("Done creating travel distance trees.");
     }
 
+    // Mark all services that are active on the given day. Trips on inactive services will not be used in the search.
+    public BitSet getActiveServicesForDate (LocalDate date) {
+        BitSet activeServices = new BitSet();
+        int s = 0;
+        for (Service service : services) {
+            if (service.activeOn(date)) {
+                activeServices.set(s);
+            }
+            s++;
+        }
+        return activeServices;
+    }
 
     // TODO setStreetLayer which automatically links and records the streetLayer ID in a field for use elsewhere?
 }
