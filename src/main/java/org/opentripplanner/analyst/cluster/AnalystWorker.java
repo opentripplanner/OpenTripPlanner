@@ -384,6 +384,7 @@ public class AnalystWorker implements Runnable {
             // Why not pass in ts as well since this is a throwaway calculator?
             RepeatedRaptorProfileRouter router =
                     new RepeatedRaptorProfileRouter(graph, clusterRequest.profileRequest, sampleSet);
+            router.ts = ts;
 
             // Produce RAPTOR data tables, going through a cache where relevant.
             // This is only used for multi-point requests. Single-point requests are assumed to be continually
@@ -406,7 +407,7 @@ public class AnalystWorker implements Runnable {
             ResultEnvelope envelope = new ResultEnvelope();
             try {
                 // TODO when router runs, if there are no transit modes defined it should just skip the transit work.
-                router.route(ts);
+                router.route();
                 long resultSetStart = System.currentTimeMillis();
                 // TODO move all this into the main route function
                 if (isochrone) {

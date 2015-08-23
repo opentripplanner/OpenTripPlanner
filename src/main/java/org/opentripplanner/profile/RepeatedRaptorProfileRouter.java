@@ -83,6 +83,9 @@ public class RepeatedRaptorProfileRouter {
 
     private PropagatedTimesStore propagatedTimesStore;
 
+    // Set this field to an existing taskStatistics before routing if you want to collect performance information.
+    public TaskStatistics ts = new TaskStatistics();
+
     /**
      * Make a router to use for making time surfaces only.
      *
@@ -122,10 +125,6 @@ public class RepeatedRaptorProfileRouter {
     }
 
     public void route () {
-        route(new TaskStatistics());
-    }
-
-    public void route (TaskStatistics ts) {
 
         boolean isochrone = (sampleSet == null); // When no sample set is provided, we're making isochrones.
         boolean transit = (request.transitModes != null && request.transitModes.isTransit()); // Does the search involve transit at all?
