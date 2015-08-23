@@ -3,6 +3,7 @@ package org.opentripplanner.streets;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
+import org.opentripplanner.transit.TransitRouter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +30,9 @@ import java.util.List;
 public class TempVertexSet {
 
     private final StreetLayer streetLayer;
-    TIntList edgePairs = new TIntArrayList();
-    TIntList firstDistancesMm = new TIntArrayList();
-    TIntList secondDistancesMm = new TIntArrayList();
+    TIntList edges = new TIntArrayList(); // These are in fact the even (forward) edge IDs of closest edge pairs.
+    TIntList fromDistancesMillimeters = new TIntArrayList();
+    TIntList toDistancesMillimeters = new TIntArrayList();
     List<TIntIntMap> stopTrees = null;
 
     public TempVertexSet (StreetLayer streetLayer) {
@@ -39,17 +40,33 @@ public class TempVertexSet {
     }
 
     public int getSize() {
-        return edgePairs.size();
+        return edges.size();
     }
 
     public void addTempVertex (int fixedLat, int fixedLon) {
         // TODO find nearest edge pair, record distances to its endpoints
+        // Reuse code from stop linker.
+        Split split = streetLayer.findSplit(fixedLat, fixedLon, 300);
+        edges.add(split.edge);
+        fromDistancesMillimeters.add(split.lengthBefore_mm);
+        toDistancesMillimeters.add(split.lengthAfter_mm);
     }
 
     public void buildStopTrees () {
+        EdgeStore.Edge edge = streetLayer.edgeStore.getCursor();
         stopTrees = new ArrayList<>();
-        for (int i = 0; i < edgePairs.size(); i++) {
+        for (int i = 0; i < edges.size(); i++) {
+            StreetRouter streetRouter = new StreetRouter(streetLayer);
+            edge.seek(edges.get(i));
+            //streetRouter.addInitialVertex(edge.getFromVertex(), fromDistancesMillimeters.get(i));
+            //streetRouter.addInitialVertex(edge.getToVertex(), toDistancesMillimeters.get(i));
+            // streetRouter.setDestination(coords); goal direction is entirely geographical, just set a target location
+            // streetRouter.route();
             // TODO run a search at each temp vertex, retaining the walk times to vertices.
         }
+    }
+
+    public void eval (StreetRouter streetRouter, TransitRouter transitRouter) {
+        // Take times at transit stops and on street vertices, and find a min travel time for every point in this set.
     }
 }
