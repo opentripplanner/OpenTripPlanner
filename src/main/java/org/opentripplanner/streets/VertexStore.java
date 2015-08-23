@@ -27,7 +27,7 @@ public class VertexStore implements Serializable {
      * @return the index of the new vertex.
      */
     public int addVertex (double lat, double lon) {
-        return addVertexFixed(degreesToFixedInt(lat), degreesToFixedInt(lon));
+        return addVertexFixed(floatingDegreesToFixed(lat), floatingDegreesToFixed(lon));
     }
 
     /**
@@ -103,11 +103,11 @@ public class VertexStore implements Serializable {
         return new Vertex(index);
     }
 
-    public static int degreesToFixedInt (double degrees) {
+    public static int floatingDegreesToFixed(double degrees) {
         return (int)(degrees * FIXED_FACTOR);
     }
 
-    public static double fixedIntToDegrees (int fixed) {
+    public static double fixedDegreesToFloating(int fixed) {
         return fixed / FIXED_FACTOR;
     }
 

@@ -226,9 +226,10 @@ public class EdgeStore implements Serializable {
         }
 
         /**
-         * Always iterates forward, whether or not we are on a forward or backward edge.
+         * Call a function on every segment in this edges's geometry.
+         * Always iterates forward over the geometry, whether we are on a forward or backward edge.
          */
-        public void iterateGeometry (SegmentConsumer segmentConsumer) {
+        public void forEachSegment (SegmentConsumer segmentConsumer) {
             VertexStore.Vertex vertex = vertexStore.getCursor(fromVertices.get(pairIndex));
             int prevFixedLat = vertex.getFixedLat();
             int prevFixedLon = vertex.getFixedLon();
@@ -247,21 +248,30 @@ public class EdgeStore implements Serializable {
             segmentConsumer.consumeSegment(s, prevFixedLat, prevFixedLon, vertex.getFixedLat(), vertex.getFixedLon());
         }
 
-        /** @return an envelope around the whole edge geometry. */
-        public Envelope getEnvelope() {
-            Envelope envelope = new Envelope();
-            VertexStore.Vertex vertex = vertexStore.getCursor();
-            vertex.seek(fromVertices.get(pairIndex));
-            envelope.expandToInclude(vertex.getFixedLon(), vertex.getFixedLat());
+
+        /**
+         * Call a function for every point on this edge's geometry, including the beginning end end points.
+         * Always iterates forward over the geometry, whether we are on a forward or backward edge.
+         */
+        public void forEachPoint (PointConsumer pointConsumer) {
+            VertexStore.Vertex vertex = vertexStore.getCursor(fromVertices.get(pairIndex));
+            int p = 0;
+            pointConsumer.consumePoint(p++, vertex.getFixedLat(), vertex.getFixedLon());
             int[] intermediates = geometries.get(pairIndex);
             int i = 0;
             while (i < intermediates.length) {
-                int fixedLat = intermediates[i++];
-                int fixedLon = intermediates[i++];
-                envelope.expandToInclude(fixedLon, fixedLat);
+                pointConsumer.consumePoint(p++, intermediates[i++], intermediates[i++]);
             }
             vertex.seek(toVertices.get(pairIndex));
-            envelope.expandToInclude(vertex.getFixedLon(), vertex.getFixedLat());
+            pointConsumer.consumePoint(p, vertex.getFixedLat(), vertex.getFixedLon());
+        }
+
+        /** @return an envelope around the whole edge geometry. */
+        public Envelope getEnvelope() {
+            Envelope envelope = new Envelope();
+            forEachPoint((p, fixedLat, fixedLon) -> {
+                envelope.expandToInclude(fixedLon, fixedLat);
+            });
             return envelope;
         }
 
@@ -271,8 +281,10 @@ public class EdgeStore implements Serializable {
         public int nSegments () {
             int[] geom = geometries.get(pairIndex);
             if (geom != null) {
-                return geom.length + 1;
+                // Number of packed lat-lon pairs plus the final segment.
+                return (geom.length / 2) + 1;
             } else {
+                // A single segment from the initial vertex to the final vertex.
                 return 1;
             }
         }
@@ -306,6 +318,12 @@ public class EdgeStore implements Serializable {
     @FunctionalInterface
     public static interface SegmentConsumer {
         public void consumeSegment (int index, int fixedLat0, int fixedLon0, int fixedLat1, int fixedLon1);
+    }
+
+    /** A functional interface that consumes the points in a street geometry one by one. */
+    @FunctionalInterface
+    public static interface PointConsumer {
+        public void consumePoint (int index, int fixedLat, int fixedLon);
     }
 
     public void dump () {

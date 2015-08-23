@@ -35,7 +35,7 @@ public class TransferFinder {
     public TransferFinder(TransitLayer transitLayer, StreetLayer streetLayer, int radiusMeters) {
         this.transitLayer = transitLayer;
         this.streetLayer = streetLayer;
-        streetRouter = new StreetRouter(streetLayer, transitLayer);
+        streetRouter = new StreetRouter(streetLayer);
         streetRouter.distanceLimitMeters = radiusMeters;
     }
 
@@ -56,7 +56,7 @@ public class TransferFinder {
                 continue;
             }
             streetRouter.route(originStreetVertex, StreetRouter.ALL_VERTICES);
-            TIntIntMap timesToReachedStops = streetRouter.timesToReachedStops();
+            TIntIntMap timesToReachedStops = streetRouter.timesToReachedStops(transitLayer);
             // Filter down the list of target stops to only include those stops that are the closest on some pattern.
             TIntIntMap bestStopOnPattern = new TIntIntHashMap(50, 0.5f, -1, -1);
             // For every reached stop,

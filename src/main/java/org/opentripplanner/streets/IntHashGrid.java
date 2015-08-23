@@ -62,7 +62,7 @@ public class IntHashGrid {
     private int nEntries = 0;
 
     public IntHashGrid(double binSizeDegrees) {
-        yBinSize = VertexStore.degreesToFixedInt(binSizeDegrees);
+        yBinSize = VertexStore.floatingDegreesToFixed(binSizeDegrees);
         xBinSize = (int)(yBinSize / 0.7); // Assume about 45 degrees latitude for now, cos(45deg)
         if (binSizeDegrees <= 0) {
             throw new IllegalStateException("bin size must be positive.");

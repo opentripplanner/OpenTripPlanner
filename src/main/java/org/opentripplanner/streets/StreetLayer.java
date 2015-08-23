@@ -4,14 +4,10 @@ import com.conveyal.gtfs.model.Stop;
 import com.conveyal.osmlib.Node;
 import com.conveyal.osmlib.OSM;
 import com.conveyal.osmlib.Way;
-import com.vividsolutions.jts.geom.Envelope;
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TLongIntMap;
 import gnu.trove.map.hash.TLongIntHashMap;
-import org.apache.commons.math3.util.FastMath;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.TransitLayer;
 import org.slf4j.Logger;
@@ -44,6 +40,8 @@ import java.util.Random;
 public class StreetLayer implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreetLayer.class);
+
+    private static final int SNAP_RADIUS_MM = 5 * 1000;
 
     // Edge lists should be constructed after the fact from edges. This minimizes serialized size too.
     transient List<TIntList> outgoingEdges;
@@ -172,7 +170,7 @@ public class StreetLayer implements Serializable {
     public void testRouting (boolean withDestinations, TransitLayer transitLayer) {
         LOG.info("Routing from random vertices in the graph...");
         LOG.info("{} goal direction.", withDestinations ? "Using" : "Not using");
-        StreetRouter router = new StreetRouter(this, transitLayer);
+        StreetRouter router = new StreetRouter(this);
         long startTime = System.currentTimeMillis();
         final int N = 1_000;
         final int nVertices = outgoingEdges.size();
@@ -216,117 +214,78 @@ public class StreetLayer implements Serializable {
         edgesPerListHistogram.display();
     }
 
+
     /**
      * Create a street-layer vertex representing a transit stop.
      * Connect that new vertex to the street network if possible.
      * The vertex will be created and assigned an index whether or not it is successfully linked.
      *
      * TODO maybe use X and Y everywhere for fixed point, and lat/lon for double precision degrees.
+     * TODO move this into Split.perform(), store streetLayer ref in Split
      *
-     * @return the street vertex index that was created for this stop.
+     * @return the index of a street vertex very close to this stop, or -1 if no such vertex could be found or created.
      */
-    public int linkTransitStop (double lat, double lon, double radiusMeters) {
+    public int getOrCreateVertexNear (double lat, double lon, double radiusMeters) {
 
-        // NOTE THIS ENTIRE GEOMETRIC CALCULATION IS HAPPENING IN FIXED PRECISION INT DEGREES
-        int fLat = VertexStore.degreesToFixedInt(lat);
-        int fLon = VertexStore.degreesToFixedInt(lon);
-
-        // We won't worry about the perpendicular walks yet.
-        // Just insert or find a vertex on the nearest road and return that vertex.
-
-        final double metersPerDegreeLat = 111111.111;
-        double cosLat = FastMath.cos(FastMath.toRadians(lat)); // The projection factor, Earth is a "sphere"
-        double radiusFixedLat = VertexStore.degreesToFixedInt(radiusMeters / metersPerDegreeLat);
-        double radiusFixedLon = radiusFixedLat / cosLat; // Expand the X search space, don't shrink it.
-        Envelope envelope = new Envelope(fLon, fLon, fLat, fLat);
-        envelope.expandBy(radiusFixedLon, radiusFixedLat);
-        double squaredRadiusFixedLat = radiusFixedLat * radiusFixedLat; // May overflow, don't use an int
-        EdgeStore.Edge edge = edgeStore.getCursor();
-        TIntIterator edgeIterator = spatialIndex.query(envelope).iterator(); // Iterate over forward (even) edges found.
-        // The split location currently being examined and the best one seen so far.
-        Split curr = new Split();
-        Split best = new Split();
-        while (edgeIterator.hasNext()) {
-            curr.edge = edgeIterator.next();
-            edge.seek(curr.edge);
-            edge.iterateGeometry((seg, fLat0, fLon0, fLat1, fLon1) -> {
-                // Find the fraction along the current segment
-                curr.seg = seg;
-                curr.frac = GeometryUtils.segmentFraction(fLon0, fLat0, fLon1, fLat1, fLon, fLat, cosLat);
-                // Project to get the closest point on the segment.
-                // Note: the fraction is scaleless, xScale is accounted for in the segmentFraction function.
-                curr.fLon = fLon0 + curr.frac * (fLon1 - fLon0);
-                curr.fLat = fLat0 + curr.frac * (fLat1 - fLat0);
-                // Find squared distance to edge (avoid taking root)
-                double dx = (curr.fLon - fLon) * cosLat;
-                double dy = (curr.fLat - fLat);
-                curr.distSquared = dx * dx + dy * dy;
-                // Ignore segments that are too far away (filter false positives).
-                // Replace the best segment if we've found something closer.
-                if (curr.distSquared < squaredRadiusFixedLat && curr.distSquared < best.distSquared) {
-                    best.setFrom(curr);
-                }
-            }); // end loop over segments
-        } // end loop over edges
-
-        // If no linking site was found within range, exit.
-        if (best.edge < 0) {
+        Split split = findSplit(lat, lon, radiusMeters);
+        if (split == null) {
+            // If no linking site was found within range.
             return -1;
         }
 
         // We have a linking site. Find or make a suitable vertex at that site.
-        edge.seek(best.edge);
-        if (best.frac == 0 && best.seg == 0) {
-            return edge.getFromVertex(); // At the beginning of the edge
-        } else if (best.frac == 1 && best.seg == edge.nSegments() - 1) {
-            return edge.getToVertex(); // At the end of the edge
-        }
-        // The split is somewhere away from an existing vertex. Make a new one.
-        // We must iterate back over the edge to accumulate distances along its geometry.
+        // Retaining the original Edge cursor object inside findSplit is not necessary, one object creation is harmless.
+        EdgeStore.Edge edge = edgeStore.getCursor(split.edge);
 
-        best.lengthBefore = 0; // stored in Split to avoid "effectively final" BS.
-        edge.iterateGeometry((seg, fLat0, fLon0, fLat1, fLon1) -> {
-            // Sum lengths only up to the split point.
-            // lengthAfter should be total length minus lengthBefore, which ensures splits do not change total lengths.
-            if (seg <= best.seg) {
-                double dx = (fLon1 - fLon0) * cosLat;
-                double dy = (fLat1 - fLat0);
-                double length = FastMath.sqrt(dx * dx + dy * dy);
-                // TODO accumulate before/after geoms. Split point can be passed over since it's not an intermediate.
-                if (seg == best.seg) {
-                    length *= best.frac;
-                }
-                best.lengthBefore += length;
+        // Check for cases where we don't need to create a new vertex (the edge is reached end-wise)
+        if (split.lengthBefore_mm < SNAP_RADIUS_MM || split.lengthAfter_mm < SNAP_RADIUS_MM) {
+            if (split.lengthBefore_mm < split.lengthAfter_mm) {
+                // Very close to the beginning of the edge.
+                return edge.getFromVertex();
+            } else {
+                // Very close to the end of the edge.
+                return edge.getToVertex();
             }
-        });
+        }
 
-        // Create a new vertex at the split point.
-        int newVertexIndex = vertexStore.addVertexFixed((int)best.fLat, (int)best.fLon);
-
-        // Convert the fixed-precision degree measurements into (milli)meters
-        int length_mm_1 = (int)(VertexStore.fixedIntToDegrees((int)(best.lengthBefore)) * metersPerDegreeLat * 1000);
-        int length_mm_2 = edge.getLengthMm() - length_mm_1;
+        // The split is somewhere away from an existing intersection vertex. Make a new vertex.
+        int newVertexIndex = vertexStore.addVertexFixed((int)split.fLat, (int)split.fLon);
 
         // Modify the existing bidirectional edge pair to lead up to the split.
         // Its spatial index entry is still valid, its envelope has only shrunk.
         int oldToVertex = edge.getToVertex();
-        edge.setLengthMm(length_mm_1);
+        edge.setLengthMm(split.lengthBefore_mm);
         edge.setToVertex(newVertexIndex);
         edge.setGeometry(Collections.EMPTY_LIST); // Turn it into a straight line for now.
 
         // Make a second, new bidirectional edge pair after the split and add it to the spatial index.
         // New edges will be added to edge lists later (the edge list is a transient index).
-        EdgeStore.Edge newEdge = edgeStore.addStreetPair(newVertexIndex, oldToVertex, length_mm_2);
+        EdgeStore.Edge newEdge = edgeStore.addStreetPair(newVertexIndex, oldToVertex, split.lengthAfter_mm);
         spatialIndex.insert(newEdge.getEnvelope(), newEdge.edgeIndex);
         // TODO newEdge.copyFlagsFrom(edge) to match the existing edge...
         return newVertexIndex;
+
+        // TODO store street-to-stop distance in a table in TransitLayer. This also allows adjusting for subway entrances etc.
+
     }
 
-    public void linkStops (TransitLayer transitLayer) {
+    /**
+     * Non-destructively find a good split location on an existing street.
+     * @return a Split object representing a point along a sub-segment of a specific edge.
+     */
+    public Split findSplit (double lat, double lon, double radiusMeters) {
+        return Split.find (lat, lon, radiusMeters, this);
+    }
+
+    /**
+     * For every stop in a TransitLayer, find or create a nearby vertex in the street layer and record the connection
+     * between the two.
+     */
+    public void associateStops(TransitLayer transitLayer) {
         for (Stop stop : transitLayer.stopForIndex) {
-            int streetVertexIndex = linkTransitStop(stop.stop_lat, stop.stop_lon, 300);
+            int streetVertexIndex = getOrCreateVertexNear(stop.stop_lat, stop.stop_lon, 300);
             transitLayer.streetVertexForStop.add(streetVertexIndex); // -1 means no link
-            // The inverse stopForStreetVertex map is a transient, derived index and will be built from streetVertexForStop.
+            // The inverse stopForStreetVertex map is a transient, derived index and will be built later.
         }
     }
 
