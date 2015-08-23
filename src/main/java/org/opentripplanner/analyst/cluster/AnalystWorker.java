@@ -36,15 +36,21 @@ import org.opentripplanner.api.model.TraverseModeSetSerializer;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.profile.RaptorWorkerData;
 import org.opentripplanner.profile.RepeatedRaptorProfileRouter;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.SocketTimeoutException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -227,7 +233,7 @@ public class AnalystWorker implements Runnable {
         batchExecutor = new ThreadPoolExecutor(1, nP, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(nP * 2));
         batchExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
-        // build the graph, iff we know what graph to build
+        // Build a graph on startup, iff a graph ID was provided.
         if (graphId != null) {
             LOG.info("Prebuilding graph {}", graphId);
             Graph graph = clusterGraphBuilder.getGraph(graphId);
