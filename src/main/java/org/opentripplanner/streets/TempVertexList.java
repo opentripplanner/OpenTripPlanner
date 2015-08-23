@@ -68,6 +68,10 @@ public class TempVertexList {
         // Iterate over all locations in this temporary vertex list.
         EdgeStore.Edge edge = streetLayer.edgeStore.getCursor();
         for (int i = 0; i < edges.size(); i++) {
+            if (edges.get(i) < 0) {
+                travelTimes.add(Integer.MAX_VALUE);
+                continue;
+            }
             edge.seek(edges.get(i));
             int elapsedFromTime = Integer.MAX_VALUE;
             int elapsedToTime = Integer.MAX_VALUE;
