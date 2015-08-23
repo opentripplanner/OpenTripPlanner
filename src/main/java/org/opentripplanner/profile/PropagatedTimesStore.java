@@ -10,6 +10,8 @@ import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.analyst.cluster.ResultEnvelope;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
+import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
+import org.opentripplanner.analyst.request.SampleGridRenderer.WTWDAccumulativeMetric;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler;
 import org.opentripplanner.common.geometry.DelaunayIsolineBuilder;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
@@ -214,21 +216,20 @@ public class PropagatedTimesStore {
         final int spacing = 5;
         final int nMax = 24;
         final int cutoffMinutes = 120;
+        final int offroadDistanceMeters = 250;
 
-        SparseMatrixZSampleGrid<SampleGridRenderer.WTWD> grid = makeSampleGridForVertices(times);
-
+        SparseMatrixZSampleGrid<WTWD> grid = makeSampleGridForVertices(times, offroadDistanceMeters);
         long t0 = System.currentTimeMillis();
-        DelaunayIsolineBuilder<SampleGridRenderer.WTWD> isolineBuilder =
-                new DelaunayIsolineBuilder<SampleGridRenderer.WTWD>(
-                        grid.delaunayTriangulate(), new SampleGridRenderer.WTWD.IsolineMetric());
+        DelaunayIsolineBuilder<WTWD> isolineBuilder =
+                new DelaunayIsolineBuilder<>(grid.delaunayTriangulate(), new WTWD.IsolineMetric());
 
         List<IsochroneData> isoData = new ArrayList<IsochroneData>();
         for (int minutes = spacing, n = 0; minutes <= cutoffMinutes && n < nMax; minutes += spacing, n++) {
             int seconds = minutes * 60;
-            SampleGridRenderer.WTWD z0 = new SampleGridRenderer.WTWD();
+            WTWD z0 = new WTWD();
             z0.w = 1.0;
             z0.wTime = seconds;
-            z0.d = 300; // meters. TODO set dynamically / properly, make sure it matches grid cell size? Review Laurent's recent code.
+            z0.d = offroadDistanceMeters;
             IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
             isoData.add(isochrone);
         }
@@ -245,41 +246,43 @@ public class PropagatedTimesStore {
      * Create a SampleGrid from only the times stored in this PropagatedTimesStore.
      * This assumes that the target indexes in this router/propagatedTimesStore are vertex indexes, not pointset indexes.
      * This is not really ideal since it includes only intersection nodes, and no points along the road segments.
+     * FIXME this may be why we're getting hole-punching failures.
      * TODO: rewrite the isoline code to use only primitive collections and operate on a scalar field.
      */
-    public SparseMatrixZSampleGrid<SampleGridRenderer.WTWD> makeSampleGridForVertices (int[] times) {
-        SparseMatrixZSampleGrid<SampleGridRenderer.WTWD> grid;
+    public SparseMatrixZSampleGrid<WTWD> makeSampleGridForVertices (int[] times, final double gridSizeMeters) {
+        SparseMatrixZSampleGrid<WTWD> grid;
         long t0 = System.currentTimeMillis();
-        final double gridSizeMeters = 300; // Todo: set dynamically and make sure this matches isoline builder params
         // Off-road max distance MUST be APPROX EQUALS to the grid precision
         // TODO: Loosen this restriction (by adding more closing sample).
-        // Change the 0.8 magic factor here with caution.
-        final double D0 = 0.8 * gridSizeMeters; // offroad walk distance roughly grid size
-        final double V0 = 1.00; // off-road walk speed in m/sec
-        Coordinate coordinateOrigin = new Coordinate(); // TODO set proper origin
+        // Change the 0.8 magic factor here with caution. Should be roughly grid size.
+        final double offroadWalkDistance = 0.8 * gridSizeMeters;
+        final double offroadWalkSpeed = 1.00; // in m/sec
+        Coordinate coordinateOrigin = graph.getCenter().get();
         final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
-        grid = new SparseMatrixZSampleGrid<SampleGridRenderer.WTWD>(16, times.length, dX, dY, coordinateOrigin);
+        grid = new SparseMatrixZSampleGrid<WTWD>(16, times.length, dX, dY, coordinateOrigin);
         AccumulativeGridSampler.AccumulativeMetric<SampleGridRenderer.WTWD> metric =
-                new SampleGridRenderer.WTWDAccumulativeMetric(cosLat, D0, V0, gridSizeMeters);
-        AccumulativeGridSampler<SampleGridRenderer.WTWD> sampler =
-                new AccumulativeGridSampler<SampleGridRenderer.WTWD>(grid, metric);
+                new WTWDAccumulativeMetric(cosLat, offroadWalkDistance, offroadWalkSpeed, gridSizeMeters);
+        AccumulativeGridSampler<WTWD> sampler =
+                new AccumulativeGridSampler<>(grid, metric);
         // Iterate over every vertex, adding it to the ZSampleGrid if it was reached.
-        // TODO propagation along street geometries here would be better
         for (int v = 0; v < times.length; v++) {
             int time = times[v];
-            if (time == Integer.MAX_VALUE) { // TODO check "unreached" value
-                continue;
+            if (time == Integer.MAX_VALUE) {
+                continue; // MAX_VALUE is the "unreached" value
             }
-            SampleGridRenderer.WTWD z = new SampleGridRenderer.WTWD();
+            WTWD z = new WTWD();
             z.w = 1.0;
             z.d = 0.0;
             z.wTime = time;
             z.wBoardings = 0; // unused
             z.wWalkDist = 0; // unused
             Vertex vertex = graph.getVertexById(v); // FIXME ack, this uses a hashtable and autoboxing!
-            sampler.addSamplingPoint(vertex.getCoordinate(), z, V0);
+            // FIXME we should propagate along street geometries here
+            if (vertex != null) {
+                sampler.addSamplingPoint(vertex.getCoordinate(), z, offroadWalkSpeed);
+            }
         }
         sampler.close();
         long t1 = System.currentTimeMillis();

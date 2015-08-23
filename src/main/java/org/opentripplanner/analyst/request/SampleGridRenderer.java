@@ -195,7 +195,7 @@ public class SampleGridRenderer {
 
         public static class IsolineMetric implements IsolineBuilder.ZMetric<WTWD> {
             @Override
-            public int cut(WTWD zA, SampleGridRenderer.WTWD zB, WTWD z0) {
+            public int cut(WTWD zA, WTWD zB, WTWD z0) {
                 double t0 = z0.wTime / z0.w;
                 double tA = zA.d > z0.d ? Double.POSITIVE_INFINITY : zA.wTime / zA.w;
                 double tB = zB.d > z0.d ? Double.POSITIVE_INFINITY : zB.wTime / zB.w;
