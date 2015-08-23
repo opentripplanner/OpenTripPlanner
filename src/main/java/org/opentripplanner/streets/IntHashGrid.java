@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A spatial index using a 2D fast long hashtable from the Trove library.
  * This is a modified version of laurentg's original hashgrid class,
  * using primitive int values instead of Object lists, as well as some Java 8 functional syntax.
+ * It is also intended to store fixed-precision integer geographic coordinates rather than double-precision.
  * 
  * Objects to index are placed in all grid bins touching the bounding envelope. We *do not store*
  * any bounding envelope for each object: we will therefore return false positives when querying,
@@ -48,14 +49,8 @@ public class IntHashGrid {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(IntHashGrid.class);
 
-    /* Computation done based on geographical coordinates. */
-    private static final double DEFAULT_Y_BIN_SIZE = 0.005; // ~500m
-
-    /* Computation done based on geographical coordinates at ~45 degree lat */
-    private static final double DEFAULT_X_BIN_SIZE = 0.0035; // ~500m
-
-    /* Size of bin in X and Y direction, in coordinates units. */
-    private final double xBinSize, yBinSize;
+    /* Size of bin in X and Y direction, in coordinate units. */
+    private final int xBinSize, yBinSize;
 
     /* The map of all bins. Please see visit() and xKey/yKey for details on the key. */
     private final TLongObjectMap<TIntList> bins;
@@ -66,20 +61,23 @@ public class IntHashGrid {
 
     private int nEntries = 0;
 
-    public IntHashGrid(double xBinSize, double yBinSize) {
-        if (xBinSize <= 0 || yBinSize <= 0)
+    public IntHashGrid(double binSizeDegrees) {
+        yBinSize = VertexStore.degreesToFixedInt(binSizeDegrees);
+        xBinSize = (int)(yBinSize / 0.7); // Assume about 45 degrees latitude for now, cos(45deg)
+        if (binSizeDegrees <= 0) {
             throw new IllegalStateException("bin size must be positive.");
-        this.xBinSize = xBinSize;
-        this.yBinSize = yBinSize;
+        }
         // For 200m bins, 500x500 = 100x100km = 250000 bins
         bins = new TLongObjectHashMap<>();
     }
 
     /** Create a HashGrid with the default grid dimensions. */
     public IntHashGrid() {
-        this(DEFAULT_X_BIN_SIZE, DEFAULT_Y_BIN_SIZE);
+        this(0.0018); // About 200m
     }
 
+
+    // TODO check that the number of bins to is sane.
     public final void insert(Envelope envelope, final int item) {
         visit(envelope, true, (bin, mapKey) -> {
             /*
@@ -96,6 +94,7 @@ public class IntHashGrid {
         nObjects++;
     }
 
+    // FIXME we should really be using this method. Long roads can have very big envelopes. Really the edges should be rasterized into the grid.
     public final void insert(LineString geom, final int item) {
         Coordinate[] coord = geom.getCoordinates();
         final TLongSet keys = new TLongHashSet(coord.length * 8);

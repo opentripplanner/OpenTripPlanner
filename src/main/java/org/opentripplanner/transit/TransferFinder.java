@@ -42,23 +42,23 @@ public class TransferFinder {
     public void findTransfers () {
 
         LOG.info("Finding transfers through the street network from all stops...");
+        final TIntArrayList EMPTY_INT_LIST = new TIntArrayList(); // Optimization: use the same empty list for all stops with no transfers
 
         // For each stop, all transfers out of that stop packed as pairs of (toStopIndex, distance)
         List<TIntList> transfersForStop = new ArrayList<>(transitLayer.getStopCount());
-
         for (int s = 0; s < transitLayer.getStopCount(); s++) {
-
             // From each stop, run a street search looking for other transit stops.
             int originStreetVertex = transitLayer.streetVertexForStop.get(s);
             if (originStreetVertex == -1) {
                 LOG.warn("Stop {} is not connected to the street network.", s);
+                // Every iteration must add an array to transfersForStop to maintain the right length.
+                transfersForStop.add(EMPTY_INT_LIST);
                 continue;
             }
             streetRouter.route(originStreetVertex, StreetRouter.ALL_VERTICES);
             TIntIntMap timesToReachedStops = streetRouter.timesToReachedStops();
-
             // Filter down the list of target stops to only include those stops that are the closest on some pattern.
-            TIntIntMap bestStopOnPattern = new TIntIntHashMap();
+            TIntIntMap bestStopOnPattern = new TIntIntHashMap(50, 0.5f, -1, -1);
             // For every reached stop,
             timesToReachedStops.forEachEntry((stopIndex, timeToStop) -> {
                 // For every pattern passing through that stop,
@@ -84,13 +84,19 @@ public class TransferFinder {
             usefulTargetStops.addAll(bestStopOnPattern.valueCollection());
             // Pack transfers as pairs of (target stop index, distance)
             TIntList packedTransfers = new TIntArrayList();
+            // LOG.info("From {}", transitLayer.stopForIndex.get(s).stop_code);
             usefulTargetStops.forEach(targetStopIndex -> {
                 packedTransfers.add(targetStopIndex);
                 packedTransfers.add(timesToReachedStops.get(targetStopIndex));
+                // LOG.info("{} at {}m", transitLayer.stopForIndex.get(targetStopIndex).stop_code, timesToReachedStops.get(targetStopIndex));
                 return true;
             });
             // Record this list of transfers as coming out of the stop with index s.
-            transfersForStop.add(packedTransfers);
+            if (packedTransfers.size() > 0) {
+                transfersForStop.add(packedTransfers);
+            } else {
+                transfersForStop.add(EMPTY_INT_LIST);
+            }
         }
         // Store the transfers in the transit layer
         transitLayer.transfersForStop = transfersForStop;

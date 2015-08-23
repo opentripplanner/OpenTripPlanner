@@ -22,10 +22,22 @@ public class VertexStore implements Serializable {
         fixedLons = new TIntArrayList(initialSize);
     }
 
+    /**
+     * Add a vertex, specifying its coordinates in double-precision floating point degrees.
+     * @return the index of the new vertex.
+     */
     public int addVertex (double lat, double lon) {
+        return addVertexFixed(degreesToFixedInt(lat), degreesToFixedInt(lon));
+    }
+
+    /**
+     * Add a vertex, specifying its coordinates in fixed-point lat and lon.
+     * @return the index of the new vertex.
+     */
+    public int addVertexFixed (int fixedLat, int fixedLon) {
         int vertexIndex = nVertices++;
-        fixedLats.add((int)(lat * FIXED_FACTOR));
-        fixedLons.add((int)(lon * FIXED_FACTOR));
+        fixedLats.add(fixedLat);
+        fixedLons.add(fixedLon);
         return vertexIndex;
     }
 
@@ -71,6 +83,14 @@ public class VertexStore implements Serializable {
 
         public double getLon() {
             return fixedLons.get(index) / FIXED_FACTOR;
+        }
+
+        public int getFixedLat() {
+            return fixedLats.get(index);
+        }
+
+        public int getFixedLon() {
+            return fixedLons.get(index);
         }
 
     }

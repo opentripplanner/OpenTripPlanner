@@ -17,6 +17,14 @@ import java.util.List;
  *
  * Temp vertex sets can be persisted in the graph itself to save a worker the effort of loading street geometries and
  * re-linking stops.
+ *
+ * We can't use TempVertexSets to handle linking transit stops into the street network, because we want other
+ * TempVertexSets to see the transit stop splitters as permanent and insert themselves between the intersection and the
+ * transit stop splitter vertex.
+ *
+ * Searches always proceed outward from origins or targets (think StopTreeCache for the targets, which handles the last mile from transit to targets). We can have completely temporary vertices that are not even recorded in the main transport network store.
+ * Keep in mind that if origins and destinations are pre-linked into the graph, the street geometries or even the whole street layer can be dropped entirely, and it’s still useful for routing. So the TransportNetwork must be serializable and usable with a null StreetLayer.
+ *
  */
 public class TempVertexSet {
 

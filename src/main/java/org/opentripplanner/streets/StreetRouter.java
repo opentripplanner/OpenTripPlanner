@@ -5,8 +5,6 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.transit.TransitLayer;
@@ -45,18 +43,18 @@ public class StreetRouter {
 
     double targetLat, targetLon; // for goal direction heuristic
 
-    public TIntSet transitStopVerticesHit = new TIntHashSet();
-
     /**
      * @return a map from transit stop indexes to their distances from the origin
      */
     public TIntIntMap timesToReachedStops () {
         TIntIntMap result = new TIntIntHashMap();
         // Convert stop vertex indexes in street layer to transit layer stop indexes.
-        transitStopVerticesHit.forEach(vertexIndex -> {
-            int weight = bestStates.get(vertexIndex).weight;
+        bestStates.forEachEntry((vertexIndex, state) -> {
             int stopIndex = transitLayer.stopForStreetVertex.get(vertexIndex);
-            result.put(stopIndex, weight);
+            // -1 indicates no value, this street vertex is not a transit stop
+            if (stopIndex >= 0) {
+                result.put(stopIndex, state.weight);
+            }
             return true; // continue iteration
         });
         return result;
@@ -71,7 +69,6 @@ public class StreetRouter {
         long startTime = System.currentTimeMillis();
         bestStates.clear();
         queue.reset();
-        transitStopVerticesHit.clear();
         State startState = new State(fromVertex, -1, null);
         bestStates.put(fromVertex, startState);
         queue.insert(startState, 0);
@@ -120,11 +117,6 @@ public class StreetRouter {
                 State existingBest = bestStates.get(s1.vertex);
                 if (existingBest == null || existingBest.weight > s1.weight) {
                     bestStates.put(s1.vertex, s1);
-                    if (edge.getFlag(EdgeStore.Flag.TRANSIT_LINK) && edge.isForward()) {
-                        transitStopVerticesHit.add(edge.getToVertex());
-                        // Once we go into a transit stop, we don't follow any edges out of it.
-                        return true; // iteration should continue
-                    }
                 }
                 int remainingWeight = goalDirection ? heuristic(s1) : 0;
                 queue.insert(s1, s1.weight + remainingWeight);

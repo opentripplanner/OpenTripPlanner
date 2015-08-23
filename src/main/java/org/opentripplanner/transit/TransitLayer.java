@@ -176,7 +176,7 @@ public class TransitLayer implements Serializable {
         }
 
         // 2. What street vertex represents each transit stop? Invert the serialized map.
-        stopForStreetVertex = new TIntIntHashMap();
+        stopForStreetVertex = new TIntIntHashMap(streetVertexForStop.size(), 0.5f, -1, -1);
         for (int s = 0; s < streetVertexForStop.size(); s++) {
             stopForStreetVertex.put(streetVertexForStop.get(s), s);
         }

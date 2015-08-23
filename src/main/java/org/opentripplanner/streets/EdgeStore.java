@@ -1,6 +1,7 @@
 package org.opentripplanner.streets;
 
 import com.conveyal.osmlib.Node;
+import com.vividsolutions.jts.geom.Envelope;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class EdgeStore implements Serializable {
     private static final int DEFAULT_SPEED_KPH = 50;
     private static final int[] EMPTY_INT_ARRAY = new int[0];
 
+    // The vertices that are referred to in these edges
+    private VertexStore vertexStore;
+
     int nEdges = 0;
     protected TIntList flags;
     protected TIntList speeds;
@@ -43,7 +47,8 @@ public class EdgeStore implements Serializable {
     protected TIntList lengths_mm;
     protected List<int[]> geometries; // intermediate points along the edge, other than the intersection endpoints
 
-    public EdgeStore (int initialSize) {
+    public EdgeStore (VertexStore vertexStore, int initialSize) {
+        this.vertexStore = vertexStore;
         // There is one flags and speeds entry per edge.
         flags = new TIntArrayList(initialSize);
         speeds = new TIntArrayList(initialSize);
@@ -112,16 +117,6 @@ public class EdgeStore implements Serializable {
 
     }
 
-    @FunctionalInterface
-    public static interface SegmentConsumer {
-        public void consumeSegment (int index, int fixedLat0, int fixedLon0, int fixedLat1, int fixedLon1);
-    }
-
-    public void consumeGeometry (SegmentConsumer geometryConsumer) {
-        int fixedLat;
-        int fixedLon;
-    }
-
     /** Inner class that serves as a cursor: points to a single edge in this store, and can be moved to other indexes. */
     public class Edge {
 
@@ -156,6 +151,17 @@ public class EdgeStore implements Serializable {
             return isBackward ? fromVertices.get(pairIndex) : toVertices.get(pairIndex);
         }
 
+        /**
+         * NOTE that this will have an effect on both edges in the bidirectional edge pair.
+         */
+        public void setToVertex(int toVertexIndex) {
+            if (isBackward) {
+                fromVertices.set(pairIndex, toVertexIndex);
+            } else {
+                toVertices.set(pairIndex, toVertexIndex);
+            }
+        }
+
         public boolean getFlag(Flag flag) {
             return (flags.get(edgeIndex) & flag.flag) != 0;
         }
@@ -174,6 +180,13 @@ public class EdgeStore implements Serializable {
 
         public int getLengthMm () {
             return lengths_mm.get(pairIndex);
+        }
+
+        /**
+         * Set the length for the current edge pair (always the same in both directions).
+         */
+        public void setLengthMm (int millimeters) {
+            lengths_mm.set(pairIndex, millimeters);
         }
 
         public boolean isBackward () {
@@ -212,6 +225,58 @@ public class EdgeStore implements Serializable {
             geometries.set(pairIndex, intermediateCoords);
         }
 
+        /**
+         * Always iterates forward, whether or not we are on a forward or backward edge.
+         */
+        public void iterateGeometry (SegmentConsumer segmentConsumer) {
+            VertexStore.Vertex vertex = vertexStore.getCursor(fromVertices.get(pairIndex));
+            int prevFixedLat = vertex.getFixedLat();
+            int prevFixedLon = vertex.getFixedLon();
+            int[] intermediates = geometries.get(pairIndex);
+            int s = 0;
+            int i = 0;
+            while (i < intermediates.length) {
+                int fixedLat = intermediates[i++];
+                int fixedLon = intermediates[i++];
+                segmentConsumer.consumeSegment(s, prevFixedLat, prevFixedLon, fixedLat, fixedLon);
+                prevFixedLat = fixedLat;
+                prevFixedLon = fixedLon;
+                s++;
+            }
+            vertex.seek(toVertices.get(pairIndex));
+            segmentConsumer.consumeSegment(s, prevFixedLat, prevFixedLon, vertex.getFixedLat(), vertex.getFixedLon());
+        }
+
+        /** @return an envelope around the whole edge geometry. */
+        public Envelope getEnvelope() {
+            Envelope envelope = new Envelope();
+            VertexStore.Vertex vertex = vertexStore.getCursor();
+            vertex.seek(fromVertices.get(pairIndex));
+            envelope.expandToInclude(vertex.getFixedLon(), vertex.getFixedLat());
+            int[] intermediates = geometries.get(pairIndex);
+            int i = 0;
+            while (i < intermediates.length) {
+                int fixedLat = intermediates[i++];
+                int fixedLon = intermediates[i++];
+                envelope.expandToInclude(fixedLon, fixedLat);
+            }
+            vertex.seek(toVertices.get(pairIndex));
+            envelope.expandToInclude(vertex.getFixedLon(), vertex.getFixedLat());
+            return envelope;
+        }
+
+        /**
+         * @return the number of segments in the geometry of the current edge.
+         */
+        public int nSegments () {
+            int[] geom = geometries.get(pairIndex);
+            if (geom != null) {
+                return geom.length + 1;
+            } else {
+                return 1;
+            }
+        }
+
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
@@ -235,6 +300,12 @@ public class EdgeStore implements Serializable {
         Edge edge = new Edge();
         edge.seek(pos);
         return edge;
+    }
+
+    /** A functional interface that consumes segments in a street geometry one by one. */
+    @FunctionalInterface
+    public static interface SegmentConsumer {
+        public void consumeSegment (int index, int fixedLat0, int fixedLon0, int fixedLat1, int fixedLon1);
     }
 
     public void dump () {
