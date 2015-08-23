@@ -31,8 +31,6 @@ public class StreetRouter {
 
     private StreetLayer streetLayer;
 
-    private TransitLayer transitLayer;
-
     public int distanceLimitMeters = 2_000;
 
     TIntObjectMap<State> bestStates = new TIntObjectHashMap<>();
@@ -45,8 +43,9 @@ public class StreetRouter {
 
     /**
      * @return a map from transit stop indexes to their distances from the origin
+     * Note that the TransitLayer contains all the information about which street vertices are transit stops.
      */
-    public TIntIntMap timesToReachedStops () {
+    public TIntIntMap timesToReachedStops (TransitLayer transitLayer) {
         TIntIntMap result = new TIntIntHashMap();
         // Convert stop vertex indexes in street layer to transit layer stop indexes.
         bestStates.forEachEntry((vertexIndex, state) -> {
@@ -60,9 +59,8 @@ public class StreetRouter {
         return result;
     }
 
-    public StreetRouter (StreetLayer streetLayer, TransitLayer transitLayer) {
+    public StreetRouter (StreetLayer streetLayer) {
         this.streetLayer = streetLayer;
-        this.transitLayer = transitLayer;
     }
 
     public void route (int fromVertex, int toVertex) {
