@@ -7,9 +7,9 @@ import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import org.joda.time.DateTimeZone;
-import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
+import org.opentripplanner.analyst.cluster.ResultEnvelope;
 import org.opentripplanner.analyst.cluster.TaskStatistics;
 import org.opentripplanner.analyst.scenario.AddTripPattern;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -86,6 +86,9 @@ public class RepeatedRaptorProfileRouter {
     // Set this field to an existing taskStatistics before routing if you want to collect performance information.
     public TaskStatistics ts = new TaskStatistics();
 
+    // Set this field to true before routing if you want the full travel times included in your response.
+    public boolean includeTimes = false;
+
     /**
      * Make a router to use for making time surfaces only.
      *
@@ -124,7 +127,7 @@ public class RepeatedRaptorProfileRouter {
         this.sampleSet = sampleSet;
     }
 
-    public void route () {
+    public ResultEnvelope route () {
 
         boolean isochrone = (sampleSet == null); // When no sample set is provided, we're making isochrones.
         boolean transit = (request.transitModes != null && request.transitModes.isTransit()); // Does the search involve transit at all?
@@ -187,14 +190,25 @@ public class RepeatedRaptorProfileRouter {
         for (int min : propagatedTimesStore.mins) {
             if (min != RaptorWorker.UNREACHED) ts.targetsReached++;
         }
-
-        // No destination point set was provided and we're just making isochrones, rather than finding access times to
-        // a set of specific points. The set of time surfaces for min/avg/max will be stored as a field in this object.
-        if (isochrone) {
-            timeSurfaceRangeSet = propagatedTimesStore.makeSurfaces(this);
-        }
         ts.compute = (int) (System.currentTimeMillis() - computationStartTime);
         LOG.info("Profile request finished in {} seconds", (ts.compute) / 1000.0);
+
+        // Turn the results of the search into isochrone geometries or accessibility data as requested.
+        long resultSetStart = System.currentTimeMillis();
+        ResultEnvelope envelope = new ResultEnvelope();
+        if (isochrone) {
+            // No destination point set was provided and we're just making isochrones based on travel time to vertices,
+            // rather than finding access times to a set of user-specified points.
+            envelope = propagatedTimesStore.makeIsochronesForVertices();
+        } else {
+            // A destination point set was provided. We've found access times to a set of specified points.
+            // TODO actually use those boolean params to calculate isochrones on a regular grid pointset
+            // TODO maybe there's a better way to pass includeTimes in here from the clusterRequest,
+            // maybe we should just provide the whole clusterRequest not just the wrapped profileRequest.
+            envelope = propagatedTimesStore.makeResults(sampleSet, includeTimes, true, false);
+        }
+        ts.resultSets = (int) (System.currentTimeMillis() - resultSetStart);
+        return envelope;
     }
 
     /**
@@ -262,13 +276,6 @@ public class RepeatedRaptorProfileRouter {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Make a result set range set, optionally including times
-     */
-    public ResultSet.RangeSet makeResults (boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
-        return propagatedTimesStore.makeResults(sampleSet, includeTimes, includeHistograms, includeIsochrones);
     }
 
     /** Create RAPTOR worker data from a graph, profile request and sample set (the last of which may be null */

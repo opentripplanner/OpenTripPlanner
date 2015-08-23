@@ -162,15 +162,17 @@ public class RepeatedRaptorComparison {
 
                 RepeatedRaptorProfileRouter rrpr = new RepeatedRaptorProfileRouter(graph, req, ss);
                 rrpr.raptorWorkerData = data;
+                rrpr.includeTimes = true;
+                // TODO we really want to disable both isochrone and accessibility generation here.
+                // Because a sampleSet is provided it's going to make accessibility information (not isochrones).
 
+                ResultEnvelope results = new ResultEnvelope();
                 try {
-                    rrpr.route();
+                    results = rrpr.route();
                 } catch (Exception e) {
                     LOG.error("Exception during routing", e);
                     return;
                 }
-
-                ResultSet.RangeSet results = rrpr.makeResults(true, false, false);
 
                 for (ResultEnvelope.Which which : new ResultEnvelope.Which[] {
                         ResultEnvelope.Which.BEST_CASE, ResultEnvelope.Which.AVERAGE,
@@ -181,15 +183,15 @@ public class RepeatedRaptorComparison {
                     switch (which) {
                     case BEST_CASE:
                         histogram = bestCaseHisto;
-                        resultSet = results.min;
+                        resultSet = results.worstCase;
                         break;
                     case WORST_CASE:
                         histogram = worstCaseHisto;
-                        resultSet = results.max;
+                        resultSet = results.bestCase;
                         break;
                     case AVERAGE:
                         histogram = avgCaseHisto;
-                        resultSet = results.avg;
+                        resultSet = results.avgCase;
                         break;
                     default:
                         histogram = null;

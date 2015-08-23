@@ -1,15 +1,30 @@
 package org.opentripplanner.profile;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.analyst.TimeSurface;
+import org.opentripplanner.analyst.cluster.ResultEnvelope;
+import org.opentripplanner.analyst.core.IsochroneData;
+import org.opentripplanner.analyst.request.SampleGridRenderer;
+import org.opentripplanner.common.geometry.AccumulativeGridSampler;
+import org.opentripplanner.common.geometry.DelaunayIsolineBuilder;
+import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+
+import static org.apache.commons.math3.util.FastMath.toRadians;
 
 /**
  * Stores travel times propagated to the search targets (all vertices in the street network or a set of points of
@@ -33,6 +48,8 @@ import java.util.Random;
  * demand for visualization.
  */
 public class PropagatedTimesStore {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PropagatedTimesStore.class);
 
     // Four parallel arrays has worse locality than one big 4|V|-length flat array, but merging per-raptor-call values
     // into this summary statistics storage is not the slow part of the algorithm. Optimization should concentrate on
@@ -143,14 +160,16 @@ public class PropagatedTimesStore {
         }
     }
 
-    /** Make a ResultSet directly given a sample set (must have constructed RaptorWorkerData from the same sampleset) */
-    public ResultSet.RangeSet makeResults(SampleSet ss, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
-        ResultSet.RangeSet ret = new ResultSet.RangeSet();
-
-        ret.min = new ResultSet(mins, ss.pset, includeTimes, includeHistograms, includeIsochrones);
-        ret.avg = new ResultSet(avgs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
-        ret.max = new ResultSet(maxs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
-        return ret;
+    /**
+     * Make a ResultEnvelope directly from a given SampleSet.
+     * The RaptorWorkerData must have been constructed from the same SampleSet.
+     */
+    public ResultEnvelope makeResults(SampleSet ss, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
+        ResultEnvelope envelope = new ResultEnvelope();
+        envelope.worstCase = new ResultSet(mins, ss.pset, includeTimes, includeHistograms, includeIsochrones);
+        envelope.avgCase   = new ResultSet(avgs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
+        envelope.bestCase  = new ResultSet(maxs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
+        return envelope;
     }
 
     public TimeSurface.RangeSet makeSurfaces(RepeatedRaptorProfileRouter repeatedRaptorProfileRouter) {
@@ -170,6 +189,102 @@ public class PropagatedTimesStore {
             rangeSet.avg.times.put(vertex, avg);
         }
         return rangeSet;
+    }
+
+    /**
+     * This bypasses a bunch of conversion and copy steps and just makes the isochrones.
+     * This assumes that the target indexes in this router/propagatedTimesStore are vertex indexes, not pointset indexes.
+     * TODO parameter for a pointset or a vertex lookup table, so we can handle both.
+     */
+    public ResultEnvelope makeIsochronesForVertices () {
+        ResultEnvelope envelope = new ResultEnvelope();
+        envelope.worstCase = makeIsochroneForVertices(mins);
+        envelope.avgCase = makeIsochroneForVertices(avgs);
+        envelope.bestCase = makeIsochroneForVertices(maxs);
+        return envelope;
+    }
+
+    /**
+     * This bypasses a bunch of TimeSurface conversion/copy steps we were going though and makes the isochrones directly.
+     * This assumes that the target indexes in this router/propagatedTimesStore are vertex indexes, not pointset indexes.
+     * Called three times on min/avg/max to create the three elements of a ResultEnvelope.
+     */
+    private ResultSet makeIsochroneForVertices (int[] times) {
+
+        final int spacing = 5;
+        final int nMax = 24;
+        final int cutoffMinutes = 120;
+
+        SparseMatrixZSampleGrid<SampleGridRenderer.WTWD> grid = makeSampleGridForVertices(times);
+
+        long t0 = System.currentTimeMillis();
+        DelaunayIsolineBuilder<SampleGridRenderer.WTWD> isolineBuilder =
+                new DelaunayIsolineBuilder<SampleGridRenderer.WTWD>(
+                        grid.delaunayTriangulate(), new SampleGridRenderer.WTWD.IsolineMetric());
+
+        List<IsochroneData> isoData = new ArrayList<IsochroneData>();
+        for (int minutes = spacing, n = 0; minutes <= cutoffMinutes && n < nMax; minutes += spacing, n++) {
+            int seconds = minutes * 60;
+            SampleGridRenderer.WTWD z0 = new SampleGridRenderer.WTWD();
+            z0.w = 1.0;
+            z0.wTime = seconds;
+            z0.d = 300; // meters. TODO set dynamically / properly, make sure it matches grid cell size? Review Laurent's recent code.
+            IsochroneData isochrone = new IsochroneData(seconds, isolineBuilder.computeIsoline(z0));
+            isoData.add(isochrone);
+        }
+
+        long t1 = System.currentTimeMillis();
+        ResultSet resultSet = new ResultSet();
+        resultSet.isochrones = new IsochroneData[isoData.size()];
+        isoData.toArray(resultSet.isochrones);
+        LOG.debug("Computed {} isochrones in {} msec", isoData.size(), (int) (t1 - t0));
+        return resultSet;
+    }
+
+    /**
+     * Create a SampleGrid from only the times stored in this PropagatedTimesStore.
+     * This assumes that the target indexes in this router/propagatedTimesStore are vertex indexes, not pointset indexes.
+     * This is not really ideal since it includes only intersection nodes, and no points along the road segments.
+     * TODO: rewrite the isoline code to use only primitive collections and operate on a scalar field.
+     */
+    public SparseMatrixZSampleGrid<SampleGridRenderer.WTWD> makeSampleGridForVertices (int[] times) {
+        SparseMatrixZSampleGrid<SampleGridRenderer.WTWD> grid;
+        long t0 = System.currentTimeMillis();
+        final double gridSizeMeters = 300; // Todo: set dynamically and make sure this matches isoline builder params
+        // Off-road max distance MUST be APPROX EQUALS to the grid precision
+        // TODO: Loosen this restriction (by adding more closing sample).
+        // Change the 0.8 magic factor here with caution.
+        final double D0 = 0.8 * gridSizeMeters; // offroad walk distance roughly grid size
+        final double V0 = 1.00; // off-road walk speed in m/sec
+        Coordinate coordinateOrigin = new Coordinate(); // TODO set proper origin
+        final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));
+        double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
+        double dX = dY / cosLat;
+        grid = new SparseMatrixZSampleGrid<SampleGridRenderer.WTWD>(16, times.length, dX, dY, coordinateOrigin);
+        AccumulativeGridSampler.AccumulativeMetric<SampleGridRenderer.WTWD> metric =
+                new SampleGridRenderer.WTWDAccumulativeMetric(cosLat, D0, V0, gridSizeMeters);
+        AccumulativeGridSampler<SampleGridRenderer.WTWD> sampler =
+                new AccumulativeGridSampler<SampleGridRenderer.WTWD>(grid, metric);
+        // Iterate over every vertex, adding it to the ZSampleGrid if it was reached.
+        // TODO propagation along street geometries here would be better
+        for (int v = 0; v < times.length; v++) {
+            int time = times[v];
+            if (time == Integer.MAX_VALUE) { // TODO check "unreached" value
+                continue;
+            }
+            SampleGridRenderer.WTWD z = new SampleGridRenderer.WTWD();
+            z.w = 1.0;
+            z.d = 0.0;
+            z.wTime = time;
+            z.wBoardings = 0; // unused
+            z.wWalkDist = 0; // unused
+            Vertex vertex = graph.getVertexById(v); // FIXME ack, this uses a hashtable and autoboxing!
+            sampler.addSamplingPoint(vertex.getCoordinate(), z, V0);
+        }
+        sampler.close();
+        long t1 = System.currentTimeMillis();
+        LOG.info("Made scalar SampleGrid from TimeSurface in {} msec.", (int) (t1 - t0));
+        return grid;
     }
 
     public static enum ConfidenceCalculationMethod {

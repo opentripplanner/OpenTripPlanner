@@ -27,7 +27,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.opentripplanner.analyst.PointSet;
-import org.opentripplanner.analyst.ResultSet;
 import org.opentripplanner.analyst.SampleSet;
 import org.opentripplanner.api.model.AgencyAndIdSerializer;
 import org.opentripplanner.api.model.JodaLocalDateSerializer;
@@ -403,32 +402,15 @@ public class AnalystWorker implements Runnable {
                 router.raptorWorkerData = null;
             }
 
-            // This result envelope will hold the results of the one-to-many profile or single-departure-time search.
+            // Run the core repeated-raptor analysis.
+            // This result envelope will contain the results of the one-to-many profile or single-departure-time search.
             ResultEnvelope envelope = new ResultEnvelope();
             try {
                 // TODO when router runs, if there are no transit modes defined it should just skip the transit work.
-                router.route();
-                long resultSetStart = System.currentTimeMillis();
-                // TODO move all this into the main route function
-                if (isochrone) {
-                    // Currently we are building the isochrones from the times at street vertices rather
-                    // than the times at the targets. We should ideally make a grid of targets that exactly coincides
-                    // with the accumulator grid used to build the isochrones.
-                    // This ResultSet constructor creates isochrones, as no targets are supplied.
-                    envelope.worstCase = new ResultSet(router.timeSurfaceRangeSet.max);
-                    envelope.bestCase = new ResultSet(router.timeSurfaceRangeSet.min);
-                    envelope.avgCase = new ResultSet(router.timeSurfaceRangeSet.avg);
-                } else {
-                    ResultSet.RangeSet results = router.makeResults(clusterRequest.includeTimes, true, false);
-                    // TODO Set min/avg/max in constructor?
-                    envelope.bestCase = results.min;
-                    envelope.avgCase = results.avg;
-                    envelope.worstCase = results.max;
-                }
+                router.includeTimes = clusterRequest.includeTimes;
+                envelope = router.route();
                 envelope.id = clusterRequest.id;
                 envelope.destinationPointsetId = clusterRequest.destinationPointsetId;
-
-                ts.resultSets = (int) (System.currentTimeMillis() - resultSetStart);
                 ts.success = true;
             } catch (Exception ex) {
                 // An error occurred. Leave the envelope empty and TODO include error information.

@@ -49,11 +49,10 @@ public class ResultSet implements Serializable{
     /** Times to reach every feature, may be null */
     public int[] times;
 
-    /** Isochrones from the origin, may be null */
+    /** Isochrone geometries around the origin, may be null. */
     public IsochroneData[] isochrones;
 
     public ResultSet() {
-        // TODO is this ever used?
     }
 
     /** Build a new ResultSet by evaluating the given TimeSurface at all the given sample points, not including times. */
@@ -79,7 +78,6 @@ public class ResultSet implements Serializable{
     
     private void buildIsochrones(TimeSurface surface) {
         List<IsochroneData> id = SurfaceResource.getIsochronesAccumulative(surface, 5, 24);
-        
         this.isochrones = new IsochroneData[id.size()];
         id.toArray(this.isochrones);
     }
