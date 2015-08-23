@@ -224,6 +224,10 @@ public class AnalystWorker implements Runnable {
         instanceType = getInstanceType();
     }
 
+    /**
+     * This is the main worker event loop which fetches tasks from a broker and schedules them for execution.
+     * It maintains a small local queue on the worker so that it doesn't idle while fetching new tasks.
+     */
     @Override
     public void run() {
         // create executors with up to one thread per processor
@@ -305,6 +309,10 @@ public class AnalystWorker implements Runnable {
         }
     }
 
+    /**
+     * This is the callback that processes a single task and returns the results upon completion.
+     * It may be called several times simultaneously on different executor threads.
+     */
     private void handleOneRequest(AnalystClusterRequest clusterRequest) {
 
         if (dryRunFailureRate >= 0) {
@@ -400,7 +408,7 @@ public class AnalystWorker implements Runnable {
                 // TODO when router runs, if there are no transit modes defined it should just skip the transit work.
                 router.route(ts);
                 long resultSetStart = System.currentTimeMillis();
-
+                // TODO move all this into the main route function
                 if (isochrone) {
                     // Currently we are building the isochrones from the times at street vertices rather
                     // than the times at the targets. We should ideally make a grid of targets that exactly coincides
@@ -423,10 +431,13 @@ public class AnalystWorker implements Runnable {
                 ts.success = true;
             } catch (Exception ex) {
                 // An error occurred. Leave the envelope empty and TODO include error information.
-                ts.success = false;
                 LOG.error("Error occurred in profile request", ex);
+                ts.success = false;
             }
 
+            // Send the ResultEnvelope back to the user.
+            // The results are either stored on S3 (for multi-origin jobs) or sent back through the broker (for
+            // immediate interactive display of isochrones).
             if (clusterRequest.outputLocation != null) {
                 // Convert the result envelope and its contents to JSON and gzip it in this thread.
                 // Transfer the results to Amazon S3 in another thread, piping between the two.
@@ -449,8 +460,10 @@ public class AnalystWorker implements Runnable {
                 finishPriorityTask(clusterRequest, envelope);
             }
 
+            // Record information about the current task so we can analyze usage and efficiency over time.
             ts.total = (int) (System.currentTimeMillis() - startTime);
             statsStore.store(ts);
+
         } catch (Exception ex) {
             LOG.error("An error occurred while routing", ex);
         }
@@ -554,7 +567,7 @@ public class AnalystWorker implements Runnable {
     }
 
     /**
-     * DELETE the given message from the broker, indicating that it has been processed by a worker.
+     * Tell the broker that the given message has been successfully processed by a worker (HTTP DELETE).
      */
     public void deleteRequest(AnalystClusterRequest clusterRequest) {
         String url = BROKER_BASE_URL + String.format("/tasks/%s", clusterRequest.taskId);

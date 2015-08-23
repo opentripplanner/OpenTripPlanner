@@ -6,8 +6,10 @@ import java.io.Serializable;
 
 /**
  * Statistics about running a single task.
+ * TODO use two functions: markTime() and finishedX() for each time record. The markTime() function can be reused for every record.
  */
 public class TaskStatistics implements Serializable{
+
     public static final long serialVersionUID = 1;
 
     /** milliseconds of compute time once the RAPTOR worker was started, exclusive of building result sets */

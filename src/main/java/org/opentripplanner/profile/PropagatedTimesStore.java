@@ -143,22 +143,6 @@ public class PropagatedTimesStore {
         }
     }
 
-    /** You need to pass in a pre-constructed rangeSet because it requires a reference to the profile router. */
-    public void makeSurfaces(TimeSurface.RangeSet rangeSet) {
-        for (Vertex vertex : graph.index.vertexForId.values()) {
-            int min = mins[vertex.getIndex()];
-            int max = maxs[vertex.getIndex()];
-            int avg = avgs[vertex.getIndex()];
-
-            if (avg == Integer.MAX_VALUE)
-                continue;
-            // Count is positive, extrema and sum must also be present
-            rangeSet.min.times.put(vertex, min);
-            rangeSet.max.times.put(vertex, max);
-            rangeSet.avg.times.put(vertex, avg);
-        }
-    }
-
     /** Make a ResultSet directly given a sample set (must have constructed RaptorWorkerData from the same sampleset) */
     public ResultSet.RangeSet makeResults(SampleSet ss, boolean includeTimes, boolean includeHistograms, boolean includeIsochrones) {
         ResultSet.RangeSet ret = new ResultSet.RangeSet();
@@ -167,6 +151,25 @@ public class PropagatedTimesStore {
         ret.avg = new ResultSet(avgs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         ret.max = new ResultSet(maxs, ss.pset, includeTimes, includeHistograms, includeIsochrones);
         return ret;
+    }
+
+    public TimeSurface.RangeSet makeSurfaces(RepeatedRaptorProfileRouter repeatedRaptorProfileRouter) {
+        TimeSurface.RangeSet rangeSet = new TimeSurface.RangeSet();
+        rangeSet.min = new TimeSurface(repeatedRaptorProfileRouter);
+        rangeSet.avg = new TimeSurface(repeatedRaptorProfileRouter);
+        rangeSet.max = new TimeSurface(repeatedRaptorProfileRouter);
+        for (Vertex vertex : graph.index.vertexForId.values()) {
+            int min = mins[vertex.getIndex()];
+            int max = maxs[vertex.getIndex()];
+            int avg = avgs[vertex.getIndex()];
+            if (avg == Integer.MAX_VALUE)
+                continue;
+            // Count is positive, extrema and sum must also be present
+            rangeSet.min.times.put(vertex, min);
+            rangeSet.max.times.put(vertex, max);
+            rangeSet.avg.times.put(vertex, avg);
+        }
+        return rangeSet;
     }
 
     public static enum ConfidenceCalculationMethod {

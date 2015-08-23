@@ -99,6 +99,7 @@ public class RepeatedRaptorProfileRouter {
      * TODO merge this with the 3-arg constructor, and just specify what happens when you have a null pointset.
      * This should allow us to get rid of some conditionals in the calling code.
      */
+    @Deprecated // just call the one below with null
     public RepeatedRaptorProfileRouter(Graph graph, ProfileRequest request) {
         this(graph, request, null);
     }
@@ -142,7 +143,7 @@ public class RepeatedRaptorProfileRouter {
 
         // Find the transit stops that are accessible from the origin, leaving behind an SPT behind of access
         // times to all reachable vertices.
-        long initialStopStartTime = System.currentTimeMillis(); // TODO replace with named functions on stats object like "beginInitialStopSearch"
+        long initialStopStartTime = System.currentTimeMillis();
         // This will return null if we have no transit data, but will leave behind a pre-transit SPT.
         TIntIntMap transitStopAccessTimes = findInitialStops(false, raptorWorkerData);
         // Create an array containing the best travel time in seconds to each vertex in the graph when not using transit.
@@ -191,11 +192,7 @@ public class RepeatedRaptorProfileRouter {
         // No destination point set was provided and we're just making isochrones, rather than finding access times to
         // a set of specific points. The set of time surfaces for min/avg/max will be stored as a field in this object.
         if (isochrone) {
-            timeSurfaceRangeSet = new TimeSurface.RangeSet();
-            timeSurfaceRangeSet.min = new TimeSurface(this);
-            timeSurfaceRangeSet.avg = new TimeSurface(this);
-            timeSurfaceRangeSet.max = new TimeSurface(this);
-            propagatedTimesStore.makeSurfaces(timeSurfaceRangeSet); // TODO could me makeSurfaces(this)
+            timeSurfaceRangeSet = propagatedTimesStore.makeSurfaces(this);
         }
         ts.compute = (int) (System.currentTimeMillis() - computationStartTime);
         LOG.info("Profile request finished in {} seconds", (ts.compute) / 1000.0);
