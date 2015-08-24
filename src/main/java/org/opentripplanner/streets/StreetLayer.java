@@ -68,7 +68,7 @@ public class StreetLayer implements Serializable {
         this.osm = osm;
         for (Map.Entry<Long, Way> entry : osm.ways.entrySet()) {
             Way way = entry.getValue();
-            if (!way.hasTag("highway")) {
+            if ( ! (way.hasTag("highway") || way.hasTag("area") || way.hasTag("public_transport", "platform"))) {
                 continue;
             }
             int nEdgesCreated = 0;
